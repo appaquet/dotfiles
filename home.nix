@@ -8,6 +8,9 @@
     # ./some-other-mod.nix
   ];
 
+  # Will install the `home-manager` command - see https://github.com/nix-community/home-manager/blob/master/modules/programs/home-manager.nix
+  programs.home-manager.enable = true;
+
   # These packages will be installed in the home directory
   # Options from different modules get merged, you can add this into many files
   home.packages = with pkgs; [
