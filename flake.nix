@@ -19,38 +19,55 @@
     };
   };
 
-  outputs = { nixpkgs, home-manager, flake-utils, ... }: # destructures the input flakes
+  outputs = inputs @ { nixpkgs, home-manager, flake-utils, darwin, ... }:
+    let
+      config = {
+        permittedInsecurePackages = [ ];
+        allowUnfree = true;
+      };
+
+    in
+
     flake-utils.lib.eachDefaultSystem
       (system: (
         let
           pkgs = import nixpkgs {
-            inherit system;
+            inherit system config;
           };
         in
         {
           homeConfigurations = {
             "appaquet@deskapp" = home-manager.lib.homeManagerConfiguration {
-              inherit pkgs; # same as pkgs = pkgs;
-
-              # Specify your home configuration modules here, for example,
-              # the path to your home.nix.
+              inherit pkgs;
               modules = [ ./home-manager/deskapp.nix ];
-
-              # Optionally use extraSpecialArgs
-              # to pass through arguments to home.nix
+              extraSpecialArgs = { inherit inputs; };
             };
 
             "appaquet@mbpapp" = home-manager.lib.homeManagerConfiguration {
-              inherit pkgs; # same as pkgs = pkgs;
-
-              # Specify your home configuration modules here, for example,
-              # the path to your home.nix.
+              inherit pkgs;
               modules = [ ./home-manager/mbpapp.nix ];
-
-              # Optionally use extraSpecialArgs
-              # to pass through arguments to home.nix
+              extraSpecialArgs = { inherit inputs; };
             };
           };
         }
-      ));
+
+      )) // {
+
+      darwinConfigurations = {
+        # nix build .#darwinConfigurations.mbp2021.system
+        # ./result/sw/bin/darwin-rebuild switch --flake .
+        mbpapp = darwin.lib.darwinSystem {
+          system = "aarch64-darwin";
+          pkgs = import nixpkgs {
+            inherit config;
+            system = "aarch64-darwin";
+          };
+          modules = [
+            ./nixpkgs/darwin/mbp2021/configuration.nix
+          ];
+          inputs = { inherit inputs darwin; };
+        };
+      };
+
+    };
 }
