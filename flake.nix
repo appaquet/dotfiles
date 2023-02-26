@@ -39,13 +39,13 @@
           homeConfigurations = {
             "appaquet@deskapp" = home-manager.lib.homeManagerConfiguration {
               inherit pkgs;
-              modules = [ ./home-manager/deskapp.nix ];
+              modules = [ ./nixpkgs/home-manager/deskapp.nix ];
               extraSpecialArgs = { inherit inputs; };
             };
 
             "appaquet@mbpapp" = home-manager.lib.homeManagerConfiguration {
               inherit pkgs;
-              modules = [ ./home-manager/mbpapp.nix ];
+              modules = [ ./nixpkgs/home-manager/mbpapp.nix ];
               extraSpecialArgs = { inherit inputs; };
             };
           };
@@ -56,7 +56,7 @@
       darwinConfigurations = {
         # nix build .#darwinConfigurations.mbp2021.system
         # ./result/sw/bin/darwin-rebuild switch --flake .
-        mbpapp = darwin.lib.darwinSystem {
+        mbpvmapp = darwin.lib.darwinSystem {
           system = "aarch64-darwin";
           pkgs = import nixpkgs {
             inherit config;

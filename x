@@ -19,14 +19,19 @@ fi
 
 COMMAND=$1
 case $COMMAND in
+    fetch-vm)
+        shift
+        rsync -avz --delete appaquet@192.168.2.97:dotfiles/ ~/dotfiles/
+        ;;
+
     build)
         shift
         nix build ".#homeConfigurations.${HOME_CONFIG}.activationPackage"
         ;;
 
-    fetch-vm)
+    build-darwin)
         shift
-        rsync -avz appaquet@192.168.2.97:dotfiles/ ~/dotfiles/
+        nix build ".#darwinConfigurations.mbpvmapp.system"
         ;;
 
     activate)
@@ -34,9 +39,17 @@ case $COMMAND in
         ./result/activate
         ;;
 
+    activate-darwin)
+        shift
+        ./result/sw/bin/darwin-rebuild switch --flake .
+        ;;
+
     *)
         echo "usage:" >&2
-        echo "   $0 build" >&2
+        echo "   $0 build: build current home manager" >&2
+        echo "   $0 activate: activate result home manager" >&2
+        echo "   $0 build-darwin: build darwin config" >&2
+        echo "   $0 activate: activate darwin config" >&2
         exit 1
         ;;
 esac    

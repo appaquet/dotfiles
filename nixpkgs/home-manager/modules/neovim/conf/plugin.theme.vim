@@ -1,0 +1,1 @@
+set background=dark     " Assume a dark background
