@@ -19,7 +19,7 @@
     };
   };
 
-  outputs = inputs @ { nixpkgs, home-manager, flake-utils, darwin, ... }:
+  outputs = inputs @ { self, nixpkgs, home-manager, flake-utils, darwin, ... }:
     let
       config = {
         permittedInsecurePackages = [ ];
@@ -36,22 +36,27 @@
           };
         in
         {
-          homeConfigurations = {
+          homes = {
             "appaquet@deskapp" = home-manager.lib.homeManagerConfiguration {
               inherit pkgs;
-              modules = [ ./nixpkgs/home-manager/deskapp.nix ];
+              modules = [ ./packages/home-manager/deskapp.nix ];
               extraSpecialArgs = { inherit inputs; };
             };
 
             "appaquet@mbpapp" = home-manager.lib.homeManagerConfiguration {
               inherit pkgs;
-              modules = [ ./nixpkgs/home-manager/mbpapp.nix ];
+              modules = [ ./packages/home-manager/mbpapp.nix ];
               extraSpecialArgs = { inherit inputs; };
             };
           };
         }
 
       )) // {
+
+      homeConfigurations = {
+        "appaquet@deskapp" = self.homes.x86_64-linux."appaquet@deskapp";
+        "appaquet@mbpapp" = self.homes.aarch64-darwin."appaquet@mbpapp";
+      };
 
       darwinConfigurations = {
         # nix build .#darwinConfigurations.mbp2021.system
@@ -63,7 +68,7 @@
             system = "aarch64-darwin";
           };
           modules = [
-            ./nixpkgs/darwin/mbp2021/configuration.nix
+            ./packages/darwin/mbp2021/configuration.nix
           ];
           inputs = { inherit inputs darwin; };
         };

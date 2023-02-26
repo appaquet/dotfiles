@@ -9,9 +9,9 @@ MACHINE_KEY="${USER}@${HOSTNAME}"
 
 HOME_CONFIG=""
 if [[ "${MACHINE_KEY}" == "appaquet@ubuntu-nix" ]]; then
-    HOME_CONFIG="x86_64-linux.appaquet@deskapp"
+    HOME_CONFIG="appaquet@deskapp"
 elif [[ "${MACHINE_KEY}" == "appaquet@mbpvmapp.local" ]]; then
-    HOME_CONFIG="aarch64-darwin.appaquet@mbpapp"
+    HOME_CONFIG="appaquet@mbpapp"
 else
     echo "Non-configured machine (${MACHINE_KEY})"
     exit 1
@@ -26,7 +26,9 @@ case $COMMAND in
 
     build)
         shift
-        nix build ".#homeConfigurations.${HOME_CONFIG}.activationPackage"
+        # nix build ".#homeConfigurations.${HOME_CONFIG}.activationPackage"
+        # home-manager build 
+        home-manager build --flake ".#$HOME_CONFIG"
         ;;
 
     build-darwin)
@@ -36,7 +38,8 @@ case $COMMAND in
 
     activate)
         shift
-        ./result/activate
+        # ./result/activate
+        home-manager switch --flake ".#$HOME_CONFIG"
         ;;
 
     activate-darwin)

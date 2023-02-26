@@ -26,7 +26,7 @@ in
     vimAlias = true;
 
     plugins = with pkgs.vimPlugins; [
-      nvim-tree-lua 
+      nvim-tree-lua
       ctrlp-vim
       fzf-vim
       base16-vim # theme
