@@ -17,6 +17,10 @@ in
   home.file.".tmux.conf".text = dotTmuxConfFile;
   home.file.".tmux.conf.local".source = ./tmux.conf.local;
 
+  home.packages = with pkgs; [
+    tmux
+  ];
+
   programs.tmux = {
     enable = true;
     package = pkgs.tmux;

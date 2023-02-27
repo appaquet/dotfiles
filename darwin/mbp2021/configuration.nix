@@ -12,6 +12,7 @@
 
   nix = {
     package = pkgs.nix; 
+
     settings = {
       experimental-features = [ "flakes" "nix-command" ];
       auto-optimise-store = true;
@@ -20,6 +21,7 @@
     registry = {
       nixpkgs.flake = inputs.nixpkgs;
     };
+
     extraOptions = ''
       keep-outputs = true
       keep-derivations = true
@@ -41,7 +43,7 @@
   environment.shells = [ pkgs.fish ];
   # fonts.fontDir.enable = true;
 
-  users.users.mrene = {
+  users.users.appaquet = {
     home = "/Users/appaquet";
     shell = "${pkgs.fish}/bin/fish";
   };

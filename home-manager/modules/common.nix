@@ -13,7 +13,7 @@
   programs.home-manager.enable = true;
 
   home.packages = with pkgs; [
-    tmux
+    autojump
 
     git
     gh
