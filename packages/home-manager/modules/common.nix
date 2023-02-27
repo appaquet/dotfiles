@@ -11,9 +11,29 @@
   programs.home-manager.enable = true;
 
   home.packages = with pkgs; [
-    jq
-    bat
+    tmux
+
+    git
+
+    bat # cat replacement
+    hexyl
+
     fzf
-    any-nix-shell
+    ripgrep
+
+    dua
+    bottom
+    htop
+
+    jq
+    jless
+
+    tealdeer # rust version of tldr
+
+    kubectx
+    kubectl
+    k9s
+
+    any-nix-shell # allows using fish for `nix shell`
   ];
 }
