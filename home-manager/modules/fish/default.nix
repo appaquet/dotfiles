@@ -17,8 +17,12 @@
 
       set EDITOR nvim
 
+      # Term color support + theme
       set -x TERM xterm-256color
-      set -g theme_color_scheme base16
+      set -g theme_color_scheme base16 # Use `bobthefish_display_colors --all` to list themes
+
+      # Source any local stuff from .profile
+      fenv source ~/.profile
     '';
 
     plugins = [
@@ -35,12 +39,17 @@
         name = "fzf-fish";
         src = pkgs.fishPlugins.fzf-fish.src;
       }
+      {
+        name = "foreign-env";
+        src = pkgs.fishPlugins.foreign-env.src;
+      }
     ];
 
     shellAliases = {
       gs = "git status";
       l = "ls";
       k = "kubectl";
+      randstr = "randstr 'tr -cd \"[:alnum:]\" < /dev/urandom | fold -w30 | head -n1'";
     };
 
     shellAbbrs = {

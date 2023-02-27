@@ -2,11 +2,12 @@
 
 {
   imports = [
-    ./fish/fish.nix
+    ./fish
     ./tmux.nix
-    ./git/git.nix
-    ./neovim/neovim.nix
-    ./rtx/rtx.nix
+    ./git
+    ./neovim
+    ./rtx
+    ./jira.nix
   ];
 
   programs.home-manager.enable = true;
