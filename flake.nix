@@ -28,7 +28,7 @@
 
       # Add custom packages to nixpkgs
       packageOverlay = final: prev: {
-        rtx = prev.callPackage ./packages/overlays/rtx { };
+        rtx = prev.callPackage ./packages/rtx { };
       };
 
       overlays = [
@@ -49,7 +49,7 @@
               pkgs = import nixpkgs {
                 inherit system overlays config;
               };
-              modules = [ ./packages/home-manager/deskapp.nix ];
+              modules = [ ./home-manager/deskapp.nix ];
               extraSpecialArgs = { inherit inputs; };
             };
 
@@ -57,7 +57,7 @@
               pkgs = import nixpkgs {
                 inherit system overlays config;
               };
-              modules = [ ./packages/home-manager/mbpapp.nix ];
+              modules = [ ./home-manager/mbpapp.nix ];
               extraSpecialArgs = { inherit inputs; };
             };
           };
@@ -80,7 +80,7 @@
             system = "aarch64-darwin";
           };
           modules = [
-            ./packages/darwin/mbp2021/configuration.nix
+            ./darwin/mbp2021/configuration.nix
           ];
           inputs = { inherit inputs darwin; };
         };
