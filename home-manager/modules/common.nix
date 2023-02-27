@@ -3,7 +3,7 @@
 {
   imports = [
     ./fish
-    ./tmux.nix
+    ./tmux
     ./git
     ./neovim
     ./rtx
