@@ -1,34 +1,32 @@
-{ lib
-, stdenv
-, rustPlatform
-, fetchFromGitHub
-, pkg-config
-, libiconv
-, openssl
-, breakpointHook
-, darwin ? null
-}:
+{ lib, stdenv, fetchurl }:
 
-rustPlatform.buildRustPackage rec {
+stdenv.mkDerivation {
   pname = "rtx";
   version = "v1.18.0";
 
-  src = fetchFromGitHub {
-    owner = "jdxcode";
-    repo = "rtx";
-    rev = "3c979d9564147bb0ef3d7748daa32f2899542ca6";
-    sha256 = "cw35KMMEGOWI2vYAfv5B7BPMJf1VXTbkKDbcx6mcrgw=";
-  };
+  # Use `nix-prefetch-url https://...` to get hash
+  src =
+    (if stdenv.isLinux then
+      fetchurl
+        {
+          url = "https://github.com/jdxcode/rtx/releases/download/v1.18.0/rtx-v1.18.0-linux-x64";
+          sha256 = "0k6y13qyzn6qhfzcrg3mls9bdhpj2hwndh59cbch9y6l5fh8pcmi";
+        }
+    else if stdenv.isDarwin && stdenv.isAarch64 then
+      fetchurl
+        {
+          url = "https://github.com/jdxcode/rtx/releases/download/v1.18.0/rtx-v1.18.0-macos-arm64";
+          sha256 = "1zffg3h6wr6m8rgg2biwp8lp43scfsrbawjq1haqzkxfmmkrcg90";
+        }
+    else abort ("unsupported os & arch")
+    );
 
-  cargoSha256 = "pUCKCQFsHlOsCMrj6Z48r4eX5UfhTtEdRb8m8Es8BF8=";
-  cargoPatches = [ ./0001-no-vendored-openssl.patch ];
-
-  nativeBuildInputs = [
-    # breakpointHook
-    pkg-config
-  ];
-
-  buildInputs = [ openssl ] ++ lib.optionals stdenv.isDarwin (with darwin.apple_sdk.frameworks; [ Security ]);
+  phases = [ "installPhase" "patchPhase" ];
+  installPhase = ''
+    mkdir -p $out/bin
+    cp $src $out/bin/rtx
+    chmod +x $out/bin/rtx
+  '';
 
   meta = with lib; {
     description = "Runtime Executor (asdf rust clone) ";

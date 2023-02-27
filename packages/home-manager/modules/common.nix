@@ -34,7 +34,7 @@
     kubectl
     k9s
 
-    # rtx
+    rtx
 
     cargo
 
