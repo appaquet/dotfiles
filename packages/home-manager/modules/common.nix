@@ -2,10 +2,11 @@
 
 {
   imports = [
-    ./fish.nix
+    ./fish/fish.nix
     ./tmux.nix
     ./git/git.nix
     ./neovim/neovim.nix
+    ./rtx/rtx.nix
   ];
 
   programs.home-manager.enable = true;
@@ -14,6 +15,7 @@
     tmux
 
     git
+    gh
 
     bat # cat replacement
     hexyl
@@ -34,9 +36,9 @@
     kubectl
     k9s
 
-    rtx
+    dive # docker container explorer
 
-    cargo
+    rustup # don't install cargo, let rustup do the job here
 
     any-nix-shell # allows using fish for `nix shell`
   ];

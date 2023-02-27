@@ -1,0 +1,7 @@
+buf latest
+istioctl 1.14.0
+nodejs 18.14.2
+sops 3.7.3
+yq 4.25.3
+jb latest
+tanka latest
