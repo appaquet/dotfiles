@@ -1,0 +1,54 @@
+From 6657c46e767f1d426950c6dd1c92b18a2e9f579c Mon Sep 17 00:00:00 2001
+From: Andre-Philippe Paquet <appaquet@gmail.com>
+Date: Mon, 27 Feb 2023 01:03:46 +0000
+Subject: [PATCH] no vendored openssl
+
+---
+ Cargo.lock | 10 ----------
+ Cargo.toml |  2 +-
+ 2 files changed, 1 insertion(+), 11 deletions(-)
+
+diff --git a/Cargo.lock b/Cargo.lock
+index 805022a..524b25a 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -1102,15 +1102,6 @@ version = "0.1.5"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "ff011a302c396a5197692431fc1948019154afc178baf7d8e37367442a4601cf"
+ 
+-[[package]]
+-name = "openssl-src"
+-version = "111.25.0+1.1.1t"
+-source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "3173cd3626c43e3854b1b727422a276e568d9ec5fe8cec197822cf52cfb743d6"
+-dependencies = [
+- "cc",
+-]
+-
+ [[package]]
+ name = "openssl-sys"
+ version = "0.9.80"
+@@ -1120,7 +1111,6 @@ dependencies = [
+  "autocfg",
+  "cc",
+  "libc",
+- "openssl-src",
+  "pkg-config",
+  "vcpkg",
+ ]
+diff --git a/Cargo.toml b/Cargo.toml
+index fc877f6..27e254d 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -48,7 +48,7 @@ lazy_static = "1.4.0"
+ log = "0.4.17"
+ num_cpus = "1.15.0"
+ once_cell = "1.17.0"
+-openssl = { version = "0.10", features = ["vendored"] }
++openssl = { version = "0.10" }
+ owo-colors = { version = "3.5.0" }
+ rayon = "1.6.1"
+ regex = "1.7.1"
+-- 
+2.38.3
+

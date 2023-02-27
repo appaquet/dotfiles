@@ -26,25 +26,37 @@
         allowUnfree = true;
       };
 
+      # Add custom packages to nixpkgs
+      packageOverlay = final: prev: {
+        rtx = prev.callPackage ./packages/overlays/rtx { };
+      };
+
+      overlays = [
+        packageOverlay
+      ];
     in
 
     flake-utils.lib.eachDefaultSystem
       (system: (
         let
           pkgs = import nixpkgs {
-            inherit system config;
+            inherit system overlays config;
           };
         in
         {
           homes = {
             "appaquet@deskapp" = home-manager.lib.homeManagerConfiguration {
-              inherit pkgs;
+              pkgs = import nixpkgs {
+                inherit system overlays config;
+              };
               modules = [ ./packages/home-manager/deskapp.nix ];
               extraSpecialArgs = { inherit inputs; };
             };
 
             "appaquet@mbpapp" = home-manager.lib.homeManagerConfiguration {
-              inherit pkgs;
+              pkgs = import nixpkgs {
+                inherit system overlays config;
+              };
               modules = [ ./packages/home-manager/mbpapp.nix ];
               extraSpecialArgs = { inherit inputs; };
             };
@@ -64,7 +76,7 @@
         mbpvmapp = darwin.lib.darwinSystem {
           system = "aarch64-darwin";
           pkgs = import nixpkgs {
-            inherit config;
+            inherit config overlays;
             system = "aarch64-darwin";
           };
           modules = [

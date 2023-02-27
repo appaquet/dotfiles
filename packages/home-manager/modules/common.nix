@@ -34,6 +34,10 @@
     kubectl
     k9s
 
+    # rtx
+
+    cargo
+
     any-nix-shell # allows using fish for `nix shell`
   ];
 }
