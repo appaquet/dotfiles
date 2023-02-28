@@ -12,7 +12,7 @@
   services.nix-daemon.enable = true;
 
   nix = {
-    package = pkgs.nix; 
+    package = pkgs.nix;
 
     settings = {
       experimental-features = [ "flakes" "nix-command" ];
@@ -34,6 +34,13 @@
       experimental-features = nix-command flakes
     '';
   };
+
+  system.activationScripts.extraActivation.text = ''
+    # Copy fish shell so that it can be used as a login shell and prevent being
+    # wiped out accidently.
+    mkdir -p /usr/local/bin/
+    cp ${pkgs.fish}/bin/fish /usr/local/bin/
+  '';
 
   security.pam.enableSudoTouchIdAuth = true;
 
