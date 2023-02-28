@@ -19,7 +19,14 @@
 
       # Term color support + theme
       set -x TERM xterm-256color
+      set -g theme_display_cmd_duration no
+      set -g theme_display_date no
       set -g theme_color_scheme base16 # Use `bobthefish_display_colors --all` to list themes
+
+      # Paths
+      # We don't use the normal fish_user_paths because it slows down everything in the config.fish
+      # See https://github.com/fish-shell/fish-shell/issues/2688
+      set -x PATH ~/bin $PATH
 
       # Source any local stuff from .profile
       fenv source ~/.profile

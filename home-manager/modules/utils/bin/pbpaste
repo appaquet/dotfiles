@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+os=$(uname)
+if [[ "$os" == "Linux" ]]; then
+  if [[ "$DISPLAY" != "" ]]; then
+    xclip -selection clipboard -o
+  else
+    ssh laptop.tailscale /usr/bin/pbpaste
+  fi
+elif [[ "$os" == "Darwin" ]]; then
+  reattach-to-user-namespace /usr/bin/pbpaste
+fi

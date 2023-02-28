@@ -1,0 +1,4 @@
+#!/bin/bash
+
+TEXT=${@:1}
+printf "\033]2;$TEXT\033\\"

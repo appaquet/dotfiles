@@ -8,6 +8,7 @@
     ./neovim
     ./rtx
     ./jira.nix
+    ./utils
   ];
 
   programs.home-manager.enable = true;
@@ -37,10 +38,13 @@
     kubectl
     k9s
 
+    (google-cloud-sdk.withExtraComponents (with google-cloud-sdk.components; [ gke-gcloud-auth-plugin ]))
+
     dive # docker container explorer
 
     rustup # don't install cargo, let rustup do the job here
 
+    nix-output-monitor
     any-nix-shell # allows using fish for `nix shell`
   ];
 }
