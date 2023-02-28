@@ -8,6 +8,6 @@
   home.file.".tool-versions".source = ./tool-versions;
 
   xdg.configFile."fish/conf.d/rtx.fish".text = ''
-    rtx activate fish | source
+    ${pkgs.rtx}/bin/rtx activate fish | source
   '';
 }

@@ -42,4 +42,11 @@ in
       (builtins.readFile ./conf/plugin.nvimtree.vim)
     ]);
   };
+
+  programs.fish = {
+    interactiveShellInit = ''
+      set -x EDITOR nvim
+      set -x VISUAL nvim
+    '';
+  };
 }

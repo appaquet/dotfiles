@@ -2,20 +2,20 @@
 
 {
   imports = [
-    ./fish
+    ./fish.nix
     ./tmux
     ./git
     ./neovim
     ./rtx
     ./jira.nix
     ./utils
+    ./autojump.nix
+    ./rust.nix
   ];
 
   programs.home-manager.enable = true;
 
   home.packages = with pkgs; [
-    autojump
-
     git
     gh
 
@@ -42,9 +42,6 @@
 
     dive # docker container explorer
 
-    rustup # don't install cargo, let rustup do the job here
-
     nix-output-monitor
-    any-nix-shell # allows using fish for `nix shell`
   ];
 }

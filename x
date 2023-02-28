@@ -4,11 +4,11 @@ set -e
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 pushd "$ROOT"
 
-HOSTNAME=$(uname -n)
+HOSTNAME=$(uname -n | tr '[:upper:]' '[:lower:]')
 MACHINE_KEY="${USER}@${HOSTNAME}"
 
 HOME_CONFIG=""
-if [[ "${MACHINE_KEY}" == "appaquet@ubuntu-nix" ]]; then
+if [[ "${MACHINE_KEY}" == "appaquet@ubuntu-nix" || "${MACHINE_KEY}" == "appaquet@deskapp" ]]; then
     HOME_CONFIG="appaquet@deskapp"
 elif [[ "${MACHINE_KEY}" == "appaquet@mbpvmapp.local" ]]; then
     HOME_CONFIG="appaquet@mbpapp"
@@ -41,6 +41,7 @@ fetch-vm)
 build)
     shift
     # home-manager build --flake ".#$HOME_CONFIG"
+    # home-manager switch --flake ".#$HOME_CONFIG"
     ${NIX_BUILDER} build ".#homeConfigurations.${HOME_CONFIG}.activationPackage"
     ;;
 
@@ -51,8 +52,7 @@ build-darwin)
 
 activate)
     shift
-    # ./result/activate
-    home-manager switch --flake ".#$HOME_CONFIG"
+    ./result/activate
     ;;
 
 activate-darwin)
