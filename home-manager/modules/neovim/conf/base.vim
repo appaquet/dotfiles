@@ -24,7 +24,7 @@ set exrc                " allow project specific .vimrc
 set secure              " (https://andrew.stwrt.ca/posts/project-specific-vimrc/)
 
 "" Persists the undo across sessions
-set undodir=~/.vim/undodir
+set undodir=~/.config/nvim/undodir
 set undofile
 
 "" Fixes slow escape in tmux
@@ -38,9 +38,9 @@ if !has('gui_running')
   augroup END
 endif
 
-"" fish doesn't play well with vim
-"" See https://github.com/VundleVim/Vundle.vim
-set shell=/bin/bash
+" "" fish doesn't play well with vim
+" "" See https://github.com/VundleVim/Vundle.vim
+" set shell=/bin/bash
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Util functions

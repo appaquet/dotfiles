@@ -29,7 +29,9 @@
       set -x PATH ~/bin $PATH
 
       # Source any local stuff from .profile
-      fenv source ~/.profile
+      if test -f ~/.profile
+        fenv source ~/.profile
+      end
     '';
 
     plugins = [

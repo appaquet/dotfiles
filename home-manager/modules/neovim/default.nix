@@ -26,7 +26,9 @@ in
     vimAlias = true;
 
     plugins = with pkgs.vimPlugins; [
+      nvim-web-devicons
       nvim-tree-lua
+
       ctrlp-vim
       fzf-vim
       base16-vim # theme
@@ -36,6 +38,7 @@ in
     extraConfig = (builtins.concatStringsSep "\n" [
       (builtins.readFile ./conf/base.vim)
       (builtins.readFile ./conf/keymap.vim)
+      (builtins.readFile ./conf/theme.vim)
       (builtins.readFile ./conf/plugin.nvimtree.vim)
     ]);
   };

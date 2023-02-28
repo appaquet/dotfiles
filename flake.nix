@@ -71,7 +71,7 @@
       };
 
       darwinConfigurations = {
-        # nix build .#darwinConfigurations.mbp2021.system
+        # nix build .#darwinConfigurations.mbpvmapp.system
         # ./result/sw/bin/darwin-rebuild switch --flake .
         mbpvmapp = darwin.lib.darwinSystem {
           system = "aarch64-darwin";
@@ -80,7 +80,7 @@
             system = "aarch64-darwin";
           };
           modules = [
-            ./darwin/mbp2021/configuration.nix
+            ./darwin/mbpapp/configuration.nix
           ];
           inputs = { inherit inputs darwin; };
         };

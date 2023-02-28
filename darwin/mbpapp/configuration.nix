@@ -1,6 +1,7 @@
 { pkgs, config, lib, inputs, ... }:
 {
   imports = [
+    ./fonts.nix
   ];
 
   environment.systemPackages = with pkgs; [
@@ -41,7 +42,6 @@
   };
 
   environment.shells = [ pkgs.fish ];
-  # fonts.fontDir.enable = true;
 
   users.users.appaquet = {
     home = "/Users/appaquet";

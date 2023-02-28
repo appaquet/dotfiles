@@ -46,7 +46,7 @@ build)
 
 build-darwin)
     shift
-    ${NIX_BUILDER} ".#darwinConfigurations.mbpvmapp.system"
+    ${NIX_BUILDER} build ".#darwinConfigurations.mbpvmapp.system"
     ;;
 
 activate)
@@ -58,6 +58,12 @@ activate)
 activate-darwin)
     shift
     ./result/sw/bin/darwin-rebuild switch --flake .
+    ;;
+
+update)
+    shift
+    nix-channel --update
+    nix flake update
     ;;
 
 check)
@@ -75,10 +81,11 @@ gc)
 *)
     echo "usage:" >&2
     echo "   $0 build: build current home manager" >&2
-    echo "   $0 activate: activate result home manager" >&2
     echo "   $0 build-darwin: build darwin config" >&2
-    echo "   $0 activate: activate darwin config" >&2
+    echo "   $0 activate: activate result home manager" >&2
+    echo "   $0 activate-darwin: activate darwin config" >&2
     echo "   $0 gc: run garbage collection" >&2
+    echo "   $0 check: check eval homes & darwin" >&2
     exit 1
     ;;
 esac
