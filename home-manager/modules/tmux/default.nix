@@ -13,7 +13,7 @@ let
   dotTmuxConfFile = builtins.readFile (dotTmuxRepo + "/.tmux-537b276d74968a72811f0779979b4e78fc7f4777/.tmux.conf");
 in
 {
-  # gpakosz/.tmux expect its file to be at the specific place...
+  # gpakosz/.tmux expect its files to be at specific places...
   home.file.".tmux.conf".text = dotTmuxConfFile;
   home.file.".tmux.conf.local".source = ./tmux.conf.local;
 
@@ -26,7 +26,11 @@ in
     package = pkgs.tmux;
 
     extraConfig = ''
+      # Loads gpakosz/.tmux configuration
       source-file ~/.tmux.conf
+
+      # Synchronized panes
+      bind e setw synchronize-panes\; display-message "Synchronized pane is now #{?synchronize-panes,on,off}"
     '';
   };
 }

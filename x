@@ -33,9 +33,11 @@ check_home() {
 
 COMMAND=$1
 case $COMMAND in
-fetch-vm)
+check)
     shift
-    rsync -avz --delete appaquet@192.168.2.97:dotfiles/ ~/dotfiles/
+    check_home "appaquet@deskapp"
+    check_home "appaquet@mbpapp"
+    check_eval ".#darwinConfigurations.mbpvmapp.system"
     ;;
 
 build)
@@ -66,26 +68,26 @@ update)
     nix flake update
     ;;
 
-check)
-    shift
-    check_home "appaquet@deskapp"
-    check_home "appaquet@mbpapp"
-    check_eval ".#darwinConfigurations.mbpvmapp.system"
-    ;;
-
 gc)
     shift
     nix-collect-garbage
     ;;
 
+fetch-deskapp)
+    shift
+    rsync -avz --delete appaquet@deskapp.tailscale:dotfiles/ ~/dotfiles/
+    ;;
+
 *)
     echo "usage:" >&2
+    echo "   $0 check: check eval homes & darwin" >&2
     echo "   $0 build: build current home manager" >&2
     echo "   $0 build-darwin: build darwin config" >&2
     echo "   $0 activate: activate result home manager" >&2
     echo "   $0 activate-darwin: activate darwin config" >&2
+    echo "   $0 update: update nix channels" >&2
     echo "   $0 gc: run garbage collection" >&2
-    echo "   $0 check: check eval homes & darwin" >&2
+    echo "   $0 fetch-deskapp: fetch latest dotfiles from deskapp" >&2
     exit 1
     ;;
 esac

@@ -35,7 +35,6 @@
     tealdeer # rust version of tldr
 
     kubectx
-    kubectl
     k9s
 
     (google-cloud-sdk.withExtraComponents (with google-cloud-sdk.components; [ gke-gcloud-auth-plugin ]))

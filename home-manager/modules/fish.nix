@@ -52,8 +52,8 @@
     ];
 
     shellAliases = {
-      gs = "git status";
       l = "ls";
+      ll = "ls -lash";
       k = "kubectl";
       randstr = "randstr 'tr -cd \"[:alnum:]\" < /dev/urandom | fold -w30 | head -n1'";
     };
@@ -73,12 +73,25 @@
       gpr = "git pull --rebase --autostash";
       gca = "git commit --amend";
       gr = "git rev-parse --short=7 @";
-      gb = "git for-each-ref --sort=-committerdate refs/heads/ --format=\"%(color: red)%(committerdate:short) %(color: 244) - - %(color: cyan)%(refname:short) %(color: 244) - - %(color: green)%(subject) \"";
       grsw = "git restore --staged --worktree";
       grws = "git restore --staged --worktree";
       grs = "git restore --staged";
       ghpr = "gh pr create --draft --body \"\" --title";
       gts = "git tag --sort version:refname";
     };
+
+    # View more examples here https://github.com/junegunn/fzf-git.sh/blob/main/fzf-git.sh
+    functions.gb = ''
+      set COMMAND 'git for-each-ref --sort=-committerdate refs/heads/ --format="%(color: red)%(committerdate:short)%(color: 244)|%(color: cyan)%(refname:short)%(color: 244)|%(color: green)%(subject)" --color=always | column -ts"|"'
+      FZF_DEFAULT_COMMAND=$COMMAND fzf \
+        --ansi \
+        --header "enter to checkout, ctrl-d to delete" \
+        --bind "ctrl-d:execute(echo {+} | awk '{print \$2}' | xargs git branch -D)+reload:$COMMAND" \
+        | awk '{print $2}' | xargs git checkout
+    '';
+
+    functions.gcpm = ''
+      MSG=(git log --pretty=format:%s | head -n 100 | uniq | head -n 10 | fzf) git commit -m "$MSG"
+    '';
   };
 }

@@ -37,7 +37,7 @@
 
   system.activationScripts.extraActivation.text = ''
     # Copy fish shell so that it can be used as a login shell and prevent being
-    # wiped out accidently.
+    # wiped out accidently. Still need to be added to /etc/shells to be usable.
     mkdir -p /usr/local/bin/
     cp ${pkgs.fish}/bin/fish /usr/local/bin/
   '';
