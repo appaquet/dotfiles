@@ -32,8 +32,8 @@ map <D-q> :q<CR>
 map <Leader>q :q<CR>
 
 " Cleanly close buffer
-map <D-0> <Plug>Kwbd
-nmap <leader>w <Plug>Kwbd
+map <D-0> :Bclose<creating>
+nmap <leader>w :Bclose<CR>
 
 " For when you forget to sudo.. Really Write the file.
 cmap w!! w !sudo tee % >/dev/null

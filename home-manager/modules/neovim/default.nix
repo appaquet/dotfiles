@@ -43,6 +43,7 @@ in
       (builtins.readFile ./conf/keymap.vim)
       (builtins.readFile ./conf/theme.vim)
       (builtins.readFile ./conf/plugin.nvimtree.vim)
+      (builtins.readFile ./conf/plugin.airline.vim)
     ]);
   };
 
