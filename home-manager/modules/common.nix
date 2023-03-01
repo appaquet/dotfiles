@@ -38,6 +38,7 @@
     k9s
 
     (google-cloud-sdk.withExtraComponents (with google-cloud-sdk.components; [ gke-gcloud-auth-plugin ]))
+    cloud-sql-proxy
 
     dive # docker container explorer
 

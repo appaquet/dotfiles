@@ -29,10 +29,13 @@ in
       nvim-web-devicons
       nvim-tree-lua
 
-      ctrlp-vim
-      fzf-vim
+      fzf-vim # :Files (ctrl-p), :Rg (ctrl-f)
       base16-vim # theme
       vim-airline # status / tab bar
+
+      vim-multiple-cursors # ctrl-n multi cursors
+      bclose-vim # close buffer cleanly via <leader>w
+      delimitMate # auto close quotes, parens, etc
     ];
 
     extraConfig = (builtins.concatStringsSep "\n" [
@@ -47,6 +50,8 @@ in
     interactiveShellInit = ''
       set -x EDITOR nvim
       set -x VISUAL nvim
+      alias vi=nvim
+      alias vim=nvim
     '';
   };
 }

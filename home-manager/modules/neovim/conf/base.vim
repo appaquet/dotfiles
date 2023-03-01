@@ -38,10 +38,6 @@ if !has('gui_running')
   augroup END
 endif
 
-" "" fish doesn't play well with vim
-" "" See https://github.com/VundleVim/Vundle.vim
-" set shell=/bin/bash
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Util functions
 ""

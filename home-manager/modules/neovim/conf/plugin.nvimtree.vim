@@ -1,5 +1,5 @@
 map <C-e> :NvimTreeToggle<CR>
-map <C-f> :NvimTreeFindFile<CR>
+" map <C-f> :NvimTreeFindFile<CR>
 
 lua << END
 -- disable netrw at the very start of your init.lua (strongly advised)

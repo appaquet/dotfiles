@@ -31,10 +31,18 @@ map <Leader>r :!./rsync.sh<CR>
 map <D-q> :q<CR>
 map <Leader>q :q<CR>
 
+" Cleanly close buffer
+map <D-0> <Plug>Kwbd
+nmap <leader>w <Plug>Kwbd
+
 " For when you forget to sudo.. Really Write the file.
 cmap w!! w !sudo tee % >/dev/null
 cmap wq wqa
 cmap qw wqq
+
+" Ctrp-p via fzf
+map <C-p> :Files<CR>
+map <C-f> :Rg<CR>
 
 " Toggle mouse for copy
 nmap <Leader>m :call ToggleMouse()<CR>
