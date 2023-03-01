@@ -8,9 +8,9 @@ HOSTNAME=$(uname -n | tr '[:upper:]' '[:lower:]')
 MACHINE_KEY="${USER}@${HOSTNAME}"
 
 HOME_CONFIG=""
-if [[ "${MACHINE_KEY}" == "appaquet@ubuntu-nix" || "${MACHINE_KEY}" == "appaquet@deskapp" ]]; then
+if [[ "${MACHINE_KEY}" == "appaquet@deskapp" || "${MACHINE_KEY}" == "appaquet@ubuntu-nix" ]]; then
     HOME_CONFIG="appaquet@deskapp"
-elif [[ "${MACHINE_KEY}" == "appaquet@mbpvmapp.local" ]]; then
+elif [[ "${MACHINE_KEY}" == "appaquet@mbpapp.local" || "${MACHINE_KEY}" == "appaquet@mbpvmapp.local" ]]; then
     HOME_CONFIG="appaquet@mbpapp"
 else
     echo "Non-configured machine (${MACHINE_KEY})"
@@ -49,7 +49,7 @@ build)
 
 build-darwin)
     shift
-    ${NIX_BUILDER} build ".#darwinConfigurations.mbpvmapp.system"
+    ${NIX_BUILDER} build ".#darwinConfigurations.mbpapp.system"
     ;;
 
 activate)

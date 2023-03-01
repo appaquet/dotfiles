@@ -26,6 +26,9 @@ in
     package = pkgs.tmux;
 
     extraConfig = ''
+      # Specify plugins here since tpm looks for plugins in xdg config
+      set -g @plugin 'tmux-plugins/tmux-resurrect'
+
       # Loads gpakosz/.tmux configuration
       source-file ~/.tmux.conf
 

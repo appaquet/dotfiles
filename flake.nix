@@ -71,9 +71,9 @@
       };
 
       darwinConfigurations = {
-        # nix build .#darwinConfigurations.mbpvmapp.system
+        # nix build .#darwinConfigurations.mbmapp.system
         # ./result/sw/bin/darwin-rebuild switch --flake .
-        mbpvmapp = darwin.lib.darwinSystem {
+        mbpapp = darwin.lib.darwinSystem {
           system = "aarch64-darwin";
           pkgs = import nixpkgs {
             inherit config overlays;
