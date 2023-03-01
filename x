@@ -4,13 +4,13 @@ set -e
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 pushd "$ROOT"
 
-HOSTNAME=$(uname -n | tr '[:upper:]' '[:lower:]')
+HOSTNAME=$(uname -n | tr '[:upper:]' '[:lower:] | sed 's/\.local//'')
 MACHINE_KEY="${USER}@${HOSTNAME}"
 
 HOME_CONFIG=""
 if [[ "${MACHINE_KEY}" == "appaquet@deskapp" || "${MACHINE_KEY}" == "appaquet@ubuntu-nix" ]]; then
     HOME_CONFIG="appaquet@deskapp"
-elif [[ "${MACHINE_KEY}" == "appaquet@mbpapp.local" || "${MACHINE_KEY}" == "appaquet@mbpvmapp.local" ]]; then
+elif [[ "${MACHINE_KEY}" == "appaquet@mbpapp" || "${MACHINE_KEY}" == "appaquet@mbpvmapp" ]]; then
     HOME_CONFIG="appaquet@mbpapp"
 else
     echo "Non-configured machine (${MACHINE_KEY})"
@@ -37,7 +37,7 @@ check)
     shift
     check_home "appaquet@deskapp"
     check_home "appaquet@mbpapp"
-    check_eval ".#darwinConfigurations.mbpvmapp.system"
+    check_eval ".#darwinConfigurations.mbpapp.system"
     ;;
 
 build)

@@ -3,6 +3,7 @@
 
 ## TODO
 
+- [ ] Switch to the new RTX plugin?? https://github.com/jdxcode/rtx/pull/239/files
 - [ ] Switch env variables to <https://discourse.nixos.org/t/home-manager-doesnt-seem-to-recognize-sessionvariables/8488> ?
 - [ ] Copy rest of cheat sheets
 - [ ] On the fly binary definition: <https://github.com/Mic92/dotfiles/blob/main/home-manager/modules/rust.nix>

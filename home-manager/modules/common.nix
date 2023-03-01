@@ -31,6 +31,7 @@
 
     jq
     jless
+    tokei
 
     tealdeer # rust version of tldr
 

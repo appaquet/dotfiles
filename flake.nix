@@ -46,17 +46,13 @@
         {
           homes = {
             "appaquet@deskapp" = home-manager.lib.homeManagerConfiguration {
-              pkgs = import nixpkgs {
-                inherit system overlays config;
-              };
+              inherit pkgs;
               modules = [ ./home-manager/deskapp.nix ];
               extraSpecialArgs = { inherit inputs; };
             };
 
             "appaquet@mbpapp" = home-manager.lib.homeManagerConfiguration {
-              pkgs = import nixpkgs {
-                inherit system overlays config;
-              };
+              inherit pkgs;
               modules = [ ./home-manager/mbpapp.nix ];
               extraSpecialArgs = { inherit inputs; };
             };
@@ -71,8 +67,6 @@
       };
 
       darwinConfigurations = {
-        # nix build .#darwinConfigurations.mbmapp.system
-        # ./result/sw/bin/darwin-rebuild switch --flake .
         mbpapp = darwin.lib.darwinSystem {
           system = "aarch64-darwin";
           pkgs = import nixpkgs {

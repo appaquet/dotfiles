@@ -33,6 +33,30 @@ in
       base16-vim # theme
       vim-airline # status / tab bar
 
+      # This should have been working, but it's not: https://nixos.wiki/wiki/Treesitter
+      # nvim-treesitter.withPlugins (p: [  # see https://github.com/nvim-treesitter/nvim-treesitter for available languages
+      #   p.nix
+      #   p.go
+      #   p.gomod
+      #   p.gosum
+      #   p.rust
+      #   p.toml
+      #   p.bash
+      #   p.proto
+      #   p.sql
+      #   p.markdown
+      #   p.c
+      #   p.python
+      #   p.dockerfile
+      #   p.dot
+      #   p.fish
+      #   p.html
+      #   p.css
+      #   p.javascript
+      #   p.typescript
+      # ])
+      # nvim-treesitter-textobjects # provider object manipulation (#TODO: Add bindings)
+
       vim-multiple-cursors # ctrl-n multi cursors
       bclose-vim # close buffer cleanly via <leader>w
       delimitMate # auto close quotes, parens, etc

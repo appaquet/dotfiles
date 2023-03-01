@@ -58,18 +58,5 @@ endfunction
 command! -nargs=* Delete call DeleteCfd( '<args>' )
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"" Identation preferences
-""
-
-" Defaults to spaces
+" Defaults to space indentation
 setlocal expandtab shiftwidth=2 tabstop=2 cino=N-s<CR>
-
-" Some files forced to spaces
-autocmd FileType hpp setlocal expandtab shiftwidth=2 tabstop=2 cino=N-s<CR>
-autocmd FileType h setlocal expandtab shiftwidth=2 tabstop=2 cino=N-s<CR>
-autocmd FileType cpp setlocal expandtab shiftwidth=2 tabstop=2 cino=N-s<CR>
-autocmd FileType scala setlocal expandtab shiftwidth=2 tabstop=2 cino=N-s<CR>
-autocmd FileType lua setlocal expandtab shiftwidth=2 tabstop=2 cino=N-s<CR>
-autocmd FileType rb setlocal expandtab shiftwidth=2 tabstop=2 cino=N-s<CR>
-autocmd FileType javascript setlocal expandtab shiftwidth=2 tabstop=2 cino=N-s<CR>
