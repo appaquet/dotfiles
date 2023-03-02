@@ -91,7 +91,7 @@
     '';
 
     functions.gcpm = ''
-      MSG=(git log --pretty=format:%s | head -n 100 | uniq | head -n 10 | fzf) git commit -m "$MSG"
+      MSG=(git log --pretty=format:%s | head -n 100 | uniq | head -n 15 | fzf) git commit -m "$MSG"
     '';
   };
 }
