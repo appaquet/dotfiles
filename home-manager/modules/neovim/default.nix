@@ -71,12 +71,13 @@ in
     ]);
   };
 
-  programs.fish = {
-    interactiveShellInit = ''
-      set -x EDITOR nvim
-      set -x VISUAL nvim
-      alias vi=nvim
-      alias vim=nvim
-    '';
+  home.shellAliases = {
+    vi = "nvim";
+    vim = "nvim";
+  };
+
+  home.sessionVariables = {
+    EDITOR = "nvim";
+    VISUAL = "nvim";
   };
 }

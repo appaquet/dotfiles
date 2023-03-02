@@ -29,6 +29,9 @@
       if test -f ~/.profile
         fenv source ~/.profile
       end
+
+      # Apparently the plugin doesn't do this for us on MacOS for some reason
+      fzf_configure_bindings
     '';
 
     plugins = [

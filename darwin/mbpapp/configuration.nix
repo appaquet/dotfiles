@@ -35,21 +35,11 @@
     '';
   };
 
-  system.activationScripts.extraActivation.text = ''
-    # Copy fish shell so that it can be used as a login shell and prevent being
-    # wiped out accidently. Still need to be added to /etc/shells to be usable.
-    mkdir -p /usr/local/bin/
-    rm /usr/local/bin/fish
-    cp ${pkgs.fish}/bin/fish /usr/local/bin/
-  '';
-
   security.pam.enableSudoTouchIdAuth = true;
 
   programs = {
     fish.enable = true;
   };
-
-  environment.shells = [ pkgs.fish ];
 
   users.users.appaquet = {
     home = "/Users/appaquet";

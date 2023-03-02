@@ -1,13 +1,6 @@
 
 # Nixified dotfiles
 
-## TODO
-
-- [ ] Switch to the new RTX plugin?? https://github.com/jdxcode/rtx/pull/239/files
-- [ ] Switch env variables to <https://discourse.nixos.org/t/home-manager-doesnt-seem-to-recognize-sessionvariables/8488> ?
-- [ ] Copy rest of cheat sheets
-- [ ] On the fly binary definition: <https://github.com/Mic92/dotfiles/blob/main/home-manager/modules/rust.nix>
-
 ## Initial setup
 
 1. Make sure that fish is installed and is the default shell. Otherwise it won't properly setup for fish but only for currently running shell.
@@ -33,7 +26,7 @@
    ```
 
 6. On MacOS, apply darwin config: `./x build-darwin` and `./x activate-darwin`
-   1. Activate shell by adding `/usr/local/bin/fish` to `/etc/shells` and running `chsh -s /usr/local/bin/fish`
+   1. Activate shell by adding `/Users/appaquet/.nix-profile/bin/fish` to `/etc/shells` and running `chsh -s /Users/appaquet/.nix-profile/bin/fish`
    2. Select a patched nerdfonts font in iTerm2 in order to have icons in neovim.
 
 7. Build `./x build` and activate `./x activate`
@@ -112,3 +105,9 @@
   - [tmux-resurrect](https://github.com/tmux-plugins/tmux-resurrect)
     - `<ctrl>b <ctrl>s` to save current layout
     - `<ctrl>b <ctrl>r` to ressurect last saved layout
+
+
+## Resources
+
+- https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/trivial-builders.nix
+- https://nix-community.github.io/home-manager/options.html
