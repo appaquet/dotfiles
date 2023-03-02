@@ -32,6 +32,11 @@
 7. Build `./x build` and activate `./x activate`
    1. On Linux, you may have to change shell to fish: `usermod -s /home/$USER/.nix-profile/bin/fish $USER`
 
+## Maintenance
+
+- To update flakes, run `./x update`
+- To update a specific flake, run `nix flake lock --update-input <the flake>`
+
 ## Troubleshooting
 
 1. It seems that when switching to newer fish, the paths weren't properly set.
@@ -106,8 +111,8 @@
     - `<ctrl>b <ctrl>s` to save current layout
     - `<ctrl>b <ctrl>r` to ressurect last saved layout
 
-
 ## Resources
 
-- https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/trivial-builders.nix
-- https://nix-community.github.io/home-manager/options.html
+- <https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/trivial-builders.nix>
+- <https://nix-community.github.io/home-manager/options.html>
+- <https://daiderd.com/nix-darwin/manual/index.html#sec-options>

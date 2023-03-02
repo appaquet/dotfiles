@@ -7,13 +7,15 @@
     ./git
     ./neovim
     ./rtx
-    ./jira.nix
     ./utils
     ./autojump.nix
     ./rust.nix
   ];
 
   programs.home-manager.enable = true;
+
+  humanfirst.enable = true; # enable humanfirst goodies (git shortcuts, jira, etc.)
+  humanfirst.identity.email = "app@humanfirst.ai";
 
   home.packages = with pkgs; [
     git

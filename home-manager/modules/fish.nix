@@ -82,19 +82,5 @@
       ghpr = "gh pr create --draft --body \"\" --title";
       gts = "git tag --sort version:refname";
     };
-
-    # View more examples here https://github.com/junegunn/fzf-git.sh/blob/main/fzf-git.sh
-    functions.gb = ''
-      set COMMAND 'git for-each-ref --sort=-committerdate refs/heads/ --format="%(color: red)%(committerdate:short)%(color: 244)|%(color: cyan)%(refname:short)%(color: 244)|%(color: green)%(subject)" --color=always | column -ts"|"'
-      FZF_DEFAULT_COMMAND=$COMMAND fzf \
-        --ansi \
-        --header "enter to checkout, ctrl-d to delete" \
-        --bind "ctrl-d:execute(echo {+} | awk '{print \$2}' | xargs git branch -D)+reload:$COMMAND" \
-        | awk '{print $2}' | xargs git checkout
-    '';
-
-    functions.gcpm = ''
-      MSG=(git log --pretty=format:%s | head -n 100 | uniq | head -n 15 | fzf) git commit -m "$MSG"
-    '';
   };
 }

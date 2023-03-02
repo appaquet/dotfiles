@@ -7,18 +7,21 @@
 
     home-manager = {
       url = "github:nix-community/home-manager";
-
-      # Makes home-manager's nixpkgs input follow our nixpkgs version
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs"; # makes home-manager's nixpkgs input follow our nixpkgs version
     };
 
     darwin = {
       url = "github:lnl7/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    humanfirst-dots = {
+      url = "git+ssh://git@github.com/zia-ai/shared-dotfiles";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = inputs @ { self, nixpkgs, home-manager, flake-utils, darwin, ... }:
+  outputs = inputs @ { self, nixpkgs, home-manager, humanfirst-dots, flake-utils, darwin, ... }:
     let
       config = {
         permittedInsecurePackages = [ ];
@@ -33,6 +36,10 @@
       overlays = [
         packageOverlay
       ];
+
+      commonHomeModules = [
+        humanfirst-dots.homeManagerModule
+      ];
     in
 
     flake-utils.lib.eachDefaultSystem
@@ -46,13 +53,13 @@
           homes = {
             "appaquet@deskapp" = home-manager.lib.homeManagerConfiguration {
               inherit pkgs;
-              modules = [ ./home-manager/deskapp.nix ];
+              modules = [ ./home-manager/deskapp.nix ] ++ commonHomeModules;
               extraSpecialArgs = { inherit inputs; };
             };
 
             "appaquet@mbpapp" = home-manager.lib.homeManagerConfiguration {
               inherit pkgs;
-              modules = [ ./home-manager/mbpapp.nix ];
+              modules = [ ./home-manager/mbpapp.nix ] ++ commonHomeModules;
               extraSpecialArgs = { inherit inputs; };
             };
           };
