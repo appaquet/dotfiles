@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, unstablePkgs, ... }:
 
 {
   imports = [
@@ -17,7 +17,7 @@
   humanfirst.enable = true; # enable humanfirst goodies (git shortcuts, jira, etc.)
   humanfirst.identity.email = "app@humanfirst.ai";
 
-  home.packages = with pkgs; [
+  home.packages = with pkgs; [ # prefix with unstablePkgs to install from unstable
     git
     gh
 

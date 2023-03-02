@@ -1,7 +1,7 @@
 {
   inputs = {
-    # nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     flake-utils.url = "github:numtide/flake-utils";
 
@@ -21,7 +21,7 @@
     };
   };
 
-  outputs = inputs @ { self, nixpkgs, home-manager, humanfirst-dots, flake-utils, darwin, ... }:
+  outputs = inputs @ { self, nixpkgs, nixpkgs-unstable, home-manager, humanfirst-dots, flake-utils, darwin, ... }:
     let
       config = {
         permittedInsecurePackages = [ ];
@@ -48,19 +48,23 @@
           pkgs = import nixpkgs {
             inherit system overlays config;
           };
+
+          unstablePkgs = import nixpkgs-unstable {
+            inherit system overlays config;
+          };
         in
         {
           homes = {
             "appaquet@deskapp" = home-manager.lib.homeManagerConfiguration {
               inherit pkgs;
               modules = [ ./home-manager/deskapp.nix ] ++ commonHomeModules;
-              extraSpecialArgs = { inherit inputs; };
+              extraSpecialArgs = { inherit inputs unstablePkgs; };
             };
 
             "appaquet@mbpapp" = home-manager.lib.homeManagerConfiguration {
               inherit pkgs;
               modules = [ ./home-manager/mbpapp.nix ] ++ commonHomeModules;
-              extraSpecialArgs = { inherit inputs; };
+              extraSpecialArgs = { inherit inputs unstablePkgs; };
             };
           };
         }
