@@ -1,2 +1,2 @@
-nodejs 18.14.2
-kubectl 1.25.6
+nodejs lts
+kubectl latest

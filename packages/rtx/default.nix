@@ -2,22 +2,22 @@
 
 let
   sources = {
+    # Use `nix-prefetch-url https://...` to get hash
     "x86_64-linux" = fetchurl {
-      url = "https://github.com/jdxcode/rtx/releases/download/v1.18.0/rtx-v1.18.0-linux-x64";
-      sha256 = "0k6y13qyzn6qhfzcrg3mls9bdhpj2hwndh59cbch9y6l5fh8pcmi";
+      url = "https://github.com/jdxcode/rtx/releases/download/v1.20.2/rtx-v1.20.2-linux-x64";
+      sha256 = "18nwcswph5rhwm71dglc8kfc2b7w1qljmc7z86s6m7xzdf7911rr";
     };
     "aarch64-darwin" = fetchurl {
-      url = "https://github.com/jdxcode/rtx/releases/download/v1.18.0/rtx-v1.18.0-macos-arm64";
-      sha256 = "1zffg3h6wr6m8rgg2biwp8lp43scfsrbawjq1haqzkxfmmkrcg90";
+      url = "https://github.com/jdxcode/rtx/releases/download/v1.20.2/rtx-v1.20.2-macos-arm64";
+      sha256 = "0lrxy5d6q3bx0qhaijd41vc44i915wbkyhdb5w1msikyd9rd2nj8";
     };
   };
 in
 
 stdenv.mkDerivation {
   pname = "rtx";
-  version = "v1.18.0";
+  version = "v1.20.2";
 
-  # Use `nix-prefetch-url https://...` to get hash
   # Supported platforms are asserted automatically by the meta.platforms field
   src = sources.${system};
   dontUnpack = true;

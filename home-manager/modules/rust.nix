@@ -5,6 +5,8 @@
     rustup # don't install cargo, let rustup do the job here
   ];
 
-  home.sessionPath = [ "~/.cargo/bin" ];
+  programs.fish.interactiveShellInit = ''
+      set -x PATH $PATH ~/.cargo/bin
+  '';
 }
 

@@ -1,6 +1,10 @@
 
 # Nixified dotfiles
 
+## TODO
+
+- [ ] Manage brew through nix: <https://daiderd.com/nix-darwin/manual/index.html#opt-homebrew.enable>
+
 ## Initial setup
 
 1. Make sure that fish is installed and is the default shell. Otherwise it won't properly setup for fish but only for currently running shell.

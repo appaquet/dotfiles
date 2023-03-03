@@ -17,6 +17,7 @@
 
     humanfirst-dots = {
       url = "git+ssh://git@github.com/zia-ai/shared-dotfiles";
+      # url = "path:/home/appaquet/dotfiles/shared-dotfiles";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -42,7 +43,7 @@
       ];
     in
 
-    flake-utils.lib.eachDefaultSystem
+    flake-utils.lib.eachDefaultSystem # prevent having to hard-code system by iterating on available systems
       (system: (
         let
           pkgs = import nixpkgs {
@@ -71,6 +72,7 @@
 
       )) // {
 
+      # properly expose home configurations with appropriate expected system
       homeConfigurations = {
         "appaquet@deskapp" = self.homes.x86_64-linux."appaquet@deskapp";
         "appaquet@mbpapp" = self.homes.aarch64-darwin."appaquet@mbpapp";
@@ -89,6 +91,5 @@
           inputs = { inherit inputs darwin; };
         };
       };
-
     };
 }

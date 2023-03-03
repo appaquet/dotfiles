@@ -1,7 +1,9 @@
 { pkgs, ... }:
 
 {
-  home.file.".local/dotfiles_bin".source = ./bin;
+  home.file.".local/utils".source = ./bin;
 
-  home.sessionPath = [ "~/.local/dotfiles_bin" ];
+  programs.fish.interactiveShellInit = ''
+    set -x PATH ~/.local/utils $PATH
+  '';
 }

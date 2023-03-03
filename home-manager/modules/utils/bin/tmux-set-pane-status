@@ -1,4 +1,7 @@
 #!/bin/bash
 
+tmux set pane-border-status top
+tmux set  pane-border-format "#{pane_index} #T"
+
 TEXT=${@:1}
 printf "\033]2;$TEXT\033\\"

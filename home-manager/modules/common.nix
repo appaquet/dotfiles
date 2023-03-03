@@ -10,6 +10,7 @@
     ./utils
     ./autojump.nix
     ./rust.nix
+    ./jira.nix
   ];
 
   programs.home-manager.enable = true;
@@ -17,7 +18,10 @@
   humanfirst.enable = true; # enable humanfirst goodies (git shortcuts, jira, etc.)
   humanfirst.identity.email = "app@humanfirst.ai";
 
-  home.packages = with pkgs; [ # prefix with unstablePkgs to install from unstable
+  # Notes: 
+  #  - not everything is installed using nix. some tools are install via `rtx` when different versions are required (see ./rtx/tool-versions)
+  #  - to install an unstable package, use `unstablePkgs.<package-name>`
+  home.packages = with pkgs; [ 
     git
     gh
 
@@ -30,6 +34,7 @@
     dua
     bottom
     htop
+    ookla-speedtest
 
     jq
     jless
