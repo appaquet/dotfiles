@@ -33,40 +33,29 @@ in
       base16-vim # theme
       vim-airline # status / tab bar
 
-      {
-        plugin = nvim-treesitter.withPlugins (p: [
-          # see https://github.com/nvim-treesitter/nvim-treesitter for available languages
-          p.nix
-          p.go
-          p.gomod
-          p.rust
-          p.toml
-          p.bash
-          p.proto
-          p.sql
-          p.markdown
-          p.c
-          p.python
-          p.dockerfile
-          p.dot
-          p.fish
-          p.html
-          p.css
-          p.javascript
-          p.typescript
-        ]);
-        type = "lua";
-        config = ''
-          require'nvim-treesitter.configs'.setup {
-            highlight = {
-              enable = true,
-              --additional_vim_regex_highlighting = false,
-            };
-          }
-          --vim.api.nvim_set_hl(0, "@none", { link = "Normal" })
-        '';
-      }
-      # nvim-treesitter-textobjects # provider object manipulation (#TODO: Add bindings)
+      (nvim-treesitter.withPlugins (p: [
+        # see https://github.com/nvim-treesitter/nvim-treesitter for available languages
+        p.nix
+        p.go
+        p.gomod
+        p.rust
+        p.toml
+        p.bash
+        p.proto
+        p.sql
+        p.markdown
+        p.c
+        p.python
+        p.dockerfile
+        p.dot
+        p.fish
+        p.html
+        p.css
+        p.javascript
+        p.typescript
+        p.vim
+      ]))
+      nvim-treesitter-textobjects # provider object manipulation
 
       vim-multiple-cursors # ctrl-n multi cursors
       bclose-vim # close buffer cleanly via <leader>w
@@ -79,6 +68,7 @@ in
       (builtins.readFile ./conf/theme.vim)
       (builtins.readFile ./conf/plugin.nvimtree.vim)
       (builtins.readFile ./conf/plugin.airline.vim)
+      (builtins.readFile ./conf/plugin.treesitter.vim)
       (builtins.readFile ./conf/plugin.fzf.vim)
     ]);
   };

@@ -22,6 +22,7 @@ require'nvim-treesitter.configs'.setup {
     additional_vim_regex_highlighting = false,
   },
 
+  -- See https://github.com/nvim-treesitter/nvim-treesitter-textobjects
   textobjects = {
     select = {
       enable = true,
