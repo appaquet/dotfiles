@@ -11,7 +11,7 @@ set ruler               " show the ruler
 set showmatch           " show matching brackets/parenthesis
 set incsearch           " find as you type search
 set hlsearch            " highlight search terms
-set nu                  " Line numbers on
+set relativenumber      " Relative line numbers
 set smartcase           " case sensitive when uc present
 set ignorecase          " case insensitive search
 set hidden              " Buffer switching without saving
@@ -38,6 +38,9 @@ if !has('gui_running')
   augroup END
 endif
 
+" Defaults to space indentation
+setlocal expandtab shiftwidth=2 tabstop=2 cino=N-s<CR>
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Util functions
 ""
@@ -56,7 +59,3 @@ fun! DeleteCfd( arg )
   silent exe "bwipe! " . l:curfile
 endfunction
 command! -nargs=* Delete call DeleteCfd( '<args>' )
-
-
-" Defaults to space indentation
-setlocal expandtab shiftwidth=2 tabstop=2 cino=N-s<CR>

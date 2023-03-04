@@ -3,6 +3,8 @@
 
 ## TODO
 
+- [ ] Cleanup session paths
+- [ ] Copy x ?
 - [ ] Manage brew through nix: <https://daiderd.com/nix-darwin/manual/index.html#opt-homebrew.enable>
 
 ## Initial setup

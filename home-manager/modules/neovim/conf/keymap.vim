@@ -40,10 +40,6 @@ cmap w!! w !sudo tee % >/dev/null
 cmap wq wqa
 cmap qw wqq
 
-" Ctrp-p via fzf
-map <C-p> :Files<CR>
-map <C-f> :Rg<CR>
-
 " Toggle mouse for copy
 nmap <Leader>m :call ToggleMouse()<CR>
 function! ToggleMouse()
