@@ -10,11 +10,11 @@ let
     stripRoot = false;
   };
 
-  dotTmuxConfFile = builtins.readFile (dotTmuxRepo + "/.tmux-537b276d74968a72811f0779979b4e78fc7f4777/.tmux.conf");
+  dotTmuxConfFile = "${dotTmuxRepo}/.tmux-537b276d74968a72811f0779979b4e78fc7f4777/.tmux.conf";
 in
 {
   # gpakosz/.tmux expect its files to be at specific places...
-  home.file.".tmux.conf".text = dotTmuxConfFile;
+  home.file.".tmux.conf".source = dotTmuxConfFile;
   home.file.".tmux.conf.local".source = ./tmux.conf.local;
 
   home.packages = with pkgs; [

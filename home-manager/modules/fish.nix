@@ -82,5 +82,16 @@
       ghpr = "gh pr create --draft --body \"\" --title";
       gts = "git tag --sort version:refname";
     };
+
+    functions = {
+      # Reload fish with latest paths from nix.
+      # If not working, make sure that fish_user_paths are correctly set as explained in the README.
+      reload = ''
+        set -e PATH
+        set -e __HM_SESS_VARS_SOURCED
+        clear
+        ~/.nix-profile/bin/fish
+      '';
+    };
   };
 }

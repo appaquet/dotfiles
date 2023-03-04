@@ -21,7 +21,10 @@
   # Notes: 
   #  - not everything is installed using nix. some tools are install via `rtx` when different versions are required (see ./rtx/tool-versions)
   #  - to install an unstable package, use `unstablePkgs.<package-name>`
-  home.packages = with pkgs; [ 
+  home.packages = with pkgs; [
+    manix # nix doc cli searcher
+    nix-output-monitor # better nix build output
+
     git
     gh
 
@@ -44,12 +47,11 @@
 
     kubectx
     k9s
+    dive # docker container explorer
 
     (google-cloud-sdk.withExtraComponents (with google-cloud-sdk.components; [ gke-gcloud-auth-plugin ]))
     cloud-sql-proxy
 
-    dive # docker container explorer
-
-    nix-output-monitor
+    rsync
   ];
 }
