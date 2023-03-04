@@ -39,7 +39,7 @@ if !has('gui_running')
 endif
 
 " Defaults to space indentation
-setlocal expandtab shiftwidth=2 tabstop=2 cino=N-s<CR>
+set expandtab shiftwidth=2 tabstop=2
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Util functions

@@ -59,6 +59,7 @@
       ll = "ls -lash";
       k = "kubectl";
       randstr = "randstr 'tr -cd \"[:alnum:]\" < /dev/urandom | fold -w30 | head -n1'";
+      x = "~/dotfiles/x";
     };
 
     shellAbbrs = {
