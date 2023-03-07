@@ -1,7 +1,7 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 
 {
   home.file.".local/utils".source = ./bin;
 
-  home.sessionPath = [ "~/.local/utils" ];
+  home.sessionPath = [ "${config.home.homeDirectory}/.local/utils" ];
 }

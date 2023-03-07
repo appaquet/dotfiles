@@ -60,6 +60,7 @@ in
       vim-multiple-cursors # ctrl-n multi cursors
       bclose-vim # close buffer cleanly via <leader>w
       delimitMate # auto close quotes, parens, etc
+      nerdcommenter # block comment (<leader>cc)
     ];
 
     extraConfig = (builtins.concatStringsSep "\n" [
