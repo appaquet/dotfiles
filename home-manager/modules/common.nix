@@ -38,6 +38,7 @@
     bottom
     htop
     ookla-speedtest
+    mtr
 
     jq
     jless
