@@ -4,12 +4,12 @@ let
   sources = {
     # Use `nix-prefetch-url https://...` to get hash
     "x86_64-linux" = fetchurl {
-      url = "https://github.com/jdxcode/rtx/releases/download/v1.20.2/rtx-v1.20.2-linux-x64";
-      sha256 = "18nwcswph5rhwm71dglc8kfc2b7w1qljmc7z86s6m7xzdf7911rr";
+      url = "https://github.com/jdxcode/rtx/releases/download/v1.27.11/rtx-v1.27.11-linux-x64";
+      sha256 = "12df60vdkkcmmwzm3gb84m5ri7rmbfah19i5cpz3wbbdkbwhfk9f";
     };
     "aarch64-darwin" = fetchurl {
-      url = "https://github.com/jdxcode/rtx/releases/download/v1.20.2/rtx-v1.20.2-macos-arm64";
-      sha256 = "0lrxy5d6q3bx0qhaijd41vc44i915wbkyhdb5w1msikyd9rd2nj8";
+      url = "https://github.com/jdxcode/rtx/releases/download/v1.27.11/rtx-v1.27.11-macos-arm64";
+      sha256 = "1dpfj6m7910s940i06f6nny1gf4jp847sdh358s1w5ihg8w95q0f";
     };
   };
 in

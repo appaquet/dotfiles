@@ -46,8 +46,6 @@
 
     tealdeer # rust version of tldr
 
-    kubectx
-    k9s
     dive # docker container explorer
 
     (google-cloud-sdk.withExtraComponents (with google-cloud-sdk.components; [ gke-gcloud-auth-plugin ]))
