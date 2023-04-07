@@ -52,5 +52,6 @@
     cloud-sql-proxy
 
     rsync
+    rclone
   ];
 }
