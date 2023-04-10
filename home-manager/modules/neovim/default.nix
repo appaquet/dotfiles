@@ -25,13 +25,20 @@ in
     viAlias = true;
     vimAlias = true;
 
+
+    # TODO: Inspire configs from:
+    # - https://github.com/rockerBOO/awesome-neovim#preconfigured-configuration (meta list of configs)
+    # - https://astronvim.com/#-features
+    # - https://www.lunarvim.org/docs/plugins/core-plugins-list
     plugins = with pkgs.vimPlugins; [
       nvim-web-devicons
       nvim-tree-lua
 
       fzf-vim # :Files (ctrl-p), :Rg (ctrl-f)
       base16-vim # theme
-      vim-airline # status / tab bar
+
+      # TODO: Replace with https://github.com/nvim-lualine/lualine.nvim + https://github.com/romgrk/barbar.nvim
+      vim-airline # status / tab bar 
 
       (nvim-treesitter.withPlugins (p: [
         # see https://github.com/nvim-treesitter/nvim-treesitter for available languages

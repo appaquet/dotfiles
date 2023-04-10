@@ -12,11 +12,9 @@
 
 2. Download nix installer & run it with multi-user mode enabled: `curl -L https://nixos.org/nix/install | sh -s -- --daemon`
 
-3. [Install nix](https://nixos.org/download.html)
+3. Enable flakes: `mkdir -p ~/.config/nix/ && echo 'experimental-features = nix-command flakes' > ~/.config/nix/nix.conf`
 
-4. Enable flakes: `mkdir -p ~/.config/nix/ && echo 'experimental-features = nix-command flakes' > ~/.config/nix/nix.conf`
-
-5. On Linux, configure nix by adding to `/etc/nix/nix.conf`.
+4. On Linux, configure nix by adding to `/etc/nix/nix.conf`.
    No need to do it on Darwin since we already do it nix-darwin (see [configuration.nix](./darwin/mbpapp/configuration.nix))
 
    ```conf
@@ -30,11 +28,11 @@
       experimental-features = nix-command flakes
    ```
 
-6. On MacOS, apply darwin config: `./x build-darwin` and `./x activate-darwin`
+5. On MacOS, apply darwin config: `./x build-darwin` and `./x activate-darwin`
    1. Activate shell by adding `/Users/appaquet/.nix-profile/bin/fish` to `/etc/shells` and running `chsh -s /Users/appaquet/.nix-profile/bin/fish`
    2. Select a patched nerdfonts font in iTerm2 in order to have icons in neovim.
 
-7. Build `./x build` and activate `./x activate`
+6. Build `./x build` and activate `./x activate`
    1. On Linux, you may have to change shell to fish: `usermod -s /home/$USER/.nix-profile/bin/fish $USER`
 
 ## Maintenance
@@ -45,7 +43,8 @@
 ## Troubleshooting
 
 1. It seems that when switching to newer fish, the paths weren't properly set.
-   They should look like:
+   On top of that, it may be shadowed by a global fish path too. Unset it with `set -ge` first.
+   They should look like (add with `set -Ua fish_user_paths`)
      - /nix/var/nix/profiles/default/bin
      - /home/appaquet/.nix-profile/bin
 
