@@ -8,6 +8,8 @@
   home.packages = with pkgs; [
     nil # nix lsp
     nixpkgs-fmt
+
+    gnumake
   ];
 
   programs.fish = {

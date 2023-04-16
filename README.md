@@ -115,6 +115,10 @@
     - `<ctrl>b <ctrl>s` to save current layout
     - `<ctrl>b <ctrl>r` to ressurect last saved layout
 
+### direnv
+
+- To activate and use flake: `echo "use flake" >> .envrc && direnv allow`
+
 ## Resources
 
 - <https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/trivial-builders.nix>

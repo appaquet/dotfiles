@@ -91,5 +91,12 @@
           inputs = { inherit inputs darwin; };
         };
       };
+
+      nixosConfigurations = {
+        deskapp = inputs.nixpkgs.lib.nixosSystem {
+          specialArgs = { inherit (self) common; inherit inputs; };
+          modules = [ ./nixos/deskapp/configuration.nix ];
+        };
+      };
     };
 }
