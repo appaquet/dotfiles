@@ -2,18 +2,21 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ inputs, config, pkgs, ... }:
 
 {
   imports =
-    [ # Include the results of the hardware scan.
+    [
       ./hardware-configuration.nix
+
+      inputs.vscode-server.nixosModule
     ];
 
   # Bootloader.
   boot.loader.grub.enable = true;
   boot.loader.grub.device = "/dev/vda";
   boot.loader.grub.useOSProber = true;
+  boot.growPartition = true;
 
   networking.hostName = "deskapp"; # Define your hostname.
 
@@ -102,6 +105,8 @@
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
+
+  services.vscode-server.enable = true;
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];

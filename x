@@ -40,7 +40,7 @@ check)
     check_eval ".#darwinConfigurations.mbpapp.system"
     ;;
 
-build)
+build-home)
     shift
     # home-manager build --flake ".#$HOME_CONFIG"
     # home-manager switch --flake ".#$HOME_CONFIG"
@@ -52,7 +52,12 @@ build-darwin)
     ${NIX_BUILDER} build ".#darwinConfigurations.mbpapp.system"
     ;;
 
-activate)
+build-nixos)
+    shift
+    sudo nixos-rebuild build --flake ".#deskapp"
+    ;;
+
+activate-home)
     shift
     ./result/activate
     ;;
@@ -60,6 +65,11 @@ activate)
 activate-darwin)
     shift
     ./result/sw/bin/darwin-rebuild switch --flake .
+    ;;
+
+activate-nixos)
+    shift
+    sudo nixos-rebuild switch --flake ".#deskapp"
     ;;
 
 update)
@@ -81,10 +91,12 @@ fetch-deskapp)
 *)
     echo "usage:" >&2
     echo "   $0 check: check eval homes & darwin" >&2
-    echo "   $0 build: build current home manager" >&2
+    echo "   $0 build-home: build current home manager" >&2
     echo "   $0 build-darwin: build darwin config" >&2
+    echo "   $0 build-nixos: build nixos config" >&2
     echo "   $0 activate: activate result home manager" >&2
     echo "   $0 activate-darwin: activate darwin config" >&2
+    echo "   $0 activate-nixos: activate nixos config" >&2
     echo "   $0 update: update nix channels" >&2
     echo "   $0 gc: run garbage collection" >&2
     echo "   $0 fetch-deskapp: fetch latest dotfiles from deskapp" >&2

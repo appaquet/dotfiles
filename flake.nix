@@ -5,6 +5,8 @@
 
     flake-utils.url = "github:numtide/flake-utils";
 
+    nix-alien.url = "github:thiagokokada/nix-alien";
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs"; # makes home-manager's nixpkgs input follow our nixpkgs version
@@ -20,9 +22,11 @@
       # url = "path:/home/appaquet/dotfiles/shared-dotfiles";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    vscode-server.url = "github:msteen/nixos-vscode-server";
   };
 
-  outputs = inputs @ { self, nixpkgs, nixpkgs-unstable, home-manager, humanfirst-dots, flake-utils, darwin, ... }:
+  outputs = inputs @ { self, nixpkgs, nixpkgs-unstable, home-manager, humanfirst-dots, flake-utils, darwin, nix-alien, ... }:
     let
       config = {
         permittedInsecurePackages = [ ];
@@ -36,6 +40,8 @@
 
       overlays = [
         packageOverlay
+
+        nix-alien.overlays.default
       ];
 
       commonHomeModules = [
@@ -94,7 +100,10 @@
 
       nixosConfigurations = {
         deskapp = inputs.nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit (self) common; inherit inputs; };
+          specialArgs = { 
+            inherit (self) common; 
+            inherit inputs; 
+          };
           modules = [ ./nixos/deskapp/configuration.nix ];
         };
       };

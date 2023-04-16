@@ -3,6 +3,7 @@
 {
   imports = [
     ./modules/common.nix
+    ./modules/nixos.nix
   ];
 
   home.packages = with pkgs; [

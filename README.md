@@ -35,6 +35,13 @@
 6. Build `./x build` and activate `./x activate`
    1. On Linux, you may have to change shell to fish: `usermod -s /home/$USER/.nix-profile/bin/fish $USER`
 
+### On NixOS
+
+1. Enable vscode server patcher (see <https://github.com/msteen/nixos-vscode-server#enable-the-service>)
+  1.1 Enable service: `systemctl --user enable auto-fix-vscode-server.service` (it's safe to ignore warning)
+  1.2. And start it: `systemctl --user start auto-fix-vscode-server.service`
+  1.3. To prevent GC: `ln -sfT /run/current-system/etc/systemd/user/auto-fix-vscode-server.service ~/.config/systemd/user/auto-fix-vscode-server.service`
+
 ## Maintenance
 
 - To update flakes, run `./x update`
@@ -48,6 +55,9 @@
      - /nix/var/nix/profiles/default/bin
      - /home/appaquet/.nix-profile/bin
 
+2. To patch an external dynamic linked binary on NixOS, use [nix-alien](https://github.com/thiagokokada/nix-alien)
+  2.1 `nix-alien <binary>`
+  
 ## Cheat sheets
 
 ### Fish
@@ -114,10 +124,6 @@
   - [tmux-resurrect](https://github.com/tmux-plugins/tmux-resurrect)
     - `<ctrl>b <ctrl>s` to save current layout
     - `<ctrl>b <ctrl>r` to ressurect last saved layout
-
-### direnv
-
-- To activate and use flake: `echo "use flake" >> .envrc && direnv allow`
 
 ## Resources
 
