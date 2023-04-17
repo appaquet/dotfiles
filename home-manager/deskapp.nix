@@ -10,6 +10,8 @@
     nil # nix lsp
     nixpkgs-fmt
 
+    tailscale
+
     gnumake
   ];
 

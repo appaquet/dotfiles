@@ -17,9 +17,13 @@ else
     exit 1
 fi
 
+sudo echo # prime pw for nom redirects to work
+
 NIX_BUILDER="nix"
+NOM_PIPE="tee"
 if [[ -x ~/.nix-profile/bin/nom ]]; then
     NIX_BUILDER="nom"
+    NOM_PIPE="nom"
 fi
 
 check_eval() {
@@ -42,9 +46,7 @@ check)
 
 build-home)
     shift
-    # home-manager build --flake ".#$HOME_CONFIG"
-    # home-manager switch --flake ".#$HOME_CONFIG"
-    ${NIX_BUILDER} build ".#homeConfigurations.${HOME_CONFIG}.activationPackage"
+    home-manager build --flake ".#$HOME_CONFIG" |& ${NOM_PIPE}
     ;;
 
 build-darwin)
@@ -54,12 +56,12 @@ build-darwin)
 
 build-nixos)
     shift
-    sudo nixos-rebuild build --flake ".#deskapp"
+    sudo nixos-rebuild build --flake ".#deskapp" |& ${NOM_PIPE}
     ;;
 
 activate-home)
     shift
-    ./result/activate
+    home-manager switch --flake ".#$HOME_CONFIG" |& ${NOM_PIPE}
     ;;
 
 activate-darwin)
@@ -69,7 +71,7 @@ activate-darwin)
 
 activate-nixos)
     shift
-    sudo nixos-rebuild switch --flake ".#deskapp"
+    sudo nixos-rebuild switch --flake ".#deskapp" |& ${NOM_PIPE}
     ;;
 
 update)
