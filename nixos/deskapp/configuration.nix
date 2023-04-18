@@ -1,4 +1,4 @@
-{ inputs, config, pkgs, ... }:
+{ inputs, config, lib, pkgs, ... }:
 
 {
   imports =
@@ -75,7 +75,11 @@
 
   services.openssh.enable = true;
 
-  services.vscode-server.enable = true;
-
   networking.firewall.enable = false;
+
+  services.vscode-server.enable = true;
+  #services.vscode-server.enableFHS = true;
+  #services.vscode-server.extraRuntimeDependencies = with pkgs; [
+  #  zlib
+  #];
 }
