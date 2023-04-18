@@ -1,4 +1,8 @@
 {
+  # To use, create .envrc with:
+  # use flake /home/appaquet/dotfiles/shells/exocore --impure
+  # watch_file /home/appaquet/dotfiles/shells/exocore/flake.nix
+
   description = "exomind";
 
   inputs = {
