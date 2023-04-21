@@ -17,9 +17,13 @@ else
     exit 1
 fi
 
+sudo echo # prime pw for nom redirects to work
+
 NIX_BUILDER="nix"
+NOM_PIPE="tee"
 if [[ -x ~/.nix-profile/bin/nom ]]; then
     NIX_BUILDER="nom"
+    NOM_PIPE="nom"
 fi
 
 check_eval() {
@@ -40,11 +44,9 @@ check)
     check_eval ".#darwinConfigurations.mbpapp.system"
     ;;
 
-build)
+build-home)
     shift
-    # home-manager build --flake ".#$HOME_CONFIG"
-    # home-manager switch --flake ".#$HOME_CONFIG"
-    ${NIX_BUILDER} build ".#homeConfigurations.${HOME_CONFIG}.activationPackage"
+    home-manager build --flake ".#$HOME_CONFIG" |& ${NOM_PIPE}
     ;;
 
 build-darwin)
@@ -52,14 +54,24 @@ build-darwin)
     ${NIX_BUILDER} build ".#darwinConfigurations.mbpapp.system"
     ;;
 
-activate)
+build-nixos)
     shift
-    ./result/activate
+    sudo nixos-rebuild build --flake ".#deskapp" |& ${NOM_PIPE}
+    ;;
+
+activate-home)
+    shift
+    home-manager switch --flake ".#$HOME_CONFIG" |& ${NOM_PIPE}
     ;;
 
 activate-darwin)
     shift
     ./result/sw/bin/darwin-rebuild switch --flake .
+    ;;
+
+activate-nixos)
+    shift
+    sudo nixos-rebuild switch --flake ".#deskapp" |& ${NOM_PIPE}
     ;;
 
 update)
@@ -81,10 +93,12 @@ fetch-deskapp)
 *)
     echo "usage:" >&2
     echo "   $0 check: check eval homes & darwin" >&2
-    echo "   $0 build: build current home manager" >&2
+    echo "   $0 build-home: build current home manager" >&2
     echo "   $0 build-darwin: build darwin config" >&2
+    echo "   $0 build-nixos: build nixos config" >&2
     echo "   $0 activate: activate result home manager" >&2
     echo "   $0 activate-darwin: activate darwin config" >&2
+    echo "   $0 activate-nixos: activate nixos config" >&2
     echo "   $0 update: update nix channels" >&2
     echo "   $0 gc: run garbage collection" >&2
     echo "   $0 fetch-deskapp: fetch latest dotfiles from deskapp" >&2

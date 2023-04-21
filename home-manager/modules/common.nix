@@ -18,6 +18,9 @@
   humanfirst.enable = true; # enable humanfirst goodies (git shortcuts, jira, etc.)
   humanfirst.identity.email = "app@humanfirst.ai";
 
+  programs.direnv.enable = true;
+  programs.direnv.nix-direnv.enable = true;
+
   # Notes: 
   #  - not everything is installed using nix. some tools are install via `rtx` when different versions are required (see ./rtx/tool-versions)
   #  - to install an unstable package, use `unstablePkgs.<package-name>`
