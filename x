@@ -65,17 +65,14 @@ symlink_files() {
 
 COMMAND=$1
 case $COMMAND in
-check)
-    shift
-    check_home "appaquet@deskapp"
-    check_home "appaquet@mbpapp"
-    check_eval ".#darwinConfigurations.mbpapp.system"
-    ;;
-
 home)
     shift
     SUBCOMMAND=$1
     case $SUBCOMMAND in
+    check)
+        shift
+        check_home $HOME_CONFIG
+        ;;
     build)
         shift
         home-manager build --flake ".#$HOME_CONFIG" |& ${NOM_PIPE}
@@ -100,6 +97,10 @@ darwin)
         shift
         ${NIX_BUILDER} build ".#darwinConfigurations.mbpapp.system"
         ;;
+    check)
+        shift
+        check_eval ".#darwinConfigurations.mbpapp.system"
+        ;;
     activate)
         shift
         ./result/sw/bin/darwin-rebuild switch --flake .
@@ -110,6 +111,13 @@ darwin)
         exit 1
         ;;
     esac
+    ;;
+
+check)
+    shift
+    check_home "appaquet@deskapp"
+    check_home "appaquet@mbpapp"
+    check_eval ".#darwinConfigurations.mbpapp.system"
     ;;
 
 update)
@@ -138,9 +146,9 @@ fetch-deskapp)
     ;;
 
 *)
-    echo "$0 check: check eval homes & darwin" >&2
     echo "$0 home: home manager sub commands" >&2
     echo "$0 darwin: darwin sub commands" >&2
+    echo "$0 check: eval home & darwin configs for all hosts" >&2
     echo "$0 update: update nix channels" >&2
     echo "$0 link: link system files" >&2
     echo "$0 gc: run garbage collection" >&2
