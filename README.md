@@ -1,11 +1,6 @@
 
 # Nixified dotfiles
 
-## TODO
-
-- [ ] Manage brew through nix: <https://daiderd.com/nix-darwin/manual/index.html#opt-homebrew.enable>
-- [ ] Find out how to declaratively install apt packages
-
 ## Initial setup
 
 1. Make sure that fish is installed and is the default shell. Otherwise it won't properly setup for fish but only for currently running shell.
@@ -120,3 +115,8 @@
 - <https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/trivial-builders.nix>
 - <https://nix-community.github.io/home-manager/options.html>
 - <https://daiderd.com/nix-darwin/manual/index.html#sec-options>
+
+## TODO
+
+- [ ] Manage brew through nix: <https://daiderd.com/nix-darwin/manual/index.html#opt-homebrew.enable>
+- [ ] Find out how to declaratively install apt packages

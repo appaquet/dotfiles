@@ -35,6 +35,34 @@ check_home() {
     check_eval ".#homeConfigurations.${1}.activationPackage"
 }
 
+symlink_files() {
+    local host="$1"
+    local file
+    for file in $(find "${ROOT}/files/${host}" -type f); do
+        local target_file="${file/${ROOT}\/files\/${host}/}"
+        local target_path="${target_file}"
+
+        # check if file doesn't already exist and isn't already a simlink
+        if [[ -e "${target_path}" ]]; then
+            if [[ ! -L "${target_path}" ]]; then
+                echo "File already exists: ${target_path}! Not linking it."
+            fi
+            continue
+        fi
+
+        echo "Symlinking ${file} to ${target_path}"
+
+        # if outside of home, use sudo
+        if [[ "${target_path}" != "${HOME}/"* ]]; then
+            sudo mkdir -p "$(dirname "${target_path}")"
+            sudo ln -sf "${file}" "${target_path}"
+        else
+            mkdir -p "$(dirname "${target_path}")"
+            ln -sf "${file}" "${target_path}"
+        fi
+    done
+}
+
 COMMAND=$1
 case $COMMAND in
 check)
@@ -90,6 +118,15 @@ update)
     nix flake update
     ;;
 
+link)
+    shift
+    if [[ ! -d "${ROOT}/files/${HOSTNAME}" ]]; then
+        echo "No files for ${HOSTNAME}"
+        exit 1
+    fi
+    symlink_files "$HOSTNAME"
+    ;;
+
 gc)
     shift
     nix-collect-garbage
@@ -105,6 +142,7 @@ fetch-deskapp)
     echo "$0 home: home manager sub commands" >&2
     echo "$0 darwin: darwin sub commands" >&2
     echo "$0 update: update nix channels" >&2
+    echo "$0 link: link system files" >&2
     echo "$0 gc: run garbage collection" >&2
     echo "$0 fetch-deskapp: fetch latest dotfiles from deskapp" >&2
     exit 1
