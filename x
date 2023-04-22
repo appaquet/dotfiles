@@ -44,34 +44,44 @@ check)
     check_eval ".#darwinConfigurations.mbpapp.system"
     ;;
 
-build-home)
+home)
     shift
-    home-manager build --flake ".#$HOME_CONFIG" |& ${NOM_PIPE}
+    SUBCOMMAND=$1
+    case $SUBCOMMAND in
+    build)
+        shift
+        home-manager build --flake ".#$HOME_CONFIG" |& ${NOM_PIPE}
+        ;;
+    activate)
+        shift
+        home-manager switch --flake ".#$HOME_CONFIG" |& ${NOM_PIPE}
+        ;;
+    *)
+        echo "$0 $COMMAND build: build home" >&2
+        echo "$0 $COMMAND activate: activate/switch home" >&2
+        exit 1
+        ;;
+    esac
     ;;
 
-build-darwin)
+darwin)
     shift
-    ${NIX_BUILDER} build ".#darwinConfigurations.mbpapp.system"
-    ;;
-
-build-nixos)
-    shift
-    sudo nixos-rebuild build --flake ".#deskapp" |& ${NOM_PIPE}
-    ;;
-
-activate-home)
-    shift
-    home-manager switch --flake ".#$HOME_CONFIG" |& ${NOM_PIPE}
-    ;;
-
-activate-darwin)
-    shift
-    ./result/sw/bin/darwin-rebuild switch --flake .
-    ;;
-
-activate-nixos)
-    shift
-    sudo nixos-rebuild switch --flake ".#deskapp" |& ${NOM_PIPE}
+    SUCOMMAND=$1
+    case $SUBCOMMAND in
+    build)
+        shift
+        ${NIX_BUILDER} build ".#darwinConfigurations.mbpapp.system"
+        ;;
+    activate)
+        shift
+        ./result/sw/bin/darwin-rebuild switch --flake .
+        ;;
+    *)
+        echo "$0 $COMMAND build: build home" >&2
+        echo "$0 $COMMAND activate: activate/switch home" >&2
+        exit 1
+        ;;
+    esac
     ;;
 
 update)
@@ -91,17 +101,12 @@ fetch-deskapp)
     ;;
 
 *)
-    echo "usage:" >&2
-    echo "   $0 check: check eval homes & darwin" >&2
-    echo "   $0 build-home: build current home manager" >&2
-    echo "   $0 build-darwin: build darwin config" >&2
-    echo "   $0 build-nixos: build nixos config" >&2
-    echo "   $0 activate: activate result home manager" >&2
-    echo "   $0 activate-darwin: activate darwin config" >&2
-    echo "   $0 activate-nixos: activate nixos config" >&2
-    echo "   $0 update: update nix channels" >&2
-    echo "   $0 gc: run garbage collection" >&2
-    echo "   $0 fetch-deskapp: fetch latest dotfiles from deskapp" >&2
+    echo "$0 check: check eval homes & darwin" >&2
+    echo "$0 home: home manager sub commands" >&2
+    echo "$0 darwin: darwin sub commands" >&2
+    echo "$0 update: update nix channels" >&2
+    echo "$0 gc: run garbage collection" >&2
+    echo "$0 fetch-deskapp: fetch latest dotfiles from deskapp" >&2
     exit 1
     ;;
 esac
