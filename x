@@ -83,7 +83,7 @@ home)
 
 darwin)
     shift
-    SUCOMMAND=$1
+    SUBCOMMAND=$1
     case $SUBCOMMAND in
     build)
         shift

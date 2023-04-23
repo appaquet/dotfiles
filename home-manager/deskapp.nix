@@ -2,18 +2,11 @@
 
 {
   imports = [
-    ./modules/common.nix
+    ./modules/base.nix
     ./modules/dev.nix
+    ./modules/hf.nix
+    ./modules/vms.nix
   ];
-
-  programs.fish = {
-    shellAbbrs = {
-      vm = "sudo virsh ";
-      vmls = "sudo virsh list --all";
-      vmstart = "sudo virsh start";
-      vmstop = "sudo virsh shutdown";
-    };
-  };
 
   home.username = "appaquet";
   home.homeDirectory = "/home/appaquet";
