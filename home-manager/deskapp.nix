@@ -3,21 +3,15 @@
 {
   imports = [
     ./modules/common.nix
-  ];
-
-  home.packages = with pkgs; [
-    nil # nix lsp
-    nixpkgs-fmt
+    ./modules/dev.nix
   ];
 
   programs.fish = {
     shellAbbrs = {
       vm = "sudo virsh ";
-      vml = "sudo virsh list --all";
       vmls = "sudo virsh list --all";
-      vmstart = "sudo virsh start ";
-      vmstop = "sudo virsh shutdown ";
-      vmshut = "sudo virsh shutdown ";
+      vmstart = "sudo virsh start";
+      vmstop = "sudo virsh shutdown";
     };
   };
 

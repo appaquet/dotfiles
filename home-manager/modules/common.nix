@@ -9,8 +9,6 @@
     ./rtx
     ./utils
     ./autojump.nix
-    ./rust.nix
-    ./jira.nix
   ];
 
   programs.home-manager.enable = true;
@@ -26,10 +24,9 @@
   #  - to install an unstable package, use `unstablePkgs.<package-name>`
   home.packages = with pkgs; [
     manix # nix doc cli searcher
-    nix-output-monitor # better nix build output
+    nix-output-monitor # better nix build output (nom)
 
     git
-    gh
 
     bat # cat replacement
     hexyl
@@ -45,14 +42,8 @@
 
     jq
     jless
-    tokei
 
     tealdeer # rust version of tldr
-
-    dive # docker container explorer
-
-    (google-cloud-sdk.withExtraComponents (with google-cloud-sdk.components; [ gke-gcloud-auth-plugin ]))
-    cloud-sql-proxy
 
     rsync
     rclone
