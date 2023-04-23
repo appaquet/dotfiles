@@ -71,13 +71,13 @@ home)
         shift
         home-manager build --flake ".#$HOME_CONFIG" |& ${NOM_PIPE}
         ;;
-    activate)
+    switch)
         shift
         home-manager switch --flake ".#$HOME_CONFIG" |& ${NOM_PIPE}
         ;;
     *)
         echo "$0 $COMMAND build: build home" >&2
-        echo "$0 $COMMAND activate: activate/switch home" >&2
+        echo "$0 $COMMAND switch: switch home" >&2
         exit 1
         ;;
     esac
@@ -95,13 +95,13 @@ darwin)
         shift
         check_eval ".#darwinConfigurations.mbpapp.system"
         ;;
-    activate)
+    switch)
         shift
         ./result/sw/bin/darwin-rebuild switch --flake .
         ;;
     *)
         echo "$0 $COMMAND build: build home" >&2
-        echo "$0 $COMMAND activate: activate/switch home" >&2
+        echo "$0 $COMMAND switch: switch home" >&2
         exit 1
         ;;
     esac
