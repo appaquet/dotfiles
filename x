@@ -35,30 +35,22 @@ check_home() {
     check_eval ".#homeConfigurations.${1}.activationPackage"
 }
 
-symlink_files() {
+copy_files() {
     local host="$1"
     local file
     for file in $(find "${ROOT}/files/${host}" -type f); do
         local target_file="${file/${ROOT}\/files\/${host}/}"
         local target_path="${target_file}"
 
-        # check if file doesn't already exist and isn't already a simlink
-        if [[ -e "${target_path}" ]]; then
-            if [[ ! -L "${target_path}" ]]; then
-                echo "File already exists: ${target_path}! Not linking it."
-            fi
-            continue
-        fi
-
-        echo "Symlinking ${file} to ${target_path}"
+        echo "Copy ${file} to ${target_path}"
 
         # if outside of home, use sudo
         if [[ "${target_path}" != "${HOME}/"* ]]; then
             sudo mkdir -p "$(dirname "${target_path}")"
-            sudo ln -sf "${file}" "${target_path}"
+            sudo cp "${file}" "${target_path}"
         else
             mkdir -p "$(dirname "${target_path}")"
-            ln -sf "${file}" "${target_path}"
+            cp "${file}" "${target_path}"
         fi
     done
 }
@@ -132,7 +124,7 @@ link)
         echo "No files for ${HOSTNAME}"
         exit 1
     fi
-    symlink_files "$HOSTNAME"
+    copy_files "$HOSTNAME"
     ;;
 
 gc)
