@@ -1,6 +1,10 @@
 { pkgs, ... }:
 
 {
+  imports = [
+    ./jira.nix
+  ];
+
   humanfirst.enable = true; # enable humanfirst goodies (git shortcuts, jira, etc.)
   humanfirst.identity.email = "app@humanfirst.ai";
 

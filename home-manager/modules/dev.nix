@@ -3,7 +3,6 @@
 {
   imports = [
     ./rust.nix
-    ./jira.nix
   ];
 
   home.packages = with pkgs; [

@@ -4,7 +4,7 @@
   imports = [
     ./modules/base.nix
     ./modules/dev.nix
-    ./modules/hf.nix
+    ./modules/work.nix
   ];
 
   home.username = "appaquet";

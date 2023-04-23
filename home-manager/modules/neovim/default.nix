@@ -64,6 +64,8 @@ in
       ]))
       nvim-treesitter-textobjects # provider object manipulation
 
+      Rename # :Rename <new name>
+
       vim-multiple-cursors # ctrl-n multi cursors
       bclose-vim # close buffer cleanly via <leader>w
       delimitMate # auto close quotes, parens, etc
