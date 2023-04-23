@@ -17,8 +17,6 @@ else
     exit 1
 fi
 
-sudo echo # prime pw for nom redirects to work
-
 NIX_BUILDER="nix"
 NOM_PIPE="tee"
 if [[ -x ~/.nix-profile/bin/nom ]]; then
@@ -33,6 +31,10 @@ check_eval() {
 check_home() {
     echo "Checking home ${1}"
     check_eval ".#homeConfigurations.${1}.activationPackage"
+}
+
+prime_sudo() {
+    sudo echo # prime pw for nom redirects to work
 }
 
 copy_files() {
@@ -124,6 +126,8 @@ link)
         echo "No files for ${HOSTNAME}"
         exit 1
     fi
+
+    prime_sudo
     copy_files "$HOSTNAME"
     ;;
 

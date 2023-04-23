@@ -23,11 +23,11 @@
       experimental-features = nix-command flakes
    ```
 
-5. On MacOS, apply darwin config: `./x build-darwin` and `./x activate-darwin`
+5. On MacOS, apply darwin config: `./x darwin build` and `./x darwin activate`
    1. Activate shell by adding `/Users/appaquet/.nix-profile/bin/fish` to `/etc/shells` and running `chsh -s /Users/appaquet/.nix-profile/bin/fish`
    2. Select a patched nerdfonts font in iTerm2 in order to have icons in neovim.
 
-6. Build `./x build` and activate `./x activate`
+6. Build `./x home build` and activate `./x home activate`
    1. On Linux, you may have to change shell to fish: `usermod -s /home/$USER/.nix-profile/bin/fish $USER`
 
 ## Maintenance
