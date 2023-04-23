@@ -1,5 +1,4 @@
 nodejs lts
 kubectl latest
-protoc 22.2
 kubectx latest
 k9s latest
