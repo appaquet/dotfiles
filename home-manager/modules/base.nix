@@ -13,6 +13,10 @@
 
   programs.home-manager.enable = true;
 
+  # https://github.com/nix-community/nix-direnv#via-home-manager
+  programs.direnv.enable = true;
+  programs.direnv.nix-direnv.enable = true;
+
   # Notes: 
   #  - not everything is installed using nix. some tools are install via `rtx` when different versions are required (see ./rtx/tool-versions)
   #  - to install an unstable package, use `unstablePkgs.<package-name>`

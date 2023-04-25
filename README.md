@@ -29,11 +29,6 @@
 6. On MacOS, apply darwin config: `./x darwin build` and `./x darwin witch`
    2. Select a patched nerdfonts font in iTerm2 in order to have icons in neovim.
 
-## Maintenance
-
-- To update flakes, run `./x update`
-- To update a specific flake, run `nix flake lock --update-input <the flake>`
-
 ## Troubleshooting
 
 1. It seems that when switching to newer fish, the paths weren't properly set.

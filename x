@@ -116,8 +116,13 @@ check)
 
 update)
     shift
-    nix-channel --update
-    nix flake update
+    PACKAGE="$1"
+    if [[ -z "$PACKAGE" ]]; then
+      nix-channel --update
+      nix flake update
+    else
+      nix flake lock --update-input $PACKAGE
+    fi
     ;;
 
 link)
@@ -133,7 +138,14 @@ link)
 
 gc)
     shift
+    echo "Garbage collecting..."
     nix-collect-garbage
+    ;;
+
+optimize)
+    shift
+    echo "Optimizing store..."
+    nix store optimise
     ;;
 
 fetch-deskapp)
@@ -148,6 +160,7 @@ fetch-deskapp)
     echo "$0 update: update nix channels" >&2
     echo "$0 link: link system files" >&2
     echo "$0 gc: run garbage collection" >&2
+    echo "$0 optimize: optimize store" >&2
     echo "$0 fetch-deskapp: fetch latest dotfiles from deskapp" >&2
     exit 1
     ;;
