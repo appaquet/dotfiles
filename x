@@ -69,11 +69,11 @@ home)
         ;;
     build)
         shift
-        home-manager build --flake ".#$HOME_CONFIG" |& ${NOM_PIPE}
+        home-manager build --flake ".#$HOME_CONFIG" | ${NOM_PIPE}
         ;;
     switch)
         shift
-        home-manager switch --flake ".#$HOME_CONFIG" |& ${NOM_PIPE}
+        home-manager switch --flake ".#$HOME_CONFIG" | ${NOM_PIPE}
         ;;
     *)
         echo "$0 $COMMAND build: build home" >&2
