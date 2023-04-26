@@ -1,5 +1,9 @@
 { config, pkgs, lib, libs, ... }:
 {
+  home.packages = with pkgs; [
+    git
+  ];
+
   programs.git = {
     enable = true;
     userName = "Andre-Philippe Paquet";

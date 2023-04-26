@@ -6,6 +6,7 @@
     youtube-dl
     imagemagick
     mpv
+    graphviz
   ];
 }
 

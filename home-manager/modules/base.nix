@@ -24,8 +24,6 @@
     manix # nix doc cli searcher
     nix-output-monitor # better nix build output (nom)
 
-    git
-
     bat # cat replacement
     hexyl
 
@@ -40,6 +38,16 @@
 
     jq
     jless
+
+    zip
+    unzip
+    pigz # parallel gzip
+    gzip
+    bzip2
+    gnutar
+
+    curl
+    wget
 
     tealdeer # rust version of tldr
 
