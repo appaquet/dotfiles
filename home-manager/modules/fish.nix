@@ -31,20 +31,16 @@
         fenv source ~/.profile
       end
 
+      # Enable direnv
+      if command -v direnv &>/dev/null
+          eval (direnv hook fish)
+      end
+
       # Apparently the plugin doesn't do this for us on MacOS for some reason
       fzf_configure_bindings
     '';
 
     plugins = [
-      #{
-        #name = "bobthefish";
-        #src = pkgs.fetchFromGitHub {
-          #owner = "oh-my-fish";
-          #repo = "theme-bobthefish";
-          #rev = "2dcfcab653ae69ae95ab57217fe64c97ae05d8de";
-          #sha256 = "118hj100c4bb8hyhr22mrsjhg97pyd24cwb1l39bhryd0k9yc5lc";
-        #};
-      #}
       {
         name = "fzf-fish";
         src = pkgs.fishPlugins.fzf-fish.src;
@@ -98,7 +94,6 @@
     };
   };
 
-
   programs.starship = {
     enable = true;
     enableFishIntegration = true;
@@ -124,70 +119,5 @@
       nodejs = { disabled = true; };
       rust = { disabled = true; };
     };
-
-    #settings = {
-      ## adapted from https://gist.github.com/notheotherben/92302a60f8599ba73f1c2840f3c6d455
-      #format = lib.concatStrings [
-        #"[](fg:#1C4961)" # round start
-
-        #"$username$hostname"
-        #"[](fg:#1C4961 bg:#3E7EA0)"
-
-        #"[ $directory](bg:#3E7EA0 fg:#C8E1EE)"
-        #"[](fg:#3E7EA0 bg:#5A98B9)"
-
-        #"[ $git_branch ](bg:#5A98B9 fg:#C7D8E1)"
-        #"[](fg:#5A98B9 bg:#5EADD7)"
-
-        #"[ $git_status ](bg:#5EADD7 fg:#E1E9ED)"
-        #"[](fg:#5EADD7 bg:#79C3EC)"
-
-        #"[ $time ](bg:#79C3EC fg:#F1FAFF)"
-        #"[](fg:#79C3EC bg:none)"
-
-        #" $all$character"
-      #];
-
-      #add_newline = true;
-
-      #username = {
-        #show_always = false;
-        #style_user = "bg:#1C4961 fg:#93ACBA";
-        #style_root = "bg:#1C4961 fg:#93ACBA";
-        #format = "[$user@]($style)";
-      #};
-      #hostname = {
-        #ssh_only = false;
-        #style = "bg:#1C4961 fg:#93ACBA";
-        #format = "[$hostname]($style)";
-      #};
-      #directory = {
-        #style = "bg:#3E7EA0 fg:#A4C7DA";
-        #read_only_style = "bg:#3E7EA0 fg:red";
-        #truncate_to_repo = false;
-        #truncation_length = 2; # show 2 parent dirs in full length
-        #fish_style_pwd_dir_length = 1; # past truncation, shorten parents to 1 char
-      #};
-      #git_branch = {
-        #format = "$symbol$branch";
-        #style = "";
-      #};
-      #git_status = {
-        #format = "$all_status$ahead_behind";
-        #style = "";
-      #};
-      #time = {
-        #disabled = false;
-        #format = "$time";
-        #style = "";
-      #};
-
-      #gcloud = { disabled = true; };
-      #nix_shell = { disabled = true; };
-      #package = { disabled = true; };
-      #golang = { disabled = true; };
-      #nodejs = { disabled = true; };
-      #rust = { disabled = true; };
-    #};
   };
 }

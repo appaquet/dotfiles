@@ -9,24 +9,22 @@
     ./rtx
     ./utils
     ./autojump.nix
-    ./rust.nix
-    ./jira.nix
   ];
 
   programs.home-manager.enable = true;
 
-  humanfirst.enable = true; # enable humanfirst goodies (git shortcuts, jira, etc.)
-  humanfirst.identity.email = "app@humanfirst.ai";
+  # https://github.com/nix-community/nix-direnv#via-home-manager
+  programs.direnv.enable = true;
+  programs.direnv.nix-direnv.enable = true;
 
   # Notes: 
   #  - not everything is installed using nix. some tools are install via `rtx` when different versions are required (see ./rtx/tool-versions)
   #  - to install an unstable package, use `unstablePkgs.<package-name>`
   home.packages = with pkgs; [
     manix # nix doc cli searcher
-    nix-output-monitor # better nix build output
+    nix-output-monitor # better nix build output (nom)
 
     git
-    gh
 
     bat # cat replacement
     hexyl
@@ -42,14 +40,8 @@
 
     jq
     jless
-    tokei
 
     tealdeer # rust version of tldr
-
-    dive # docker container explorer
-
-    (google-cloud-sdk.withExtraComponents (with google-cloud-sdk.components; [ gke-gcloud-auth-plugin ]))
-    cloud-sql-proxy
 
     rsync
     rclone
