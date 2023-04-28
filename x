@@ -69,11 +69,11 @@ home)
         ;;
     build)
         shift
-        home-manager build --flake ".#$HOME_CONFIG" | ${NOM_PIPE}
+        home-manager build --flake ".#$HOME_CONFIG" 2>&1 | ${NOM_PIPE}
         ;;
     switch)
         shift
-        home-manager switch --flake ".#$HOME_CONFIG" | ${NOM_PIPE}
+        home-manager switch --flake ".#$HOME_CONFIG" 2>&1 | ${NOM_PIPE}
         ;;
     *)
         echo "$0 $COMMAND build: build home" >&2
@@ -118,8 +118,8 @@ update)
     shift
     PACKAGE="$1"
     if [[ -z "$PACKAGE" ]]; then
-      nix-channel --update
-      nix flake update
+      nix-channel --update 2>&1 | ${NOM_PIPE}
+      nix flake update 2>&1 | ${NOM_PIPE}
     else
       nix flake lock --update-input $PACKAGE
     fi

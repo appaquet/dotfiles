@@ -41,7 +41,7 @@
 
     zip
     unzip
-    pigz # parallel gzip
+    pigz
     gzip
     bzip2
     gnutar
