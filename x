@@ -8,7 +8,7 @@ HOSTNAME=$(uname -n | tr '[:upper:]' '[:lower:] | sed 's/\.local//'')
 MACHINE_KEY="${USER}@${HOSTNAME}"
 
 HOME_CONFIG=""
-if [[ "${MACHINE_KEY}" == "appaquet@deskapp" || "${MACHINE_KEY}" == "appaquet@ubuntu-nix" ]]; then
+if [[ "${MACHINE_KEY}" == "appaquet@deskapp" || "${MACHINE_KEY}" == "appaquet@nixos" ]]; then
     HOME_CONFIG="appaquet@deskapp"
 elif [[ "${MACHINE_KEY}" == "appaquet@mbpapp" || "${MACHINE_KEY}" == "appaquet@mbpvmapp" ]]; then
     HOME_CONFIG="appaquet@mbpapp"

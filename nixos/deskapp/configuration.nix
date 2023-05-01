@@ -14,7 +14,9 @@
   boot.loader.grub.useOSProber = true;
   boot.growPartition = true; # only relevant for vms
 
-  networking.hostName = "deskapp"; # Define your hostname.
+  networking.hostName = "nixos"; # Define your hostname.
+
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # Enable networking
   networking.networkmanager.enable = true;
