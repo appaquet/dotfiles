@@ -8,6 +8,8 @@
 
     tailscale
     gnumake
+
+    bintools
   ];
 
 }

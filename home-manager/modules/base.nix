@@ -17,25 +17,18 @@
   programs.direnv.enable = true;
   programs.direnv.nix-direnv.enable = true;
 
-  # https://github.com/nix-community/nix-direnv#via-home-manager
-  programs.direnv.enable = true;
-  programs.direnv.nix-direnv.enable = true;
-
   # Notes: 
   #  - not everything is installed using nix. some tools are install via `rtx` when different versions are required (see ./rtx/tool-versions)
   #  - to install an unstable package, use `unstablePkgs.<package-name>`
   home.packages = with pkgs; [
     manix # nix doc cli searcher
-<<<<<<< HEAD:home-manager/modules/common.nix
     nix-output-monitor # better nix build output
+
     direnv
     nix-direnv
 
     git
     gh
-=======
-    nix-output-monitor # better nix build output (nom)
->>>>>>> master:home-manager/modules/base.nix
 
     bat # cat replacement
     hexyl
