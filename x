@@ -69,11 +69,11 @@ home)
         ;;
     build)
         shift
-        home-manager build --flake ".#$HOME_CONFIG" 2>&1 | ${NOM_PIPE}
+        ${NIX_BUILDER} build ".#homeConfigurations.${HOME_CONFIG}.activationPackage" 2>&1 | ${NOM_PIPE}
         ;;
     switch)
         shift
-        home-manager switch --flake ".#$HOME_CONFIG" 2>&1 | ${NOM_PIPE}
+        ./result/activate
         ;;
     *)
         echo "$0 $COMMAND build: build home" >&2
