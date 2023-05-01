@@ -2,7 +2,10 @@
 
 {
   imports = [
-    ./modules/common.nix
+    ./modules/base.nix
+    ./modules/dev.nix
+    ./modules/work.nix
+    ./modules/media.nix
   ];
 
   home.username = "appaquet";

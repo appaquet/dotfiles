@@ -1,20 +1,13 @@
 
 # Nixified dotfiles
 
-## TODO
-
-- [ ] Manage brew through nix: <https://daiderd.com/nix-darwin/manual/index.html#opt-homebrew.enable>
-- [ ] Find out how to declaratively install apt packages
-
 ## Initial setup
 
-1. Make sure that fish is installed and is the default shell. Otherwise it won't properly setup for fish but only for currently running shell.
+1. Download nix installer & run it with multi-user mode enabled: `curl -L https://nixos.org/nix/install | sh -s -- --daemon`
 
-2. Download nix installer & run it with multi-user mode enabled: `curl -L https://nixos.org/nix/install | sh -s -- --daemon`
+2. Enable flakes: `mkdir -p ~/.config/nix/ && echo 'experimental-features = nix-command flakes' > ~/.config/nix/nix.conf`
 
-3. Enable flakes: `mkdir -p ~/.config/nix/ && echo 'experimental-features = nix-command flakes' > ~/.config/nix/nix.conf`
-
-4. On Linux, configure nix by adding to `/etc/nix/nix.conf`.
+3. On Linux, configure nix by adding to `/etc/nix/nix.conf`.
    No need to do it on Darwin since we already do it nix-darwin (see [configuration.nix](./darwin/mbpapp/configuration.nix))
 
    ```conf
@@ -28,12 +21,13 @@
       experimental-features = nix-command flakes
    ```
 
-5. On MacOS, apply darwin config: `./x build-darwin` and `./x activate-darwin`
-   1. Activate shell by adding `/Users/appaquet/.nix-profile/bin/fish` to `/etc/shells` and running `chsh -s /Users/appaquet/.nix-profile/bin/fish`
-   2. Select a patched nerdfonts font in iTerm2 in order to have icons in neovim.
+4. Build `./x home build` and activate `./x home switch`
 
-6. Build `./x build` and activate `./x activate`
-   1. On Linux, you may have to change shell to fish: `usermod -s /home/$USER/.nix-profile/bin/fish $USER`
+5. Activate shell by adding `/home/appaquet/.nix-profile/bin/fish` to `/etc/shells`
+   and running `chsh -s /home/appaquet/.nix-profile/bin/fish`
+
+6. On MacOS, apply darwin config: `./x darwin build` and `./x darwin witch`
+   2. Select a patched nerdfonts font in iTerm2 in order to have icons in neovim.
 
 ### On NixOS
 
@@ -50,7 +44,7 @@
 ## Troubleshooting
 
 1. It seems that when switching to newer fish, the paths weren't properly set.
-   On top of that, it may be shadowed by a global fish path too. Unset it with `set -ge` first.
+   On top of that, it may be shadowed by a global fish path too. Unset it with `set -ge fish_user_paths` first.
    They should look like (add with `set -Ua fish_user_paths`)
      - /nix/var/nix/profiles/default/bin
      - /home/appaquet/.nix-profile/bin
@@ -130,3 +124,8 @@
 - <https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/trivial-builders.nix>
 - <https://nix-community.github.io/home-manager/options.html>
 - <https://daiderd.com/nix-darwin/manual/index.html#sec-options>
+
+## TODO
+
+- [ ] Manage brew through nix: <https://daiderd.com/nix-darwin/manual/index.html#opt-homebrew.enable>
+- [ ] Find out how to declaratively install apt packages

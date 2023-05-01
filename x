@@ -35,54 +35,146 @@ check_home() {
     check_eval ".#homeConfigurations.${1}.activationPackage"
 }
 
+prime_sudo() {
+    sudo echo # prime pw for nom redirects to work
+}
+
+copy_files() {
+    local host="$1"
+    local file
+    for file in $(find "${ROOT}/files/${host}" -type f); do
+        local target_file="${file/${ROOT}\/files\/${host}/}"
+        local target_path="${target_file}"
+
+        echo "Copy ${file} to ${target_path}"
+
+        # if outside of home, use sudo
+        if [[ "${target_path}" != "${HOME}/"* ]]; then
+            sudo mkdir -p "$(dirname "${target_path}")"
+            sudo cp "${file}" "${target_path}"
+        else
+            mkdir -p "$(dirname "${target_path}")"
+            cp "${file}" "${target_path}"
+        fi
+    done
+}
+
 COMMAND=$1
 case $COMMAND in
+home)
+    shift
+    SUBCOMMAND=$1
+    case $SUBCOMMAND in
+    check)
+        shift
+        check_home $HOME_CONFIG
+        ;;
+    build)
+        shift
+        ${NIX_BUILDER} build ".#homeConfigurations.${HOME_CONFIG}.activationPackage" 2>&1 | ${NOM_PIPE}
+        ;;
+    switch)
+        shift
+        ./result/activate
+        ;;
+    *)
+        echo "$0 $COMMAND build: build home" >&2
+        echo "$0 $COMMAND switch: switch home" >&2
+        exit 1
+        ;;
+    esac
+    ;;
+
+darwin)
+    shift
+    SUBCOMMAND=$1
+    case $SUBCOMMAND in
+    check)
+        shift
+        check_eval ".#darwinConfigurations.mbpapp.system"
+        ;;
+    build)
+        shift
+        ${NIX_BUILDER} build ".#darwinConfigurations.mbpapp.system"
+        ;;
+    switch)
+        shift
+        ./result/sw/bin/darwin-rebuild switch --flake .
+        ;;
+    *)
+        echo "$0 $COMMAND check: check home" >&2
+        echo "$0 $COMMAND build: build home" >&2
+        echo "$0 $COMMAND switch: switch home" >&2
+        exit 1
+        ;;
+    esac
+    ;;
+
+nixos)
+    shift
+    SUBCOMMAND=$1
+    case $SUBCOMMAND in
+    check)
+        shift
+        check_eval ".#nixosConfigurations.${HOSTNAME}.config.system.build.toplevel"
+        ;;
+    build)
+        shift
+        sudo nixos-rebuild build --flake ".#deskapp" |& ${NOM_PIPE}
+        ;;
+    switch)
+        shift
+        sudo nixos-rebuild switch --flake ".#deskapp" |& ${NOM_PIPE}
+        ;;
+    *)
+        echo "$0 $COMMAND check: check nixos" >&2
+        echo "$0 $COMMAND build: build nixos" >&2
+        echo "$0 $COMMAND switch: switch nixos" >&2
+        exit 1
+        ;;
+    esac
+    ;;
+
 check)
     shift
     check_home "appaquet@deskapp"
     check_home "appaquet@mbpapp"
     check_eval ".#darwinConfigurations.mbpapp.system"
-    ;;
-
-build-home)
-    shift
-    home-manager build --flake ".#$HOME_CONFIG" |& ${NOM_PIPE}
-    ;;
-
-build-darwin)
-    shift
-    ${NIX_BUILDER} build ".#darwinConfigurations.mbpapp.system"
-    ;;
-
-build-nixos)
-    shift
-    sudo nixos-rebuild build --flake ".#deskapp" |& ${NOM_PIPE}
-    ;;
-
-activate-home)
-    shift
-    home-manager switch --flake ".#$HOME_CONFIG" |& ${NOM_PIPE}
-    ;;
-
-activate-darwin)
-    shift
-    ./result/sw/bin/darwin-rebuild switch --flake .
-    ;;
-
-activate-nixos)
-    shift
-    sudo nixos-rebuild switch --flake ".#deskapp" |& ${NOM_PIPE}
+    check_eval ".#nixosConfigurations.${HOSTNAME}.config.system.build.toplevel"
     ;;
 
 update)
     shift
-    nix-channel --update
-    nix flake update
+    PACKAGE="$1"
+    if [[ -z "$PACKAGE" ]]; then
+      nix-channel --update 2>&1 | ${NOM_PIPE}
+      nix flake update 2>&1 | ${NOM_PIPE}
+    else
+      nix flake lock --update-input $PACKAGE
+    fi
+    ;;
+
+link)
+    shift
+    if [[ ! -d "${ROOT}/files/${HOSTNAME}" ]]; then
+        echo "No files for ${HOSTNAME}"
+        exit 1
+    fi
+
+    prime_sudo
+    copy_files "$HOSTNAME"
     ;;
 
 gc)
     shift
+    echo "Garbage collecting..."
     nix-collect-garbage
+    ;;
+
+optimize)
+    shift
+    echo "Optimizing store..."
+    nix store optimise
     ;;
 
 fetch-deskapp)
@@ -91,17 +183,15 @@ fetch-deskapp)
     ;;
 
 *)
-    echo "usage:" >&2
-    echo "   $0 check: check eval homes & darwin" >&2
-    echo "   $0 build-home: build current home manager" >&2
-    echo "   $0 build-darwin: build darwin config" >&2
-    echo "   $0 build-nixos: build nixos config" >&2
-    echo "   $0 activate: activate result home manager" >&2
-    echo "   $0 activate-darwin: activate darwin config" >&2
-    echo "   $0 activate-nixos: activate nixos config" >&2
-    echo "   $0 update: update nix channels" >&2
-    echo "   $0 gc: run garbage collection" >&2
-    echo "   $0 fetch-deskapp: fetch latest dotfiles from deskapp" >&2
+    echo "$0 home: home manager sub commands" >&2
+    echo "$0 darwin: darwin sub commands" >&2
+    echo "$0 nixos: nixos sub commands" >&2
+    echo "$0 check: eval home & nixos & darwin configs for all hosts" >&2
+    echo "$0 update: update nix channels" >&2
+    echo "$0 link: link system files" >&2
+    echo "$0 gc: run garbage collection" >&2
+    echo "$0 optimize: optimize store" >&2
+    echo "$0 fetch-deskapp: fetch latest dotfiles from deskapp" >&2
     exit 1
     ;;
 esac

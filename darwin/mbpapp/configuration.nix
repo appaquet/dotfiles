@@ -26,7 +26,7 @@
     extraOptions = ''
       keep-outputs = true
       keep-derivations = true
-      auto-optimise-store = true
+      auto-optimise-store = false
 
       # assuming the builder has a faster internet connection
       builders-use-substitutes = true

@@ -9,14 +9,13 @@
     ./rtx
     ./utils
     ./autojump.nix
-    ./rust.nix
-    ./jira.nix
   ];
 
   programs.home-manager.enable = true;
 
-  humanfirst.enable = true; # enable humanfirst goodies (git shortcuts, jira, etc.)
-  humanfirst.identity.email = "app@humanfirst.ai";
+  # https://github.com/nix-community/nix-direnv#via-home-manager
+  programs.direnv.enable = true;
+  programs.direnv.nix-direnv.enable = true;
 
   # https://github.com/nix-community/nix-direnv#via-home-manager
   programs.direnv.enable = true;
@@ -27,12 +26,16 @@
   #  - to install an unstable package, use `unstablePkgs.<package-name>`
   home.packages = with pkgs; [
     manix # nix doc cli searcher
+<<<<<<< HEAD:home-manager/modules/common.nix
     nix-output-monitor # better nix build output
     direnv
     nix-direnv
 
     git
     gh
+=======
+    nix-output-monitor # better nix build output (nom)
+>>>>>>> master:home-manager/modules/base.nix
 
     bat # cat replacement
     hexyl
@@ -48,14 +51,18 @@
 
     jq
     jless
-    tokei
+
+    zip
+    unzip
+    pigz
+    gzip
+    bzip2
+    gnutar
+
+    curl
+    wget
 
     tealdeer # rust version of tldr
-
-    dive # docker container explorer
-
-    (google-cloud-sdk.withExtraComponents (with google-cloud-sdk.components; [ gke-gcloud-auth-plugin ]))
-    cloud-sql-proxy
 
     rsync
     rclone

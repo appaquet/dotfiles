@@ -2,29 +2,13 @@
 
 {
   imports = [
-    ./modules/common.nix
+    ./modules/base.nix
+    ./modules/dev.nix
+    ./modules/work.nix
+    ./modules/vms.nix
     ./modules/nixos.nix
+    ./modules/media.nix
   ];
-
-  home.packages = with pkgs; [
-    nil # nix lsp
-    nixpkgs-fmt
-
-    tailscale
-
-    gnumake
-  ];
-
-  programs.fish = {
-    shellAbbrs = {
-      vm = "sudo virsh ";
-      vml = "sudo virsh list --all";
-      vmls = "sudo virsh list --all";
-      vmstart = "sudo virsh start ";
-      vmstop = "sudo virsh shutdown ";
-      vmshut = "sudo virsh shutdown ";
-    };
-  };
 
   home.username = "appaquet";
   home.homeDirectory = "/home/appaquet";
