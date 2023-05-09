@@ -80,8 +80,12 @@
   networking.firewall.enable = false;
 
   services.vscode-server.enable = true;
-  #services.vscode-server.enableFHS = true;
-  #services.vscode-server.extraRuntimeDependencies = with pkgs; [
-  #  zlib
-  #];
+  services.vscode-server.enableFHS = false;
+  services.vscode-server.extraRuntimeDependencies = with pkgs; [
+    zlib
+    glib
+    clang
+    llvmPackages.libclang
+    llvmPackages.libcxxClang
+  ];
 }
