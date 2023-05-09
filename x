@@ -147,8 +147,8 @@ update)
     shift
     PACKAGE="$1"
     if [[ -z "$PACKAGE" ]]; then
-      nix-channel --update 2>&1 | ${NOM_PIPE}
-      nix flake update 2>&1 | ${NOM_PIPE}
+      nix-channel --update
+      nix flake update
     else
       nix flake lock --update-input $PACKAGE
     fi
