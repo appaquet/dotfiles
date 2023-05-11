@@ -69,9 +69,8 @@
   - `<leader>w` to close the current buffer by trying not to messup the layout
   - `<leader><tab>` to switch between tab and spaces
   - `<ctrl>e` or `<leader>e` to toggle Nerdtree (files)
-  - `<leader>d` if YouCompleteMe is available, go to definition
   - `<ctrl>p` fuzzy finding file
-  - `<ctrl>a` fuzzy find the current word in files using ack
+  - `<ctrl>f` riggrep search
   - `<leader>m` to toggle mouse support (useful to allow select + copy)
   - `<leader>y` to yank to clipboard using [bin/pbcopy](bin/pbcopy) util
   - `<leader>p` to paste from clipboard using [bin/pbpaste](bin/pbpaste) util

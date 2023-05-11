@@ -1,4 +1,4 @@
-"" Various buffers mapping
+" Buffer navigation & control
 map <D-1> :br!<CR>
 map <Leader>1 :br!<CR>
 map <D-2> :br!<CR>:bn!<CR>
@@ -19,21 +19,29 @@ map <D-9> :br!<CR>:bn! 8<CR>
 map <Leader>9 :br!<CR>:bn! 8<CR>
 map <Leader>] :bn!<CR>
 map <Leader>[ :bp!<CR>
-map <Leader>x :w<CR>:!./%<CR>
-map <Leader>z :'<,'>w !sh<CR>
-map <Leader>y :w !pbcopy<CR><CR>
-map <Leader>p :read !pbpaste<CR>
-map <D-x> :w<CR>:!./%<CR>
-map <D-s> :w<CR>
-map <Leader>s :w<CR>
-map <D-r>r :!./rsync.sh<CR>
-map <Leader>r :!./rsync.sh<CR>
-map <D-q> :q<CR>
-map <Leader>q :q<CR>
 
 " Cleanly close buffer
 map <D-0> :Bclose<creating>
 nmap <leader>w :Bclose<CR>
+
+" Execute current file or selection
+map <Leader>x :w<CR>:!./%<CR>
+map <Leader>z :'<,'>w !sh<CR>
+map <D-r>r :!./rsync.sh<CR>
+map <Leader>r :!./rsync.sh<CR>
+
+" Clipboard
+map <Leader>y :w !pbcopy<CR><CR>
+map <Leader>p :read !pbpaste<CR>
+
+
+" Save & quit
+map <D-x> :w<CR>:!./%<CR>
+map <D-s> :w<CR>
+map <Leader>s :w<CR>
+map <D-q> :q<CR>
+map <Leader>q :q<CR>
+
 
 " For when you forget to sudo.. Really Write the file.
 cmap w!! w !sudo tee % >/dev/null

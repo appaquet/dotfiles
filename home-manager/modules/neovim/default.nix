@@ -1,22 +1,10 @@
 { config, lib, pkgs, unstablePkgs, ... }:
 
-let
-  base16-vim = pkgs.vimPlugins.base16-vim.overrideAttrs (old: {
-    src = pkgs.fetchFromGitHub {
-      owner = "chriskempson";
-      repo = "base16-vim";
-      rev = "3be3cd82cd31acfcab9a41bad853d9c68d30478d";
-      sha256 = "uJvaYYDMXvoo0fhBZUhN8WBXeJ87SRgof6GEK2efFT0=";
-    };
-  });
-
-in
 {
   programs.neovim = {
     enable = true;
     viAlias = true;
     vimAlias = true;
-
 
     # TODO: Inspire configs from:
     # - https://github.com/AstroNvim/AstroNvim
@@ -25,7 +13,7 @@ in
     # - https://www.lunarvim.org/docs/plugins/core-plugins-list
     plugins = with pkgs.vimPlugins; [
       # Theme
-      base16-vim
+      nvim-base16
       nvim-web-devicons
 
       # Layout
@@ -33,6 +21,18 @@ in
       lualine-nvim # https://github.com/nvim-lualine/lualine.nvim
       lualine-lsp-progress
       bufferline-nvim # https://github.com/akinsho/bufferline.nvim
+
+      # Autocomplete
+      luasnip
+      nvim-cmp
+      cmp-cmdline
+      cmp_luasnip
+      cmp-nvim-lsp
+      cmp-nvim-lsp-signature-help
+      cmp-nvim-lsp-document-symbol
+
+      # LSP
+      nvim-lspconfig # https://github.com/neovim/nvim-lspconfig/
 
       # Syntax
       (nvim-treesitter.withPlugins (p: [
@@ -77,6 +77,7 @@ in
       (builtins.readFile ./conf/plugin.lualine.vim)
       (builtins.readFile ./conf/plugin.treesitter.vim)
       (builtins.readFile ./conf/plugin.fzf.vim)
+      (builtins.readFile ./conf/plugin.lsp.vim)
     ]);
   };
 
