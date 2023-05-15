@@ -34,7 +34,6 @@ map <Leader>r :!./rsync.sh<CR>
 map <Leader>y :w !pbcopy<CR><CR>
 map <Leader>p :read !pbpaste<CR>
 
-
 " Save & quit
 map <D-x> :w<CR>:!./%<CR>
 map <D-s> :w<CR>

@@ -2,6 +2,16 @@ lua << END
 
 local lspconfig = require('lspconfig')
 
+
+lspconfig.pyright.setup {}
+lspconfig.tsserver.setup {}
+lspconfig.rust_analyzer.setup {
+  -- Server-specific settings. See `:help lspconfig-setup`
+  settings = {
+    ['rust-analyzer'] = {},
+  },
+}
+
 -- Nil (see https://github.com/oxalica/nil/blob/main/dev/nvim-lsp.nix)
 local nil_lsp_path = vim.env.NIL_PATH or '/home/appaquet/.nix-profile/bin/nil'
 local nil_caps = vim.tbl_deep_extend(
@@ -26,15 +36,6 @@ lspconfig.nil_ls.setup {
   },
 }
 
-
-lspconfig.pyright.setup {}
-lspconfig.tsserver.setup {}
-lspconfig.rust_analyzer.setup {
-  -- Server-specific settings. See `:help lspconfig-setup`
-  settings = {
-    ['rust-analyzer'] = {},
-  },
-}
 
 
 -- Global mappings.
@@ -76,11 +77,8 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 
 
-
-
-
+-- nvim-cmp + luasnip
 local luasnip = require 'luasnip'
--- nvim-cmp setup
 local cmp = require 'cmp'
 cmp.setup {
   snippet = {

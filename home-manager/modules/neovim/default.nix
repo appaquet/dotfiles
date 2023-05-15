@@ -22,17 +22,17 @@
       lualine-lsp-progress
       bufferline-nvim # https://github.com/akinsho/bufferline.nvim
 
-      # Autocomplete
+      # LSP
+      nvim-lspconfig # https://github.com/neovim/nvim-lspconfig/
+
+      # Autocomplete (w/ LSP)
       luasnip
-      nvim-cmp
+      nvim-cmp # https://github.com/hrsh7th/nvim-cmp
       cmp-cmdline
       cmp_luasnip
       cmp-nvim-lsp
       cmp-nvim-lsp-signature-help
       cmp-nvim-lsp-document-symbol
-
-      # LSP
-      nvim-lspconfig # https://github.com/neovim/nvim-lspconfig/
 
       # Syntax
       (nvim-treesitter.withPlugins (p: [
