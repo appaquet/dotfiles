@@ -11,6 +11,10 @@ let
       url = "https://github.com/jdxcode/rtx/releases/download/v1.29.6/rtx-v1.29.6-macos-arm64";
       sha256 = "0gwrg38mjj8l0qkvaqp2mw3cli0x5y5b3bly0br730dhkbgi58m9";
     };
+    "x86_64-darwin" = fetchurl {
+      url = "https://github.com/jdxcode/rtx/releases/download/v1.29.6/rtx-v1.29.6-macos-x64";
+      sha256 = "0h18zs0qvqy5za12llqa35qcz1gzxzsf5nkn8g4ayfqrbhfpm4fm";
+    };
   };
 
 in
