@@ -35,6 +35,7 @@
     htop
     ookla-speedtest
     mtr
+    neofetch
 
     jq
     jless

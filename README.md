@@ -87,6 +87,9 @@
   - `E <file>`: open a new buffer for a new file in current buffer's directory
   - `Delete`: delete current buffer's file
 
+- Basics
+  - `<ctrl>o` navigate back and `<ctrl>i` to navigate forward
+
 ### tmux
 
 - Shortcuts
