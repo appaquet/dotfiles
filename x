@@ -139,7 +139,8 @@ link)
 gc)
     shift
     echo "Garbage collecting..."
-    nix-collect-garbage
+    nix-collect-garbage --delete-older-than "14d"
+    home-manager expire-generations "-14 days"
     ;;
 
 optimize)
