@@ -27,8 +27,8 @@ stdenv.mkDerivation {
   src = sources.${system};
   dontUnpack = true;
 
-  # From https://nixos.wiki/wiki/Packaging/Binaries
-  # lib.optionals returns [ ] if the condition is false so it's a noop on other platforms
+  buildInputs = lib.optionals stdenv.isLinux [ stdenv.cc.cc.lib ];
+
   nativeBuildInputs = lib.optionals stdenv.isLinux [
     autoPatchelfHook
   ];
