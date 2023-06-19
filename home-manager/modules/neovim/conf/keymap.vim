@@ -54,11 +54,11 @@ function! ToggleMouse()
     if &mouse == 'a'
         " disable mouse
         set mouse=
-        set nonumber
+        set norelativenumber
     else
         " enable mouse everywhere
         set mouse=a
-        set number
+        set relativenumber
     endif
 endfunc
 
