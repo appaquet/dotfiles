@@ -91,6 +91,11 @@
         $CLEAR
         ~/.nix-profile/bin/fish
       '';
+
+      # ripgrep & open files in vim
+      vimrg = ''
+        vim -c "Rg $argv"
+      '';
     };
   };
 
