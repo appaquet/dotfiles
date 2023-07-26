@@ -29,6 +29,12 @@
 6. On MacOS, apply darwin config: `./x darwin build` and `./x darwin witch`
    2. Select a patched nerdfonts font in iTerm2 in order to have icons in neovim.
 
+## Not covered
+
+- Rust is not installed using Nix anymore as it breaks [cross](https://github.com/cross-rs/cross) since Rust
+  binaries link with Nix libs. Cross does mount `/nix`, but it doesn't seem sufficient...
+  See [this commit](https://github.com/appaquet/dotfiles/commit/4aebf75a47536c833140d463cbc1606d474e1f91).
+
 ## Troubleshooting
 
 1. It seems that when switching to newer fish, the paths weren't properly set.
