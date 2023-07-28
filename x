@@ -8,9 +8,9 @@ HOSTNAME=$(uname -n | tr '[:upper:]' '[:lower:] | sed 's/\.local//'')
 MACHINE_KEY="${USER}@${HOSTNAME}"
 
 HOME_CONFIG=""
-if [[ "${MACHINE_KEY}" == "appaquet@deskapp" || "${MACHINE_KEY}" == "appaquet@nixos" ]]; then
+if [[ "${MACHINE_KEY}" == "appaquet@deskapp"* || "${MACHINE_KEY}" == "appaquet@nixos"* || "${MACHINE_KEY}" == "appaquet@ubuntu-nix"* ]]; then
     HOME_CONFIG="appaquet@deskapp"
-elif [[ "${MACHINE_KEY}" == "appaquet@mbpapp" || "${MACHINE_KEY}" == "appaquet@mbpvmapp" ]]; then
+elif [[ "${MACHINE_KEY}" == "appaquet@mbpapp"* || "${MACHINE_KEY}" == "appaquet@mbpvmapp"* ]]; then
     HOME_CONFIG="appaquet@mbpapp"
 else
     echo "Non-configured machine (${MACHINE_KEY})"
@@ -168,7 +168,15 @@ link)
 gc)
     shift
     echo "Garbage collecting..."
-    nix-collect-garbage
+
+    nix-collect-garbage --delete-older-than "14d"
+    home-manager expire-generations "-14 days"
+
+    # Cleaning as root collects more stuff as well
+    # See https://www.reddit.com/r/NixOS/comments/10107km/how_to_delete_old_generations_on_nixos/?s=8
+    ncg=$(which nix-collect-garbage)
+    sudo ${ncg} -d
+
     ;;
 
 optimize)

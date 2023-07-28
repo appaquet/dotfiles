@@ -4,26 +4,31 @@ let
   sources = {
     # Use `nix-prefetch-url https://...` to get hash
     "x86_64-linux" = fetchurl {
-      url = "https://github.com/jdxcode/rtx/releases/download/v1.29.3/rtx-v1.29.3-linux-x64";
-      sha256 = "0fr4m814yylvm2c7r7lrnlf16sgsqrqn3mq45ynql1yd654bn357";
+      url = "https://github.com/jdxcode/rtx/releases/download/v1.34.2/rtx-v1.34.2-linux-x64";
+      sha256 = "1c9fh1h7lg1zhyj4x37walh4hpcjp98pfhp0akyvkwqypgpk3pwp";
     };
     "aarch64-darwin" = fetchurl {
-      url = "https://github.com/jdxcode/rtx/releases/download/v1.29.3/rtx-v1.29.3-macos-arm64";
-      sha256 = "0maz5kkb8z2c30wj30kwh146ligzmz7h4z6zmfmga4pf7dx49498";
+      url = "https://github.com/jdxcode/rtx/releases/download/v1.34.2/rtx-v1.34.2-macos-arm64";
+      sha256 = "1rz7vdpj5zlhhz80qiz76p07s27ywl12hi5i5cnxc9k6xm8k8ilj";
+    };
+    "x86_64-darwin" = fetchurl {
+      url = "https://github.com/jdxcode/rtx/releases/download/v1.34.2/rtx-v1.34.2-macos-x64";
+      sha256 = "0z6hf36rr65ffr4dnyyw5khb9b2cpc6641m4isbg0f2qc1my068y";
     };
   };
+
 in
 
 stdenv.mkDerivation {
   pname = "rtx";
-  version = "v1.20.2";
+  version = "v1.34.2";
 
   # Supported platforms are asserted automatically by the meta.platforms field
   src = sources.${system};
   dontUnpack = true;
 
-  # From https://nixos.wiki/wiki/Packaging/Binaries
-  # lib.optionals returns [ ] if the condition is false so it's a noop on other platforms
+  buildInputs = lib.optionals stdenv.isLinux [ stdenv.cc.cc.lib ];
+
   nativeBuildInputs = lib.optionals stdenv.isLinux [
     autoPatchelfHook
   ];

@@ -1,45 +1,40 @@
-{ config, lib, pkgs, ... }:
-let
-  base16-vim = pkgs.vimPlugins.base16-vim.overrideAttrs (old: {
-    src = pkgs.fetchFromGitHub {
-      owner = "chriskempson";
-      repo = "base16-vim";
-      rev = "3be3cd82cd31acfcab9a41bad853d9c68d30478d";
-      sha256 = "uJvaYYDMXvoo0fhBZUhN8WBXeJ87SRgof6GEK2efFT0=";
-    };
-  });
+{ config, lib, pkgs, unstablePkgs, ... }:
 
-  vim-airline = pkgs.vimPlugins.vim-airline.overrideAttrs (old: {
-    src = pkgs.fetchFromGitHub {
-      owner = "vim-airline";
-      repo = "vim-airline";
-      rev = "038e3a6ca59f11b3bb6a94087c1792322d1a1d5c";
-      sha256 = "m6ENdxaWT/e6Acl2OblnfvKFAO9ysPgrexoNL2TUqVQ=";
-    };
-  });
-
-in
 {
   programs.neovim = {
     enable = true;
     viAlias = true;
     vimAlias = true;
 
-
     # TODO: Inspire configs from:
+    # - https://github.com/AstroNvim/AstroNvim
     # - https://github.com/rockerBOO/awesome-neovim#preconfigured-configuration (meta list of configs)
     # - https://astronvim.com/#-features
     # - https://www.lunarvim.org/docs/plugins/core-plugins-list
     plugins = with pkgs.vimPlugins; [
+      # Theme
+      nvim-base16
       nvim-web-devicons
+
+      # Layout
       nvim-tree-lua
+      lualine-nvim # https://github.com/nvim-lualine/lualine.nvim
+      lualine-lsp-progress
+      bufferline-nvim # https://github.com/akinsho/bufferline.nvim
 
-      fzf-vim # :Files (ctrl-p), :Rg (ctrl-f)
-      base16-vim # theme
+      # LSP
+      nvim-lspconfig # https://github.com/neovim/nvim-lspconfig/
 
-      # TODO: Replace with https://github.com/nvim-lualine/lualine.nvim + https://github.com/romgrk/barbar.nvim
-      vim-airline # status / tab bar 
+      # Autocomplete (w/ LSP)
+      luasnip
+      nvim-cmp # https://github.com/hrsh7th/nvim-cmp
+      cmp-cmdline
+      cmp_luasnip
+      cmp-nvim-lsp
+      cmp-nvim-lsp-signature-help
+      cmp-nvim-lsp-document-symbol
 
+      # Syntax
       (nvim-treesitter.withPlugins (p: [
         # see https://github.com/nvim-treesitter/nvim-treesitter for available languages
         p.nix
@@ -64,8 +59,9 @@ in
       ]))
       nvim-treesitter-textobjects # provider object manipulation
 
+      # Tools
+      fzf-vim # :Files (ctrl-p), :Rg (ctrl-f)
       Rename # :Rename <new name>
-
       vim-multiple-cursors # ctrl-n multi cursors
       bclose-vim # close buffer cleanly via <leader>w
       delimitMate # auto close quotes, parens, etc
@@ -77,9 +73,11 @@ in
       (builtins.readFile ./conf/keymap.vim)
       (builtins.readFile ./conf/theme.vim)
       (builtins.readFile ./conf/plugin.nvimtree.vim)
-      (builtins.readFile ./conf/plugin.airline.vim)
+      (builtins.readFile ./conf/plugin.bufferline.vim)
+      (builtins.readFile ./conf/plugin.lualine.vim)
       (builtins.readFile ./conf/plugin.treesitter.vim)
       (builtins.readFile ./conf/plugin.fzf.vim)
+      (builtins.readFile ./conf/plugin.lsp.vim)
     ]);
   };
 

@@ -41,6 +41,12 @@
 - To update flakes, run `./x update`
 - To update a specific flake, run `nix flake lock --update-input <the flake>`
 
+## Not covered
+
+- Rust is not installed using Nix anymore as it breaks [cross](https://github.com/cross-rs/cross) since Rust
+  binaries link with Nix libs. Cross does mount `/nix`, but it doesn't seem sufficient...
+  See [this commit](https://github.com/appaquet/dotfiles/commit/4aebf75a47536c833140d463cbc1606d474e1f91).
+
 ## Troubleshooting
 
 1. It seems that when switching to newer fish, the paths weren't properly set.
@@ -71,7 +77,8 @@
 
 ### Neovim
 
-- Shortcuts
+#### Mapping
+- General
   - `<leader>` is configured to `\` (backslash)
   - `<leader> 1 through 9` to switch between opened buffers
   - `<leader>]` to switch to next buffer
@@ -84,16 +91,25 @@
   - `<leader>w` to close the current buffer by trying not to messup the layout
   - `<leader><tab>` to switch between tab and spaces
   - `<ctrl>e` or `<leader>e` to toggle Nerdtree (files)
-  - `<leader>d` if YouCompleteMe is available, go to definition
   - `<ctrl>p` fuzzy finding file
-  - `<ctrl>a` fuzzy find the current word in files using ack
+  - `<ctrl>f` riggrep search
   - `<leader>m` to toggle mouse support (useful to allow select + copy)
   - `<leader>y` to yank to clipboard using [bin/pbcopy](bin/pbcopy) util
   - `<leader>p` to paste from clipboard using [bin/pbpaste](bin/pbpaste) util
 
+- LSP
+  - `gD` goto declaration
+  - `gd` goto definition
+  - `gi` goto implementation
+  - `K` hover info
+  - `<space>rn` rename symbol
+
 - Commands
   - `E <file>`: open a new buffer for a new file in current buffer's directory
   - `Delete`: delete current buffer's file
+
+- Basics
+  - `<ctrl>o` navigate back and `<ctrl>i` to navigate forward
 
 ### tmux
 

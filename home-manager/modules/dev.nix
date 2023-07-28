@@ -1,10 +1,6 @@
-{ pkgs, unstablePkgs, ... }:
+{ pkgs, ... }:
 
 {
-  imports = [
-    ./rust.nix
-  ];
-
   home.packages = with pkgs; [
     nil # nix lsp
     nixpkgs-fmt
