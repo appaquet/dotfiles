@@ -7,7 +7,6 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
-    #nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     rust-overlay.url = "github:oxalica/rust-overlay";
   };
@@ -25,7 +24,7 @@
       in
       {
         devShells = {
-          default = pkgs.mkShell {
+          default = pkgs.mkShell rec {
             buildInputs = with pkgs; [
               clang
               protobuf
@@ -33,10 +32,7 @@
               nodejs
               yarn
               nix-ld
-            ];
 
-            nativeBuildInputs = with pkgs; [
-              clang
               llvmPackages.libclang
               llvmPackages.libcxxClang
               zlib
