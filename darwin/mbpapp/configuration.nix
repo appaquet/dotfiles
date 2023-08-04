@@ -20,7 +20,7 @@
     };
 
     registry = {
-      nixpkgs.flake = inputs.nixpkgs;
+      nixpkgs.flake = inputs.inputs.nixpkgs;
     };
 
     extraOptions = ''
