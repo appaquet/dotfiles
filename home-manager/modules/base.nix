@@ -23,6 +23,8 @@
   home.packages = with pkgs; [
     manix # nix doc cli searcher
     nix-output-monitor # better nix build output (nom)
+    nil # nix lsp
+    nixpkgs-fmt
 
     bat # cat replacement
     hexyl

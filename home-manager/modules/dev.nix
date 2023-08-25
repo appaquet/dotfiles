@@ -2,9 +2,6 @@
 
 {
   home.packages = with pkgs; [
-    nil # nix lsp
-    nixpkgs-fmt
-
     gh
 
     tokei

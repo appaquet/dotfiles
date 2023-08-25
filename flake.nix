@@ -62,6 +62,12 @@
               extraSpecialArgs = { inherit inputs unstablePkgs; };
             };
 
+            "appaquet@servapp" = home-manager.lib.homeManagerConfiguration {
+              inherit pkgs;
+              modules = [ ./home-manager/servapp.nix ] ++ commonHomeModules;
+              extraSpecialArgs = { inherit inputs unstablePkgs; };
+            };
+
             "appaquet@mbpapp" = home-manager.lib.homeManagerConfiguration {
               inherit pkgs;
               modules = [ ./home-manager/mbpapp.nix ] ++ commonHomeModules;
@@ -75,6 +81,7 @@
       # properly expose home configurations with appropriate expected system
       homeConfigurations = {
         "appaquet@deskapp" = self.homes.x86_64-linux."appaquet@deskapp";
+        "appaquet@servapp" = self.homes.x86_64-linux."appaquet@servapp";
         "appaquet@mbpapp" = self.homes.aarch64-darwin."appaquet@mbpapp";
       };
 
