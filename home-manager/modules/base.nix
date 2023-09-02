@@ -40,6 +40,8 @@
     gping
     neofetch
 
+    dig
+
     jq
     jless
 
