@@ -4,16 +4,16 @@ let
   sources = {
     # Use `nix-prefetch-url https://...` to get hash
     "x86_64-linux" = fetchurl {
-      url = "https://github.com/jdxcode/rtx/releases/download/v1.34.2/rtx-v1.34.2-linux-x64";
-      sha256 = "1c9fh1h7lg1zhyj4x37walh4hpcjp98pfhp0akyvkwqypgpk3pwp";
+      url = "https://github.com/jdxcode/rtx/releases/download/v2023.9.0/rtx-v2023.9.0-linux-x64";
+      sha256 = "0lbk37g35f729mb98kigg4nv3fb7ljrihlzpszyr9x72vvgxv0ln";
     };
     "aarch64-darwin" = fetchurl {
-      url = "https://github.com/jdxcode/rtx/releases/download/v1.34.2/rtx-v1.34.2-macos-arm64";
-      sha256 = "1rz7vdpj5zlhhz80qiz76p07s27ywl12hi5i5cnxc9k6xm8k8ilj";
+      url = "https://github.com/jdxcode/rtx/releases/download/v2023.9.0/rtx-v2023.9.0-macos-arm64";
+      sha256 = "0ipjwzsdcb14p7gqral2bsj9p8jckk9sds0w6npwz4hcqjphj9az";
     };
     "x86_64-darwin" = fetchurl {
-      url = "https://github.com/jdxcode/rtx/releases/download/v1.34.2/rtx-v1.34.2-macos-x64";
-      sha256 = "0z6hf36rr65ffr4dnyyw5khb9b2cpc6641m4isbg0f2qc1my068y";
+      url = "https://github.com/jdxcode/rtx/releases/download/v2023.9.0/rtx-v2023.9.0-macos-x64";
+      sha256 = "0ym6zsfc9h7bc9b32pg4fpbffly5ayrphxd5lfcssl86lkspy9sm";
     };
   };
 
@@ -21,7 +21,7 @@ in
 
 stdenv.mkDerivation {
   pname = "rtx";
-  version = "v1.34.2";
+  version = "v2023.9.0";
 
   # Supported platforms are asserted automatically by the meta.platforms field
   src = sources.${system};
