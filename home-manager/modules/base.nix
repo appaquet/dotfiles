@@ -39,7 +39,7 @@
     mtr
     gping
     neofetch
-
+    bandwhich
     dig
 
     jq
