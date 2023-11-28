@@ -29,15 +29,6 @@
         allowUnfree = true;
       };
 
-      # Add custom packages to nixpkgs
-      packageOverlay = final: prev: {
-        rtx = prev.callPackage ./packages/rtx { };
-      };
-
-      overlays = [
-        packageOverlay
-      ];
-
       commonHomeModules = [
         humanfirst-dots.homeManagerModule
       ];
@@ -47,11 +38,11 @@
       (system: (
         let
           pkgs = import nixpkgs {
-            inherit system overlays config;
+            inherit system config;
           };
 
           unstablePkgs = import nixpkgs-unstable {
-            inherit system overlays config;
+            inherit system config;
           };
         in
         {
@@ -89,7 +80,7 @@
         mbpapp = darwin.lib.darwinSystem {
           system = "aarch64-darwin";
           pkgs = import nixpkgs {
-            inherit config overlays;
+            inherit config;
             system = "aarch64-darwin";
           };
           modules = [
