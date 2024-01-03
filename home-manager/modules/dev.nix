@@ -6,7 +6,8 @@
 
     tokei
 
-    dive # docker container explorer
+    dive       # docker container explorer
+    lazydocker # top like app for docker
 
     protobuf
     capnproto
