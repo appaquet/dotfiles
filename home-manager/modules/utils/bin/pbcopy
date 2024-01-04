@@ -5,7 +5,7 @@ if [[ "$os" == "Linux" ]]; then
   if [[ "$DISPLAY" != "" ]]; then
     xclip -selection clipboard
   else
-    ssh laptop.tailscale /usr/bin/pbcopy
+    ssh mbpapp.n3x.net /usr/bin/pbcopy
   fi
 elif [[ "$os" == "Darwin" ]]; then
   reattach-to-user-namespace /usr/bin/pbcopy

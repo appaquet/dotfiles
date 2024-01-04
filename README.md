@@ -24,7 +24,9 @@
 4. Build `./x home build` and activate `./x home switch`
 
 5. Activate shell by adding `/home/appaquet/.nix-profile/bin/fish` to `/etc/shells`
-   and running `chsh -s /home/appaquet/.nix-profile/bin/fish`
+   and running `chsh -s /home/appaquet/.nix-profile/bin/fish`.
+
+   Then reconnect, and may need to fix paths (see bellow)
 
 6. On MacOS, apply darwin config: `./x darwin build` and `./x darwin witch`
    2. Select a patched nerdfonts font in iTerm2 in order to have icons in neovim.
