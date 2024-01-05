@@ -11,6 +11,7 @@
 
     protobuf
     capnproto
+    flatbuffers
 
     mold
 

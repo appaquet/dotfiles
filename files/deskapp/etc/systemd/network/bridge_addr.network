@@ -2,6 +2,4 @@
 Name=br0
 
 [Network]
-Address=192.168.2.18/24
-Gateway=192.168.2.1
-DNS=192.168.2.1
+DHCP=yes # cannot use static ip since it will prevent vms from getting ips...
