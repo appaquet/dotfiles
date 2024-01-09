@@ -1,4 +1,4 @@
-{ config, pkgs, lib, libs, ... }:
+{ pkgs, ... }:
 {
   home.packages = with pkgs; [
     git
@@ -23,6 +23,8 @@
       github.user = "appaquet";
 
       push.autoSetupRemote = true;
+
+      rerere.enabled = true;
 
       core.editor = "nvim";
       core.fileMode = false;

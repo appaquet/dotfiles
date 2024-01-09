@@ -23,6 +23,8 @@
   home.packages = with pkgs; [
     manix # nix doc cli searcher
     nix-output-monitor # better nix build output
+    nil # nix lsp
+    nixpkgs-fmt
 
     direnv
     nix-direnv
@@ -43,6 +45,8 @@
     mtr
     gping
     neofetch
+    bandwhich
+    dig
 
     jq
     jless

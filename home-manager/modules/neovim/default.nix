@@ -7,9 +7,9 @@
     vimAlias = true;
 
     # TODO: Inspire configs from:
-    # - https://github.com/AstroNvim/AstroNvim
-    # - https://github.com/rockerBOO/awesome-neovim#preconfigured-configuration (meta list of configs)
     # - https://astronvim.com/#-features
+    # - https://nvchad.com/docs/features
+    # - https://github.com/rockerBOO/awesome-neovim#preconfigured-configuration (meta list of configs)
     # - https://www.lunarvim.org/docs/plugins/core-plugins-list
     plugins = with pkgs.vimPlugins; [
       # Theme

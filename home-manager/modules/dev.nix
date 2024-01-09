@@ -2,17 +2,18 @@
 
 {
   home.packages = with pkgs; [
-    nil # nix lsp
-    nixpkgs-fmt
-
     gh
 
     tokei
 
-    dive # docker container explorer
+    dive       # docker container explorer
+    lazydocker # top like app for docker
 
     protobuf
     capnproto
+    flatbuffers
+
+    mold
 
     (google-cloud-sdk.withExtraComponents (with google-cloud-sdk.components; [ gke-gcloud-auth-plugin ]))
     cloud-sql-proxy

@@ -24,7 +24,9 @@
 4. Build `./x home build` and activate `./x home switch`
 
 5. Activate shell by adding `/home/appaquet/.nix-profile/bin/fish` to `/etc/shells`
-   and running `chsh -s /home/appaquet/.nix-profile/bin/fish`
+   and running `chsh -s /home/appaquet/.nix-profile/bin/fish`.
+
+   Then reconnect, and may need to fix paths (see bellow)
 
 6. On MacOS, apply darwin config: `./x darwin build` and `./x darwin witch`
    2. Select a patched nerdfonts font in iTerm2 in order to have icons in neovim.
@@ -50,10 +52,14 @@
 ## Troubleshooting
 
 1. It seems that when switching to newer fish, the paths weren't properly set.
-   On top of that, it may be shadowed by a global fish path too. Unset it with `set -ge fish_user_paths` first.
-   They should look like (add with `set -Ua fish_user_paths`)
-     - /nix/var/nix/profiles/default/bin
-     - /home/appaquet/.nix-profile/bin
+   On top of that, it may be shadowed by a global fish path too. 
+   Reset fish paths with:
+
+   ```bash
+   set -ge fish_user_paths
+   set -Ua fish_user_paths /nix/var/nix/profiles/default/bin
+   set -Ua fish_user_paths /home/appaquet/.nix-profile/bin
+   ```
 
 2. To patch an external dynamic linked binary on NixOS, use [nix-alien](https://github.com/thiagokokada/nix-alien)
   2.1 `nix-alien <binary>`

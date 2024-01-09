@@ -35,7 +35,6 @@
 
       # Add custom packages to nixpkgs
       packageOverlay = final: prev: {
-        rtx = prev.callPackage ./packages/rtx { };
       };
 
       overlays = [
@@ -53,11 +52,11 @@
       (system: (
         let
           pkgs = import nixpkgs {
-            inherit system overlays config;
+            inherit system config overlays;
           };
 
           unstablePkgs = import nixpkgs-unstable {
-            inherit system overlays config;
+            inherit system config overlays;
           };
         in
         {
@@ -65,6 +64,12 @@
             "appaquet@deskapp" = home-manager.lib.homeManagerConfiguration {
               inherit pkgs;
               modules = [ ./home-manager/deskapp.nix ] ++ commonHomeModules;
+              extraSpecialArgs = { inherit inputs unstablePkgs; };
+            };
+
+            "appaquet@servapp" = home-manager.lib.homeManagerConfiguration {
+              inherit pkgs;
+              modules = [ ./home-manager/servapp.nix ] ++ commonHomeModules;
               extraSpecialArgs = { inherit inputs unstablePkgs; };
             };
 
@@ -81,6 +86,7 @@
       # properly expose home configurations with appropriate expected system
       homeConfigurations = {
         "appaquet@deskapp" = self.homes.x86_64-linux."appaquet@deskapp";
+        "appaquet@servapp" = self.homes.x86_64-linux."appaquet@servapp";
         "appaquet@mbpapp" = self.homes.aarch64-darwin."appaquet@mbpapp";
       };
 
@@ -88,7 +94,7 @@
         mbpapp = darwin.lib.darwinSystem {
           system = "aarch64-darwin";
           pkgs = import nixpkgs {
-            inherit config overlays;
+            inherit config;
             system = "aarch64-darwin";
           };
           modules = [
