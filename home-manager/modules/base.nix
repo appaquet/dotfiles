@@ -22,9 +22,15 @@
   #  - to install an unstable package, use `unstablePkgs.<package-name>`
   home.packages = with pkgs; [
     manix # nix doc cli searcher
-    nix-output-monitor # better nix build output (nom)
+    nix-output-monitor # better nix build output
     nil # nix lsp
     nixpkgs-fmt
+
+    direnv
+    nix-direnv
+
+    git
+    gh
 
     bat # cat replacement
     hexyl

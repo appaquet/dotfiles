@@ -6,6 +6,7 @@
     ./modules/dev.nix
     ./modules/work.nix
     ./modules/vms.nix
+    ./modules/nixos.nix
     ./modules/media.nix
   ];
 
