@@ -9,6 +9,6 @@
 
   home.username = "appaquet";
   home.homeDirectory = "/home/appaquet";
-  home.stateVersion = "23.05";
+  home.stateVersion = "23.11";
 }
 
