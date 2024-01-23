@@ -38,6 +38,8 @@ if !has('gui_running')
   augroup END
 endif
 
+" Test  
+
 " Defaults to space indentation
 set expandtab shiftwidth=2 tabstop=2
 

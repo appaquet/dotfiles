@@ -23,7 +23,7 @@
       bufferline-nvim # https://github.com/akinsho/bufferline.nvim
 
       # LSP
-      nvim-lspconfig # https://github.com/neovim/nvim-lspconfig/
+      nvim-lspconfig # https://github.com/neovim/nvim-lspconfig
 
       # Autocomplete (w/ LSP)
       luasnip
@@ -33,6 +33,12 @@
       cmp-nvim-lsp
       cmp-nvim-lsp-signature-help
       cmp-nvim-lsp-document-symbol
+
+      # Copilot (use Copilot auth)
+      # See https://github.com/zbirenbaum/copilot.lua
+      # and https://github.com/zbirenbaum/copilot-cmp
+      copilot-lua
+      copilot-cmp
 
       # Syntax
       (nvim-treesitter.withPlugins (p: [

@@ -41,10 +41,12 @@ map <Leader>s :w<CR>
 map <D-q> :q<CR>
 map <Leader>q :q<CR>
 
-
 " For when you forget to sudo.. Really Write the file.
 cmap w!! w !sudo tee % >/dev/null
 cmap wq wqa
+cmap Wq wqa
+cmap WQ wqa
+cmap Qw wqq
 cmap qw wqq
 
 " Toggle mouse for copy

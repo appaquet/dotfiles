@@ -149,7 +149,6 @@ gc)
     # See https://www.reddit.com/r/NixOS/comments/10107km/how_to_delete_old_generations_on_nixos/?s=8
     ncg=$(which nix-collect-garbage)
     sudo ${ncg} -d
-
     ;;
 
 optimize)
