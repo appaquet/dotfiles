@@ -33,7 +33,18 @@
 
 - Rust is not installed using Nix anymore as it breaks [cross](https://github.com/cross-rs/cross) since Rust
   binaries link with Nix libs. Cross does mount `/nix`, but it doesn't seem sufficient...
+
   See [this commit](https://github.com/appaquet/dotfiles/commit/4aebf75a47536c833140d463cbc1606d474e1f91).
+
+  Install rustup manually instead, see https://rustup.rs/
+
+- In order to enable mold, edit `~/.cargo/config` and add:
+  ```toml
+  [target.x86_64-unknown-linux-gnu]
+  linker = "clang"
+  rustflags = ["-C", "link-arg=-fuse-ld=/home/appaquet/.nix-profile/bin/mold"]
+  ```
+
 
 ## Troubleshooting
 
