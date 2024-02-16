@@ -1,7 +1,8 @@
 lua << END
 
-local lspconfig = require('lspconfig')
+-- Mostly from https://github.com/neovim/nvim-lspconfig
 
+local lspconfig = require('lspconfig')
 
 lspconfig.pyright.setup {}
 lspconfig.tsserver.setup {}
@@ -75,7 +76,8 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 
 
--- nvim-cmp + luasnip
+-- nvim-cmp (https://github.com/hrsh7th/nvim-cmp)
+-- luasnip (https://github.com/L3MON4D3/LuaSnip)
 local luasnip = require 'luasnip'
 local cmp = require 'cmp'
 cmp.setup {
@@ -123,8 +125,7 @@ cmp.setup {
   },
 }
 
-
--- copilot (see https://github.com/zbirenbaum/copilot.lua)
+-- copilot (https://github.com/zbirenbaum/copilot.lua)
 require("copilot").setup({
   suggestion = { enabled = false },
   panel = { enabled = false },
@@ -134,7 +135,7 @@ require("copilot").setup({
   }
 })
 
--- see https://github.com/zbirenbaum/copilot-cmp
+-- https://github.com/zbirenbaum/copilot-cmp
 require("copilot_cmp").setup {
   method = "getCompletionsCycling",
 }
