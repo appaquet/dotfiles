@@ -35,6 +35,8 @@
     dua
     bottom
     htop
+    dstat
+
     ookla-speedtest
     mtr
     gping
