@@ -34,8 +34,10 @@
 
     dua
     bottom
+    btop
     htop
     dstat
+    stress
 
     ookla-speedtest
     mtr
