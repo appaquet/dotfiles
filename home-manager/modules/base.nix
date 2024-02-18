@@ -36,7 +36,6 @@
     bottom
     btop
     htop
-    dstat
     stress
 
     ookla-speedtest
