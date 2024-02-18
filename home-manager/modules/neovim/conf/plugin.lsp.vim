@@ -1,7 +1,8 @@
 lua << END
 
-local lspconfig = require('lspconfig')
+-- Mostly from https://github.com/neovim/nvim-lspconfig
 
+local lspconfig = require('lspconfig')
 
 lspconfig.pyright.setup {}
 lspconfig.tsserver.setup {}
@@ -13,7 +14,7 @@ lspconfig.rust_analyzer.setup {
 }
 
 -- Nil (see https://github.com/oxalica/nil/blob/main/dev/nvim-lsp.nix)
-local nil_lsp_path = vim.env.NIL_PATH or '/home/appaquet/.nix-profile/bin/nil'
+local nil_lsp_path = vim.env.NIL_PATH or (vim.env.HOME .. '/.nix-profile/bin/nil')
 local nil_caps = vim.tbl_deep_extend(
   'force',
   vim.lsp.protocol.make_client_capabilities(),
@@ -35,8 +36,6 @@ lspconfig.nil_ls.setup {
     },
   },
 }
-
-
 
 -- Global mappings.
 -- See `:help vim.diagnostic.*` for documentation on any of the below functions
@@ -77,7 +76,8 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 
 
--- nvim-cmp + luasnip
+-- nvim-cmp (https://github.com/hrsh7th/nvim-cmp)
+-- luasnip (https://github.com/L3MON4D3/LuaSnip)
 local luasnip = require 'luasnip'
 local cmp = require 'cmp'
 cmp.setup {
@@ -86,6 +86,7 @@ cmp.setup {
       luasnip.lsp_expand(args.body)
     end,
   },
+
   mapping = cmp.mapping.preset.insert({
     ['<C-u>'] = cmp.mapping.scroll_docs(-4), -- Up
     ['<C-d>'] = cmp.mapping.scroll_docs(4), -- Down
@@ -114,6 +115,7 @@ cmp.setup {
       end
     end, { 'i', 's' }),
   }),
+
   sources = {
     { name = "copilot" },
     { name = 'nvim_lsp' },
@@ -123,5 +125,19 @@ cmp.setup {
   },
 }
 
+-- copilot (https://github.com/zbirenbaum/copilot.lua)
+require("copilot").setup({
+  suggestion = { enabled = false },
+  panel = { enabled = false },
+
+  filetypes = {
+    markdown = true, -- overrides default
+  }
+})
+
+-- https://github.com/zbirenbaum/copilot-cmp
+require("copilot_cmp").setup {
+  method = "getCompletionsCycling",
+}
 
 END

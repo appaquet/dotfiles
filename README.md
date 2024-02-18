@@ -24,9 +24,7 @@
 4. Build `./x home build` and activate `./x home switch`
 
 5. Activate shell by adding `/home/appaquet/.nix-profile/bin/fish` to `/etc/shells`
-   and running `chsh -s /home/appaquet/.nix-profile/bin/fish`.
-
-   Then reconnect, and may need to fix paths (see bellow)
+   and running `chsh -s /home/appaquet/.nix-profile/bin/fish`
 
 6. On MacOS, apply darwin config: `./x darwin build` and `./x darwin witch`
    2. Select a patched nerdfonts font in iTerm2 in order to have icons in neovim.
@@ -47,7 +45,18 @@
 
 - Rust is not installed using Nix anymore as it breaks [cross](https://github.com/cross-rs/cross) since Rust
   binaries link with Nix libs. Cross does mount `/nix`, but it doesn't seem sufficient...
+
   See [this commit](https://github.com/appaquet/dotfiles/commit/4aebf75a47536c833140d463cbc1606d474e1f91).
+
+  Install rustup manually instead, see https://rustup.rs/
+
+- In order to enable mold, edit `~/.cargo/config` and add:
+  ```toml
+  [target.x86_64-unknown-linux-gnu]
+  linker = "clang"
+  rustflags = ["-C", "link-arg=-fuse-ld=/home/appaquet/.nix-profile/bin/mold"]
+  ```
+
 
 ## Troubleshooting
 

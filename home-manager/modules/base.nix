@@ -18,7 +18,7 @@
   programs.direnv.nix-direnv.enable = true;
 
   # Notes: 
-  #  - not everything is installed using nix. some tools are install via `rtx` when different versions are required (see ./rtx/tool-versions)
+  #  - not everything is installed using nix. some tools are install via `mise` when different versions are required (see ./rtx/tool-versions)
   #  - to install an unstable package, use `unstablePkgs.<package-name>`
   home.packages = with pkgs; [
     manix # nix doc cli searcher
@@ -40,7 +40,11 @@
 
     dua
     bottom
+    btop
     htop
+    dstat
+    stress
+
     ookla-speedtest
     mtr
     gping
