@@ -79,6 +79,7 @@
       grs = "git restore --staged";
       ghpr = "gh pr create --draft --body \"\" --title";
       gts = "git tag -l --sort=-version:refname --format='%(refname:short) (%(creatordate:short))'";
+      gau = "git add -u";
     };
 
     functions = {
