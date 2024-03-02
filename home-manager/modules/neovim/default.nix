@@ -1,6 +1,11 @@
 { config, lib, pkgs, unstablePkgs, ... }:
 
 {
+  home.packages = with pkgs; [
+    nil # nix lsp
+    marksman # markdown lsp
+  ];
+
   programs.neovim = {
     enable = true;
     viAlias = true;
