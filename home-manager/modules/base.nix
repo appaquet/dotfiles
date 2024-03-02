@@ -1,4 +1,4 @@
-{ pkgs, unstablePkgs, ... }:
+{ pkgs, inputs, ... }:
 
 {
   imports = [
@@ -25,12 +25,14 @@
     nix-output-monitor # better nix build output (nom)
     nil # nix lsp
     nixpkgs-fmt
+    inputs.fzf-nix.packages.${system}.fzf-nix # fzf-nix
 
     bat # cat replacement
     hexyl
 
     fzf
     ripgrep
+    fd
 
     dua
     bottom

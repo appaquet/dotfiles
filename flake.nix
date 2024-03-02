@@ -20,9 +20,14 @@
       # url = "path:/home/appaquet/dotfiles/shared-dotfiles";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    fzf-nix = {
+      url = "github:mrene/fzf-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = inputs @ { self, nixpkgs, nixpkgs-unstable, home-manager, humanfirst-dots, flake-utils, darwin, ... }:
+  outputs = inputs @ { self, nixpkgs, nixpkgs-unstable, home-manager, humanfirst-dots, flake-utils, darwin, fzf-nix, ... }:
     let
       config = {
         permittedInsecurePackages = [ ];

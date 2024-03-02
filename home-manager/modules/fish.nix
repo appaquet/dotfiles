@@ -38,6 +38,10 @@
 
       # Apparently the plugin doesn't do this for us on MacOS for some reason
       fzf_configure_bindings
+
+      # Some shortcuts (ctrl-alt-c, in iTerm2, rebind alt to Esc+)
+      bind \cn 'fzf-nix'
+      bind \cg 'fzf-ripgrep'
     '';
 
     plugins = [
@@ -54,7 +58,6 @@
     shellAliases = {
       l = "ls";
       ll = "ls -lash";
-      k = "kubectl";
       randstr = "randstr 'tr -cd \"[:alnum:]\" < /dev/urandom | fold -w30 | head -n1'";
       x = "~/dotfiles/x";
     };
@@ -80,6 +83,17 @@
       ghpr = "gh pr create --draft --body \"\" --title";
       gts = "git tag -l --sort=-version:refname --format='%(refname:short) (%(creatordate:short))'";
       gau = "git add -u";
+
+      k = "kubectl";
+      d = "docker";
+
+      ".." = "cd ..";
+      "..." = "cd ../..";
+      "...." = "cd ../../..";
+      "....." = "cd ../../../..";
+
+      nr = "nix run nixpkgs#(fzf-nix)";
+      ns = "nix shell nixpkgs#(fzf-nix)";
     };
 
     functions = {
