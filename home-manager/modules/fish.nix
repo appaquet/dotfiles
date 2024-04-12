@@ -58,6 +58,7 @@
     shellAliases = {
       l = "ls";
       ll = "ls -lash";
+      b = "bat";
       randstr = "randstr 'tr -cd \"[:alnum:]\" < /dev/urandom | fold -w30 | head -n1'";
       x = "~/dotfiles/x";
     };
@@ -83,6 +84,7 @@
       ghpr = "gh pr create --draft --body \"\" --title";
       gts = "git tag -l --sort=-version:refname --format='%(refname:short) (%(creatordate:short))'";
       gau = "git add -u";
+      gmr = "git maintenance run";
 
       k = "kubectl";
       d = "docker";
@@ -91,6 +93,9 @@
       "..." = "cd ../..";
       "...." = "cd ../../..";
       "....." = "cd ../../../..";
+
+      llt = "ll -t"; # sort by time
+      lls = "ll -S"; # sort by size
 
       nr = "nix run nixpkgs#(fzf-nix)";
       ns = "nix shell nixpkgs#(fzf-nix)";

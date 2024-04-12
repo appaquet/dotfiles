@@ -21,10 +21,13 @@
 
     extraConfig = {
       # Popular options here: https://jvns.ca/blog/2024/02/16/popular-git-config-options/
+      # For some more: https://blog.gitbutler.com/git-tips-and-tricks/
+      # For all options: https://git-scm.com/docs/git-config
 
       github.user = "appaquet";
 
-      push.autoSetupRemote = true;
+      push.autoSetupRemote = true; # auto set upstream
+      push.useForceIfIncludes = true; # only allow push if the remote tref is also locally (preventing accidental force push)
 
       rerere.enabled = true;
 
@@ -38,7 +41,7 @@
 
       diff.algorithm = "histogram";
 
-      core.excludeFiles = "~/.gitignore";
+      core.excludeFiles = "~/.gitignore"; # global git ignore
 
       # Early corruption detection
       transfer.fsckobjects = true;

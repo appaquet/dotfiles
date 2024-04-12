@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, unstablePkgs, ... }:
 
 {
   home.packages = with pkgs; [
@@ -13,7 +13,7 @@
     capnproto
     flatbuffers
 
-    mold
+    unstablePkgs.mold-wrapped # 23.11 still points to old 2.3.3 which had bug
 
     (google-cloud-sdk.withExtraComponents (with google-cloud-sdk.components; [ gke-gcloud-auth-plugin ]))
     google-cloud-sql-proxy
