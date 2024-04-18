@@ -45,6 +45,7 @@
     neofetch
     bandwhich
     dig
+    whois
 
     jq
     jless

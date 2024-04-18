@@ -16,8 +16,8 @@
     };
 
     humanfirst-dots = {
-      url = "git+ssh://git@github.com/zia-ai/shared-dotfiles";
-      # url = "path:/home/appaquet/dotfiles/shared-dotfiles";
+      #url = "git+ssh://git@github.com/zia-ai/shared-dotfiles";
+      url = "path:/home/appaquet/dotfiles/shared-dotfiles";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

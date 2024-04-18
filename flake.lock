@@ -126,17 +126,14 @@
         ]
       },
       "locked": {
-        "lastModified": 1677798751,
-        "narHash": "sha256-zUYkOZftta1V+nYCZzg5zh3itAbnNDFhwGq4ggqJXbI=",
-        "ref": "refs/heads/master",
-        "rev": "8cb07c50ff0aa2f25ac3d1fef29bc0c469b9b560",
-        "revCount": 11,
-        "type": "git",
-        "url": "ssh://git@github.com/zia-ai/shared-dotfiles"
+        "lastModified": 1712949781,
+        "narHash": "sha256-kIuTcxAQ1vU2GpKjcdLI0lPNeaGA5gS3t9lA955/T0A=",
+        "path": "/home/appaquet/dotfiles/shared-dotfiles",
+        "type": "path"
       },
       "original": {
-        "type": "git",
-        "url": "ssh://git@github.com/zia-ai/shared-dotfiles"
+        "path": "/home/appaquet/dotfiles/shared-dotfiles",
+        "type": "path"
       }
     },
     "nixpkgs": {
@@ -175,11 +172,11 @@
     },
     "nixpkgs-unstable": {
       "locked": {
-        "lastModified": 1712791164,
-        "narHash": "sha256-3sbWO1mbpWsLepZGbWaMovSO7ndZeFqDSdX0hZ9nVyw=",
+        "lastModified": 1713248628,
+        "narHash": "sha256-NLznXB5AOnniUtZsyy/aPWOk8ussTuePp2acb9U+ISA=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "1042fd8b148a9105f3c0aca3a6177fd1d9360ba5",
+        "rev": "5672bc9dbf9d88246ddab5ac454e82318d094bb8",
         "type": "github"
       },
       "original": {
@@ -191,11 +188,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1712741485,
-        "narHash": "sha256-bCs0+MSTra80oXAsnM6Oq62WsirOIaijQ/BbUY59tR4=",
+        "lastModified": 1713145326,
+        "narHash": "sha256-m7+IWM6mkWOg22EC5kRUFCycXsXLSU7hWmHdmBfmC3s=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "b2cf36f43f9ef2ded5711b30b1f393ac423d8f72",
+        "rev": "53a2c32bc66f5ae41a28d7a9a49d321172af621e",
         "type": "github"
       },
       "original": {

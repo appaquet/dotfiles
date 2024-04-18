@@ -6,7 +6,7 @@
 
     tokei
 
-    dive       # docker container explorer
+    unstablePkgs.dive # docker container explorer
     lazydocker # top like app for docker
 
     protobuf
