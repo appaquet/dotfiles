@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1716993688,
-        "narHash": "sha256-vo5k2wQekfeoq/2aleQkBN41dQiQHNTniZeVONWiWLs=",
+        "lastModified": 1718662658,
+        "narHash": "sha256-AKG7BsqtVWDlefgzyKz7vjaKTLi4+bmTSBhowbQoZtM=",
         "owner": "lnl7",
         "repo": "nix-darwin",
-        "rev": "c0d5b8c54d6828516c97f6be9f2d00c63a363df4",
+        "rev": "29b3096a6e283d7e6779187244cb2a3942239fdf",
         "type": "github"
       },
       "original": {
@@ -126,14 +126,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1717595033,
-        "narHash": "sha256-kIuTcxAQ1vU2GpKjcdLI0lPNeaGA5gS3t9lA955/T0A=",
-        "path": "/home/appaquet/dotfiles/shared-dotfiles",
-        "type": "path"
+        "lastModified": 1718761797,
+        "narHash": "sha256-al9VkUX7mAYnk+Wz8ukYCOFgTPPH8FIOCJ2BTh1IePY=",
+        "ref": "refs/heads/master",
+        "rev": "e2e98a719affe8ea1e36314e3160ab42528f02db",
+        "revCount": 12,
+        "type": "git",
+        "url": "ssh://git@github.com/zia-ai/shared-dotfiles"
       },
       "original": {
-        "path": "/home/appaquet/dotfiles/shared-dotfiles",
-        "type": "path"
+        "type": "git",
+        "url": "ssh://git@github.com/zia-ai/shared-dotfiles"
       }
     },
     "nixpkgs": {
@@ -172,11 +175,11 @@
     },
     "nixpkgs-unstable": {
       "locked": {
-        "lastModified": 1717196966,
-        "narHash": "sha256-yZKhxVIKd2lsbOqYd5iDoUIwsRZFqE87smE2Vzf6Ck0=",
+        "lastModified": 1718530797,
+        "narHash": "sha256-pup6cYwtgvzDpvpSCFh1TEUjw2zkNpk8iolbKnyFmmU=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "57610d2f8f0937f39dbd72251e9614b1561942d8",
+        "rev": "b60ebf54c15553b393d144357375ea956f89e9a9",
         "type": "github"
       },
       "original": {
@@ -188,16 +191,16 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1717530100,
-        "narHash": "sha256-b4Dn+PnrZoVZ/BoR9JN2fTxXxplJrAsdSUIePf4Cacs=",
+        "lastModified": 1718437845,
+        "narHash": "sha256-ZT7Oc1g4I4pHVGGjQFnewFVDRLH5cIZhEzODLz9YXeY=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "a2e1d0414259a144ebdc048408a807e69e0565af",
+        "rev": "752c634c09ceb50c45e751f8791cb45cb3d46c9e",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
-        "ref": "nixos-23.11",
+        "ref": "nixos-24.05",
         "repo": "nixpkgs",
         "type": "github"
       }
