@@ -2,6 +2,10 @@
 {
   home.packages = with pkgs; [
     git
+
+    # allows adding filers to prior commits automatically based on directories
+    # see https://github.com/tummychow/git-absorb
+    git-absorb
   ];
 
   programs.git = {
@@ -27,9 +31,13 @@
       github.user = "appaquet";
 
       push.autoSetupRemote = true; # auto set upstream
-      push.useForceIfIncludes = true; # only allow push if the remote tref is also locally (preventing accidental force push)
+      push.useForceIfIncludes = true; # only allow push if the remote ref is also locally (preventing accidental force push)
 
-      rerere.enabled = true;
+      rerere.enabled = true; # save merge conflict resolutions
+
+      # better stacked branches support
+      # see https://andrewlock.net/working-with-stacked-branches-in-git-is-easier-with-update-refs/
+      rebase.updateRefs = true;
 
       core.editor = "nvim";
       core.fileMode = false;
@@ -39,7 +47,7 @@
 
       init.defaultBranch = "main";
 
-      diff.algorithm = "histogram";
+      diff.algorithm = "histogram"; # better diffing algorithm
 
       core.excludeFiles = "~/.gitignore"; # global git ignore
 
