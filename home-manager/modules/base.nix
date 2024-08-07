@@ -1,4 +1,4 @@
-{ pkgs, unstablePkgs, ... }:
+{ pkgs, inputs, ... }:
 
 {
   imports = [
@@ -22,9 +22,10 @@
   #  - to install an unstable package, use `unstablePkgs.<package-name>`
   home.packages = with pkgs; [
     manix # nix doc cli searcher
-    nix-output-monitor # better nix build output
+    nix-output-monitor # better nix build output (nom)
     nil # nix lsp
     nixpkgs-fmt
+    inputs.fzf-nix.packages.${system}.fzf-nix # fzf-nix
 
     direnv
     nix-direnv
@@ -37,12 +38,12 @@
 
     fzf
     ripgrep
+    fd
 
     dua
     bottom
     btop
     htop
-    dstat
     stress
 
     ookla-speedtest
@@ -51,6 +52,7 @@
     neofetch
     bandwhich
     dig
+    whois
 
     jq
     jless

@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-23.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     flake-utils.url = "github:numtide/flake-utils";
@@ -8,7 +8,7 @@
     nix-alien.url = "github:thiagokokada/nix-alien";
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-23.11";
+      url = "github:nix-community/home-manager/release-24.05";
       inputs.nixpkgs.follows = "nixpkgs"; # makes home-manager's nixpkgs input follow our nixpkgs version
     };
 
@@ -19,14 +19,19 @@
 
     humanfirst-dots = {
       url = "git+ssh://git@github.com/zia-ai/shared-dotfiles";
-      # url = "path:/home/appaquet/dotfiles/shared-dotfiles";
+      #url = "path:/home/appaquet/dotfiles/shared-dotfiles";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    fzf-nix = {
+      url = "github:mrene/fzf-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     vscode-server.url = "github:msteen/nixos-vscode-server";
   };
 
-  outputs = inputs @ { self, nixpkgs, nixpkgs-unstable, home-manager, humanfirst-dots, flake-utils, darwin, nix-alien, ... }:
+  outputs = inputs @ { self, nixpkgs, nixpkgs-unstable, home-manager, humanfirst-dots, flake-utils, darwin, nix-alien, fzf-nix, ... }:
     let
       config = {
         permittedInsecurePackages = [ ];

@@ -1,6 +1,11 @@
 { config, lib, pkgs, unstablePkgs, ... }:
 
 {
+  home.packages = with pkgs; [
+    nil # nix lsp
+    marksman # markdown lsp
+  ];
+
   programs.neovim = {
     enable = true;
     viAlias = true;
@@ -13,7 +18,7 @@
     # - https://www.lunarvim.org/docs/plugins/core-plugins-list
     plugins = with pkgs.vimPlugins; [
       # Theme
-      nvim-base16
+      base16-nvim
       nvim-web-devicons
 
       # Layout

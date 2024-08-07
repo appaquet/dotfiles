@@ -75,11 +75,22 @@ home)
         shift
         ${NIX_BUILDER} build ".#homeConfigurations.${HOME_CONFIG}.activationPackage" 2>&1 | ${NOM_PIPE}
         ;;
+    generations)
+        shift
+        home-manager generations
+        ;;
+    diff)
+        shift
+        nix profile diff-closures --profile ~/.local/state/nix/profiles/home-manager
+        ;;
     switch)
         shift
         ./result/activate
         ;;
     *)
+        echo "$0 $COMMAND check: check home" >&2
+        echo "$0 $COMMAND generations: list generations" >&2
+        echo "$0 $COMMAND diff: diff last generations" >&2
         echo "$0 $COMMAND build: build home" >&2
         echo "$0 $COMMAND switch: switch home" >&2
         exit 1

@@ -89,6 +89,12 @@
   - With input `<alt><left>` or `<alt><right>` to between words
   - With input `<ctl>w` to delete previous word
   - With input `<alt>e` or `<alt>v` to open input in editor (doesn't work on MacOS)
+  - `<ctl><alt>n`: fzf nix packages
+  - `<ctl><alt>g`: fzf ripgrep
+  - `<ctl><alt>f`: fzf fd (find file)
+  - `<ctl><alt>p`: fzf processes
+  - `<ctl><alt>l`: fzf git log
+  - `<ctl><alt>s`: fzf git status
 
 ### Neovim
 
