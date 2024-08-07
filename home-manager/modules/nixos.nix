@@ -6,6 +6,7 @@
 
     tailscale
     gnumake
+    nodejs # needed for copilot
 
     bintools
   ];
