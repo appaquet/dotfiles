@@ -8,7 +8,7 @@ HOSTNAME=$(uname -n | tr '[:upper:]' '[:lower:] | sed 's/\.local//'')
 MACHINE_KEY="${USER}@${HOSTNAME}"
 
 HOME_CONFIG=""
-if [[ "${MACHINE_KEY}" == "appaquet@deskapp"* || "${MACHINE_KEY}" == "appaquet@ubuntu-nix"* ]]; then
+if [[ "${MACHINE_KEY}" == "appaquet@deskapp"* || "${MACHINE_KEY}" == "appaquet@nixos"* || "${MACHINE_KEY}" == "appaquet@ubuntu-nix"* ]]; then
     HOME_CONFIG="appaquet@deskapp"
 elif [[ "${MACHINE_KEY}" == "appaquet@servapp"* ]]; then
     HOME_CONFIG="appaquet@servapp"
@@ -18,6 +18,8 @@ else
     echo "Non-configured machine (${MACHINE_KEY})"
     exit 1
 fi
+
+sudo echo # prime pw for nom redirects to work
 
 NIX_BUILDER="nix"
 NOM_PIPE="tee"
@@ -100,21 +102,47 @@ darwin)
     shift
     SUBCOMMAND=$1
     case $SUBCOMMAND in
-    build)
-        shift
-        ${NIX_BUILDER} build ".#darwinConfigurations.mbpapp.system"
-        ;;
     check)
         shift
         check_eval ".#darwinConfigurations.mbpapp.system"
+        ;;
+    build)
+        shift
+        ${NIX_BUILDER} build ".#darwinConfigurations.mbpapp.system"
         ;;
     switch)
         shift
         ./result/sw/bin/darwin-rebuild switch --flake .
         ;;
     *)
+        echo "$0 $COMMAND check: check home" >&2
         echo "$0 $COMMAND build: build home" >&2
         echo "$0 $COMMAND switch: switch home" >&2
+        exit 1
+        ;;
+    esac
+    ;;
+
+nixos)
+    shift
+    SUBCOMMAND=$1
+    case $SUBCOMMAND in
+    check)
+        shift
+        check_eval ".#nixosConfigurations.${HOSTNAME}.config.system.build.toplevel"
+        ;;
+    build)
+        shift
+        sudo nixos-rebuild build --flake ".#deskapp" |& ${NOM_PIPE}
+        ;;
+    switch)
+        shift
+        sudo nixos-rebuild switch --flake ".#deskapp" |& ${NOM_PIPE}
+        ;;
+    *)
+        echo "$0 $COMMAND check: check nixos" >&2
+        echo "$0 $COMMAND build: build nixos" >&2
+        echo "$0 $COMMAND switch: switch nixos" >&2
         exit 1
         ;;
     esac
@@ -125,6 +153,7 @@ check)
     check_home "appaquet@deskapp"
     check_home "appaquet@mbpapp"
     check_eval ".#darwinConfigurations.mbpapp.system"
+    check_eval ".#nixosConfigurations.${HOSTNAME}.config.system.build.toplevel"
     ;;
 
 update)
@@ -176,7 +205,8 @@ fetch-deskapp)
 *)
     echo "$0 home: home manager sub commands" >&2
     echo "$0 darwin: darwin sub commands" >&2
-    echo "$0 check: eval home & darwin configs for all hosts" >&2
+    echo "$0 nixos: nixos sub commands" >&2
+    echo "$0 check: eval home & nixos & darwin configs for all hosts" >&2
     echo "$0 update: update nix channels" >&2
     echo "$0 link: link system files" >&2
     echo "$0 gc: run garbage collection" >&2

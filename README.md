@@ -29,6 +29,18 @@
 6. On MacOS, apply darwin config: `./x darwin build` and `./x darwin witch`
    2. Select a patched nerdfonts font in iTerm2 in order to have icons in neovim.
 
+### On NixOS
+
+1. Enable vscode server patcher (see <https://github.com/msteen/nixos-vscode-server#enable-the-service>)
+  1.1 Enable service: `systemctl --user enable auto-fix-vscode-server.service` (it's safe to ignore warning)
+  1.2. And start it: `systemctl --user start auto-fix-vscode-server.service`
+  1.3. To prevent GC: `ln -sfT /run/current-system/etc/systemd/user/auto-fix-vscode-server.service ~/.config/systemd/user/auto-fix-vscode-server.service`
+
+## Maintenance
+
+- To update flakes, run `./x update`
+- To update a specific flake, run `nix flake lock --update-input <the flake>`
+
 ## Not covered
 
 - Rust is not installed using Nix anymore as it breaks [cross](https://github.com/cross-rs/cross) since Rust
@@ -58,6 +70,9 @@
    set -Ua fish_user_paths /home/appaquet/.nix-profile/bin
    ```
 
+2. To patch an external dynamic linked binary on NixOS, use [nix-alien](https://github.com/thiagokokada/nix-alien)
+  2.1 `nix-alien <binary>`
+  
 ## Cheat sheets
 
 ### Fish

@@ -5,6 +5,8 @@
 
     flake-utils.url = "github:numtide/flake-utils";
 
+    nix-alien.url = "github:thiagokokada/nix-alien";
+
     home-manager = {
       url = "github:nix-community/home-manager/release-24.05";
       inputs.nixpkgs.follows = "nixpkgs"; # makes home-manager's nixpkgs input follow our nixpkgs version
@@ -25,14 +27,26 @@
       url = "github:mrene/fzf-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    vscode-server.url = "github:msteen/nixos-vscode-server";
   };
 
-  outputs = inputs @ { self, nixpkgs, nixpkgs-unstable, home-manager, humanfirst-dots, flake-utils, darwin, fzf-nix, ... }:
+  outputs = inputs @ { self, nixpkgs, nixpkgs-unstable, home-manager, humanfirst-dots, flake-utils, darwin, nix-alien, fzf-nix, ... }:
     let
       config = {
         permittedInsecurePackages = [ ];
         allowUnfree = true;
       };
+
+      # Add custom packages to nixpkgs
+      packageOverlay = final: prev: {
+      };
+
+      overlays = [
+        packageOverlay
+
+        nix-alien.overlays.default
+      ];
 
       commonHomeModules = [
         humanfirst-dots.homeManagerModule
@@ -43,11 +57,11 @@
       (system: (
         let
           pkgs = import nixpkgs {
-            inherit system config;
+            inherit system config overlays;
           };
 
           unstablePkgs = import nixpkgs-unstable {
-            inherit system config;
+            inherit system config overlays;
           };
         in
         {
@@ -92,6 +106,18 @@
             ./darwin/mbpapp/configuration.nix
           ];
           inputs = { inherit inputs darwin; };
+        };
+      };
+
+      nixosConfigurations = {
+        deskapp = inputs.nixpkgs.lib.nixosSystem {
+          specialArgs = {
+            inherit (self) common;
+            inherit inputs;
+          };
+          modules = [
+            ./nixos/deskapp/configuration.nix
+          ];
         };
       };
     };
