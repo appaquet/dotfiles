@@ -84,8 +84,16 @@
   #services.vscode-server.extraRuntimeDependencies = with pkgs; [
   #  zlib
   #  glib
+  #  glibc
   #  clang
   #  llvmPackages.libclang
   #  llvmPackages.libcxxClang
   #];
+
+  programs.nix-ld.enable = true;
+
+  programs.nix-ld.libraries = with pkgs; [
+    stdenv.cc.cc
+    zlib
+  ];
 }

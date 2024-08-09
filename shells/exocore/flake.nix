@@ -6,7 +6,7 @@
   description = "exomind";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
     flake-utils.url = "github:numtide/flake-utils";
     rust-overlay.url = "github:oxalica/rust-overlay";
   };
@@ -38,7 +38,6 @@
               llvmPackages.libclang
               llvmPackages.libcxxClang
               zlib
-              glib
             ];
 
             NODE_OPTIONS = "--openssl-legacy-provider"; # nodejs SSL error. see https://github.com/NixOS/nixpkgs/issues/209668
@@ -49,7 +48,6 @@
               pkgs.llvmPackages.libclang
               pkgs.llvmPackages.libcxxClang
               pkgs.zlib
-              pkgs.glib
             ];
             NIX_LD = builtins.readFile "${pkgs.stdenv.cc}/nix-support/dynamic-linker";
           };
