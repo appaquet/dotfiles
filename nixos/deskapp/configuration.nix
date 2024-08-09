@@ -1,18 +1,20 @@
 { inputs, config, lib, pkgs, ... }:
 
 {
-  imports =
-    [
-      ../common.nix
-      ./hardware-configuration.nix
-      inputs.vscode-server.nixosModule
-    ];
+  imports = [
+    ../common.nix
+    ./hardware-configuration.nix
+    inputs.vscode-server.nixosModule
+  ];
 
   # Bootloader.
   boot.loader.grub.enable = true;
   boot.loader.grub.device = "/dev/vda";
   boot.loader.grub.useOSProber = true;
   boot.growPartition = true; # only relevant for vms
+
+  # Mode up to date kernel
+  boot.kernelPackages = pkgs.linuxPackages_latest;
 
   networking.hostName = "nixos"; # Define your hostname.
 
@@ -25,9 +27,6 @@
   services.xserver.enable = true;
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
-
-  # Mode up to date kernel
-  boot.kernelPackages = pkgs.linuxPackages_latest;
 
   # Configure keymap in X11
   services.xserver = {
@@ -74,24 +73,13 @@
   programs.fish.enable = true;
 
   # List services that you want to enable:
-
   services.openssh.enable = true;
-
   networking.firewall.enable = false;
+  services.tailscale.enable = true;
 
   services.vscode-server.enable = true;
-  #services.vscode-server.enableFHS = false;
-  #services.vscode-server.extraRuntimeDependencies = with pkgs; [
-  #  zlib
-  #  glib
-  #  glibc
-  #  clang
-  #  llvmPackages.libclang
-  #  llvmPackages.libcxxClang
-  #];
 
   programs.nix-ld.enable = true;
-
   programs.nix-ld.libraries = with pkgs; [
     stdenv.cc.cc
     zlib

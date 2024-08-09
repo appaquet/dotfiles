@@ -21,6 +21,14 @@
           };
           overlays = [ (import rust-overlay) ];
         };
+
+        python3 = ((pkgs.python311.withPackages(p: with p; [ 
+          tensorflow 
+          grpcio-tools 
+          click
+          keras
+          mypy-protobuf
+        ])).override ({ ignoreCollisions = true; }));
       in
       {
         devShells = {
@@ -38,6 +46,11 @@
               llvmPackages.libclang
               llvmPackages.libcxxClang
               zlib
+            ];
+
+            packages = [
+              python3
+              (pkgs.poetry.override { python3 = pkgs.python311; })
             ];
 
             NODE_OPTIONS = "--openssl-legacy-provider"; # nodejs SSL error. see https://github.com/NixOS/nixpkgs/issues/209668
