@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 {
   home.packages = with pkgs; [
     git
@@ -49,7 +49,7 @@
 
       diff.algorithm = "histogram"; # better diffing algorithm
 
-      core.excludeFiles = "~/.gitignore"; # global git ignore
+      core.excludeFiles = "${config.home.homeDirectory}/.gitignore"; # global git ignore
 
       # Early corruption detection
       transfer.fsckobjects = true;

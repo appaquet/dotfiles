@@ -27,6 +27,7 @@
     nixpkgs-fmt
     libtree # recursive ldd 
     inputs.fzf-nix.packages.${system}.fzf-nix # fzf-nix
+    libtree # recursive ldd
 
     direnv
     nix-direnv
