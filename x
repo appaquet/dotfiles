@@ -73,24 +73,44 @@ home)
         shift
         ${NIX_BUILDER} build ".#homeConfigurations.${HOME_CONFIG}.activationPackage" 2>&1 | ${NOM_PIPE}
         ;;
+    diff)
+        shift
+        nvd diff ~/.local/state/nix/profiles/home-manager ./result
+        ;;
     generations)
         shift
         home-manager generations
         ;;
-    diff)
+    diff-generations)
         shift
         nix profile diff-closures --profile ~/.local/state/nix/profiles/home-manager
         ;;
     switch)
         shift
-        ./result/activate
+
+        GENERATION="${1:-}"
+        if [[ -n "$GENERATION" ]]; then
+            GEN_PATH=$(home-manager generations | grep "id ${GENERATION}" | awk '{print $7}')
+            if [[ -z "$GEN_PATH" ]]; then
+                echo "Generation $GENERATION not found"
+                exit 1
+            fi
+            
+            echo "Activating generation $GENERATION at $GEN_PATH"
+            $GEN_PATH/activate
+        else
+            echo "Activating latest generation"
+            ./result/activate
+        fi
+
         ;;
     *)
         echo "$0 $COMMAND check: check home" >&2
-        echo "$0 $COMMAND generations: list generations" >&2
-        echo "$0 $COMMAND diff: diff last generations" >&2
         echo "$0 $COMMAND build: build home" >&2
+        echo "$0 $COMMAND diff: diff last build with current" >&2
         echo "$0 $COMMAND switch: switch home" >&2
+        echo "$0 $COMMAND generations: list generations" >&2
+        echo "$0 $COMMAND diff-generations: diff last generations" >&2
         exit 1
         ;;
     esac

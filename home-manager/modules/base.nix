@@ -25,13 +25,14 @@
     nix-output-monitor # better nix build output (nom)
     nixpkgs-fmt
     inputs.fzf-nix.packages.${system}.fzf-nix # fzf-nix
+    nvd # nix package diff tool
 
     bat # cat replacement
     hexyl
 
     fzf
     ripgrep
-    fd
+    fd # replacement for find
 
     dua
     bottom
