@@ -1,13 +1,20 @@
 
 # Nixified dotfiles
 
-## Initial setup
+## Initial setup (NixOS)
+
+1. Enable vscode server patcher (see <https://github.com/msteen/nixos-vscode-server#enable-the-service>)
+  1.1 Enable service: `systemctl --user enable --now auto-fix-vscode-server.service` (it's safe to ignore warning)
+  1.2. To prevent GC: `ln -sfT /run/current-system/etc/systemd/user/auto-fix-vscode-server.service ~/.config/systemd/user/auto-fix-vscode-server.service`
+
+
+## Initial setup (MacOS & other distos)
 
 1. Download nix installer & run it with multi-user mode enabled: `curl -L https://nixos.org/nix/install | sh -s -- --daemon`
 
-2. Enable flakes: `mkdir -p ~/.config/nix/ && echo 'experimental-features = nix-command flakes' > ~/.config/nix/nix.conf`
+1. Enable flakes: `mkdir -p ~/.config/nix/ && echo 'experimental-features = nix-command flakes' > ~/.config/nix/nix.conf`
 
-3. On Linux, configure nix by adding to `/etc/nix/nix.conf`.
+1. On Linux, configure nix by adding to `/etc/nix/nix.conf`.
    No need to do it on Darwin since we already do it nix-darwin (see [configuration.nix](./darwin/mbpapp/configuration.nix))
 
    ```conf
@@ -21,20 +28,13 @@
       experimental-features = nix-command flakes
    ```
 
-4. Build `./x home build` and activate `./x home switch`
+1. Build `./x home build` and activate `./x home switch`
 
-5. Activate shell by adding `/home/appaquet/.nix-profile/bin/fish` to `/etc/shells`
+1. Activate shell by adding `/home/appaquet/.nix-profile/bin/fish` to `/etc/shells`
    and running `chsh -s /home/appaquet/.nix-profile/bin/fish`
 
-6. On MacOS, apply darwin config: `./x darwin build` and `./x darwin witch`
+1. On MacOS, apply darwin config: `./x darwin build` and `./x darwin witch`
    2. Select a patched nerdfonts font in iTerm2 in order to have icons in neovim.
-
-### On NixOS
-
-1. Enable vscode server patcher (see <https://github.com/msteen/nixos-vscode-server#enable-the-service>)
-  1.1 Enable service: `systemctl --user enable auto-fix-vscode-server.service` (it's safe to ignore warning)
-  1.2. And start it: `systemctl --user start auto-fix-vscode-server.service`
-  1.3. To prevent GC: `ln -sfT /run/current-system/etc/systemd/user/auto-fix-vscode-server.service ~/.config/systemd/user/auto-fix-vscode-server.service`
 
 ## Maintenance
 
@@ -57,7 +57,6 @@
   rustflags = ["-C", "link-arg=-fuse-ld=/home/appaquet/.nix-profile/bin/mold"]
   ```
 
-
 ## Troubleshooting
 
 1. It seems that when switching to newer fish, the paths weren't properly set.
@@ -69,9 +68,6 @@
    set -Ua fish_user_paths /nix/var/nix/profiles/default/bin
    set -Ua fish_user_paths /home/appaquet/.nix-profile/bin
    ```
-
-2. To patch an external dynamic linked binary on NixOS, use [nix-alien](https://github.com/thiagokokada/nix-alien)
-  2.1 `nix-alien <binary>`
   
 ## Cheat sheets
 

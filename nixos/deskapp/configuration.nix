@@ -1,32 +1,29 @@
-{ inputs, config, lib, pkgs, ... }:
+{ inputs, config, pkgs, ... }:
 
 {
-  imports = [
-    ../common.nix
-    ./hardware-configuration.nix
-    inputs.vscode-server.nixosModule
-  ];
+  imports =
+    [
+      ./hardware-configuration.nix
+      ../common.nix
+      inputs.vscode-server.nixosModule
+    ];
 
   # Bootloader.
-  boot.loader.grub.enable = true;
-  boot.loader.grub.device = "/dev/vda";
-  boot.loader.grub.useOSProber = true;
-  boot.growPartition = true; # only relevant for vms
-
-  # Mode up to date kernel
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+  boot.kernelParams = [
+    "pcie_port_pm=off"
+  ];
 
   networking.hostName = "nixos"; # Define your hostname.
-
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # Enable networking
   networking.networkmanager.enable = true;
 
   # Display
   services.xserver.enable = true;
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+  services.xserver.displayManager.lightdm.enable = true;
+  services.xserver.desktopManager.xfce.enable = true;
 
   # Configure keymap in X11
   services.xserver = {
@@ -34,10 +31,10 @@
     xkbVariant = "";
   };
 
+  # Enable CUPS to print documents.
   services.printing.enable = false;
 
   # Enable sound with pipewire.
-  sound.enable = true;
   hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
@@ -45,43 +42,46 @@
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
+    # If you want to use JACK applications, uncomment this
+    #jack.enable = true;
+
+    # use the example session manager (no others are packaged yet so this is enabled by default,
+    # no need to redefine it in your config for now)
+    #media-session.enable = true;
   };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.appaquet = {
     isNormalUser = true;
+    shell = pkgs.fish;
     description = "appaquet";
     extraGroups = [ "networkmanager" "wheel" ];
-    shell = pkgs.fish;
     packages = with pkgs; [
-      firefox
+    #  thunderbird
     ];
   };
+  programs.fish.enable = true;
 
   # Enable automatic login for the user.
   services.xserver.displayManager.autoLogin.enable = true;
   services.xserver.displayManager.autoLogin.user = "appaquet";
 
-  # Workaround for GNOME autologin: https://github.com/NixOS/nixpkgs/issues/103746#issuecomment-945091229
-  systemd.services."getty@tty1".enable = false;
-  systemd.services."autovt@tty1".enable = false;
+  # Install firefox
+  programs.firefox.enable = true;
 
+  # List packages installed in system profile. To search, run:
+  # $ nix search wget
   environment.systemPackages = with pkgs; [
-    # wget
+  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+  #  wget
   ];
 
-  programs.fish.enable = true;
-
-  # List services that you want to enable:
+  # Enable the OpenSSH daemon.
   services.openssh.enable = true;
-  networking.firewall.enable = false;
-  services.tailscale.enable = true;
 
-  services.vscode-server.enable = true;
-
-  programs.nix-ld.enable = true;
-  programs.nix-ld.libraries = with pkgs; [
-    stdenv.cc.cc
-    zlib
-  ];
+  # Open ports in the firewall.
+  # networking.firewall.allowedTCPPorts = [ ... ];
+  # networking.firewall.allowedUDPPorts = [ ... ];
+  # Or disable the firewall altogether.
+  # networking.firewall.enable = false;
 }

@@ -92,11 +92,6 @@
     ]);
   };
 
-  home.shellAliases = {
-    vi = "nvim";
-    vim = "nvim";
-  };
-
   home.sessionVariables = {
     EDITOR = "nvim";
     VISUAL = "nvim";
