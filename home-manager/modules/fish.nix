@@ -123,6 +123,8 @@
     enable = true;
     enableFishIntegration = true;
     settings = {
+      command_timeout = 2000;
+
       username = {
         disabled = false;
         show_always = true;

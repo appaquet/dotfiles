@@ -25,7 +25,6 @@
     nix-output-monitor # better nix build output (nom)
     nixpkgs-fmt
     inputs.fzf-nix.packages.${system}.fzf-nix # fzf-nix
-    libtree # recursive ldd
 
     bat # cat replacement
     hexyl
