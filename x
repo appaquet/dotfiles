@@ -161,7 +161,26 @@ nixos)
         ;;
     switch)
         shift
-        sudo nixos-rebuild switch --flake ".#deskapp" |& ${NOM_PIPE}
+
+        GENERATION="${1:-}"
+        if [[ -n "$GENERATION" ]]; then
+            GEN_PATH="/nix/var/nix/profiles/system-${GENERATION}-link"
+            if [[ -z "$GEN_PATH" ]]; then
+                echo "Generation $GENERATION not found"
+                exit 1
+            fi
+            
+            echo "Activating generation $GENERATION at $GEN_PATH"
+            sudo $GEN_PATH/activate
+        else
+            echo "Activating latest generation"
+            sudo nixos-rebuild switch --flake ".#deskapp" |& ${NOM_PIPE}
+        fi
+
+        ;;
+    list-generations)
+        shift
+        nix profile history --profile /nix/var/nix/profiles/system
         ;;
     *)
         echo "$0 $COMMAND check: check nixos" >&2
