@@ -12,13 +12,24 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelParams = [
+    # Prevent intel nic from dropping after 1h
+    # See https://www.reddit.com/r/buildapc/comments/xypn1m/network_card_intel_ethernet_controller_i225v_igc/
     "pcie_port_pm=off"
+    "pcie_aspm.policy=performance"
   ];
 
   networking.hostName = "nixos"; # Define your hostname.
 
-  # Enable networking
+  # Networking
   networking.networkmanager.enable = true;
+  networking.useDHCP = false;
+  networking.bridges."br0".interfaces = [ "eno1" ];
+  networking.interfaces."br0".ipv4.addresses = [{
+    address = "192.168.2.99";
+    prefixLength = 16;
+  }];
+  networking.defaultGateway = "192.168.2.1";
+  networking.nameservers = [ "192.168.2.1" ];
 
   # Display
   services.xserver.enable = true;

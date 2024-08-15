@@ -8,7 +8,10 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
     flake-utils.url = "github:numtide/flake-utils";
-    rust-overlay.url = "github:oxalica/rust-overlay";
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { nixpkgs, rust-overlay, flake-utils, ... }:
@@ -41,7 +44,10 @@
               yarn
               nix-ld
 
-              rust-bin.stable.latest.default
+              (rust-bin.stable.latest.default.override {
+                extensions = [ "rust-src" ];
+                targets = [ "wasm32-unknown-unknown" ];
+              })
 
               llvmPackages.libclang
               llvmPackages.libcxxClang
