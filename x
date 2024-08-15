@@ -155,6 +155,10 @@ nixos)
         shift
         sudo nixos-rebuild build --flake ".#deskapp" |& ${NOM_PIPE}
         ;;
+    diff)
+        shift
+        nvd diff /run/current-system result
+        ;;
     switch)
         shift
         sudo nixos-rebuild switch --flake ".#deskapp" |& ${NOM_PIPE}
