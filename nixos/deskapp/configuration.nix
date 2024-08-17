@@ -20,6 +20,16 @@
 
   networking.hostName = "nixos"; # Define your hostname.
 
+  # Drives (lsblk -f)
+  fileSystems."/mnt/secondary" = {
+    device = "/dev/disk/by-uuid/e154b94d-9f7e-4079-a80b-659e6ab532ca";
+    fsType = "ext4";
+  };
+  fileSystems."/mnt/manjaro" = {
+    device = "/dev/disk/by-uuid/7474df9e-0ada-475a-9a21-995fbdb988c4";
+    fsType = "ext4";
+  };
+
   # Networking
   networking.networkmanager.enable = true;
   networking.useDHCP = false;
@@ -30,6 +40,10 @@
   }];
   networking.defaultGateway = "192.168.2.1";
   networking.nameservers = [ "192.168.2.1" ];
+
+  networking.hosts = {
+    "100.81.111.43" = [ "localhost.humanfirst.ai" ];
+  };
 
   # Display
   services.xserver.enable = true;
@@ -68,7 +82,7 @@
     description = "appaquet";
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
-    #  thunderbird
+      #  thunderbird
     ];
   };
   programs.fish.enable = true;
@@ -83,8 +97,8 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #  wget
+    #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    #  wget
   ];
 
   # Enable the OpenSSH daemon.
