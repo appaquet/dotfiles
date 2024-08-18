@@ -25,12 +25,12 @@
           overlays = [ (import rust-overlay) ];
         };
 
-        python3 = ((pkgs.python311.withPackages(p: with p; [ 
-          tensorflow 
-          grpcio-tools 
-          click
-          keras
-          mypy-protobuf
+        python3 = ((pkgs.python310.withPackages (p: with p; [
+          #tensorflow 
+          #grpcio-tools 
+          #click
+          #keras
+          #mypy-protobuf
         ])).override ({ ignoreCollisions = true; }));
       in
       {
@@ -52,11 +52,17 @@
               llvmPackages.libclang
               llvmPackages.libcxxClang
               zlib
+              libtensorflow
             ];
 
+            # fixes go debugging
+            # https://github.com/NixOS/nixpkgs/issues/18995
+            hardeningDisable = [ "fortify" ];
+
             packages = [
+              pkgs.pkg-config
               python3
-              (pkgs.poetry.override { python3 = pkgs.python311; })
+              (pkgs.poetry.override { python3 = pkgs.python310; })
             ];
 
             NODE_OPTIONS = "--openssl-legacy-provider"; # nodejs SSL error. see https://github.com/NixOS/nixpkgs/issues/209668
@@ -69,6 +75,12 @@
               pkgs.zlib
             ];
             NIX_LD = builtins.readFile "${pkgs.stdenv.cc}/nix-support/dynamic-linker";
+
+            shellHook = ''
+              # fixes libstdc++ issues with python
+              # see https://nixos.wiki/wiki/Packaging/Quirks_and_Caveats#ImportError:_libstdc.2B.2B.so.6:_cannot_open_shared_object_file:_No_such_file
+              LD_LIBRARY_PATH=${pkgs.stdenv.cc.cc.lib}/lib/
+            '';
           };
         };
       });

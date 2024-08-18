@@ -5,6 +5,7 @@
     [
       ./hardware-configuration.nix
       ../common.nix
+      ../dev.nix
       inputs.vscode-server.nixosModule
     ];
 
@@ -80,12 +81,18 @@
     isNormalUser = true;
     shell = pkgs.fish;
     description = "appaquet";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "docker"
+    ];
     packages = with pkgs; [
       #  thunderbird
     ];
   };
   programs.fish.enable = true;
+
+  virtualisation.docker.enable = true;
 
   # Enable automatic login for the user.
   services.xserver.displayManager.autoLogin.enable = true;
