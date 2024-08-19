@@ -114,12 +114,14 @@
   - `<leader>y` to yank to clipboard using [bin/pbcopy](bin/pbcopy) util
   - `<leader>p` to paste from clipboard using [bin/pbpaste](bin/pbpaste) util
 
-- LSP
+- Code / LSP
   - `gD` goto declaration
   - `gd` goto definition
   - `gi` goto implementation
   - `K` hover info
   - `<space>rn` rename symbol
+  - `<leader>cc` comment
+  - `<leader>cu` uncomment
 
 - Commands
   - `E <file>`: open a new buffer for a new file in current buffer's directory

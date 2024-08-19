@@ -10,6 +10,7 @@ MACHINE_KEY="${USER}@${HOSTNAME}"
 HOME_CONFIG=""
 if [[ "${MACHINE_KEY}" == "appaquet@deskapp"* || "${MACHINE_KEY}" == "appaquet@nixos"* || "${MACHINE_KEY}" == "appaquet@ubuntu-nix"* ]]; then
     HOME_CONFIG="appaquet@deskapp"
+    HOSTNAME="deskapp"
 elif [[ "${MACHINE_KEY}" == "appaquet@servapp"* ]]; then
     HOME_CONFIG="appaquet@servapp"
 elif [[ "${MACHINE_KEY}" == "appaquet@mbpapp"* || "${MACHINE_KEY}" == "appaquet@mbpvmapp"* ]]; then
@@ -153,7 +154,7 @@ nixos)
         ;;
     build)
         shift
-        sudo nixos-rebuild build --flake ".#deskapp" |& ${NOM_PIPE}
+        sudo nixos-rebuild build --flake ".#${HOSTNAME}" |& ${NOM_PIPE}
         ;;
     diff)
         shift
@@ -174,7 +175,7 @@ nixos)
             sudo $GEN_PATH/activate
         else
             echo "Activating latest generation"
-            sudo nixos-rebuild switch --flake ".#deskapp" |& ${NOM_PIPE}
+            sudo nixos-rebuild switch --flake ".#${HOSTNAME}" |& ${NOM_PIPE}
         fi
 
         ;;
