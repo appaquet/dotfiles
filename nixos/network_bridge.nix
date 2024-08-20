@@ -1,5 +1,4 @@
 { inputs, lib, config, pkgs, ... }:
-with lib;
 
 let
   cfg = config.networking.myBridge;
@@ -31,7 +30,7 @@ in
     };
 
     lanNameservers = lib.mkOption {
-      type = listOf lib.types.string;
+      type = lib.listOf lib.types.string;
       description = "Lan name servers";
     };
   };

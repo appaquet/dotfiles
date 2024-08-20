@@ -6,6 +6,8 @@
       ./hardware-configuration.nix
       ../common.nix
       ../dev.nix
+      ./virt.nix
+      ./virt-gpu.nix
       inputs.vscode-server.nixosModule
     ];
 
@@ -95,8 +97,6 @@
 
   # Virtualisation
   virtualisation.docker.enable = true;
-  virtualisation.libvirtd.enable = true; # https://nixos.wiki/wiki/Virt-manager
-  programs.virt-manager.enable = true;
 
   # Enable automatic login for the user.
   services.xserver.displayManager.autoLogin.enable = true;
@@ -119,5 +119,5 @@
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+  networking.firewall.enable = false;
 }

@@ -67,6 +67,7 @@
    set -ge fish_user_paths
    set -Ua fish_user_paths /nix/var/nix/profiles/default/bin
    set -Ua fish_user_paths /home/appaquet/.nix-profile/bin
+   set -Ua fish_user_paths /home/appaquet/.local/utils/
    ```
   
 ## Cheat sheets

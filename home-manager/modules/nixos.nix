@@ -6,7 +6,5 @@
 
     gnumake
     nodejs # needed for copilot
-
-    bintools # ld, objdump, etc.
   ];
 }
