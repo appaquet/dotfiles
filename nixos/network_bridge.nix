@@ -1,10 +1,10 @@
 { lib, config, ... }:
 
 let
-  cfg = config.myBridge;
+  cfg = config.networking.myBridge;
 in
 {
-  options.myBridge = {
+  options.networking.myBridge = {
     enable = lib.mkEnableOption "Enable module";
 
     interface = lib.mkOption {
