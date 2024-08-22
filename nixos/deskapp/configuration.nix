@@ -8,7 +8,6 @@
       ../dev.nix
       ./virt.nix
       ./virt-gpu.nix
-      inputs.vscode-server.nixosModule
     ];
 
   # Bootloader.

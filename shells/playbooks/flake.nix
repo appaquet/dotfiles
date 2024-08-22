@@ -20,30 +20,18 @@
           };
           overlays = [];
         };
-
-        python3 = ((pkgs.python311.withPackages(p: with p; [ 
-          tensorflow 
-          grpcio-tools 
-          click
-          keras
-          mypy-protobuf
-        ])).override ({ ignoreCollisions = true; }));
       in
       {
         devShells = {
-          default = pkgs.mkShell rec {
-            buildInputs = with pkgs; [
+          default = pkgs.mkShell {
+            buildInputs = [
+            ];
+
+            packages = with pkgs; [
               protobuf
               nodejs_20
               yarn
             ];
-
-            packages = [
-              python3
-              (pkgs.poetry.override { python3 = pkgs.python311; })
-            ];
-
-            NODE_OPTIONS = "--openssl-legacy-provider"; # nodejs SSL error. see https://github.com/NixOS/nixpkgs/issues/209668
           };
         };
       });
