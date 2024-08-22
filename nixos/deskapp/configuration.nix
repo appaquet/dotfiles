@@ -6,6 +6,7 @@
       ./hardware-configuration.nix
       ../common.nix
       ../dev.nix
+      ../docker.nix
       ./virt.nix
       ./virt-gpu.nix
     ];
@@ -85,17 +86,12 @@
     extraGroups = [
       "networkmanager"
       "wheel"
-      "docker"
-      "libvirtd"
     ];
     packages = with pkgs; [
       #  thunderbird
     ];
   };
   programs.fish.enable = true;
-
-  # Virtualisation
-  virtualisation.docker.enable = true;
 
   # Enable automatic login for the user.
   services.xserver.displayManager.autoLogin.enable = true;

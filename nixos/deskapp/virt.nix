@@ -19,6 +19,12 @@
     };
   };
 
+  users.users.appaquet = {
+    extraGroups = [
+      "libvirtd"
+    ];
+  };
+
   virtualisation.spiceUSBRedirection.enable = true;
 
   programs.virt-manager.enable = true;
