@@ -5,6 +5,7 @@
     [
       ./hardware-configuration.nix
       ../common.nix
+      ../network_bridge.nix
       ../dev.nix
       ../docker.nix
       ./virt.nix
@@ -35,14 +36,20 @@
 
   # Networking
   networking.networkmanager.enable = true;
-  networking.useDHCP = false;
-  networking.bridges."br0".interfaces = [ "eno1" ];
-  networking.interfaces."br0".ipv4.addresses = [{
-    address = "192.168.2.99";
-    prefixLength = 16;
-  }];
-  networking.defaultGateway = "192.168.2.1";
-  networking.nameservers = [ "192.168.2.1" ];
+  #networking.useDHCP = false;
+  #networking.bridges."br0".interfaces = [ "eno1" ];
+  #networking.interfaces."br0".ipv4.addresses = [{
+  #address = "192.168.2.99";
+  #prefixLength = 16;
+  #}];
+  #networking.defaultGateway = "192.168.2.1";
+  #networking.nameservers = [ "192.168.2.1" ];
+
+  myBridge = {
+    enable = true;
+    interface = "eno1";
+    lanIp = "192.168.2.99";
+  };
 
   networking.hosts = {
     "100.81.111.43" = [ "localhost.humanfirst.ai" ];

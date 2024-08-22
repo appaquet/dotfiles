@@ -1,20 +1,19 @@
-{ inputs, lib, config, pkgs, ... }:
+{ lib, config, ... }:
 
 let
-  cfg = config.networking.myBridge;
+  cfg = config.myBridge;
 in
 {
-
   options.myBridge = {
-    enable = lib.mkEnableOption "Enable Module";
+    enable = lib.mkEnableOption "Enable module";
 
     interface = lib.mkOption {
-      type = lib.types.string;
+      type = lib.types.str;
       description = "Network interface";
     };
 
     lanIp = lib.mkOption {
-      type = lib.types.string;
+      type = lib.types.str;
       description = "Lan IP";
     };
 
@@ -25,16 +24,17 @@ in
     };
 
     lanGateway = lib.mkOption {
-      type = lib.types.string;
+      type = lib.types.str;
       description = "Lan gateway";
+      default = "192.168.2.1";
     };
 
     lanNameservers = lib.mkOption {
-      type = lib.listOf lib.types.string;
+      type = lib.types.listOf lib.types.str;
       description = "Lan name servers";
+      default = [ "192.168.2.1" ];
     };
   };
-
 
   config = lib.mkIf cfg.enable {
     networking.useDHCP = false;
