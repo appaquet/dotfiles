@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 tmux set pane-border-status top
 tmux set pane-border-format "#{pane_index} #T"

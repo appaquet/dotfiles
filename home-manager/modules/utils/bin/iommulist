@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 # change the 999 if needed
 shopt -s nullglob
 for d in /sys/kernel/iommu_groups/{0..999}/devices/*; do

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 CURRENT_DIR=$(pwd)
 CURRENT_NAME=$(uname -n)
