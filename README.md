@@ -161,7 +161,3 @@
 - <https://nix-community.github.io/home-manager/options.html>
 - <https://daiderd.com/nix-darwin/manual/index.html#sec-options>
 
-## TODO
-
-- [ ] Manage brew through nix: <https://daiderd.com/nix-darwin/manual/index.html#opt-homebrew.enable>
-- [ ] Find out how to declaratively install apt packages
