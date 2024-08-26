@@ -3,8 +3,8 @@
 {
   home.packages = with pkgs; [
     nix-alien
+    steam-run
 
-    gnumake
     nodejs # needed for copilot
   ];
 }

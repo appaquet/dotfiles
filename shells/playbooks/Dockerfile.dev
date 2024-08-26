@@ -1,0 +1,30 @@
+FROM cruizba/ubuntu-dind:focal-latest
+
+RUN apt update && \
+    apt install -y vim gpg apt-transport-https ca-certificates gnupg curl net-tools sudo git
+
+RUN adduser --uid 1000 --gid 100 --disabled-password --gecos '' --shell /usr/bin/bash appaquet
+RUN mkdir -p /usr/local/gcloud && chown 1000:100 /usr/local/gcloud
+RUN echo 'appaquet ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+USER appaquet
+
+RUN curl https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz > /tmp/google-cloud-sdk.tar.gz
+RUN mkdir -p /usr/local/gcloud \
+  && tar -C /usr/local/gcloud -xvf /tmp/google-cloud-sdk.tar.gz \
+  && /usr/local/gcloud/google-cloud-sdk/install.sh
+ENV PATH $PATH:/usr/local/gcloud/google-cloud-sdk/bin
+RUN echo 'export PATH=$PATH:/usr/local/gcloud/google-cloud-sdk/bin' >> ~/.bashrc
+RUN gcloud components install -q kubectl gke-gcloud-auth-plugin
+
+RUN curl https://mise.run | sh 
+RUN echo 'eval "$(~/.local/bin/mise activate bash)"' >> ~/.bashrc
+
+RUN sudo chmod a+rw /usr/local/bin
+COPY entrypoint.sh /usr/local/bin/
+RUN sudo chmod +x /usr/local/bin/entrypoint.sh
+
+WORKDIR /home/appaquet/Work/humanfirst/workspace
+
+# docker build -t e2e-dev -f Dockerfile.dev .
+# docker run -it --rm --privileged -v ~/.docker:/home/appaquet/.docker -v ~/.config/gcloud:/home/appaquet/.config/gcloud -v ~/.config/humanfirst:/home/appaquet/.config/humanfirst -v /home/appaquet/Work:/home/appaquet/Work  e2e-dev
