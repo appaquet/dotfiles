@@ -1,9 +1,9 @@
 {
   # To use, create .envrc with:
-  # use flake /home/appaquet/dotfiles/shells/exocore --impure
-  # watch_file /home/appaquet/dotfiles/shells/exocore/flake.nix
+  # use flake /home/appaquet/dotfiles/shells/backend --impure
+  # watch_file /home/appaquet/dotfiles/shells/backend/flake.nix
 
-  description = "exomind";
+  description = "backend";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
@@ -24,10 +24,18 @@
           };
           overlays = [ (import rust-overlay) ];
         };
+
+        python3 = ((pkgs.python310.withPackages (p: with p; [
+          #tensorflow 
+          #grpcio-tools 
+          #click
+          #keras
+          #mypy-protobuf
+        ])).override ({ ignoreCollisions = true; }));
       in
       {
         devShells = {
-          default = pkgs.mkShell {
+          default = pkgs.mkShell rec {
             buildInputs = with pkgs; [
               clang
               nix-ld
@@ -40,15 +48,21 @@
               llvmPackages.libclang
               llvmPackages.libcxxClang
               zlib
+              libtensorflow
             ];
+
+            # fixes go debugging
+            # https://github.com/NixOS/nixpkgs/issues/18995
+            hardeningDisable = [ "fortify" ];
 
             packages = with pkgs; [
               pkg-config
               python3
               protobuf
-              capnproto
               nodejs
               yarn
+
+              (poetry.override { python3 = python310; })
             ];
 
             NIX_LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
@@ -59,6 +73,12 @@
               pkgs.zlib
             ];
             NIX_LD = builtins.readFile "${pkgs.stdenv.cc}/nix-support/dynamic-linker";
+
+            shellHook = ''
+              # fixes libstdc++ issues with python
+              # see https://nixos.wiki/wiki/Packaging/Quirks_and_Caveats#ImportError:_libstdc.2B.2B.so.6:_cannot_open_shared_object_file:_No_such_file
+              LD_LIBRARY_PATH=${pkgs.stdenv.cc.cc.lib}/lib/
+            '';
           };
         };
       });

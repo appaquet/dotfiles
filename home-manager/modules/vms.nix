@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, ... }:
 
 {
   programs.fish = {
@@ -9,4 +9,8 @@
       vmstop = "sudo virsh shutdown";
     };
   };
+
+  home.packages = with pkgs; [
+    pciutils # lspci
+  ];
 }

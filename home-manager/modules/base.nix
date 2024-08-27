@@ -23,9 +23,17 @@
   home.packages = with pkgs; [
     manix # nix doc cli searcher
     nix-output-monitor # better nix build output (nom)
+    nil # nix lsp
     nixpkgs-fmt
+    libtree # recursive ldd 
     inputs.fzf-nix.packages.${system}.fzf-nix # fzf-nix
     nvd # nix package diff tool
+
+    direnv
+    nix-direnv
+
+    git
+    gh
 
     bat # cat replacement
     hexyl
