@@ -9,7 +9,7 @@
 
     home-manager = {
       url = "github:nix-community/home-manager/release-24.05";
-      inputs.nixpkgs.follows = "nixpkgs"; # makes home-manager's nixpkgs input follow our nixpkgs version
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     darwin = {

@@ -8,9 +8,12 @@ HOSTNAME=$(uname -n | tr '[:upper:]' '[:lower:] | sed 's/\.local//'')
 MACHINE_KEY="${USER}@${HOSTNAME}"
 
 HOME_CONFIG=""
-if [[ "${MACHINE_KEY}" == "appaquet@deskapp"* || "${MACHINE_KEY}" == "appaquet@nixos"* || "${MACHINE_KEY}" == "appaquet@ubuntu-nix"* ]]; then
+if [[ "${MACHINE_KEY}" == "appaquet@deskapp"* ]]; then
     HOME_CONFIG="appaquet@deskapp"
     HOSTNAME="deskapp"
+elif [[ "${MACHINE_KEY}" == "appaquet@nixos"* ]]; then
+    HOME_CONFIG="appaquet@nixapp"
+    HOSTNAME="nixapp"
 elif [[ "${MACHINE_KEY}" == "appaquet@servapp"* ]]; then
     HOME_CONFIG="appaquet@servapp"
 elif [[ "${MACHINE_KEY}" == "appaquet@mbpapp"* || "${MACHINE_KEY}" == "appaquet@mbpvmapp"* ]]; then
@@ -186,6 +189,7 @@ nixos)
     *)
         echo "$0 $COMMAND check: check nixos" >&2
         echo "$0 $COMMAND build: build nixos" >&2
+        echo "$0 $COMMAND build: diff nixos" >&2
         echo "$0 $COMMAND switch: switch nixos" >&2
         exit 1
         ;;
@@ -195,8 +199,12 @@ nixos)
 check)
     shift
     check_home "appaquet@deskapp"
+    check_home "appaquet@servapp"
+
     check_home "appaquet@mbpapp"
     check_eval ".#darwinConfigurations.mbpapp.system"
+
+    check_home "appaquet@nixos"
     check_eval ".#nixosConfigurations.${HOSTNAME}.config.system.build.toplevel"
     ;;
 
@@ -243,7 +251,7 @@ optimize)
 
 fetch-deskapp)
     shift
-    rsync -avz --delete appaquet@deskapp.tailscale:dotfiles/ ~/dotfiles/
+    rsync -avz --delete appaquet@deskapp.n3x.net:dotfiles/ ~/dotfiles/
     ;;
 
 *)
