@@ -41,6 +41,12 @@
     zlib
   ];
 
+  # System wide packages
+  environment.systemPackages = with pkgs; [
+    vim
+    lsof
+  ];
+
   # Run fstrim weekly
   services.fstrim.enable = true;
 
