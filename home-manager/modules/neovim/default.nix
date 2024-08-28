@@ -58,6 +58,7 @@
         p.sql
         p.markdown
         p.c
+        p.lua
         p.python
         p.dockerfile
         p.dot
