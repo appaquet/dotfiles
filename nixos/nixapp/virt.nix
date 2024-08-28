@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 
 {
   # See 
@@ -18,6 +18,9 @@
       };
     };
   };
+  programs.virt-manager.enable = true;
+  environment.systemPackages = [ pkgs.swtpm ];
+  virtualisation.spiceUSBRedirection.enable = true;
 
   users.users.appaquet = {
     extraGroups = [
@@ -25,9 +28,16 @@
     ];
   };
 
-  virtualisation.spiceUSBRedirection.enable = true;
-
-  programs.virt-manager.enable = true;
-
-  environment.systemPackages = [ pkgs.swtpm ];
+  # Allow virsh to be run without password
+  security.sudo = {
+    extraRules = [{
+      commands = [
+        {
+          command = "${config.system.path}/bin/virsh";
+          options = [ "NOPASSWD" ];
+        }
+      ];
+      groups = [ "wheel" ];
+    }];
+  };
 }

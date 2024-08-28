@@ -57,7 +57,6 @@
     xkbVariant = "";
   };
 
-  # Enable CUPS to print documents.
   services.printing.enable = false;
 
   # Enable sound with pipewire.
@@ -75,21 +74,6 @@
     # no need to redefine it in your config for now)
     #media-session.enable = true;
   };
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.appaquet = {
-    isNormalUser = true;
-    shell = pkgs.fish;
-    description = "appaquet";
-    extraGroups = [
-      "networkmanager"
-      "wheel"
-    ];
-    packages = with pkgs; [
-      #  thunderbird
-    ];
-  };
-  programs.fish.enable = true;
 
   # Enable automatic login for the user.
   services.xserver.displayManager.autoLogin.enable = true;
@@ -113,4 +97,12 @@
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   networking.firewall.enable = false;
+
+  # This value determines the NixOS release from which the default
+  # settings for stateful data, like file locations and database versions
+  # on your system were taken. It‘s perfectly fine and recommended to leave
+  # this value at the release version of the first install of this system.
+  # Before changing this value read the documentation for this option
+  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
+  system.stateVersion = "24.05";
 }
