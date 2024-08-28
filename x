@@ -23,8 +23,6 @@ else
     exit 1
 fi
 
-sudo echo # prime pw for nom redirects to work
-
 NIX_BUILDER="nix"
 NOM_PIPE="tee"
 if [[ -x ~/.nix-profile/bin/nom ]]; then
@@ -148,6 +146,8 @@ darwin)
     ;;
 
 nixos)
+    prime_sudo
+
     shift
     SUBCOMMAND=$1
     case $SUBCOMMAND in

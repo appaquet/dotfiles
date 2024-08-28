@@ -72,6 +72,12 @@
               extraSpecialArgs = { inherit inputs unstablePkgs; };
             };
 
+            "appaquet@nixapp" = home-manager.lib.homeManagerConfiguration {
+              inherit pkgs;
+              modules = [ ./home-manager/nixapp.nix ] ++ commonHomeModules;
+              extraSpecialArgs = { inherit inputs unstablePkgs; };
+            };
+
             "appaquet@servapp" = home-manager.lib.homeManagerConfiguration {
               inherit pkgs;
               modules = [ ./home-manager/servapp.nix ] ++ commonHomeModules;
@@ -92,6 +98,7 @@
       homeConfigurations = {
         "appaquet@deskapp" = self.homes.x86_64-linux."appaquet@deskapp";
         "appaquet@servapp" = self.homes.x86_64-linux."appaquet@servapp";
+        "appaquet@nixapp" = self.homes.x86_64-linux."appaquet@nixapp";
         "appaquet@mbpapp" = self.homes.aarch64-darwin."appaquet@mbpapp";
       };
 
@@ -110,13 +117,13 @@
       };
 
       nixosConfigurations = {
-        deskapp = inputs.nixpkgs.lib.nixosSystem {
+        nixapp = inputs.nixpkgs.lib.nixosSystem {
           specialArgs = {
             inherit (self) common;
             inherit inputs;
           };
           modules = [
-            ./nixos/deskapp/configuration.nix
+            ./nixos/nixapp/configuration.nix
           ];
         };
       };
