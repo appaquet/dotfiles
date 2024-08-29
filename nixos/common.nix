@@ -43,7 +43,6 @@
 
   # System wide packages
   environment.systemPackages = with pkgs; [
-    vim
     lsof
   ];
 

@@ -11,7 +11,7 @@ HOME_CONFIG=""
 if [[ "${MACHINE_KEY}" == "appaquet@deskapp"* ]]; then
     HOME_CONFIG="appaquet@deskapp"
     HOSTNAME="deskapp"
-elif [[ "${MACHINE_KEY}" == "appaquet@nixos"* ]]; then
+elif [[ "${MACHINE_KEY}" == "appaquet@nixapp"* || "${MACHINE_KEY}" == "appaquet@nixos"* ]]; then
     HOME_CONFIG="appaquet@nixapp"
     HOSTNAME="nixapp"
 elif [[ "${MACHINE_KEY}" == "appaquet@servapp"* ]]; then
