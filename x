@@ -157,7 +157,7 @@ nixos)
         ;;
     build)
         shift
-        sudo nixos-rebuild build --flake ".#${HOSTNAME}" |& ${NOM_PIPE}
+        sudo nixos-rebuild build --flake ".#${HOSTNAME}" 2>&1 | ${NOM_PIPE}
         ;;
     diff)
         shift
@@ -178,7 +178,7 @@ nixos)
             sudo $GEN_PATH/activate
         else
             echo "Activating latest generation"
-            sudo nixos-rebuild switch --flake ".#${HOSTNAME}" |& ${NOM_PIPE}
+            sudo nixos-rebuild switch --flake ".#${HOSTNAME}" 2>&1 | ${NOM_PIPE}
         fi
 
         ;;
