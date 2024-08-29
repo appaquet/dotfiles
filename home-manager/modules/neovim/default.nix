@@ -4,6 +4,7 @@
   home.packages = with pkgs; [
     nil # nix lsp
     marksman # markdown lsp
+    nodejs # for copilot
   ];
 
   programs.neovim = {
