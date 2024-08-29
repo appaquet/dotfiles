@@ -15,24 +15,16 @@
     package = pkgs.nix;
 
     settings = {
-      experimental-features = [ "flakes" "nix-command" ];
+      experimental-features = [ "flakes" "nix-command" "fetch-closure" ];
       auto-optimise-store = true;
+      keep-outputs = true;
+      keep-derivations = true;
+      builders-use-substitutes = true; # allow use of cached builds, require fast internet
     };
 
     registry = {
       nixpkgs.flake = inputs.inputs.nixpkgs;
     };
-
-    extraOptions = ''
-      keep-outputs = true
-      keep-derivations = true
-      auto-optimise-store = false
-
-      # assuming the builder has a faster internet connection
-      builders-use-substitutes = true
-
-      experimental-features = nix-command flakes
-    '';
   };
 
   security.pam.enableSudoTouchIdAuth = true;

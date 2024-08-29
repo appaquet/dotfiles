@@ -3,6 +3,20 @@
 
 ## Initial setup (NixOS)
 
+1. Setup NixOS using the installer.
+
+1. Once installed, edit `/etc/nixos/configuration.nix` and rebuild:
+   * Enable sshd
+   * Add git in packages
+
+1. SSH to the machine.
+
+1. Clone this repo (need to setup keys).
+
+1. Copy `/etc/nixos/*.nix` to this repo to compare & adapt.
+
+1. Rebuild & switch using this repo.
+
 1. Enable vscode server patcher (see <https://github.com/msteen/nixos-vscode-server#enable-the-service>)
   1.1 Enable service: `systemctl --user enable --now auto-fix-vscode-server.service` (it's safe to ignore warning)
   1.2. To prevent GC: `ln -sfT /run/current-system/etc/systemd/user/auto-fix-vscode-server.service ~/.config/systemd/user/auto-fix-vscode-server.service`
@@ -22,10 +36,10 @@
       keep-derivations = true
       auto-optimise-store = true
 
-      # assuming the builder has a faster internet connection
+      # allow use of cached builds, require fast internet
       builders-use-substitutes = true
 
-      experimental-features = nix-command flakes
+      experimental-features = nix-command flakes fetch-closure
    ```
 
 1. Build `./x home build` and activate `./x home switch`
