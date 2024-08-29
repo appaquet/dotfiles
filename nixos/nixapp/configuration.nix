@@ -33,6 +33,10 @@
     device = "/dev/disk/by-uuid/7474df9e-0ada-475a-9a21-995fbdb988c4";
     fsType = "ext4";
   };
+  swapDevices = [{
+    device = "/swapfile";
+    size = 16 * 1024; # 16GB
+  }];
 
   # Networking
   networking.networkmanager.enable = true;

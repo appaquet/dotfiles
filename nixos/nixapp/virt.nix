@@ -33,11 +33,34 @@
     extraRules = [{
       commands = [
         {
-          command = "${config.system.path}/bin/virsh";
+          command = "${config.system.path}/bin/virsh"; # sudoers file wants explicit path
           options = [ "NOPASSWD" ];
         }
       ];
       groups = [ "wheel" ];
     }];
+  };
+
+  # Shutdown all VMs before going to sleep
+  systemd.services.virt-pre-sleep-hook = {
+    description = "Virt pre-sleep hook";
+    wantedBy = [ "sleep.target" ]; # Trigger on any sleep state
+    before = [ "sleep.target" ]; # Ensure it runs before sleep
+
+    serviceConfig = {
+      Type = "oneshot";
+    };
+
+    script = ''
+      VIRSH="${pkgs.libvirt}/bin/virsh"
+      for vm in `$VIRSH list --state-running --name`; do
+        $VIRSH shutdown $vm
+
+        # wait for it to shutdown
+        while $VIRSH list --state-running --name | grep -q $vm; do
+          sleep 1
+        done
+      done
+    '';
   };
 }
