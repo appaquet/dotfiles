@@ -45,6 +45,7 @@
   # System wide packages
   environment.systemPackages = with pkgs; [
     lsof
+    pciutils # lspci
   ];
 
   # Run fstrim weekly

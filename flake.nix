@@ -40,6 +40,7 @@
 
       # Add custom packages to nixpkgs
       packageOverlay = final: prev: {
+        exo = prev.callPackage ./overlays/exo { };
       };
 
       overlays = [
