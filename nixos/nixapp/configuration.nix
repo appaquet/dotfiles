@@ -8,8 +8,8 @@
       ../network_bridge.nix
       ../dev.nix
       ../docker.nix
-      ./virt.nix
-      ./virt-gpu.nix
+      ../virt.nix
+      ../virt-gpu-passthrough.nix
     ];
 
   # Bootloader.
@@ -54,14 +54,21 @@
   services.xserver.enable = true;
   services.xserver.displayManager.lightdm.enable = true;
   services.xserver.desktopManager.xfce.enable = true;
-
-  # Configure keymap in X11
+  services.xserver.displayManager.autoLogin.enable = true;
+  services.xserver.displayManager.autoLogin.user = "appaquet";
   services.xserver = {
     layout = "us";
     xkbVariant = "";
   };
 
-  services.printing.enable = false;
+  # Virtualization
+  virtualisation.gpuPassthrough = {
+    enable = true;
+    devices = [
+      "10de:2216" # Graphics
+      "10de:1aef" # Audio
+    ];
+  };
 
   # Enable sound with pipewire.
   hardware.pulseaudio.enable = false;
@@ -79,10 +86,6 @@
     #media-session.enable = true;
   };
 
-  # Enable automatic login for the user.
-  services.xserver.displayManager.autoLogin.enable = true;
-  services.xserver.displayManager.autoLogin.user = "appaquet";
-
   # Install firefox
   programs.firefox.enable = true;
 
@@ -94,6 +97,8 @@
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   networking.firewall.enable = false;
+
+  services.printing.enable = false;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

@@ -41,7 +41,7 @@
     }];
   };
 
-  # Shutdown all VMs before going to sleep
+  # Shutdown all vms before suspend
   systemd.services.virt-pre-sleep-hook = {
     description = "Virt pre-sleep hook";
     wantedBy = [ "sleep.target" ]; # Trigger on any sleep state
