@@ -8,34 +8,11 @@ lspconfig.pyright.setup {}
 lspconfig.tsserver.setup {}
 lspconfig.marksman.setup {}
 lspconfig.gopls.setup {}
+lspconfig.nixd.setup {}
 lspconfig.rust_analyzer.setup {
   -- Server-specific settings. See `:help lspconfig-setup`
   settings = {
     ['rust-analyzer'] = {},
-  },
-}
-
--- Nil (see https://github.com/oxalica/nil/blob/main/dev/nvim-lsp.nix)
-local nil_lsp_path = vim.env.NIL_PATH or (vim.env.HOME .. '/.nix-profile/bin/nil')
-local nil_caps = vim.tbl_deep_extend(
-  'force',
-  vim.lsp.protocol.make_client_capabilities(),
-  require('cmp_nvim_lsp').default_capabilities(),
-  -- File watching is disabled by default for neovim.
-  -- See: https://github.com/neovim/neovim/pull/22405
-  { workspace = { didChangeWatchedFiles = { dynamicRegistration = true } } }
-);
-lspconfig.nil_ls.setup {
-  autostart = true,
-  capabilities = nil_caps,
-  cmd = { nil_lsp_path },
-  settings = {
-    ['nil'] = {
-      testSetting = 42,
-      formatting = {
-        command = { "nixpkgs-fmt" },
-      },
-    },
   },
 }
 

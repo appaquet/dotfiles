@@ -28,10 +28,15 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nixd = {
+      url = "github:nix-community/nixd";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     vscode-server.url = "github:msteen/nixos-vscode-server";
   };
 
-  outputs = inputs @ { self, nixpkgs, nixpkgs-unstable, home-manager, humanfirst-dots, flake-utils, darwin, nix-alien, fzf-nix, ... }:
+  outputs = inputs @ { self, nixpkgs, nixpkgs-unstable, home-manager, humanfirst-dots, flake-utils, darwin, nix-alien, fzf-nix, nixd, ... }:
     let
       config = {
         permittedInsecurePackages = [ ];

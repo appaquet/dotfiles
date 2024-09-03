@@ -2,8 +2,6 @@
 
 {
   home.packages = with pkgs; [
-    gh
-
     tokei
 
     dive # docker container explorer

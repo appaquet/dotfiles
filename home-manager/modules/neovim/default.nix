@@ -2,7 +2,7 @@
 
 {
   home.packages = with pkgs; [
-    nil # nix lsp
+    nixd # nix lsp
     marksman # markdown lsp
     nodejs # for copilot
   ];
