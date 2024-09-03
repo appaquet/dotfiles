@@ -1,4 +1,4 @@
-{ pkgs, config, lib, inputs, ... }:
+{ pkgs, inputs, ... }:
 {
   imports = [
     ./fonts.nix

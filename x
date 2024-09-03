@@ -243,6 +243,11 @@ gc)
     sudo ${ncg} -d
     ;;
 
+format)
+    shift
+    nixpkgs-fmt .
+    ;;
+
 optimize)
     shift
     echo "Optimizing store..."
