@@ -22,7 +22,7 @@
     "pcie_aspm.policy=performance"
   ];
 
-  networking.hostName = "nixos"; # Define your hostname.
+  networking.hostName = "nixapp"; # Define your hostname.
 
   # Drives (lsblk -f)
   fileSystems."/mnt/secondary" = {
