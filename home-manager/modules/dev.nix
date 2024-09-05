@@ -11,8 +11,6 @@
     capnproto
     flatbuffers
 
-    mold-wrapped
-
     gnumake
     bintools # ld, objdump, etc.
   ];

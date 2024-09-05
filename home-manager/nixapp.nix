@@ -3,6 +3,7 @@
 {
   imports = [
     ./modules/base.nix
+    ./modules/linux.nix
     ./modules/dev.nix
     ./modules/work.nix
     ./modules/vms.nix

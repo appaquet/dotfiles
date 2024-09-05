@@ -25,7 +25,6 @@
     manix # nix doc cli searcher
     nix-output-monitor # better nix build output (nom)
     nixpkgs-fmt
-    libtree # recursive ldd 
     fzf-nix # fzf-nix
     nvd # nix package diff tool
 

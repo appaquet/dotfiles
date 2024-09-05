@@ -16,7 +16,7 @@
 
     settings = {
       experimental-features = [ "flakes" "nix-command" "fetch-closure" ];
-      auto-optimise-store = true;
+      auto-optimise-store = false; # TODO: Turn back on when https://github.com/NixOS/nix/issues/7273
       keep-outputs = true;
       keep-derivations = true;
       builders-use-substitutes = true; # allow use of cached builds, require fast internet

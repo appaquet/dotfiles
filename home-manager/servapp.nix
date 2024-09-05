@@ -3,6 +3,7 @@
 {
   imports = [
     ./modules/base.nix
+    ./modules/linux.nix
     ./modules/vms.nix
     ./modules/media.nix
   ];
