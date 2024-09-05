@@ -1,4 +1,4 @@
-{ pkgs, inputs, ... }:
+{ pkgs, ... }:
 
 {
   imports = [
@@ -9,6 +9,7 @@
     ./mise
     ./utils
     ./autojump.nix
+    ./ssh.nix
   ];
 
   programs.home-manager.enable = true;
@@ -25,7 +26,7 @@
     nix-output-monitor # better nix build output (nom)
     nixpkgs-fmt
     libtree # recursive ldd 
-    inputs.fzf-nix.packages.${system}.fzf-nix # fzf-nix
+    fzf-nix # fzf-nix
     nvd # nix package diff tool
 
     direnv

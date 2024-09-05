@@ -36,7 +36,7 @@
     vscode-server.url = "github:msteen/nixos-vscode-server";
   };
 
-  outputs = inputs @ { self, nixpkgs, nixpkgs-unstable, home-manager, humanfirst-dots, flake-utils, darwin, nix-alien, fzf-nix, nixd, ... }:
+  outputs = inputs @ { self, nixpkgs, nixpkgs-unstable, home-manager, humanfirst-dots, flake-utils, darwin, nix-alien, ... }:
     let
       config = {
         permittedInsecurePackages = [ ];
@@ -46,6 +46,7 @@
       # Add custom packages to nixpkgs
       packageOverlay = final: prev: {
         exo = prev.callPackage ./overlays/exo { };
+        fzf-nix = inputs.fzf-nix.packages.${prev.system}.fzf-nix;
       };
 
       overlays = [
