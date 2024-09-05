@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 {
   imports = [
@@ -72,5 +72,8 @@
 
     rsync
     rclone
+  ]
+  ++ lib.optionals stdenv.isLinux [
+    libtree # recursive ldd 
   ];
 }

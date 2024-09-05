@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 {
   home.packages = with pkgs; [
@@ -13,6 +13,9 @@
 
     gnumake
     bintools # ld, objdump, etc.
+  ]
+  ++ lib.optionals stdenv.isLinux [
+    mold-wrapped
   ];
 }
 
