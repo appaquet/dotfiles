@@ -7,7 +7,6 @@
     matchBlocks = {
       github = {
         hostname = "github.com";
-        user = "git";
         identityFile = "~/.ssh/github_id_rsa";
       };
 
