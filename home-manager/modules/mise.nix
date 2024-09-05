@@ -1,4 +1,4 @@
-{ unstablePkgs, lib, cfg, ... }:
+{ unstablePkgs, cfg, ... }:
 
 let
   miseConfig = ''
@@ -15,14 +15,16 @@ let
 in
 {
   home.packages = [
-    unstablePkgs.rtx
+    unstablePkgs.mise
   ];
 
-  home.file.".tool-versions".source = ./tool-versions;
+  # global tools
+  home.file.".tool-versions".text = ''
+  '';
 
   xdg.configFile."fish/conf.d/mise.fish".text = ''
-  ${unstablePkgs.rtx}/bin/mise activate fish | source
-  '' ;
+    ${unstablePkgs.mise}/bin/mise activate fish | source
+  '';
 
   xdg.configFile."mise/config.toml".text = miseConfig;
 }

@@ -6,7 +6,7 @@
     ./tmux
     ./git
     ./neovim
-    ./mise
+    ./mise.nix
     ./utils
     ./autojump.nix
     ./ssh.nix
@@ -18,9 +18,6 @@
   programs.direnv.enable = true;
   programs.direnv.nix-direnv.enable = true;
 
-  # Notes: 
-  #  - not everything is installed using nix. some tools are install via `mise` when different versions are required (see ./rtx/tool-versions)
-  #  - to install an unstable package, use `unstablePkgs.<package-name>`
   home.packages = with pkgs; [
     manix # nix doc cli searcher
     nix-output-monitor # better nix build output (nom)
