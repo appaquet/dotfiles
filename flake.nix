@@ -80,7 +80,7 @@
             "appaquet@deskapp" = home-manager.lib.homeManagerConfiguration {
               inherit pkgs;
               modules = [ ./home-manager/deskapp.nix ] ++ commonHomeModules;
-              extraSpecialArgs = { inherit inputs unstablePkgs; };
+              extraSpecialArgs = { inherit inputs unstablePkgs cfg; };
             };
 
             "appaquet@nixapp" = home-manager.lib.homeManagerConfiguration {
@@ -97,13 +97,13 @@
             "appaquet@servapp" = home-manager.lib.homeManagerConfiguration {
               inherit pkgs;
               modules = [ ./home-manager/servapp.nix ] ++ commonHomeModules;
-              extraSpecialArgs = { inherit inputs unstablePkgs; };
+              extraSpecialArgs = { inherit inputs unstablePkgs cfg; };
             };
 
             "appaquet@mbpapp" = home-manager.lib.homeManagerConfiguration {
               inherit pkgs;
               modules = [ ./home-manager/mbpapp.nix ] ++ commonHomeModules;
-              extraSpecialArgs = { inherit inputs unstablePkgs; };
+              extraSpecialArgs = { inherit inputs unstablePkgs cfg; };
             };
           };
         }
