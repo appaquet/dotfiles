@@ -70,6 +70,10 @@
           unstablePkgs = import nixpkgs-unstable {
             inherit system config overlays;
           };
+
+          cfg = {
+            isNixos = false;
+          };
         in
         {
           homes = {
@@ -82,7 +86,12 @@
             "appaquet@nixapp" = home-manager.lib.homeManagerConfiguration {
               inherit pkgs;
               modules = [ ./home-manager/nixapp.nix ] ++ commonHomeModules;
-              extraSpecialArgs = { inherit inputs unstablePkgs; };
+              extraSpecialArgs = {
+                inherit inputs unstablePkgs;
+                cfg = cfg // {
+                  isNixos = true;
+                };
+              };
             };
 
             "appaquet@servapp" = home-manager.lib.homeManagerConfiguration {

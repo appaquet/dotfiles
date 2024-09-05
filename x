@@ -146,8 +146,6 @@ darwin)
     ;;
 
 nixos)
-    prime_sudo
-
     shift
     SUBCOMMAND=$1
     case $SUBCOMMAND in
@@ -157,6 +155,7 @@ nixos)
         ;;
     build)
         shift
+        prime_sudo
         sudo nixos-rebuild build --flake ".#${HOSTNAME}" 2>&1 | ${NOM_PIPE}
         ;;
     diff)
@@ -166,6 +165,7 @@ nixos)
     switch)
         shift
 
+        prime_sudo
         GENERATION="${1:-}"
         if [[ -n "$GENERATION" ]]; then
             GEN_PATH="/nix/var/nix/profiles/system-${GENERATION}-link"
@@ -182,14 +182,15 @@ nixos)
         fi
 
         ;;
-    list-generations)
+    generations)
         shift
         nix profile history --profile /nix/var/nix/profiles/system
         ;;
     *)
         echo "$0 $COMMAND check: check nixos" >&2
         echo "$0 $COMMAND build: build nixos" >&2
-        echo "$0 $COMMAND build: diff nixos" >&2
+        echo "$0 $COMMAND diff: diff nixos" >&2
+        echo "$0 $COMMAND generations: diff nixos" >&2
         echo "$0 $COMMAND switch: switch nixos" >&2
         exit 1
         ;;
@@ -239,8 +240,8 @@ gc)
 
     # Cleaning as root collects more stuff as well
     # See https://www.reddit.com/r/NixOS/comments/10107km/how_to_delete_old_generations_on_nixos/?s=8
-    ncg=$(which nix-collect-garbage)
-    sudo ${ncg} -d
+    #ncg=$(which nix-collect-garbage)
+    #sudo ${ncg} -d
     ;;
 
 format)

@@ -27,6 +27,7 @@
     nixpkgs-fmt
     fzf-nix # fzf-nix
     nvd # nix package diff tool
+    nix-tree # explore nix derivations dependencies (https://github.com/utdemir/nix-tree)
 
     direnv
     nix-direnv
