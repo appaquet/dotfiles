@@ -122,7 +122,7 @@
   - `<leader>q` to close the current buffer (equivalent to `:q`)
   - `<leader>w` to close the current buffer by trying not to messup the layout
   - `<leader><tab>` to switch between tab and spaces
-  - `<ctrl>e` or `<leader>e` to toggle Nerdtree (files)
+  - `<ctrl>e` or `<leader>e` to toggle file etree
   - `<ctrl>p` fuzzy finding file
   - `<ctrl>f` riggrep search
   - `<leader>m` to toggle mouse support (useful to allow select + copy)

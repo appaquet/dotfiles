@@ -1,7 +1,7 @@
-{ lib, stdenv, fetchurl, system, autoPatchelfHook, rustPlatform, fetchFromGitHub }:
+{ rustPlatform, fetchFromGitHub }:
 
 # See https://github.com/NixOS/nixpkgs/blob/master/doc/languages-frameworks/rust.section.md
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage {
   pname = "exo";
   version = "0.1.25";
 

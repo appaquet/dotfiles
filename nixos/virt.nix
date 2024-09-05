@@ -54,12 +54,31 @@
     script = ''
       VIRSH="${pkgs.libvirt}/bin/virsh"
       for vm in `$VIRSH list --state-running --name`; do
+        echo "Shutting down $vm..."
         $VIRSH shutdown $vm
 
+        function is_running() {
+          $VIRSH list --state-running --name | grep -q $1
+        }
+
+        function destroy() {
+          $VIRSH destroy $1
+        }
+
         # wait for it to shutdown
-        while $VIRSH list --state-running --name | grep -q $vm; do
+        ITER=0
+        while is_running $vm; do
+          if [ $ITER -gt 60 ]; then
+            echo "VM $vm did not shutdown in time, destroying..."
+            destroy $1
+            exit 1
+          fi  
+
           sleep 1
+          ITER=$((ITER + 1))
         done
+
+        echo "Successfully shut down $vm"
       done
     '';
   };

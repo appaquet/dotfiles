@@ -38,7 +38,6 @@
           default = pkgs.mkShell rec {
             buildInputs = with pkgs; [
               clang
-              nix-ld
 
               (rust-bin.stable.latest.default.override {
                 extensions = [ "rust-src" ];
@@ -51,26 +50,26 @@
               libtensorflow
             ];
 
+            nativeBuildInputs = with pkgs; [
+              pkg-config # required by go for oxidized
+
+              nodejs
+              yarn
+
+              python3
+              (poetry.override { python3 = python310; })
+            ];
+
             # fixes go debugging
             # https://github.com/NixOS/nixpkgs/issues/18995
             hardeningDisable = [ "fortify" ];
 
-            packages = with pkgs; [
-              pkg-config
-              python3
-              protobuf
-              nodejs
-              yarn
-
-              (poetry.override { python3 = python310; })
-            ];
-
-            NIX_LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
-              pkgs.stdenv.cc.cc
-              pkgs.clang
-              pkgs.llvmPackages.libclang
-              pkgs.llvmPackages.libcxxClang
-              pkgs.zlib
+            NIX_LD_LIBRARY_PATH = with pkgs; pkgs.lib.makeLibraryPath [
+              stdenv.cc.cc
+              clang
+              llvmPackages.libclang
+              llvmPackages.libcxxClang
+              zlib
             ];
             NIX_LD = builtins.readFile "${pkgs.stdenv.cc}/nix-support/dynamic-linker";
 

@@ -4,6 +4,7 @@
   imports =
     [
       ./hardware-configuration.nix
+      ./ha-ctrl.nix
       ../common.nix
       ../network_bridge.nix
       ../dev.nix
