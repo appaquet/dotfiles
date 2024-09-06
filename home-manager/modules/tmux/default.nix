@@ -5,15 +5,15 @@ let
   dotTmuxRepo = pkgs.fetchFromGitHub {
     owner = "gpakosz"; # https://github.com/gpakosz/.tmux
     repo = ".tmux";
-    rev = "537b276d74968a72811f0779979b4e78fc7f4777";
-    sha256 = "UN2424KMjP6j2hPBk/EQZtiRiNzlOrpRGtvn6TPQ3Wk=";
+    rev = "5f1047550ba2ba16a27bf8c9ea958fbbf974598d";
+    sha256 = "sha256-rsqNQE7XBSzHsXqx2Cl9B8p8FyrhQYUoQSCj5teHSFk";
     stripRoot = false;
   };
 
-  dotTmuxConfFile = "${dotTmuxRepo}/.tmux-537b276d74968a72811f0779979b4e78fc7f4777/.tmux.conf";
+  dotTmuxConfFile = "${dotTmuxRepo}/.tmux-5f1047550ba2ba16a27bf8c9ea958fbbf974598d/.tmux.conf";
 in
 {
-  # gpakosz/.tmux expect its files to be at specific places...
+  # gpakosz/.tmux expect its files to be at specific locations
   home.file.".tmux.conf".source = dotTmuxConfFile;
   home.file.".tmux.conf.local".source = ./tmux.conf.local;
 
