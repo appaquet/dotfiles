@@ -244,7 +244,7 @@ gc)
     #sudo ${ncg} -d
     ;;
 
-format)
+fmt)
     shift
     nixpkgs-fmt .
     ;;
@@ -268,6 +268,7 @@ fetch-deskapp)
     echo "$0 update: update nix channels" >&2
     echo "$0 link: link system files" >&2
     echo "$0 gc: run garbage collection" >&2
+    echo "$0 fmt: format nix files" >&2
     echo "$0 optimize: optimize store" >&2
     echo "$0 fetch-deskapp: fetch latest dotfiles from deskapp" >&2
     exit 1

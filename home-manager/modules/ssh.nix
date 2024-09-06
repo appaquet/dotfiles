@@ -13,7 +13,8 @@
         forwardAgent = true;
       };
 
-      "nixos.n3x.net" = { # TODO: temp
+      "nixos.n3x.net" = {
+        # TODO: temp
         forwardAgent = true;
       };
 
