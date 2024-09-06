@@ -1,6 +1,6 @@
 lua << END
 
--- Mostly from https://github.com/neovim/nvim-lspconfig
+-- Adapted from https://github.com/neovim/nvim-lspconfig
 
 local lspconfig = require('lspconfig')
 

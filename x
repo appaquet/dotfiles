@@ -77,18 +77,6 @@ home)
         shift
         ${NIX_BUILDER} build ".#homeConfigurations.${HOME_CONFIG}.activationPackage" 2>&1 | ${NOM_PIPE}
         ;;
-    diff)
-        shift
-        nvd diff ~/.local/state/nix/profiles/home-manager ./result
-        ;;
-    generations)
-        shift
-        home-manager generations
-        ;;
-    diff-generations)
-        shift
-        nix profile diff-closures --profile ~/.local/state/nix/profiles/home-manager
-        ;;
     switch)
         shift
 
@@ -106,13 +94,29 @@ home)
             echo "Activating latest generation"
             ./result/activate
         fi
-
+        ;;
+    diff)
+        shift
+        nvd diff ~/.local/state/nix/profiles/home-manager ./result
+        ;;
+    tree)
+        shift
+        nix-tree ~/.local/state/nix/profiles/home-manager
+        ;;
+    generations)
+        shift
+        home-manager generations
+        ;;
+    diff-generations)
+        shift
+        nix profile diff-closures --profile ~/.local/state/nix/profiles/home-manager
         ;;
     *)
         echo "$0 $COMMAND check: check home" >&2
         echo "$0 $COMMAND build: build home" >&2
-        echo "$0 $COMMAND diff: diff last build with current" >&2
         echo "$0 $COMMAND switch: switch home" >&2
+        echo "$0 $COMMAND diff: diff last build with current" >&2
+        echo "$0 $COMMAND tree: show home tree" >&2
         echo "$0 $COMMAND generations: list generations" >&2
         echo "$0 $COMMAND diff-generations: diff last generations" >&2
         exit 1
@@ -136,10 +140,15 @@ darwin)
         shift
         ./result/sw/bin/darwin-rebuild switch --flake .
         ;;
+    tree)
+      shift
+      nix-tree ~/.nix-profile
+      ;;
     *)
         echo "$0 $COMMAND check: check home" >&2
         echo "$0 $COMMAND build: build home" >&2
         echo "$0 $COMMAND switch: switch home" >&2
+        echo "$0 $COMMAND tree: show home tree" >&2
         exit 1
         ;;
     esac
@@ -157,10 +166,6 @@ nixos)
         shift
         prime_sudo
         sudo nixos-rebuild build --flake ".#${HOSTNAME}" 2>&1 | ${NOM_PIPE}
-        ;;
-    diff)
-        shift
-        nvd diff /run/current-system result
         ;;
     switch)
         shift
@@ -180,8 +185,15 @@ nixos)
             echo "Activating latest generation"
             sudo nixos-rebuild switch --flake ".#${HOSTNAME}" 2>&1 | ${NOM_PIPE}
         fi
-
         ;;
+    diff)
+        shift
+        nvd diff /run/current-system result
+        ;;
+    tree)
+      shift
+      nix-tree /run/current-system
+      ;;
     generations)
         shift
         nix profile history --profile /nix/var/nix/profiles/system
@@ -190,6 +202,7 @@ nixos)
         echo "$0 $COMMAND check: check nixos" >&2
         echo "$0 $COMMAND build: build nixos" >&2
         echo "$0 $COMMAND diff: diff nixos" >&2
+        echo "$0 $COMMAND tree: show nixos tree" >&2
         echo "$0 $COMMAND generations: diff nixos" >&2
         echo "$0 $COMMAND switch: switch nixos" >&2
         exit 1

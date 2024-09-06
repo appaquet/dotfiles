@@ -28,6 +28,18 @@
       lualine-lsp-progress
       bufferline-nvim # https://github.com/akinsho/bufferline.nvim
 
+      # Tools
+      fzf-vim # :Files (ctrl-p), :Rg (ctrl-f)
+      Rename # :Rename <new name>
+      vim-multiple-cursors # ctrl-n multi cursors
+      bclose-vim # close buffer cleanly via <leader>w
+      delimitMate # auto close quotes, parens, etc
+      nerdcommenter # block comment (<leader>cc, <leader>cu)
+
+      # Git
+      vim-fugitive # Git (diff|log|...) commands
+      vim-gitgutter # Show diffs on the left of line numbers
+
       # LSP
       nvim-lspconfig # https://github.com/neovim/nvim-lspconfig
 
@@ -71,14 +83,6 @@
         p.vim
       ]))
       nvim-treesitter-textobjects # provider object manipulation
-
-      # Tools
-      fzf-vim # :Files (ctrl-p), :Rg (ctrl-f)
-      Rename # :Rename <new name>
-      vim-multiple-cursors # ctrl-n multi cursors
-      bclose-vim # close buffer cleanly via <leader>w
-      delimitMate # auto close quotes, parens, etc
-      nerdcommenter # block comment (<leader>cc, <leader>cu)
     ];
 
     extraConfig = (builtins.concatStringsSep "\n" [
@@ -91,6 +95,7 @@
       (builtins.readFile ./conf/plugin.treesitter.vim)
       (builtins.readFile ./conf/plugin.fzf.vim)
       (builtins.readFile ./conf/plugin.lsp.vim)
+      (builtins.readFile ./conf/plugin.copilot.vim)
     ]);
   };
 
