@@ -25,6 +25,7 @@
   users.users.appaquet = {
     extraGroups = [
       "libvirtd"
+      "kvm"
     ];
   };
 

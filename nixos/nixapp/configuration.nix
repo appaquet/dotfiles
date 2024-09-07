@@ -5,12 +5,11 @@
     [
       ./hardware-configuration.nix
       ./ha-ctrl.nix
+      ./virt
       ../common.nix
       ../network_bridge.nix
       ../dev.nix
       ../docker.nix
-      ../virt.nix
-      ../virt-gpu-passthrough.nix
     ];
 
   # Bootloader.
@@ -60,15 +59,6 @@
   services.xserver = {
     layout = "us";
     xkbVariant = "";
-  };
-
-  # Virtualization
-  virtualisation.gpuPassthrough = {
-    enable = true;
-    devices = [
-      "10de:2216" # Graphics
-      "10de:1aef" # Audio
-    ];
   };
 
   # Enable sound with pipewire.

@@ -62,11 +62,11 @@ let
         start)
           VM="$1"
           if [[ "$VM" == "win10" ]]; then
-            vm_stop ubuntu-embed
+            vm_stop embed
             vm_start win10
-          elif [[ "$VM" == "ubuntu-embed" ]]; then
+          elif [[ "$VM" == "embed" ]]; then
             vm_stop win10
-            vm_start ubuntu-embed
+            vm_start embed
           else
             echo "Unknown VM: $VM"
             exit 1

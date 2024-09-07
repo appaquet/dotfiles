@@ -1,0 +1,15 @@
+<pool type='dir'>
+  <name>secondary</name>
+  <uuid>4f3da6b6-08ad-4f85-a1fa-25f7252a99c5</uuid>
+  <source>
+  </source>
+  <target>
+    <path>/mnt/secondary/vms</path>
+    <permissions>
+      <mode>0711</mode>
+      <owner>0</owner>
+      <group>0</group>
+    </permissions>
+  </target>
+</pool>
+
