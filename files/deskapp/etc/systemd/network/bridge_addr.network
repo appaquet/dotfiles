@@ -1,5 +1,0 @@
-[Match]
-Name=br0
-
-[Network]
-DHCP=yes # cannot use static ip since it will prevent vms from getting ips...

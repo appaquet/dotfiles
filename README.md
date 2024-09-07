@@ -7,11 +7,13 @@
 
 1. Once installed, edit `/etc/nixos/configuration.nix` and rebuild:
    * Enable sshd
-   * Add git in packages
+   * Enable flakes: `nix.settings.experimental-features = [ "flakes" ];`
 
 1. SSH to the machine.
 
-1. Clone this repo (need to setup keys).
+1. Clone this repo (need to setup keys, use a nix-shell with git and neovim).
+
+1. Setup home-manager & enable.
 
 1. Copy `/etc/nixos/*.nix` to this repo to compare & adapt.
 

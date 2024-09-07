@@ -85,7 +85,12 @@
             "appaquet@deskapp" = home-manager.lib.homeManagerConfiguration {
               inherit pkgs;
               modules = [ ./home-manager/deskapp.nix ] ++ commonHomeModules;
-              extraSpecialArgs = { inherit inputs unstablePkgs cfg; };
+              extraSpecialArgs = {
+                inherit inputs unstablePkgs;
+                cfg = cfg // {
+                  isNixos = true;
+                };
+              };
             };
 
             "appaquet@nixapp" = home-manager.lib.homeManagerConfiguration {
@@ -145,6 +150,16 @@
           };
           modules = [
             ./nixos/nixapp/configuration.nix
+          ];
+        };
+
+        deskapp = inputs.nixpkgs.lib.nixosSystem {
+          specialArgs = {
+            inherit (self) common;
+            inherit inputs;
+          };
+          modules = [
+            ./nixos/deskapp/configuration.nix
           ];
         };
       };
