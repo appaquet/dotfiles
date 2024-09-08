@@ -7,7 +7,7 @@
     ./modules/work.nix
     ./modules/vms.nix
     ./modules/media.nix
-    ./modules/nixos.nix
+    ./modules/exo.nix
   ];
 
   home.username = "appaquet";

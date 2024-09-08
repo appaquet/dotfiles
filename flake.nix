@@ -48,20 +48,22 @@
         allowUnfree = true;
       };
 
-      # Add custom packages to nixpkgs
-      packageOverlay = final: prev: {
+      packageOverlays = final: prev: {
         exo = prev.callPackage ./overlays/exo { };
         fzf-nix = inputs.fzf-nix.packages.${prev.system}.fzf-nix;
       };
 
-      overlays = [
-        packageOverlay
-
+      homeOverlays = [
+        packageOverlays
         nix-alien.overlays.default
       ];
 
       commonHomeModules = [
         humanfirst-dots.homeManagerModule
+      ];
+
+      nixosOverlays = [
+        nix-alien.overlays.default
       ];
     in
 
@@ -69,11 +71,13 @@
       (system: (
         let
           pkgs = import nixpkgs {
-            inherit system config overlays;
+            inherit system config;
+            overlays = homeOverlays;
           };
 
           unstablePkgs = import nixpkgs-unstable {
-            inherit system config overlays;
+            inherit system config;
+            overlays = homeOverlays;
           };
 
           cfg = {
@@ -147,6 +151,7 @@
           specialArgs = {
             inherit (self) common;
             inherit inputs;
+            overlays = nixosOverlays;
           };
           modules = [
             ./nixos/nixapp/configuration.nix
@@ -157,6 +162,7 @@
           specialArgs = {
             inherit (self) common;
             inherit inputs;
+            overlays = nixosOverlays;
           };
           modules = [
             ./nixos/deskapp/configuration.nix

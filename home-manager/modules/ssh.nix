@@ -1,4 +1,4 @@
-{ ... }:
+{ lib, ... }:
 
 {
   programs.ssh = {
@@ -33,10 +33,6 @@
 
       "github.com" = {
         identityFile = "~/.ssh/github_id_rsa";
-      };
-
-      "*.n3x.net" = {
-        user = "appaquet";
       };
     };
   };

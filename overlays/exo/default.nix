@@ -8,11 +8,11 @@ rustPlatform.buildRustPackage {
   src = fetchFromGitHub {
     owner = "appaquet";
     repo = "exocore";
-    rev = "bump-deps";
-    hash = "sha256-fsDu3ng0oppnsi9hDVkhjHVdOIyYECoTx0wKZg4xfCY=";
+    rev = "v0.1.26";
+    hash = "sha256-SMT5Qal4FkF1MTRDvjWYico6AzH/byqrVUbzpsQiufE=";
   };
 
-  cargoHash = "sha256-p/vX+d2LoGNyU1FiJKjYTpsiuz+2zhdiSLMc8mOJADU=";
+  cargoHash = "sha256-mmzDZT/XlLeQPl/Fi+0uf2vcr5G8YA49vUVewFTAels=";
 
   cargoBuildFlags = [
     "--package"

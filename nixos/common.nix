@@ -1,11 +1,12 @@
-{ pkgs, ... }:
+{ pkgs, overlays, ... }:
 
 {
   time.timeZone = "America/Toronto";
   i18n.defaultLocale = "en_CA.UTF-8";
 
   nixpkgs.config.allowUnfree = true;
-
+  nixpkgs.overlays = overlays;
+ 
   nix = {
     settings = {
       experimental-features = [ "flakes" "nix-command" "fetch-closure" ];
@@ -44,6 +45,7 @@
 
   # System wide packages
   environment.systemPackages = with pkgs; [
+    nix-alien # runs unpatched binaries. either through a FHS, or using nix-ld
     lsof
     pciutils # lspci
   ];
