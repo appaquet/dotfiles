@@ -1,11 +1,10 @@
-{ pkgs, overlays, ... }:
+{ pkgs, ... }:
 
 {
   time.timeZone = "America/Toronto";
   i18n.defaultLocale = "en_CA.UTF-8";
 
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.overlays = overlays;
 
   nix = {
     settings = {

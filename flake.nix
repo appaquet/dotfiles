@@ -41,7 +41,7 @@
     vscode-server.url = "github:msteen/nixos-vscode-server";
   };
 
-  outputs = inputs @ { self, nixpkgs, nixpkgs-unstable, home-manager, humanfirst-dots, flake-utils, darwin, nix-alien, ... }:
+  outputs = inputs @ { self, nixpkgs, nixpkgs-unstable, home-manager, humanfirst-dots, flake-utils, darwin, ... }:
     let
       config = {
         permittedInsecurePackages = [ ];
@@ -55,7 +55,7 @@
 
       homeOverlays = [
         packageOverlays
-        nix-alien.overlays.default
+        inputs.nix-alien.overlays.default
       ];
 
       commonHomeModules = [
@@ -63,8 +63,11 @@
       ];
 
       nixosOverlays = [
-        nix-alien.overlays.default
+        inputs.nix-alien.overlays.default
       ];
+      nixosOverlaysModule = (_: {
+        nixpkgs.overlays = nixosOverlays;
+      });
     in
 
     flake-utils.lib.eachDefaultSystem # prevent having to hard-code system by iterating on available systems
@@ -151,9 +154,9 @@
           specialArgs = {
             inherit (self) common;
             inherit inputs;
-            overlays = nixosOverlays;
           };
           modules = [
+            nixosOverlaysModule
             ./nixos/nixapp/configuration.nix
           ];
         };
@@ -162,9 +165,9 @@
           specialArgs = {
             inherit (self) common;
             inherit inputs;
-            overlays = nixosOverlays;
           };
           modules = [
+            nixosOverlaysModule
             ./nixos/deskapp/configuration.nix
           ];
         };

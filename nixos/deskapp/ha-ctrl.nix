@@ -24,7 +24,7 @@ let
 
       virsh shutdown $VM
 
-      for i in `seq 0 60`; do
+      for i in `seq 0 40`; do # needs to be <60s since HA timeouts after 1m
         sleep 1
         if ! vm_running "$VM"; then
           return
