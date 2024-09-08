@@ -6,7 +6,7 @@
 
   nixpkgs.config.allowUnfree = true;
   nixpkgs.overlays = overlays;
- 
+
   nix = {
     settings = {
       experimental-features = [ "flakes" "nix-command" "fetch-closure" ];
