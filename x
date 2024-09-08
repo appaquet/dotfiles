@@ -213,13 +213,15 @@ nixos)
 check)
     shift
     check_home "appaquet@deskapp"
+    check_eval ".#nixosConfigurations.deskapp.config.system.build.toplevel"
+
     check_home "appaquet@servapp"
 
     check_home "appaquet@mbpapp"
     check_eval ".#darwinConfigurations.mbpapp.system"
 
-    check_home "appaquet@nixos"
-    check_eval ".#nixosConfigurations.${HOSTNAME}.config.system.build.toplevel"
+    check_home "appaquet@nixapp"
+    check_eval ".#nixosConfigurations.nixapp.config.system.build.toplevel"
     ;;
 
 update)
