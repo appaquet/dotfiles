@@ -1,11 +1,13 @@
 { pkgs, lib, ... }:
 
 let
+  # Set mold as linker
+  # Disable readonly segment in mold for perf (See https://github.com/flamegraph-rs/flamegraph)
   cargoConfig = "" +
     (if pkgs.stdenv.isLinux then ''
       [target.x86_64-unknown-linux-gnu]
       linker = "clang"
-      rustflags = ["-C", "link-arg=-fuse-ld=${pkgs.mold-wrapped}/bin/mold"]
+      rustflags = ["-Clink-arg=-fuse-ld=${pkgs.mold-wrapped}/bin/mold", "-Clink-arg=-Wl,--no-rosegment"]
     '' else "");
 
 in

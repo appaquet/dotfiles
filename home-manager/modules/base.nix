@@ -29,9 +29,6 @@
     direnv
     nix-direnv
 
-    git
-    gh
-
     bat # cat replacement
     hexyl
 

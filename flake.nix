@@ -38,7 +38,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    vscode-server.url = "github:msteen/nixos-vscode-server";
+    vscode-server = {
+      url = "github:msteen/nixos-vscode-server";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs @ { self, nixpkgs, nixpkgs-unstable, home-manager, humanfirst-dots, flake-utils, darwin, ... }:

@@ -7,6 +7,7 @@
 
   environment.systemPackages = with pkgs; [
     distrobox
+    linuxPackages_latest.perf # perf
   ];
 
   # Automatically patches vscode-server nodejs

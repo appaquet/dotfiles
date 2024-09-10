@@ -173,7 +173,7 @@
 
 ## Resources
 
-- <https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/trivial-builders.nix>
 - <https://nix-community.github.io/home-manager/options.html>
 - <https://daiderd.com/nix-darwin/manual/index.html#sec-options>
+- <https://nixos.org/manual/nixos/stable/>
 

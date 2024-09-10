@@ -82,6 +82,7 @@
       grws = "git restore --staged --worktree";
       grs = "git restore --staged";
       ghpr = "gh pr create --draft --body \"\" --title";
+      ghck = "git checkout (gh-pr-select)";
       gts = "git tag -l --sort=-version:refname --format='%(refname:short) (%(creatordate:short))'";
       gau = "git add -u";
       gmr = "git maintenance run";

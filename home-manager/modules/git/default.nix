@@ -2,11 +2,25 @@
 {
   home.packages = with pkgs; [
     git
+    gh
 
     # allows adding filers to prior commits automatically based on directories
     # see https://github.com/tummychow/git-absorb
     git-absorb
+
+    fzf
   ];
+
+  programs.fish.functions.gh-pr-select = ''
+    set COMMAND 'gh pr list --json number,title,author,headRefName,updatedAt \
+    --template "{{tablerow \"Ref\" \"PR\" \"Title\" \"Author\" \"Date\"}}{{range .}}{{tablerow (.headRefName | color \"blue\") (printf \"#%v\" .number | color \"yellow\") (.title | color \"green\") (.author.name | color \"cyan\") (timeago .updatedAt)}}{{end}}"'
+    GH_FORCE_TTY=100% FZF_DEFAULT_COMMAND=$COMMAND fzf \
+              --ansi \
+              --header-lines=1 \
+              --no-multi \
+              --prompt 'Search Open PRs > ' \
+              | awk '{print $1}'
+  '';
 
   programs.git = {
     enable = true;
