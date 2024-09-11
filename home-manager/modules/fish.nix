@@ -141,7 +141,9 @@
       };
 
       gcloud = { disabled = true; };
-      nix_shell = { disabled = true; };
+      nix_shell = {
+        format = "via [$symbol\($name\)]($style) ";
+      };
       package = { disabled = true; };
       golang = { disabled = true; };
       nodejs = { disabled = true; };

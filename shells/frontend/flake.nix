@@ -1,9 +1,9 @@
 {
   # To use, create .envrc with:
-  # use flake /home/appaquet/dotfiles/shells/playbooks --impure
-  # watch_file /home/appaquet/dotfiles/shells/playbooks/flake.nix
+  # use flake /home/appaquet/dotfiles/shells/frontend --impure
+  # watch_file /home/appaquet/dotfiles/shells/frontend/flake.nix
 
-  description = "playbooks";
+  description = "HF frontend & e2e";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
@@ -24,6 +24,8 @@
       {
         devShells = {
           default = pkgs.mkShell {
+            name = "frontend";
+
             buildInputs = [
             ];
 

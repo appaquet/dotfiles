@@ -3,7 +3,7 @@
   # use flake /home/appaquet/dotfiles/shells/backend --impure
   # watch_file /home/appaquet/dotfiles/shells/backend/flake.nix
 
-  description = "backend";
+  description = "HF backend";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
@@ -36,6 +36,8 @@
       {
         devShells = {
           default = pkgs.mkShell rec {
+            name = "backend";
+
             buildInputs = with pkgs; [
               clang
 

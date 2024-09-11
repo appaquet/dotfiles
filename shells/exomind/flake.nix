@@ -1,7 +1,7 @@
 {
   # To use, create .envrc with:
-  # use flake /home/appaquet/dotfiles/shells/exocore --impure
-  # watch_file /home/appaquet/dotfiles/shells/exocore/flake.nix
+  # use flake /home/appaquet/dotfiles/shells/exomind --impure
+  # watch_file /home/appaquet/dotfiles/shells/exomind/flake.nix
 
   description = "exomind";
 
@@ -27,6 +27,8 @@
       in
       {
         devShells = {
+          name = "exomind";
+
           default = pkgs.mkShell {
             buildInputs = with pkgs; [
               clang
