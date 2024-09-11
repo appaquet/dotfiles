@@ -149,6 +149,7 @@
       nodejs = { disabled = true; };
       rust = { disabled = true; };
       buf = { disabled = true; };
+      vagrant = { disabled = true; };
     };
   };
 }
