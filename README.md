@@ -117,16 +117,19 @@
   - `<leader> 1 through 9` to switch between opened buffers
   - `<leader>]` to switch to next buffer
   - `<leader>[` to switch to previous buffer
-  - `<leader>w` to save current buffer
+  - `<leader>s` to save current buffer
   - `<leader>x` to save and then execute current buffer (as long as it's chmod +x)
   - `<leader>z` to execute current visual selection in a shell
   - `<leader>r` to save current buffer and then execute `rsync.sh` in working dir
   - `<leader>q` to close the current buffer (equivalent to `:q`)
   - `<leader>w` to close the current buffer by trying not to messup the layout
   - `<leader><tab>` to switch between tab and spaces
-  - `<ctrl>e` or `<leader>e` to toggle file etree
+  - `<ctrl>e` to toggle file etree
   - `<ctrl>p` fuzzy finding file
+  - `<ctrl>u` fuzzy finding buffers and history
   - `<ctrl>f` riggrep search
+  - `<ctrl>o` go back to previous cursor
+  - `<ctrl>i` go forward to next cursor
   - `<leader>m` to toggle mouse support (useful to allow select + copy)
   - `<leader>y` to yank to clipboard using [bin/pbcopy](bin/pbcopy) util
   - `<leader>p` to paste from clipboard using [bin/pbpaste](bin/pbpaste) util
@@ -140,12 +143,26 @@
   - `<leader>cc` comment
   - `<leader>cu` uncomment
 
+- Nvim tree
+  - In tree
+    - `g?` to show help
+    - `<ctrl>]` to CD into directory
+    - `-` go up one directory
+    - `<ctrl>v` Open in vertical split
+    - `<ctrl>x` Open in horizontal split
+    - `I` Toggle hidden files
+    - `r` Rename file
+    - `d` Delete file
+    - `a` Add file or directory if it ends with `/`
+    - `c`, `x`, `v` to copy, cut, paste files
+    - `f` to find file, `F` to clear
+    - `q` to close tree
+    - `E` to expand all, `W` to collapse
+  - `<ctrl>e` to toggle file tree
+
 - Commands
   - `E <file>`: open a new buffer for a new file in current buffer's directory
   - `Delete`: delete current buffer's file
-
-- Basics
-  - `<ctrl>o` navigate back and `<ctrl>i` to navigate forward
 
 ### tmux
 
