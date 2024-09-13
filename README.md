@@ -88,6 +88,12 @@
   
 ## Cheat sheets
 
+## Nix
+- Run a uninstalled package: `nix run nixpkgs#cowsay hello world`
+- Run a uninstalled package, with fuzzy finding: `nix run nixpkgs#(fzf-nix)`, or `nr`
+- Start a shell with a package: `nix shell nixpkgs#ripgrep`
+- Start a shell with a package, with fuzzy finding: `nix shell nixpkgs#(fzf-nix)`, or `ns`
+
 ### Fish
 
 - Foreign env is used to source `~/.profile`. Any local variables can be set there.
@@ -126,7 +132,7 @@
   - `<leader><tab>` to switch between tab and spaces
   - `<ctrl>e` to toggle file etree
   - `<ctrl>p` fuzzy finding file
-  - `<ctrl>u` fuzzy finding buffers and history
+  - `<ctrl>l` fuzzy finding buffers and history
   - `<ctrl>f` riggrep search
   - `<ctrl>o` go back to previous cursor
   - `<ctrl>i` go forward to next cursor

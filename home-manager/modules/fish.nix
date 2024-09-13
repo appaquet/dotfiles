@@ -100,6 +100,10 @@
 
       nr = "nix run nixpkgs#(fzf-nix)";
       ns = "nix shell nixpkgs#(fzf-nix)";
+
+      ai = "aichat";
+      aie = "aichat -e";
+      aif = "aichat -f";
     };
 
     functions = {

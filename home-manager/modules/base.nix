@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ pkgs, unstablePkgs, lib, ... }:
 
 {
   imports = [
@@ -64,6 +64,7 @@
     wget
 
     tealdeer # rust version of tldr
+    unstablePkgs.aichat # cli llm tool
 
     rsync
     rclone

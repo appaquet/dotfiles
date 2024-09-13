@@ -32,7 +32,6 @@
           default = pkgs.mkShell {
             buildInputs = with pkgs; [
               clang
-              nix-ld
 
               (rust-bin.stable.latest.default.override {
                 extensions = [ "rust-src" ];
@@ -42,23 +41,26 @@
               llvmPackages.libclang
               llvmPackages.libcxxClang
               zlib
+              openssl
             ];
 
-            packages = with pkgs; [
+            nativeBuildInputs = with pkgs; [
               pkg-config
               python3
               protobuf
               capnproto
               nodejs
               yarn
+              openssl
             ];
 
-            NIX_LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
-              pkgs.stdenv.cc.cc
-              pkgs.clang
-              pkgs.llvmPackages.libclang
-              pkgs.llvmPackages.libcxxClang
-              pkgs.zlib
+            NIX_LD_LIBRARY_PATH = with pkgs; pkgs.lib.makeLibraryPath [
+              stdenv.cc.cc
+              clang
+              llvmPackages.libclang
+              llvmPackages.libcxxClang
+              zlib
+              openssl
             ];
             NIX_LD = builtins.readFile "${pkgs.stdenv.cc}/nix-support/dynamic-linker";
           };

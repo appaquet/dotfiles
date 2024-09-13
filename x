@@ -174,7 +174,7 @@ nixos)
         GENERATION="${1:-}"
         if [[ -n "$GENERATION" ]]; then
             GEN_PATH="/nix/var/nix/profiles/system-${GENERATION}-link"
-            if [[ -z "$GEN_PATH" ]]; then
+            if [[ ! -d "$GEN_PATH" ]]; then
                 echo "Generation $GENERATION not found"
                 exit 1
             fi
@@ -194,6 +194,33 @@ nixos)
       shift
       nix-tree /run/current-system
       ;;
+    kernel-versions)
+      shift
+      BOOTED=$(readlink /run/booted-system/{initrd,kernel,kernel-modules} | tr '\n' ' ')
+      CURRENT=$(readlink /run/current-system/{initrd,kernel,kernel-modules} | tr '\n' ' ')
+      RESULT=$(readlink ./result/{initrd,kernel,kernel-modules} | tr '\n' ' ')
+      HAS_DIFF=0
+
+      if [[ "$BOOTED" != "$CURRENT" ]]; then
+        HAS_DIFF=1
+        echo "Booted kernel isn't the same as last generation"
+        echo "  Booted: $BOOTED"
+        echo "  Current: $CURRENT"
+        echo " "
+      fi
+
+      if [[ "$BOOTED" != "$RESULT" ]]; then
+        HAS_DIFF=1
+        echo "Booted kernel isn't the same as the one in ./result"
+        echo "  Booted: $BOOTED"
+        echo "  Result: $RESULT"
+      fi
+
+      if [[ "$HAS_DIFF" -eq 0 ]]; then
+        echo "Kernel versions are consistent"
+      fi
+
+      ;;
     generations)
         shift
         nix profile history --profile /nix/var/nix/profiles/system
@@ -203,6 +230,7 @@ nixos)
         echo "$0 $COMMAND build: build nixos" >&2
         echo "$0 $COMMAND diff: diff nixos" >&2
         echo "$0 $COMMAND tree: show nixos tree" >&2
+        echo "$0 $COMMAND kernel-versions: show kernel versions" >&2
         echo "$0 $COMMAND generations: diff nixos" >&2
         echo "$0 $COMMAND switch: switch nixos" >&2
         exit 1
@@ -256,7 +284,7 @@ gc)
     # Cleaning as root collects more stuff as well
     # See https://www.reddit.com/r/NixOS/comments/10107km/how_to_delete_old_generations_on_nixos/?s=8
     #ncg=$(which nix-collect-garbage)
-    #sudo ${ncg} -d
+    #sudo ${ncg} -d --delete-older-than "14d"
     ;;
 
 fmt)

@@ -43,12 +43,13 @@
 
               (rust-bin.stable.latest.default.override {
                 extensions = [ "rust-src" ];
-                targets = [ "wasm32-unknown-unknown" ];
               })
 
               llvmPackages.libclang
               llvmPackages.libcxxClang
               zlib
+              openssl
+
               libtensorflow
             ];
 
@@ -72,6 +73,7 @@
               llvmPackages.libclang
               llvmPackages.libcxxClang
               zlib
+              openssl
             ];
             NIX_LD = builtins.readFile "${pkgs.stdenv.cc}/nix-support/dynamic-linker";
 
