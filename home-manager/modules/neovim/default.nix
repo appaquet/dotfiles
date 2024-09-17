@@ -29,7 +29,7 @@
       bufferline-nvim # https://github.com/akinsho/bufferline.nvim
 
       # Tools
-      fzf-vim # :Files (ctrl-p), :Rg (ctrl-f)
+      fzf-vim # :Files (ctrl-p), :Rg (ctrl-f), :History (ctrl-l)
       Rename # :Rename <new name>
       vim-multiple-cursors # ctrl-n multi cursors
       bclose-vim # close buffer cleanly via <leader>w
@@ -38,7 +38,7 @@
 
       # Git
       vim-fugitive # Git (diff|log|...) commands
-      vim-gitgutter # Show diffs on the left of line numbers
+      vim-gitgutter # Show diffs in gutter
 
       # LSP
       nvim-lspconfig # https://github.com/neovim/nvim-lspconfig

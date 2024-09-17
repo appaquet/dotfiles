@@ -153,7 +153,7 @@
       };
 
       nixosConfigurations = {
-        nixapp = inputs.nixpkgs.lib.nixosSystem {
+        nixapp = nixpkgs.lib.nixosSystem {
           specialArgs = {
             inherit (self) common;
             inherit inputs;
@@ -164,7 +164,7 @@
           ];
         };
 
-        deskapp = inputs.nixpkgs.lib.nixosSystem {
+        deskapp = nixpkgs.lib.nixosSystem {
           specialArgs = {
             inherit (self) common;
             inherit inputs;

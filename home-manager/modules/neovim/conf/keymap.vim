@@ -21,7 +21,7 @@ map <Leader>] :bn!<CR>
 map <Leader>[ :bp!<CR>
 
 " Cleanly close buffer
-map <D-0> :Bclose<creating>
+map <D-0> :Bclose<CR>
 nmap <leader>w :Bclose<CR>
 
 " Execute current file or selection
@@ -45,7 +45,9 @@ map <Leader>q :q<CR>
 cmap w!! w !sudo tee % >/dev/null
 cmap wq wqa
 cmap Wq wqa
+cmap Wqa wqa
 cmap WQ wqa
+cmap WQa wqa
 cmap Qw wqq
 cmap qw wqq
 

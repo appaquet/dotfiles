@@ -10,12 +10,12 @@ set ruler               " show the ruler
 set showmatch           " show matching brackets/parenthesis
 set incsearch           " find as you type search
 set hlsearch            " highlight search terms
-set relativenumber      " Relative line numbers
+set relativenumber      " relative line numbers
 set smartcase           " case sensitive when uc present
 set ignorecase          " case insensitive search
-set hidden              " Buffer switching without saving
+set hidden              " buffer switching without saving
 
-set autoread            " Auto reread modified file
+set autoread            " auto reread modified file
 set autoindent          " indent at the same level of the previous line
 set mouse=a             " automatically enable mouse usage
 
@@ -36,8 +36,6 @@ if !has('gui_running')
     au InsertLeave * set timeoutlen=1000
   augroup END
 endif
-
-" Test  
 
 " Defaults to space indentation
 set expandtab shiftwidth=2 tabstop=2
