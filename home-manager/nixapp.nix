@@ -4,7 +4,7 @@
   imports = [
     ./modules/base.nix
     ./modules/dev.nix
-    ./modules/work.nix
+    ./modules/work
     ./modules/vms.nix
     ./modules/media.nix
     ./modules/exo.nix

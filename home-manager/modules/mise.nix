@@ -8,7 +8,7 @@ let
 
   # should not install python or node via mise on nixos since 
   # it needs to compile from scratch.
-  # we're better of using nixpkgs instead
+  # we're better off using nixpkgs instead
   (if cfg.isNixos then ''
     disable_tools = ["python", "node"]
   '' else "");

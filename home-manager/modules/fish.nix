@@ -20,6 +20,7 @@
       ${pkgs.any-nix-shell}/bin/any-nix-shell fish --info-right | source
 
       # Term color support + theme
+      # TODO: test what still makes sense here.. i use starfish now
       set -x TERM xterm-256color
       set -g theme_display_cmd_duration no
       set -g theme_display_date no
@@ -39,7 +40,7 @@
       # Apparently the plugin doesn't do this for us on MacOS for some reason
       fzf_configure_bindings
 
-      # Some shortcuts (ctrl-alt-c, in iTerm2, rebind alt to Esc+)
+      # Some shortcuts (ctrl-alt-c, in iTerm2, need to rebind alt to Esc+)
       bind \cn 'fzf-nix'
       bind \cg 'fzf-ripgrep'
     '';

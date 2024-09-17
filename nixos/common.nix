@@ -35,7 +35,6 @@
 
   # Allow running external dynamically binaries
   # nix-ld replaces interpreter and automatically link with nix libs
-  # `nix-alien-ld` can be used to run binaries
   programs.nix-ld.enable = true;
   programs.nix-ld.libraries = with pkgs; [
     stdenv.cc.cc

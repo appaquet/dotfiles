@@ -2,7 +2,7 @@
 
 let
   # Set mold as linker
-  # Disable readonly segment in mold for perf (See https://github.com/flamegraph-rs/flamegraph)
+  # Disable readonly segment in mold for `perf` (See https://github.com/flamegraph-rs/flamegraph)
   cargoConfig = "" +
     (if pkgs.stdenv.isLinux then ''
       [target.x86_64-unknown-linux-gnu]
