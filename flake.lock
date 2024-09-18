@@ -210,11 +210,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1718761797,
-        "narHash": "sha256-al9VkUX7mAYnk+Wz8ukYCOFgTPPH8FIOCJ2BTh1IePY=",
+        "lastModified": 1726604389,
+        "narHash": "sha256-n18XkQQo08HU5xS8XZiQKqS7r5TIDPEvE3kOUhaYaoA=",
         "ref": "refs/heads/master",
-        "rev": "e2e98a719affe8ea1e36314e3160ab42528f02db",
-        "revCount": 12,
+        "rev": "66710e2e069d5a4ec1a9bdcb611977de6db7a275",
+        "revCount": 13,
         "type": "git",
         "url": "ssh://git@github.com/zia-ai/shared-dotfiles"
       },

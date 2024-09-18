@@ -127,8 +127,9 @@
   - `<leader>x` to save and then execute current buffer (as long as it's chmod +x)
   - `<leader>z` to execute current visual selection in a shell
   - `<leader>r` to save current buffer and then execute `rsync.sh` in working dir
-  - `<leader>q` to close the current buffer (equivalent to `:q`)
   - `<leader>w` to close the current buffer by trying not to messup the layout
+- `<leader>o` to close all buffers except the current one
+  - `<leader>q` to quit vim
   - `<leader><tab>` to switch between tab and spaces
   - `<ctrl>e` to toggle file etree
   - `<ctrl>p` fuzzy finding file

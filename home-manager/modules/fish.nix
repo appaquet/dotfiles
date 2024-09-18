@@ -73,12 +73,17 @@
       gds = "git diff --staged";
       gp = "git pull";
       gck = "git checkout";
-      gcm = "git commit -m";
+      gcm = {
+        expansion = "git commit -m \"%\"";
+        setCursor = true;
+      };
       gchm = "git commit -m (git log -1 --pretty=format:%s)";
       gpom = "git pull origin master";
       gpr = "git pull --rebase --autostash";
+      gpf = "git push --force-with-lease";
       gca = "git commit --amend";
       gr = "git rev-parse --short=7 @";
+      grc = "GIT_EDITOR=true git rebase --continue";
       grsw = "git restore --staged --worktree";
       grws = "git restore --staged --worktree";
       grs = "git restore --staged";
@@ -102,8 +107,16 @@
       nr = "nix run nixpkgs#(fzf-nix)";
       ns = "nix shell nixpkgs#(fzf-nix)";
 
-      ai = "aichat";
-      aie = "aichat -e";
+      # TODO: Fix it with cursor since need quotes most of the time. See https://github.com/fish-shell/fish-shell/pull/9313
+      # https://github.com/nix-community/home-manager/blob/master/modules/programs/fish.nix#L170
+      ai = {
+        expansion = "aichat \"%\"";
+        setCursor = true;
+      };
+      aie = {
+        expansion = "aichat -e \"%\"";
+        setCursor = true;
+      };
       aif = "aichat -f";
     };
 

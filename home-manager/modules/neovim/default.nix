@@ -32,7 +32,7 @@
       fzf-vim # :Files (ctrl-p), :Rg (ctrl-f), :History (ctrl-l)
       Rename # :Rename <new name>
       vim-multiple-cursors # ctrl-n multi cursors
-      bclose-vim # close buffer cleanly via <leader>w
+      nvim-bufdel # :BufDel, :BufDelOthers (properly close buffers)
       delimitMate # auto close quotes, parens, etc
       nerdcommenter # block comment (<leader>cc, <leader>cu)
 

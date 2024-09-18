@@ -21,13 +21,12 @@ map <Leader>] :bn!<CR>
 map <Leader>[ :bp!<CR>
 
 " Cleanly close buffer
-map <D-0> :Bclose<CR>
-nmap <leader>w :Bclose<CR>
+map <leader>w :BufDel<CR>
+map <leader>o :BufDelOthers<CR>
 
 " Execute current file or selection
 map <Leader>x :w<CR>:!./%<CR>
 map <Leader>z :'<,'>w !sh<CR>
-map <D-r>r :!./rsync.sh<CR>
 map <Leader>r :!./rsync.sh<CR>
 
 " Clipboard
@@ -35,11 +34,9 @@ map <Leader>y :w !pbcopy<CR><CR>
 map <Leader>p :read !pbpaste<CR>
 
 " Save & quit
-map <D-x> :w<CR>:!./%<CR>
 map <D-s> :w<CR>
 map <Leader>s :w<CR>
-map <D-q> :q<CR>
-map <Leader>q :q<CR>
+map <Leader>q :qa<CR>
 
 " For when you forget to sudo.. Really Write the file.
 cmap w!! w !sudo tee % >/dev/null
