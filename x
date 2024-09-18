@@ -11,16 +11,16 @@ HOME_CONFIG=""
 if [[ "${MACHINE_KEY}" == "appaquet@deskapp"* || "${MACHINE_KEY}" == "appaquet@nixos"* ]]; then
     HOME_CONFIG="appaquet@deskapp"
     HOSTNAME="deskapp"
+
 elif [[ "${MACHINE_KEY}" == "appaquet@nixapp"* ]]; then
     HOME_CONFIG="appaquet@nixapp"
     HOSTNAME="nixapp"
+
 elif [[ "${MACHINE_KEY}" == "appaquet@servapp"* ]]; then
     HOME_CONFIG="appaquet@servapp"
+
 elif [[ "${MACHINE_KEY}" == "appaquet@mbpapp"* || "${MACHINE_KEY}" == "appaquet@mbpvmapp"* ]]; then
     HOME_CONFIG="appaquet@mbpapp"
-else
-    echo "Non-configured machine (${MACHINE_KEY})"
-    exit 1
 fi
 
 NIX_BUILDER="nix"
@@ -67,6 +67,12 @@ COMMAND=$1
 case $COMMAND in
 home)
     shift
+
+    if [[ -z "$HOME_CONFIG" ]]; then
+      echo "No home configuration for ${MACHINE_KEY}"
+      exit 1
+    fi
+
     SUBCOMMAND=$1
     case $SUBCOMMAND in
     check)
