@@ -16,6 +16,7 @@ jobs:
           access-tokens = github.com=${{ secrets.GH_PAT }}
         github-token: ${{ secrets.GH_PAT }}
     - run: | 
+        nix-channel --update
         nix-env -iA nixpkgs-fmt
         ./x fmt --check
 
