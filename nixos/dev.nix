@@ -1,4 +1,4 @@
-{ pkgs, inputs, ... }:
+{ pkgs, inputs, config, ... }:
 
 {
   imports = [
@@ -7,7 +7,7 @@
 
   environment.systemPackages = with pkgs; [
     distrobox
-    linuxPackages_latest.perf # perf
+    config.boot.kernelPackages.perf # perf, aligned with current kernel version
   ];
 
   # Automatically patches vscode-server nodejs
