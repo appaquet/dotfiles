@@ -5,17 +5,16 @@ on:
   push:
 
 jobs:
-  tests:
+  home_check:
     runs-on: ubuntu-latest
-
+    matrix:
+      machine: ["appaquet@mbpapp", "appaquet@deskapp", "appaquet@servapp"]
     steps:
     - uses: actions/checkout@v4
-
     - uses: DeterminateSystems/nix-installer-action@main
       with:
         extra-conf: |
           experimental-features = nix-command flakes
           access-tokens = github.com=${{ secrets.GH_PAT }}
         github-token: ${{ secrets.GH_PAT }}
-
-    - run: ./x check
+    - run: MACHINE_KEY="${{ matrix.machine }}" ./x home check

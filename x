@@ -5,7 +5,10 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 pushd "$ROOT"
 
 HOSTNAME=$(uname -n | tr '[:upper:]' '[:lower:] | sed 's/\.local//'')
-MACHINE_KEY="${USER}@${HOSTNAME}"
+
+if [[ -z "${MACHINE_KEY}" ]]; then
+  MACHINE_KEY="${USER}@${HOSTNAME}"
+fi
 
 HOME_CONFIG=""
 if [[ "${MACHINE_KEY}" == "appaquet@deskapp"* || "${MACHINE_KEY}" == "appaquet@nixos"* ]]; then
