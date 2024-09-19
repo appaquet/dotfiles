@@ -15,9 +15,13 @@ jobs:
           experimental-features = nix-command flakes
           access-tokens = github.com=${{ secrets.GH_PAT }}
         github-token: ${{ secrets.GH_PAT }}
-    - run: | 
-        nix-channel --update
-        nix-env -iA nixpkgs-fmt
+    - name: Add & update nixpkgs channel
+      run: | 
+        nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
+        nix-channel --update nixpkgs
+    - name: Install formatter & format
+      run: | 
+        nix profile install nixpkgs#nixpkgs-fmt
         ./x fmt --check
 
   home_check:
