@@ -16,6 +16,6 @@ jobs:
         extra-conf: |
           experimental-features = nix-command flakes
           access-tokens = github.com=${{ secrets.GH_PAT }}
-          nix-path = "nixpkgs=channel:nixos-unstable"
+        github-token: ${{ secrets.GH_PAT }}
 
     - run: ./x check
