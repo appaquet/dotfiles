@@ -1,10 +1,24 @@
 name: "Push checker"
 
+# TODO: nixpkgs-fmt --check .
+
 on:
   pull_request:
   push:
 
 jobs:
+  fmt_check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: DeterminateSystems/nix-installer-action@main
+      with:
+        extra-conf: |
+          experimental-features = nix-command flakes
+          access-tokens = github.com=${{ secrets.GH_PAT }}
+        github-token: ${{ secrets.GH_PAT }}
+    - run: ./x fmt --check
+
   home_check:
     runs-on: ubuntu-latest
     strategy:

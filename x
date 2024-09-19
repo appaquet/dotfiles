@@ -298,7 +298,7 @@ gc)
 
 fmt)
     shift
-    nixpkgs-fmt .
+    nixpkgs-fmt $@ .
     ;;
 
 optimize)
