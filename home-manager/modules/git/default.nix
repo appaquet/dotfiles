@@ -11,6 +11,39 @@
     fzf
   ];
 
+  programs.fish = {
+    shellAbbrs = {
+      gs = "git status";
+      gl = "git log";
+      gls = "git log --stat";
+      glm = "git log --merges --first-parent";
+      gd = "git diff";
+      gds = "git diff --staged";
+      gp = "git pull";
+      gck = "git checkout";
+      gcm = {
+        expansion = "git commit -m \"%\"";
+        setCursor = true;
+      };
+      gchm = "git commit -m (git log -1 --pretty=format:%s)";
+      gpom = "git pull origin master";
+      gpr = "git pull --rebase --autostash";
+      gpf = "git push --force-with-lease";
+      gca = "git commit --amend";
+      gr = "git rev-parse --short=7 @";
+      grc = "GIT_EDITOR=true git rebase --continue";
+      gri = "git rebase -i --committer-date-is-author-date";
+      grs = "git restore --staged";
+      grsw = "git restore --staged --worktree";
+      grws = "git restore --staged --worktree";
+      ghpr = "gh pr create --draft --body \"\" --title";
+      ghck = "git checkout (gh-pr-select)";
+      gts = "git tag -l --sort=-version:refname --format='%(refname:short) (%(creatordate:short))'";
+      gau = "git add -u";
+      gmr = "git maintenance run";
+    };
+  };
+
   programs.git = {
     enable = true;
     userName = "Andre-Philippe Paquet";

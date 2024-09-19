@@ -34,6 +34,7 @@
 
     fzf
     ripgrep
+    ripgrep-all # supports pdf, docs, etc.
     fd # replacement for find
 
     dua

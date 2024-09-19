@@ -13,20 +13,21 @@
 
 1. Clone this repo (need to setup keys, use a nix-shell with git and neovim).
 
-1. Setup a github personal access token in ~/.config/nix/nix.conf (see [doc](https://nix.dev/manual/nix/2.18/command-ref/conf-file#conf-access-tokens))
+1. Setup a GitHub personal access token in `~/.config/nix/nix.conf` (see [doc](https://nix.dev/manual/nix/2.18/command-ref/conf-file#conf-access-tokens))
+
    ```conf
     access-tokens = github.com:<YOUR_TOKEN>
    ```
 
-1. Setup home-manager & enable.
+1. Setup home-manager & activate it.
 
 1. Copy `/etc/nixos/*.nix` to this repo to compare & adapt.
 
 1. Rebuild & switch using this repo.
 
 1. Enable vscode server patcher (see <https://github.com/msteen/nixos-vscode-server#enable-the-service>)
-  1.1 Enable service: `systemctl --user enable --now auto-fix-vscode-server.service` (it's safe to ignore warning)
-  1.2. To prevent GC: `ln -sfT /run/current-system/etc/systemd/user/auto-fix-vscode-server.service ~/.config/systemd/user/auto-fix-vscode-server.service`
+   1. Enable service: `systemctl --user enable --now auto-fix-vscode-server.service` (it's safe to ignore warning)
+   1. To prevent GC: `ln -sfT /run/current-system/etc/systemd/user/auto-fix-vscode-server.service ~/.config/systemd/user/auto-fix-vscode-server.service`
 
 
 ## Initial setup (MacOS & other distos)
@@ -55,28 +56,7 @@
    and running `chsh -s /home/appaquet/.nix-profile/bin/fish`
 
 1. On MacOS, apply darwin config: `./x darwin build` and `./x darwin witch`
-   2. Select a patched nerdfonts font in iTerm2 in order to have icons in neovim.
-
-## Maintenance
-
-- To update flakes, run `./x update`
-- To update a specific flake, run `nix flake lock --update-input <the flake>`
-
-## Not covered
-
-- Rust is not installed using Nix anymore as it breaks [cross](https://github.com/cross-rs/cross) since Rust
-  binaries link with Nix libs. Cross does mount `/nix`, but it doesn't seem sufficient...
-
-  See [this commit](https://github.com/appaquet/dotfiles/commit/4aebf75a47536c833140d463cbc1606d474e1f91).
-
-  Install rustup manually instead, see https://rustup.rs/
-
-- In order to enable mold, edit `~/.cargo/config` and add:
-  ```toml
-  [target.x86_64-unknown-linux-gnu]
-  linker = "clang"
-  rustflags = ["-C", "link-arg=-fuse-ld=/home/appaquet/.nix-profile/bin/mold"]
-  ```
+   1. Select a patched nerdfonts font in iTerm2 in order to have icons in neovim.
 
 ## Troubleshooting
 
