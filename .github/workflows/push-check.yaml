@@ -1,7 +1,5 @@
 name: "Push checker"
 
-# TODO: nixpkgs-fmt --check .
-
 on:
   pull_request:
   push:
@@ -17,7 +15,9 @@ jobs:
           experimental-features = nix-command flakes
           access-tokens = github.com=${{ secrets.GH_PAT }}
         github-token: ${{ secrets.GH_PAT }}
-    - run: ./x fmt --check
+    - run: | 
+        nix-env -iA nixpkgs-fmt
+        ./x fmt --check
 
   home_check:
     runs-on: ubuntu-latest
