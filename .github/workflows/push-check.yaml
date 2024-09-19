@@ -19,3 +19,33 @@ jobs:
           access-tokens = github.com=${{ secrets.GH_PAT }}
         github-token: ${{ secrets.GH_PAT }}
     - run: MACHINE_KEY="${{ matrix.machine }}" ./x home check
+
+  darwin_check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        machine: ["appaquet@mbpapp"]
+    steps:
+    - uses: actions/checkout@v4
+    - uses: DeterminateSystems/nix-installer-action@main
+      with:
+        extra-conf: |
+          experimental-features = nix-command flakes
+          access-tokens = github.com=${{ secrets.GH_PAT }}
+        github-token: ${{ secrets.GH_PAT }}
+    - run: MACHINE_KEY="${{ matrix.machine }}" ./x darwin check
+
+  nixos_check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        machine: ["appaquet@deskapp"]
+    steps:
+    - uses: actions/checkout@v4
+    - uses: DeterminateSystems/nix-installer-action@main
+      with:
+        extra-conf: |
+          experimental-features = nix-command flakes
+          access-tokens = github.com=${{ secrets.GH_PAT }}
+        github-token: ${{ secrets.GH_PAT }}
+    - run: MACHINE_KEY="${{ matrix.machine }}" ./x nixos check
