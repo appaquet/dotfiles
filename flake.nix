@@ -13,7 +13,10 @@
     };
 
     darwin = {
-      url = "github:lnl7/nix-darwin/master";
+      #url = "github:lnl7/nix-darwin/master";
+      # TODO: Switch back when this is merged https://github.com/LnL7/nix-darwin/pull/1083
+      url = "github:emilazy/nix-darwin/push-zovpmlzlzvvm";
+
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
