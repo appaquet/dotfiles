@@ -13,6 +13,11 @@
 
 1. Clone this repo (need to setup keys, use a nix-shell with git and neovim).
 
+1. Setup a github personal access token in ~/.config/nix/nix.conf (see [doc](https://nix.dev/manual/nix/2.18/command-ref/conf-file#conf-access-tokens))
+   ```conf
+    access-tokens = github.com:<YOUR_TOKEN>
+   ```
+
 1. Setup home-manager & enable.
 
 1. Copy `/etc/nixos/*.nix` to this repo to compare & adapt.

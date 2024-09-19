@@ -212,15 +212,15 @@
       "locked": {
         "lastModified": 1726604389,
         "narHash": "sha256-n18XkQQo08HU5xS8XZiQKqS7r5TIDPEvE3kOUhaYaoA=",
-        "ref": "refs/heads/master",
+        "owner": "zia-ai",
+        "repo": "shared-dotfiles",
         "rev": "66710e2e069d5a4ec1a9bdcb611977de6db7a275",
-        "revCount": 13,
-        "type": "git",
-        "url": "ssh://git@github.com/zia-ai/shared-dotfiles"
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "ssh://git@github.com/zia-ai/shared-dotfiles"
+        "owner": "zia-ai",
+        "repo": "shared-dotfiles",
+        "type": "github"
       }
     },
     "nix-alien": {
