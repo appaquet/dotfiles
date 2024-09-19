@@ -59,6 +59,7 @@
     gzip
     bzip2
     gnutar
+    bc
 
     curl
     wget
