@@ -7,8 +7,9 @@ on:
 jobs:
   home_check:
     runs-on: ubuntu-latest
-    matrix:
-      machine: ["appaquet@mbpapp", "appaquet@deskapp", "appaquet@servapp"]
+    strategy:
+      matrix:
+        machine: ["appaquet@mbpapp", "appaquet@deskapp", "appaquet@servapp"]
     steps:
     - uses: actions/checkout@v4
     - uses: DeterminateSystems/nix-installer-action@main
