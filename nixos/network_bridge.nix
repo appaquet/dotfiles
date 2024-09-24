@@ -26,13 +26,13 @@ in
     lanGateway = lib.mkOption {
       type = lib.types.str;
       description = "Lan gateway";
-      default = "192.168.2.1";
+      default = "192.168.0.1";
     };
 
     lanNameservers = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       description = "Lan name servers";
-      default = [ "192.168.2.1" ];
+      default = [ "192.168.0.1" ];
     };
   };
 

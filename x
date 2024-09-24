@@ -173,8 +173,7 @@ nixos)
         ;;
     build)
         shift
-        prime_sudo
-        sudo nixos-rebuild build --flake ".#${HOSTNAME}" 2>&1 | ${NOM_PIPE}
+        nixos-rebuild build --flake ".#${HOSTNAME}" 2>&1 | ${NOM_PIPE}
         ;;
     switch)
         shift

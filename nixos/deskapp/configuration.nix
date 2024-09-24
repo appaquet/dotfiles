@@ -43,7 +43,7 @@
   networking.myBridge = {
     enable = true;
     interface = "eno1";
-    lanIp = "192.168.2.99";
+    lanIp = "192.168.0.30";
   };
 
   networking.hosts = {

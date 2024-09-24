@@ -453,7 +453,28 @@
         "nixpkgs": "nixpkgs_3",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "nixvirt": "nixvirt",
+        "secrets": "secrets",
         "vscode-server": "vscode-server"
+      }
+    },
+    "secrets": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1727139918,
+        "narHash": "sha256-/6/34HDQt6osFlag230dfGmNjYRnHFwDPelH2OO8g8A=",
+        "owner": "appaquet",
+        "repo": "dotfiles-secrets",
+        "rev": "6fd9b4706d51f1e949b96bad0a018c3e1679930d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "appaquet",
+        "repo": "dotfiles-secrets",
+        "type": "github"
       }
     },
     "systems": {

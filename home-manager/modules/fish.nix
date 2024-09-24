@@ -60,7 +60,7 @@
       l = "ls";
       ll = "ls -lash";
       b = "bat";
-      randstr = "randstr 'tr -cd \"[:alnum:]\" < /dev/urandom | fold -w30 | head -n1'";
+      randstr = "tr -cd \"[:alnum:]\" < /dev/urandom | fold -w30 | head -n1";
       x = "~/dotfiles/x";
     };
 
