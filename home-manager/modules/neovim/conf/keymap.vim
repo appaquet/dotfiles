@@ -45,6 +45,8 @@ cmap Wq wqa
 cmap Wqa wqa
 cmap WQ wqa
 cmap WQa wqa
+cmap wqaa wqa
+cmap WQaa wqa
 cmap Qw wqq
 cmap qw wqq
 
