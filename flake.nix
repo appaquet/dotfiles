@@ -25,7 +25,7 @@
 
     secrets = {
       url = "github:appaquet/dotfiles-secrets";
-      #url = "path:/home/appaquet/dotfiles/secrets";
+      # url = "path:/home/appaquet/dotfiles/secrets";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -166,7 +166,7 @@
         nixapp = nixpkgs.lib.nixosSystem {
           specialArgs = {
             inherit (self) common;
-            inherit inputs;
+            inherit inputs secrets;
           };
           modules = [
             nixosOverlaysModule
@@ -177,7 +177,7 @@
         deskapp = nixpkgs.lib.nixosSystem {
           specialArgs = {
             inherit (self) common;
-            inherit inputs;
+            inherit inputs secrets;
           };
           modules = [
             nixosOverlaysModule

@@ -1,4 +1,4 @@
-{ ... }:
+{ secrets, ... }:
 
 {
   imports = [
@@ -8,6 +8,7 @@
     ./modules/vms.nix
     ./modules/media.nix
     ./modules/exo.nix
+    secrets.homeManager.nasappCifs
   ];
 
   home.username = "appaquet";

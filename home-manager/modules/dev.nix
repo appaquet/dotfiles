@@ -12,9 +12,11 @@ let
 
 in
 {
-  imports = secrets.devHomeModules;
+  imports = [
+    secrets.homeManager.dev
+  ];
 
-  home.packages = (with pkgs; [
+  home.packages = with pkgs;    [
     tokei
 
     dive # docker container explorer
@@ -26,9 +28,9 @@ in
 
     gnumake
     bintools # ld, objdump, etc.
-  ]) ++ lib.optionals pkgs.stdenv.isLinux (with pkgs; [
+  ] ++ lib.optionals pkgs.stdenv.isLinux [
     mold-wrapped
-  ]);
+  ];
 
   home.file.".cargo/config.toml".text = cargoConfig;
 }

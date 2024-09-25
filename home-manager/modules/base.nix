@@ -10,7 +10,7 @@
     ./utils
     ./autojump.nix
     ./ssh.nix
-  ] ++ secrets.commonHomeModules;
+  ] ++ secrets.homeManager.common;
 
   programs.home-manager.enable = true;
 
