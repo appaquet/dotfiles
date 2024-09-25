@@ -1,4 +1,4 @@
-{ pkgs, unstablePkgs, lib, ... }:
+{ pkgs, unstablePkgs, lib, secrets, ... }:
 
 {
   imports = [
@@ -10,7 +10,7 @@
     ./utils
     ./autojump.nix
     ./ssh.nix
-  ];
+  ] ++ secrets.commonHomeModules;
 
   programs.home-manager.enable = true;
 

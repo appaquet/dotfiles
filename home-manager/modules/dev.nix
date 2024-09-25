@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, secrets, ... }:
 
 let
   # Set mold as linker
@@ -12,6 +12,8 @@ let
 
 in
 {
+  imports = secrets.devHomeModules;
+
   home.packages = (with pkgs; [
     tokei
 

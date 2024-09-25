@@ -69,7 +69,6 @@
 
       commonHomeModules = [
         humanfirst-dots.homeManagerModule
-        secrets.homeSecrets
       ];
 
       nixosOverlays = [
@@ -103,7 +102,7 @@
               inherit pkgs;
               modules = [ ./home-manager/deskapp.nix ] ++ commonHomeModules;
               extraSpecialArgs = {
-                inherit inputs unstablePkgs;
+                inherit inputs unstablePkgs secrets;
                 cfg = cfg // {
                   isNixos = true;
                 };
@@ -114,7 +113,7 @@
               inherit pkgs;
               modules = [ ./home-manager/nixapp.nix ] ++ commonHomeModules;
               extraSpecialArgs = {
-                inherit inputs unstablePkgs;
+                inherit inputs unstablePkgs secrets;
                 cfg = cfg // {
                   isNixos = true;
                 };
@@ -124,13 +123,17 @@
             "appaquet@servapp" = home-manager.lib.homeManagerConfiguration {
               inherit pkgs;
               modules = [ ./home-manager/servapp.nix ] ++ commonHomeModules;
-              extraSpecialArgs = { inherit inputs unstablePkgs cfg; };
+              extraSpecialArgs = {
+                inherit inputs unstablePkgs cfg secrets;
+              };
             };
 
             "appaquet@mbpapp" = home-manager.lib.homeManagerConfiguration {
               inherit pkgs;
               modules = [ ./home-manager/mbpapp.nix ] ++ commonHomeModules;
-              extraSpecialArgs = { inherit inputs unstablePkgs cfg; };
+              extraSpecialArgs = {
+                inherit inputs unstablePkgs cfg secrets;
+              };
             };
           };
         }

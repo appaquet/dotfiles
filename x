@@ -7,7 +7,7 @@ pushd "$ROOT"
 HOSTNAME=$(uname -n | tr '[:upper:]' '[:lower:] | sed 's/\.local//'')
 
 if [[ -z "${MACHINE_KEY}" ]]; then
-  MACHINE_KEY="${USER}@${HOSTNAME}"
+    MACHINE_KEY="${USER}@${HOSTNAME}"
 fi
 
 HOME_CONFIG=""
@@ -33,6 +33,11 @@ if [[ -x ~/.nix-profile/bin/nom ]]; then
     NOM_PIPE="nom"
 fi
 
+if [[ ! -f "$ROOT/secrets/flake.nix" ]]; then
+    echo "Secrets aren't checked out. Make sure you checkout & decrypt them after activation"
+    sleep 2
+fi
+
 check_eval() {
     nix eval --raw "${1}"
 }
@@ -49,7 +54,7 @@ prime_sudo() {
 copy_files() {
     local host="$1"
     local file
-    for file in $(find "${ROOT}/files/${host}" -type f); do
+    find "${ROOT}/files/${host}" -type f | while read -r file; do
         local target_file="${file/${ROOT}\/files\/${host}/}"
         local target_path="${target_file}"
 
@@ -72,8 +77,8 @@ home)
     shift
 
     if [[ -z "$HOME_CONFIG" ]]; then
-      echo "No home configuration for ${MACHINE_KEY}"
-      exit 1
+        echo "No home configuration for ${MACHINE_KEY}"
+        exit 1
     fi
 
     SUBCOMMAND=$1
@@ -96,7 +101,7 @@ home)
                 echo "Generation $GENERATION not found"
                 exit 1
             fi
-            
+
             echo "Activating generation $GENERATION at $GEN_PATH"
             $GEN_PATH/activate
         else
@@ -150,9 +155,9 @@ darwin)
         ./result/sw/bin/darwin-rebuild switch --flake .
         ;;
     tree)
-      shift
-      nix-tree ~/.nix-profile
-      ;;
+        shift
+        nix-tree ~/.nix-profile
+        ;;
     *)
         echo "$0 $COMMAND check: check home" >&2
         echo "$0 $COMMAND build: build home" >&2
@@ -186,7 +191,7 @@ nixos)
                 echo "Generation $GENERATION not found"
                 exit 1
             fi
-            
+
             echo "Activating generation $GENERATION at $GEN_PATH"
             sudo $GEN_PATH/activate
         else
@@ -199,36 +204,36 @@ nixos)
         nvd diff /run/current-system result
         ;;
     tree)
-      shift
-      nix-tree /run/current-system
-      ;;
+        shift
+        nix-tree /run/current-system
+        ;;
     kernel-versions)
-      shift
-      BOOTED=$(readlink /run/booted-system/{initrd,kernel,kernel-modules} | tr '\n' ' ')
-      CURRENT=$(readlink /run/current-system/{initrd,kernel,kernel-modules} | tr '\n' ' ')
-      RESULT=$(readlink ./result/{initrd,kernel,kernel-modules} | tr '\n' ' ')
-      HAS_DIFF=0
+        shift
+        BOOTED=$(readlink /run/booted-system/{initrd,kernel,kernel-modules} | tr '\n' ' ')
+        CURRENT=$(readlink /run/current-system/{initrd,kernel,kernel-modules} | tr '\n' ' ')
+        RESULT=$(readlink ./result/{initrd,kernel,kernel-modules} | tr '\n' ' ')
+        HAS_DIFF=0
 
-      if [[ "$BOOTED" != "$CURRENT" ]]; then
-        HAS_DIFF=1
-        echo "Booted kernel isn't the same as last generation"
-        echo "  Booted: $BOOTED"
-        echo "  Current: $CURRENT"
-        echo " "
-      fi
+        if [[ "$BOOTED" != "$CURRENT" ]]; then
+            HAS_DIFF=1
+            echo "Booted kernel isn't the same as last generation"
+            echo "  Booted: $BOOTED"
+            echo "  Current: $CURRENT"
+            echo " "
+        fi
 
-      if [[ "$BOOTED" != "$RESULT" ]]; then
-        HAS_DIFF=1
-        echo "Booted kernel isn't the same as the one in ./result"
-        echo "  Booted: $BOOTED"
-        echo "  Result: $RESULT"
-      fi
+        if [[ "$BOOTED" != "$RESULT" ]]; then
+            HAS_DIFF=1
+            echo "Booted kernel isn't the same as the one in ./result"
+            echo "  Booted: $BOOTED"
+            echo "  Result: $RESULT"
+        fi
 
-      if [[ "$HAS_DIFF" -eq 0 ]]; then
-        echo "Kernel versions are consistent"
-      fi
+        if [[ "$HAS_DIFF" -eq 0 ]]; then
+            echo "Kernel versions are consistent"
+        fi
 
-      ;;
+        ;;
     generations)
         shift
         nix profile history --profile /nix/var/nix/profiles/system
@@ -264,10 +269,10 @@ update)
     shift
     PACKAGE="$1"
     if [[ -z "$PACKAGE" ]]; then
-      nix-channel --update
-      nix flake update
+        nix-channel --update
+        nix flake update
     else
-      nix flake lock --update-input $PACKAGE
+        nix flake lock --update-input $PACKAGE
     fi
     ;;
 
@@ -297,7 +302,11 @@ gc)
 
 fmt)
     shift
-    nixpkgs-fmt $@ .
+    nixpkgs-fmt "${@}" .
+    ;;
+
+secrets)
+    # TODO:
     ;;
 
 optimize)
