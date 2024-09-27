@@ -76,11 +76,17 @@
       llt = "ll -t"; # sort by time
       lls = "ll -S"; # sort by size
 
-      nr = "nix run nixpkgs#(fzf-nix)";
-      ns = "nix shell nixpkgs#(fzf-nix)";
+      nr = {
+        expansion = "nix run nixpkgs#%";
+        setCursor = true;
+      };
+      ns = {
+        expansion = "nix shell nixpkgs#%";
+        setCursor = true;
+      };
+      nrf = "nix run nixpkgs#(fzf-nix)";
+      nsf = "nix shell nixpkgs#(fzf-nix)";
 
-      # TODO: Fix it with cursor since need quotes most of the time. See https://github.com/fish-shell/fish-shell/pull/9313
-      # https://github.com/nix-community/home-manager/blob/master/modules/programs/fish.nix#L170
       ai = {
         expansion = "aichat \"%\"";
         setCursor = true;
@@ -93,16 +99,6 @@
     };
 
     functions = {
-      # Reload fish with latest paths from nix.
-      # If not working, make sure that fish_user_paths are correctly set as explained in the README.
-      reload = ''
-        set CLEAR (which clear)
-        set -e PATH
-        set -e __HM_SESS_VARS_SOURCED
-        $CLEAR
-        ~/.nix-profile/bin/fish
-      '';
-
       # ripgrep & open files in vim
       vimrg = ''
         vim -c "Rg $argv"

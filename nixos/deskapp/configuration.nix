@@ -68,7 +68,6 @@
     interface = "eno1";
     lanIp = "192.168.0.30";
   };
-
   networking.hosts = {
     "100.109.193.77" = [ "localhost.humanfirst.ai" ];
   };

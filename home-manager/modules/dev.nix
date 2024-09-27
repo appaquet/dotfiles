@@ -16,7 +16,7 @@ in
     secrets.homeManager.dev
   ];
 
-  home.packages = with pkgs;    [
+  home.packages = (with pkgs; [
     tokei
 
     dive # docker container explorer
@@ -28,8 +28,8 @@ in
 
     gnumake
     bintools # ld, objdump, etc.
-  ] ++ lib.optionals pkgs.stdenv.isLinux [
-    mold-wrapped
+  ]) ++ lib.optionals pkgs.stdenv.isLinux [
+    pkgs.mold-wrapped
   ];
 
   home.file.".cargo/config.toml".text = cargoConfig;

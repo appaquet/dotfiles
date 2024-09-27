@@ -5,8 +5,9 @@
     inputs.vscode-server.nixosModule
   ];
 
-  environment.systemPackages = with pkgs; [
+  environment.systemPackages = (with pkgs; [
     distrobox
+  ]) ++ [
     config.boot.kernelPackages.perf # perf, aligned with current kernel version
   ];
 

@@ -32,7 +32,7 @@
       gca = "git commit --amend";
       gr = "git rev-parse --short=7 @";
       grc = "GIT_EDITOR=true git rebase --continue";
-      gri = "git rebase -i --committer-date-is-author-date";
+      gri = "git rebase -i --committer-date-is-author-date --autostash";
       grs = "git restore --staged";
       grsw = "git restore --staged --worktree";
       grws = "git restore --staged --worktree";

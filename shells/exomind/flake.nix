@@ -54,7 +54,7 @@
               openssl
             ];
 
-            NIX_LD_LIBRARY_PATH = with pkgs; pkgs.lib.makeLibraryPath [
+            NIX_LD_LIBRARY_PATH = with pkgs; lib.makeLibraryPath [
               stdenv.cc.cc
               clang
               llvmPackages.libclang

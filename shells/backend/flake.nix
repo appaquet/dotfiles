@@ -58,6 +58,7 @@
 
               nodejs
               yarn
+              jemalloc
 
               python3
               (poetry.override { python3 = python310; })
@@ -67,7 +68,7 @@
             # https://github.com/NixOS/nixpkgs/issues/18995
             hardeningDisable = [ "fortify" ];
 
-            NIX_LD_LIBRARY_PATH = with pkgs; pkgs.lib.makeLibraryPath [
+            NIX_LD_LIBRARY_PATH = with pkgs; lib.makeLibraryPath [
               stdenv.cc.cc
               clang
               llvmPackages.libclang

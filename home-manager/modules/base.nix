@@ -18,7 +18,7 @@
   programs.direnv.enable = true;
   programs.direnv.nix-direnv.enable = true;
 
-  home.packages = with pkgs; [
+  home.packages = (with pkgs; [
     manix # nix doc cli searcher
     nix-output-monitor # better nix build output (nom)
     nixpkgs-fmt
@@ -64,14 +64,17 @@
 
     curl
     wget
+    socat
 
     tealdeer # rust version of tldr
-    unstablePkgs.aichat # cli llm tool
 
     rsync
     rclone
-  ]
-  ++ lib.optionals stdenv.isLinux [
-    libtree # recursive ldd 
+  ])
+  ++ (with unstablePkgs; [
+    aichat # cli llm tool
+  ])
+  ++ lib.optionals pkgs.stdenv.isLinux [
+    pkgs.libtree # recursive ldd 
   ];
 }

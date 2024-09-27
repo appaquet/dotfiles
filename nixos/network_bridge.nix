@@ -46,5 +46,4 @@ in
     networking.defaultGateway = cfg.lanGateway;
     networking.nameservers = cfg.lanNameservers;
   };
-
 }

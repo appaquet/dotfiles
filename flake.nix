@@ -102,7 +102,8 @@
               inherit pkgs;
               modules = [ ./home-manager/deskapp.nix ] ++ commonHomeModules;
               extraSpecialArgs = {
-                inherit inputs unstablePkgs secrets;
+                inherit inputs unstablePkgs;
+                secrets = secrets.init "deskapp";
                 cfg = cfg // {
                   isNixos = true;
                 };
@@ -113,7 +114,8 @@
               inherit pkgs;
               modules = [ ./home-manager/nixapp.nix ] ++ commonHomeModules;
               extraSpecialArgs = {
-                inherit inputs unstablePkgs secrets;
+                inherit inputs unstablePkgs;
+                secrets = secrets.init "nixapp";
                 cfg = cfg // {
                   isNixos = true;
                 };
@@ -124,7 +126,8 @@
               inherit pkgs;
               modules = [ ./home-manager/servapp.nix ] ++ commonHomeModules;
               extraSpecialArgs = {
-                inherit inputs unstablePkgs cfg secrets;
+                inherit inputs unstablePkgs cfg;
+                secrets = secrets.init "servapp";
               };
             };
 
@@ -132,7 +135,8 @@
               inherit pkgs;
               modules = [ ./home-manager/mbpapp.nix ] ++ commonHomeModules;
               extraSpecialArgs = {
-                inherit inputs unstablePkgs cfg secrets;
+                inherit inputs unstablePkgs cfg;
+                secrets = secrets.init "mbapp";
               };
             };
           };
@@ -166,7 +170,8 @@
         nixapp = nixpkgs.lib.nixosSystem {
           specialArgs = {
             inherit (self) common;
-            inherit inputs secrets;
+            inherit inputs;
+            secrets = secrets.init "nixapp";
           };
           modules = [
             nixosOverlaysModule
@@ -177,7 +182,8 @@
         deskapp = nixpkgs.lib.nixosSystem {
           specialArgs = {
             inherit (self) common;
-            inherit inputs secrets;
+            inherit inputs;
+            secrets = secrets.init "deskapp";
           };
           modules = [
             nixosOverlaysModule
