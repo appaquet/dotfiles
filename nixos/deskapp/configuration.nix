@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, secrets, ... }:
 
 {
   imports = [
@@ -55,10 +55,11 @@
           "x-systemd.idle-timeout=60"
           "x-systemd.device-timeout=5s"
           "x-systemd.mount-timeout=5s"
+          "credentials=${secrets.deskapp.nasappCifs}"
         ];
         automount_opts = builtins.concatStringsSep "," automount_opts_list;
       in
-      [ "${automount_opts},credentials=/home/appaquet/.secrets/nasapp_cifs" ];
+      [ automount_opts ];
   };
 
   # Networking

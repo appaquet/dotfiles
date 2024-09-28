@@ -13,7 +13,7 @@ let
 in
 {
   imports = [
-    secrets.homeManager.dev
+    secrets.devHome
   ];
 
   home.packages = (with pkgs; [

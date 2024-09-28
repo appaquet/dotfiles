@@ -98,45 +98,57 @@
         in
         {
           homes = {
-            "appaquet@deskapp" = home-manager.lib.homeManagerConfiguration {
+            "appaquet@deskapp" = home-manager.lib.homeManagerConfiguration rec {
               inherit pkgs;
-              modules = [ ./home-manager/deskapp.nix ] ++ commonHomeModules;
+              modules = [
+                ./home-manager/deskapp.nix
+                extraSpecialArgs.secrets.commonHome
+              ] ++ commonHomeModules;
               extraSpecialArgs = {
                 inherit inputs unstablePkgs;
-                secrets = secrets.init "deskapp";
+                secrets = secrets.init "linux";
                 cfg = cfg // {
                   isNixos = true;
                 };
               };
             };
 
-            "appaquet@nixapp" = home-manager.lib.homeManagerConfiguration {
+            "appaquet@nixapp" = home-manager.lib.homeManagerConfiguration rec {
               inherit pkgs;
-              modules = [ ./home-manager/nixapp.nix ] ++ commonHomeModules;
+              modules = [
+                ./home-manager/nixapp.nix
+                extraSpecialArgs.secrets.commonHome
+              ] ++ commonHomeModules;
               extraSpecialArgs = {
                 inherit inputs unstablePkgs;
-                secrets = secrets.init "nixapp";
+                secrets = secrets.init "linux";
                 cfg = cfg // {
                   isNixos = true;
                 };
               };
             };
 
-            "appaquet@servapp" = home-manager.lib.homeManagerConfiguration {
+            "appaquet@servapp" = home-manager.lib.homeManagerConfiguration rec {
               inherit pkgs;
-              modules = [ ./home-manager/servapp.nix ] ++ commonHomeModules;
+              modules = [
+                ./home-manager/servapp.nix
+                extraSpecialArgs.secrets.commonHome
+              ] ++ commonHomeModules;
               extraSpecialArgs = {
                 inherit inputs unstablePkgs cfg;
-                secrets = secrets.init "servapp";
+                secrets = secrets.init "linux";
               };
             };
 
-            "appaquet@mbpapp" = home-manager.lib.homeManagerConfiguration {
+            "appaquet@mbpapp" = home-manager.lib.homeManagerConfiguration rec{
               inherit pkgs;
-              modules = [ ./home-manager/mbpapp.nix ] ++ commonHomeModules;
+              modules = [
+                ./home-manager/mbpapp.nix
+                extraSpecialArgs.secrets.commonHome
+              ] ++ commonHomeModules;
               extraSpecialArgs = {
                 inherit inputs unstablePkgs cfg;
-                secrets = secrets.init "mbapp";
+                secrets = secrets.init "darwin";
               };
             };
           };
@@ -171,7 +183,7 @@
           specialArgs = {
             inherit (self) common;
             inherit inputs;
-            secrets = secrets.init "nixapp";
+            secrets = secrets.init "linux";
           };
           modules = [
             nixosOverlaysModule
@@ -183,7 +195,7 @@
           specialArgs = {
             inherit (self) common;
             inherit inputs;
-            secrets = secrets.init "deskapp";
+            secrets = secrets.init "linux";
           };
           modules = [
             nixosOverlaysModule
