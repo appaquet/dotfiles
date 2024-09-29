@@ -1,10 +1,12 @@
-{ pkgs, secrets, ... }:
+{ ... }:
 
 {
   imports = [
     ./hardware-configuration.nix
     ./ha-ctrl.nix
     ./virt
+    ./home-backup.nix
+    ./vms-backup.nix
     ../common.nix
     ../network_bridge.nix
     ../dev.nix
@@ -36,31 +38,6 @@
     device = "/swapfile";
     size = 16 * 1024; # 16GB
   }];
-
-  # Mount to nasapp
-  environment.systemPackages = [ pkgs.cifs-utils ];
-  fileSystems."/mnt/deskapp_backup" = {
-    device = "//192.168.0.20/backup_ubuntu";
-    fsType = "cifs";
-    options =
-      let
-        automount_opts_list = [
-          "vers=2.0"
-          "uid=appaquet"
-          "gid=users"
-          # don't mount with fstab, but with systemd + make it resilient to network failures
-          # from https://discourse.nixos.org/t/seeking-help-with-mounting-samba-cifs-behind-a-vpn-currently-using-autofs/35436/6
-          "noauto"
-          "x-systemd.automount"
-          "x-systemd.idle-timeout=60"
-          "x-systemd.device-timeout=5s"
-          "x-systemd.mount-timeout=5s"
-          "credentials=${secrets.deskapp.nasappCifs}"
-        ];
-        automount_opts = builtins.concatStringsSep "," automount_opts_list;
-      in
-      [ automount_opts ];
-  };
 
   # Networking
   networking.networkmanager.enable = true;

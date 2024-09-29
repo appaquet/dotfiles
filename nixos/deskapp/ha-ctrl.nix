@@ -38,7 +38,7 @@ let
     }
 
     function vm_stop_all() {
-      for vm in $(virsh list --all --title | awk '{print $2}' | grep -v Name | sed -r '/^\s*$/d'); do
+      for vm in $(virsh list --all --name); do
         vm_stop $vm
       done
     }
@@ -94,7 +94,6 @@ let
       vm_stop_all
       systemctl poweroff
     }
-
 
     CMD="$1"
     shift
