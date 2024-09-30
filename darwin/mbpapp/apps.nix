@@ -37,24 +37,26 @@
     ];
 
     casks = [
-      "1password"
-      "google-chrome"
-      "bartender"
       "iterm2"
       "firefox"
+      "google-chrome"
+
+      "1password"
+      "bartender"
 
       "signal"
       "discord"
 
       "chatgpt"
 
+      "spotify"
       "vlc"
       "gimp"
 
       "postman"
       "wireshark"
       "appcleaner"
-      "spotify"
+      "blackhole-2ch"
     ];
   };
 }
