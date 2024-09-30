@@ -38,7 +38,7 @@
       grws = "git restore --staged --worktree";
       ghpr = "gh pr create --draft --body \"\" --title";
       ghck = "git checkout (gh-pr-select)";
-      gts = "git tag -l --sort=-version:refname --format='%(refname:short) (%(creatordate:short))'";
+      gts = "git checkout (git-tag-select)";
       gau = "git add -u";
       gmr = "git maintenance run";
     };
