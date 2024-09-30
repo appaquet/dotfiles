@@ -22,8 +22,6 @@ in
     dive # docker container explorer
     lazydocker # top like app for docker
 
-    unstablePkgs.binsider # binary analysis tool
-
     protobuf
     capnproto
     flatbuffers
@@ -32,6 +30,7 @@ in
     bintools # ld, objdump, etc.
   ]) ++ lib.optionals pkgs.stdenv.isLinux [
     pkgs.mold-wrapped
+    unstablePkgs.binsider # binary analysis tool
   ];
 
   home.file.".cargo/config.toml".text = cargoConfig;
