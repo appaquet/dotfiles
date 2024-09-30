@@ -11,13 +11,16 @@ if [[ -z "${MACHINE_KEY}" ]]; then
 fi
 
 HOME_CONFIG=""
+NIXOS=0
 if [[ "${MACHINE_KEY}" == "appaquet@deskapp"* || "${MACHINE_KEY}" == "appaquet@nixos"* ]]; then
     HOME_CONFIG="appaquet@deskapp"
     HOSTNAME="deskapp"
+    NIXOS=1
 
 elif [[ "${MACHINE_KEY}" == "appaquet@nixapp"* ]]; then
     HOME_CONFIG="appaquet@nixapp"
     HOSTNAME="nixapp"
+    NIXOS=1
 
 elif [[ "${MACHINE_KEY}" == "appaquet@servapp"* ]]; then
     HOME_CONFIG="appaquet@servapp"
@@ -180,6 +183,10 @@ nixos)
         shift
         nixos-rebuild build --flake ".#${HOSTNAME}" 2>&1 | ${NOM_PIPE}
         ;;
+    boot)
+        shift
+        nixos-rebuild boot --flake ".#${HOSTNAME}" 2>&1 | ${NOM_PIPE}
+        ;;
     switch)
         shift
 
@@ -241,6 +248,7 @@ nixos)
     *)
         echo "$0 $COMMAND check: check nixos" >&2
         echo "$0 $COMMAND build: build nixos" >&2
+        echo "$0 $COMMAND boot: rebuild boot (remove old gens)" >&2
         echo "$0 $COMMAND diff: diff nixos" >&2
         echo "$0 $COMMAND tree: show nixos tree" >&2
         echo "$0 $COMMAND kernel-versions: show kernel versions" >&2
@@ -296,8 +304,12 @@ gc)
 
     # Cleaning as root collects more stuff as well
     # See https://www.reddit.com/r/NixOS/comments/10107km/how_to_delete_old_generations_on_nixos/?s=8
-    #ncg=$(which nix-collect-garbage)
-    #sudo ${ncg} -d --delete-older-than "14d"
+    ncg=$(which nix-collect-garbage)
+    sudo ${ncg} -d --delete-older-than "14d"
+
+    if [[ "$NIXOS" -eq 1 ]]; then
+        echo "Call x nixos boot to remove old generations from boot"
+    fi
     ;;
 
 fmt)
