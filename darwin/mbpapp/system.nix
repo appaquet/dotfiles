@@ -1,0 +1,95 @@
+{ ... }:
+{
+  # Inspired from https://github.com/ryan4yin/nix-darwin-kickstarter/blob/main/rich-demo/modules/system.nix
+  system = {
+    keyboard = {
+      enableKeyMapping = true;
+      remapCapsLockToEscape = true;
+    };
+
+    defaults = {
+      menuExtraClock.Show24Hour = true;
+
+      dock = {
+        tilesize = 32; # icon size
+        magnification = true;
+        largesize = 70; # magnification size
+
+        # Hot corners
+        wvous-bl-corner = 2; # bottom left = Mission Control
+        wvous-br-corner = 5; # bottom right = Screen Saver
+
+        # Spaces
+        mru-spaces = false; # disable reordering spaces based on most recent use
+      };
+
+      spaces = {
+        spans-displays = true; # switch spaces on all displays
+      };
+
+      loginwindow = {
+        GuestEnabled = false; # disable guest user
+      };
+
+      finder = {
+        AppleShowAllExtensions = true; # show all file extensions
+        FXEnableExtensionChangeWarning = false; # disable warning when changing file extension
+        QuitMenuItem = true; # enable quit menu item
+        ShowPathbar = true; # show path bar
+        ShowStatusBar = true; # show status bar
+      };
+
+      trackpad = {
+        Clicking = true; # enable tap to click
+        TrackpadRightClick = true; # enable two finger right click
+      };
+
+      screencapture = {
+        location = "~/DocumentsApp/Screenshots/";
+        type = "png";
+      };
+
+      # Customize settings that not supported by nix-darwin directly
+      # Incomplete list of macOS `defaults` commands :
+      #   https://github.com/yannbertrand/macos-defaults
+      # Use `defaults read NSGlobalDomain` to list all custom settings
+      NSGlobalDomain = {
+        AppleInterfaceStyle = "Dark"; # dark mode
+
+        # Finder
+        AppleShowAllExtensions = true; # show all file extensions
+
+        # Keybord
+        InitialKeyRepeat = 15; # normal minimum is 15 (225 ms), maximum is 120 (1800 ms)
+        KeyRepeat = 2; # normal minimum is 2 (30 ms), maximum is 120 (1800 ms)
+        ApplePressAndHoldEnabled = false; # long press doesn't show accented chars selector
+        "com.apple.keyboard.fnState" = true; # use F1, F2, etc. keys as standard function keys
+
+        # Trackpad
+        "com.apple.swipescrolldirection" = true; # enable natural scrolling
+      };
+
+      # Customize settings that not supported by nix-darwin directly
+      # see the source code of this project to get more undocumented options:
+      #    https://github.com/rgcr/m-cli
+      # 
+      # All custom entries can be found by running `defaults read` command.
+      # or `defaults read xxx` to read a specific domain.
+      CustomUserPreferences = {
+        NSGlobalDomain = {
+          AppleLanguages = [
+            "en"
+            "en-CA"
+            "fr-CA"
+          ];
+        };
+
+        "com.apple.screensaver" = {
+          # Require password immediately after sleep or screen saver begins
+          askForPassword = 1;
+          askForPasswordDelay = 0;
+        };
+      };
+    };
+  };
+}

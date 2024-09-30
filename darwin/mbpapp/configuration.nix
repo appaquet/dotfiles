@@ -1,11 +1,9 @@
 { pkgs, inputs, ... }:
 {
   imports = [
+    ./apps.nix
     ./fonts.nix
-  ];
-
-  environment.systemPackages = with pkgs; [
-    fish
+    ./system.nix
   ];
 
   # Auto upgrade nix package and the daemon service.
@@ -28,6 +26,14 @@
   };
 
   security.pam.enableSudoTouchIdAuth = true;
+
+  time.timeZone = "America/Toronto";
+
+  networking.localHostName = "mbpapp";
+
+  environment.systemPackages = with pkgs; [
+    fish
+  ];
 
   programs = {
     fish.enable = true;
