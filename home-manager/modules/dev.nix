@@ -1,4 +1,4 @@
-{ pkgs, lib, secrets, ... }:
+{ pkgs, unstablePkgs, lib, secrets, ... }:
 
 let
   # Set mold as linker
@@ -21,6 +21,8 @@ in
 
     dive # docker container explorer
     lazydocker # top like app for docker
+
+    unstablePkgs.binsider # binary analysis tool
 
     protobuf
     capnproto

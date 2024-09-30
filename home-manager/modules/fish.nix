@@ -86,6 +86,7 @@
       };
       nrf = "nix run nixpkgs#(fzf-nix)";
       nsf = "nix shell nixpkgs#(fzf-nix)";
+      fn = "fzf-nix";
 
       ai = {
         expansion = "aichat \"%\"";
