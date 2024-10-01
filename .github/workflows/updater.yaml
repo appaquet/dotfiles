@@ -19,7 +19,7 @@ jobs:
           github-token: ${{ secrets.GH_PAT }}
       - name: Add & update nixpkgs channel
         run: |
-          nix-channel --add https://nixos.org/channels/nixpkgs-24.05 nixpkgs
+          nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
           nix-channel --update nixpkgs
 
           # install nvd to diff
@@ -70,7 +70,7 @@ jobs:
           github-token: ${{ secrets.GH_PAT }}
       - name: Add & update nixpkgs channel
         run: |
-          nix-channel --add https://nixos.org/channels/nixpkgs-24.05 nixpkgs
+          nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
           nix-channel --update nixpkgs
 
           # install nvd to diff
