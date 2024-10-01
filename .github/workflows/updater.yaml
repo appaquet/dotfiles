@@ -1,0 +1,41 @@
+name: "Flake updater"
+
+on:
+  # schedule:
+  #   - cron: "0 0 * * *"
+  pull_request:
+  push:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+        with:
+          extra-conf: |
+            experimental-features = nix-command flakes
+            access-tokens = github.com=${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GH_PAT }}
+      - name: Add & update nixpkgs channel
+        run: |
+          nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
+          nix-channel --update nixpkgs
+          
+          # install nvd to diff
+          nix profile install nixpkgs#nvd
+
+      - name: Building baseline...
+        run: |
+          MACHINE_KEY="appaquet@deskapp" ./x nixos build
+          cp -r result nixos-result
+
+          MACHINE_KEY="appaquet@deskapp" ./x home build
+          cp -r result home-result
+
+          MACHINE_KEY="appaquet@mbpapp" ./x darwin build
+          cp -r result darwin-result
+
+      - name: Update flakes
+        run: |
+          nix flake update

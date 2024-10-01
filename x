@@ -317,10 +317,6 @@ fmt)
     nixpkgs-fmt "${@}" .
     ;;
 
-secrets)
-    # TODO:
-    ;;
-
 optimize)
     shift
     echo "Optimizing store..."
