@@ -7,7 +7,7 @@ on:
   push:
 
 jobs:
-  update:
+  update_linux:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,21 +21,67 @@ jobs:
         run: |
           nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
           nix-channel --update nixpkgs
-          
+
+          # install nvd to diff
+          nix profile install nixpkgs#nixos-rebuild nixpkgs#nvd
+
+      - name: Building baseline...
+        run: |
+          MACHINE_KEY="appaquet@deskapp" ./x nixos build
+          cp -r result nixos-result-before
+
+          MACHINE_KEY="appaquet@deskapp" ./x home build
+          cp -r result home-result-before
+
+      - name: Update flakes
+        run: |
+          nix flake update
+
+      - name: Building new...
+        run: |
+          MACHINE_KEY="appaquet@deskapp" ./x nixos build
+          cp -r result nixos-result-after
+
+          MACHINE_KEY="appaquet@deskapp" ./x home build
+          cp -r result home-result-after
+
+      - name: Diffing...
+        run: |
+          nvd diff nixos-result-before nixos-result-after
+          nvd diff home-result-before home-result-after
+
+  update_darwin:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+        with:
+          extra-conf: |
+            experimental-features = nix-command flakes
+            access-tokens = github.com=${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GH_PAT }}
+      - name: Add & update nixpkgs channel
+        run: |
+          nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
+          nix-channel --update nixpkgs
+
           # install nvd to diff
           nix profile install nixpkgs#nvd nixpkgs#nixos-rebuild
 
       - name: Building baseline...
         run: |
-          MACHINE_KEY="appaquet@deskapp" ./x nixos build
-          cp -r result nixos-result
-
-          MACHINE_KEY="appaquet@deskapp" ./x home build
-          cp -r result home-result
-
           MACHINE_KEY="appaquet@mbpapp" ./x darwin build
-          cp -r result darwin-result
+          cp -r result darwin-result-before
 
       - name: Update flakes
         run: |
           nix flake update
+
+      - name: Building new...
+        run: |
+          MACHINE_KEY="appaquet@mbpapp" ./x darwin build
+          cp -r result darwin-result-after
+
+      - name: Diffing...
+        run: |
+          nvd diff darwin-result-before darwin-result-after
