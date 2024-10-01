@@ -56,8 +56,8 @@ jobs:
       - name: Diffing...
         run: |
           set -xe
-          nvd diff nixos-result-before nixos-result-after
-          nvd diff home-result-before home-result-after
+          nvd diff nixos-result-before nixos-result-after | tee nixos-diff
+          nvd diff home-result-before home-result-after | tee home-diff
 
   update_darwin:
     runs-on: macos-latest
@@ -96,4 +96,4 @@ jobs:
       - name: Diffing...
         run: |
           set -xe
-          nvd diff ./darwin-result-before ./darwin-result-after
+          nvd diff ./darwin-result-before ./darwin-result-after | tee darwin-diff
