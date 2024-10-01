@@ -17,7 +17,7 @@ jobs:
         github-token: ${{ secrets.GH_PAT }}
     - name: Add & update nixpkgs channel
       run: | 
-        nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
+        nix-channel --add https://nixos.org/channels/nixos-24.05 nixpkgs
         nix-channel --update nixpkgs
     - name: Install formatter & format
       run: | 
