@@ -23,7 +23,7 @@ jobs:
           nix-channel --update nixpkgs
           
           # install nvd to diff
-          nix profile install nixpkgs#nvd
+          nix profile install nixpkgs#nvd nixpkgs#nixos-rebuild
 
       - name: Building baseline...
         run: |
