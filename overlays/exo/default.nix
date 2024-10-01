@@ -12,7 +12,7 @@ rustPlatform.buildRustPackage {
     hash = "sha256-k+jFQotmH4dfDMMxdOhZZCjYgb5dxB8eOmeDmjUK/0Y=";
   };
 
-  cargoHash = "sha256-p0WMSHNMlbwHfF0bxaXHNRvg6Z+IyyckxrZ3BzMkzgI=";
+  cargoHash = "sha256-o8m1/9NpydiPXPH3sgH5dL3zyPgNlVK8OGeFYDSTnYs=";
 
   cargoBuildFlags = [
     "--package"
