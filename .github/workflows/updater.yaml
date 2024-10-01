@@ -19,17 +19,21 @@ jobs:
           github-token: ${{ secrets.GH_PAT }}
       - name: Add & update nixpkgs channel
         run: |
-          nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
+          nix-channel --add https://nixos.org/channels/nixpkgs-24.05 nixpkgs
           nix-channel --update nixpkgs
 
           # install nvd to diff
           nix profile install nixpkgs#nixos-rebuild nixpkgs#nvd
 
-      - name: Building baseline...
+      - name: Building NixOS baseline...
         run: |
+          set -xe
           MACHINE_KEY="appaquet@deskapp" ./x nixos build
           cp -r result nixos-result-before
 
+      - name: Building Home Manager baseline...
+        run: |
+          set -xe
           MACHINE_KEY="appaquet@deskapp" ./x home build
           cp -r result home-result-before
 
@@ -37,11 +41,15 @@ jobs:
         run: |
           nix flake update
 
-      - name: Building new...
+      - name: Building NixOS new
         run: |
+          set -xe
           MACHINE_KEY="appaquet@deskapp" ./x nixos build
           cp -r result nixos-result-after
 
+      - name: Building Home Manager new
+        run: |
+          set -xe
           MACHINE_KEY="appaquet@deskapp" ./x home build
           cp -r result home-result-after
 
@@ -62,11 +70,11 @@ jobs:
           github-token: ${{ secrets.GH_PAT }}
       - name: Add & update nixpkgs channel
         run: |
-          nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
+          nix-channel --add https://nixos.org/channels/nixpkgs-24.05 nixpkgs
           nix-channel --update nixpkgs
 
           # install nvd to diff
-          nix profile install nixpkgs#nvd nixpkgs#nixos-rebuild
+          nix profile install nixpkgs#nvd
 
       - name: Building baseline...
         run: |
@@ -84,4 +92,4 @@ jobs:
 
       - name: Diffing...
         run: |
-          nvd diff darwin-result-before darwin-result-after
+          nvd diff ./darwin-result-before ./darwin-result-after
