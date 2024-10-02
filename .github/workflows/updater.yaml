@@ -206,7 +206,7 @@ jobs:
             exit 0
           fi
 
-          cat */* > all-diffs
+          cat diffs/*/* > all-diffs
           if [ -z "$(cat all-diffs)" ]; then
             echo "No diffs found, exiting"
             exit 0
