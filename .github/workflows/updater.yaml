@@ -7,11 +7,11 @@ on:
   push:
 
 jobs:
-  update_homes:
+  update_linux_homes:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        machine: ["appaquet@mbpapp", "appaquet@deskapp", "appaquet@servapp"]
+        machine: ["appaquet@deskapp", "appaquet@servapp"]
     steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@main
