@@ -164,3 +164,21 @@ jobs:
           path: "${{ matrix.machine }}-darwin-diff"
           if-no-files-found: ignore # no files means no diff
 
+  # fetches artifacts from previous jobs
+  # if any diff exists, it will create a PR
+  create_pr:
+    runs-on: ubuntu-latest
+    needs: [update_homes, update_nixos, update_darwin]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: diffs
+
+      - name: Create PR
+        run: |
+          set -xe
+          ls -l diffs
+
