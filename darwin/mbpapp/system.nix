@@ -64,6 +64,7 @@
         KeyRepeat = 2; # normal minimum is 2 (30 ms), maximum is 120 (1800 ms)
         ApplePressAndHoldEnabled = false; # long press doesn't show accented chars selector
         "com.apple.keyboard.fnState" = true; # use F1, F2, etc. keys as standard function keys
+        NSAutomaticPeriodSubstitutionEnabled = false; # prevent adding a . after two consecutive space
 
         # Trackpad
         "com.apple.swipescrolldirection" = true; # enable natural scrolling
