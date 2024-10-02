@@ -177,7 +177,7 @@ jobs:
           if [ $NB_CHANGES -gt 0 ]; then
             echo "Changes for ${{ matrix.machine }} darwin:" > ${{ matrix.machine }}-darwin-diff
             cat diff >> ${{ matrix.machine }}-darwin-diff
-          }
+          fi
 
       - name: Add as artifact
         uses: actions/upload-artifact@v4
