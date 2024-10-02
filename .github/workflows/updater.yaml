@@ -56,7 +56,8 @@ jobs:
         run: |
           set -xe
           nvd diff result-before result-after | tee diff
-          cat diff > "${{ matrix.pair.machine }}-home-diff"
+          echo "Changes for ${{ matrix.pair.machine }} home:" > "${{ matrix.pair.machine }}-home-diff"
+          cat diff >> "${{ matrix.pair.machine }}-home-diff"
 
       - name: Add as artifact
         uses: actions/upload-artifact@v4
@@ -107,7 +108,16 @@ jobs:
         run: |
           set -xe
           nvd diff result-before result-after | tee diff
-          cat diff > ${{ matrix.machine }}-nixos-diff
+
+          # Only include if significant changes. Ex base output:
+          # Version changes:
+          # [U.]  #1  nixos-system-deskapp  24.05.20240928.fbca5e7 -> 24.05.20240930.1719f27
+          # Closure size: 1637 -> 1637 (29 paths added, 29 paths removed, delta +0, disk usage +7.5KiB).
+          NB_CHANGES=$(pbpaste | grep -vcE "(Version changes|nixos-system|Closure size)")
+          if [ $NB_CHANGES -gt 0 ]; then
+            echo "Changes for ${{ matrix.machine }} nixos:" > ${{ matrix.machine }}-nixos-diff
+            cat diff >> ${{ matrix.machine }}-nixos-diff
+          fi
 
       - name: Add as artifact
         uses: actions/upload-artifact@v4
@@ -158,7 +168,16 @@ jobs:
         run: |
           set -xe
           nvd diff ./darwin-result-before ./darwin-result-after | tee diff
-          cat diff > ${{ matrix.machine }}-darwin-diff
+
+          # Only include if significant changes. Ex base output:
+          # Version changes:
+          # [C.]  #1  darwin-system  24.05pre-git+darwin4.4b43b68, 24.05pre-git+darwin5 -> 24.05pre-git+darwin4.f61d5f2, 24.05pre-git+darwin5
+          # Closure size: 169 -> 169 (10 paths added, 10 paths removed, delta +0, disk usage +3.7KiB).
+          NB_CHANGES=$(pbpaste | grep -vcE "(Version changes|darwin-system|Closure size)")
+          if [ $NB_CHANGES -gt 0 ]; then
+            echo "Changes for ${{ matrix.machine }} darwin:" > ${{ matrix.machine }}-darwin-diff
+            cat diff >> ${{ matrix.machine }}-darwin-diff
+          }
 
       - name: Add as artifact
         uses: actions/upload-artifact@v4
@@ -181,6 +200,16 @@ jobs:
       - name: Create PR
         run: |
           set -xe
-          ls -l diffs/*
-          cat diffs/*
 
+          if [ -z "$(ls -A diffs)" ]; then
+            echo "No diffs found, exiting"
+            exit 0
+          fi
+
+          cat */* > all-diffs
+          if [ -z "$(cat all-diffs)" ]; then
+            echo "No diffs found, exiting"
+            exit 0
+          fi
+
+          cat all-diffs
