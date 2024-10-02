@@ -3,6 +3,7 @@ name: "Flake updater"
 on:
   # schedule:
   #   - cron: "0 0 * * *"
+  workflow_dispatch: # allow manual triggering
   pull_request:
   push:
 
@@ -32,6 +33,7 @@ jobs:
         run: |
           nix-channel --add https://nixos.org/channels/nixos-24.05 nixpkgs
           nix-channel --update nixpkgs
+          nix profile install nixpkgs#nvd
 
       - name: Building Home Manager baseline...
         run: |
@@ -53,7 +55,7 @@ jobs:
       - name: Diffing...
         run: |
           set -xe
-          nix run nixpkgs#nvd diff result-before result-after | tee diff
+          nvd diff result-before result-after | tee diff
           cat diff > "${{ matrix.pair.machine }}-home-diff"
 
       - name: Add as artifact
@@ -63,56 +65,56 @@ jobs:
           path: "${{ matrix.pair.machine }}-home-diff"
           if-no-files-found: ignore # no files means no diff
 
-  #update_nixos:
-    #runs-on: ubuntu-latest
-    #strategy:
-      #matrix:
-        #machine: ["appaquet@deskapp"]
-    #steps:
-      #- uses: actions/checkout@v4
+  update_nixos:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        machine: ["appaquet@deskapp"]
+    steps:
+      - uses: actions/checkout@v4
 
-      #- uses: DeterminateSystems/nix-installer-action@main
-        #with:
-          #extra-conf: |
-            #experimental-features = nix-command flakes
-            #access-tokens = github.com=${{ secrets.GH_PAT }}
-          #github-token: ${{ secrets.GH_PAT }}
+      - uses: DeterminateSystems/nix-installer-action@main
+        with:
+          extra-conf: |
+            experimental-features = nix-command flakes
+            access-tokens = github.com=${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GH_PAT }}
 
-      #- name: Add & update nixpkgs channel
-        #run: |
-          #nix-channel --add https://nixos.org/channels/nixos-24.05 nixpkgs
-          #nix-channel --update nixpkgs
-          #nix profile install nixpkgs#nixos-rebuild
+      - name: Add & update nixpkgs channel
+        run: |
+          nix-channel --add https://nixos.org/channels/nixos-24.05 nixpkgs
+          nix-channel --update nixpkgs
+          nix profile install nixpkgs#nixos-rebuild nixpkgs#nvd
 
-      #- name: Building NixOS baseline...
-        #run: |
-          #set -xe
-          #MACHINE_KEY="appaquet@deskapp" ./x nixos build
-          #mv result result-before
+      - name: Building NixOS baseline...
+        run: |
+          set -xe
+          MACHINE_KEY="appaquet@deskapp" ./x nixos build
+          mv result result-before
 
-      #- name: Update flakes
-        #run: |
-          #set -xe
-          #nix flake update
+      - name: Update flakes
+        run: |
+          set -xe
+          nix flake update
 
-      #- name: Building NixOS new
-        #run: |
-          #set -xe
-          #MACHINE_KEY="appaquet@deskapp" ./x nixos build
-          #mv result result-after
+      - name: Building NixOS new
+        run: |
+          set -xe
+          MACHINE_KEY="appaquet@deskapp" ./x nixos build
+          mv result result-after
 
-      #- name: Diffing...
-        #run: |
-          #set -xe
-          #nvd diff result-before result-after | tee diff
-          #cat diff > ${{ matrix.machine }}-nixos-diff
+      - name: Diffing...
+        run: |
+          set -xe
+          nvd diff result-before result-after | tee diff
+          cat diff > ${{ matrix.machine }}-nixos-diff
 
-      #- name: Add as artifact
-        #uses: actions/upload-artifact@v4
-        #with:
-          #name: "${{ matrix.machine }}-nixos-diff"
-          #path: "${{ matrix.machine }}-nixos-diff"
-          #if-no-files-found: ignore # no files means no diff
+      - name: Add as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: "${{ matrix.machine }}-nixos-diff"
+          path: "${{ matrix.machine }}-nixos-diff"
+          if-no-files-found: ignore # no files means no diff
 
   update_darwin:
     runs-on: macos-latest
@@ -133,6 +135,7 @@ jobs:
         run: |
           nix-channel --add https://nixos.org/channels/nixos-24.05 nixpkgs
           nix-channel --update nixpkgs
+          nix profile install nixpkgs#nvd
 
       - name: Building baseline...
         run: |
@@ -154,7 +157,7 @@ jobs:
       - name: Diffing...
         run: |
           set -xe
-          nix run nixpkgs#nvd diff ./darwin-result-before ./darwin-result-after | tee diff
+          nvd diff ./darwin-result-before ./darwin-result-after | tee diff
           cat diff > ${{ matrix.machine }}-darwin-diff
 
       - name: Add as artifact
@@ -164,12 +167,9 @@ jobs:
           path: "${{ matrix.machine }}-darwin-diff"
           if-no-files-found: ignore # no files means no diff
 
-  # fetches artifacts from previous jobs
-  # if any diff exists, it will create a PR
   create_pr:
     runs-on: ubuntu-latest
-      #needs: [update_homes, update_nixos, update_darwin]
-    needs: [update_homes, update_darwin]
+    needs: [update_homes, update_nixos, update_darwin]
     steps:
       - uses: actions/checkout@v4
 
@@ -182,6 +182,5 @@ jobs:
         run: |
           set -xe
           ls -l diffs/*
-
-
+          cat diffs/*
 
