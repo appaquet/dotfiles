@@ -110,7 +110,9 @@ require("copilot").setup({
   panel = { enabled = false },
 
   filetypes = {
-    markdown = true, -- overrides default
+    -- override default false
+    markdown = true,
+    yaml = true,
   }
 })
 

@@ -7,8 +7,11 @@ on:
   push:
 
 jobs:
-  update_linux:
+  update_homes:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        machine: ["appaquet@mbpapp", "appaquet@deskapp", "appaquet@servapp"]
     steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@main
@@ -22,42 +25,84 @@ jobs:
           nix-channel --add https://nixos.org/channels/nixos-24.05 nixpkgs
           nix-channel --update nixpkgs
 
-          nix profile install nixpkgs#nixos-rebuild nixpkgs#nvd
-
-      - name: Building NixOS baseline...
-        run: |
-          set -xe
-          MACHINE_KEY="appaquet@deskapp" ./x nixos build
-          mv result nixos-result-before
-
       - name: Building Home Manager baseline...
         run: |
           set -xe
-          MACHINE_KEY="appaquet@deskapp" ./x home build
-          mv result home-result-before
+          MACHINE_KEY="${{ matrix.machine }}" ./x home build
+          mv result result-before
 
       - name: Update flakes
         run: |
           set -xe
           nix flake update
 
-      - name: Building NixOS new
-        run: |
-          set -xe
-          MACHINE_KEY="appaquet@deskapp" ./x nixos build
-          mv result nixos-result-after
-
       - name: Building Home Manager new
         run: |
           set -xe
-          MACHINE_KEY="appaquet@deskapp" ./x home build
-          mv result home-result-after
+          MACHINE_KEY="${{ matrix.machine }}" ./x home build
+          mv result result-after
 
       - name: Diffing...
         run: |
           set -xe
-          nvd diff nixos-result-before nixos-result-after | tee nixos-diff
-          nvd diff home-result-before home-result-after | tee home-diff
+          nix run nixpkgs#nvd diff result-before result-after | tee "${{ matrix.machine }}-home-diff"
+
+      - name: Add as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: "${{ matrix.machine }}-home-diff"
+
+  #update_nixos:
+    #runs-on: ubuntu-latest
+    #steps:
+      #- uses: actions/checkout@v4
+      #- uses: DeterminateSystems/nix-installer-action@main
+        #with:
+          #extra-conf: |
+            #experimental-features = nix-command flakes
+            #access-tokens = github.com=${{ secrets.GH_PAT }}
+          #github-token: ${{ secrets.GH_PAT }}
+      #- name: Add & update nixpkgs channel
+        #run: |
+          #nix-channel --add https://nixos.org/channels/nixos-24.05 nixpkgs
+          #nix-channel --update nixpkgs
+          #nix profile install nixpkgs#nixos-rebuild nixpkgs#nvd
+
+      #- name: Building NixOS baseline...
+        #run: |
+          #set -xe
+          #MACHINE_KEY="appaquet@deskapp" ./x nixos build
+          #mv result nixos-result-before
+
+      #- name: Building Home Manager baseline...
+        #run: |
+          #set -xe
+          #MACHINE_KEY="appaquet@deskapp" ./x home build
+          #mv result home-result-before
+
+      #- name: Update flakes
+        #run: |
+          #set -xe
+          #nix flake update
+
+      #- name: Building NixOS new
+        #run: |
+          #set -xe
+          #MACHINE_KEY="appaquet@deskapp" ./x nixos build
+          #mv result nixos-result-after
+
+      #- name: Building Home Manager new
+        #run: |
+          #set -xe
+          #MACHINE_KEY="appaquet@deskapp" ./x home build
+          #mv result home-result-after
+
+      #- name: Diffing...
+        #run: |
+          #set -xe
+          #nvd diff nixos-result-before nixos-result-after | tee nixos-diff
+          #nvd diff home-result-before home-result-after | tee home-diff
+
 
   update_darwin:
     runs-on: macos-latest
