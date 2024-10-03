@@ -228,8 +228,8 @@ jobs:
           BRANCH_NAME="update-flake"
 
           # Check if pr exists, delete it if it does
-          gh pr view $BRANCH_NAME &>/dev/null
-          if [ $? -eq 0 ]; then
+          EXISTS=$(gh pr view $BRANCH_NAME &| grep -cv "no pull" || true)
+          if [ $EXISTS -gt 0 ]; then
               echo "PR exists, deleting it"
               gh pr close $BRANCH_NAME --delete-branch
           fi
