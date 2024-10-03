@@ -278,9 +278,9 @@ jobs:
           git push origin $BRANCH_NAME
 
           echo "Diffs:" > body
-          echo "```" >> body
+          echo "\`\`\`" >> body
           cat all-diffs >> body
-          echo "```" >> body
+          echo "\`\`\`" >> body
 
           gh pr create --title "Flake update" --body $(cat body) --base master --head "$BRANCH_NAME" --reviewer appaquet
         env:
