@@ -245,6 +245,9 @@ jobs:
             exit 0
           fi
 
+          git config --global user.email "appaquet@gmail.com"
+          git config --global user.name "Andre-Philippe Paquet"
+
           git branch -D $BRANCH_NAME || true
           git checkout -b $BRANCH_NAME
           git add flake.lock
