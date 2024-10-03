@@ -66,7 +66,7 @@ jobs:
   #         if [ $NB_CHANGES -gt 0 ]; then
   #           echo "Changes for ${{ matrix.pair.machine }} home:" > diff-out
   #           cat diff >> diff-out
-  #           echo -n "" >> diff-out
+  #           echo -n " " >> diff-out
   #           cat diff-out > "${{ matrix.pair.machine }}-home-diff"
   #         fi
 
@@ -136,7 +136,7 @@ jobs:
   #         if [ $NB_CHANGES -gt 0 ]; then
   #           echo "Changes for ${{ matrix.machine }} nixos:" > diff-out
   #           cat diff >> diff-out
-  #           echo -n "" >> diff-out
+  #           echo -n " " >> diff-out
   #           cat diff-out > "${{ matrix.machine }}-nixos-diff"
   #         fi
 
@@ -200,7 +200,7 @@ jobs:
   #         if [ $NB_CHANGES -gt 0 ]; then
   #           echo "Changes for ${{ matrix.machine }} darwin:" > diff-out
   #           cat diff >> diff-out
-  #           echo -n "" >> diff-out
+  #           echo -n " " >> diff-out
   #           cat diff-out > "${{ matrix.machine }}-darwin-diff"
   #         fi
 
@@ -218,7 +218,7 @@ jobs:
       - name: Create PR
         run: |
           echo "something" > something-diff
-          echo -n "" >> flake.lock
+          echo -n " " >> flake.lock
       - name: Add as artifact
         uses: actions/upload-artifact@v4
         with:
