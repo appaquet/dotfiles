@@ -218,6 +218,7 @@ jobs:
       - name: Create PR
         run: |
           echo "something" > diff
+          echo "\n" >> flake.nix
       - name: Add as artifact
         uses: actions/upload-artifact@v4
         with:
