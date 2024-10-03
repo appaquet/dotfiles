@@ -228,6 +228,7 @@ jobs:
   create_pr:
     runs-on: ubuntu-latest
     # needs: [update_homes, update_nixos, update_darwin]
+    needs: [incoming]
     steps:
       - uses: actions/checkout@v4
 
