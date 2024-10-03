@@ -223,13 +223,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: diff
-          path: diff
+          path: something-diff
           if-no-files-found: ignore # no files means no diff
       - name: Add as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: flake.nix
-          path: flake.nix
+          name: flake.lock
+          path: flake.lock
 
   create_pr:
     runs-on: ubuntu-latest
@@ -256,6 +256,8 @@ jobs:
           fi
 
           mkdir -p diffs # ensure we don't fail if no diffs
+          ls -la diffs/
+
           find diffs -name "*-diff" -exec cat {} \; > all-diffs
           if [ -z "$(cat all-diffs)" ]; then
             echo "No diffs found, exiting"
