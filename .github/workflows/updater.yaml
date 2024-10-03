@@ -275,7 +275,7 @@ jobs:
           git checkout -b $BRANCH_NAME
           git add flake.lock
           git commit -m "chore(deps): update flake lock"
-          git push origin $BRANCH_NAME
+          git push --force-with-lease origin $BRANCH_NAME
 
           echo "Diffs:" > body
           echo "```" >> body
