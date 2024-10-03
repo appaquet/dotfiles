@@ -276,4 +276,4 @@ jobs:
           git push origin $BRANCH_NAME
           gh pr create --title "Flake update" --body "$(cat all-diffs)" --base master --head "$BRANCH_NAME"
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
