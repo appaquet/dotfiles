@@ -2,7 +2,7 @@ name: "Flake updater"
 
 on:
   schedule:
-    - cron: "0 3 * * *"
+    - cron: "0 7 * * *" # UTC, 3AM EST
   workflow_dispatch: # allow manual triggering
   # pull_request:
   # push:
@@ -275,7 +275,14 @@ jobs:
           git checkout -b $BRANCH_NAME
           git add flake.lock
           git commit -m "chore(deps): update flake lock"
-          git push origin $BRANCH_NAME
-          gh pr create --title "Flake update" --body "\`\`\`$(cat all-diffs)\`\`\`" --base master --head "$BRANCH_NAME"
+          git push --force-with-lease origin $BRANCH_NAME
+
+          echo "Diffs:" > body
+          echo "\`\`\`" >> body
+          cat all-diffs >> body
+          echo "\`\`\`" >> body
+          cat body
+
+          gh pr create --title "Flake update" --body-file body --base master --head "$BRANCH_NAME" --reviewer appaquet
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
