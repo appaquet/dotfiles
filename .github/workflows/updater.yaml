@@ -1,0 +1,281 @@
+name: "Flake updater"
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch: # allow manual triggering
+  # pull_request:
+  # push:
+
+jobs:
+  update_homes:
+    strategy:
+      matrix:
+        pair:
+          - machine: "appaquet@deskapp"
+            os: ubuntu-latest
+          - machine: "appaquet@servapp"
+            os: ubuntu-latest
+          - machine: "appaquet@mbpapp"
+            os: macos-latest
+    runs-on: ${{ matrix.pair.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@main
+        with:
+          extra-conf: |
+            experimental-features = nix-command flakes
+            access-tokens = github.com=${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GH_PAT }}
+
+      - name: Add & update nixpkgs channel
+        run: |
+          nix-channel --add https://nixos.org/channels/nixos-24.05 nixpkgs
+          nix-channel --update nixpkgs
+          nix profile install nixpkgs#nvd
+
+      - name: Building Home Manager baseline...
+        run: |
+          set -xe
+          MACHINE_KEY="${{ matrix.pair.machine }}" ./x home build
+          mv result result-before
+
+      - name: Update flakes
+        run: |
+          set -xe
+          nix flake update
+
+      - name: Building Home Manager new
+        run: |
+          set -xe
+          MACHINE_KEY="${{ matrix.pair.machine }}" ./x home build
+          mv result result-after
+
+      - name: Diffing...
+        run: |
+          set -xe
+          nvd diff result-before result-after | tee diff
+
+          # Only include if significant changes. Ex base output:
+          #   <<< result-before
+          #   >>> result-after
+          #   Version changes:
+          #   Closure size: 716 -> 716 (10 paths added, 10 paths removed, delta +0, disk usage +287.0KiB).
+          NB_CHANGES=$(grep -vcE "(Version changes|Closure size|<<<|>>>)" diff || true)
+          if [ $NB_CHANGES -gt 0 ]; then
+            echo "Changes for ${{ matrix.pair.machine }} home:" > diff-out
+            cat diff >> diff-out
+            echo -n " " >> diff-out
+            cat diff-out > "${{ matrix.pair.machine }}-home-diff"
+          fi
+
+      - name: Add diff as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: "${{ matrix.pair.machine }}-home-diff"
+          path: "${{ matrix.pair.machine }}-home-diff"
+          if-no-files-found: ignore # no files means no diff
+
+      - name: Add flake.lock
+        uses: actions/upload-artifact@v4
+        with:
+          name: "${{ matrix.pair.machine }}-flake"
+          path: "flake.lock"
+
+  update_nixos:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        machine: ["appaquet@deskapp"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@main
+        with:
+          extra-conf: |
+            experimental-features = nix-command flakes
+            access-tokens = github.com=${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GH_PAT }}
+
+      - name: Add & update nixpkgs channel
+        run: |
+          nix-channel --add https://nixos.org/channels/nixos-24.05 nixpkgs
+          nix-channel --update nixpkgs
+          nix profile install nixpkgs#nixos-rebuild nixpkgs#nvd
+
+      - name: Building NixOS baseline...
+        run: |
+          set -xe
+          MACHINE_KEY="appaquet@deskapp" ./x nixos build
+          mv result result-before
+
+      - name: Update flakes
+        run: |
+          set -xe
+          nix flake update
+
+      - name: Building NixOS new
+        run: |
+          set -xe
+          MACHINE_KEY="appaquet@deskapp" ./x nixos build
+          mv result result-after
+
+      - name: Diffing...
+        run: |
+          set -xe
+          nvd diff result-before result-after | tee diff
+
+          # Only include if significant changes. Ex base output:
+          #   <<< result-before
+          #   >>> result-after
+          #   Version changes:
+          #   [U.]  #1  nixos-system-deskapp  24.05.20240928.fbca5e7 -> 24.05.20240930.1719f27
+          #   Closure size: 1637 -> 1637 (29 paths added, 29 paths removed, delta +0, disk usage +7.5KiB).
+          NB_CHANGES=$(grep -vcE "(Version changes|nixos-system|Closure size|<<<|>>>)" diff || true)
+          if [ $NB_CHANGES -gt 0 ]; then
+            echo "Changes for ${{ matrix.machine }} nixos:" > diff-out
+            cat diff >> diff-out
+            echo -n " " >> diff-out
+            cat diff-out > "${{ matrix.machine }}-nixos-diff"
+          fi
+
+      - name: Add as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: "${{ matrix.machine }}-nixos-diff"
+          path: "${{ matrix.machine }}-nixos-diff"
+          if-no-files-found: ignore # no files means no diff
+
+  update_darwin:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        machine: ["appaquet@mbpapp"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@main
+        with:
+          extra-conf: |
+            experimental-features = nix-command flakes
+            access-tokens = github.com=${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GH_PAT }}
+
+      - name: Add & update nixpkgs channel
+        run: |
+          nix-channel --add https://nixos.org/channels/nixos-24.05 nixpkgs
+          nix-channel --update nixpkgs
+          nix profile install nixpkgs#nvd
+
+      - name: Building baseline...
+        run: |
+          set -xe
+          MACHINE_KEY="${{ matrix.machine }}" ./x darwin build
+          mv result darwin-result-before
+
+      - name: Update flakes
+        run: |
+          set -xe
+          nix flake update
+
+      - name: Building new...
+        run: |
+          set -xe
+          MACHINE_KEY="${{ matrix.machine }}" ./x darwin build
+          mv result darwin-result-after
+
+      - name: Diffing...
+        run: |
+          set -xe
+          nvd diff ./darwin-result-before ./darwin-result-after | tee diff
+
+          # Only include if significant changes. Ex base output:
+          #   <<< result-before
+          #   >>> result-after
+          #   Version changes:
+          #   [C.]  #1  darwin-system  24.05pre-git+darwin4.4b43b68, 24.05pre-git+darwin5 -> 24.05pre-git+darwin4.f61d5f2, 24.05pre-git+darwin5
+          #   Closure size: 169 -> 169 (10 paths added, 10 paths removed, delta +0, disk usage +3.7KiB).
+          NB_CHANGES=$(grep -vcE "(Version changes|darwin-system|Closure size|<<<|>>>)" diff || true)
+          if [ $NB_CHANGES -gt 0 ]; then
+            echo "Changes for ${{ matrix.machine }} darwin:" > diff-out
+            cat diff >> diff-out
+            echo -n " " >> diff-out
+            cat diff-out > "${{ matrix.machine }}-darwin-diff"
+          fi
+
+      - name: Add as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: "${{ matrix.machine }}-darwin-diff"
+          path: "${{ matrix.machine }}-darwin-diff"
+          if-no-files-found: ignore # no files means no diff
+
+  # test_incoming:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Create PR
+  #       run: |
+  #         echo "something" > something-diff
+  #         echo -n " " >> flake.lock
+  #     - name: Add as artifact
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: diff
+  #         path: something-diff
+  #         if-no-files-found: ignore # no files means no diff
+  #     - name: Add as artifact
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: flake.lock
+  #         path: flake.lock
+
+  create_pr:
+    runs-on: ubuntu-latest
+    needs: [update_homes, update_nixos, update_darwin]
+    # needs: [test_incoming]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: diffs
+
+      - name: Create PR
+        run: |
+          set -xe
+          BRANCH_NAME="update-flake"
+
+          # Check if pr exists, delete it if it does
+          EXISTS=$(gh pr view $BRANCH_NAME 2>&1 | grep -cv "no pull" || true)
+          if [ $EXISTS -gt 0 ]; then
+            echo "PR exists, deleting it"
+            gh pr close $BRANCH_NAME --delete-branch
+          fi
+
+          mkdir -p diffs # ensure we don't fail if no diffs
+          ls -la diffs/
+
+          find diffs -type f -name "*-diff" -exec cat {} \; > all-diffs
+          if [ -z "$(cat all-diffs)" ]; then
+            echo "No diffs found, exiting"
+            exit 0
+          fi
+
+          find diffs -type f -name "flake.lock" -exec cp {} flake.lock \;
+
+          git config --global user.email "appaquet@gmail.com"
+          git config --global user.name "Andre-Philippe Paquet"
+
+          git fetch
+          git checkout origin/master
+          git branch -D $BRANCH_NAME || true
+          git checkout -b $BRANCH_NAME
+          git add flake.lock
+          git commit -m "chore(deps): update flake lock"
+          git push origin $BRANCH_NAME
+          gh pr create --title "Flake update" --body "\`\`\`$(cat all-diffs)\`\`\`" --base master --head "$BRANCH_NAME"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
