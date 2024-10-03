@@ -278,10 +278,10 @@ jobs:
           git push origin $BRANCH_NAME
 
           echo "Diffs:" > body
-          echo "\`\`\`" >> body
+          echo "```" >> body
           cat all-diffs >> body
-          echo "\`\`\`" >> body
+          echo "```" >> body
 
-          gh pr create --title "Flake update" --body $(cat body) --base master --head "$BRANCH_NAME" --reviewer appaquet
+          gh pr create --title "Flake update" --body-file body --base master --head "$BRANCH_NAME" --reviewer appaquet
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
