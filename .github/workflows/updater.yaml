@@ -2,10 +2,10 @@ name: "Flake updater"
 
 on:
   schedule:
-    - cron: "0 3 * * *"
+    - cron: "0 7 * * *" # UTC, 3AM EST
   workflow_dispatch: # allow manual triggering
-  pull_request:
-  push:
+  # pull_request:
+  # push:
 
 jobs:
   update_homes:
