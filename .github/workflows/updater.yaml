@@ -228,10 +228,10 @@ jobs:
           BRANCH_NAME="update-flake"
 
           # Check if pr exists, delete it if it does
-          EXISTS=$(gh pr view $BRANCH_NAME &| grep -cv "no pull" || true)
+          EXISTS=$(gh pr view $BRANCH_NAME 2>&1 | grep -cv "no pull" || true)
           if [ $EXISTS -gt 0 ]; then
-              echo "PR exists, deleting it"
-              gh pr close $BRANCH_NAME --delete-branch
+            echo "PR exists, deleting it"
+            gh pr close $BRANCH_NAME --delete-branch
           fi
 
           if [ -z "$(ls -A diffs)" ]; then
@@ -250,4 +250,4 @@ jobs:
           git add flake.lock
           git commit -m "chore(deps): update flake lock"
           git push origin $BRANCH_NAME
-          gh pr create --title "Flake update" --body $(cat all-diffs) --base master --head "$BRANCH_NAME"
+          gh pr create --title "Flake update" --body "$(cat all-diffs)" --base master --head "$BRANCH_NAME"
