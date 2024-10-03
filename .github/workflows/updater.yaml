@@ -250,16 +250,13 @@ jobs:
             gh pr close $BRANCH_NAME --delete-branch
           fi
 
-          if [ -z "$(ls -A diffs)" ]; then
-            echo "No diffs found, exiting"
-            exit 0
-          fi
-
-          cat diffs/*/* > all-diffs
+          find diffs -name "*-diff" -exec cat {} \; > all-diffs
           if [ -z "$(cat all-diffs)" ]; then
             echo "No diffs found, exiting"
             exit 0
           fi
+
+          find diffs -name "flake.lock" -exec cp {} flake.lock \;
 
           git config --global user.email "appaquet@gmail.com"
           git config --global user.name "Andre-Philippe Paquet"
