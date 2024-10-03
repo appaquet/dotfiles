@@ -1,23 +1,23 @@
 name: "Flake updater"
 
 on:
-  # schedule:
-  #   - cron: "0 0 * * *"
+  schedule:
+    - cron: "0 3 * * *"
   workflow_dispatch: # allow manual triggering
-  pull_request:
-  push:
+  # pull_request:
+  # push:
 
 jobs:
   update_homes:
     strategy:
       matrix:
         pair:
-          # - machine: "appaquet@deskapp"
-          #   os: ubuntu-latest
+          - machine: "appaquet@deskapp"
+            os: ubuntu-latest
           - machine: "appaquet@servapp"
             os: ubuntu-latest
-          # - machine: "appaquet@mbpapp"
-          #   os: macos-latest
+          - machine: "appaquet@mbpapp"
+            os: macos-latest
     runs-on: ${{ matrix.pair.os }}
     steps:
       - uses: actions/checkout@v4
