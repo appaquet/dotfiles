@@ -62,7 +62,7 @@ jobs:
           #   >>> result-after
           #   Version changes:
           #   Closure size: 716 -> 716 (10 paths added, 10 paths removed, delta +0, disk usage +287.0KiB).
-          NB_CHANGES=$(grep -vcE "(Version changes|Closure size|<<<|>>>)" diff || true)
+          NB_CHANGES=$(grep -vcE "(Version changes|No version|Closure size|<<<|>>>)" diff || true)
           if [ $NB_CHANGES -gt 0 ]; then
             echo "Changes for ${{ matrix.pair.machine }} home:" > diff-out
             cat diff >> diff-out
@@ -132,7 +132,7 @@ jobs:
           #   Version changes:
           #   [U.]  #1  nixos-system-deskapp  24.05.20240928.fbca5e7 -> 24.05.20240930.1719f27
           #   Closure size: 1637 -> 1637 (29 paths added, 29 paths removed, delta +0, disk usage +7.5KiB).
-          NB_CHANGES=$(grep -vcE "(Version changes|nixos-system|Closure size|<<<|>>>)" diff || true)
+          NB_CHANGES=$(grep -vcE "(Version changes|No version|nixos-system|Closure size|<<<|>>>)" diff || true)
           if [ $NB_CHANGES -gt 0 ]; then
             echo "Changes for ${{ matrix.machine }} nixos:" > diff-out
             cat diff >> diff-out
@@ -196,7 +196,7 @@ jobs:
           #   Version changes:
           #   [C.]  #1  darwin-system  24.05pre-git+darwin4.4b43b68, 24.05pre-git+darwin5 -> 24.05pre-git+darwin4.f61d5f2, 24.05pre-git+darwin5
           #   Closure size: 169 -> 169 (10 paths added, 10 paths removed, delta +0, disk usage +3.7KiB).
-          NB_CHANGES=$(grep -vcE "(Version changes|darwin-system|Closure size|<<<|>>>)" diff || true)
+          NB_CHANGES=$(grep -vcE "(Version changes|No version|darwin-system|Closure size|<<<|>>>)" diff || true)
           if [ $NB_CHANGES -gt 0 ]; then
             echo "Changes for ${{ matrix.machine }} darwin:" > diff-out
             cat diff >> diff-out
@@ -261,6 +261,10 @@ jobs:
           fi
 
           find diffs -type f -name "flake.lock" -exec cp {} flake.lock \;
+          if [ -z "$(git diff --exit-code flake.lock)" ]; then
+            echo "No flake.lock changes found, exiting"
+            exit 0
+          fi
 
           git config --global user.email "appaquet@gmail.com"
           git config --global user.name "Andre-Philippe Paquet"
