@@ -225,6 +225,11 @@ jobs:
           name: diff
           path: diff
           if-no-files-found: ignore # no files means no diff
+      - name: Add as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: flake.nix
+          path: flake.nix
 
   create_pr:
     runs-on: ubuntu-latest
@@ -250,6 +255,7 @@ jobs:
             gh pr close $BRANCH_NAME --delete-branch
           fi
 
+          mkdir -p diffs # ensure we don't fail if no diffs
           find diffs -name "*-diff" -exec cat {} \; > all-diffs
           if [ -z "$(cat all-diffs)" ]; then
             echo "No diffs found, exiting"
