@@ -37,26 +37,27 @@
     ];
 
     casks = [
-      "iterm2"
-      "firefox"
-      "google-chrome"
+      { name = "iterm2"; greedy = true; }
 
-      "1password"
-      "bartender"
+      { name = "firefox"; greedy = true; }
+      { name = "google-chrome"; greedy = true; }
 
-      "signal"
-      "discord"
+      { name = "1password"; greedy = true; }
+      { name = "bartender"; greedy = true; }
 
-      "chatgpt"
+      { name = "signal"; greedy = true; }
+      { name = "discord"; greedy = true; }
+      { name = "chatgpt"; greedy = true; }
 
-      "spotify"
-      "vlc"
-      "gimp"
+      { name = "spotify"; greedy = true; }
 
-      "postman"
-      "wireshark"
-      "appcleaner"
-      "blackhole-2ch"
+      { name = "vlc"; greedy = true; }
+      { name = "gimp"; greedy = true; }
+
+      { name = "postman"; greedy = true; }
+      { name = "wireshark"; greedy = true; }
+      { name = "appcleaner"; greedy = true; }
+      { name = "blackhole-2ch"; greedy = true; }
     ];
   };
 }
