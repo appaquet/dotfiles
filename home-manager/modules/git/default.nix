@@ -40,6 +40,7 @@
       ghck = "git checkout (gh-pr-select)";
       gts = "git checkout (git-tag-select)";
       gau = "git add -u";
+      gad = "git add .";
       gmr = "git maintenance run";
     };
   };
