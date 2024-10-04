@@ -41,7 +41,7 @@ if [[ ! -f "$ROOT/secrets/flake.nix" ]]; then
     sleep 2
 fi
 
-SECRETS_CHANGED=$(git diff --submodule=log secrets | grep -q "Submodule")
+SECRETS_CHANGED=$(git diff --submodule=log secrets | grep "Submodule")
 if [[ -n "$SECRETS_CHANGED" ]]; then
     echo "Secrets submodule has changes. Make sure to update prior to building"
     sleep 1
