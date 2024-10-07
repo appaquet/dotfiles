@@ -18,11 +18,11 @@ in
     unstablePkgs.mise
   ];
 
-  # global tools
+  # global tools (none anymore since we're using nixpkgs)
   home.file.".tool-versions".text = ''
   '';
 
-  xdg.configFile."fish/conf.d/mise.fish".text = ''
+  programs.fish.interactiveShellInit = ''
     ${unstablePkgs.mise}/bin/mise activate fish | source
   '';
 

@@ -1,9 +1,9 @@
-{ pkgs, ... }:
+{ pkgs, unstablePkgs, ... }:
 
 {
   home.packages = with pkgs; [
     ffmpeg
-    yt-dlp
+    unstablePkgs.yt-dlp
     imagemagick
     mpv
     graphviz

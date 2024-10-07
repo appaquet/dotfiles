@@ -15,6 +15,6 @@
   };
 
   programs.fish.interactiveShellInit = ''
-    set JIRA_API_TOKEN (cat ${secrets.work.jiraToken})
+    set -x JIRA_API_TOKEN (cat ${secrets.work.jiraToken})
   '';
 }

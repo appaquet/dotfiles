@@ -32,7 +32,7 @@ let
     chmod -R u+wr,g+wr,a+r .
 
     # Backup
-    ${pkgs.rsync}/bin/rsync -av --progress --delete --whole-file --sparse . ${backupMount}/vms/
+    ${pkgs.rsync}/bin/rsync -av --progress --delete --whole-file --sparse . ${backupMount}/
   '';
 in
 
