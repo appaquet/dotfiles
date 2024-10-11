@@ -24,7 +24,7 @@
       };
 
       spaces = {
-        spans-displays = true; # switch spaces on all displays
+        spans-displays = false; # each screen has their own spaces
       };
 
       loginwindow = {
