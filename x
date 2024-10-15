@@ -191,7 +191,9 @@ nixos)
         ;;
     boot)
         shift
-        nixos-rebuild boot --flake ".#${HOSTNAME}" 2>&1 | ${NOM_PIPE}
+
+        prime_sudo
+        sudo nixos-rebuild boot --flake ".#${HOSTNAME}" 2>&1 | ${NOM_PIPE}
         ;;
     switch)
         shift
@@ -314,7 +316,7 @@ gc)
     sudo ${ncg} -d --delete-older-than "14d"
 
     if [[ "$NIXOS" -eq 1 ]]; then
-        echo "Call x nixos boot to remove old generations from boot"
+        echo "⏩️ Call x nixos boot to remove old generations from boot"
     fi
     ;;
 
