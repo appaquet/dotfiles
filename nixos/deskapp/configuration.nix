@@ -11,6 +11,7 @@
     ../network_bridge.nix
     ../dev.nix
     ../docker.nix
+    ../ups.nix
   ];
 
   # Bootloader.
