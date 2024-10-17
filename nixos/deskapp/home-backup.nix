@@ -53,7 +53,7 @@ in
     options =
       let
         automount_opts_list = [
-          "vers=2.0"
+          "vers=3.0"
           "uid=appaquet"
           "gid=users"
           # don't mount with fstab, but with systemd & make it resilient to network failures
