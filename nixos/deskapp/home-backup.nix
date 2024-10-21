@@ -37,7 +37,7 @@ let
 
     for FOLDER in ${foldersStr}; do
       echo "Syncing $FOLDER"
-      ${pkgs.rsync}/bin/rsync -av --progress ${excludeStr} --delete --delete-excluded $FOLDER ${backupMount}/home/ || true
+      ${pkgs.rsync}/bin/rsync -av --progress ${excludeStr} --delete --delete-excluded --whole-file --sparse $FOLDER ${backupMount}/home/ || true
     done
   '';
 in
