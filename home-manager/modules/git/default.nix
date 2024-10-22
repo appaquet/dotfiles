@@ -38,6 +38,10 @@
       grws = "git restore --staged --worktree";
       ghpr = "gh pr create --draft --body \"\" --title";
       ghck = "git checkout (gh-pr-select)";
+      gham = {
+        expansion = "for pr in %; gh pr review --approve $pr; gh pr merge --merge --auto $pr; end";
+        setCursor = true;
+      };
       gts = "git checkout (git-tag-select)";
       gau = "git add -u";
       gad = "git add .";
