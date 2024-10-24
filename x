@@ -30,10 +30,8 @@ elif [[ "${MACHINE_KEY}" == "appaquet@mbpapp"* || "${MACHINE_KEY}" == "appaquet@
 fi
 
 NIX_BUILDER="nix"
-NOM_PIPE="tee"
 if [[ -x ~/.nix-profile/bin/nom ]]; then
     NIX_BUILDER="nom"
-    NOM_PIPE="nom"
 fi
 
 if [[ ! -f "$ROOT/secrets/flake.nix" ]]; then
@@ -98,7 +96,7 @@ home)
         ;;
     build)
         shift
-        ${NIX_BUILDER} build ".#homeConfigurations.${HOME_CONFIG}.activationPackage" 2>&1 | ${NOM_PIPE}
+        ${NIX_BUILDER} build ".#homeConfigurations.${HOME_CONFIG}.activationPackage"
         ;;
     switch)
         shift
@@ -187,13 +185,13 @@ nixos)
         ;;
     build)
         shift
-        nixos-rebuild build --flake ".#${HOSTNAME}" 2>&1 | ${NOM_PIPE}
+        nixos-rebuild build --flake ".#${HOSTNAME}"
         ;;
     boot)
         shift
 
         prime_sudo
-        sudo nixos-rebuild boot --flake ".#${HOSTNAME}" 2>&1 | ${NOM_PIPE}
+        sudo nixos-rebuild boot --flake ".#${HOSTNAME}"
         ;;
     switch)
         shift
@@ -211,7 +209,7 @@ nixos)
             sudo $GEN_PATH/activate
         else
             echo "Activating latest generation"
-            sudo nixos-rebuild switch --flake ".#${HOSTNAME}" 2>&1 | ${NOM_PIPE}
+            sudo nixos-rebuild switch --flake ".#${HOSTNAME}"
         fi
         ;;
     diff)
