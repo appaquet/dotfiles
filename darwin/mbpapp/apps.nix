@@ -44,6 +44,7 @@
 
       { name = "1password"; greedy = true; }
       { name = "bartender"; greedy = true; }
+      { name = "bettertouchtool"; greedy = true; }
 
       { name = "signal"; greedy = true; }
       { name = "discord"; greedy = true; }
