@@ -55,6 +55,9 @@
       { name = "vlc"; greedy = true; }
       { name = "gimp"; greedy = true; }
 
+      { name = "notion"; greedy = true; }
+      { name = "notion-calendar"; greedy = true; }
+
       { name = "postman"; greedy = true; }
       { name = "wireshark"; greedy = true; }
       { name = "appcleaner"; greedy = true; }
