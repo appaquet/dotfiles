@@ -49,6 +49,7 @@
       { name = "signal"; greedy = true; }
       { name = "discord"; greedy = true; }
       { name = "chatgpt"; greedy = true; }
+      { name = "gather"; greedy = true; }
 
       { name = "spotify"; greedy = true; }
 
@@ -57,6 +58,7 @@
 
       { name = "notion"; greedy = true; }
       { name = "notion-calendar"; greedy = true; }
+      { name = "fellow"; greedy = true; }
 
       { name = "postman"; greedy = true; }
       { name = "wireshark"; greedy = true; }
