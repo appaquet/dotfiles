@@ -18,6 +18,7 @@ let
     "multilang.local"
     "downloads"
     "assets"
+    "__debug_bin*"
   ];
   excludeStr = builtins.concatStringsSep " " (map (x: "--exclude \"" + x + "\"") exclude);
 
@@ -28,6 +29,7 @@ let
     "etc"
     ".config"
     "dotfiles"
+    ".local"
   ];
   foldersStr = builtins.concatStringsSep " " (map (x: "${homePath}/" + x) folders);
 
