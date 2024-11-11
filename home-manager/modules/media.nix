@@ -5,7 +5,6 @@
     ffmpeg
     unstablePkgs.yt-dlp
     imagemagick
-    mpv
     graphviz
   ];
 }
