@@ -113,21 +113,6 @@
               };
             };
 
-            "appaquet@nixapp" = home-manager.lib.homeManagerConfiguration rec {
-              inherit pkgs;
-              modules = [
-                ./home-manager/nixapp.nix
-                extraSpecialArgs.secrets.commonHome
-              ] ++ commonHomeModules;
-              extraSpecialArgs = {
-                inherit inputs unstablePkgs;
-                secrets = secrets.init "linux";
-                cfg = cfg // {
-                  isNixos = true;
-                };
-              };
-            };
-
             "appaquet@servapp" = home-manager.lib.homeManagerConfiguration rec {
               inherit pkgs;
               modules = [
@@ -160,7 +145,6 @@
       homeConfigurations = {
         "appaquet@deskapp" = self.homes.x86_64-linux."appaquet@deskapp";
         "appaquet@servapp" = self.homes.x86_64-linux."appaquet@servapp";
-        "appaquet@nixapp" = self.homes.x86_64-linux."appaquet@nixapp";
         "appaquet@mbpapp" = self.homes.aarch64-darwin."appaquet@mbpapp";
       };
 
@@ -179,18 +163,6 @@
       };
 
       nixosConfigurations = {
-        nixapp = nixpkgs.lib.nixosSystem {
-          specialArgs = {
-            inherit (self) common;
-            inherit inputs;
-            secrets = secrets.init "linux";
-          };
-          modules = [
-            nixosOverlaysModule
-            ./nixos/nixapp/configuration.nix
-          ];
-        };
-
         deskapp = nixpkgs.lib.nixosSystem {
           specialArgs = {
             inherit (self) common;

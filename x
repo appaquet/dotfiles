@@ -17,11 +17,6 @@ if [[ "${MACHINE_KEY}" == "appaquet@deskapp"* || "${MACHINE_KEY}" == "appaquet@n
     HOSTNAME="deskapp"
     NIXOS=1
 
-elif [[ "${MACHINE_KEY}" == "appaquet@nixapp"* ]]; then
-    HOME_CONFIG="appaquet@nixapp"
-    HOSTNAME="nixapp"
-    NIXOS=1
-
 elif [[ "${MACHINE_KEY}" == "appaquet@servapp"* ]]; then
     HOME_CONFIG="appaquet@servapp"
 
@@ -274,9 +269,6 @@ check)
 
     check_home "appaquet@mbpapp"
     check_eval ".#darwinConfigurations.mbpapp.system"
-
-    check_home "appaquet@nixapp"
-    check_eval ".#nixosConfigurations.nixapp.config.system.build.toplevel"
     ;;
 
 update)
