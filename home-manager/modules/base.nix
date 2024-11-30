@@ -76,5 +76,6 @@
   ])
   ++ lib.optionals pkgs.stdenv.isLinux [
     pkgs.libtree # recursive ldd 
+    pkgs.dool # dstat alternative, only on linux
   ];
 }
