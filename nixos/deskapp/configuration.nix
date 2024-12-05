@@ -33,7 +33,7 @@
     # https://forums.developer.nvidia.com/t/unbinding-isolating-a-card-is-difficult-post-470/223134
     modesetting.enable = false;
     powerManagement.enable = false;
-    powerManagement.finegrained = false;
+    powerManagement.finegrained = false; # TODO: check if can be enabled (test suspend)
     open = false;
     nvidiaSettings = false; # no need for settings menu
     package = config.boot.kernelPackages.nvidiaPackages.stable;
