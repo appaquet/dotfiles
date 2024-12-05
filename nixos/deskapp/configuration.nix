@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 
 {
   imports = [
@@ -23,6 +23,29 @@
     "pcie_port_pm=off"
     "pcie_aspm.policy=performance"
   ];
+
+
+  services.xserver.videoDrivers = [ "nvidia" "amdgpu" ];
+
+  # From https://nixos.wiki/wiki/Nvidia
+  hardware.nvidia = {
+    # Hinders with dynamic switching since it manages the card using KMS
+    # https://forums.developer.nvidia.com/t/unbinding-isolating-a-card-is-difficult-post-470/223134
+    modesetting.enable = false;
+    powerManagement.enable = false;
+    powerManagement.finegrained = false;
+    open = false;
+    nvidiaSettings = false; # no need for settings menu
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
+  };
+
+  # To test: docker run --rm -it --device=nvidia.com/gpu=all ubuntu:latest nvidia-smi
+  hardware.nvidia-container-toolkit.enable = true;
+
+  environment.systemPackages = with pkgs; [
+    nvtopPackages.nvidia
+  ];
+
 
   networking.hostName = "deskapp";
 
