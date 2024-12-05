@@ -5,7 +5,7 @@ lua << END
 local lspconfig = require('lspconfig')
 
 lspconfig.pyright.setup {}
-lspconfig.tsserver.setup {}
+lspconfig.ts_ls.setup {}
 lspconfig.marksman.setup {}
 lspconfig.gopls.setup {}
 lspconfig.nixd.setup {}

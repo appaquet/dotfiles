@@ -277,6 +277,12 @@ update)
     if [[ -z "$PACKAGE" ]]; then
         nix-channel --update
         nix flake update
+
+        for shell in $(ls shells); do
+          pushd "shells/${shell}"
+          nix flake update
+          popd
+        done
     else
         nix flake lock --update-input $PACKAGE
     fi
