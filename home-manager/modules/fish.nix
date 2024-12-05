@@ -66,7 +66,6 @@
 
     shellAbbrs = {
       k = "kubectl";
-      d = "docker";
 
       ".." = "cd ..";
       "..." = "cd ../..";

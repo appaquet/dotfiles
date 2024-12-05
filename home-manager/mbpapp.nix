@@ -6,6 +6,7 @@
     ./modules/dev.nix
     ./modules/work
     ./modules/media.nix
+    ./modules/docker.nix
   ];
 
   home.username = "appaquet";
