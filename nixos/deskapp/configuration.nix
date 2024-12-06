@@ -1,16 +1,17 @@
-{ pkgs, config, ... }:
+{ pkgs, ... }:
 
 {
   imports = [
-    ./hardware-configuration.nix
+    ./gpu-switch.nix
     ./ha-ctrl.nix
-    ./virt
+    ./hardware-configuration.nix
     ./home-backup.nix
+    ./virt
     ./vms-backup.nix
     ../common.nix
-    ../network_bridge.nix
     ../dev.nix
     ../docker.nix
+    ../network_bridge.nix
     ../ups.nix
   ];
 
@@ -23,29 +24,6 @@
     "pcie_port_pm=off"
     "pcie_aspm.policy=performance"
   ];
-
-
-  services.xserver.videoDrivers = [ "nvidia" "amdgpu" ];
-
-  # From https://nixos.wiki/wiki/Nvidia
-  hardware.nvidia = {
-    # Hinders with dynamic switching since it manages the card using KMS
-    # https://forums.developer.nvidia.com/t/unbinding-isolating-a-card-is-difficult-post-470/223134
-    modesetting.enable = false;
-    powerManagement.enable = false;
-    powerManagement.finegrained = false; # TODO: check if can be enabled (test suspend)
-    open = false;
-    nvidiaSettings = false; # no need for settings menu
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
-  };
-
-  # To test: docker run --rm -it --device=nvidia.com/gpu=all ubuntu:latest nvidia-smi
-  hardware.nvidia-container-toolkit.enable = true;
-
-  environment.systemPackages = with pkgs; [
-    nvtopPackages.nvidia
-  ];
-
 
   networking.hostName = "deskapp";
 
@@ -78,12 +56,12 @@
   services.xserver.enable = true;
   services.xserver.displayManager.lightdm.enable = true;
   services.xserver.desktopManager.xfce.enable = true;
-  services.xserver.displayManager.autoLogin.enable = true;
-  services.xserver.displayManager.autoLogin.user = "appaquet";
   services.xserver = {
-    layout = "us";
-    xkbVariant = "";
+    xkb.layout = "us";
+    xkb.variant = "";
   };
+  services.displayManager.autoLogin.enable = true;
+  services.displayManager.autoLogin.user = "appaquet";
 
   # Enable sound with pipewire.
   hardware.pulseaudio.enable = false;
@@ -93,18 +71,11 @@
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    #jack.enable = true;
-
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    #media-session.enable = true;
   };
 
-  # Install firefox
+  # Programs & services
   programs.firefox.enable = true;
-
-  # Enable the OpenSSH daemon.
+  services.printing.enable = false;
   services.openssh.enable = true;
 
   # Open ports in the firewall.
@@ -112,8 +83,6 @@
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   networking.firewall.enable = false;
-
-  services.printing.enable = false;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
