@@ -1,4 +1,7 @@
-{ lib, pkgs, config, ... }:
+{  pkgs, config, ... }:
+
+# TODO: systemd on boot to switch ?
+# TODO: qemu hooks
 
 let
   # Keep in sync with ./virt/default.nix
@@ -58,6 +61,12 @@ let
             echo "Loading vfio drivers..."
             modprobe -a vfio_pci vfio vfio_iommu_type1
             sleep 5
+        fi
+
+        gpu_driver=$(get_bus_driver $gpu_bus)
+        if [ "$gpu_driver" == "$to_driver" ]; then
+            echo "Loading drivers bound to $to_driver automatically"
+            exit 0
         fi
 
         sleep 2
