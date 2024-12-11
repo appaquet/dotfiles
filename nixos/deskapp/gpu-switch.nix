@@ -1,4 +1,4 @@
-{  pkgs, config, ... }:
+{ pkgs, config, ... }:
 
 # TODO: systemd on boot to switch ?
 # TODO: qemu hooks
