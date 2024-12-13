@@ -1,4 +1,9 @@
-{ pkgs, secrets, config, ... }:
+{
+  pkgs,
+  secrets,
+  config,
+  ...
+}:
 
 let
   exclude = [

@@ -105,14 +105,16 @@ in
   environment.systemPackages = [ haCtrl ];
 
   security.sudo = {
-    extraRules = [{
-      commands = [
-        {
-          command = "${config.system.path}/bin/ha-ctrl"; # sudoers file wants explicit path
-          options = [ "NOPASSWD" ];
-        }
-      ];
-      groups = [ "wheel" ];
-    }];
+    extraRules = [
+      {
+        commands = [
+          {
+            command = "${config.system.path}/bin/ha-ctrl"; # sudoers file wants explicit path
+            options = [ "NOPASSWD" ];
+          }
+        ];
+        groups = [ "wheel" ];
+      }
+    ];
   };
 }

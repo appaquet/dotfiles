@@ -9,4 +9,3 @@
     . ${pkgs.autojump}/share/autojump/autojump.fish
   '';
 }
-

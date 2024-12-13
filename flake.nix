@@ -50,7 +50,18 @@
     };
   };
 
-  outputs = inputs @ { self, nixpkgs, nixpkgs-unstable, home-manager, humanfirst-dots, secrets, flake-utils, darwin, ... }:
+  outputs =
+    inputs@{
+      self,
+      nixpkgs,
+      nixpkgs-unstable,
+      home-manager,
+      humanfirst-dots,
+      secrets,
+      flake-utils,
+      darwin,
+      ...
+    }:
     let
       config = {
         permittedInsecurePackages = [ ];
@@ -74,72 +85,78 @@
       nixosOverlays = [
         inputs.nix-alien.overlays.default
       ];
-      nixosOverlaysModule = (_: {
-        nixpkgs.overlays = nixosOverlays;
-      });
+      nixosOverlaysModule = (
+        _: {
+          nixpkgs.overlays = nixosOverlays;
+        }
+      );
     in
 
     flake-utils.lib.eachDefaultSystem # prevent having to hard-code system by iterating on available systems
-      (system: (
-        let
-          pkgs = import nixpkgs {
-            inherit system config;
-            overlays = homeOverlays;
-          };
+      (
+        system:
+        (
+          let
+            pkgs = import nixpkgs {
+              inherit system config;
+              overlays = homeOverlays;
+            };
 
-          unstablePkgs = import nixpkgs-unstable {
-            inherit system config;
-            overlays = homeOverlays;
-          };
+            unstablePkgs = import nixpkgs-unstable {
+              inherit system config;
+              overlays = homeOverlays;
+            };
 
-          cfg = {
-            isNixos = false;
-          };
-        in
-        {
-          homes = {
-            "appaquet@deskapp" = home-manager.lib.homeManagerConfiguration rec {
-              inherit pkgs;
-              modules = [
-                ./home-manager/deskapp.nix
-                extraSpecialArgs.secrets.commonHome
-              ] ++ commonHomeModules;
-              extraSpecialArgs = {
-                inherit inputs unstablePkgs;
-                secrets = secrets.init "linux";
-                cfg = cfg // {
-                  isNixos = true;
+            cfg = {
+              isNixos = false;
+            };
+          in
+          {
+            homes = {
+              "appaquet@deskapp" = home-manager.lib.homeManagerConfiguration rec {
+                inherit pkgs;
+                modules = [
+                  ./home-manager/deskapp.nix
+                  extraSpecialArgs.secrets.commonHome
+                ] ++ commonHomeModules;
+                extraSpecialArgs = {
+                  inherit inputs unstablePkgs;
+                  secrets = secrets.init "linux";
+                  cfg = cfg // {
+                    isNixos = true;
+                  };
+                };
+              };
+
+              "appaquet@servapp" = home-manager.lib.homeManagerConfiguration rec {
+                inherit pkgs;
+                modules = [
+                  ./home-manager/servapp.nix
+                  extraSpecialArgs.secrets.commonHome
+                ] ++ commonHomeModules;
+                extraSpecialArgs = {
+                  inherit inputs unstablePkgs cfg;
+                  secrets = secrets.init "linux";
+                };
+              };
+
+              "appaquet@mbpapp" = home-manager.lib.homeManagerConfiguration rec {
+                inherit pkgs;
+                modules = [
+                  ./home-manager/mbpapp.nix
+                  extraSpecialArgs.secrets.commonHome
+                ] ++ commonHomeModules;
+                extraSpecialArgs = {
+                  inherit inputs unstablePkgs cfg;
+                  secrets = secrets.init "darwin";
                 };
               };
             };
+          }
 
-            "appaquet@servapp" = home-manager.lib.homeManagerConfiguration rec {
-              inherit pkgs;
-              modules = [
-                ./home-manager/servapp.nix
-                extraSpecialArgs.secrets.commonHome
-              ] ++ commonHomeModules;
-              extraSpecialArgs = {
-                inherit inputs unstablePkgs cfg;
-                secrets = secrets.init "linux";
-              };
-            };
-
-            "appaquet@mbpapp" = home-manager.lib.homeManagerConfiguration rec{
-              inherit pkgs;
-              modules = [
-                ./home-manager/mbpapp.nix
-                extraSpecialArgs.secrets.commonHome
-              ] ++ commonHomeModules;
-              extraSpecialArgs = {
-                inherit inputs unstablePkgs cfg;
-                secrets = secrets.init "darwin";
-              };
-            };
-          };
-        }
-
-      )) // {
+        )
+      )
+    // {
 
       # properly expose home configurations with appropriate expected system
       homeConfigurations = {

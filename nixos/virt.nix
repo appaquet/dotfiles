@@ -1,7 +1,7 @@
 { pkgs, config, ... }:
 
 {
-  # See 
+  # See
   # - https://nixos.wiki/wiki/Virt-manager
   # - https://www.reddit.com/r/NixOS/comments/ulzr88/creating_a_windows_11_vm_on_nixos_secure_boot/
   # - https://nixos.wiki/wiki/Libvirt
@@ -31,15 +31,17 @@
 
   # Allow virsh to be run without password
   security.sudo = {
-    extraRules = [{
-      commands = [
-        {
-          command = "${config.system.path}/bin/virsh"; # sudoers file wants explicit path
-          options = [ "NOPASSWD" ];
-        }
-      ];
-      groups = [ "wheel" ];
-    }];
+    extraRules = [
+      {
+        commands = [
+          {
+            command = "${config.system.path}/bin/virsh"; # sudoers file wants explicit path
+            options = [ "NOPASSWD" ];
+          }
+        ];
+        groups = [ "wheel" ];
+      }
+    ];
   };
 
   # Shutdown all vms before suspend

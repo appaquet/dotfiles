@@ -37,33 +37,93 @@
     ];
 
     casks = [
-      { name = "iterm2"; greedy = true; }
+      {
+        name = "iterm2";
+        greedy = true;
+      }
 
-      { name = "firefox"; greedy = true; }
-      { name = "google-chrome"; greedy = true; }
+      {
+        name = "firefox";
+        greedy = true;
+      }
+      {
+        name = "google-chrome";
+        greedy = true;
+      }
 
-      { name = "1password"; greedy = true; }
-      { name = "bartender"; greedy = true; }
-      { name = "bettertouchtool"; greedy = true; }
+      {
+        name = "1password";
+        greedy = true;
+      }
+      {
+        name = "bartender";
+        greedy = true;
+      }
+      {
+        name = "bettertouchtool";
+        greedy = true;
+      }
 
-      { name = "signal"; greedy = true; }
-      { name = "discord"; greedy = true; }
-      { name = "chatgpt"; greedy = true; }
-      { name = "gather"; greedy = true; }
+      {
+        name = "signal";
+        greedy = true;
+      }
+      {
+        name = "discord";
+        greedy = true;
+      }
+      {
+        name = "chatgpt";
+        greedy = true;
+      }
+      {
+        name = "gather";
+        greedy = true;
+      }
 
-      { name = "spotify"; greedy = true; }
+      {
+        name = "spotify";
+        greedy = true;
+      }
 
-      { name = "vlc"; greedy = true; }
-      { name = "gimp"; greedy = true; }
+      {
+        name = "vlc";
+        greedy = true;
+      }
+      {
+        name = "gimp";
+        greedy = true;
+      }
 
-      { name = "notion"; greedy = true; }
-      { name = "notion-calendar"; greedy = true; }
-      { name = "fellow"; greedy = true; }
+      {
+        name = "notion";
+        greedy = true;
+      }
+      {
+        name = "notion-calendar";
+        greedy = true;
+      }
+      {
+        name = "fellow";
+        greedy = true;
+      }
 
-      { name = "postman"; greedy = true; }
-      { name = "wireshark"; greedy = true; }
-      { name = "appcleaner"; greedy = true; }
-      { name = "blackhole-2ch"; greedy = true; }
+      {
+        name = "postman";
+        greedy = true;
+      }
+      {
+        name = "wireshark";
+        greedy = true;
+      }
+      {
+        name = "appcleaner";
+        greedy = true;
+      }
+      {
+        name = "blackhole-2ch";
+        greedy = true;
+      }
     ];
   };
 }

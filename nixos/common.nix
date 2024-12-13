@@ -8,7 +8,11 @@
 
   nix = {
     settings = {
-      experimental-features = [ "flakes" "nix-command" "fetch-closure" ];
+      experimental-features = [
+        "flakes"
+        "nix-command"
+        "fetch-closure"
+      ];
       auto-optimise-store = true;
       keep-outputs = true;
       keep-derivations = true;

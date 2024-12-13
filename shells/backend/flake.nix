@@ -14,8 +14,15 @@
     };
   };
 
-  outputs = { nixpkgs, rust-overlay, flake-utils, ... }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      nixpkgs,
+      rust-overlay,
+      flake-utils,
+      ...
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
         pkgs = import nixpkgs {
           inherit system;
@@ -25,13 +32,18 @@
           overlays = [ (import rust-overlay) ];
         };
 
-        python3 = ((pkgs.python310.withPackages (p: with p; [
-          #tensorflow 
-          #grpcio-tools 
-          #click
-          #keras
-          #mypy-protobuf
-        ])).override ({ ignoreCollisions = true; }));
+        python3 = (
+          (pkgs.python310.withPackages (
+            p: with p; [
+              #tensorflow
+              #grpcio-tools
+              #click
+              #keras
+              #mypy-protobuf
+            ]
+          )).override
+            ({ ignoreCollisions = true; })
+        );
       in
       {
         devShells = {
@@ -68,14 +80,16 @@
             # https://github.com/NixOS/nixpkgs/issues/18995
             hardeningDisable = [ "fortify" ];
 
-            NIX_LD_LIBRARY_PATH = with pkgs; lib.makeLibraryPath [
-              stdenv.cc.cc
-              clang
-              llvmPackages.libclang
-              llvmPackages.libcxxClang
-              zlib
-              openssl
-            ];
+            NIX_LD_LIBRARY_PATH =
+              with pkgs;
+              lib.makeLibraryPath [
+                stdenv.cc.cc
+                clang
+                llvmPackages.libclang
+                llvmPackages.libcxxClang
+                zlib
+                openssl
+              ];
             NIX_LD = builtins.readFile "${pkgs.stdenv.cc}/nix-support/dynamic-linker";
 
             shellHook = ''
@@ -85,5 +99,6 @@
             '';
           };
         };
-      });
+      }
+    );
 }

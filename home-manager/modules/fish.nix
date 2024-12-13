@@ -126,16 +126,30 @@
         format = "[$hostname ]($style)";
       };
 
-      gcloud = { disabled = true; };
+      gcloud = {
+        disabled = true;
+      };
       nix_shell = {
         format = "via [$symbol\($name\)]($style) ";
       };
-      package = { disabled = true; };
-      golang = { disabled = true; };
-      nodejs = { disabled = true; };
-      rust = { disabled = true; };
-      buf = { disabled = true; };
-      vagrant = { disabled = true; };
+      package = {
+        disabled = true;
+      };
+      golang = {
+        disabled = true;
+      };
+      nodejs = {
+        disabled = true;
+      };
+      rust = {
+        disabled = true;
+      };
+      buf = {
+        disabled = true;
+      };
+      vagrant = {
+        disabled = true;
+      };
     };
   };
 }

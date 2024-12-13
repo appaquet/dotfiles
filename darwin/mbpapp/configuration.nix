@@ -13,7 +13,11 @@
     package = pkgs.nix;
 
     settings = {
-      experimental-features = [ "flakes" "nix-command" "fetch-closure" ];
+      experimental-features = [
+        "flakes"
+        "nix-command"
+        "fetch-closure"
+      ];
       auto-optimise-store = false; # TODO: Turn back on when https://github.com/NixOS/nix/issues/7273
       keep-outputs = true;
       keep-derivations = true;

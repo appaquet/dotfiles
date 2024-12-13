@@ -39,10 +39,12 @@ in
   config = lib.mkIf cfg.enable {
     networking.useDHCP = false;
     networking.bridges."br0".interfaces = [ cfg.interface ];
-    networking.interfaces."br0".ipv4.addresses = [{
-      address = cfg.lanIp;
-      prefixLength = cfg.lanPrefixLength;
-    }];
+    networking.interfaces."br0".ipv4.addresses = [
+      {
+        address = cfg.lanIp;
+        prefixLength = cfg.lanPrefixLength;
+      }
+    ];
     networking.defaultGateway = cfg.lanGateway;
     networking.nameservers = cfg.lanNameservers;
   };

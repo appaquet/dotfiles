@@ -1,15 +1,22 @@
-{ pkgs, inputs, config, ... }:
+{
+  pkgs,
+  inputs,
+  config,
+  ...
+}:
 
 {
   imports = [
     inputs.vscode-server.nixosModule
   ];
 
-  environment.systemPackages = (with pkgs; [
-    distrobox
-  ]) ++ [
-    config.boot.kernelPackages.perf # perf, aligned with current kernel version
-  ];
+  environment.systemPackages =
+    (with pkgs; [
+      distrobox
+    ])
+    ++ [
+      config.boot.kernelPackages.perf # perf, aligned with current kernel version
+    ];
 
   # Automatically patches vscode-server nodejs
   # See https://github.com/nix-community/nixos-vscode-server

@@ -33,10 +33,22 @@
 
         # Don't spam WALL
         NOTIFYFLAG = [
-          [ "COMMOK" "SYSLOG" ]
-          [ "COMMBAD" "SYSLOG" ]
-          [ "NOCOMM" "SYSLOG" ]
-          [ "NOPARENT" "SYSLOG" ]
+          [
+            "COMMOK"
+            "SYSLOG"
+          ]
+          [
+            "COMMBAD"
+            "SYSLOG"
+          ]
+          [
+            "NOCOMM"
+            "SYSLOG"
+          ]
+          [
+            "NOPARENT"
+            "SYSLOG"
+          ]
         ];
       };
 

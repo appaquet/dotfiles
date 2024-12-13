@@ -318,7 +318,7 @@ gc)
 
 fmt)
     shift
-    nixpkgs-fmt "${@}" .
+    find . -name "*.nix" -not -path "./humanfirst-dots/*" -exec nixfmt "${@}" {} \;
     ;;
 
 optimize)

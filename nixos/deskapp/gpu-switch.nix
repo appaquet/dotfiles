@@ -91,7 +91,10 @@ in
 {
   # Enable both nvidia & amd drivers, even if nvidia won't be used for display. This allow
   # installing drivers.
-  services.xserver.videoDrivers = [ "nvidia" "amdgpu" ];
+  services.xserver.videoDrivers = [
+    "nvidia"
+    "amdgpu"
+  ];
 
   # From https://nixos.wiki/wiki/Nvidia
   hardware.nvidia = {

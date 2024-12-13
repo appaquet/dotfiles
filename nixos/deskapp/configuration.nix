@@ -2,7 +2,7 @@
 
 {
   imports = [
-    ./gpu-switch.nix
+    # ./gpu-switch.nix
     ./ha-ctrl.nix
     ./hardware-configuration.nix
     ./home-backup.nix
@@ -36,10 +36,12 @@
     device = "/dev/disk/by-uuid/1bece886-d8b2-4fd4-a057-990de4ba308c";
     fsType = "ext4";
   };
-  swapDevices = [{
-    device = "/swapfile";
-    size = 16 * 1024; # 16GB
-  }];
+  swapDevices = [
+    {
+      device = "/swapfile";
+      size = 16 * 1024; # 16GB
+    }
+  ];
 
   # Networking
   networking.networkmanager.enable = true;
