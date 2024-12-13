@@ -77,6 +77,12 @@ let
 
     function nvidia() {
         switch_driver "nvidia"
+
+        # Force drivers to persist, preventing high power usage on idle
+        nvidia-smi -pm 1
+
+        # Restart nvidia-container-toolkit-cdi-generator to pick up new driver
+        systemctl restart nvidia-container-toolkit-cdi-generator.service
     }
 
     function vfio() {

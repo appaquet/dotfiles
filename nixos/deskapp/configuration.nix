@@ -2,7 +2,7 @@
 
 {
   imports = [
-    # ./gpu-switch.nix
+    ./gpu-switch.nix
     ./ha-ctrl.nix
     ./hardware-configuration.nix
     ./home-backup.nix
