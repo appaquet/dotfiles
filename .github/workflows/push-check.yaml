@@ -21,7 +21,7 @@ jobs:
         nix-channel --update nixpkgs
     - name: Install formatter & format
       run: | 
-        nix profile install nixpkgs#nixpkgs-fmt
+        nix profile install nixpkgs#nixfmt-rfc-style
         ./x fmt --check
 
   home_check:

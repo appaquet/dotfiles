@@ -14,4 +14,3 @@
   home.homeDirectory = "/home/appaquet";
   home.stateVersion = "23.11";
 }
-

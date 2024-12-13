@@ -14,8 +14,15 @@
     };
   };
 
-  outputs = { nixpkgs, rust-overlay, flake-utils, ... }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      nixpkgs,
+      rust-overlay,
+      flake-utils,
+      ...
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
         pkgs = import nixpkgs {
           inherit system;
@@ -54,16 +61,19 @@
               openssl
             ];
 
-            NIX_LD_LIBRARY_PATH = with pkgs; lib.makeLibraryPath [
-              stdenv.cc.cc
-              clang
-              llvmPackages.libclang
-              llvmPackages.libcxxClang
-              zlib
-              openssl
-            ];
+            NIX_LD_LIBRARY_PATH =
+              with pkgs;
+              lib.makeLibraryPath [
+                stdenv.cc.cc
+                clang
+                llvmPackages.libclang
+                llvmPackages.libcxxClang
+                zlib
+                openssl
+              ];
             NIX_LD = builtins.readFile "${pkgs.stdenv.cc}/nix-support/dynamic-linker";
           };
         };
-      });
+      }
+    );
 }

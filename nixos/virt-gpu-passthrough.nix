@@ -15,20 +15,18 @@ in
     devices = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ ];
-      description = "Device IDs to pass through. Use `iommulist | grep NVIDIA` to find";
+      description = "PCI identifiers to passthrough";
     };
   };
 
   config = lib.mkIf cfg.enable {
     boot = {
       # Load these kernel modules before everything else
-      # load vfio before nouveau drivers so that vfio claims the gpu first
+      # so that nvidia drivers don't claim the gpu
       kernelModules = [
         "vfio_pci"
         "vfio"
         "vfio_iommu_type1"
-
-        "nouveau"
       ];
 
       # Enable kernel modules, assign gpu to vfio
@@ -40,6 +38,6 @@ in
       ];
     };
 
-    hardware.opengl.enable = true;
+    hardware.graphics.enable = true;
   };
 }
