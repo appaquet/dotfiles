@@ -8,6 +8,8 @@ let
   gpuPci = "10de:2216";
   audioPci = "10de:1aef";
 
+  # GPU switching script
+  # Used in qemu hooks defined in `./virt/default.nix`
   gpuSwitch = pkgs.writeShellScriptBin "gpu-switch" ''
     #!/usr/bin/env bash
     set -uo pipefail
@@ -17,9 +19,12 @@ let
         exit 1
     fi
 
+    AWK=${pkgs.gawk}/bin/awk
+    LSPCI=${pkgs.pciutils}/bin/lspci
+
     function get_bus() {
         # takes a PCI device identifier (ex: 10de:2216) and returns the bus address (ex: 01:00.0)
-        lspci -nn | grep "$1" | awk '{print $1}'
+        $LSPCI -nn | grep "$1" | $AWK '{print $1}'
     }
 
     function format_bus() {
@@ -29,7 +34,7 @@ let
 
     function get_bus_driver() {
         # takes a bus address (ex: 0000:01:00.0) and returns the driver in use (ex: nvidia, vfio-pci)
-        echo $(lspci -nn -s $1 -k | grep "Kernel driver in use" | awk '{print $5}')
+        echo $($LSPCI -nn -s $1 -k | grep "Kernel driver in use" | $AWK '{print $5}')
     }
 
     function switch_driver() {
@@ -49,16 +54,24 @@ let
         if [ "$gpu_driver" != "" ]; then
             echo "Unbinding GPU from $gpu_driver"
             echo $gpu_bus >/sys/bus/pci/drivers/$gpu_driver/unbind
-            echo $audio_bus >/sys/bus/pci/drivers/$gpu_driver/unbind
+            echo $audio_bus >/sys/bus/pci/drivers/$gpu_driver/unbind || true
             sleep 5
         fi
 
+        # Force removal, otherwise drivers may not recognize the device (especially if it comes back from windows)
+        echo "Removing GPU and audio devices"
+        echo "1" > /sys/bus/pci/devices/$gpu_bus/remove || true
+        echo "1" > /sys/bus/pci/devices/$audio_bus/remove || true
+        sleep 5
+
         if [ "$to_driver" == "nvidia" ]; then
             echo "Loading nvidia drivers..."
+            modprobe -r vfio_pci vfio vfio_iommu_type1
             modprobe -a nvidia nvidia_modeset nvidia_uvm nvidia_drm
             sleep 5
         elif [ "$to_driver" == "vfio-pci" ]; then
             echo "Loading vfio drivers..."
+            modprobe -r nvidia nvidia_modeset nvidia_uvm nvidia_drm
             modprobe -a vfio_pci vfio vfio_iommu_type1
             sleep 5
         fi
@@ -69,27 +82,39 @@ let
             exit 0
         fi
 
-        sleep 2
+        echo "Rescanning PCI bus"
+        echo "1" > /sys/bus/pci/rescan
+
+        sleep 5
+
         echo "Binding GPU to $to_driver"
-        echo $gpu_bus >/sys/bus/pci/drivers/$to_driver/bind
-        echo $audio_bus >/sys/bus/pci/drivers/$to_driver/bind
+        echo $gpu_bus >/sys/bus/pci/drivers/$to_driver/bind || true
+        echo $audio_bus >/sys/bus/pci/drivers/$to_driver/bind || true
+
+        sleep 5
     }
 
     function nvidia() {
         switch_driver "nvidia"
 
         # Force drivers to persist, preventing high power usage on idle
-        nvidia-smi -pm 1
+        /run/current-system/sw/bin/nvidia-smi -pm 1
 
         # Restart nvidia-container-toolkit-cdi-generator to pick up new driver
-        systemctl restart nvidia-container-toolkit-cdi-generator.service
+        /run/current-system/sw/bin/systemctl restart nvidia-container-toolkit-cdi-generator.service
     }
 
     function vfio() {
         switch_driver "vfio-pci"
     }
 
-    CMD="$1"
+    function status() {
+        gpu_bus=$(format_bus $(get_bus "${gpuPci}"))
+        gpu_driver=$(get_bus_driver $gpu_bus)
+        echo "GPU driver: $gpu_driver"
+    }
+
+    CMD="''${1:-status}"
     shift
     $CMD "$@"
   '';
