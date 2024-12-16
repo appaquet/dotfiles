@@ -108,6 +108,7 @@ jobs:
         run: |
           set -xe
           MACHINE_KEY="appaquet@deskapp" ./x nixos build
+          nix-collect-garbage # free up intermediary, since we're low on disk on gha
           mv result result-before
 
       - name: Update flakes
