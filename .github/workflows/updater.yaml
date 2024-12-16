@@ -104,16 +104,16 @@ jobs:
           nix-channel --update nixpkgs
           nix profile install nixpkgs#nixos-rebuild nixpkgs#nvd
 
-      - name: Building NixOS baseline...
+      - name: Freeing space
+        run: |
+          set -xe
+          nix-collect-garbage # gha disk is limited, giving us some space
+
+      - name: Building NixOS baseline
         run: |
           set -xe
           MACHINE_KEY="appaquet@deskapp" ./x nixos build
           mv result result-before
-
-      - name: Cleaning up...
-        run: |
-          set -xe
-          nix-collect-garbage
 
       - name: Update flakes
         run: |
