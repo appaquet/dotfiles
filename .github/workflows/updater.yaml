@@ -110,6 +110,11 @@ jobs:
           MACHINE_KEY="appaquet@deskapp" ./x nixos build
           mv result result-before
 
+      - name: Cleaning up...
+        run: |
+          set -xe
+          nix-collect-garbage
+
       - name: Update flakes
         run: |
           set -xe
