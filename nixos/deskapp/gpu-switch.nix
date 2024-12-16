@@ -1,8 +1,5 @@
 { pkgs, config, ... }:
 
-# TODO: systemd on boot to switch ?
-# TODO: qemu hooks
-
 let
   # Keep in sync with ./virt/default.nix
   gpuPci = "10de:2216";
@@ -21,6 +18,8 @@ let
 
     AWK=${pkgs.gawk}/bin/awk
     LSPCI=${pkgs.pciutils}/bin/lspci
+    MODPROBE=${pkgs.kmod}/bin/modprobe
+    RMMOD=${pkgs.kmod}/bin/rmmod
 
     function get_bus() {
         # takes a PCI device identifier (ex: 10de:2216) and returns the bus address (ex: 01:00.0)
@@ -66,13 +65,16 @@ let
 
         if [ "$to_driver" == "nvidia" ]; then
             echo "Loading nvidia drivers..."
-            modprobe -r vfio_pci vfio vfio_iommu_type1
-            modprobe -a nvidia nvidia_modeset nvidia_uvm nvidia_drm
+            $MODPROBE -r vfio_pci vfio vfio_iommu_type1
+            $MODPROBE -a nvidia nvidia_modeset nvidia_uvm nvidia_drm
             sleep 5
         elif [ "$to_driver" == "vfio-pci" ]; then
             echo "Loading vfio drivers..."
-            modprobe -r nvidia nvidia_modeset nvidia_uvm nvidia_drm
-            modprobe -a vfio_pci vfio vfio_iommu_type1
+            $RMMOD nvidia_drm # modprobe -r doesn't seem to always work... order is important
+            $RMMOD nvidia_uvm
+            $RMMOD nvidia_modeset
+            $RMMOD nvidia
+            $MODPROBE -a vfio_pci vfio vfio_iommu_type1
             sleep 5
         fi
 
@@ -150,4 +152,15 @@ in
     nvtopPackages.nvidia
     gpuSwitch
   ];
+
+  systemd.services.switch-gpu-boot = {
+    description = "Switch GPU to NVIDIA on boot";
+    after = [ "libvirtd.service" ];
+    requires = [ "libvirtd.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${gpuSwitch}/bin/gpu-switch nvidia";
+    };
+    wantedBy = [ "multi-user.target" ];
+  };
 }

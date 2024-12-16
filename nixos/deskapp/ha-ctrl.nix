@@ -95,6 +95,11 @@ let
       systemctl poweroff
     }
 
+    function reboot() {
+      vm_stop_all
+      reboot
+    }
+
     CMD="$1"
     shift
     $CMD "$@"
