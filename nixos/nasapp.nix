@@ -6,23 +6,92 @@
 }:
 
 let
+  nasappIp = "192.168.0.20";
+
+  modOptions = {
+    nasapp = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Enable NasAPP mounts";
+      };
+
+      shares = lib.mkOption {
+        type = lib.types.listOf shareType;
+        default = [ ];
+        description = "List of shares to mount";
+      };
+
+      credentials = lib.mkOption {
+        type = lib.types.str;
+        default = "";
+        description = "Global credentials file for mounting shares";
+      };
+
+      uid = lib.mkOption {
+        type = lib.types.str;
+        default = "appaquet";
+        description = "Default UID for mounting shares";
+      };
+
+      gid = lib.mkOption {
+        type = lib.types.str;
+        default = "users";
+        description = "Default GID for mounting shares";
+      };
+    };
+  };
+
+  shareType = lib.types.submodule {
+    options = {
+      share = lib.mkOption {
+        type = lib.types.str;
+        description = "The share name to mount (no //, only the name)";
+      };
+
+      mount = lib.mkOption {
+        type = lib.types.str;
+        description = "The mount point for the share";
+      };
+
+      credentials = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "Credentials file override for the share";
+      };
+
+      uid = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "UID override for the share";
+      };
+
+      gid = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "GID override for the share";
+      };
+    };
+  };
+
   mkMount =
     {
       share,
-      mount,
       credentials,
       uid,
       gid,
     }:
     {
-      device = share;
+      device = "//${nasappIp}/${share}";
       fsType = "cifs";
       options =
         let
           automount_opts_list = [
+            "vers=3.0"
             "uid=${uid}"
             "gid=${gid}"
-            "vers=3.0"
+            # don't mount with fstab, but with systemd & make it resilient to network failures
+            # from https://discourse.nixos.org/t/seeking-help-with-mounting-samba-cifs-behind-a-vpn-currently-using-autofs/35436/6
             "noauto"
             "x-systemd.automount"
             "x-systemd.idle-timeout=60"
@@ -35,74 +104,12 @@ let
         [ automount_opts ];
     };
 
-  shareType = lib.types.attrsOf (
-    lib.types.submodule {
-      options = {
-        share = lib.mkOption {
-          type = lib.types.str;
-          description = "The share path.";
-        };
+  isNullOrEmpty = value: value == null || value == "";
 
-        mount = lib.mkOption {
-          type = lib.types.str;
-          description = "The mount point for the share.";
-        };
-
-        credentials = lib.mkOption {
-          type = lib.types.nullOr lib.types.str;
-          default = null;
-          description = "Optional credentials for the share.";
-        };
-
-        uid = lib.mkOption {
-          type = lib.types.nullOr lib.types.str;
-          default = null;
-          description = "Optional UID for the share.";
-        };
-
-        gid = lib.mkOption {
-          type = lib.types.nullOr lib.types.str;
-          default = null;
-          description = "Optional GID for the share.";
-        };
-      };
-    }
-  );
+  orDefault = value: default: if isNullOrEmpty value then default else value;
 in
 {
-  options = {
-    nasapp = {
-      enable = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        description = "Enable NasAPP mounts.";
-      };
-
-      shares = lib.mkOption {
-        type = lib.types.listOf shareType;
-        default = [ ];
-        description = "List of shares to mount.";
-      };
-
-      credentials = lib.mkOption {
-        type = lib.types.str;
-        default = "";
-        description = "Global credential for mounting shares.";
-      };
-
-      uid = lib.mkOption {
-        type = lib.types.str;
-        default = "appaquet";
-        description = "Default UID for mounting shares.";
-      };
-
-      gid = lib.mkOption {
-        type = lib.types.str;
-        default = "users";
-        description = "Default GID for mounting shares.";
-      };
-    };
-  };
+  options = modOptions;
 
   config = lib.mkIf config.nasapp.enable {
     environment.systemPackages = [
@@ -110,21 +117,12 @@ in
     ];
 
     fileSystems = lib.mkMerge (
-      # map (shareOpt: {
-      #   "${shareOpt.mount}" = mkMount {
-      #     share = shareOpt.share;
-      #     mount = shareOpt.mount;
-      #     credentials = if shareOpt ? credentials then shareOpt.credentials else config.nasapp.credentials;
-      #     uid = if shareOpt ? uid then shareOpt.uid else config.nasapp.uid;
-      #     gid = if shareOpt ? gid then shareOpt.gid else config.nasapp.gid;
-      #   };
-      # }) config.nasapp.shares
-
       map (shareOpt: {
-        "bleh" = {
-          mountPoint = "${shareOpt.mount}";
-          device = "//192.168.0.20/backup_deskapp_vms";
-          fsType = "cifs";
+        "${shareOpt.mount}" = mkMount {
+          share = shareOpt.share;
+          credentials = orDefault shareOpt.credentials config.nasapp.credentials;
+          uid = orDefault shareOpt.uid config.nasapp.uid;
+          gid = orDefault shareOpt.gid config.nasapp.gid;
         };
       }) config.nasapp.shares
     );

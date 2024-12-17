@@ -1,6 +1,5 @@
 {
   pkgs,
-  secrets,
   config,
   ...
 }:
@@ -50,22 +49,12 @@ let
 in
 
 {
-  imports = [
-    ../nasapp.nix
+  nasapp.shares = [
+    {
+      share = "backup_deskapp";
+      mount = backupMount;
+    }
   ];
-
-  nasapp = {
-    enable = true;
-    credentials = secrets.deskapp.nasappCifs;
-    shares = [
-      {
-        share = "//192.168.0.20/backup_deskapp";
-        mount = "/mnt/deskapp_backupp";
-        uid = "appaquet";
-        gid = "users";
-      }
-    ];
-  };
 
   systemd.services."backup-home" = {
     serviceConfig = {
