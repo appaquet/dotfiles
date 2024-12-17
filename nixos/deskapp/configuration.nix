@@ -4,8 +4,7 @@
   imports = [
     ./hardware-configuration.nix
     ./virt
-    # ./home-backup.nix
-    ./vms-backup.nix
+    ./backups
     ./gpu-switch.nix
     ./ha-ctrl.nix
     ../common.nix
