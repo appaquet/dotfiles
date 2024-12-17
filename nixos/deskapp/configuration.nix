@@ -1,18 +1,18 @@
-{ pkgs, ... }:
+{ pkgs, secrets, ... }:
 
 {
   imports = [
+    ./hardware-configuration.nix
+    ./virt
+    ./backups
     ./gpu-switch.nix
     ./ha-ctrl.nix
-    ./hardware-configuration.nix
-    ./home-backup.nix
-    ./virt
-    ./vms-backup.nix
     ../common.nix
     ../dev.nix
     ../docker.nix
     ../network_bridge.nix
     ../ups.nix
+    ../nasapp.nix
   ];
 
   boot.loader.systemd-boot.enable = true;
@@ -52,6 +52,14 @@
   };
   networking.hosts = {
     "100.109.193.77" = [ "localhost.humanfirst.ai" ];
+  };
+
+  # NasAPP mounts
+  nasapp = {
+    enable = true;
+    credentials = secrets.deskapp.nasappCifs;
+    uid = "appaquet";
+    gid = "users";
   };
 
   # Display

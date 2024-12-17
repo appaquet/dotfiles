@@ -1,4 +1,4 @@
-{ pkgs, secrets, ... }:
+{ pkgs, ... }:
 
 let
   backupMount = "/mnt/deskapp_backup_vms";
@@ -37,32 +37,12 @@ let
 in
 
 {
-  environment.systemPackages = [
-    pkgs.cifs-utils
+  nasapp.shares = [
+    {
+      share = "backup_deskapp_vms";
+      mount = backupMount;
+    }
   ];
-
-  fileSystems."${backupMount}" = {
-    device = "//192.168.0.20/backup_deskapp_vms";
-    fsType = "cifs";
-    options =
-      let
-        automount_opts_list = [
-          "vers=3.0"
-          "uid=appaquet"
-          "gid=users"
-          # don't mount with fstab, but with systemd & make it resilient to network failures
-          # from https://discourse.nixos.org/t/seeking-help-with-mounting-samba-cifs-behind-a-vpn-currently-using-autofs/35436/6
-          "noauto"
-          "x-systemd.automount"
-          "x-systemd.idle-timeout=60"
-          "x-systemd.device-timeout=5s"
-          "x-systemd.mount-timeout=5s"
-          "credentials=${secrets.deskapp.nasappCifs}"
-        ];
-        automount_opts = builtins.concatStringsSep "," automount_opts_list;
-      in
-      [ automount_opts ];
-  };
 
   systemd.services."backup-vms" = {
     serviceConfig = {
