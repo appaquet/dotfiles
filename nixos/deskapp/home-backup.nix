@@ -6,6 +6,8 @@
 }:
 
 let
+  nasapp = import ../nasapp.nix { inherit pkgs; };
+
   exclude = [
     "_nosync"
     ".direnv"
@@ -54,27 +56,11 @@ in
     pkgs.cifs-utils
   ];
 
-  fileSystems."${backupMount}" = {
-    device = "//192.168.0.20/backup_deskapp";
-    fsType = "cifs";
-    options =
-      let
-        automount_opts_list = [
-          "vers=3.0"
-          "uid=appaquet"
-          "gid=users"
-          # don't mount with fstab, but with systemd & make it resilient to network failures
-          # from https://discourse.nixos.org/t/seeking-help-with-mounting-samba-cifs-behind-a-vpn-currently-using-autofs/35436/6
-          "noauto"
-          "x-systemd.automount"
-          "x-systemd.idle-timeout=60"
-          "x-systemd.device-timeout=5s"
-          "x-systemd.mount-timeout=5s"
-          "credentials=${secrets.deskapp.nasappCifs}"
-        ];
-        automount_opts = builtins.concatStringsSep "," automount_opts_list;
-      in
-      [ automount_opts ];
+  fileSystems."${backupMount}" = smb.mkSmb { 
+    share = "//192.168.0.20/backup_deskapp";
+    uid = "appaquet";
+    gid = "users";
+    credentials = secrets.deskapp.nasappCifs;
   };
 
   systemd.services."backup-home" = {
