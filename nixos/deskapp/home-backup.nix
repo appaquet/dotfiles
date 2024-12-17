@@ -6,8 +6,6 @@
 }:
 
 let
-  nasapp = import ../nasapp.nix { inherit pkgs; };
-
   exclude = [
     "_nosync"
     ".direnv"
@@ -52,15 +50,21 @@ let
 in
 
 {
-  environment.systemPackages = [
-    pkgs.cifs-utils
+  imports = [
+    ../nasapp.nix
   ];
 
-  fileSystems."${backupMount}" = smb.mkSmb { 
-    share = "//192.168.0.20/backup_deskapp";
-    uid = "appaquet";
-    gid = "users";
+  nasapp = {
+    enable = true;
     credentials = secrets.deskapp.nasappCifs;
+    shares = [
+      {
+        share = "//192.168.0.20/backup_deskapp";
+        mount = "/mnt/deskapp_backupp";
+        uid = "appaquet";
+        gid = "users";
+      }
+    ];
   };
 
   systemd.services."backup-home" = {
