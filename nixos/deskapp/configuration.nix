@@ -10,7 +10,7 @@
     ../common.nix
     ../dev.nix
     ../docker.nix
-    ../network_bridge.nix
+    ../network-bridge.nix
     ../ups.nix
     ../nasapp.nix
   ];
