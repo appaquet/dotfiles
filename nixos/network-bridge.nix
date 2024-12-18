@@ -19,7 +19,7 @@ in
 
     lanPrefixLength = lib.mkOption {
       type = lib.types.int;
-      default = 16;
+      default = 23;
       description = "Lan prefix length";
     };
 
