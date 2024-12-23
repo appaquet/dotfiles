@@ -34,6 +34,7 @@
   #   interface = "enp1s0"; # TODO: probably wrong
   #   lanIp = "192.168.0.13";
   # };
+  networking.firewall.enable = false;
 
   # NasAPP mounts
   nasapp = {
@@ -78,12 +79,6 @@
   programs.firefox.enable = true;
   services.printing.enable = false;
   services.openssh.enable = true;
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  networking.firewall.enable = false;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
