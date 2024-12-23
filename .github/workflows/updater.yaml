@@ -87,7 +87,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        machine: ["appaquet@deskapp"]
+        machine: ["appaquet@deskapp", "appaquet@servapp"]
     steps:
       - uses: actions/checkout@v4
 
@@ -107,7 +107,7 @@ jobs:
       - name: Building NixOS baseline
         run: |
           set -xe
-          MACHINE_KEY="appaquet@deskapp" ./x nixos build
+          MACHINE_KEY="${{ matrix.machine }}" ./x nixos build
           nix-collect-garbage # free up intermediary, since we're low on disk on gha
           mv result result-before
 
@@ -119,7 +119,7 @@ jobs:
       - name: Building NixOS new
         run: |
           set -xe
-          MACHINE_KEY="appaquet@deskapp" ./x nixos build
+          MACHINE_KEY="${{ matrix.machine }}" ./x nixos build
           mv result result-after
 
       - name: Diffing...

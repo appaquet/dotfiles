@@ -1,0 +1,15 @@
+<pool type='dir'>
+  <name>download</name>
+  <uuid>146285e4-c183-4ab1-9bb6-ac5c73508702</uuid>
+  <source>
+  </source>
+  <target>
+    <path>/home/appaquet/Downloads</path>
+    <permissions>
+      <mode>0755</mode>
+      <owner>1000</owner>
+      <group>100</group>
+    </permissions>
+  </target>
+</pool>
+

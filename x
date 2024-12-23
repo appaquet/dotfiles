@@ -12,13 +12,15 @@ fi
 
 HOME_CONFIG=""
 NIXOS=0
-if [[ "${MACHINE_KEY}" == "appaquet@deskapp"* || "${MACHINE_KEY}" == "appaquet@nixos"* ]]; then
+if [[ "${MACHINE_KEY}" == "appaquet@deskapp"* ]]; then
     HOME_CONFIG="appaquet@deskapp"
     HOSTNAME="deskapp"
     NIXOS=1
 
 elif [[ "${MACHINE_KEY}" == "appaquet@servapp"* ]]; then
     HOME_CONFIG="appaquet@servapp"
+    HOSTNAME="servapp"
+    NIXOS=1
 
 elif [[ "${MACHINE_KEY}" == "appaquet@mbpapp"* || "${MACHINE_KEY}" == "appaquet@mbpvmapp"* ]]; then
     HOME_CONFIG="appaquet@mbpapp"
@@ -279,9 +281,9 @@ update)
         nix flake update
 
         for shell in $(ls shells); do
-          pushd "shells/${shell}"
-          nix flake update
-          popd
+            pushd "shells/${shell}"
+            nix flake update
+            popd
         done
     else
         nix flake lock --update-input $PACKAGE

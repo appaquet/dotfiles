@@ -135,8 +135,11 @@
                   extraSpecialArgs.secrets.commonHome
                 ] ++ commonHomeModules;
                 extraSpecialArgs = {
-                  inherit inputs unstablePkgs cfg;
+                  inherit inputs unstablePkgs;
                   secrets = secrets.init "linux";
+                  cfg = cfg // {
+                    isNixos = true;
+                  };
                 };
               };
 
@@ -189,6 +192,18 @@
           modules = [
             nixosOverlaysModule
             ./nixos/deskapp/configuration.nix
+          ];
+        };
+
+        servapp = nixpkgs.lib.nixosSystem {
+          specialArgs = {
+            inherit (self) common;
+            inherit inputs;
+            secrets = secrets.init "linux";
+          };
+          modules = [
+            nixosOverlaysModule
+            ./nixos/servapp/configuration.nix
           ];
         };
       };
