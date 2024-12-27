@@ -73,8 +73,8 @@
 
         if [[ "$OPERATION" == "prepare" ]]; then
           /run/current-system/sw/bin/gpu-switch vfio
-        elif [[ "$OPERATION" == "release" ]]; then
-          /run/current-system/sw/bin/gpu-switch nvidia
+        # elif [[ "$OPERATION" == "release" ]]; then
+        #   /run/current-system/sw/bin/gpu-switch nvidia
         fi
       '';
     in
