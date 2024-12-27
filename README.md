@@ -81,6 +81,11 @@
    set -Ua fish_user_paths /home/appaquet/.local/utils/
    ```
   
+1. On MacOS, we may end up with an older version of nix installed, leading to flakes
+   not working because of use of newer syntax in the lock files (see <https://github.com/LnL7/nix-darwin/issues/931>)
+
+   The fix is to uninstall the old one: `sudo -i nix-env --uninstall nix`
+
 ## Cheat sheets
 
 ## Nix
