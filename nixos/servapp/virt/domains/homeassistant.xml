@@ -1,4 +1,4 @@
-<domain type='kvm' id='2'>
+<domain type='kvm' id='3'>
   <name>homeassistant</name>
   <uuid>594f25c4-862c-448c-8154-4666f6f36718</uuid>
   <metadata>
@@ -148,21 +148,21 @@
     <interface type='bridge'>
       <mac address='52:54:00:a3:77:84'/>
       <source bridge='br0'/>
-      <target dev='vnet1'/>
+      <target dev='vnet2'/>
       <model type='virtio'/>
       <link state='up'/>
       <alias name='net0'/>
       <address type='pci' domain='0x0000' bus='0x01' slot='0x00' function='0x0'/>
     </interface>
     <serial type='pty'>
-      <source path='/dev/pts/1'/>
+      <source path='/dev/pts/0'/>
       <target type='isa-serial' port='0'>
         <model name='isa-serial'/>
       </target>
       <alias name='serial0'/>
     </serial>
-    <console type='pty' tty='/dev/pts/1'>
-      <source path='/dev/pts/1'/>
+    <console type='pty' tty='/dev/pts/0'>
+      <source path='/dev/pts/0'/>
       <target type='serial' port='0'/>
       <alias name='serial0'/>
     </console>
@@ -172,7 +172,9 @@
       <address type='virtio-serial' controller='0' bus='0' port='2'/>
     </channel>
     <channel type='unix'>
-      <target type='virtio' name='org.qemu.guest_agent.0'/>
+      <source mode='bind' path='/run/libvirt/qemu/channel/3-homeassistant/org.qemu.guest_agent.0'/>
+      <target type='virtio' name='org.qemu.guest_agent.0' state='connected'/>
+      <alias name='channel1'/>
       <address type='virtio-serial' controller='0' bus='0' port='1'/>
     </channel>
     <input type='tablet' bus='usb'>
@@ -185,7 +187,7 @@
     <input type='keyboard' bus='ps2'>
       <alias name='input2'/>
     </input>
-    <graphics type='spice' port='5901' autoport='yes' listen='127.0.0.1'>
+    <graphics type='spice' port='5900' autoport='yes' listen='127.0.0.1'>
       <listen type='address' address='127.0.0.1'/>
       <image compression='off'/>
     </graphics>
@@ -237,8 +239,8 @@
     </rng>
   </devices>
   <seclabel type='dynamic' model='dac' relabel='yes'>
-    <label>+958:+958</label>
-    <imagelabel>+958:+958</imagelabel>
+    <label>+301:+301</label>
+    <imagelabel>+301:+301</imagelabel>
   </seclabel>
 </domain>
 

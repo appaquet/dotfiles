@@ -14,9 +14,6 @@
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.kernel.sysctl = {
-    "net.ipv6.conf.all.forwarding" = "1"; # VMs forward
-  };
 
   networking.hostName = "servapp";
 

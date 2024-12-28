@@ -7,6 +7,7 @@
   # - https://nixos.wiki/wiki/Libvirt
   virtualisation.libvirtd = {
     enable = true;
+    onBoot = "ignore"; # don't resume running vms automatically
 
     qemu = {
       package = pkgs.qemu_kvm;
@@ -28,12 +29,6 @@
       "kvm"
     ];
   };
-
-  # Allow ipv6 forward via bridge
-  networking.firewall.extraCommands = ''
-    ip6tables -A FORWARD -i br0 -o br0 -j ACCEPT
-    ip6tables -A FORWARD -i br0 -j ACCEPT
-  '';
 
   # Allow virsh to be run without password
   security.sudo = {
