@@ -58,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        machine: ["appaquet@deskapp"]
+        machine: ["appaquet@deskapp", "appaquet@servapp"]
     steps:
     - uses: actions/checkout@v4
     - uses: DeterminateSystems/nix-installer-action@main

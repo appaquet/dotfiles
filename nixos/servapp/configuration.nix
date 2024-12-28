@@ -4,38 +4,20 @@
   imports = [
     ./hardware-configuration.nix
     ./virt
-    ./backups
-    ./gpu-switch.nix
-    ./ha-ctrl.nix
     ../common.nix
     ../dev.nix
     ../docker.nix
     ../network-bridge.nix
-    ../ups.nix
+    # TODO: ../ups.nix
     ../nasapp.nix
   ];
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.kernelPackages = pkgs.linuxPackages_latest;
-  boot.kernelParams = [
-    # Prevent intel nic from dropping after 1h
-    # See https://www.reddit.com/r/buildapc/comments/xypn1m/network_card_intel_ethernet_controller_i225v_igc/
-    "pcie_port_pm=off"
-    "pcie_aspm.policy=performance"
-  ];
 
-  networking.hostName = "deskapp";
+  networking.hostName = "servapp";
 
-  # Drives (lsblk -f)
-  fileSystems."/mnt/secondary" = {
-    device = "/dev/disk/by-uuid/e154b94d-9f7e-4079-a80b-659e6ab532ca";
-    fsType = "ext4";
-  };
-  fileSystems."/mnt/tertiary" = {
-    device = "/dev/disk/by-uuid/1bece886-d8b2-4fd4-a057-990de4ba308c";
-    fsType = "ext4";
-  };
+  # Drives
   swapDevices = [
     {
       device = "/swapfile";
@@ -47,20 +29,27 @@
   networking.networkmanager.enable = true;
   networking.myBridge = {
     enable = true;
-    interface = "eno1";
-    lanIp = "192.168.0.30";
-  };
-  networking.hosts = {
-    "100.109.193.77" = [ "localhost.humanfirst.ai" ];
+    interface = "enp1s0";
+    lanIp = "192.168.0.13";
   };
   networking.firewall.enable = false;
 
   # NasAPP mounts
   nasapp = {
     enable = true;
-    credentials = secrets.deskapp.nasappCifs;
+    credentials = secrets.servapp.nasappCifs;
     uid = "appaquet";
     gid = "users";
+    shares = [
+      {
+        share = "backup_servapp"; # TODO: move to backup
+        mount = "/mnt/backup_servapp";
+      }
+      {
+        share = "video";
+        mount = "/mnt/video";
+      }
+    ];
   };
 
   # Display
@@ -95,5 +84,5 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "24.05";
+  system.stateVersion = "24.11";
 }

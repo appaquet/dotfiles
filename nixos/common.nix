@@ -26,6 +26,8 @@
     shell = pkgs.fish;
     description = "appaquet";
 
+    homeMode = "0755"; # virt access to var files
+
     extraGroups = [
       "networkmanager"
       "wheel"

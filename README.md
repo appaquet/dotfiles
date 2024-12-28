@@ -81,6 +81,12 @@
    set -Ua fish_user_paths /home/appaquet/.local/utils/
    ```
   
+1. `failed: unable to open database file at ... command-not-found`
+   As root, run:
+   ```
+   nix-channel --add https://nixos.org/channels/nixos-unstable nixos
+   nix-channel --update
+   ```
 1. On MacOS, we may end up with an older version of nix installed, leading to flakes
    not working because of use of newer syntax in the lock files (see <https://github.com/LnL7/nix-darwin/issues/931>)
 

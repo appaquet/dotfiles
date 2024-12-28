@@ -7,6 +7,7 @@
   # - https://nixos.wiki/wiki/Libvirt
   virtualisation.libvirtd = {
     enable = true;
+    onBoot = "ignore"; # don't resume running vms automatically
 
     qemu = {
       package = pkgs.qemu_kvm;
