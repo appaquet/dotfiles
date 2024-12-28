@@ -8,14 +8,15 @@
     ../dev.nix
     ../docker.nix
     ../network-bridge.nix
-    ../ups.nix
+    # TODO: ../ups.nix
     ../nasapp.nix
   ];
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.kernelPackages = pkgs.linuxPackages_latest;
-  boot.kernelParams = [ ];
+  boot.kernel.sysctl = {
+    "net.ipv6.conf.all.forwarding" = "1"; # VMs forward
+  };
 
   networking.hostName = "servapp";
 
@@ -28,12 +29,12 @@
   ];
 
   # Networking
-  # networking.networkmanager.enable = true;
-  # networking.myBridge = {
-  #   enable = true;
-  #   interface = "enp1s0"; # TODO: probably wrong
-  #   lanIp = "192.168.0.13";
-  # };
+  networking.networkmanager.enable = true;
+  networking.myBridge = {
+    enable = true;
+    interface = "enp1s0";
+    lanIp = "192.168.0.13";
+  };
   networking.firewall.enable = false;
 
   # NasAPP mounts

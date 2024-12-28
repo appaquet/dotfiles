@@ -29,6 +29,12 @@
     ];
   };
 
+  # Allow ipv6 forward via bridge
+  networking.firewall.extraCommands = ''
+    ip6tables -A FORWARD -i br0 -o br0 -j ACCEPT
+    ip6tables -A FORWARD -i br0 -j ACCEPT
+  '';
+
   # Allow virsh to be run without password
   security.sudo = {
     extraRules = [
