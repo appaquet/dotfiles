@@ -53,7 +53,7 @@
         ${pkgs.iptables}/bin/ip6tables -A FORWARD -i br0 -o br0 -j ACCEPT
         ${pkgs.iptables}/bin/ip6tables -A FORWARD -i br0 -j ACCEPT
 
-        sleep 10 # Really make sure usb is ready
+        sleep 30 # Really make sure usb is ready
 
         ${pkgs.libvirt}/bin/virsh start homeassistant || true
         ${pkgs.libvirt}/bin/virsh start pihole || true
