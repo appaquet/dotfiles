@@ -7,6 +7,7 @@
 
 1. Once installed, edit `/etc/nixos/configuration.nix` and rebuild:
    * Enable sshd
+   * Change hostname
    * Enable flakes: `nix.settings.experimental-features = [ "flakes" ];`
 
 1. SSH to the machine.
