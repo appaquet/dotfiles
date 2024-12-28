@@ -113,7 +113,7 @@ let
     function status() {
         gpu_bus=$(format_bus $(get_bus "${gpuPci}"))
         gpu_driver=$(get_bus_driver $gpu_bus)
-        echo "GPU driver: $gpu_driver"
+        echo "$gpu_driver"
     }
 
     CMD="''${1:-status}"

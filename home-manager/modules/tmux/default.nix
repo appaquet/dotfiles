@@ -34,6 +34,11 @@ in
 
       # Synchronized panes
       bind e setw synchronize-panes\; display-message "Synchronized pane is now #{?synchronize-panes,on,off}"
+
+      # Fixes issue on macOS where shell in tmux is not right
+      # See https://github.com/tmux/tmux/issues/4162
+      set -gu default-command
+      set -g default-shell "${pkgs.fish}/bin/fish"
     '';
   };
 }

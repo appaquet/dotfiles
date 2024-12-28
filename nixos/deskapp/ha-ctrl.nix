@@ -100,6 +100,18 @@ let
       reboot
     }
 
+    function gpu_status() {
+      /run/current-system/sw/bin/gpu-switch status
+    }
+
+    function gpu_vfio() {
+      /run/current-system/sw/bin/gpu-switch vfio
+    }
+
+    function gpu_nvidia() {
+      /run/current-system/sw/bin/gpu-switch nvidia
+    }
+
     CMD="$1"
     shift
     $CMD "$@"
