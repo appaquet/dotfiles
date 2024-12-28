@@ -2,17 +2,17 @@
 
 {
   imports = [
-    ./hardware-configuration.nix
-    ./virt
-    ./backups
-    ./gpu-switch.nix
-    ./ha-ctrl.nix
     ../common.nix
     ../dev.nix
     ../docker.nix
+    ../nasapp.nix
     ../network-bridge.nix
     ../ups.nix
-    ../nasapp.nix
+    ./backups
+    ./gpu-switch.nix
+    ./ha-ctrl.nix
+    ./hardware-configuration.nix
+    ./virt
   ];
 
   boot.loader.systemd-boot.enable = true;

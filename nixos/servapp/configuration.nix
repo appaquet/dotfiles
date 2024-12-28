@@ -1,15 +1,15 @@
-{ pkgs, secrets, ... }:
+{ secrets, ... }:
 
 {
   imports = [
-    ./hardware-configuration.nix
-    ./virt
     ../common.nix
     ../dev.nix
     ../docker.nix
-    ../network-bridge.nix
-    # TODO: ../ups.nix
     ../nasapp.nix
+    ../network-bridge.nix
+    ../ups.nix
+    ./hardware-configuration.nix
+    ./virt
   ];
 
   boot.loader.systemd-boot.enable = true;

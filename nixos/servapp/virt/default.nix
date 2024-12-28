@@ -43,13 +43,19 @@
   # Also forward ipv6 to bridge devices
   systemd.services.virt-start-vms = {
     description = "Starts VMs after system fully booted";
-    after = [ "display-manager.service" "libvirtd.service" ];
-    requires = [ "display-manager.service" "libvirtd.service" ];
+    after = [
+      "display-manager.service"
+      "libvirtd.service"
+    ];
+    requires = [
+      "display-manager.service"
+      "libvirtd.service"
+    ];
     serviceConfig = {
       Type = "oneshot";
       ExecStart = "${pkgs.writeShellScript "start-vms" ''
         #!/run/current-system/sw/bin/bash
-        
+
         ${pkgs.iptables}/bin/ip6tables -A FORWARD -i br0 -o br0 -j ACCEPT
         ${pkgs.iptables}/bin/ip6tables -A FORWARD -i br0 -j ACCEPT
 
