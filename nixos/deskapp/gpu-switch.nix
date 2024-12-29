@@ -153,13 +153,14 @@ in
     gpuSwitch
   ];
 
-  #   description = "Switch GPU to NVIDIA on boot";
-  #   after = [ "libvirtd.service" ];
-  #   requires = [ "libvirtd.service" ];
-  #   serviceConfig = {
-  #     Type = "oneshot";
-  #     ExecStart = "${gpuSwitch}/bin/gpu-switch nvidia";
-  #   };
-  #   wantedBy = [ "multi-user.target" ];
-  # };
+  systemd.services.switch-gpu-boot = {
+    description = "Switch GPU to NVIDIA on boot";
+    after = [ "libvirtd.service" ];
+    requires = [ "libvirtd.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${gpuSwitch}/bin/gpu-switch nvidia";
+    };
+    wantedBy = [ "multi-user.target" ];
+  };
 }
