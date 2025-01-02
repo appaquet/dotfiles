@@ -67,6 +67,7 @@ jobs:
             echo "Changes for ${{ matrix.pair.machine }} home:" > diff-out
             cat diff >> diff-out
             echo -n " " >> diff-out
+            echo -n " " >> diff-out
             cat diff-out > "${{ matrix.pair.machine }}-home-diff"
           fi
 
@@ -138,6 +139,7 @@ jobs:
             echo "Changes for ${{ matrix.machine }} nixos:" > diff-out
             cat diff >> diff-out
             echo -n " " >> diff-out
+            echo -n " " >> diff-out
             cat diff-out > "${{ matrix.machine }}-nixos-diff"
           fi
 
@@ -201,6 +203,7 @@ jobs:
           if [ $NB_CHANGES -gt 0 ]; then
             echo "Changes for ${{ matrix.machine }} darwin:" > diff-out
             cat diff >> diff-out
+            echo -n " " >> diff-out
             echo -n " " >> diff-out
             cat diff-out > "${{ matrix.machine }}-darwin-diff"
           fi
