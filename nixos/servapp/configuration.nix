@@ -34,6 +34,12 @@
   };
   networking.firewall.enable = false;
 
+  services.tailscale = {
+    enable = true;
+    useRoutingFeatures = "server";
+    extraSetFlags = [ "--advertise-exit-node" ];
+  };
+
   # NasAPP mounts
   nasapp = {
     enable = true;
