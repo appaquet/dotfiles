@@ -17,6 +17,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix";
+
     humanfirst-dots = {
       url = "github:zia-ai/shared-dotfiles";
       #url = "path:/home/appaquet/dotfiles/humanfirst-dots";
@@ -57,6 +59,7 @@
       nixpkgs-unstable,
       home-manager,
       humanfirst-dots,
+      raspberry-pi-nix,
       secrets,
       flake-utils,
       darwin,
@@ -231,6 +234,21 @@
           modules = [
             nixosOverlaysModule
             ./nixos/utm/configuration.nix
+          ];
+        };
+
+        piapp = nixpkgs.lib.nixosSystem {
+          system = "aarch64-linux";
+          specialArgs = {
+            inherit (self) common;
+            inherit inputs;
+            secrets = secrets.init "linux";
+          };
+          modules = [
+            nixosOverlaysModule
+            raspberry-pi-nix.nixosModules.raspberry-pi
+            raspberry-pi-nix.nixosModules.sd-image
+            ./nixos/piapp/configuration.nix
           ];
         };
       };
