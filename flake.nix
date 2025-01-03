@@ -68,13 +68,12 @@
         allowUnfree = true;
       };
 
-      packageOverlays = final: prev: {
+      homePackageOverlays = final: prev: {
         exo = prev.callPackage ./overlays/exo { };
-        fzf-nix = inputs.fzf-nix.packages.${prev.system}.fzf-nix;
       };
 
       homeOverlays = [
-        packageOverlays
+        homePackageOverlays
         inputs.nix-alien.overlays.default
       ];
 
@@ -143,6 +142,21 @@
                 };
               };
 
+              "appaquet@utm" = home-manager.lib.homeManagerConfiguration rec {
+                inherit pkgs;
+                modules = [
+                  ./home-manager/utm.nix
+                  extraSpecialArgs.secrets.commonHome
+                ] ++ commonHomeModules;
+                extraSpecialArgs = {
+                  inherit inputs unstablePkgs;
+                  secrets = secrets.init "linux";
+                  cfg = cfg // {
+                    isNixos = true;
+                  };
+                };
+              };
+
               "appaquet@mbpapp" = home-manager.lib.homeManagerConfiguration rec {
                 inherit pkgs;
                 modules = [
@@ -165,6 +179,7 @@
       homeConfigurations = {
         "appaquet@deskapp" = self.homes.x86_64-linux."appaquet@deskapp";
         "appaquet@servapp" = self.homes.x86_64-linux."appaquet@servapp";
+        "appaquet@utm" = self.homes.aarch64-linux."appaquet@utm";
         "appaquet@mbpapp" = self.homes.aarch64-darwin."appaquet@mbpapp";
       };
 
@@ -204,6 +219,18 @@
           modules = [
             nixosOverlaysModule
             ./nixos/servapp/configuration.nix
+          ];
+        };
+
+        utm = nixpkgs.lib.nixosSystem {
+          specialArgs = {
+            inherit (self) common;
+            inherit inputs;
+            secrets = secrets.init "linux";
+          };
+          modules = [
+            nixosOverlaysModule
+            ./nixos/utm/configuration.nix
           ];
         };
       };
