@@ -1,6 +1,8 @@
 { ...}:
 
 {
+  # From https://github.com/NixOS/nixpkgs/issues/260754
+
   imports = [
     ../common.nix
   ];
