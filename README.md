@@ -139,7 +139,8 @@
   * `<leader>w` to close the current buffer by trying not to messup the layout
 
 * `<leader>o` to close all buffers except the current one
-  * `<leader>q` to quit vim
+  * `<leader>qq` to quit vim
+  * `<leader>q` to close current pane
   * `<leader><tab>` to switch between tab and spaces
   * `<ctrl>e` to toggle file etree
   * `<ctrl>p` fuzzy finding file

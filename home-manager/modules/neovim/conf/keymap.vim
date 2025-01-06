@@ -36,7 +36,8 @@ map <Leader>p :read !pbpaste<CR>
 " Save & quit
 map <D-s> :w<CR>
 map <Leader>s :w<CR>
-map <Leader>q :qa<CR>
+map <Leader>q :q<CR>
+map <Leader>qq :qa<CR>
 
 " For when you forget to sudo.. Really Write the file.
 cmap w!! w !sudo tee % >/dev/null
