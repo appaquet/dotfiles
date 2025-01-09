@@ -72,11 +72,13 @@
 
 ## Initial setup for Raspberry Pi
 
-Notes: 
+### Notes
 * <https://github.com/nix-community/raspberry-pi-nix> is used to simplify a lot of the quirks for Rpi.
 * Because of the use of `raspberry-pi-nix`, there is no need for a `hardware-configuration.nix` as it's automatically generated & included.
 * I use a Mac VM to build the initial SD card to prevent potentially recompiling the whole kernel on a poor Rpi.
 
+
+### Steps
 1. On a UTM NixOS host, create the Rpi NixOS config, and then build and SD card: `nix build '.#nixosConfigurations.piapp.config.system.build.sdImage'`
 
 1. Copy the result image to a SD / USB Stick or Nvme (via USB adapter): `zstdcat result/the-image.img.zstd | dd of=/dev/the-device status=progress`
