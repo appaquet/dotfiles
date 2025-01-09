@@ -11,6 +11,8 @@
     fzf
   ];
 
+  humanfirst.git.enable = true;
+
   programs.fish = {
     shellAbbrs = {
       gs = "git status";

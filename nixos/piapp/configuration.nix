@@ -1,8 +1,9 @@
-{ ... }:
+{ secrets, ... }:
 
 {
   imports = [
     ../common.nix
+    ../nasapp.nix
   ];
 
   # From https://github.com/NixOS/nixpkgs/issues/260754
@@ -24,7 +25,21 @@
       wlan0.useDHCP = false;
       eth0.useDHCP = true;
     };
-    firewall.enable = true;
+    firewall.enable = false;
+  };
+
+  nasapp = {
+    enable = true;
+    credentials = secrets.deskapp.nasappCifs;
+    uid = "appaquet";
+    gid = "users";
+
+    shares = [
+      {
+        share = "backup_piapp";
+        mount = "/mnt/piapp_backup";
+      }
+    ];
   };
 
   services.openssh.enable = true;
