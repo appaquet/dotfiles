@@ -18,7 +18,7 @@ jobs:
             os: ubuntu-latest
           - machine: "appaquet@piapp"
             os: macos-latest
-          - machine: "appaquet@mbpap"
+          - machine: "appaquet@mbpapp"
             os: macos-latest
     runs-on: ${{ matrix.pair.os }}
     steps:
