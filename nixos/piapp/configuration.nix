@@ -5,6 +5,7 @@
   # and https://github.com/nix-community/raspberry-pi-nix
 
   imports = [
+    ./hardware-configuration.nix
     ../common.nix
   ];
 

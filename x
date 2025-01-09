@@ -27,6 +27,11 @@ elif [[ "${MACHINE_KEY}" == "appaquet@utm"* ]]; then
     HOSTNAME="utm"
     NIXOS=1
 
+elif [[ "${MACHINE_KEY}" == "appaquet@piapp"* ]]; then
+    HOME_CONFIG="appaquet@piapp"
+    HOSTNAME="piapp"
+    NIXOS=1
+
 elif [[ "${MACHINE_KEY}" == "appaquet@mbpapp"* || "${MACHINE_KEY}" == "appaquet@mbpvmapp"* ]]; then
     HOME_CONFIG="appaquet@mbpapp"
 fi

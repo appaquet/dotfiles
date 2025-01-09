@@ -160,6 +160,21 @@
                 };
               };
 
+              "appaquet@piapp" = home-manager.lib.homeManagerConfiguration rec {
+                inherit pkgs;
+                modules = [
+                  ./home-manager/piapp.nix
+                  extraSpecialArgs.secrets.commonHome
+                ] ++ commonHomeModules;
+                extraSpecialArgs = {
+                  inherit inputs unstablePkgs;
+                  secrets = secrets.init "linux";
+                  cfg = cfg // {
+                    isNixos = true;
+                  };
+                };
+              };
+
               "appaquet@mbpapp" = home-manager.lib.homeManagerConfiguration rec {
                 inherit pkgs;
                 modules = [
@@ -183,6 +198,7 @@
         "appaquet@deskapp" = self.homes.x86_64-linux."appaquet@deskapp";
         "appaquet@servapp" = self.homes.x86_64-linux."appaquet@servapp";
         "appaquet@utm" = self.homes.aarch64-linux."appaquet@utm";
+        "appaquet@piapp" = self.homes.aarch64-linux."appaquet@piapp";
         "appaquet@mbpapp" = self.homes.aarch64-darwin."appaquet@mbpapp";
       };
 

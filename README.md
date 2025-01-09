@@ -69,6 +69,26 @@
 1. Activate shell by adding `/home/appaquet/.nix-profile/bin/fish` to `/etc/shells`
    and running `chsh -s /home/appaquet/.nix-profile/bin/fish`
 
+
+## Initial setup for Raspberry Pi
+
+Notes: 
+* <https://github.com/nix-community/raspberry-pi-nix> is used to simplify a lot of the quirks for Rpi.
+* I use a Mac VM to build the initial SD card to prevent potentially recompiling the whole kernel on a poor Rpi.
+
+1. Install NixOS on an UTM linux machine.
+
+1. Create the Rpi NixOS config, and then build and SD card: `nix build '.#nixosConfigurations.piapp.config.system.build.sdImage'`
+
+1. Copy the result image to a SD / USB Stick or Nvme (via USB adapter): `zstdcat result/the-image.img.zstd | dd of=/dev/the-device status=progress`
+
+1. Boot the Rpi, change password.
+
+1. Follow normal procedure to setup home-manager.
+
+1. Generate configs & adapt with already created one: `sudo nixos-generate-config`, move them and then delete them.
+
+
 ## Troubleshooting
 
 1. It seems that when switching to newer fish, the paths weren't properly set.
