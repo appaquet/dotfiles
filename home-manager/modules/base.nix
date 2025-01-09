@@ -2,6 +2,7 @@
   pkgs,
   unstablePkgs,
   lib,
+  inputs,
   ...
 }:
 
@@ -28,7 +29,6 @@
       manix # nix doc cli searcher
       nix-output-monitor # better nix build output (nom)
       nixfmt-rfc-style
-      fzf-nix # fzf-nix
       nvd # nix package diff tool
       nix-tree # explore nix derivations dependencies (https://github.com/utdemir/nix-tree)
 
@@ -83,5 +83,8 @@
     ++ lib.optionals pkgs.stdenv.isLinux [
       pkgs.libtree # recursive ldd
       pkgs.dool # dstat alternative, only on linux
+    ]
+    ++ lib.optionals (pkgs.stdenv.isDarwin || pkgs.stdenv.isx86_64) [
+      inputs.fzf-nix.packages.${pkgs.system}.fzf-nix # fzf-nix, somehow doesn't work on linux arm
     ];
 }

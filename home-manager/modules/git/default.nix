@@ -11,6 +11,8 @@
     fzf
   ];
 
+  humanfirst.git.enable = true; # gcmp, gb, gh-pr-select, git-tag-select
+
   programs.fish = {
     shellAbbrs = {
       gs = "git status";

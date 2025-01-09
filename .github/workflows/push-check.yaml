@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        machine: ["appaquet@mbpapp", "appaquet@deskapp", "appaquet@servapp"]
+        machine: ["appaquet@mbpapp", "appaquet@deskapp", "appaquet@servapp", "appaquet@piapp"]
     steps:
     - uses: actions/checkout@v4
     - uses: DeterminateSystems/nix-installer-action@main
@@ -58,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        machine: ["appaquet@deskapp", "appaquet@servapp"]
+        machine: ["appaquet@deskapp", "appaquet@servapp", "appaquet@piapp"]
     steps:
     - uses: actions/checkout@v4
     - uses: DeterminateSystems/nix-installer-action@main

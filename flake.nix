@@ -17,6 +17,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix";
+
     humanfirst-dots = {
       url = "github:zia-ai/shared-dotfiles";
       #url = "path:/home/appaquet/dotfiles/humanfirst-dots";
@@ -57,6 +59,7 @@
       nixpkgs-unstable,
       home-manager,
       humanfirst-dots,
+      raspberry-pi-nix,
       secrets,
       flake-utils,
       darwin,
@@ -68,13 +71,12 @@
         allowUnfree = true;
       };
 
-      packageOverlays = final: prev: {
+      homePackageOverlays = final: prev: {
         exo = prev.callPackage ./overlays/exo { };
-        fzf-nix = inputs.fzf-nix.packages.${prev.system}.fzf-nix;
       };
 
       homeOverlays = [
-        packageOverlays
+        homePackageOverlays
         inputs.nix-alien.overlays.default
       ];
 
@@ -143,6 +145,36 @@
                 };
               };
 
+              "appaquet@utm" = home-manager.lib.homeManagerConfiguration rec {
+                inherit pkgs;
+                modules = [
+                  ./home-manager/utm.nix
+                  extraSpecialArgs.secrets.commonHome
+                ] ++ commonHomeModules;
+                extraSpecialArgs = {
+                  inherit inputs unstablePkgs;
+                  secrets = secrets.init "linux";
+                  cfg = cfg // {
+                    isNixos = true;
+                  };
+                };
+              };
+
+              "appaquet@piapp" = home-manager.lib.homeManagerConfiguration rec {
+                inherit pkgs;
+                modules = [
+                  ./home-manager/piapp.nix
+                  extraSpecialArgs.secrets.commonHome
+                ] ++ commonHomeModules;
+                extraSpecialArgs = {
+                  inherit inputs unstablePkgs;
+                  secrets = secrets.init "linux";
+                  cfg = cfg // {
+                    isNixos = true;
+                  };
+                };
+              };
+
               "appaquet@mbpapp" = home-manager.lib.homeManagerConfiguration rec {
                 inherit pkgs;
                 modules = [
@@ -165,6 +197,8 @@
       homeConfigurations = {
         "appaquet@deskapp" = self.homes.x86_64-linux."appaquet@deskapp";
         "appaquet@servapp" = self.homes.x86_64-linux."appaquet@servapp";
+        "appaquet@utm" = self.homes.aarch64-linux."appaquet@utm";
+        "appaquet@piapp" = self.homes.aarch64-linux."appaquet@piapp";
         "appaquet@mbpapp" = self.homes.aarch64-darwin."appaquet@mbpapp";
       };
 
@@ -204,6 +238,33 @@
           modules = [
             nixosOverlaysModule
             ./nixos/servapp/configuration.nix
+          ];
+        };
+
+        utm = nixpkgs.lib.nixosSystem {
+          specialArgs = {
+            inherit (self) common;
+            inherit inputs;
+            secrets = secrets.init "linux";
+          };
+          modules = [
+            nixosOverlaysModule
+            ./nixos/utm/configuration.nix
+          ];
+        };
+
+        piapp = nixpkgs.lib.nixosSystem {
+          system = "aarch64-linux";
+          specialArgs = {
+            inherit (self) common;
+            inherit inputs;
+            secrets = secrets.init "linux";
+          };
+          modules = [
+            nixosOverlaysModule
+            raspberry-pi-nix.nixosModules.raspberry-pi
+            raspberry-pi-nix.nixosModules.sd-image
+            ./nixos/piapp/configuration.nix
           ];
         };
       };

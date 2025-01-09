@@ -16,7 +16,9 @@ jobs:
             os: ubuntu-latest
           - machine: "appaquet@servapp"
             os: ubuntu-latest
-          - machine: "appaquet@mbpapp"
+          - machine: "appaquet@piapp"
+            os: macos-latest
+          - machine: "appaquet@mbpap"
             os: macos-latest
     runs-on: ${{ matrix.pair.os }}
     steps:
@@ -67,7 +69,7 @@ jobs:
             echo "Changes for ${{ matrix.pair.machine }} home:" > diff-out
             cat diff >> diff-out
             echo -n " " >> diff-out
-            echo -n " " >> diff-out
+            echo -n "------------------" >> diff-out
             cat diff-out > "${{ matrix.pair.machine }}-home-diff"
           fi
 
@@ -139,7 +141,7 @@ jobs:
             echo "Changes for ${{ matrix.machine }} nixos:" > diff-out
             cat diff >> diff-out
             echo -n " " >> diff-out
-            echo -n " " >> diff-out
+            echo -n "------------------" >> diff-out
             cat diff-out > "${{ matrix.machine }}-nixos-diff"
           fi
 
@@ -204,7 +206,7 @@ jobs:
             echo "Changes for ${{ matrix.machine }} darwin:" > diff-out
             cat diff >> diff-out
             echo -n " " >> diff-out
-            echo -n " " >> diff-out
+            echo -n "------------------" >> diff-out
             cat diff-out > "${{ matrix.machine }}-darwin-diff"
           fi
 
