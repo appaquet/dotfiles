@@ -25,6 +25,7 @@
     isNormalUser = true;
     shell = pkgs.fish;
     description = "appaquet";
+    initialPassword = "carpediem";
 
     homeMode = "0755"; # virt access to var files
 
