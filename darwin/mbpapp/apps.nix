@@ -76,10 +76,6 @@
         name = "chatgpt";
         greedy = true;
       }
-      {
-        name = "gather";
-        greedy = true;
-      }
 
       {
         name = "spotify";
@@ -122,6 +118,10 @@
       }
       {
         name = "blackhole-2ch";
+        greedy = true;
+      }
+      {
+        name = "utm";
         greedy = true;
       }
     ];

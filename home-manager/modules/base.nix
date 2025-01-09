@@ -52,7 +52,7 @@
       ookla-speedtest
       mtr
       gping
-      neofetch
+      fastfetch
       bandwhich
       dig
       whois
