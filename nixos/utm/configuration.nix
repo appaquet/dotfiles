@@ -3,7 +3,6 @@
 {
   imports = [
     ../common.nix
-    ../cachix.nix
     ./hardware-configuration.nix
   ];
 

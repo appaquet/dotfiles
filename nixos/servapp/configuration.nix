@@ -2,7 +2,6 @@
 
 {
   imports = [
-    ../cachix.nix
     ../common.nix
     ../dev.nix
     ../docker.nix

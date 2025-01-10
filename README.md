@@ -88,7 +88,8 @@
 
 ## Common
 
-1. Enable [nix-community](https://app.cachix.org/cache/nix-community) cachix cache (`cachix use nix-community`)
+1. The [nix-community](https://app.cachix.org/cache/nix-community) cachix cache may need to be configured and enabled manually before building nixos for the
+   first time (`cachix use nix-community`).
 
 ## Troubleshooting
 

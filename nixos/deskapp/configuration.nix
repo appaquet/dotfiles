@@ -7,7 +7,6 @@
     ../docker.nix
     ../nasapp.nix
     ../network-bridge.nix
-    ../cachix.nix
     ../ups.nix
     ./backups
     ./gpu-switch.nix
