@@ -30,6 +30,8 @@
    1. Enable service: `systemctl --user enable --now auto-fix-vscode-server.service` (it's safe to ignore warning)
    1. To prevent GC: `ln -sfT /run/current-system/etc/systemd/user/auto-fix-vscode-server.service ~/.config/systemd/user/auto-fix-vscode-server.service`
 
+1. Enable [nix-community](https://app.cachix.org/cache/nix-community) cachix cache (`cachix use nix-community`)
+
 ## Initial setup on MacOS
 
 1. Download nix installer & run it with multi-user mode enabled: `curl -L https://nixos.org/nix/install | sh -s -- --daemon`
@@ -43,6 +45,8 @@
 1. Install [HomeBrew](https://brew.sh/).
 
 1. Setup nix-darwin & activate it.
+
+1. Enable [nix-community](https://app.cachix.org/cache/nix-community) cachix cache (`cachix use nix-community`)
 
 ## Initial setup on Non-NixOS Linux
 
@@ -69,6 +73,7 @@
 1. Activate shell by adding `/home/appaquet/.nix-profile/bin/fish` to `/etc/shells`
    and running `chsh -s /home/appaquet/.nix-profile/bin/fish`
 
+1. Enable [nix-community](https://app.cachix.org/cache/nix-community) cachix cache (`cachix use nix-community`)
 
 ## Initial setup for Raspberry Pi
 

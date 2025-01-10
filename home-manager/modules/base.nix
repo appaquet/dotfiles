@@ -31,6 +31,7 @@
       nixfmt-rfc-style
       nvd # nix package diff tool
       nix-tree # explore nix derivations dependencies (https://github.com/utdemir/nix-tree)
+      cachix
 
       direnv
       nix-direnv
