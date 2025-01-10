@@ -27,7 +27,6 @@ map <leader>o :BufDelOthers<CR>
 " Execute current file or selection
 map <Leader>x :w<CR>:!./%<CR>
 map <Leader>z :'<,'>w !sh<CR>
-map <Leader>r :!./rsync.sh<CR>
 
 " Clipboard
 map <Leader>y :w !pbcopy<CR><CR>
@@ -65,15 +64,3 @@ function! ToggleMouse()
         set relativenumber
     endif
 endfunc
-
-" Allow switching by doing <leader><tab>
-nmap <leader><tab> :call SwitchTab()<CR>
-function! SwitchTab()
-  if (&l:expandtab)
-    echo "Switched to Tabs"
-    setlocal noexpandtab shiftwidth=4 tabstop=4 cino=N-s<CR>
-  else
-    echo "Switched to Spaces"
-    setlocal expandtab shiftwidth=2 tabstop=2 cino=N-s<CR>
-  endif
-endfunction

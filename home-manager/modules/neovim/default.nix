@@ -29,7 +29,7 @@
       bufferline-nvim # https://github.com/akinsho/bufferline.nvim
 
       # Tools
-      fzf-vim # :Files (ctrl-p), :Rg (ctrl-f), :History (ctrl-l)
+      fzf-lua # <leader>f*
       Rename # :Rename <new name>
       vim-multiple-cursors # ctrl-n multi cursors
       nvim-bufdel # :BufDel, :BufDelOthers (properly close buffers)
