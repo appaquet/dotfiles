@@ -2,6 +2,7 @@
 
 {
   imports = [
+    ../cachix.nix
     ../common.nix
     ../nasapp.nix
   ];

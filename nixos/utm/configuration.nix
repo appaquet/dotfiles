@@ -1,11 +1,10 @@
-{ inputs, ... }:
+{ ... }:
 
 {
   imports = [
     ../common.nix
+    ../cachix.nix
     ./hardware-configuration.nix
-
-    inputs.home-manager.nixosModules.home-manager
   ];
 
   boot.loader.systemd-boot.enable = true;
