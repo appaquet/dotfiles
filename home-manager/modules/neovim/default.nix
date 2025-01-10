@@ -27,9 +27,10 @@
       lualine-nvim # https://github.com/nvim-lualine/lualine.nvim
       lualine-lsp-progress
       bufferline-nvim # https://github.com/akinsho/bufferline.nvim
+      auto-session # automatically restore last session
 
       # Tools
-      fzf-vim # :Files (ctrl-p), :Rg (ctrl-f), :History (ctrl-l)
+      fzf-lua # <leader>f*
       Rename # :Rename <new name>
       vim-multiple-cursors # ctrl-n multi cursors
       nvim-bufdel # :BufDel, :BufDelOthers (properly close buffers)
@@ -90,13 +91,14 @@
         (builtins.readFile ./conf/base.vim)
         (builtins.readFile ./conf/keymap.vim)
         (builtins.readFile ./conf/theme.vim)
-        (builtins.readFile ./conf/plugin.nvimtree.vim)
+        (builtins.readFile ./conf/plugin.autosession.vim)
         (builtins.readFile ./conf/plugin.bufferline.vim)
-        (builtins.readFile ./conf/plugin.lualine.vim)
-        (builtins.readFile ./conf/plugin.treesitter.vim)
+        (builtins.readFile ./conf/plugin.copilot.vim)
         (builtins.readFile ./conf/plugin.fzf.vim)
         (builtins.readFile ./conf/plugin.lsp.vim)
-        (builtins.readFile ./conf/plugin.copilot.vim)
+        (builtins.readFile ./conf/plugin.lualine.vim)
+        (builtins.readFile ./conf/plugin.nvimtree.vim)
+        (builtins.readFile ./conf/plugin.treesitter.vim)
       ]
     );
   };

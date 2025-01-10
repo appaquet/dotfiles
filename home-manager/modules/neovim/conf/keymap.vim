@@ -1,79 +1,65 @@
-" Buffer navigation & control
-map <D-1> :br!<CR>
-map <Leader>1 :br!<CR>
-map <D-2> :br!<CR>:bn!<CR>
-map <Leader>2 :br!<CR>:bn!<CR>
-map <D-3> :br!<CR>:bn! 2<CR>
-map <Leader>3 :br!<CR>:bn! 2<CR>
-map <D-4> :br!<CR>:bn! 3<CR>
-map <Leader>4 :br!<CR>:bn! 3<CR>
-map <D-5> :br!<CR>:bn! 4<CR>
-map <Leader>5 :br!<CR>:bn! 4<CR>
-map <D-6> :br!<CR>:bn! 5<CR>
-map <Leader>6 :br!<CR>:bn! 5<CR>
-map <D-7> :br!<CR>:bn! 6<CR>
-map <Leader>7 :br!<CR>:bn! 6<CR>
-map <D-8> :br!<CR>:bn! 7<CR>
-map <Leader>8 :br!<CR>:bn! 7<CR>
-map <D-9> :br!<CR>:bn! 8<CR>
-map <Leader>9 :br!<CR>:bn! 8<CR>
-map <Leader>] :bn!<CR>
-map <Leader>[ :bp!<CR>
+lua << END
 
-" Cleanly close buffer
-map <leader>w :BufDel<CR>
-map <leader>o :BufDelOthers<CR>
+-- Buffer navigation & control
+vim.keymap.set('n', '<Leader>1', ':br!<CR>', { noremap = true, silent = true, desc = "Switch to buffer 1" })
+vim.keymap.set('n', '<Leader>2', ':br!<CR>:bn!<CR>', { noremap = true, silent = true, desc = "Switch to buffer 2" })
+vim.keymap.set('n', '<Leader>3', ':br!<CR>:bn!<CR>', { noremap = true, silent = true, desc = "Switch to buffer 3" })
+vim.keymap.set('n', '<Leader>4', ':br!<CR>:bn!<CR>', { noremap = true, silent = true, desc = "Switch to buffer 4" })
+vim.keymap.set('n', '<Leader>5', ':br!<CR>:bn!<CR>', { noremap = true, silent = true, desc = "Switch to buffer 5" })
+vim.keymap.set('n', '<Leader>6', ':br!<CR>:bn!<CR>', { noremap = true, silent = true, desc = "Switch to buffer 6" })
+vim.keymap.set('n', '<Leader>7', ':br!<CR>:bn!<CR>', { noremap = true, silent = true, desc = "Switch to buffer 7" })
+vim.keymap.set('n', '<Leader>8', ':br!<CR>:bn!<CR>', { noremap = true, silent = true, desc = "Switch to buffer 8" })
+vim.keymap.set('n', '<Leader>9', ':br!<CR>:bn!<CR>', { noremap = true, silent = true, desc = "Switch to buffer 9" })
+vim.keymap.set('n', '<Leader>]', ':bn!<CR>', { noremap = true, silent = true, desc = "Next buffer" })
+vim.keymap.set('n', '<Leader>[', ':bp!<CR>', { noremap = true, silent = true, desc = "Previous buffer" })
 
-" Execute current file or selection
-map <Leader>x :w<CR>:!./%<CR>
-map <Leader>z :'<,'>w !sh<CR>
-map <Leader>r :!./rsync.sh<CR>
+-- Cleanly close buffers
+vim.keymap.set('n', '<Leader>w', ':BufDel<CR>', { noremap = true, silent = true, desc = "Delete current buffer" })
+vim.keymap.set('n', '<Leader>o', ':BufDelOthers<CR>', { noremap = true, silent = true, desc = "Delete other buffers" })
 
-" Clipboard
-map <Leader>y :w !pbcopy<CR><CR>
-map <Leader>p :read !pbpaste<CR>
+-- Execute current file or selection
+vim.keymap.set('n', '<Leader>x', ':w<CR>:!./%<CR>', { noremap = true, silent = true, desc = "Save and execute current file" })
+vim.keymap.set('v', '<Leader>z', ':w !sh<CR>', { noremap = true, silent = true, desc = "Execute selected lines in shell" })
 
-" Save & quit
-map <D-s> :w<CR>
-map <Leader>s :w<CR>
-map <Leader>q :q<CR>
-map <Leader>qq :qa<CR>
+-- Clipboard operations
+vim.keymap.set('n', '<Leader>y', ':w !pbcopy<CR><CR>', { noremap = true, silent = true, desc = "Copy current file content to system clipboard" })
+vim.keymap.set('n', '<Leader>p', ':read !pbpaste<CR>', { noremap = true, silent = true, desc = "Paste from system clipboard" })
 
-" For when you forget to sudo.. Really Write the file.
-cmap w!! w !sudo tee % >/dev/null
-cmap wq wqa
-cmap Wq wqa
-cmap Wqa wqa
-cmap WQ wqa
-cmap WQa wqa
-cmap wqaa wqa
-cmap WQaa wqa
-cmap Qw wqq
-cmap qw wqq
+-- Save & quit shortcuts
+vim.keymap.set('n', '<D-s>', ':w<CR>', { noremap = true, silent = true, desc = "Save file (Cmd+S)" })
+vim.keymap.set('n', '<Leader>s', ':w<CR>', { noremap = true, silent = true, desc = "Save file (Leader+S)" })
+vim.keymap.set('n', '<Leader>qq', ':q<CR>', { noremap = true, silent = true, desc = "Quit current buffer" })
+vim.keymap.set('n', '<Leader>qa', ':qa<CR>', { noremap = true, silent = true, desc = "Quit all buffers" })
 
-" Toggle mouse for copy
-nmap <Leader>m :call ToggleMouse()<CR>
-function! ToggleMouse()
-    " check if mouse is enabled
-    if &mouse == 'a'
-        " disable mouse
-        set mouse=
-        set norelativenumber
-    else
-        " enable mouse everywhere
-        set mouse=a
-        set relativenumber
-    endif
-endfunc
+-- Command-line mappings for "sudo save" and quick quit commands
+vim.cmd([[
+  cnoremap w!! w !sudo tee % >/dev/null
+  cnoremap wq wqa
+  cnoremap Wq wqa
+  cnoremap Wqa wqa
+  cnoremap WQ wqa
+  cnoremap WQa wqa
+  cnoremap wqaa wqa
+  cnoremap WQaa wqa
+  cnoremap Qw wqq
+  cnoremap qw wqq
+]])
 
-" Allow switching by doing <leader><tab>
-nmap <leader><tab> :call SwitchTab()<CR>
-function! SwitchTab()
-  if (&l:expandtab)
-    echo "Switched to Tabs"
-    setlocal noexpandtab shiftwidth=4 tabstop=4 cino=N-s<CR>
+-- Toggle mouse support for easier copying
+vim.keymap.set('n', '<Leader>m', function()
+  if vim.o.mouse == 'a' then
+    vim.o.mouse = ''  -- Disable mouse
+    vim.o.relativenumber = false  -- Disable relative line numbers
   else
-    echo "Switched to Spaces"
-    setlocal expandtab shiftwidth=2 tabstop=2 cino=N-s<CR>
-  endif
-endfunction
+    vim.o.mouse = 'a'  -- Enable mouse
+    vim.o.relativenumber = true  -- Enable relative line numbers
+  end
+end, { noremap = true, silent = true, desc = "Toggle mouse support" })
+
+-- Quickfix
+vim.keymap.set("n", "<leader>qo", "<cmd>copen<cr>", { desc = "Quickfix: Open" })
+vim.keymap.set("n", "<leader>qc", "<cmd>cclose<cr>", { desc = "Quickfix: Close" })
+vim.keymap.set("n", "<leader>qn", "<cmd>cnext<cr>", { desc = "Quickfix: Next" })
+vim.keymap.set("n", "<leader>qp", "<cmd>cprev<cr>", { desc = "Quickfix: Previous" })
+
+END
