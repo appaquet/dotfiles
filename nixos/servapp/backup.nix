@@ -8,7 +8,16 @@ let
   backupScript = pkgs.writeShellScriptBin "backup-home" ''
     set -x
     export PATH=/run/current-system/sw/bin:$PATH
-    /home/appaquet/backup.sh
+
+    for FOLDER in /home/appaquet/*; do
+      if [ ! -f "$FOLDER/backup.sh" ]; then
+        echo "Skipping $FOLDER"
+        continue
+      fi
+
+      echo "Syncing $FOLDER..."
+      ./$FOLDER/backup.sh
+    done
   '';
 in
 
