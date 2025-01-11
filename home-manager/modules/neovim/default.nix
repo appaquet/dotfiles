@@ -36,6 +36,7 @@
       nvim-bufdel # :BufDel, :BufDelOthers (properly close buffers)
       delimitMate # auto close quotes, parens, etc
       nerdcommenter # block comment (<leader>cc, <leader>cu)
+      which-key-nvim # show keymap hints
 
       # Git
       vim-fugitive # Git (diff|log|...) commands
