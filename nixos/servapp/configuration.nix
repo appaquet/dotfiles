@@ -8,6 +8,7 @@
     ../nasapp.nix
     ../network-bridge.nix
     ../ups.nix
+    ./backup.nix
     ./hardware-configuration.nix
     ./virt
   ];
@@ -47,10 +48,6 @@
     uid = "appaquet";
     gid = "users";
     shares = [
-      {
-        share = "backup_servapp"; # TODO: move to backup
-        mount = "/mnt/backup_servapp";
-      }
       {
         share = "video";
         mount = "/mnt/video";
