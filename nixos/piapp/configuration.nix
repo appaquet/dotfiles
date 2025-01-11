@@ -30,7 +30,7 @@
 
   nasapp = {
     enable = true;
-    credentials = secrets.deskapp.nasappCifs;
+    credentials = secrets.piapp.nasappCifs;
     uid = "appaquet";
     gid = "users";
 
