@@ -1,5 +1,6 @@
 { pkgs, secrets, ... }:
 let
+  # Heavily adapted from: https://github.com/bercribe/nixos/blob/71c3fe9b382f6827e905f26702b90e78d1489517/modules/systems/hardware/ups/server.nix#L21
   vendorId = "0764";
   productId = "0501";
 in
@@ -8,7 +9,6 @@ in
     enable = true;
     mode = "netserver";
 
-    # Adapted from: https://github.com/bercribe/nixos/blob/71c3fe9b382f6827e905f26702b90e78d1489517/modules/systems/hardware/ups/server.nix#L21
     ups.ups = {
       # ups name "ups" expect by synology
       description = "CyberPower CP1500 AVR UPS";
@@ -84,6 +84,5 @@ in
         echo "Not enough runtime left, skipping WOL"
       fi
     '';
->>>>>>> c076d6c (servapp: auto wol when ups is back)
   };
 }
