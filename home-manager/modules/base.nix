@@ -57,6 +57,7 @@
       bandwhich
       dig
       whois
+      wol
 
       jq
       jless
