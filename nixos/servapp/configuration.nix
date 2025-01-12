@@ -7,7 +7,7 @@
     ../docker.nix
     ../nasapp.nix
     ../network-bridge.nix
-    ../ups-client.nix
+    ../ups/client.nix
     ./backup.nix
     ./hardware-configuration.nix
     ./virt
@@ -80,6 +80,12 @@
   programs.firefox.enable = true;
   services.printing.enable = false;
   services.openssh.enable = true;
+
+  # UPS
+  power.myUps = {
+    enable = true;
+    shutdownDelay = 0; # wait for as long as possible
+  };
 
   system.stateVersion = "24.11";
 }

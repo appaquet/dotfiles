@@ -7,7 +7,7 @@
     ../docker.nix
     ../nasapp.nix
     ../network-bridge.nix
-    ../ups-client.nix
+    ../ups/client.nix
     ./backups
     ./gpu-switch.nix
     ./ha-ctrl.nix
@@ -88,6 +88,12 @@
   programs.firefox.enable = true;
   services.printing.enable = false;
   services.openssh.enable = true;
+
+  # UPS
+  power.myUps = {
+    enable = true;
+    shutdownDelay = 600; # turn off after 5 mins on bat
+  };
 
   system.stateVersion = "24.05";
 }
