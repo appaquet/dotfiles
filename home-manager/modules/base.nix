@@ -57,7 +57,6 @@
       bandwhich
       dig
       whois
-      wol
 
       jq
       jless
@@ -85,6 +84,7 @@
     ++ lib.optionals pkgs.stdenv.isLinux [
       pkgs.libtree # recursive ldd
       pkgs.dool # dstat alternative, only on linux
+      pkgs.wol # wake on lan
     ]
     ++ lib.optionals (pkgs.stdenv.isDarwin || pkgs.stdenv.isx86_64) [
       inputs.fzf-nix.packages.${pkgs.system}.fzf-nix # fzf-nix, somehow doesn't work on linux arm
