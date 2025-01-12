@@ -17,9 +17,12 @@
   * `<leader>o` to close all buffers except the current one
 
 ## Fzf
-  * `<leader>ff` fuzzy finding file names
-  * `<leader>fs` fuzzy find in current file
-  * `<leader>fS` fuzzy find in workspace / file contents
+  * `<ctrl>p` or `<leader>ff` fuzzy finding file names
+  * `<ctrl-l>` or `<leader>fs` fuzzy find in current file
+  * `<ctrl-g>` or `<leader>fS` fuzzy find in workspace (ripgrep)
+  * `<ctrl-b>` or `<leader>fb` fuzzy find through buffers
+  * `<ctrl-\>` fuzzy find through neovim commands
+  * `<leader>fk` fuzzy find through keymaps
   * When open, `<ctrl>q`, sends matches to the quickfix list
   * See [plgin.fzf.vim](./home-manager/modules/neovim/plugins/fzf.vim) for more
 
