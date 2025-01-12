@@ -25,6 +25,12 @@ in
       description = "Shutdown after X minutes of UPS power";
       default = 0;
     };
+
+    shutdownCmd = lib.mkOption {
+      type = lib.types.string;
+      description = "Shutdown command";
+      default = "${pkgs.systemd}/bin/shutdown now";
+    };
   };
 
   config = lib.mkIf cfg.enable (
@@ -42,7 +48,7 @@ in
           upsmon = {
             settings = {
               MINSUPPLIES = 1;
-              SHUTDOWNCMD = "${pkgs.systemd}/bin/shutdown now";
+              SHUTDOWNCMD = cfg.shutdownCmd;
               DEADTIME = 999999; # we don't want to stop if remote server becomes unavailable
 
               # Don't spam WALL

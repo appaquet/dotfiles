@@ -92,7 +92,8 @@
   # UPS
   power.myUps = {
     enable = true;
-    shutdownDelay = 600; # turn off after 5 mins on bat
+    shutdownDelay = 60; # suspend after 1 min on bat
+    shutdownCmd = "${pkgs.systemd}/bin/systemctl suspend";
   };
 
   system.stateVersion = "24.05";
