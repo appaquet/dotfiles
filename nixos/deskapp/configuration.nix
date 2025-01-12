@@ -7,7 +7,7 @@
     ../docker.nix
     ../nasapp.nix
     ../network-bridge.nix
-    #../ups.nix
+    ../ups-client.nix
     ./backups
     ./gpu-switch.nix
     ./ha-ctrl.nix

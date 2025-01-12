@@ -7,7 +7,7 @@
     ../docker.nix
     ../nasapp.nix
     ../network-bridge.nix
-    #../ups.nix
+    ../ups-client.nix
     ./backup.nix
     ./hardware-configuration.nix
     ./virt

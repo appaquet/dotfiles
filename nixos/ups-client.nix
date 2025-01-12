@@ -7,12 +7,12 @@
 
     users.monuser = {
       upsmon = "primary";
-      passwordFile = secrets.deskapp.nasappUpsPw;
+      passwordFile = secrets.upsPw;
     };
 
     upsmon = {
       settings = {
-        MINSUPPLIES = 1; # Minimum number of power supplies
+        MINSUPPLIES = 1;
         SHUTDOWNCMD = "${pkgs.systemd}/bin/shutdown now";
 
         # Don't spam WALL
@@ -39,7 +39,7 @@
       monitor.main = {
         system = "ups@192.168.0.20";
         user = "monuser";
-        passwordFile = secrets.deskapp.nasappUpsPw;
+        passwordFile = secrets.upsPw;
       };
     };
   };

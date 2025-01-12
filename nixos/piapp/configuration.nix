@@ -4,6 +4,7 @@
   imports = [
     ../common.nix
     ../nasapp.nix
+    ./ups-server.nix
   ];
 
   # From https://github.com/NixOS/nixpkgs/issues/260754
