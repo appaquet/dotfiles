@@ -14,6 +14,7 @@
       settings = {
         MINSUPPLIES = 1;
         SHUTDOWNCMD = "${pkgs.systemd}/bin/shutdown now";
+        DEADTIME = 999999; # we don't want to stop if piapp is unreachable...
 
         # Don't spam WALL
         NOTIFYFLAG = [
