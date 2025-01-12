@@ -20,6 +20,7 @@ in
         "productid = ${productId}"
 
         # Override low bat thresholds to 30% or 10m left.
+        "override.battery.charge.warning = 50"
         "override.battery.charge.low = 30"
         "override.battery.runtime.low = 600"
         "ignorelb"
