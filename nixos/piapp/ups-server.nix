@@ -52,6 +52,5 @@ in
         SHUTDOWNCMD = "systemctl restart upsd";
       };
     };
-
   };
 }
