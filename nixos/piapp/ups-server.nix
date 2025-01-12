@@ -19,10 +19,10 @@ in
         "vendorid = ${vendorId}"
         "productid = ${productId}"
 
-        # Override low bat thresholds to 50% or 300s left.
-        #"override.battery.charge.low = 50"
-        #"override.battery.runtime.low = 300"
-        #"ignorelb"
+        # Override low bat thresholds to 30% or 10m left.
+        "override.battery.charge.low = 30"
+        "override.battery.runtime.low = 600"
+        "ignorelb"
       ];
     };
 
