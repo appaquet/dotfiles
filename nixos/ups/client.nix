@@ -8,6 +8,13 @@
 
 let
   cfg = config.power.myUps;
+
+  mapNotifyFlags =
+    listTypes: notification:
+    map (typ: [
+      typ
+      notification
+    ]) listTypes;
 in
 
 {
@@ -22,12 +29,12 @@ in
 
     shutdownDelay = lib.mkOption {
       type = lib.types.int;
-      description = "Shutdown after X minutes of UPS power";
+      description = "Shutdown after X seconds of UPS power";
       default = 0;
     };
 
     shutdownCmd = lib.mkOption {
-      type = lib.types.string;
+      type = lib.types.str;
       description = "Shutdown command";
       default = "${pkgs.systemd}/bin/shutdown now";
     };
@@ -50,26 +57,18 @@ in
               MINSUPPLIES = 1;
               SHUTDOWNCMD = cfg.shutdownCmd;
               DEADTIME = 999999; # we don't want to stop if remote server becomes unavailable
+              #DEBUG_MIN = 9;
 
-              # Don't spam WALL
-              NOTIFYFLAG = [
-                [
-                  "COMMOK"
-                  "SYSLOG"
-                ]
-                [
-                  "COMMBAD"
-                  "SYSLOG"
-                ]
-                [
-                  "NOCOMM"
-                  "SYSLOG"
-                ]
-                [
-                  "NOPARENT"
-                  "SYSLOG"
-                ]
-              ];
+              # Don't spam WALL, send to syslog + upssched
+              NOTIFYFLAG = mapNotifyFlags [
+                "ONLINE"
+                "COMMOK"
+                "COMMBAD"
+                "NOCOMM"
+                "NOPARENT"
+                "ONBATT"
+                "LOWBATT"
+              ] "SYSLOG+EXEC";
             };
 
             monitor.main = {

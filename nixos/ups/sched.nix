@@ -20,6 +20,7 @@ let
     text = ''
       log_event () {
         logger -t upssched-cmd "$1"
+        #echo "$1" >> /tmp/upssched-cmd.log
       }
 
       case $1 in
@@ -54,7 +55,7 @@ let
   };
 in
 pkgs.writeText "upssched.conf" ''
-  CMDSCRIPT ${upssched-cmd}
+  CMDSCRIPT ${upssched-cmd}/bin/upssched-cmd
   PIPEFN /var/lib/nut/upssched.pipe
   LOCKFN /var/lib/nut/upssched.lock
   AT ONBATT * EXECUTE onbatt
@@ -62,6 +63,7 @@ pkgs.writeText "upssched.conf" ''
   AT ONBATT * START-TIMER timeonbatt ${toString cfg.shutdownDelay}
   AT ONLINE * CANCEL-TIMER timeonbatt timeonline
   AT COMMBAD * EXECUTE upsgone
+  AT COMMOK * EXECUTE online
   AT NOCOMM * EXECUTE upsgone
   AT REPLBATT * EXECUTE replacebat
   AT LOWBATT * EXECUTE lowbat
