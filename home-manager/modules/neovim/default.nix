@@ -69,8 +69,10 @@ in
       # and https://github.com/zbirenbaum/copilot-cmp
       copilot-lua
       copilot-cmp
+
+      # Avante and dependencies
       avante-nvim
-      render-markdown-nvim # needed for avante
+      render-markdown-nvim
 
       # Syntax
       (nvim-treesitter.withPlugins (p: [
