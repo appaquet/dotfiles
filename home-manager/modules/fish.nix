@@ -19,13 +19,8 @@
       # Add support for nix run and nix-shell in fish
       ${pkgs.any-nix-shell}/bin/any-nix-shell fish --info-right | source
 
-      # Term color support + theme
-      # TODO: test what still makes sense here.. i use starfish now
+      # Force term color support
       set -x TERM xterm-256color
-      set -g theme_display_cmd_duration no
-      set -g theme_display_date no
-      set -g theme_newline_cursor yes # have prompt start on sep line
-      set -g theme_color_scheme base16 # Use `bobthefish_display_colors --all` to list themes
 
       # Source any local stuff from .profile
       if test -f ~/.profile

@@ -19,7 +19,7 @@
     # - https://www.lunarvim.org/docs/plugins/core-plugins-list
     plugins = with pkgs.vimPlugins; [
       # Theme
-      base16-nvim
+      night-owl-nvim
       nvim-web-devicons
 
       # Layout

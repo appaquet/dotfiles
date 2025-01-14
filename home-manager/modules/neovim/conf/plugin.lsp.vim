@@ -3,7 +3,6 @@ lua << END
 -- Adapted from https://github.com/neovim/nvim-lspconfig
 
 local lspconfig = require('lspconfig')
-
 lspconfig.pyright.setup {}
 lspconfig.ts_ls.setup {}
 lspconfig.marksman.setup {}
@@ -14,6 +13,11 @@ lspconfig.rust_analyzer.setup {
   settings = {
     ['rust-analyzer'] = {},
   },
+
+  -- https://rust-analyzer.github.io/manual.html#nvim-lsp
+  on_attach = function(client, bufnr)
+     vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+  end
 }
 
 -- Global mappings.

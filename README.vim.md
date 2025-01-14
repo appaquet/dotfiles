@@ -38,8 +38,14 @@
   * `gD` goto declaration
   * `gd` goto definition
   * `gi` goto implementation
+  * `<space>D` type definition
   * `K` hover info
   * `<space>rn` rename symbol
+  * `<space>ca` code action on code or block (ex: extract function)
+  * `gr` list all references of a symbol (to quickfix)
+  * `<space>f` format cod
+  * `]d` go to next diagnostic
+  * `[d` go to prev diagnostic
 
 ## Nvim tree
   * `<ctrl>e` to toggle filetree
