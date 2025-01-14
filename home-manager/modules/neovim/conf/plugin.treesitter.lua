@@ -1,4 +1,3 @@
-lua << END
 require'nvim-treesitter.configs'.setup {
   ensure_installed = {}, -- change in neovim/default.nix
   sync_install = false,
@@ -125,4 +124,3 @@ require'nvim-treesitter.configs'.setup {
     },
   },
 }
-END

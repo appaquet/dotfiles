@@ -1,5 +1,3 @@
-lua << END
-
 -- copilot (https://github.com/zbirenbaum/copilot.lua)
 -- disable suggestions & panel since we are using cmp
 require("copilot").setup({
@@ -17,5 +15,3 @@ require("copilot").setup({
 require("copilot_cmp").setup {
   method = "getCompletionsCycling",
 }
-
-END

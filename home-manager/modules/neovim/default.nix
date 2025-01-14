@@ -1,5 +1,15 @@
 { pkgs, ... }:
 
+let
+  readLuaFile =
+    path:
+    builtins.concatStringsSep "\n" [
+      "lua << END"
+      (builtins.readFile path)
+      "END"
+    ];
+
+in
 {
   home.packages = with pkgs; [
     nixd # nix lsp
@@ -90,16 +100,16 @@
     extraConfig = (
       builtins.concatStringsSep "\n" [
         (builtins.readFile ./conf/base.vim)
-        (builtins.readFile ./conf/keymap.vim)
-        (builtins.readFile ./conf/theme.vim)
-        (builtins.readFile ./conf/plugin.autosession.vim)
-        (builtins.readFile ./conf/plugin.bufferline.vim)
-        (builtins.readFile ./conf/plugin.copilot.vim)
-        (builtins.readFile ./conf/plugin.fzf.vim)
-        (builtins.readFile ./conf/plugin.lsp.vim)
-        (builtins.readFile ./conf/plugin.lualine.vim)
-        (builtins.readFile ./conf/plugin.nvimtree.vim)
-        (builtins.readFile ./conf/plugin.treesitter.vim)
+        (readLuaFile ./conf/keymap.lua)
+        (readLuaFile ./conf/theme.lua)
+        (readLuaFile ./conf/plugin.autosession.lua)
+        (readLuaFile ./conf/plugin.bufferline.lua)
+        (readLuaFile ./conf/plugin.copilot.lua)
+        (readLuaFile ./conf/plugin.fzf.lua)
+        (readLuaFile ./conf/plugin.lsp.lua)
+        (readLuaFile ./conf/plugin.lualine.lua)
+        (readLuaFile ./conf/plugin.nvimtree.lua)
+        (readLuaFile ./conf/plugin.treesitter.lua)
       ]
     );
   };

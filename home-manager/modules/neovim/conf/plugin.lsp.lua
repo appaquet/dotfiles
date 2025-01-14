@@ -1,5 +1,3 @@
-lua << END
-
 -- Adapted from https://github.com/neovim/nvim-lspconfig
 
 local lspconfig = require('lspconfig')
@@ -123,5 +121,3 @@ require("copilot").setup({
 require("copilot_cmp").setup {
   method = "getCompletionsCycling",
 }
-
-END
