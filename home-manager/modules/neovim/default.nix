@@ -47,6 +47,7 @@ in
       delimitMate # auto close quotes, parens, etc
       nerdcommenter # block comment (<leader>cc, <leader>cu)
       which-key-nvim # show keymap hints
+      todo-comments-nvim # highlight TODO, FIXME, etc
 
       # Git
       vim-fugitive # Git (diff|log|...) commands
@@ -114,6 +115,7 @@ in
         (readLuaFile ./conf/plugin.lsp.lua)
         (readLuaFile ./conf/plugin.lualine.lua)
         (readLuaFile ./conf/plugin.nvimtree.lua)
+        (readLuaFile ./conf/plugin.todocomments.lua)
         (readLuaFile ./conf/plugin.treesitter.lua)
       ]
     );

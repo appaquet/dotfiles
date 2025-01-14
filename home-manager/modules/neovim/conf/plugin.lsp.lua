@@ -6,6 +6,7 @@ lspconfig.ts_ls.setup {}
 lspconfig.marksman.setup {}
 lspconfig.gopls.setup {}
 lspconfig.nixd.setup {}
+lspconfig.buf_ls.setup {}
 lspconfig.rust_analyzer.setup {
   -- Server-specific settings. See `:help lspconfig-setup`
   settings = {
@@ -35,18 +36,19 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
     -- Buffer local mappings.
     -- See `:help vim.lsp.*` for documentation on any of the below functions
+    -- Adapted a bit from https://lsp-zero.netlify.app/docs/language-server-configuration.html
     local opts = { buffer = ev.buf }
-    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, { buffer = ev.buf, desc = "LSP: Got to declaration" })
+    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, { buffer = ev.buf, desc = "LSP: Go to declaration" })
     vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { buffer = ev.buf, desc = "LSP: Go to definition" })
-    vim.keymap.set('n', 'K', vim.lsp.buf.hover, { buffer = ev.buf, desc = "LSP: Show hover" })
-    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, { buffer = ev.buf, desc = "LSP: Go to implementation" })
+    vim.keymap.set('n', 'gt', vim.lsp.buf.type_definition, { buffer = ev.buf, desc = "LSP: Go to type type definition" })
+    vim.keymap.set('n', 'K', vim.lsp.buf.hover, { buffer = ev.buf, desc = "LSP: Displays hover information about a symbol" })
+    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, { buffer = ev.buf, desc = "LSP: List all implementations" })
     vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, { buffer = ev.buf, desc = "LSP: Show signature help" })
     vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, { buffer = ev.buf, desc = "LSP: Add workspace folder" })
     vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, { buffer = ev.buf, desc = "LSP: Remove workspace folder" })
     vim.keymap.set('n', '<space>wl', function()
       print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
     end, { buffer = ev.buf, desc = "LSP: List workspace folders" })
-    vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, { buffer = ev.buf, desc = "LSP: Go to type definition" })
     vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, { buffer = ev.buf, desc = "LSP: Rename" })
     vim.keymap.set({ 'n', 'v' }, '<space>ca', vim.lsp.buf.code_action, { buffer = ev.buf, desc = "LSP: Code action" })
     vim.keymap.set('n', 'gr', vim.lsp.buf.references, { buffer = ev.buf, desc = "LSP: List references" })
@@ -69,13 +71,17 @@ cmp.setup {
 
   mapping = cmp.mapping.preset.insert({
     ['<C-u>'] = cmp.mapping.scroll_docs(-4), -- Up
+
     ['<C-d>'] = cmp.mapping.scroll_docs(4), -- Down
+
     -- C-b (back) C-f (forward) for snippet placeholder navigation.
     ['<C-Space>'] = cmp.mapping.complete(),
+
     ['<CR>'] = cmp.mapping.confirm {
       behavior = cmp.ConfirmBehavior.Replace,
       select = true,
     },
+
     ['<Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_next_item()
@@ -85,6 +91,7 @@ cmp.setup {
         fallback()
       end
     end, { 'i', 's' }),
+
     ['<S-Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_prev_item()
@@ -95,6 +102,13 @@ cmp.setup {
       end
     end, { 'i', 's' }),
   }),
+
+  -- TODO:
+  --window = {
+    --documentation = {
+      --max_width = 80,
+    --},
+  --},
 
   sources = {
     { name = "copilot" },

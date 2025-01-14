@@ -147,7 +147,7 @@
 
 ### Neovim
 
-See [README.vim.md](./README.vim.md)
+See [README.nvim.md](./README.nvim.md)
 
 ### tmux
 
@@ -167,6 +167,9 @@ See [README.vim.md](./README.vim.md)
     * `y` to yank
     * `H` and `L` start line / end line
   * `<ctrl>b q` to show pane ids, then `:swap-pane -s X -t Y` to swap
+  * History search
+    * Enable copy mode: `<ctrl>b [`
+    * Use `?` or `/` and then navigate matches with `n` or `N`
 
 * Plugins (via integrated .tmux.conf's tpm)
   * [tmux-resurrect](https://github.com/tmux-plugins/tmux-resurrect)

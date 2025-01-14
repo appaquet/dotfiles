@@ -35,11 +35,11 @@
   * `<leader>cu` uncomment
 
 ## Code / LSP
-  * `gD` goto declaration
-  * `gd` goto definition
-  * `gi` goto implementation
-  * `<space>D` type definition
-  * `K` hover info
+  * `gD` go to declaration
+  * `gd` go to definition
+  * `gi` find all implementations
+  * `go` go to type definiton
+  * `K` Displays hover information about a symbol
   * `<space>rn` rename symbol
   * `<space>ca` code action on code or block (ex: extract function)
   * `gr` list all references of a symbol (to quickfix)
