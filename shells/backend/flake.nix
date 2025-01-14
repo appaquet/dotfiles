@@ -54,7 +54,10 @@
               clang
 
               (rust-bin.stable.latest.default.override {
-                extensions = [ "rust-src" "rust-analyzer" ];
+                extensions = [
+                  "rust-src"
+                  "rust-analyzer"
+                ];
               })
 
               llvmPackages.libclang

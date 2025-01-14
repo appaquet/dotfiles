@@ -1,3 +1,4 @@
+
 vim.keymap.set('n', '<Leader>e', ':NvimTreeToggle<CR>', { desc = "Tree: Toggle" })
 
 -- disable netrw at the very start of your init.lua (strongly advised)
