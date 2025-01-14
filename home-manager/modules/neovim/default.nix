@@ -69,6 +69,8 @@ in
       # and https://github.com/zbirenbaum/copilot-cmp
       copilot-lua
       copilot-cmp
+      avante-nvim
+      render-markdown-nvim # needed for avante
 
       # Syntax
       (nvim-treesitter.withPlugins (p: [
@@ -103,6 +105,7 @@ in
         (readLuaFile ./conf/keymap.lua)
         (readLuaFile ./conf/theme.lua)
         (readLuaFile ./conf/plugin.autosession.lua)
+        (readLuaFile ./conf/plugin.avante.lua)
         (readLuaFile ./conf/plugin.bufferline.lua)
         (readLuaFile ./conf/plugin.copilot.lua)
         (readLuaFile ./conf/plugin.fzf.lua)

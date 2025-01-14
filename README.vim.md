@@ -13,7 +13,7 @@
   * `<leader>s` to save current buffer
   * `<leader>x` to save and then execute current buffer (as long as it's chmod +x)
   * `<leader>z` to execute current visual selection in a shell
-  * `<leader>w` to close the current buffer by trying not to messup the layout
+  * `<leader>w` to close the current buffer by trying not to mess up the layout
   * `<leader>o` to close all buffers except the current one
 
 ## Fzf
@@ -24,7 +24,7 @@
   * `<ctrl-\>` fuzzy find through neovim commands
   * `<leader>fk` fuzzy find through keymaps
   * When open, `<ctrl>q`, sends matches to the quickfix list
-  * See [plgin.fzf.vim](./home-manager/modules/neovim/plugins/fzf.vim) for more
+  * See [plugin.fzf.vim](./home-manager/modules/neovim/plugins/fzf.vim) for more
 
 ## Editing & navigation
   * `<leader>y` to yank to clipboard using [bin/pbcopy](bin/pbcopy) util
@@ -43,7 +43,7 @@
   * `<space>rn` rename symbol
   * `<space>ca` code action on code or block (ex: extract function)
   * `gr` list all references of a symbol (to quickfix)
-  * `<space>f` format cod
+  * `<space>f` format code
   * `]d` go to next diagnostic
   * `[d` go to prev diagnostic
 
