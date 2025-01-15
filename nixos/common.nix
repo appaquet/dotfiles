@@ -43,6 +43,8 @@
     ];
   };
   programs.fish.enable = true;
+  security.sudo.enable = true;
+  security.sudo.wheelNeedsPassword = true;
 
   # Allow running external dynamically binaries
   # nix-ld replaces interpreter and automatically link with nix libs
@@ -63,7 +65,7 @@
   # Run fstrim weekly
   services.fstrim.enable = true;
 
+  # Networking
   services.tailscale.enable = true;
-  security.sudo.enable = true;
-  security.sudo.wheelNeedsPassword = true;
+  systemd.services.NetworkManager-wait-online.enable = false; # cause more issues than it solves
 }
