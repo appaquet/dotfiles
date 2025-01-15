@@ -19,7 +19,7 @@ vim.keymap.set('n', '<Leader>x', ':w<CR>:!./%<CR>', { desc = "Save and execute c
 vim.keymap.set('v', '<Leader>z', ':w !sh<CR>', { desc = "Execute selected lines in shell" })
 
 -- Clipboard operations
-vim.keymap.set('n', '<Leader>y', ':w !pbcopy<CR><CR>', { desc = "Copy current file content to system clipboard" })
+vim.keymap.set('v', '<Leader>y', ':w !pbcopy<CR><CR>', { desc = "Copy current file content to system clipboard" })
 vim.keymap.set('n', '<Leader>p', ':read !pbpaste<CR>', { desc = "Paste from system clipboard" })
 
 -- Save & quit shortcuts
