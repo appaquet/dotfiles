@@ -135,16 +135,6 @@ require("copilot_cmp").setup {
 ---------
 -- Golang
 -- https://github.com/ray-x/go.nvim
-require("go").setup {
-    lsp_cfg = {
-    settings = {
-      gopls = {
-        staticcheck = true,
-      },
-    },
-  },
-  gofmt = 'gofmt',
-}
 
 -- Format & cleanup imports on save
 local format_sync_grp = vim.api.nvim_create_augroup("goimports", {})
@@ -155,3 +145,17 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   end,
   group = format_sync_grp,
 })
+
+
+load_plugin_on_first_open("go", "go", function()
+  require("go").setup {
+      lsp_cfg = {
+      settings = {
+        gopls = {
+          staticcheck = true,
+        },
+      },
+    },
+    gofmt = 'gofmt',
+  }
+end)

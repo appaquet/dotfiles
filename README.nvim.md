@@ -79,7 +79,20 @@
 * `<leader>qn` to go to next quickfix
 * `<leader>qp` to go to prev quickfix
 
+## Testing
+  * `<leader>tc` to run nearest / under cursor
+  * `<leader>tdc` to debug nearest
+  * `<leader>tf` to run file
+  * `<leader>tdf` to debug file
+  * `<leader>tl` to run last
+  * `<leader>tdl` to debug last
+  * `<leader>ts` to stop test
+  * `<leader>tp` to open output panel
+  * `<leader>tk` to clear output panel
+  * `<leader>tq` to close output panel
+
 ## Commands
   * `Rename <file name>` to rename current file
   * `Edit <file name>` to create a file in current buffer dir
   * `Delete` to delete current file
+

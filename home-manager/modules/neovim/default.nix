@@ -51,6 +51,9 @@ in
       # LSP / Languages
       nvim-lspconfig # https://github.com/neovim/nvim-lspconfig
       go-nvim
+      neotest
+      neotest-golang
+      rustaceanvim
 
       # Autocomplete (w/ LSP)
       luasnip
@@ -101,6 +104,7 @@ in
     extraConfig = (
       builtins.concatStringsSep "\n" [
         (builtins.readFile ./conf/base.vim)
+        (readLuaFile ./conf/base.lua)
         (readLuaFile ./conf/keymap.lua)
         (readLuaFile ./conf/theme.lua)
         (readLuaFile ./conf/plugin.autosession.lua)
@@ -110,6 +114,7 @@ in
         (readLuaFile ./conf/plugin.fzf.lua)
         (readLuaFile ./conf/plugin.lsp.lua)
         (readLuaFile ./conf/plugin.lualine.lua)
+        (readLuaFile ./conf/plugin.neotest.lua)
         (readLuaFile ./conf/plugin.nvimtree.lua)
         (readLuaFile ./conf/plugin.todocomments.lua)
         (readLuaFile ./conf/plugin.treesitter.lua)
