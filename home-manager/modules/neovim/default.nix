@@ -22,11 +22,6 @@ in
     viAlias = true;
     vimAlias = true;
 
-    # TODO: Inspire configs from:
-    # - https://astronvim.com/#-features
-    # - https://nvchad.com/docs/features
-    # - https://github.com/rockerBOO/awesome-neovim#preconfigured-configuration (meta list of configs)
-    # - https://www.lunarvim.org/docs/plugins/core-plugins-list
     plugins = with pkgs.vimPlugins; [
       # Theme
       night-owl-nvim
@@ -53,8 +48,9 @@ in
       vim-fugitive # Git (diff|log|...) commands
       vim-gitgutter # Show diffs in gutter
 
-      # LSP
+      # LSP / Languages
       nvim-lspconfig # https://github.com/neovim/nvim-lspconfig
+      go-nvim
 
       # Autocomplete (w/ LSP)
       luasnip

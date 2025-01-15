@@ -103,13 +103,6 @@ cmp.setup {
     end, { 'i', 's' }),
   }),
 
-  -- TODO:
-  --window = {
-    --documentation = {
-      --max_width = 80,
-    --},
-  --},
-
   sources = {
     { name = "copilot" },
     { name = 'nvim_lsp' },
@@ -119,7 +112,9 @@ cmp.setup {
   },
 }
 
--- copilot (https://github.com/zbirenbaum/copilot.lua)
+-------------
+-- copilot 
+-- https://github.com/zbirenbaum/copilot.lua
 require("copilot").setup({
   suggestion = { enabled = false },
   panel = { enabled = false },
@@ -131,7 +126,32 @@ require("copilot").setup({
   }
 })
 
+-- cmp support for copilot
 -- https://github.com/zbirenbaum/copilot-cmp
 require("copilot_cmp").setup {
   method = "getCompletionsCycling",
 }
+
+---------
+-- Golang
+-- https://github.com/ray-x/go.nvim
+require("go").setup {
+    lsp_cfg = {
+    settings = {
+      gopls = {
+        staticcheck = true,
+      },
+    },
+  },
+  gofmt = 'gofmt',
+}
+
+-- Format & cleanup imports on save
+local format_sync_grp = vim.api.nvim_create_augroup("goimports", {})
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = "*.go",
+  callback = function()
+   require('go.format').goimports()
+  end,
+  group = format_sync_grp,
+})
