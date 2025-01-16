@@ -18,6 +18,7 @@ Neotest.setup({
 
 local function run_nearest()
   Neotest.output_panel.open()
+  Neotest.output_panel.clear()
   Neotest.run.run()
 end
 
@@ -27,21 +28,23 @@ end
 
 local function run_file()
   Neotest.output_panel.open()
+  Neotest.output_panel.clear()
   Neotest.run.run(vim.fn.expand("%"))
 end
 
 local function debug_file()
   Neotest.output_panel.open()
+  Neotest.output_panel.clear()
   Neotest.run.run({ vim.fn.expand("%"), strategy = "dap" })
 end
 
 local function run_last()
   Neotest.output_panel.open()
+  Neotest.output_panel.clear()
   Neotest.run.run_last()
 end
 
 local function debug_last()
-  Neotest.output_panel.open()
   Neotest.run.run_last({ strategy = "dap" })
 end
 

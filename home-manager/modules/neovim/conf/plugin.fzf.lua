@@ -37,6 +37,7 @@ vim.keymap.set("n", "<leader>fh", fzf.helptags, { desc = "FZF: Help tags" })
 vim.keymap.set("n", "<leader>fk", fzf.keymaps, { desc = "FZF: Keymaps" })
 
 vim.keymap.set("n", "<leader>fql", fzf.quickfix, { desc = "FZF: Quickfix list" })
+vim.keymap.set("n", "<leader>xf", fzf.quickfix, { desc = "FZF: Quickfix list" })
 vim.keymap.set("n", "<leader>fqs", fzf.quickfix_stack, { desc = "FZF: Quickfix stack" })
 
 vim.keymap.set("n", "<leader>fls", fzf.lsp_document_symbols, { desc = "FZF: LSP document symbols" })

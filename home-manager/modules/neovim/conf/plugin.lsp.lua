@@ -45,14 +45,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
 -- Enable inlays
 vim.lsp.inlay_hint.enable(true)
 
---------------
--- Diagnostics
--- See `:help vim.diagnostic.*` for documentation on any of the below functions
-vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, { desc = "LSP: Open diagnostic float" })
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = "LSP: Go to previous diagnostic" })
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = "LSP: Go to next diagnostic" })
-vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, { desc = "LSP: Set location list" })
-
 -- nvim-cmp (https://github.com/hrsh7th/nvim-cmp)
 -- luasnip (https://github.com/L3MON4D3/LuaSnip)
 local luasnip = require 'luasnip'

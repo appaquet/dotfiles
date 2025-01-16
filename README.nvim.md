@@ -11,10 +11,9 @@
   * `<leader>]` to switch to next buffer
   * `<leader>[` to switch to previous buffer
   * `<leader>s` to save current buffer
-  * `<leader>x` to save and then execute current buffer (as long as it's chmod +x)
-  * `<leader>z` to execute current visual selection in a shell
   * `<leader>w` to close the current buffer by trying not to mess up the layout
-  * `<leader>o` to close all buffers except the current one
+  * `<leader>wo` to close all buffers except the current one
+  * `<leader>wa` to close all buffers
 
 ## Fzf
   * `<ctrl>p` or `<leader>ff` fuzzy finding file names
@@ -44,8 +43,11 @@
   * `<space>ca` code action on code or block (ex: extract function)
   * `gr` list all references of a symbol (to quickfix)
   * `<space>f` format code
-  * `]d` go to next diagnostic
-  * `[d` go to prev diagnostic
+
+## Diagnostics
+  * `<leader>db` Open diagnostic float
+  * `<leader>dn` or `]d` Go to next diagnostic
+  * `<leader>dp` or `[d` Go to previous diagnostic
 
 ## Nvim tree
   * `<ctrl>e` to toggle filetree
@@ -74,10 +76,11 @@
   * `:Gblame` to show blame
 
 ## Quickfix
-* `<leader>qo` to open quickfix
-* `<leader>qc` to close quickfix
-* `<leader>qn` to go to next quickfix
-* `<leader>qp` to go to prev quickfix
+* `<leader>xo` to open quickfix
+* `<leader>xq` to close quickfix
+* `<leader>xn` or `]d` to go to next quickfix
+* `<leader>xp` or `[d` to go to prev quickfix
+* `<leader>xf` to find in quickfix
 
 ## Testing
   * `<leader>tc` to run nearest / under cursor
@@ -90,6 +93,10 @@
   * `<leader>tp` to open output panel
   * `<leader>tk` to clear output panel
   * `<leader>tq` to close output panel
+
+## Misc
+  * `<leader>r` to execute current buffer in a shell (normal mode)
+  * `<leader>r` to execute current visual selection in a shell (visual mode)
 
 ## Commands
   * `Rename <file name>` to rename current file

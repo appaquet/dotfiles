@@ -44,9 +44,13 @@ in
       which-key-nvim # show keymap hints
       todo-comments-nvim # highlight TODO, FIXME, etc
 
+      # Diagnostics
+      trouble-nvim
+
       # Git
       vim-fugitive # Git (diff|log|...) commands
       vim-gitgutter # Show diffs in gutter
+      diffview-nvim # :DiffviewOpen, :DiffviewClose
 
       # LSP / Languages
       nvim-lspconfig # https://github.com/neovim/nvim-lspconfig
@@ -118,6 +122,7 @@ in
         (readLuaFile ./conf/plugin.nvimtree.lua)
         (readLuaFile ./conf/plugin.todocomments.lua)
         (readLuaFile ./conf/plugin.treesitter.lua)
+        (readLuaFile ./conf/plugin.trouble.lua)
       ]
     );
   };

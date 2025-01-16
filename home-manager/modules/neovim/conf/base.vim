@@ -11,6 +11,7 @@ set showmatch           " show matching brackets/parenthesis
 set incsearch           " find as you type search
 set hlsearch            " highlight search terms
 set relativenumber      " relative line numbers
+set number              " show current absolute number instead of 0
 set smartcase           " case sensitive when uc present
 set ignorecase          " case insensitive search
 set hidden              " buffer switching without saving
