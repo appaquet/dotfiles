@@ -45,9 +45,12 @@
   * `<space>f` format code
 
 ## Diagnostics
-  * `<leader>db` Open diagnostic float
+  * `<leader>ds` or `<leader>df` Open diagnostic float
   * `<leader>dn` or `]d` Go to next diagnostic
   * `<leader>dp` or `[d` Go to previous diagnostic
+  * `<leader>do` Open diagnostic panel (Trouble)
+  * `<leader>dq` Close diagnostic panel (Trouble)
+
 
 ## Nvim tree
   * `<ctrl>e` to toggle filetree
@@ -78,8 +81,8 @@
 ## Quickfix
 * `<leader>xo` to open quickfix
 * `<leader>xq` to close quickfix
-* `<leader>xn` or `]d` to go to next quickfix
-* `<leader>xp` or `[d` to go to prev quickfix
+* `<leader>xn` or `]x` to go to next quickfix
+* `<leader>xp` or `[x` to go to prev quickfix
 * `<leader>xf` to find in quickfix
 
 ## Testing
@@ -90,7 +93,7 @@
   * `<leader>tl` to run last
   * `<leader>tdl` to debug last
   * `<leader>ts` to stop test
-  * `<leader>tp` to open output panel
+  * `<leader>to` to open output panel
   * `<leader>tk` to clear output panel
   * `<leader>tq` to close output panel
 

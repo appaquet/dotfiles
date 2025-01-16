@@ -35,6 +35,7 @@ end
 
 -- See `:help vim.diagnostic.*` for documentation on any of the below functions
 vim.keymap.set('n', '<leader>ds', vim.diagnostic.open_float, { desc = "Diag: Open diagnostic float" })
+vim.keymap.set('n', '<leader>df', vim.diagnostic.open_float, { desc = "Diag: Open diagnostic float" })
 vim.keymap.set('n', '<leader>dn', trouble_next, { desc = "Diag: Go to next diagnostic" })
 vim.keymap.set('n', ']d', trouble_next, { desc = "Diag: Go to next diagnostic" })
 vim.keymap.set('n', '<leader>dp', trouble_prev, { desc = "Diag: Go to previous diagnostic" })

@@ -20,7 +20,9 @@
       ${pkgs.any-nix-shell}/bin/any-nix-shell fish --info-right | source
 
       # Force term color support
+      # Some TUI may not appear correctly otherwise
       set -x TERM xterm-256color
+      set -x COLORTERM truecolor
 
       # Source any local stuff from .profile
       if test -f ~/.profile
