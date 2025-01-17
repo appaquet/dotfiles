@@ -7,13 +7,20 @@
   * `<leader>m` to toggle mouse support (useful to allow select + copy)
 
 ## Buffers
-  * `<leader> 1 through 9` to switch between opened buffers
+* `<leader> 1 through 9` to switch to buffer 1 through 9
   * `<leader>]` to switch to next buffer
   * `<leader>[` to switch to previous buffer
   * `<leader>s` to save current buffer
   * `<leader>w` to close the current buffer by trying not to mess up the layout
   * `<leader>wo` to close all buffers except the current one
   * `<leader>wa` to close all buffers
+
+## Tabs
+  * `<leader>l]` to switch to next tab
+  * `<leader>l[` to switch to previous tab
+  * `<leader>lw` or `<leader>lq` to close current tab
+  * `<leader>ln` to open a new tab
+* `<leader>l1 through 5` to switch to tab 1 through 5
 
 ## Fzf
   * `<ctrl>p` or `<leader>ff` fuzzy finding file names

@@ -1,25 +1,35 @@
 
-
 -- Buffer navigation & control
 require('bufdel').setup {
   quit = false,  -- don't quit on last close
 }
 
-vim.keymap.set('n', '<Leader>1', ':br!<CR>', { silent = true, desc = "Switch to buffer 1" })
-vim.keymap.set('n', '<Leader>2', ':br!<CR>:bn!<CR>', { silent = true, desc = "Switch to buffer 2" })
-vim.keymap.set('n', '<Leader>3', ':br!<CR>:bn!<CR>', { silent = true, desc = "Switch to buffer 3" })
-vim.keymap.set('n', '<Leader>4', ':br!<CR>:bn!<CR>', { silent = true, desc = "Switch to buffer 4" })
-vim.keymap.set('n', '<Leader>5', ':br!<CR>:bn!<CR>', { silent = true, desc = "Switch to buffer 5" })
-vim.keymap.set('n', '<Leader>6', ':br!<CR>:bn!<CR>', { silent = true, desc = "Switch to buffer 6" })
-vim.keymap.set('n', '<Leader>7', ':br!<CR>:bn!<CR>', { silent = true, desc = "Switch to buffer 7" })
-vim.keymap.set('n', '<Leader>8', ':br!<CR>:bn!<CR>', { silent = true, desc = "Switch to buffer 8" })
-vim.keymap.set('n', '<Leader>9', ':br!<CR>:bn!<CR>', { silent = true, desc = "Switch to buffer 9" })
-vim.keymap.set('n', '<Leader>]', ':bn!<CR>', { silent = true, desc = "Next buffer" })
-vim.keymap.set('n', '<Leader>[', ':bp!<CR>', { silent = true, desc = "Previous buffer" })
-vim.keymap.set('n', '<Leader>w', ':BufDel<CR>', { silent = true, desc = "Close current buffer" })
-vim.keymap.set('n', '<Leader>wo', ':BufDelOthers<CR>', { silent = true, desc = "Close other buffers" })
-vim.keymap.set('n', '<Leader>wa', ':BufDelAll<CR>', { silent = true, desc = "Close all buffers" })
+vim.keymap.set('n', '<Leader>1', ':br!<CR>', { silent = true, desc = "Buf: Switch 1" })
+vim.keymap.set('n', '<Leader>2', ':br!<CR>:bn!<CR>', { silent = true, desc = "Buf: Switch 2" })
+vim.keymap.set('n', '<Leader>3', ':br!<CR>:bn!<CR>', { silent = true, desc = "Buf: Switch 3" })
+vim.keymap.set('n', '<Leader>4', ':br!<CR>:bn!<CR>', { silent = true, desc = "Buf: Switch 4" })
+vim.keymap.set('n', '<Leader>5', ':br!<CR>:bn!<CR>', { silent = true, desc = "Buf: Switch 5" })
+vim.keymap.set('n', '<Leader>6', ':br!<CR>:bn!<CR>', { silent = true, desc = "Buf: Switch 6" })
+vim.keymap.set('n', '<Leader>7', ':br!<CR>:bn!<CR>', { silent = true, desc = "Buf: Switch 7" })
+vim.keymap.set('n', '<Leader>8', ':br!<CR>:bn!<CR>', { silent = true, desc = "Buf: Switch 8" })
+vim.keymap.set('n', '<Leader>9', ':br!<CR>:bn!<CR>', { silent = true, desc = "Buf: Switch 9" })
+vim.keymap.set('n', '<Leader>]', ':bn!<CR>', { silent = true, desc = "Buf: Next" })
+vim.keymap.set('n', '<Leader>[', ':bp!<CR>', { silent = true, desc = "Buf: Previous" })
+vim.keymap.set('n', '<Leader>w', ':BufDel<CR>', { silent = true, desc = "Buf: Close current" })
+vim.keymap.set('n', '<Leader>wo', ':BufDelOthers<CR>', { silent = true, desc = "Buf: Close others" })
+vim.keymap.set('n', '<Leader>wa', ':BufDelAll<CR>', { silent = true, desc = "Buf: Close all" })
 
+-- Tab navigation
+vim.keymap.set('n', '<Leader>ln', ':tabnew<CR>', { silent = true, desc = "Tab: New" })
+vim.keymap.set('n', '<Leader>lw', ':tabclose<CR>', { silent = true, desc = "Tab: Close current" })
+vim.keymap.set('n', '<Leader>lq', ':tabclose<CR>', { silent = true, desc = "Tab: Close current" })
+vim.keymap.set('n', '<Leader>l]', ':tabnext<CR>', { silent = true, desc = "Tab: Next" })
+vim.keymap.set('n', '<Leader>l[', ':tabprev<CR>', { silent = true, desc = "Tab: Previous" })
+vim.keymap.set('n', '<Leader>l1', ':tabfirst<CR>', { silent = true, desc = "Tab: Switch to 1" })
+vim.keymap.set('n', '<Leader>l2', ':tabfirst<CR>:tabnext<CR>', { silent = true, desc = "Tab: Switch to 2" })
+vim.keymap.set('n', '<Leader>l3', ':tabfirst<CR>:tabnext<CR>:tabnext<CR>', { silent = true, desc = "Tab: Switch to 3" })
+vim.keymap.set('n', '<Leader>l4', ':tabfirst<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>', { silent = true, desc = "Tab: Switch to 4" })
+vim.keymap.set('n', '<Leader>l5', ':tabfirst<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>', { silent = true, desc = "Tab: Switch to 5" })
 
 -- Clipboard operations
 vim.keymap.set('v', '<Leader>y', ':w !pbcopy<CR><CR>', { desc = "Copy current file content to system clipboard" })
@@ -51,10 +61,12 @@ vim.cmd([[
 -- Toggle mouse support for easier copying
 vim.keymap.set('n', '<Leader>m', function()
   if vim.o.mouse == 'a' then
-    vim.o.mouse = ''  -- Disable mouse
-    vim.o.relativenumber = false  -- Disable relative line numbers
+    vim.o.mouse = ''
+    vim.o.relativenumber = false
+    vim.o.number = false
   else
-    vim.o.mouse = 'a'  -- Enable mouse
-    vim.o.relativenumber = true  -- Enable relative line numbers
+    vim.o.mouse = 'a'
+    vim.o.relativenumber = true
+    vim.o.number = true
   end
 end, { silent = true, desc = "Toggle mouse support" })
