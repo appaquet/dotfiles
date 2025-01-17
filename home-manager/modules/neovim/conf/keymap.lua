@@ -20,13 +20,13 @@ vim.keymap.set('n', '<Leader>w', ':BufDel<CR>', { silent = true, desc = "Close c
 vim.keymap.set('n', '<Leader>wo', ':BufDelOthers<CR>', { silent = true, desc = "Close other buffers" })
 vim.keymap.set('n', '<Leader>wa', ':BufDelAll<CR>', { silent = true, desc = "Close all buffers" })
 
+
 -- Clipboard operations
 vim.keymap.set('v', '<Leader>y', ':w !pbcopy<CR><CR>', { desc = "Copy current file content to system clipboard" })
 vim.keymap.set('n', '<Leader>p', ':read !pbpaste<CR>', { desc = "Paste from system clipboard" })
 
 -- Save & quit shortcuts
-vim.keymap.set('n', '<D-s>', ':w<CR>', { silent = true, desc = "Save file (Cmd+S)" })
-vim.keymap.set('n', '<Leader>s', ':w<CR>', { silent = true, desc = "Save file (Leader+S)" })
+vim.keymap.set('n', '<Leader>s', ':w<CR>', { silent = true, desc = "Save file" })
 vim.keymap.set('n', '<Leader>qq', ':q<CR>', { silent = true, desc = "Quit current buffer" })
 vim.keymap.set('n', '<Leader>qa', ':qa<CR>', { silent = true, desc = "Quit all buffers" })
 

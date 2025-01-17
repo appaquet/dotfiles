@@ -1,4 +1,11 @@
 
+-- disable netrw file explorer (because we use nvimt-ree)
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
+-- set termguicolors to enable highlight groups
+vim.opt.termguicolors = true
+
 -- Load a plugin only when opening a file pattern for the first time
 function load_plugin_on_first_open(plugin_name, ft, setup_fn)
   local loaded = false

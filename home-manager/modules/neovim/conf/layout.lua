@@ -1,3 +1,39 @@
+
+
+-------------
+--- nvim-tree
+-- empty setup using defaults
+require("nvim-tree").setup {
+    update_focused_file = {
+        enable = true,
+    },
+    diagnostics = {
+      enable = true,
+      show_on_dirs = true,
+    },
+}
+
+vim.keymap.set('n', '<Leader>e', ':NvimTreeToggle<CR>', { desc = "Tree: Toggle" })
+
+
+---------------
+--- bufferline
+require("bufferline").setup {
+  options = {
+    show_duplicate_prefix = true,
+    offsets = {
+        {
+            filetype = "NvimTree",
+            text = "File Explorer",
+            text_align = "center",
+            separator = true,
+        }
+    },
+  },
+}
+
+------------
+--- lualine
 require('lualine').setup {
   options = {
     icons_enabled = true,

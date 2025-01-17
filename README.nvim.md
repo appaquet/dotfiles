@@ -103,6 +103,6 @@
 
 ## Commands
   * `Rename <file name>` to rename current file
-  * `Edit <file name>` to create a file in current buffer dir
+  * `New <file name>` to create a file in current buffer dir
   * `Delete` to delete current file
 

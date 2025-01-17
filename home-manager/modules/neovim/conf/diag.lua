@@ -11,6 +11,14 @@ local function trouble_open()
   Trouble.open("diagnostics")
 end
 
+local function trouble_focus()
+  if Trouble.is_open("diagnostics") then
+    Trouble.focus()
+  else
+    Trouble.open("diagnostics")
+  end
+end
+
 local function trouble_close()
   Trouble.close("diagnostics")
 end
@@ -42,4 +50,5 @@ vim.keymap.set('n', '<leader>dp', trouble_prev, { desc = "Diag: Go to previous d
 vim.keymap.set('n', '[d', trouble_prev, { desc = "Diag: Go to previous diagnostic" })
 vim.keymap.set('n', '<leader>dl', vim.diagnostic.setloclist, { desc = "Diag: Set location list" })
 vim.keymap.set('n', '<leader>do', trouble_open, { desc = "Diag: Open trouble" })
+vim.keymap.set('n', '<leader>df', trouble_focus, { desc = "Diag: Focus trouble" })
 vim.keymap.set('n', '<leader>dq', trouble_close, { desc = "Diag: Close trouble" })

@@ -146,3 +146,24 @@ load_plugin_on_first_open("go", "go", function()
     gofmt = 'gofmt',
   }
 end)
+
+
+------------
+-- Rust
+-- https://github.com/mrcjkb/rustaceanvim#gear-advanced-configuration
+-- https://github.com/mrcjkb/rustaceanvim/blob/master/lua/rustaceanvim/config/internal.lua
+-- See :h rustaceanvim
+vim.g.rustaceanvim = {
+  tools = {
+  },
+  server = {
+    on_attach = function(client, bufnr)
+    end,
+    default_settings = {
+      ['rust-analyzer'] = {
+      },
+    },
+  },
+  dap = {
+  },
+}
