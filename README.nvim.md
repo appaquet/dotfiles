@@ -44,6 +44,15 @@
   * `gr` list all references of a symbol (to quickfix)
   * `<space>f` format code
 
+## Git
+  * `<leader>gs` show status pane
+  * `<leader>gu` undo hunk
+  * `<leader>gs` stage hunk
+  * `<leader>gdo` diff view open
+  * `<leader>gdb` diff view open, diffing against main branch
+  * `<leader>gdq` diff view close
+
+
 ## Diagnostics
   * `<leader>ds` or `<leader>df` Open diagnostic float
   * `<leader>dn` or `]d` Go to next diagnostic

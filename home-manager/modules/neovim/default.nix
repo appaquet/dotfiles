@@ -77,6 +77,9 @@ in
       # Avante and dependencies
       avante-nvim
       render-markdown-nvim
+      nui-nvim
+      dressing-nvim
+      plenary-nvim
 
       # Syntax
       (nvim-treesitter.withPlugins (p: [
@@ -120,6 +123,7 @@ in
         (readLuaFile ./conf/treesitter.lua)
         (readLuaFile ./conf/testing.lua)
         (readLuaFile ./conf/git.lua)
+        (readLuaFile ./conf/quickfix.lua)
         (readLuaFile ./conf/code.lua)
       ]
     );
