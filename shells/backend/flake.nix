@@ -40,6 +40,10 @@
               #click
               #keras
               #mypy-protobuf
+              #numpy
+              #spacy
+              pandas
+              opencv-python
             ]
           )).override
             ({ ignoreCollisions = true; })
@@ -64,8 +68,11 @@
               llvmPackages.libcxxClang
               zlib
               openssl
-
               libtensorflow
+
+              # opencv
+              libGL
+              glib
             ];
 
             nativeBuildInputs = with pkgs; [
@@ -77,6 +84,7 @@
 
               python3
               (poetry.override { python3 = python310; })
+              pyright
             ];
 
             # fixes go debugging
@@ -96,9 +104,10 @@
             NIX_LD = builtins.readFile "${pkgs.stdenv.cc}/nix-support/dynamic-linker";
 
             shellHook = ''
-              # fixes libstdc++ issues with python
-              # see https://nixos.wiki/wiki/Packaging/Quirks_and_Caveats#ImportError:_libstdc.2B.2B.so.6:_cannot_open_shared_object_file:_No_such_file
-              LD_LIBRARY_PATH=${pkgs.stdenv.cc.cc.lib}/lib/
+              # fixes libs for python
+              # https://nixos.wiki/wiki/Packaging/Quirks_and_Caveats#ImportError:_libstdc.2B.2B.so.6:_cannot_open_shared_object_file:_No_such_file
+              # https://discourse.nixos.org/t/poetry-pandas-issue-libz-so-1-not-found/17167/5
+              export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib/:${pkgs.lib.makeLibraryPath buildInputs}:${pkgs.lib.makeLibraryPath buildInputs}/lib/:$LD_LIBRARY_PATH"
             '';
           };
         };
