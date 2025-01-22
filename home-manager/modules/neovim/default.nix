@@ -84,24 +84,25 @@ in
       # Syntax
       (nvim-treesitter.withPlugins (p: [
         # see https://github.com/nvim-treesitter/nvim-treesitter for available languages
-        p.nix
-        p.go
-        p.gomod
-        p.rust
-        p.toml
         p.bash
-        p.proto
-        p.sql
-        p.markdown
         p.c
-        p.lua
-        p.python
+        p.css
         p.dockerfile
         p.dot
         p.fish
+        p.go
+        p.gomod
         p.html
-        p.css
         p.javascript
+        p.jsonnet
+        p.lua
+        p.markdown
+        p.nix
+        p.proto
+        p.python
+        p.rust
+        p.sql
+        p.toml
         p.typescript
         p.vim
       ]))
@@ -117,14 +118,15 @@ in
         (readLuaFile ./conf/theme.lua)
         (readLuaFile ./conf/sessions.lua)
         (readLuaFile ./conf/fzf.lua)
-        (readLuaFile ./conf/diag.lua)
         (readLuaFile ./conf/ai.lua)
         (readLuaFile ./conf/lsp.lua)
         (readLuaFile ./conf/treesitter.lua)
+        (readLuaFile ./conf/diag.lua)
         (readLuaFile ./conf/testing.lua)
         (readLuaFile ./conf/git.lua)
         (readLuaFile ./conf/quickfix.lua)
         (readLuaFile ./conf/code.lua)
+        (readLuaFile ./conf/debugging.lua)
       ]
     );
   };

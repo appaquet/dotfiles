@@ -4,7 +4,6 @@
   * `<leader>` is `\` (backslash)
   * `<leader>qq` to close current pane
   * `<leader>qa` to quit vim
-  * `<leader>m` to toggle mouse support (useful to allow select + copy)
 
 ## Buffers
 * `<leader> 1 through 9` to switch to buffer 1 through 9
@@ -15,7 +14,7 @@
   * `<leader>wo` to close all buffers except the current one
   * `<leader>wa` to close all buffers
 
-## Tabs
+## Tabs (l)
   * `<leader>l]` to switch to next tab
   * `<leader>l[` to switch to previous tab
   * `<leader>lw` or `<leader>lq` to close current tab
@@ -32,14 +31,6 @@
   * When open, `<ctrl>q`, sends matches to the quickfix list
   * See [plugin.fzf.vim](./home-manager/modules/neovim/plugins/fzf.vim) for more
 
-## Editing & navigation
-  * `<leader>y` to yank to clipboard using [bin/pbcopy](bin/pbcopy) util
-  * `<leader>p` to paste from clipboard using [bin/pbpaste](bin/pbpaste) util
-  * `<ctrl>o` go back to previous cursor
-  * `<ctrl>i` go forward to next cursor
-  * `<leader>cc` comment
-  * `<leader>cu` uncomment
-
 ## Code / LSP
   * `gD` go to declaration
   * `gd` go to definition
@@ -50,22 +41,32 @@
   * `<space>ca` code action on code or block (ex: extract function)
   * `gr` list all references of a symbol (to quickfix)
   * `<space>f` format code
+  * `<leader>cc` comment
+  * `<leader>cu` uncomment
+  * `<ctrl>o` go back to previous cursor
+  * `<ctrl>i` go forward to next cursor
 
-## Git
+## Git (g)
   * `<leader>gs` show status pane
   * `<leader>gu` undo hunk
   * `<leader>gs` stage hunk
   * `<leader>gdo` diff view open
   * `<leader>gdb` diff view open, diffing against main branch
   * `<leader>gdq` diff view close
+  * `:Git` or `:G` or `<leader>fgs` git status
+  * `<leader>fgb` git branches
+  * `:Gdiff` to see diff
+  * `:Gwrite` stages current file
+  * `:Gcommit` to commit
+  * `:Glog` to show log
+  * `:Gblame` to show blame
 
-
-## Diagnostics
-  * `<leader>ds` or `<leader>df` Open diagnostic float
-  * `<leader>dn` or `]d` Go to next diagnostic
-  * `<leader>dp` or `[d` Go to previous diagnostic
-  * `<leader>do` Open diagnostic panel (Trouble)
-  * `<leader>dq` Close diagnostic panel (Trouble)
+## Diagnostics (x)
+  * `<leader>xs` or `<leader>xf` Open diagnostic float
+  * `<leader>xn` or `]x` Go to next diagnostic
+  * `<leader>xp` or `[x` Go to previous diagnostic
+  * `<leader>xo` Open diagnostic panel (Trouble)
+  * `<leader>xq` Close diagnostic panel (Trouble)
 
 
 ## Nvim tree
@@ -85,23 +86,14 @@
     * `q` to close tree
     * `E` to expand all, `W` to collapse
 
-## Git
-  * `:Git` or `:G` or `<leader>fgs` git status
-  * `<leader>fgb` git branches
-  * `:Gdiff` to see diff
-  * `:Gwrite` stages current file
-  * `:Gcommit` to commit
-  * `:Glog` to show log
-  * `:Gblame` to show blame
+## Quickfix (k)
+* `<leader>ko` to open quickfix
+* `<leader>kq` to close quickfix
+* `<leader>kn` or `]k` to go to next quickfix
+* `<leader>kp` or `[k` to go to prev quickfix
+* `<leader>kf` to find in quickfix
 
-## Quickfix
-* `<leader>xo` to open quickfix
-* `<leader>xq` to close quickfix
-* `<leader>xn` or `]x` to go to next quickfix
-* `<leader>xp` or `[x` to go to prev quickfix
-* `<leader>xf` to find in quickfix
-
-## Testing
+## Testing (t)
   * `<leader>tc` to run nearest / under cursor
   * `<leader>tdc` to debug nearest
   * `<leader>tf` to run file
@@ -116,6 +108,9 @@
 ## Misc
   * `<leader>r` to execute current buffer in a shell (normal mode)
   * `<leader>r` to execute current visual selection in a shell (visual mode)
+  * `<leader>ym` to toggle mouse support (useful to allow select + copy)
+  * `<leader>y` to yank to clipboard using [bin/pbcopy](bin/pbcopy) util
+  * `<leader>yp` to paste from clipboard using [bin/pbpaste](bin/pbpaste) util
 
 ## Commands
   * `Rename <file name>` to rename current file

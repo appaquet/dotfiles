@@ -32,6 +32,7 @@
       nvd # nix package diff tool
       nix-tree # explore nix derivations dependencies (https://github.com/utdemir/nix-tree)
       cachix
+      nix-index # nix-locate "libsomelib.so.0"
 
       direnv
       nix-direnv

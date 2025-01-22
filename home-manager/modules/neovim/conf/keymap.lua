@@ -33,7 +33,18 @@ vim.keymap.set('n', '<Leader>l5', ':tabfirst<CR>:tabnext<CR>:tabnext<CR>:tabnext
 
 -- Clipboard operations
 vim.keymap.set('v', '<Leader>y', ':w !pbcopy<CR><CR>', { desc = "Copy current file content to system clipboard" })
-vim.keymap.set('n', '<Leader>p', ':read !pbpaste<CR>', { desc = "Paste from system clipboard" })
+vim.keymap.set('n', '<Leader>yp', ':read !pbpaste<CR>', { desc = "Paste from system clipboard" })
+vim.keymap.set('n', '<Leader>ym', function()
+  if vim.o.mouse == 'a' then
+    vim.o.mouse = ''
+    vim.o.relativenumber = false
+    vim.o.number = false
+  else
+    vim.o.mouse = 'a'
+    vim.o.relativenumber = true
+    vim.o.number = true
+  end
+end, { silent = true, desc = "Toggle mouse support" })
 
 -- Save & quit shortcuts
 vim.keymap.set('n', '<Leader>s', ':w<CR>', { silent = true, desc = "Save file" })
@@ -57,16 +68,3 @@ vim.cmd([[
   cnoremap Qw wqq
   cnoremap qw wqq
 ]])
-
--- Toggle mouse support for easier copying
-vim.keymap.set('n', '<Leader>m', function()
-  if vim.o.mouse == 'a' then
-    vim.o.mouse = ''
-    vim.o.relativenumber = false
-    vim.o.number = false
-  else
-    vim.o.mouse = 'a'
-    vim.o.relativenumber = true
-    vim.o.number = true
-  end
-end, { silent = true, desc = "Toggle mouse support" })

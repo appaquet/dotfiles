@@ -4,6 +4,8 @@
 local Neotest = require("neotest")
 Neotest.setup({
   adapters = {
+    require('rustaceanvim.neotest'),
+
     require("neotest-golang")({
       go_test_args = {
         "-v",
@@ -11,8 +13,6 @@ Neotest.setup({
         "-timeout=10s",
       },
     }),
-
-    require('rustaceanvim.neotest')
   },
 })
 

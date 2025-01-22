@@ -49,8 +49,8 @@ vim.keymap.set("n", "<leader>fld", fzf.lsp_definitions, { desc = "FZF: LSP defin
 vim.keymap.set("n", "<leader>flD", fzf.lsp_declarations, { desc = "FZF: LSP declarations" })
 vim.keymap.set("n", "<leader>flt", fzf.lsp_typedefs, { desc = "FZF: LSP type definitions" })
 vim.keymap.set("n", "<leader>fli", fzf.lsp_implementations, { desc = "FZF: LSP type implementations" })
-vim.keymap.set("n", "<leader>flp", fzf.lsp_document_diagnostics, { desc = "FZF: LSP document diagnostics" })
-vim.keymap.set("n", "<leader>flP", fzf.lsp_workspace_diagnostics, { desc = "FZF: LSP workspace diagnostics" })
+vim.keymap.set("n", "<leader>flm", fzf.lsp_document_diagnostics, { desc = "FZF: LSP document diagnostics" })
+vim.keymap.set("n", "<leader>flM", fzf.lsp_workspace_diagnostics, { desc = "FZF: LSP workspace diagnostics" })
 
 vim.keymap.set("n", "<leader>fgs", fzf.git_status, { desc = "FZF: Git status" })
 vim.keymap.set("n", "<leader>fgS", fzf.git_stash, { desc = "FZF: Git stash" })
@@ -60,8 +60,3 @@ vim.keymap.set("n", "<leader>fgB", fzf.git_blame, { desc = "FZF: Git blame" })
 vim.keymap.set("n", "<leader>fgt", fzf.git_tags, { desc = "FZF: Git tags" })
 
 vim.keymap.set("n", "<leader>fdb", fzf.dap_breakpoints, { desc = "FZF: DAP breakpoints" })
-
-
-
-
-
