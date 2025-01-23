@@ -56,13 +56,19 @@
       ExecStart = "${pkgs.writeShellScript "start-vms" ''
         #!/run/current-system/sw/bin/bash
 
+        # Make sure ipv6 is forwarded
         ${pkgs.iptables}/bin/ip6tables -A FORWARD -i br0 -o br0 -j ACCEPT
         ${pkgs.iptables}/bin/ip6tables -A FORWARD -i br0 -j ACCEPT
 
         sleep 30 # Really make sure usb is ready
-
         ${pkgs.libvirt}/bin/virsh start homeassistant || true
         ${pkgs.libvirt}/bin/virsh start pihole || true
+
+        # Restart VMs, because of that weird USB bug
+        sleep 120
+        ${pkgs.libvirt}/bin/virsh shutdown homeassistant
+        sleep 60
+        ${pkgs.libvirt}/bin/virsh start homeassistant
       ''}";
     };
     wantedBy = [ "multi-user.target" ];
