@@ -3,9 +3,9 @@
 let
   ghosttyConfig =
     ''
-      # See https://ghostty.org/docs/config/reference
-      background = 000000
-      foreground = ffffff
+      # See: https://ghostty.org/docs/config/reference
+      # and: ghostty +list-themes
+      theme = Tomorrow Night Bright
 
       font-family = FiraCode Nerd Font Mono
       font-size = 12

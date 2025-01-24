@@ -35,6 +35,9 @@ in
       # Synchronized panes
       bind e setw synchronize-panes\; display-message "Synchronized pane is now #{?synchronize-panes,on,off}"
 
+      bind -r C-y swap-window -t -1 \; select-window -t -1  # swap current window with the previous one
+      bind -r C-u swap-window -t +1 \; select-window -t +1  # swap current window with the next one
+
       # Fixes issue on macOS where shell in tmux is not right
       # See https://github.com/tmux/tmux/issues/4162
       set -gu default-command

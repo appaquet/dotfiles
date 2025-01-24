@@ -137,7 +137,7 @@
   * With no input `<alt><left>` or `<alt><right>` to jump to previous directory in history
   * With input `<alt><left>` or `<alt><right>` to between words
   * With input `<ctl>w` to delete previous word
-  * With input `<alt>e` or `<alt>v` to open input in editor (doesn't work on MacOS)
+  * With input `<alt>e` or `<alt>v` to open input in editor
   * `<ctl><alt>n`: fzf nix packages
   * `<ctl><alt>g`: fzf ripgrep
   * `<ctl><alt>f`: fzf fd (find file)
@@ -155,12 +155,12 @@ See [README.nvim.md](./README.nvim.md)
   * See <https://github.com/gpakosz/.tmux> for all shortcuts
   * `<ctrl>b e` to toggle synchronized panes
   * `<ctrl>b m` to toggle mouse support (useful to allow select + copy)
-  * `<ctrl>b <ctrl>l` to navigate to next window
-  * `<ctrl>b <ctrl>h` to navigate to prev window
-  * `<ctrl>b Tab` to navigate to last window
+  * `<ctrl>b <ctrl>l / h` to navigate to next / prev window
+  * `<ctrl>b L / H / J / K` to resize pane
+  * `<ctrl>b <ctrl>l / h` to swap window left / right
   * `<ctrl>b <tab>` to navigate to last window
-  * `<ctrl>b <alt><arrows>` to resize pane
   * `<ctrl>b r` to reload config
+  * `<ctrl>b <ctrl>s` / `<ctrl>b <ctrl>r` to save and reload session
   * `<ctrl>b <enter>` to get into copy mode
     * `v` for selection
     * `ctrl-v` to switch between between block and line selection
