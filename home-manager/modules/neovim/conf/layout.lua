@@ -11,8 +11,16 @@ require("nvim-tree").setup {
       enable = true,
       show_on_dirs = true,
     },
-}
 
+    actions = {
+      open_file = {
+        resize_window = false, -- Prevent resizing tree on opening file
+      },
+    },
+    view = {
+      preserve_window_proportions = false,
+    },
+}
 vim.keymap.set('n', '<Leader>e', ':NvimTreeToggle<CR>', { desc = "Tree: Toggle" })
 
 
