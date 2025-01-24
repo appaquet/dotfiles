@@ -46,7 +46,7 @@
               opencv-python
             ]
           )).override
-            ({ ignoreCollisions = true; })
+            { ignoreCollisions = true; }
         );
       in
       {
@@ -70,9 +70,10 @@
               openssl
               libtensorflow
 
-              # opencv
+              # unstructured.io deps
               libGL
               glib
+              tesseract
             ];
 
             nativeBuildInputs = with pkgs; [

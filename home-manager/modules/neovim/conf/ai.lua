@@ -18,7 +18,6 @@ require("copilot_cmp").setup {
   method = "getCompletionsCycling",
 }
 
-
 -----------
 --- avante
 --- https://github.com/yetone/avante.nvim

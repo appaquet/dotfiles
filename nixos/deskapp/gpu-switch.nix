@@ -107,6 +107,8 @@ let
     }
 
     function vfio() {
+        docker kill hf-dev-embeddings || true
+
         switch_driver "vfio-pci"
     }
 
