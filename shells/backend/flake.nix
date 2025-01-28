@@ -64,11 +64,17 @@
                 ];
               })
 
+              stdenv.cc.cc.lib
               llvmPackages.libclang
               llvmPackages.libcxxClang
               zlib
               openssl
               libtensorflow
+
+              # static build of go bins
+              # some stuff breaks if we enable all the time
+              #glibc
+              #glibc.static
 
               # unstructured.io deps
               libGL
@@ -81,7 +87,7 @@
 
               nodejs
               yarn
-              jemalloc
+              jemalloc # for tooling
 
               python3
               (poetry.override { python3 = python310; })
@@ -105,10 +111,10 @@
             NIX_LD = builtins.readFile "${pkgs.stdenv.cc}/nix-support/dynamic-linker";
 
             shellHook = ''
-              # fixes libs for python
+              # Mostly for python fixes
               # https://nixos.wiki/wiki/Packaging/Quirks_and_Caveats#ImportError:_libstdc.2B.2B.so.6:_cannot_open_shared_object_file:_No_such_file
               # https://discourse.nixos.org/t/poetry-pandas-issue-libz-so-1-not-found/17167/5
-              export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib/:${pkgs.lib.makeLibraryPath buildInputs}:${pkgs.lib.makeLibraryPath buildInputs}/lib/:$LD_LIBRARY_PATH"
+              LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath buildInputs}"
             '';
           };
         };

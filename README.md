@@ -157,10 +157,11 @@ See [README.nvim.md](./README.nvim.md)
   * `<ctrl>b m` to toggle mouse support (useful to allow select + copy)
   * `<ctrl>b <ctrl>l / h` to navigate to next / prev window
   * `<ctrl>b L / H / J / K` to resize pane
-  * `<ctrl>b <ctrl>l / h` to swap window left / right
+  * `<ctrl>b l / h / j /k` to navigate between panes
+  * `<ctrl>b ;` to switch to last pane
+  * `<ctrl>b y / u` to swap window left / right
   * `<ctrl>b <tab>` to navigate to last window
   * `<ctrl>b r` to reload config
-  * `<ctrl>b <ctrl>s` / `<ctrl>b <ctrl>r` to save and reload session
   * `<ctrl>b <enter>` to get into copy mode
     * `v` for selection
     * `ctrl-v` to switch between between block and line selection

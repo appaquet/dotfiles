@@ -143,7 +143,7 @@ load_plugin_on_first_open("go", "go", function()
         },
       },
     },
-    gofmt = 'gofmt',
+    gofmt = 'hfgofmt', -- TODO: Find a way to be per project
   }
 end)
 
