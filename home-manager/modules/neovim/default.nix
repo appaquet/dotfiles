@@ -1,14 +1,31 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 
 let
-  readLuaFile =
-    path:
-    builtins.concatStringsSep "\n" [
-      "lua << END"
-      (builtins.readFile path)
-      "END"
-    ];
+  devMode = false; # Include files from dotfiles directly instead of via nix store
 
+  confDir = "${config.home.homeDirectory}/dotfiles/home-manager/modules/neovim/conf";
+
+  includeLuaFile =
+    path:
+    if devMode then
+      ''
+        lua dofile("${confDir}/${path}")
+      ''
+    else
+      ''
+        lua << END
+        ${builtins.readFile ./conf/${path}}
+        END
+      '';
+
+  includeVimFile =
+    path:
+    if devMode then
+      ''
+        source "${confDir}/${path}"
+      ''
+    else
+      builtins.readFile ./conf/${path};
 in
 {
   home.packages = with pkgs; [
@@ -111,22 +128,22 @@ in
 
     extraConfig = (
       builtins.concatStringsSep "\n" [
-        (builtins.readFile ./conf/base.vim)
-        (readLuaFile ./conf/base.lua)
-        (readLuaFile ./conf/keymap.lua)
-        (readLuaFile ./conf/layout.lua)
-        (readLuaFile ./conf/theme.lua)
-        (readLuaFile ./conf/sessions.lua)
-        (readLuaFile ./conf/fzf.lua)
-        (readLuaFile ./conf/ai.lua)
-        (readLuaFile ./conf/lsp.lua)
-        (readLuaFile ./conf/treesitter.lua)
-        (readLuaFile ./conf/diag.lua)
-        (readLuaFile ./conf/testing.lua)
-        (readLuaFile ./conf/git.lua)
-        (readLuaFile ./conf/quickfix.lua)
-        (readLuaFile ./conf/code.lua)
-        (readLuaFile ./conf/debugging.lua)
+        (includeVimFile "base.vim")
+        (includeLuaFile "base.lua")
+        (includeLuaFile "keymap.lua")
+        (includeLuaFile "layout.lua")
+        (includeLuaFile "theme.lua")
+        (includeLuaFile "sessions.lua")
+        (includeLuaFile "fzf.lua")
+        (includeLuaFile "ai.lua")
+        (includeLuaFile "lsp.lua")
+        (includeLuaFile "treesitter.lua")
+        (includeLuaFile "diag.lua")
+        (includeLuaFile "testing.lua")
+        (includeLuaFile "git.lua")
+        (includeLuaFile "quickfix.lua")
+        (includeLuaFile "code.lua")
+        (includeLuaFile "debugging.lua")
       ]
     );
   };

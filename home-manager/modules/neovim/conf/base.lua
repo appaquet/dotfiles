@@ -20,4 +20,3 @@ function load_plugin_on_first_open(plugin_name, ft, setup_fn)
     desc = "Load plugin " .. plugin_name .. " on first file type detection"
   })
 end
-
