@@ -32,9 +32,6 @@ in
     (with pkgs; [
       tokei
 
-      dive # docker container explorer
-      lazydocker # top like app for docker
-
       protobuf
       capnproto
       flatbuffers
