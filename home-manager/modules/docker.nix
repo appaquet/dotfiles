@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, ... }:
 
 {
   programs.fish = {
@@ -7,4 +7,9 @@
       dc = "docker compose";
     };
   };
+
+  home.packages = with pkgs; [
+    dive # docker container explorer
+    lazydocker # top like app for docker
+  ];
 }
