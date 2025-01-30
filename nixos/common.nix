@@ -46,11 +46,14 @@
   security.sudo.enable = true;
   security.sudo.wheelNeedsPassword = true;
 
-  # Enable linger 
+  # Enable linger
   # See https://discourse.nixos.org/t/adding-nixos-option-for-systemd-user-lingering/28762/3
   systemd.tmpfiles.rules = [
     "f /var/lib/systemd/linger/appaquet"
   ];
+
+  # Clean tmp dir on boot
+  boot.cleanTmpDir = true;
 
   # Allow running external dynamically binaries
   # nix-ld replaces interpreter and automatically link with nix libs
