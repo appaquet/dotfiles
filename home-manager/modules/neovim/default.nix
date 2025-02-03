@@ -41,7 +41,7 @@ in
 
     plugins = (with pkgs.vimPlugins; [
       # Theme
-      night-owl-nvim
+      catppuccin-nvim
       nvim-web-devicons
 
       # Layout
