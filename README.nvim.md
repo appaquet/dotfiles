@@ -9,6 +9,7 @@
 * `<leader> 1 through 9` to switch to buffer 1 through 9
   * `<leader>]` to switch to next buffer
   * `<leader>[` to switch to previous buffer
+* `<leader><tab>` to switch to last buffer
   * `<leader>s` to save current buffer
   * `<leader>w` to close the current buffer by trying not to mess up the layout
   * `<leader>wo` to close all buffers except the current one

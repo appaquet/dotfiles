@@ -33,7 +33,7 @@ in
       source-file ~/.tmux.conf
 
       # Synchronized panes
-      bind e setw synchronize-panes\; display-message "Synchronized pane is now #{?synchronize-panes,on,off}"
+      bind S setw synchronize-panes\; display-message "Synchronized pane is now #{?synchronize-panes,on,off}"
 
       bind -r C-y swap-window -t -1 \; select-window -t -1  # swap current window with the previous one
       bind -r C-u swap-window -t +1 \; select-window -t +1  # swap current window with the next one

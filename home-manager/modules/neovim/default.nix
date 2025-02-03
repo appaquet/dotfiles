@@ -1,4 +1,4 @@
-{ pkgs, config, ... }:
+{ pkgs, unstablePkgs, config, ... }:
 
 let
   devMode = false; # Include files from dotfiles directly instead of via nix store
@@ -22,7 +22,7 @@ let
     path:
     if devMode then
       ''
-        source "${confDir}/${path}"
+        source ${confDir}/${path}
       ''
     else
       builtins.readFile ./conf/${path};
@@ -39,7 +39,7 @@ in
     viAlias = true;
     vimAlias = true;
 
-    plugins = with pkgs.vimPlugins; [
+    plugins = (with pkgs.vimPlugins; [
       # Theme
       night-owl-nvim
       nvim-web-devicons
@@ -92,7 +92,7 @@ in
       copilot-cmp
 
       # Avante and dependencies
-      avante-nvim
+      #avante-nvim (see below, using unstable)
       render-markdown-nvim
       nui-nvim
       dressing-nvim
@@ -124,7 +124,9 @@ in
         p.vim
       ]))
       nvim-treesitter-textobjects # provider object manipulation
-    ];
+    ]) ++ (with unstablePkgs.vimPlugins; [
+      avante-nvim
+    ]);
 
     extraConfig = (
       builtins.concatStringsSep "\n" [

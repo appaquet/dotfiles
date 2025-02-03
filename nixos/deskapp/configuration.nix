@@ -51,7 +51,7 @@
     lanIp = "192.168.0.30";
   };
   networking.hosts = {
-    "100.109.193.77" = [ "localhost.humanfirst.ai" ];
+    "100.109.193.77" = [ "localhost.humanfirst.ai" "istio-ingressgateway.istio-system.svc.cluster.local" ];
   };
   networking.firewall.enable = false;
 

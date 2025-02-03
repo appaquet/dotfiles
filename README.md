@@ -153,11 +153,11 @@ See [README.nvim.md](./README.nvim.md)
 
 * Shortcuts
   * See <https://github.com/gpakosz/.tmux> for all shortcuts
-  * `<ctrl>b e` to toggle synchronized panes
+  * `<ctrl>b S` to toggle synchronized panes
   * `<ctrl>b m` to toggle mouse support (useful to allow select + copy)
   * `<ctrl>b <ctrl>l / h` to navigate to next / prev window
   * `<ctrl>b L / H / J / K` to resize pane
-  * `<ctrl>b l / h / j /k` to navigate between panes
+  * `<ctrl>b l / h / j / k` to navigate between panes
   * `<ctrl>b ;` to switch to last pane
   * `<ctrl>b y / u` to swap window left / right
   * `<ctrl>b <tab>` to navigate to last window

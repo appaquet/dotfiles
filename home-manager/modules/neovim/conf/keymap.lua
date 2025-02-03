@@ -15,6 +15,7 @@ vim.keymap.set('n', '<Leader>8', ':br!<CR>:bn!<CR>', { silent = true, desc = "Bu
 vim.keymap.set('n', '<Leader>9', ':br!<CR>:bn!<CR>', { silent = true, desc = "Buf: Switch 9" })
 vim.keymap.set('n', '<Leader>]', ':bn!<CR>', { silent = true, desc = "Buf: Next" })
 vim.keymap.set('n', '<Leader>[', ':bp!<CR>', { silent = true, desc = "Buf: Previous" })
+vim.keymap.set('n', '<Leader><Tab>', ':b#<CR>', { silent = true, desc = "Buf: Switch to last buffer" })
 vim.keymap.set('n', '<Leader>w', ':BufDel<CR>', { silent = true, desc = "Buf: Close current" })
 vim.keymap.set('n', '<Leader>wo', ':BufDelOthers<CR>', { silent = true, desc = "Buf: Close others" })
 vim.keymap.set('n', '<Leader>wa', ':BufDelAll<CR>', { silent = true, desc = "Buf: Close all" })

@@ -25,7 +25,13 @@ require('avante_lib').load()
 require('avante').setup ({
   -- From https://github.com/yetone/avante.nvim/blob/main/lua/avante/config.lua
   provider = "copilot",
-  auto_suggestions_provider = "copilot",
+
+  -- Not using auto suggestion for now
+  -- https://github.com/yetone/avante.nvim/issues/1048
+  auto_suggestions_provider = "claude",
+  behaviour = {
+    auto_suggestions = false, -- Experimental stage
+  }
 })
 
 -- needed for avante
