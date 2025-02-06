@@ -114,7 +114,11 @@
               # Mostly for python fixes
               # https://nixos.wiki/wiki/Packaging/Quirks_and_Caveats#ImportError:_libstdc.2B.2B.so.6:_cannot_open_shared_object_file:_No_such_file
               # https://discourse.nixos.org/t/poetry-pandas-issue-libz-so-1-not-found/17167/5
-              LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath buildInputs}"
+              LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath [
+                pkgs.stdenv.cc.cc
+                pkgs.zlib
+                pkgs.openssl
+              ]}"
             '';
           };
         };
