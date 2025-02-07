@@ -52,6 +52,10 @@
         share = "video";
         mount = "/mnt/video";
       }
+      {
+        share = "kiwix";
+        mount = "/mnt/kiwix";
+      }
     ];
   };
 
