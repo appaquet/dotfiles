@@ -118,6 +118,11 @@
                 pkgs.stdenv.cc.cc
                 pkgs.zlib
                 pkgs.openssl
+
+                # For unstructured.io
+                pkgs.libGL
+                pkgs.glib
+                pkgs.tesseract
               ]}"
             '';
           };

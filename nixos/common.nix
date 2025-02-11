@@ -53,7 +53,7 @@
   ];
 
   # Clean tmp dir on boot
-  boot.cleanTmpDir = true;
+  boot.tmp.cleanOnBoot = true;
 
   # Allow running external dynamically binaries
   # nix-ld replaces interpreter and automatically link with nix libs
@@ -70,6 +70,9 @@
     pciutils # lspci
     usbutils # lsusb
   ];
+
+  # Some programs (ex: Go) expects /etc/mime.types
+  environment.etc."mime.types".source = "${pkgs.mailcap}/etc/mime.types";
 
   # Run fstrim weekly
   services.fstrim.enable = true;
