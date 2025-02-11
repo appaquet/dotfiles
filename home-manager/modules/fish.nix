@@ -70,6 +70,7 @@
       "....." = "cd ../../../..";
 
       llt = "ll -t"; # sort by time
+      llth = "ll -t | head -n 20"; # sort by time, only top 20
       lls = "ll -S"; # sort by size
 
       nr = {

@@ -4,7 +4,7 @@ let
   ghosttyConfig = ''
     # See: https://ghostty.org/docs/config/reference
     # and: ghostty +list-themes
-    theme = iTerm2 Dark Background
+    theme = iTerm2 Tango Dark
 
     font-family = FiraCode Nerd Font Mono
     font-size = 12
