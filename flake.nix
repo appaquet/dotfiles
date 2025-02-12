@@ -5,8 +5,6 @@
 
     flake-utils.url = "github:numtide/flake-utils";
 
-    nix-alien.url = "github:thiagokokada/nix-alien";
-
     home-manager = {
       url = "github:nix-community/home-manager/release-24.11";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -77,7 +75,6 @@
 
       homeOverlays = [
         homePackageOverlays
-        inputs.nix-alien.overlays.default
       ];
 
       commonHomeModules = [
@@ -85,7 +82,6 @@
       ];
 
       nixosOverlays = [
-        inputs.nix-alien.overlays.default
       ];
       nixosOverlaysModule = (
         _: {
