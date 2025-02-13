@@ -54,7 +54,7 @@
       #   https://github.com/yannbertrand/macos-defaults
       # Use `defaults read NSGlobalDomain` to list all custom settings
       NSGlobalDomain = {
-        AppleInterfaceStyle = "Dark"; # dark mode
+        AppleInterfaceStyle = "Dark";
 
         # Finder
         AppleShowAllExtensions = true; # show all file extensions
@@ -89,6 +89,11 @@
           # Require password immediately after sleep or screen saver begins
           askForPassword = 1;
           askForPasswordDelay = 0;
+        };
+
+        "com.apple.WindowManager" = {
+          # Remove margins when snapping / tiling windows
+          EnableTiledWindowMargins = 0;
         };
       };
     };
