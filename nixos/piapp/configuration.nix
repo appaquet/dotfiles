@@ -4,6 +4,7 @@
   imports = [
     ../common.nix
     ../nasapp.nix
+    ../netconsole/receiver.nix
     ./ups-server.nix
   ];
 
@@ -41,6 +42,10 @@
         mount = "/mnt/piapp_backup";
       }
     ];
+  };
+
+  services.netconsole.receiver = {
+    enable = true;
   };
 
   services.openssh.enable = true;

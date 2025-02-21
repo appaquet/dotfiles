@@ -6,11 +6,11 @@
 }:
 
 let
-  cfg = config.services.netconsole.sender;
+  cfg = config.services.netconsole.receiver;
 in
 {
-  options.services.netconsole.listener = {
-    enable = lib.mkEnableOption "Enable netconsole listener service";
+  options.services.netconsole.receiver = {
+    enable = lib.mkEnableOption "Enable netconsole receiver service";
 
     port = lib.mkOption {
       type = lib.types.int;
@@ -26,11 +26,20 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.services.netconsole-listener = {
-      description = "Netconsole listener service";
+    systemd.services.netconsole-receiver = {
+      description = "Netconsole receiver service";
       wantedBy = [ "multi-user.target" ];
       serviceConfig = {
-        ExecStart = "${pkgs.netcat}/bin/nc -luk ${toString cfg.port} | tee ${cfg.logFile}";
+        ExecStart = "${pkgs.writeShellScript "netconsole-receive" ''
+          #!/run/current-system/sw/bin/bash
+
+          export PATH=$PATH:/run/current-system/sw/bin
+
+          echo "Listening..."
+          nc -luk ${toString cfg.port} | tee ${cfg.logFile}
+          echo "Done"
+        ''}";
+
         Restart = "always";
       };
     };
