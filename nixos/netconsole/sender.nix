@@ -40,6 +40,10 @@ in
       '';
     };
 
+    # We use a service to make sure netconsole is correctly started after network setup.
+    #
+    # Since we use a bridge, when booting, the network adapter isn't the same as when booted, and
+    # the module refuses to mount. Also increasing verbosity so that we send more than just panics.
     systemd.services.netconsole-enable = {
       description = "Re-enable netconsole after network setup";
       after = [ "network-setup.service" ];
