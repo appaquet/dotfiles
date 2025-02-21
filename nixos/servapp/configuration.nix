@@ -41,7 +41,6 @@
 
   services.netconsole.sender = {
     enable = true;
-    senderIp = "192.168.0.13";
     interface = "br0";
   };
 

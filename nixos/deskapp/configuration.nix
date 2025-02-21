@@ -8,6 +8,7 @@
     ../nasapp.nix
     ../network-bridge.nix
     ../ups/client.nix
+    ../netconsole/sender.nix
     ./backups
     ./gpu-switch.nix
     ./ha-ctrl.nix
