@@ -42,6 +42,7 @@
             name = "exotwo";
 
             buildInputs = with pkgs; [
+              pyright
             ];
 
             nativeBuildInputs = with pkgs; [

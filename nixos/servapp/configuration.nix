@@ -8,6 +8,7 @@
     ../nasapp.nix
     ../network-bridge.nix
     ../ups/client.nix
+    ../netconsole/sender.nix
     ./backup.nix
     ./hardware-configuration.nix
     ./virt
@@ -15,6 +16,9 @@
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  boot.kernel.sysctl = {
+    "kernel.panic" = 60;  # Restart delay after panic
+  };
 
   networking.hostName = "servapp";
 
@@ -34,6 +38,12 @@
     lanIp = "192.168.0.13";
   };
   networking.firewall.enable = false;
+
+  services.netconsole.sender = {
+    enable = true;
+    senderIp = "192.168.0.13";
+    interface = "br0";
+  };
 
   services.tailscale = {
     enable = true;
