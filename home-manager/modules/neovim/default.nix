@@ -92,11 +92,12 @@ in
       copilot-cmp
 
       # Avante and dependencies
-      #avante-nvim (see below, using unstable)
+      avante-nvim # (see below, using unstable)
       render-markdown-nvim
       nui-nvim
       dressing-nvim
       plenary-nvim
+      img-clip-nvim
 
       # Syntax
       (nvim-treesitter.withPlugins (p: [
@@ -125,7 +126,6 @@ in
       ]))
       nvim-treesitter-textobjects # provider object manipulation
     ]) ++ (with unstablePkgs.vimPlugins; [
-      avante-nvim
     ]);
 
     extraConfig = (
