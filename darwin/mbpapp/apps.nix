@@ -33,6 +33,7 @@
       "libbladerf"
       "codec2"
       "zstd"
+      "pkg-config"
     ];
 
     casks = [
