@@ -47,6 +47,7 @@
       };
       gts = "git checkout (git-tag-select)";
       gau = "git add -u";
+      ga = "git add";
       gad = "git add .";
       gmr = "git maintenance run";
     };

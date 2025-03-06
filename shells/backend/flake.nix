@@ -61,12 +61,14 @@
                 extensions = [
                   "rust-src"
                   "rust-analyzer"
+                  "llvm-tools-preview"
                 ];
               })
 
               stdenv.cc.cc.lib
               llvmPackages.libclang
               llvmPackages.libcxxClang
+              llvmPackages.bintools-unwrapped # llvm-cov
               zlib
               openssl
               libtensorflow
