@@ -40,7 +40,7 @@
         name = "iterm2";
       }
       {
-        name = "ghostty";
+        name = "wezterm";
       }
 
       {

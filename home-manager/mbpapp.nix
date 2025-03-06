@@ -8,7 +8,6 @@
     ./modules/media.nix
     ./modules/docker.nix
     ./modules/wezterm.nix
-    ./modules/ghostty.nix
   ];
 
   home.username = "appaquet";
