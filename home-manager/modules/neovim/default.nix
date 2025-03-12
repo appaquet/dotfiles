@@ -126,6 +126,7 @@ in
       ]))
       nvim-treesitter-textobjects # provider object manipulation
     ]) ++ (with unstablePkgs.vimPlugins; [
+      # avante-nvim
     ]);
 
     extraConfig = (

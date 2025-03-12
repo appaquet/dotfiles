@@ -28,6 +28,7 @@
         expansion = "git commit -m \"%\"";
         setCursor = true;
       };
+      gcp = "git reset --soft HEAD~1"; # git commit pop
       gchm = "git commit -m (git log -1 --pretty=format:%s)";
       gpom = "git pull origin master";
       gpr = "git pull --rebase --autostash";
