@@ -48,6 +48,11 @@
       url = "github:msteen/nixos-vscode-server";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    cursor-server = {
+      url = "github:p-zany/nixos-cursor-server";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
