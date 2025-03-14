@@ -93,7 +93,7 @@
   # UPS
   power.myUps = {
     enable = true;
-    shutdownDelay = 10; # suspend after 5 min on bat
+    shutdownDelay = 60; # suspend after 1 min on bat
     shutdownCmd = "${pkgs.systemd}/bin/systemctl suspend";
   };
 
