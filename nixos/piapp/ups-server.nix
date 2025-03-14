@@ -21,8 +21,9 @@ in
 
         # Override low bat thresholds to 30% or 10m left.
         # Check `upsc ups` to see all values
-        "override.battery.charge.low = 30" # default 10%
-        "override.battery.charge.warning = 50" # default 20%
+        #"override.battery.charge.low = 30" # default 10%
+        #"override.battery.charge.warning = 50" # default 20%
+        #"override.battery.runtime.low = 600" # default 300
         "ignorelb"
       ];
     };
