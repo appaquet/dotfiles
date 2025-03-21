@@ -25,7 +25,7 @@ end
 
 local function trouble_next()
   if Trouble.is_open("diagnostics") then
-    Trouble.focus()
+    --Trouble.focus()
     Trouble.next()
   else
     vim.diagnostic.goto_next()
@@ -35,7 +35,7 @@ end
 local function trouble_prev()
   if Trouble.is_open("diagnostics") then
     Trouble.focus()
-    Trouble.previous()
+    Trouble.prev()
   else
     vim.diagnostic.goto_prev()
   end

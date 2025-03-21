@@ -71,7 +71,7 @@ in
 
       # LSP / Languages
       nvim-lspconfig # https://github.com/neovim/nvim-lspconfig
-      go-nvim
+      #go-nvim (unstable)
       neotest
       neotest-golang
       rustaceanvim
@@ -92,7 +92,7 @@ in
       copilot-cmp
 
       # Avante and dependencies
-      avante-nvim # (see below, using unstable)
+      #avante-nvim (unstable)
       render-markdown-nvim
       nui-nvim
       dressing-nvim
@@ -126,7 +126,8 @@ in
       ]))
       nvim-treesitter-textobjects # provider object manipulation
     ]) ++ (with unstablePkgs.vimPlugins; [
-      # avante-nvim
+      avante-nvim
+      go-nvim
     ]);
 
     extraConfig = (
