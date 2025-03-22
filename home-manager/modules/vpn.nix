@@ -4,12 +4,13 @@ let
   vpn-shell = pkgs.writeShellApplication {
     name = "vpn-shell";
 
+    bashOptions = [ "errexit" "nounset" ]; # by default it adds pipefail, which is a pain
+
     runtimeInputs = with pkgs; [
       docker
     ];
 
     text = ''
-      #!/usr/bin/env bash
       INIT_DIR=$(pwd)
 
       SCRIPT_DIR="$(cd "$(dirname "$\{BASH_SOURCE[0]\}")" && pwd)"
@@ -47,8 +48,6 @@ let
           --hostname openvpn-shell \
           --cap-add=NET_ADMIN \
           --device /dev/net/tun \
-          -p 9091:9091 \
-          -p 8888:8888 \
           --dns 8.8.8.8 \
           --dns 8.8.4.4 \
           -v /etc/localtime:/etc/localtime:ro \
