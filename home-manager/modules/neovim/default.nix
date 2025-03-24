@@ -1,7 +1,7 @@
 { pkgs, unstablePkgs, config, ... }:
 
 let
-  devMode = false; # Include files from dotfiles directly instead of via nix store
+  devMode = true; # Include files from dotfiles directly instead of via nix store
 
   confDir = "${config.home.homeDirectory}/dotfiles/home-manager/modules/neovim/conf";
 

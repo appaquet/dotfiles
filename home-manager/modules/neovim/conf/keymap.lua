@@ -26,6 +26,8 @@ vim.keymap.set('n', '<Leader>lw', ':tabclose<CR>', { silent = true, desc = "Tab:
 vim.keymap.set('n', '<Leader>lq', ':tabclose<CR>', { silent = true, desc = "Tab: Close current" })
 vim.keymap.set('n', '<Leader>l]', ':tabnext<CR>', { silent = true, desc = "Tab: Next" })
 vim.keymap.set('n', '<Leader>l[', ':tabprev<CR>', { silent = true, desc = "Tab: Previous" })
+vim.keymap.set('n', ']l', ':tabnext<CR>', { silent = true, desc = "Tab: Next" })
+vim.keymap.set('n', '[l', ':tabprev<CR>', { silent = true, desc = "Tab: Previous" })
 vim.keymap.set('n', '<Leader>l1', ':tabfirst<CR>', { silent = true, desc = "Tab: Switch to 1" })
 vim.keymap.set('n', '<Leader>l2', ':tabfirst<CR>:tabnext<CR>', { silent = true, desc = "Tab: Switch to 2" })
 vim.keymap.set('n', '<Leader>l3', ':tabfirst<CR>:tabnext<CR>:tabnext<CR>', { silent = true, desc = "Tab: Switch to 3" })

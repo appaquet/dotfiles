@@ -16,8 +16,8 @@
   * `<leader>wa` to close all buffers
 
 ## Tabs (l)
-  * `<leader>l]` to switch to next tab
-  * `<leader>l[` to switch to previous tab
+  * `]l` to switch to next tab
+  * `[l` to switch to previous tab
   * `<leader>lw` or `<leader>lq` to close current tab
   * `<leader>ln` to open a new tab
 * `<leader>l1 through 5` to switch to tab 1 through 5
@@ -49,11 +49,6 @@
 
 ## Git (g)
   * `<leader>gs` show status pane
-  * `<leader>gu` undo hunk
-  * `<leader>gs` stage hunk
-  * `<leader>gdo` diff view open
-  * `<leader>gdb` diff view open, diffing against main branch
-  * `<leader>gdq` diff view close
   * `:Git` or `:G` or `<leader>fgs` git status
   * `<leader>fgb` git branches
   * `:Gdiff` to see diff
@@ -61,6 +56,18 @@
   * `:Gcommit` to commit
   * `:Glog` to show log
   * `:Gblame` to show blame
+
+  * `<leader>gu` undo hunk
+  * `<leader>gs` stage hunk
+  * `]h` next hunk
+  * `[h` prev hunk
+  * `<leader>ggm` switch gutter base to main branch
+  * `<leader>ggd` switch gutter base to default
+
+  * `<leader>gdo` diff view open
+  * `<leader>gdb` diff view open, diffing against main branch
+  * `<leader>gdq` diff view close
+
 
 ## Diagnostics (x)
   * `<leader>xs` or `<leader>xf` Open diagnostic float
@@ -101,10 +108,16 @@
   * `<leader>tdf` to debug file
   * `<leader>tl` to run last
   * `<leader>tdl` to debug last
-  * `<leader>ts` to stop test
-  * `<leader>to` to open output panel
-  * `<leader>tk` to clear output panel
-  * `<leader>tq` to close output panel
+  * `<leader>tu` to stop test
+  * `<leader>to` to toggle output
+  * `<leader>tq` to close output
+  * `<leader>tk` to clear output
+
+  * `<leader>ts` to toggle side / summary panel, with keymaps:
+    * `r` to run a test
+    * `u` to stop a test
+    * `i` to open a test source
+    * `?` to see all keymaps
 
 ## Misc
   * `<leader>r` to execute current buffer in a shell (normal mode)

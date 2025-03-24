@@ -36,6 +36,7 @@
               nodejs_20
               yarn
               playwright-driver.browsers
+              typescript-language-server
             ];
 
             shellHook = ''

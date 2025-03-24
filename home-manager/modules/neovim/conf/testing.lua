@@ -54,8 +54,10 @@ vim.keymap.set("n", "<leader>tf", run_file, { desc = "Test: Run file" })
 vim.keymap.set("n", "<leader>tdf", debug_file, { desc = "Test: Debug file" })
 vim.keymap.set("n", "<leader>tl", run_last, { desc = "Test: Run last" })
 vim.keymap.set("n", "<leader>tdl", debug_last, { desc = "Test: Debug last" })
-vim.keymap.set("n", "<leader>ts", Neotest.run.stop, { desc = "Test: Stop" })
+vim.keymap.set("n", "<leader>tu", Neotest.run.stop, { desc = "Test: Stop" })
 
-vim.keymap.set("n", "<leader>to", Neotest.output_panel.open, { desc = "Test: Open output panel" })
+vim.keymap.set("n", "<leader>ts", Neotest.summary.toggle, { desc = "Test: Toggle summary / side panel" })
+
+vim.keymap.set("n", "<leader>to", Neotest.output_panel.toggle, { desc = "Test: Toggle output panel" })
+vim.keymap.set("n", "<leader>tq", Neotest.output_panel.close, { desc = "Test: Toggle output panel" })
 vim.keymap.set("n", "<leader>tk", Neotest.output_panel.clear, { desc = "Test: Clear output panel" })
-vim.keymap.set("n", "<leader>tq", Neotest.output_panel.close, { desc = "Test: Close output panel" })

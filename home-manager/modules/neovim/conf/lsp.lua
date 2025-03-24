@@ -45,6 +45,14 @@ vim.api.nvim_create_autocmd('LspAttach', {
 -- Enable inlays
 vim.lsp.inlay_hint.enable(true)
 
+-- From https://github.com/zbirenbaum/copilot-cmp#tab-completion-configuration-highly-recommended
+-- Used bellow to fix tab completion
+local has_words_before = function()
+  if vim.api.nvim_buf_get_option(0, "buftype") == "prompt" then return false end
+  local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+  return col ~= 0 and vim.api.nvim_buf_get_text(0, line-1, 0, line-1, col, {})[1]:match("^%s*$") == nil
+end
+
 -- nvim-cmp (https://github.com/hrsh7th/nvim-cmp)
 -- luasnip (https://github.com/L3MON4D3/LuaSnip)
 local luasnip = require 'luasnip'
@@ -58,7 +66,6 @@ cmp.setup {
 
   mapping = cmp.mapping.preset.insert({
     ['<C-u>'] = cmp.mapping.scroll_docs(-4), -- Up
-
     ['<C-d>'] = cmp.mapping.scroll_docs(4), -- Down
 
     -- C-b (back) C-f (forward) for snippet placeholder navigation.
@@ -69,9 +76,9 @@ cmp.setup {
       select = true,
     },
 
-    ['<Tab>'] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_next_item()
+    ["<Tab>"] = vim.schedule_wrap(function(fallback)
+      if cmp.visible() and has_words_before() then
+        cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
       elseif luasnip.expand_or_jumpable() then
         luasnip.expand_or_jump()
       else
@@ -91,7 +98,7 @@ cmp.setup {
   }),
 
   sources = {
-    { name = "copilot" },
+    { name = "copilot" }, -- see ai.lua
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
     { name = 'nvim_lsp_signature_help' },
@@ -99,25 +106,6 @@ cmp.setup {
   },
 }
 
--------------
--- copilot 
--- https://github.com/zbirenbaum/copilot.lua
-require("copilot").setup({
-  suggestion = { enabled = false },
-  panel = { enabled = false },
-
-  filetypes = {
-    -- override default false
-    markdown = true,
-    yaml = true,
-  }
-})
-
--- cmp support for copilot
--- https://github.com/zbirenbaum/copilot-cmp
-require("copilot_cmp").setup {
-  method = "getCompletionsCycling",
-}
 
 ---------
 -- Golang
