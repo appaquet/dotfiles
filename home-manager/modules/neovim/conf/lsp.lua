@@ -106,11 +106,10 @@ cmp.setup {
   },
 }
 
-
 ---------
 -- Golang
 -- https://github.com/ray-x/go.nvim
-
+--
 -- Format & cleanup imports on save
 local format_sync_grp = vim.api.nvim_create_augroup("goimports", {})
 vim.api.nvim_create_autocmd("BufWritePre", {
@@ -134,7 +133,6 @@ load_plugin_on_first_open("go", "go", function()
     gofmt = 'hfgofmt', -- TODO: Find a way to be per project
   }
 end)
-
 
 ------------
 -- Rust

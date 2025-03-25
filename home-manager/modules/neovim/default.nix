@@ -99,6 +99,12 @@ in
       plenary-nvim
       img-clip-nvim
 
+      # Debugging
+      nvim-dap
+      nvim-dap-ui
+      nvim-dap-go
+      nvim-dap-python
+
       # Syntax
       (nvim-treesitter.withPlugins (p: [
         # see https://github.com/nvim-treesitter/nvim-treesitter for available languages

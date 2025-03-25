@@ -69,6 +69,7 @@
               llvmPackages.libclang
               llvmPackages.libcxxClang
               llvmPackages.bintools-unwrapped # llvm-cov
+              lldb
               zlib
               openssl
               libtensorflow
