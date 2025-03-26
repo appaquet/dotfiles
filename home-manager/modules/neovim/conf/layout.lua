@@ -29,7 +29,7 @@ vim.keymap.set('n', '<Leader>e', ':NvimTreeToggle<CR>', { desc = "Tree: Toggle" 
 require("bufferline").setup {
   options = {
     show_duplicate_prefix = true,
-    diagnostics = true,
+    diagnostics = 'nvim_lsp',
     offsets = { -- Don't show tabs over file explorer
         {
             filetype = "NvimTree",

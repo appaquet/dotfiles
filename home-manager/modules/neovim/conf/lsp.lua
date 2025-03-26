@@ -22,21 +22,22 @@ vim.api.nvim_create_autocmd('LspAttach', {
     -- See `:help vim.lsp.*` for documentation on any of the below functions
     -- Adapted a bit from https://lsp-zero.netlify.app/docs/language-server-configuration.html
     local opts = { buffer = ev.buf }
-    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, { buffer = ev.buf, desc = "LSP: Go to declaration" })
-    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { buffer = ev.buf, desc = "LSP: Go to definition" })
-    vim.keymap.set('n', 'gt', vim.lsp.buf.type_definition, { buffer = ev.buf, desc = "LSP: Go to type type definition" })
-    vim.keymap.set('n', 'K', vim.lsp.buf.hover, { buffer = ev.buf, desc = "LSP: Displays hover information about a symbol" })
-    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, { buffer = ev.buf, desc = "LSP: List all implementations" })
-    vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, { buffer = ev.buf, desc = "LSP: Show signature help" })
-    vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, { buffer = ev.buf, desc = "LSP: Add workspace folder" })
-    vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, { buffer = ev.buf, desc = "LSP: Remove workspace folder" })
-    vim.keymap.set('n', '<space>wl', function()
+    vim.keymap.set('n', '<leader>lgD', vim.lsp.buf.declaration, { buffer = ev.buf, desc = "LSP: Go to declaration" })
+    vim.keymap.set('n', '<leader>lgd', vim.lsp.buf.definition, { buffer = ev.buf, desc = "LSP: Go to definition" })
+    vim.keymap.set('n', '<leader>lgt', vim.lsp.buf.type_definition, { buffer = ev.buf, desc = "LSP: Go to type definition" })
+    vim.keymap.set('n', '<leader>lli', vim.lsp.buf.implementation, { buffer = ev.buf, desc = "LSP: List all implementations" })
+    vim.keymap.set('n', '<leader>llr', vim.lsp.buf.references, { buffer = ev.buf, desc = "LSP: List references" })
+    vim.keymap.set('n', '<leader>li', vim.lsp.buf.hover, { buffer = ev.buf, desc = "LSP: Displays hover information about a symbol" })
+    vim.keymap.set('n', '<leader>ls', vim.lsp.buf.signature_help, { buffer = ev.buf, desc = "LSP: Show signature help" })
+    vim.keymap.set('n', '<leader>lwa', vim.lsp.buf.add_workspace_folder, { buffer = ev.buf, desc = "LSP: Add workspace folder" })
+    vim.keymap.set('n', '<leader>lwr', vim.lsp.buf.remove_workspace_folder, { buffer = ev.buf, desc = "LSP: Remove workspace folder" })
+    vim.keymap.set('n', '<leader>lwl', function()
       print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
     end, { buffer = ev.buf, desc = "LSP: List workspace folders" })
-    vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, { buffer = ev.buf, desc = "LSP: Rename" })
-    vim.keymap.set({ 'n', 'v' }, '<space>ca', vim.lsp.buf.code_action, { buffer = ev.buf, desc = "LSP: Code action" })
-    vim.keymap.set('n', 'gr', vim.lsp.buf.references, { buffer = ev.buf, desc = "LSP: List references" })
-    vim.keymap.set('n', '<space>f', function()
+
+    vim.keymap.set('n', '<leader>lr', vim.lsp.buf.rename, { buffer = ev.buf, desc = "LSP: Rename" })
+    vim.keymap.set({ 'n', 'v' }, '<leader>lca', vim.lsp.buf.code_action, { buffer = ev.buf, desc = "LSP: Code action" })
+    vim.keymap.set('n', '<leader>lf', function()
       vim.lsp.buf.format { async = true }
     end, { buffer = ev.buf, desc = "LSP: Format" })
   end,
@@ -121,6 +122,7 @@ if vim.fn.executable("go") == 1 then -- Only load the plugin if `go` is availabl
   })
 
   require("go").setup {
+    lsp_keymaps = false, -- conflicts with our remaps
     lsp_cfg = {
       settings = {
         gopls = {

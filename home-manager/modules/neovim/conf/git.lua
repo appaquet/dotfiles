@@ -8,11 +8,17 @@ vim.keymap.set('n', '<Leader>gs', ':Git<CR>', { silent = true, desc = "Git: stat
 -- https://github.com/sindrets/diffview.nvim
 require("diffview").setup {}
 
+vim.g.main_branch_override = ''
 function get_main_branch()
+  if vim.g.main_branch_override ~= '' then
+    return vim.g.main_branch_override
+  end
+
   local main_branch = vim.fn.system { 'git', 'ls-remote', '--symref', 'origin', 'HEAD' }
   local main_branch = string.match(main_branch, "ref:%s+refs/heads/(%S+)")
   return main_branch
 end
+vim.api.nvim_command("command! -nargs=1 SetMainBranch let g:main_branch_override = <args>")
 
 function open_diffview_main()
   local main_branch = get_main_branch()
@@ -21,6 +27,7 @@ end
 
 vim.keymap.set('n', '<Leader>gdo', ':DiffviewOpen<CR>', { silent = true, desc = "Git: open diff view" })
 vim.keymap.set('n', '<Leader>gdm', open_diffview_main, { desc = "Git: open diff view against main branch" })
+vim.keymap.set('n', '<Leader>gdb', open_diffview_main, { desc = "Git: open diff view against main branch" })
 vim.keymap.set('n', '<Leader>gdq', ':DiffviewClose<CR>', { silent = true, desc = "Git: close diff view" })
 
 -----------------
@@ -48,6 +55,7 @@ function switch_gutter_base_default()
 end
 
 vim.keymap.set('n', '<Leader>ggm', switch_gutter_base_main, { silent = true, desc = "Git: switch gutter base to main branch" })
+vim.keymap.set('n', '<Leader>ggb', switch_gutter_base_main, { silent = true, desc = "Git: switch gutter base to main branch" })
 vim.keymap.set('n', '<Leader>ggd', switch_gutter_base_default, { silent = true, desc = "Git: switch gutter base to default" })
 
 -----------------
@@ -55,3 +63,11 @@ vim.keymap.set('n', '<Leader>ggd', switch_gutter_base_default, { silent = true, 
 -- https://github.com/pwntester/octo.nvim
 require("octo").setup()
 vim.keymap.set('n', '<Leader>ghr', ':Octo review<CR>', { silent = true, desc = "Git: github pr review" })
+
+-------------------------
+-- Gitlinker
+-- Generates shareable links
+-- https://github.com/ruifm/gitlinker.nvim
+require("gitlinker").setup {
+   mappings = "<leader>gy"
+}

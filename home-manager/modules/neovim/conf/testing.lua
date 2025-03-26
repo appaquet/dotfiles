@@ -13,12 +13,13 @@ Neotest.setup({
         "-timeout=10s",
       },
     }),
+
+    require("neotest-python"),
   },
 })
 
 local function run_nearest()
-  Neotest.output_panel.open()
-  Neotest.output_panel.clear()
+  Neotest.summary.open()
   Neotest.run.run()
 end
 
@@ -27,20 +28,17 @@ local function debug_nearest()
 end
 
 local function run_file()
-  Neotest.output_panel.open()
-  Neotest.output_panel.clear()
+  Neotest.summary.open()
   Neotest.run.run(vim.fn.expand("%"))
 end
 
 local function debug_file()
-  Neotest.output_panel.open()
-  Neotest.output_panel.clear()
+  Neotest.summary.open()
   Neotest.run.run({ vim.fn.expand("%"), strategy = "dap" })
 end
 
 local function run_last()
-  Neotest.output_panel.open()
-  Neotest.output_panel.clear()
+  Neotest.summary.open()
   Neotest.run.run_last()
 end
 
@@ -59,5 +57,5 @@ vim.keymap.set("n", "<leader>tu", Neotest.run.stop, { desc = "Test: Stop" })
 vim.keymap.set("n", "<leader>ts", Neotest.summary.toggle, { desc = "Test: Toggle summary / side panel" })
 
 vim.keymap.set("n", "<leader>to", Neotest.output_panel.toggle, { desc = "Test: Toggle output panel" })
-vim.keymap.set("n", "<leader>tq", Neotest.output_panel.close, { desc = "Test: Toggle output panel" })
 vim.keymap.set("n", "<leader>tk", Neotest.output_panel.clear, { desc = "Test: Clear output panel" })
+vim.keymap.set("n", "<leader>tq", Neotest.output_panel.close, { desc = "Test: Close output panel" })

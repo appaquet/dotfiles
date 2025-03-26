@@ -50,6 +50,7 @@ in
       lualine-lsp-progress
       bufferline-nvim # https://github.com/akinsho/bufferline.nvim
       auto-session # automatically restore last session
+      nvim-notify
 
       # Tools
       fzf-lua # <leader>f*
@@ -69,12 +70,14 @@ in
       gitsigns-nvim # Show git signs in gutter
       diffview-nvim # :DiffviewOpen, :DiffviewClose
       octo-nvim
+      gitlinker-nvim
 
       # LSP / Languages
       nvim-lspconfig # https://github.com/neovim/nvim-lspconfig
       #go-nvim (unstable)
       neotest
       neotest-golang
+      neotest-python
       rustaceanvim
 
       # Autocomplete (w/ LSP)
@@ -115,7 +118,6 @@ in
         p.dot
         p.fish
         p.go
-        p.gomod
         p.html
         p.javascript
         p.jsonnet
@@ -149,6 +151,7 @@ in
         (includeLuaFile "lsp.lua")
         (includeLuaFile "treesitter.lua")
         (includeLuaFile "diag.lua")
+        (includeLuaFile "notify.lua")
         (includeLuaFile "testing.lua")
         (includeLuaFile "git.lua")
         (includeLuaFile "quickfix.lua")

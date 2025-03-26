@@ -1,51 +1,55 @@
 # Neovim README
 
 ## General keymap
-  * `<leader>` is `\` (backslash)
-  * `<leader>qq` to close current pane
-  * `<leader>qa` to quit vim
+  * `<leader>` is space
+  * `<leader>qq` or `<ctrl-q>` to close current pane
+  * `<leader>qa` to quit
+  * `<leader>qs` to clear auto-session and quit
 
-## Buffers
-* `<leader> 1 through 9` to switch to buffer 1 through 9
-  * `<leader>]` to switch to next buffer
-  * `<leader>[` to switch to previous buffer
-* `<leader><tab>` to switch to last buffer
-  * `<leader>s` to save current buffer
-  * `<leader>w` to close the current buffer by trying not to mess up the layout
-  * `<leader>wo` to close all buffers except the current one
-  * `<leader>wa` to close all buffers
+## Buffers (b)
+  * `]b` to switch to next buffer
+  * `[b` to switch to previous buffer
+  * `<leader>b 1 through 9` to switch to buffer 1 through 9
+  * `<leader><tab>` to switch to last buffer
+  * `<leader>bc` to close the current buffer by trying not to mess up the layout
+  * `<leader>bo` to close all buffers except the current one
+  * `<leader>ba` to close all buffers
+  * `<leader>bs` or `<ctrl-s>` to save current buffer
 
-## Tabs (l)
-  * `]l` to switch to next tab
-  * `[l` to switch to previous tab
-  * `<leader>lw` or `<leader>lq` to close current tab
-  * `<leader>ln` to open a new tab
-* `<leader>l1 through 5` to switch to tab 1 through 5
+## Tabs (n)
+  * `]n` to switch to next tab
+  * `[n` to switch to previous tab
+  * `<leader>nc` to open a new tab
+  * `<leader>nq` to close current tab
+  * `<leader>n1 through 5` to switch to tab 1 through 5
 
-## Fzf
-  * `<ctrl>p` or `<leader>ff` fuzzy finding file names
+## Fzf (f)
+  * `<ctrl-p>` or `<leader>ff` fuzzy finding file names
   * `<ctrl-l>` or `<leader>fs` fuzzy find in current file
   * `<ctrl-g>` or `<leader>fS` fuzzy find in workspace (ripgrep)
   * `<ctrl-b>` or `<leader>fb` fuzzy find through buffers
-  * `<ctrl-\>` fuzzy find through neovim commands
+  * `<leader>w` fuzzy find word under cursor in file
+  * `<leader>W` fuzzy find word under cursor in workspace
   * `<leader>fk` fuzzy find through keymaps
+  * `<ctrl-\>` or `<leader>fc` fuzzy find through neovim commands
+  * `<leader>fR` to resume last search 
   * When open, `<ctrl>k`, sends matches to the quickfix list
-  * See [plugin.fzf.vim](./home-manager/modules/neovim/plugins/fzf.vim) for more
+  * See [fzf.lua](./home-manager/modules/neovim/conv/fzf.lua) for more
 
 ## Code / LSP
-  * `gD` go to declaration
-  * `gd` go to definition
-  * `gi` find all implementations
-  * `go` go to type definiton
-  * `K` Displays hover information about a symbol
-  * `<space>rn` rename symbol
-  * `<space>ca` code action on code or block (ex: extract function)
-  * `gr` list all references of a symbol (to quickfix)
-  * `<space>f` format code
-  * `<leader>cc` comment
-  * `<leader>cu` uncomment
-  * `<ctrl>o` go back to previous cursor
-  * `<ctrl>i` go forward to next cursor
+  * `<leader>lgD` LSP: Go to declaration
+  * `<leader>lgd` LSP: Go to definition
+  * `<leader>lgt` LSP: Go to type definition
+  * `<leader>lli` LSP: List all implementations
+  * `<leader>llr` LSP: List references
+  * `<leader>li` LSP: Displays hover information about a symbol
+  * `<leader>ls` LSP: Show signature help
+  * `<leader>lwa` LSP: Add workspace folder
+  * `<leader>lwr` LSP: Remove workspace folder
+  * `<leader>lwl` LSP: List workspace folders
+  * `<leader>lr` LSP: Rename
+  * `<leader>lca` LSP: Code action
+  * `<leader>lf` LSP: Format
 
 ## Git (g)
   * `<leader>gs` show status pane
@@ -56,6 +60,7 @@
   * `:Gcommit` to commit
   * `:Glog` to show log
   * `:Gblame` to show blame
+  * `<leader>gy` yank the current line GitHub URL
 
   * `<leader>gu` undo hunk
   * `<leader>ga` stage hunk

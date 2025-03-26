@@ -23,6 +23,10 @@ local function trouble_close()
   Trouble.close("diagnostics")
 end
 
+local function trouble_toggle()
+  Trouble.toggle("diagnostics")
+end
+
 local function trouble_next()
   if Trouble.is_open("diagnostics") then
     --Trouble.focus()
@@ -52,4 +56,5 @@ vim.keymap.set('n', '[x', trouble_prev, { desc = "Diag: Go to previous diagnosti
 vim.keymap.set('n', '<leader>xl', vim.diagnostic.setloclist, { desc = "Diag: Set location list" })
 vim.keymap.set('n', '<leader>xo', trouble_open, { desc = "Diag: Open trouble" })
 vim.keymap.set('n', '<leader>xf', trouble_focus, { desc = "Diag: Focus trouble" })
+vim.keymap.set('n', '<leader>xx', trouble_toggle, { desc = "Diag: Toggle trouble" })
 vim.keymap.set('n', '<leader>xq', trouble_close, { desc = "Diag: Close trouble" })
