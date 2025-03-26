@@ -29,7 +29,7 @@
   * `<ctrl-b>` or `<leader>fb` fuzzy find through buffers
   * `<ctrl-\>` fuzzy find through neovim commands
   * `<leader>fk` fuzzy find through keymaps
-  * When open, `<ctrl>q`, sends matches to the quickfix list
+  * When open, `<ctrl>k`, sends matches to the quickfix list
   * See [plugin.fzf.vim](./home-manager/modules/neovim/plugins/fzf.vim) for more
 
 ## Code / LSP
@@ -58,16 +58,17 @@
   * `:Gblame` to show blame
 
   * `<leader>gu` undo hunk
-  * `<leader>gs` stage hunk
+  * `<leader>ga` stage hunk
   * `]h` next hunk
   * `[h` prev hunk
   * `<leader>ggm` switch gutter base to main branch
   * `<leader>ggd` switch gutter base to default
 
   * `<leader>gdo` diff view open
-  * `<leader>gdb` diff view open, diffing against main branch
+  * `<leader>gdm` diff view open, diffing against main branch
   * `<leader>gdq` diff view close
 
+  * `<leader>ghr` GitHub PR review
 
 ## Diagnostics (x)
   * `<leader>xs` or `<leader>xf` Open diagnostic float
@@ -100,6 +101,7 @@
 * `<leader>kn` or `]k` to go to next quickfix
 * `<leader>kp` or `[k` to go to prev quickfix
 * `<leader>kf` to find in quickfix
+* From any fzf, `<ctrl>k`, sends matches to the quickfix list
 
 ## Testing (t)
   * `<leader>tc` to run nearest / under cursor

@@ -2,7 +2,7 @@
 
 -------------
 --- nvim-tree
--- empty setup using defaults
+--- https://github.com/nvim-tree/nvim-tree.lua
 require("nvim-tree").setup {
     update_focused_file = {
         enable = true,
@@ -11,10 +11,10 @@ require("nvim-tree").setup {
       enable = true,
       show_on_dirs = true,
     },
-
     actions = {
       open_file = {
         resize_window = false, -- Prevent resizing tree on opening file
+        quit_on_open = true, -- Close tree when opening a file
       },
     },
     view = {
@@ -25,10 +25,12 @@ vim.keymap.set('n', '<Leader>e', ':NvimTreeToggle<CR>', { desc = "Tree: Toggle" 
 
 ---------------
 --- bufferline
+--- https://github.com/akinsho/bufferline.nvim
 require("bufferline").setup {
   options = {
     show_duplicate_prefix = true,
-    offsets = {
+    diagnostics = true,
+    offsets = { -- Don't show tabs over file explorer
         {
             filetype = "NvimTree",
             text = "File Explorer",
@@ -64,7 +66,11 @@ require('lualine').setup {
   sections = {
     lualine_a = {'mode'},
     lualine_b = {'branch', 'diff', 'diagnostics'},
-    lualine_c = {'filename'},
+    lualine_c = {
+      {'filename',
+        path = 1 -- Show relative path
+      }
+    },
     lualine_x = {'encoding', 'fileformat', 'filetype'},
     lualine_y = {'progress'},
     lualine_z = {'location'}

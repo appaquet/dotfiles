@@ -66,8 +66,9 @@ in
 
       # Git
       vim-fugitive # Git (diff|log|...) commands
-      vim-gitgutter # Show diffs in gutter
+      gitsigns-nvim # Show git signs in gutter
       diffview-nvim # :DiffviewOpen, :DiffviewClose
+      octo-nvim
 
       # LSP / Languages
       nvim-lspconfig # https://github.com/neovim/nvim-lspconfig
@@ -103,7 +104,6 @@ in
       nvim-dap
       nvim-dap-ui
       nvim-dap-go
-      nvim-dap-python
 
       # Syntax
       (nvim-treesitter.withPlugins (p: [

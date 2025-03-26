@@ -5,10 +5,10 @@ local lspconfig = require('lspconfig')
 lspconfig.pyright.setup {}
 lspconfig.ts_ls.setup {}
 lspconfig.marksman.setup {}
-lspconfig.gopls.setup {}
 lspconfig.nixd.setup {}
 lspconfig.buf_ls.setup {}
---lspconfig.rust_analyzer.setup {} -- Loaded by rustaceanvim!
+--lspconfig.gopls.setup {} -- Loaded by go.nvim (see bellow)
+--lspconfig.rust_analyzer.setup {} -- Loaded by rustaceanvim (see bellow)
 
 -- Use LspAttach autocommand to only map the following keys
 -- after the language server attaches to the current buffer
@@ -106,33 +106,30 @@ cmp.setup {
   },
 }
 
----------
+-------------
 -- Golang
 -- https://github.com/ray-x/go.nvim
---
--- Format & cleanup imports on save
-local format_sync_grp = vim.api.nvim_create_augroup("goimports", {})
-vim.api.nvim_create_autocmd("BufWritePre", {
-  pattern = "*.go",
-  callback = function()
-   require('go.format').goimports()
-  end,
-  group = format_sync_grp,
-})
+if vim.fn.executable("go") == 1 then -- Only load the plugin if `go` is available since it fails otherwise
+  -- Format & cleanup imports on save
+  local format_sync_grp = vim.api.nvim_create_augroup("goimports", {})
+  vim.api.nvim_create_autocmd("BufWritePre", {
+    pattern = "*.go",
+    callback = function()
+     require('go.format').goimports()
+    end,
+    group = format_sync_grp,
+  })
 
-
-load_plugin_on_first_open("go", "go", function()
   require("go").setup {
-      lsp_cfg = {
+    lsp_cfg = {
       settings = {
         gopls = {
           staticcheck = true,
         },
       },
     },
-    gofmt = 'hfgofmt', -- TODO: Find a way to be per project
   }
-end)
+end
 
 ------------
 -- Rust

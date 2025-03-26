@@ -13,7 +13,7 @@ fzf.setup({
   },
   keymap = {
     fzf = {
-      ["ctrl-q"] = "select-all+accept", -- Sends to quickfix
+      ["ctrl-k"] = "select-all+accept", -- Sends to quickfix
     },
   },
 })

@@ -5,6 +5,7 @@
 require("copilot").setup({
   suggestion = { enabled = false }, -- because we use cmp
   panel = { enabled = false }, -- because we use cmp
+  copilot_model = "gpt-4o-copilot",
 
   filetypes = {
    -- overrides defaults
@@ -24,11 +25,11 @@ require("copilot_cmp").setup {
 require('avante_lib').load()
 require('avante').setup ({
   -- From https://github.com/yetone/avante.nvim/blob/main/lua/avante/config.lua
-  provider = "claude",
+  provider = "copilot",
 
   -- Not using auto suggestion for now
-  -- https://github.com/yetone/avante.nvim/issues/1048
-  auto_suggestions_provider = "claude",
+  -- https://github.com/yetone/avante.nvim/issues/1047
+  auto_suggestions_provider = "copilot", -- not used
   behaviour = {
     auto_suggestions = false, -- Experimental stage
   }
