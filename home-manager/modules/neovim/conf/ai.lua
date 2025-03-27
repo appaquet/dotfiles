@@ -15,7 +15,8 @@ require("copilot").setup({
 })
 
 -- https://github.com/zbirenbaum/copilot-cmp
-require("copilot_cmp").setup {
+-- FIXME: but overriden with https://github.com/litoj/cmp-copilot
+require("cmp_copilot").setup { -- FIXME: Overriden (see ../default.nix), originally "copilot_cmp"
   method = "getCompletionsCycling",
 }
 

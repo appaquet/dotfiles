@@ -25,7 +25,10 @@ vim.keymap.set('n', '<Leader>bc', ':BufDel<CR>', { silent = true, desc = "Buf: C
 vim.keymap.set('n', '<Leader>bq', ':BufDel<CR>', { silent = true, desc = "Buf: Close current" })
 vim.keymap.set('n', '<Leader>bo', ':BufDelOthers<CR>', { silent = true, desc = "Buf: Close others" })
 vim.keymap.set('n', '<Leader>ba', ':BufDelAll<CR>', { silent = true, desc = "Buf: Close all" })
+
 vim.keymap.set('n', '<Leader>bs', ':w<CR>', { silent = true, desc = "Buf: Save" })
+vim.keymap.set('n', '<Leader>bw', ':w<CR>', { silent = true, desc = "Buf: Save" })
+vim.keymap.set('n', '<Leader>w', ':w<CR>', { silent = true, desc = "Buf: Save" })
 vim.keymap.set('n', '<C-s>', ':w<CR>', { silent = true, desc = "Buf: Save" })
 
 -- Tab management (n)
