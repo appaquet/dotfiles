@@ -1,30 +1,28 @@
-
 -------------
 -- fzf-lua
 -- From https://github.com/jkearse3/dotfiles/blob/e3e53bb0c11daeb33dc5b44609ff46da9dd05b1c/nvim/lua/lazy_plugins/search.lua#L2
-local fzf = require('fzf-lua')
+local fzf = require("fzf-lua")
 
 fzf.setup({
-  winopts = {
-    preview = {
-      layout = "vertical",
-      vertical = "down:50%",
-    },
-  },
-  keymap = {
-    fzf = {
-      ["ctrl-k"] = "select-all+accept", -- Sends to quickfix
-    },
-  },
+	winopts = {
+		preview = {
+			layout = "vertical",
+			vertical = "down:50%",
+		},
+	},
+	keymap = {
+		fzf = {
+			["ctrl-k"] = "select-all+accept", -- Sends to quickfix
+		},
+	},
 })
-
 
 -- Quick keybindings
 vim.keymap.set("n", "<C-p>", fzf.files, { desc = "FZF: Files" })
 vim.keymap.set("n", "<C-l>", fzf.lgrep_curbuf, { desc = "FZF: Live grep file" })
 vim.keymap.set("n", "<C-g>", fzf.live_grep_glob, { desc = "FZF: Live grep workspace" })
 vim.keymap.set("n", "<C-b>", fzf.buffers, { desc = "FZF: Buffers" })
-vim.keymap.set({"n", "i", "v", "c", "x"}, "<C-\\>", fzf.commands, { desc = "FZF: Neovim commands" })
+vim.keymap.set({ "n", "i", "v", "c", "x" }, "<C-\\>", fzf.commands, { desc = "FZF: Neovim commands" })
 
 -- Long form keybindings
 vim.keymap.set("n", "<leader>ff", fzf.files, { desc = "FZF: Files" })
@@ -64,4 +62,3 @@ vim.keymap.set("n", "<leader>fgB", fzf.git_blame, { desc = "FZF: Git blame" })
 vim.keymap.set("n", "<leader>fgt", fzf.git_tags, { desc = "FZF: Git tags" })
 
 vim.keymap.set("n", "<leader>fdb", fzf.dap_breakpoints, { desc = "FZF: DAP breakpoints" })
-

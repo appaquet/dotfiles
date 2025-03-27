@@ -1,49 +1,48 @@
-
 -- Neotest
 -- https://github.com/nvim-neotest/neotest
 local Neotest = require("neotest")
 Neotest.setup({
-  adapters = {
-    require('rustaceanvim.neotest'),
+	adapters = {
+		require("rustaceanvim.neotest"),
 
-    require("neotest-golang")({
-      go_test_args = {
-        "-v",
-        "-count=1",
-        "-timeout=10s",
-      },
-    }),
+		require("neotest-golang")({
+			go_test_args = {
+				"-v",
+				"-count=1",
+				"-timeout=10s",
+			},
+		}),
 
-    require("neotest-python"),
-  },
+		require("neotest-python"),
+	},
 })
 
 local function run_nearest()
-  Neotest.summary.open()
-  Neotest.run.run()
+	Neotest.summary.open()
+	Neotest.run.run()
 end
 
 local function debug_nearest()
-  Neotest.run.run({ strategy = "dap" })
+	Neotest.run.run({ strategy = "dap" })
 end
 
 local function run_file()
-  Neotest.summary.open()
-  Neotest.run.run(vim.fn.expand("%"))
+	Neotest.summary.open()
+	Neotest.run.run(vim.fn.expand("%"))
 end
 
 local function debug_file()
-  Neotest.summary.open()
-  Neotest.run.run({ vim.fn.expand("%"), strategy = "dap" })
+	Neotest.summary.open()
+	Neotest.run.run({ vim.fn.expand("%"), strategy = "dap" })
 end
 
 local function run_last()
-  Neotest.summary.open()
-  Neotest.run.run_last()
+	Neotest.summary.open()
+	Neotest.run.run_last()
 end
 
 local function debug_last()
-  Neotest.run.run_last({ strategy = "dap" })
+	Neotest.run.run_last({ strategy = "dap" })
 end
 
 vim.keymap.set("n", "<leader>tc", run_nearest, { desc = "Test: Run nearest / under cursor" })

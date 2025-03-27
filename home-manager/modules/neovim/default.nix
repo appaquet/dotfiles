@@ -52,7 +52,10 @@ in
     nixd # nix lsp
     marksman # markdown lsp
     nodejs # for copilot
+    stylua # lua formatting
+    bash-language-server # bash lsp
     shfmt # shell formatting
+    shellcheck # shell linting
   ];
 
   programs.neovim = {

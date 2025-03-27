@@ -1,1 +1,1 @@
-require("auto-session").setup{}
+require("auto-session").setup({})
