@@ -15,6 +15,37 @@ Neotest.setup({
 
 		require("neotest-python"),
 	},
+
+	-- Notify on completion
+	-- https://github.com/nvim-neotest/neotest/issues/218
+	consumers = {
+		notify = function(client)
+			client.listeners.results = function(adapter_id, results, partial)
+				-- Partial results can be very frequent
+				if partial then
+					return
+				end
+
+				local fail_count = 0
+				local success_count = 0
+				for _, result in pairs(results) do
+					if result.status == "failed" then
+						fail_count = fail_count + 1
+					else
+						success_count = success_count + 1
+					end
+				end
+
+				if fail_count > 0 then
+					vim.notify(string.format("%d test(s) failed", fail_count), "error", { title = "Neotest" })
+				end
+				if success_count > 0 then
+					vim.notify(string.format("%d test(s) passed", success_count), "success", { title = "Neotest" })
+				end
+			end
+			return {}
+		end,
+	},
 })
 
 local function run_nearest()

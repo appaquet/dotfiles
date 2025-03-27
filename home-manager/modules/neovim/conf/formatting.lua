@@ -17,12 +17,13 @@ require("conform").setup({
 		},
 	},
 	format_on_save = {
-		timeout_ms = 500,
+		timeout_ms = 1000,
 		lsp_format = "fallback",
 	},
 	default_format_opts = {
 		-- fallback to lsp
 		lsp_format = "fallback",
+		async = true,
 	},
 })
 

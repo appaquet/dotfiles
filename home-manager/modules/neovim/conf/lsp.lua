@@ -23,19 +23,22 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		-- See `:help vim.lsp.*` for documentation on any of the below functions
 		-- Adapted a bit from https://lsp-zero.netlify.app/docs/language-server-configuration.html
 		local opts = { buffer = ev.buf }
+		vim.keymap.set("n", "<leader>lgd", vim.lsp.buf.definition, { buffer = ev.buf, desc = "LSP: Go to definition" })
+		vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = ev.buf, desc = "LSP: Go to definition" })
 		vim.keymap.set(
 			"n",
 			"<leader>lgD",
 			vim.lsp.buf.declaration,
 			{ buffer = ev.buf, desc = "LSP: Go to declaration" }
 		)
-		vim.keymap.set("n", "<leader>lgd", vim.lsp.buf.definition, { buffer = ev.buf, desc = "LSP: Go to definition" })
 		vim.keymap.set(
 			"n",
 			"<leader>lgt",
 			vim.lsp.buf.type_definition,
 			{ buffer = ev.buf, desc = "LSP: Go to type definition" }
 		)
+		vim.keymap.set("n", "gt", vim.lsp.buf.type_definition, { buffer = ev.buf, desc = "LSP: Go to type definition" })
+
 		vim.keymap.set(
 			"n",
 			"<leader>lli",
@@ -99,16 +102,25 @@ local has_words_before = function()
 	return col ~= 0 and vim.api.nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]:match("^%s*$") == nil
 end
 
--- nvim-cmp (https://github.com/hrsh7th/nvim-cmp)
--- luasnip (https://github.com/L3MON4D3/LuaSnip)
-local luasnip = require("luasnip")
+----------------
+--- Autocomplete
+--- nvim-cmp ( https://github.com/hrsh7th/nvim-cmp )
 local cmp = require("cmp")
+local luasnip = require("luasnip")
 cmp.setup({
+	-- luasnip ( https://github.com/L3MON4D3/LuaSnip )
 	snippet = {
 		expand = function(args)
 			luasnip.lsp_expand(args.body)
 		end,
 	},
+
+	performance = {
+		--throttle = 200, -- delay before it shows
+		--debounce = 200, -- delay to wait completion for grouping
+	},
+
+	preselect = cmp.PreselectMode.None, -- Don't preselect items
 
 	mapping = cmp.mapping.preset.insert({
 		["<C-u>"] = cmp.mapping.scroll_docs(-4), -- Up
@@ -117,40 +129,44 @@ cmp.setup({
 		-- C-b (back) C-f (forward) for snippet placeholder navigation.
 		["<C-Space>"] = cmp.mapping.complete(),
 
+		-- Accept selected
 		["<CR>"] = cmp.mapping.confirm({
 			behavior = cmp.ConfirmBehavior.Replace,
-			select = true,
+			select = false, -- don't select unless selected
 		}),
 
+		-- Accept first, a la cursor
 		["<Tab>"] = vim.schedule_wrap(function(fallback)
-			if cmp.visible() and has_words_before() then
-				cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+			if cmp.visible() then
+				cmp.confirm({
+					behavior = cmp.ConfirmBehavior.Replace,
+					select = true,
+				})
 			elseif luasnip.expand_or_jumpable() then
 				luasnip.expand_or_jump()
 			else
 				fallback()
 			end
 		end, { "i", "s" }),
-
-		["<S-Tab>"] = cmp.mapping(function(fallback)
-			if cmp.visible() then
-				cmp.select_prev_item()
-			elseif luasnip.jumpable(-1) then
-				luasnip.jump(-1)
-			else
-				fallback()
-			end
-		end, { "i", "s" }),
 	}),
+
+	window = {
+		completion = cmp.config.window.bordered(),
+		documentation = cmp.config.window.bordered(),
+	},
 
 	sources = {
 		{ name = "copilot" }, -- see ai.lua
 		{ name = "nvim_lsp" },
-		{ name = "luasnip" },
 		{ name = "nvim_lsp_signature_help" },
+		{ name = "luasnip" },
 		{ name = "buffer" },
 	},
 })
+
+-- Load default snippets
+-- Can be called again to load more from specific paths (see doc or HF backend repo)
+require("luasnip.loaders.from_vscode").lazy_load({})
 
 -------------
 -- Golang

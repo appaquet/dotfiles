@@ -1,4 +1,7 @@
+-- Setup leader key as space.
 vim.g.mapleader = " "
+vim.g.maplocalleader = " "
+vim.keymap.set("", "<Space>", "<Nop>")
 
 -- Buffer navigation & control
 require("bufdel").setup({
@@ -121,3 +124,22 @@ vim.cmd([[
 -- Misc
 vim.keymap.set("n", "<Leader>r", ":w<CR>:!./%<CR>", { silent = true, desc = "Save and execute current file" })
 vim.keymap.set("v", "<Leader>r", ":w !sh<CR>", { silent = true, desc = "Execute selected lines in shell" })
+
+function toggle_wrap()
+	if vim.wo.wrap then
+		vim.wo.wrap = false
+		vim.wo.linebreak = false
+	else
+		vim.wo.wrap = true
+		vim.wo.linebreak = true
+	end
+end
+vim.keymap.set("n", "<Leader>W", toggle_wrap, { silent = true, desc = "Toggle line wrap" })
+
+------------------
+-- Whichkey
+-- https://github.com/folke/which-key.nvim
+local wk = require("which-key")
+wk.add({
+	{ "<leader>f", group = "file" }, -- group
+})

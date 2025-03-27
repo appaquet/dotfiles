@@ -107,13 +107,16 @@ in
         conform-nvim # easy formatting
 
         # Autocomplete (w/ LSP)
-        luasnip
         nvim-cmp # https://github.com/hrsh7th/nvim-cmp
         cmp-cmdline
-        cmp_luasnip
         cmp-nvim-lsp
         cmp-nvim-lsp-signature-help
         cmp-nvim-lsp-document-symbol
+
+        # Snippets
+        luasnip
+        cmp_luasnip
+        friendly-snippets # easy load from vscode, languages, etc.
 
         # Copilot (use Copilot auth)
         # See https://github.com/zbirenbaum/copilot.lua

@@ -85,6 +85,8 @@
       nsf = "nix shell nixpkgs#(fzf-nix)";
       fn = "fzf-nix";
 
+      nv = "nvim";
+
       ai = {
         expansion = "aichat \"%\"";
         setCursor = true;
