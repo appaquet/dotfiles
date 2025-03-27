@@ -52,6 +52,7 @@ in
     nixd # nix lsp
     marksman # markdown lsp
     nodejs # for copilot
+    shfmt # shell formatting
   ];
 
   programs.neovim = {
@@ -100,6 +101,7 @@ in
         neotest-golang
         neotest-python
         rustaceanvim
+        conform-nvim # easy formatting
 
         # Autocomplete (w/ LSP)
         luasnip
@@ -171,12 +173,13 @@ in
         (includeLuaFile "layout.lua")
         (includeLuaFile "theme.lua")
         (includeLuaFile "sessions.lua")
+        (includeLuaFile "notify.lua")
         (includeLuaFile "fzf.lua")
         (includeLuaFile "ai.lua")
         (includeLuaFile "lsp.lua")
+        (includeLuaFile "formatting.lua")
         (includeLuaFile "treesitter.lua")
         (includeLuaFile "diag.lua")
-        (includeLuaFile "notify.lua")
         (includeLuaFile "testing.lua")
         (includeLuaFile "git.lua")
         (includeLuaFile "quickfix.lua")
