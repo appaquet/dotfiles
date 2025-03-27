@@ -8,8 +8,13 @@ require("conform").setup({
 		javascript = { "prettierd", "prettier", stop_after_first = true },
 		sh = { "shfmt" },
 		rust = { "rustfmt", lsp_format = "fallback" },
-
-		-- go = { "gofmt", "goimports" }, -- Already handled by the plugin
+		go = { "hfgofmt", "gofmt", "goimports" },
+	},
+	formatters = {
+		-- humanfirst one
+		hfgofmt = {
+			command = "hfgofmt",
+		},
 	},
 	format_on_save = {
 		timeout_ms = 500,
