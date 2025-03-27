@@ -157,6 +157,7 @@ cmp.setup({
 -- https://github.com/ray-x/go.nvim
 if vim.fn.executable("go") == 1 then -- Only load the plugin if `go` is available since it fails otherwise
 	-- Format & cleanup imports on save
+	--
 	--local format_sync_grp = vim.api.nvim_create_augroup("goimports", {})
 	--vim.api.nvim_create_autocmd("BufWritePre", {
 	--pattern = "*.go",
@@ -186,7 +187,9 @@ end
 vim.g.rustaceanvim = {
 	tools = {},
 	server = {
-		on_attach = function(client, bufnr) end,
+		on_attach = function(client, bufnr)
+			--
+		end,
 		default_settings = {
 			["rust-analyzer"] = {},
 		},
