@@ -1,4 +1,6 @@
 # Neovim README
+This is a collection of keymaps and commands for my Neovim setup. It doesn't contain only personal
+keymaps, but also default/built-ins that I tend to forget.
 
 ## General keymap
 * `<leader>` is space
@@ -10,8 +12,9 @@
 * `]b` to switch to next buffer
 * `[b` to switch to previous buffer
 * `<leader>b 1 through 9` to switch to buffer 1 through 9
-* `<leader><tab>` to switch to last buffer
-* `<leader>bc` to close the current buffer by trying not to mess up the layout
+* `<leader>b<tab>` to switch to last buffer
+* `<leader>bc` to open a new empty buffer
+* `<leader>bq` to close the current buffer by trying not to mess up the layout
 * `<leader>bo` to close all buffers except the current one
 * `<leader>ba` to close all buffers
 * `<leader>bs` or `<ctrl-s>` to save current buffer
@@ -32,9 +35,31 @@
 * `<leader>W` fuzzy find word under cursor in workspace
 * `<leader>fk` fuzzy find through keymaps
 * `<ctrl-\>` or `<leader>fc` fuzzy find through neovim commands
-* `<leader>fR` to resume last search 
-* When open, `<ctrl>k`, sends matches to the quickfix list
-* See [fzf.lua](./home-manager/modules/neovim/conv/fzf.lua) for more
+* `<leader>fr` to resume last search 
+* See [fzf.lua](./home-manager/modules/neovim/conf/fzf.lua) for all keymaps
+
+### Keymap inside window
+* `<ctrl>k`, sends matches to the quickfix list
+* `<ctrl>v`, open in vertical split
+* `<ctrl>s`, open in horizontal split
+* `<ctrl>t`, open in new tab
+
+## Nvim tree
+* `<ctrl>e` to toggle filetree
+* In tree
+  * `g?` to show help
+  * `<ctrl>]` to CD into directory
+  * `-` go up one directory
+  * `<ctrl>v` Open in vertical split
+  * `<ctrl>x` Open in horizontal split
+  * `I` Toggle hidden files
+  * `r` Rename file
+  * `d` Delete file
+  * `a` Add file or directory if it ends with `/`
+  * `c`, `x`, `v` to copy, cut, paste files
+  * `f` to find file, `F` to clear
+  * `q` to close tree
+  * `E` to expand all, `W` to collapse
 
 ## Code / LSP
 * `<leader>lgD` LSP: Go to declaration
@@ -64,8 +89,8 @@
 
 * `<leader>gu` undo hunk
 * `<leader>ga` stage hunk
-* `]h` next hunk
-* `[h` prev hunk
+* `]g` next git hunk
+* `[g` prev git hunk
 * `<leader>ggm` switch gutter base to main branch
 * `<leader>ggd` switch gutter base to default
 
@@ -81,23 +106,6 @@
 * `<leader>xp` or `[x` Go to previous diagnostic
 * `<leader>xo` Open diagnostic panel (Trouble)
 * `<leader>xq` Close diagnostic panel (Trouble)
-
-## Nvim tree
-* `<ctrl>e` to toggle filetree
-* In tree
-  * `g?` to show help
-  * `<ctrl>]` to CD into directory
-  * `-` go up one directory
-  * `<ctrl>v` Open in vertical split
-  * `<ctrl>x` Open in horizontal split
-  * `I` Toggle hidden files
-  * `r` Rename file
-  * `d` Delete file
-  * `a` Add file or directory if it ends with `/`
-  * `c`, `x`, `v` to copy, cut, paste files
-  * `f` to find file, `F` to clear
-  * `q` to close tree
-  * `E` to expand all, `W` to collapse
 
 ## Quickfix (k)
 * `<leader>ko` to open quickfix
@@ -156,8 +164,10 @@ Examples:
 * `m[a-z0-9A-Z]` to set mark
 * `'[a-z0-9A-Z]` to go to mark
 
-## General refresher
-* `z=` to see spelling suggestions for word under cursor
+## Layout
+* `ctrl-w w` to switch between panes
+* `ctrl-w r` or `ctrl-w R` to rotate panes
+* `ctrl-w c` or `ctrl-w o` close current split OR others.
 
 ## Misc
 * `<leader>r` to execute current buffer in a shell (normal mode)
@@ -166,6 +176,7 @@ Examples:
 * `<leader>y` to yank to clipboard using [bin/pbcopy](bin/pbcopy) util
 * `<leader>yp` to paste from clipboard using [bin/pbpaste](bin/pbpaste) util
 * `<leader>W` to toggle line wrap
+* `z=` to see spelling suggestions for word under cursor (built-in)
 
 ## Commands
 * `Rename <file name>` to rename current file
