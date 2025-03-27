@@ -18,7 +18,7 @@
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.kernelPackages = pkgs.linuxPackages_6_11;
+  boot.kernelPackages = pkgs.linuxPackages_6_12;
   boot.kernelParams = [
     # Prevent intel nic from dropping after 1h
     # See https://www.reddit.com/r/buildapc/comments/xypn1m/network_card_intel_ethernet_controller_i225v_igc/
@@ -52,7 +52,10 @@
     lanIp = "192.168.0.30";
   };
   networking.hosts = {
-    "100.109.193.77" = [ "localhost.humanfirst.ai" "istio-ingressgateway.istio-system.svc.cluster.local" ];
+    "100.109.193.77" = [
+      "localhost.humanfirst.ai"
+      "istio-ingressgateway.istio-system.svc.cluster.local"
+    ];
   };
   networking.firewall.enable = false;
 
