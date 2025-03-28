@@ -41,6 +41,7 @@ vim.keymap.set("n", "<Leader>ga", ":Gitsigns stage_hunk<CR>", { silent = true, d
 vim.keymap.set("n", "]g", ":Gitsigns nav_hunk next<CR>", { silent = true, desc = "Git: next hunk" })
 vim.keymap.set("n", "[g", ":Gitsigns nav_hunk prev<CR>", { silent = true, desc = "Git: previous hunk" })
 vim.keymap.set("n", "<Leader>gb", ":Gitsigns blame<CR>", { silent = true, desc = "Git: blame pane" })
+vim.keymap.set("n", "<Leader>gdb", ":Gitsigns diffthis<CR>", { silent = true, desc = "Git: open buffer diff" })
 
 local function switch_gutter_base_main()
 	local main_branch = get_main_branch()

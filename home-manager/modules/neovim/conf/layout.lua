@@ -27,7 +27,13 @@ vim.keymap.set("n", "<Leader>e", ":NvimTreeToggle<CR>", { desc = "Tree: Toggle" 
 require("bufferline").setup({
 	options = {
 		show_duplicate_prefix = true,
+
 		diagnostics = "nvim_lsp",
+		diagnostics_indicator = function(count, level)
+			local icon = level:match("error") and " " or " "
+			return " " .. icon .. count
+		end,
+
 		offsets = { -- Don't show tabs over file explorer
 			{
 				filetype = "NvimTree",
@@ -39,7 +45,7 @@ require("bufferline").setup({
 	},
 })
 
-------------
+-----------------------------
 --- lualine
 --- https://github.com/nvim-lualine/lualine.nvim
 require("lualine").setup({

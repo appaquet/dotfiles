@@ -8,28 +8,35 @@ require("bufdel").setup({
 	quit = false, -- don't quit on last close
 })
 
+-- TODO: Move buffer to separate file
 -- Buffer management (b)
-vim.keymap.set("n", "<Leader>b1", ":br!<CR>", { silent = true, desc = "Buf: Switch 1" })
-vim.keymap.set("n", "<Leader>b2", ":br!<CR>:bn!<CR>", { silent = true, desc = "Buf: Switch 2" })
-vim.keymap.set("n", "<Leader>b3", ":br!<CR>:bn!<CR>:bn!<CR>", { silent = true, desc = "Buf: Switch 3" })
-vim.keymap.set("n", "<Leader>b4", ":br!<CR>:bn!<CR>:bn!<CR>:bn!<CR>", { silent = true, desc = "Buf: Switch 4" })
-vim.keymap.set("n", "<Leader>b5", ":br!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>", { silent = true, desc = "Buf: Switch 5" })
-vim.keymap.set("n", "<Leader>b6", ":br!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>", { silent = true, desc = "Buf: Switch 6" })
-vim.keymap.set("n", "<Leader>b7", ":br!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>", { silent = true, desc = "Buf: Switch 7" })
-vim.keymap.set("n", "<Leader>b8", ":br!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>", { silent = true, desc = "Buf: Switch 8" })
-vim.keymap.set("n", "<Leader>b9", ":br!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>", { silent = true, desc = "Buf: Switch 9" })
-vim.keymap.set("n", "]b", ":bn!<CR>", { silent = true, desc = "Buf: Next" })
-vim.keymap.set("n", "<Leader>bn", ":bn!<CR>", { silent = true, desc = "Buf: Next" })
-vim.keymap.set("n", "[b", ":bp!<CR>", { silent = true, desc = "Buf: Previous" })
-vim.keymap.set("n", "<Leader>bp", ":bp!<CR>", { silent = true, desc = "Buf: Previous" })
+-- Use `bufferline` commands to manipulate since ordering is handled by the plugin
+vim.keymap.set("n", "<Leader>b1", ":BufferLineGoToBuffer 1<CR>", { silent = true, desc = "Buf: Switch 1" })
+vim.keymap.set("n", "<Leader>b2", ":BufferLineGoToBuffer 2<CR>", { silent = true, desc = "Buf: Switch 2" })
+vim.keymap.set("n", "<Leader>b3", ":BufferLineGoToBuffer 3<CR>", { silent = true, desc = "Buf: Switch 3" })
+vim.keymap.set("n", "<Leader>b4", ":BufferLineGoToBuffer 4<CR>", { silent = true, desc = "Buf: Switch 4" })
+vim.keymap.set("n", "<Leader>b5", ":BufferLineGoToBuffer 5<CR>", { silent = true, desc = "Buf: Switch 5" })
+vim.keymap.set("n", "<Leader>b6", ":BufferLineGoToBuffer 6<CR>", { silent = true, desc = "Buf: Switch 6" })
+vim.keymap.set("n", "<Leader>b7", ":BufferLineGoToBuffer 7<CR>", { silent = true, desc = "Buf: Switch 7" })
+vim.keymap.set("n", "<Leader>b8", ":BufferLineGoToBuffer 8<CR>", { silent = true, desc = "Buf: Switch 8" })
+vim.keymap.set("n", "<Leader>b9", ":BufferLineGoToBuffer 9<CR>", { silent = true, desc = "Buf: Switch 9" })
+vim.keymap.set("n", "]b", ":BufferLineCycleNext<CR>", { silent = true, desc = "Buf: Next" })
+vim.keymap.set("n", "[b", ":BufferLineCyclePrev<CR>", { silent = true, desc = "Buf: Previous" })
 vim.keymap.set("n", "<Leader>b<Tab>", ":b#<CR>", { silent = true, desc = "Buf: Switch to last buffer" })
 
+vim.keymap.set("n", "<Leader>bl", ":BufferLineMoveNext<CR>", { silent = true, desc = "Buf: Move right" })
+vim.keymap.set("n", "<Leader>bh", ":BufferLineMovePrev<CR>", { silent = true, desc = "Buf: Move left" })
+
 vim.keymap.set("n", "<Leader>bc", ":enew<CR>", { silent = true, desc = "Buf: New" })
+vim.keymap.set("n", "<Leader>bp", ":BufferLineTogglePin<CR>", { silent = true, desc = "Buf: Toggle pin" })
+
 vim.keymap.set("n", "<Leader>bq", ":BufDel<CR>", { silent = true, desc = "Buf: Close current" })
 vim.keymap.set("n", "<Leader>bqq", ":BufDel<CR>", { silent = true, desc = "Buf: Close current" })
 vim.keymap.set("n", "<Leader>qw", ":w<CR>:BufDel<CR>", { silent = true, desc = "Buf: Close current" })
 vim.keymap.set("n", "<Leader>bqo", ":BufDelOthers<CR>", { silent = true, desc = "Buf: Close others" })
-vim.keymap.set("n", "<Leader>bqa", ":BufDelAll<CR>", { silent = true, desc = "Buf: Close all" })
+vim.keymap.set("n", "<Leader>bqa", ":BufDelAll<CR>", { silent = true, desc = "Buf: Close all" }) -- TODO: Need a way to close all but pinned
+vim.keymap.set("n", "<Leader>bqh", ":BufferLineCloseLeft<CR>", { silent = true, desc = "Buf: Close at left" })
+vim.keymap.set("n", "<Leader>bql", ":BufferLineCloseRight<CR>", { silent = true, desc = "Buf: Close at right" })
 
 vim.keymap.set("n", "<Leader>bs", ":w<CR>", { silent = true, desc = "Buf: Save" })
 vim.keymap.set("n", "<Leader>bw", ":w<CR>", { silent = true, desc = "Buf: Save" })
