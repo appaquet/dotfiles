@@ -29,16 +29,16 @@ require("nvim-treesitter.configs").setup({
 			lookahead = true,
 
 			keymaps = {
-				["ap"] = "@parameter.outer",
-				["ip"] = "@parameter.inner",
-				-- You can use the capture groups defined in textobjects.scm
-				["af"] = "@function.outer",
-				["if"] = "@function.inner",
-				["ac"] = "@class.outer",
-				-- You can optionally set descriptions to the mappings (used in the desc parameter of
-				-- nvim_buf_set_keymap) which plugins like which-key display
-				["ic"] = { query = "@class.inner", desc = "Select inner part of a class region" },
+				["ap"] = { query = "@parameter.outer", desc = "Select outer part of a parameter" },
+				["ip"] = { query = "@parameter.inner", desc = "Select inner part of a parameter" },
+				["af"] = { query = "@function.outer", desc = "Select outer part of a function" },
+				["if"] = { query = "@function.inner", desc = "Select inner part of a function" },
+				["ac"] = { query = "@class.outer", desc = "Select outer part of a class" },
+				["ic"] = { query = "@class.inner", desc = "Select inner part of a class" },
+				["ab"] = { query = "@block.outer", desc = "Select outer part of a block" },
+				["ib"] = { query = "@block.inner", desc = "Select inner part of a block" },
 			},
+
 			-- You can choose the select mode (default is charwise 'v')
 			--
 			-- Can also be a function which gets passed a table with the keys
@@ -51,6 +51,7 @@ require("nvim-treesitter.configs").setup({
 				["@function.outer"] = "V", -- linewise
 				["@class.outer"] = "<c-v>", -- blockwise
 			},
+
 			-- If you set this to `true` (default is `false`) then any textobject is
 			-- extended to include preceding or succeeding whitespace. Succeeding
 			-- whitespace has priority in order to act similarly to eg the built-in
@@ -66,10 +67,12 @@ require("nvim-treesitter.configs").setup({
 		swap = {
 			enable = true,
 			swap_next = {
-				["<leader>SN"] = "@parameter.inner",
+				["<leader>Sp"] = { query = "@parameter.inner", desc = "Swap with next parameter" },
+				["<leader>Sf"] = { query = "@function.outer", desc = "Swap with next function" },
 			},
 			swap_previous = {
-				["<leader>SP"] = "@parameter.inner",
+				["<leader>SP"] = { query = "@parameter.inner", desc = "Swap with previous parameter" },
+				["<leader>SF"] = { query = "@function.outer", desc = "Swap with previous function" },
 			},
 		},
 
@@ -77,29 +80,26 @@ require("nvim-treesitter.configs").setup({
 			enable = true,
 			set_jumps = true, -- whether to set jumps in the jumplist
 			goto_next_start = {
-				["]m"] = "@function.outer",
+				["]f"] = { query = "@function.outer", desc = "Next function start" },
 				["]c"] = { query = "@class.outer", desc = "Next class start" },
-				--
-				-- You can use regex matching and/or pass a list in a "query" key to group multiple queires.
-				["]o"] = "@loop.*",
-				-- ["]o"] = { query = { "@loop.inner", "@loop.outer" } }
-				--
-				-- You can pass a query group to use query from `queries/<lang>/<query_group>.scm file in your runtime path.
-				-- Below example nvim-treesitter's `locals.scm` and `folds.scm`. They also provide highlights.scm and indent.scm
-				["]s"] = { query = "@scope", query_group = "locals", desc = "Next scope" },
-				["]z"] = { query = "@fold", query_group = "folds", desc = "Next fold" },
+				["]s"] = { query = "@scope", desc = "Next scope" },
+				["]z"] = { query = "@fold", desc = "Next fold" },
+				["]b"] = { query = "@block.outer", desc = "Next block start" },
 			},
 			goto_next_end = {
-				["]M"] = "@function.outer",
-				["]C"] = "@class.outer",
+				["]F"] = { query = "@function.outer", desc = "Next function end" },
+				["]C"] = { query = "@class.outer", desc = "Next class end" },
+				["]B"] = { query = "@block.outer", desc = "Next block end" },
 			},
 			goto_previous_start = {
-				["[m"] = "@function.outer",
-				["[c"] = "@class.outer",
+				["[f"] = { query = "@function.outer", desc = "Previous function start" },
+				["[c"] = { query = "@class.outer", desc = "Previous class start" },
+				["[b"] = { query = "@block.outer", desc = "Previous block start" },
 			},
 			goto_previous_end = {
-				["[M"] = "@function.outer",
-				["[C"] = "@class.outer",
+				["[F"] = { query = "@function.outer", desc = "Previous function end" },
+				["[C"] = { query = "@class.outer", desc = "Previous class end" },
+				["[B"] = { query = "@block.outer", desc = "Previous block end" },
 			},
 
 			-- Below will go to either the start or the end, whichever is closer.
@@ -118,8 +118,8 @@ require("nvim-treesitter.configs").setup({
 			border = "none",
 			floating_preview_opts = {},
 			peek_definition_code = {
-				["<leader>df"] = "@function.outer",
-				["<leader>dF"] = "@class.outer",
+				["<leader>lif"] = { query = "@function.outer", desc = "LSP: Peek function definition" },
+				["<leader>lic"] = { query = "@class.outer", desc = "LSP: Peek class definition" },
 			},
 		},
 	},

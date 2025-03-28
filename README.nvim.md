@@ -70,16 +70,22 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>lgD` LSP: Go to declaration
 * `<leader>lgd` LSP: Go to definition
 * `<leader>lgt` LSP: Go to type definition
+
 * `<leader>lli` LSP: List all implementations
 * `<leader>llr` LSP: List references
-* `<leader>li` LSP: Displays hover information about a symbol
+
 * `<leader>ls` LSP: Show signature help
-* `<leader>lwa` LSP: Add workspace folder
-* `<leader>lwr` LSP: Remove workspace folder
-* `<leader>lwl` LSP: List workspace folders
+* `<leader>lis` LSP: Displays hover information about a symbol
+* `<leader>lif` LSP: Peek function definition
+* `<leader>lic` LSP: Peek class definition
+
 * `<leader>lr` LSP: Rename
 * `<leader>lca` LSP: Code action
 * `<leader>lf` LSP: Format
+
+* `<leader>lwa` LSP: Add workspace folder
+* `<leader>lwr` LSP: Remove workspace folder
+* `<leader>lwl` LSP: List workspace folders
 
 ## Git (g)
 * `<leader>gs` show status pane
@@ -139,22 +145,17 @@ keymaps, but also default/built-ins that I tend to forget.
   * `?` for help
 
 ## Treesitter textobjects
-
-### Selection
+### Selection (in visual mode)
 - `aX`: Select around object X  
 - `iX`: Select inside object X  
-  *(X = (p)arameter, (f)unction, (c)lass)*
+  *(X = (p)arameter, (f)unction, (c)lass, (s)cope)*
 
 Examples:
-- `af`, `if`: around/inside function
-- `ac`, `ic`: around/inside class
-- `ap`, `ip`: around/inside argument/parameter
-
 ### Movement (Go to start/end)
 - `]X`: Next start of X
 - `[X`: Previous start of X
 - `]X`, `[X`: With capital letters → go to end
-  *(X = (m)ethod/function, (c)lass, l(o)op, (s)cope, (z)fold, con(d)itional)*
+  *(X = (m)ethod/function, (c)lass, l(o)op, (s)cope, (z)fold, con(d)itional, (b)lock)*
 
 Examples:
 - `[m`, `]m`: start of function
@@ -163,8 +164,18 @@ Examples:
 - `[C`, `]C`: end of class
 
 ### Swapping
-- `<leader>Sn`: Swap with next parameter
-- `<leader>Sp`: Swap with previous parameter
+- `<leader>Sp`: Swap with next parameter
+- `<leader>Sf`: Swap with next function
+- `<leader>SP`: Swap with previous parameter
+- `<leader>SF`: Swap with previous function
+
+## Text manipulation
+* `<leader>cc` to comment line (via nerdcommenter)
+* `<leader>cu` to uncomment line (via nerdcommenter)
+* `gw` to format text (in visual)
+* `gu` to lowercase text (in visual)
+* `gU` to upercase text (in visual)
+* `g~` to toggle casing (in visual)
 
 ## Marks
 * `m[a-z0-9A-Z]` to set mark
