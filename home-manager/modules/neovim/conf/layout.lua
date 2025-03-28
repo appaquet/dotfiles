@@ -19,7 +19,7 @@ require("nvim-tree").setup({
 		preserve_window_proportions = false,
 	},
 })
-vim.keymap.set("n", "<Leader>e", ":NvimTreeToggle<CR>", { desc = "Tree: Toggle" })
+vim.keymap.set("n", "<Leader>e", ":NvimTreeToggle<CR>zz", { desc = "Tree: Toggle" })
 
 ---------------
 --- bufferline

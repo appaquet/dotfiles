@@ -24,6 +24,8 @@
       gds = "git diff --staged";
       gp = "git pull";
       gck = "git checkout";
+      gckbp = "git checkout (git-prev-branch)";
+      gckbn = "git checkout (git-next-branch)";
       gcm = {
         expansion = "git commit -m \"%\"";
         setCursor = true;
@@ -51,6 +53,25 @@
       ga = "git add";
       gad = "git add .";
       gmr = "git maintenance run";
+      gbp = "git-prev-branch";
+      gbn = "git-next-branch";
+    };
+
+    functions = {
+      git-prev-branch = ''
+        git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/ | grep -v "^$(git symbolic-ref --short HEAD)\$" | head -n 1
+      '';
+
+      git-next-branch = ''
+        set current_branch (git symbolic-ref --short HEAD)
+        for branch in (git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/)
+            if test $branch != $current_branch
+                git merge-base --is-ancestor $current_branch $branch
+                echo $branch
+                break
+            end
+        end
+      '';
     };
   };
 

@@ -9,15 +9,19 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>qs` to clear auto-session and quit neovim
 
 ## Buffers (b)
+* `<leader>b 1 through 9` to switch to buffer 1 through 9
 * `]b` to switch to next buffer
 * `[b` to switch to previous buffer
-* `<leader>b 1 through 9` to switch to buffer 1 through 9
 * `<leader>b<tab>` to switch to last buffer
+* `<leader>bh` or `<leader>bl` to move tab to the left/right
 * `<leader>bc` to open a new empty buffer
-* `<leader>bq` to close the current buffer by trying not to mess up the layout
-* `<leader>bo` to close all buffers except the current one
-* `<leader>ba` to close all buffers
-* `<leader>bs` or `<ctrl-s>` to save current buffer
+* `<leader>bp` to pin a buffer (stays left)
+* `<leader>bqq` to close the current buffer by trying not to mess up the layout
+* `<leader>bqo` to close all buffers except the current one
+* `<leader>bqa` to close all buffers
+* `<leader>bqh` or `<leader>bql` to close all buffers to the left/right
+* `<leader>w` or `<ctrl-s>` to save current buffer
+* `<leader>wa` to save all buffers
 
 ## Tabs (n)
 * `]n` to switch to next tab
@@ -26,7 +30,7 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>nq` to close current tab
 * `<leader>n1 through 5` to switch to tab 1 through 5
 
-## Layout
+## Layoup
 * `ctrl-w w` to switch between panes
 * `ctrl-w r` or `ctrl-w R` to rotate panes
 * `ctrl-w c` or `ctrl-w o` close current split OR others.
@@ -70,19 +74,16 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>lgD` LSP: Go to declaration
 * `<leader>lgd` LSP: Go to definition
 * `<leader>lgt` LSP: Go to type definition
-
 * `<leader>lli` LSP: List all implementations
 * `<leader>llr` LSP: List references
-
 * `<leader>ls` LSP: Show signature help
 * `<leader>lis` LSP: Displays hover information about a symbol
 * `<leader>lif` LSP: Peek function definition
 * `<leader>lic` LSP: Peek class definition
-
+* `<leader>Ti` LSP: Toggle inlay line hints
 * `<leader>lr` LSP: Rename
 * `<leader>lca` LSP: Code action
 * `<leader>lf` LSP: Format
-
 * `<leader>lwa` LSP: Add workspace folder
 * `<leader>lwr` LSP: Remove workspace folder
 * `<leader>lwl` LSP: List workspace folders
@@ -153,7 +154,7 @@ keymaps, but also default/built-ins that I tend to forget.
 - `]X`: Next start of X
 - `[X`: Previous start of X
 - `]X`, `[X`: With capital letters → go to end
-  *(X = (m)ethod/function, (c)lass, l(o)op, (s)cope, (z)fold, con(d)itional, (b)lock)*
+  *(X = (m)ethod/function, (c)lass, l(o)op, (z)fold, con(d)itional, (b)lock)*
 
 ## Object manipulations
 - `<leader>Sp`: Swap with next parameter
@@ -191,12 +192,18 @@ keymaps, but also default/built-ins that I tend to forget.
 ## Misc
 * `<leader>r` to execute current buffer in a shell (normal mode)
 * `<leader>r` to execute current visual selection in a shell (visual mode)
-* `<leader>ym` to toggle mouse support (useful to allow select + copy)
+* `<leader>Tm` to toggle mouse support (useful to allow select + copy)
 * `<leader>y` to yank to clipboard using [bin/pbcopy](bin/pbcopy) util
 * `<leader>yp` to paste from clipboard using [bin/pbpaste](bin/pbpaste) util
-* `<leader>W` to toggle line wrap
-* `z=` to see spelling suggestions for word under cursor (built-in)
+* `<leader>Tw` to toggle line wrap
 * `zz` to center cursor in the middle of the screen
+
+## Spelling
+* `<leader>Ts` to toggle spell checking
+* `]s` or `[s` to go to next/prev spelling error
+* `z=` to see spelling suggestions for word under cursor (built-in)
+* `zg` to add word under cursor to spelling dictionary
+* `zw` to remove word under cursor from spelling dictionary
 
 ## Commands
 * `Rename <file name>` to rename current file

@@ -32,14 +32,11 @@ vim.keymap.set("n", "<Leader>bp", ":BufferLineTogglePin<CR>", { silent = true, d
 
 vim.keymap.set("n", "<Leader>bq", ":BufDel<CR>", { silent = true, desc = "Buf: Close current" })
 vim.keymap.set("n", "<Leader>bqq", ":BufDel<CR>", { silent = true, desc = "Buf: Close current" })
-vim.keymap.set("n", "<Leader>qw", ":w<CR>:BufDel<CR>", { silent = true, desc = "Buf: Close current" })
 vim.keymap.set("n", "<Leader>bqo", ":BufDelOthers<CR>", { silent = true, desc = "Buf: Close others" })
 vim.keymap.set("n", "<Leader>bqa", ":BufDelAll<CR>", { silent = true, desc = "Buf: Close all" }) -- TODO: Need a way to close all but pinned
 vim.keymap.set("n", "<Leader>bqh", ":BufferLineCloseLeft<CR>", { silent = true, desc = "Buf: Close at left" })
 vim.keymap.set("n", "<Leader>bql", ":BufferLineCloseRight<CR>", { silent = true, desc = "Buf: Close at right" })
 
-vim.keymap.set("n", "<Leader>bs", ":w<CR>", { silent = true, desc = "Buf: Save" })
-vim.keymap.set("n", "<Leader>bw", ":w<CR>", { silent = true, desc = "Buf: Save" })
 vim.keymap.set("n", "<Leader>w", ":w<CR>", { silent = true, desc = "Buf: Save" })
 vim.keymap.set("n", "<Leader>ww", ":w<CR>", { silent = true, desc = "Buf: Save" })
 vim.keymap.set("n", "<Leader>wa", ":wa<CR>", { silent = true, desc = "Buf: Save all" })
@@ -58,11 +55,17 @@ vim.keymap.set("n", "<Leader>n3", ":tabfirst<CR>:tabnext<CR>:tabnext<CR>", { sil
 vim.keymap.set("n", "<Leader>n4", ":tabfirst<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>", { silent = true, desc = "Tab: Switch to 4" })
 vim.keymap.set("n", "<Leader>n5", ":tabfirst<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>", { silent = true, desc = "Tab: Switch to 5" })
 vim.keymap.set("n", "<Leader>n6", ":tabfirst<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>", { silent = true, desc = "Tab: Switch to 6" })
+-- TODO: add rename (`BufferLineTabRename`), but need a way to input text
+
+-- Window/splits
+vim.keymap.set("n", "<Leader>qq", ":q<CR>", { silent = true, desc = "Quit current split/window" })
+vim.keymap.set("n", "<Leader>qa", ":qa<CR>", { silent = true, desc = "Quit nvim" })
+vim.keymap.set("n", "<Leader>qs", ":SessionDelete<CR>:qa<CR>", { silent = true, desc = "Clear session & quit nvim" })
 
 -- Clipboard operations
 vim.keymap.set("v", "<Leader>y", ":w !pbcopy<CR><CR>", { desc = "Copy current file content to system clipboard" })
 vim.keymap.set("n", "<Leader>yp", ":read !pbpaste<CR>", { desc = "Paste from system clipboard" })
-vim.keymap.set("n", "<Leader>ym", function()
+vim.keymap.set("n", "<Leader>Tm", function()
 	if vim.o.mouse == "a" then
 		vim.o.mouse = ""
 		vim.o.relativenumber = false
@@ -73,12 +76,6 @@ vim.keymap.set("n", "<Leader>ym", function()
 		vim.o.number = true
 	end
 end, { silent = true, desc = "Toggle mouse support" })
-
--- Save & quit shortcuts
-vim.keymap.set("n", "<Leader>qq", ":q<CR>", { silent = true, desc = "Quit current split/window" })
-vim.keymap.set("n", "<C-q>", ":q<CR>", { silent = true, desc = "Quit current split/window" })
-vim.keymap.set("n", "<Leader>qa", ":qa<CR>", { silent = true, desc = "Quit nvim" })
-vim.keymap.set("n", "<Leader>qs", ":SessionDelete<CR>:qa<CR>", { silent = true, desc = "Clear session & quit nvim" })
 
 -- Marks (m[a-z0-9A-Z], 'a-z0-9A-Z)
 vim.keymap.set("n", "<Leader>mk", ":delmarks a-z0-9<CR>", { silent = true, desc = "Marks: delete all" })
@@ -110,7 +107,10 @@ local function toggle_wrap()
 		vim.wo.linebreak = true
 	end
 end
-vim.keymap.set("n", "<Leader>W", toggle_wrap, { silent = true, desc = "Toggle line wrap" })
+vim.keymap.set("n", "<Leader>Tw", toggle_wrap, { silent = true, desc = "Toggle line wrap" })
+
+-- Spellcheck
+vim.keymap.set("n", "<Leader>Ts", ":set spell!<CR>", { silent = true, desc = "Toggle spellcheck" })
 
 ------------------
 -- Whichkey
