@@ -4,8 +4,8 @@ keymaps, but also default/built-ins that I tend to forget.
 
 ## General keymap
 * `<leader>` is space
-* `<leader>qq` or `<ctrl-q>` to close current pane
-* `<leader>qa` to quit
+* `<leader>qq` or `<ctrl-q>` to close current window
+* `<leader>qa` to quit neovim
 * `<leader>qs` to clear auto-session and quit
 
 ## Buffers (b)
@@ -26,6 +26,11 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>nq` to close current tab
 * `<leader>n1 through 5` to switch to tab 1 through 5
 
+## Layout
+* `ctrl-w w` to switch between panes
+* `ctrl-w r` or `ctrl-w R` to rotate panes
+* `ctrl-w c` or `ctrl-w o` close current split OR others.
+
 ## Fzf (f)
 * `<ctrl-p>` or `<leader>ff` fuzzy finding file names
 * `<ctrl-l>` or `<leader>fs` fuzzy find in current file
@@ -45,7 +50,7 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<ctrl>t`, open in new tab
 
 ## Nvim tree
-* `<ctrl>e` to toggle filetree
+* `<leader>e` to toggle filetree
 * In tree
   * `g?` to show help
   * `<ctrl>]` to CD into directory
@@ -131,7 +136,7 @@ keymaps, but also default/built-ins that I tend to forget.
   * `r` to run a test
   * `u` to stop a test
   * `i` to open a test source
-  * `?` to see all keymaps
+  * `?` for help
 
 ## Treesitter textobjects
 
@@ -139,6 +144,7 @@ keymaps, but also default/built-ins that I tend to forget.
 - `aX`: Select around object X  
 - `iX`: Select inside object X  
   *(X = (p)arameter, (f)unction, (c)lass)*
+
 Examples:
 - `af`, `if`: around/inside function
 - `ac`, `ic`: around/inside class
@@ -162,12 +168,15 @@ Examples:
 
 ## Marks
 * `m[a-z0-9A-Z]` to set mark
-* `'[a-z0-9A-Z]` to go to mark
+* `'[a-z0-9A-Z]` to list (which-key) and go to mark
 
-## Layout
-* `ctrl-w w` to switch between panes
-* `ctrl-w r` or `ctrl-w R` to rotate panes
-* `ctrl-w c` or `ctrl-w o` close current split OR others.
+## Recording & registers
+* `q[a-z0-9A-Z]` to start recording
+* `q` to stop recording
+* `@[a-z0-9A-Z]` to play macro (can be prefixed with number)
+* `.` to replay last action (or macro)
+* `"[a-z0-9A-Z]` to yank to register
+* `"[a-z0-9A-Z]p` to list (which-key) and paste from register
 
 ## Misc
 * `<leader>r` to execute current buffer in a shell (normal mode)

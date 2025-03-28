@@ -45,8 +45,6 @@ vim.keymap.set("n", "<Leader>bp", ":bp!<CR>", { silent = true, desc = "Buf: Prev
 vim.keymap.set("n", "<Leader>b<Tab>", ":b#<CR>", { silent = true, desc = "Buf: Switch to last buffer" })
 
 vim.keymap.set("n", "<Leader>bc", ":enew<CR>", { silent = true, desc = "Buf: New" })
-vim.keymap.set("n", "<Leader>bc", ":BufDel<CR>", { silent = true, desc = "Buf: Close current" })
-vim.keymap.set("n", "<Leader>bc", ":BufDel<CR>", { silent = true, desc = "Buf: Close current" })
 vim.keymap.set("n", "<Leader>bq", ":BufDel<CR>", { silent = true, desc = "Buf: Close current" })
 vim.keymap.set("n", "<Leader>bo", ":BufDelOthers<CR>", { silent = true, desc = "Buf: Close others" })
 vim.keymap.set("n", "<Leader>ba", ":BufDelAll<CR>", { silent = true, desc = "Buf: Close all" })
@@ -128,7 +126,7 @@ vim.cmd([[
 vim.keymap.set("n", "<Leader>r", ":w<CR>:!./%<CR>", { silent = true, desc = "Save and execute current file" })
 vim.keymap.set("v", "<Leader>r", ":w !sh<CR>", { silent = true, desc = "Execute selected lines in shell" })
 
-function toggle_wrap()
+local function toggle_wrap()
 	if vim.wo.wrap then
 		vim.wo.wrap = false
 		vim.wo.linebreak = false

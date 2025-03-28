@@ -1,6 +1,6 @@
 -- Quickfix
 
-function toggle_quickfix()
+local function toggle_quickfix()
 	local quickfix_open = false
 	for _, win in ipairs(vim.fn.getwininfo()) do
 		if win.quickfix == 1 then
@@ -15,6 +15,13 @@ function toggle_quickfix()
 		vim.cmd("copen")
 	end
 end
+
+-- Close quicklist before quitting since we auto-save session
+vim.api.nvim_create_autocmd("VimLeavePre", {
+	callback = function()
+		vim.cmd("cclose")
+	end,
+})
 
 vim.keymap.set("n", "<leader>ko", "<cmd>copen<cr>", { desc = "Quickfix: Open" })
 vim.keymap.set("n", "<leader>kq", "<cmd>cclose<cr>", { desc = "Quickfix: Close" })
