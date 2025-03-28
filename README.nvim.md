@@ -4,9 +4,9 @@ keymaps, but also default/built-ins that I tend to forget.
 
 ## General keymap
 * `<leader>` is space
-* `<leader>qq` or `<ctrl-q>` to close current window
+* `<leader>qq` or `<ctrl-q>` to close current window/split
 * `<leader>qa` to quit neovim
-* `<leader>qs` to clear auto-session and quit
+* `<leader>qs` to clear auto-session and quit neovim
 
 ## Buffers (b)
 * `]b` to switch to next buffer
@@ -144,26 +144,18 @@ keymaps, but also default/built-ins that I tend to forget.
   * `i` to open a test source
   * `?` for help
 
-## Treesitter textobjects
-### Selection (in visual mode)
+## Object selection (in visual mode)
 - `aX`: Select around object X  
 - `iX`: Select inside object X  
   *(X = (p)arameter, (f)unction, (c)lass, (s)cope)*
 
-Examples:
-### Movement (Go to start/end)
+## Object movements
 - `]X`: Next start of X
 - `[X`: Previous start of X
 - `]X`, `[X`: With capital letters → go to end
   *(X = (m)ethod/function, (c)lass, l(o)op, (s)cope, (z)fold, con(d)itional, (b)lock)*
 
-Examples:
-- `[m`, `]m`: start of function
-- `[M`, `]M`: end of function
-- `[c`, `]c`: start of class
-- `[C`, `]C`: end of class
-
-### Swapping
+## Object manipulations
 - `<leader>Sp`: Swap with next parameter
 - `<leader>Sf`: Swap with next function
 - `<leader>SP`: Swap with previous parameter
@@ -176,6 +168,13 @@ Examples:
 * `gu` to lowercase text (in visual)
 * `gU` to upercase text (in visual)
 * `g~` to toggle casing (in visual)
+
+## Folding
+* `zm` to fold more
+* `zM` to fold all
+* `zr` to unfold more
+* `zR` to unfold all
+* `za` to toggle fold under cursor
 
 ## Marks
 * `m[a-z0-9A-Z]` to set mark
@@ -197,6 +196,7 @@ Examples:
 * `<leader>yp` to paste from clipboard using [bin/pbpaste](bin/pbpaste) util
 * `<leader>W` to toggle line wrap
 * `z=` to see spelling suggestions for word under cursor (built-in)
+* `zz` to center cursor in the middle of the screen
 
 ## Commands
 * `Rename <file name>` to rename current file

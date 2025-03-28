@@ -14,30 +14,10 @@ vim.keymap.set("n", "<Leader>b2", ":br!<CR>:bn!<CR>", { silent = true, desc = "B
 vim.keymap.set("n", "<Leader>b3", ":br!<CR>:bn!<CR>:bn!<CR>", { silent = true, desc = "Buf: Switch 3" })
 vim.keymap.set("n", "<Leader>b4", ":br!<CR>:bn!<CR>:bn!<CR>:bn!<CR>", { silent = true, desc = "Buf: Switch 4" })
 vim.keymap.set("n", "<Leader>b5", ":br!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>", { silent = true, desc = "Buf: Switch 5" })
-vim.keymap.set(
-	"n",
-	"<Leader>b6",
-	":br!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>",
-	{ silent = true, desc = "Buf: Switch 6" }
-)
-vim.keymap.set(
-	"n",
-	"<Leader>b7",
-	":br!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>",
-	{ silent = true, desc = "Buf: Switch 7" }
-)
-vim.keymap.set(
-	"n",
-	"<Leader>b8",
-	":br!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>",
-	{ silent = true, desc = "Buf: Switch 8" }
-)
-vim.keymap.set(
-	"n",
-	"<Leader>b9",
-	":br!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>",
-	{ silent = true, desc = "Buf: Switch 9" }
-)
+vim.keymap.set("n", "<Leader>b6", ":br!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>", { silent = true, desc = "Buf: Switch 6" })
+vim.keymap.set("n", "<Leader>b7", ":br!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>", { silent = true, desc = "Buf: Switch 7" })
+vim.keymap.set("n", "<Leader>b8", ":br!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>", { silent = true, desc = "Buf: Switch 8" })
+vim.keymap.set("n", "<Leader>b9", ":br!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>:bn!<CR>", { silent = true, desc = "Buf: Switch 9" })
 vim.keymap.set("n", "]b", ":bn!<CR>", { silent = true, desc = "Buf: Next" })
 vim.keymap.set("n", "<Leader>bn", ":bn!<CR>", { silent = true, desc = "Buf: Next" })
 vim.keymap.set("n", "[b", ":bp!<CR>", { silent = true, desc = "Buf: Previous" })
@@ -46,17 +26,20 @@ vim.keymap.set("n", "<Leader>b<Tab>", ":b#<CR>", { silent = true, desc = "Buf: S
 
 vim.keymap.set("n", "<Leader>bc", ":enew<CR>", { silent = true, desc = "Buf: New" })
 vim.keymap.set("n", "<Leader>bq", ":BufDel<CR>", { silent = true, desc = "Buf: Close current" })
-vim.keymap.set("n", "<Leader>bo", ":BufDelOthers<CR>", { silent = true, desc = "Buf: Close others" })
-vim.keymap.set("n", "<Leader>ba", ":BufDelAll<CR>", { silent = true, desc = "Buf: Close all" })
+vim.keymap.set("n", "<Leader>bqq", ":BufDel<CR>", { silent = true, desc = "Buf: Close current" })
+vim.keymap.set("n", "<Leader>qw", ":w<CR>:BufDel<CR>", { silent = true, desc = "Buf: Close current" })
+vim.keymap.set("n", "<Leader>bqo", ":BufDelOthers<CR>", { silent = true, desc = "Buf: Close others" })
+vim.keymap.set("n", "<Leader>bqa", ":BufDelAll<CR>", { silent = true, desc = "Buf: Close all" })
 
 vim.keymap.set("n", "<Leader>bs", ":w<CR>", { silent = true, desc = "Buf: Save" })
 vim.keymap.set("n", "<Leader>bw", ":w<CR>", { silent = true, desc = "Buf: Save" })
 vim.keymap.set("n", "<Leader>w", ":w<CR>", { silent = true, desc = "Buf: Save" })
+vim.keymap.set("n", "<Leader>ww", ":w<CR>", { silent = true, desc = "Buf: Save" })
+vim.keymap.set("n", "<Leader>wa", ":wa<CR>", { silent = true, desc = "Buf: Save all" })
 vim.keymap.set("n", "<C-s>", ":w<CR>", { silent = true, desc = "Buf: Save" })
 
 -- Tab management (n)
 vim.keymap.set("n", "<Leader>nc", ":tabnew<CR>", { silent = true, desc = "Tab: New" })
-vim.keymap.set("n", "<Leader>nw", ":tabclose<CR>", { silent = true, desc = "Tab: Close current" })
 vim.keymap.set("n", "<Leader>nq", ":tabclose<CR>", { silent = true, desc = "Tab: Close current" })
 vim.keymap.set("n", "]n", ":tabnext<CR>", { silent = true, desc = "Tab: Next" })
 vim.keymap.set("n", "<Leader>nn", ":tabnext<CR>", { silent = true, desc = "Tab: Next" })
@@ -65,24 +48,9 @@ vim.keymap.set("n", "<Leader>np", ":tabprev<CR>", { silent = true, desc = "Tab: 
 vim.keymap.set("n", "<Leader>n1", ":tabfirst<CR>", { silent = true, desc = "Tab: Switch to 1" })
 vim.keymap.set("n", "<Leader>n2", ":tabfirst<CR>:tabnext<CR>", { silent = true, desc = "Tab: Switch to 2" })
 vim.keymap.set("n", "<Leader>n3", ":tabfirst<CR>:tabnext<CR>:tabnext<CR>", { silent = true, desc = "Tab: Switch to 3" })
-vim.keymap.set(
-	"n",
-	"<Leader>n4",
-	":tabfirst<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>",
-	{ silent = true, desc = "Tab: Switch to 4" }
-)
-vim.keymap.set(
-	"n",
-	"<Leader>n5",
-	":tabfirst<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>",
-	{ silent = true, desc = "Tab: Switch to 5" }
-)
-vim.keymap.set(
-	"n",
-	"<Leader>n6",
-	":tabfirst<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>",
-	{ silent = true, desc = "Tab: Switch to 6" }
-)
+vim.keymap.set("n", "<Leader>n4", ":tabfirst<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>", { silent = true, desc = "Tab: Switch to 4" })
+vim.keymap.set("n", "<Leader>n5", ":tabfirst<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>", { silent = true, desc = "Tab: Switch to 5" })
+vim.keymap.set("n", "<Leader>n6", ":tabfirst<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>", { silent = true, desc = "Tab: Switch to 6" })
 
 -- Clipboard operations
 vim.keymap.set("v", "<Leader>y", ":w !pbcopy<CR><CR>", { desc = "Copy current file content to system clipboard" })
@@ -100,8 +68,8 @@ vim.keymap.set("n", "<Leader>ym", function()
 end, { silent = true, desc = "Toggle mouse support" })
 
 -- Save & quit shortcuts
-vim.keymap.set("n", "<Leader>qq", ":q<CR>", { silent = true, desc = "Quit current buffer" })
-vim.keymap.set("n", "<C-q>", ":q<CR>", { silent = true, desc = "Quit current buffer" })
+vim.keymap.set("n", "<Leader>qq", ":q<CR>", { silent = true, desc = "Quit current split/window" })
+vim.keymap.set("n", "<C-q>", ":q<CR>", { silent = true, desc = "Quit current split/window" })
 vim.keymap.set("n", "<Leader>qa", ":qa<CR>", { silent = true, desc = "Quit nvim" })
 vim.keymap.set("n", "<Leader>qs", ":SessionDelete<CR>:qa<CR>", { silent = true, desc = "Clear session & quit nvim" })
 

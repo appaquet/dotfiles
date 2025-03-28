@@ -46,10 +46,9 @@ require("nvim-treesitter.configs").setup({
 			-- * method: eg 'v' or 'o'
 			-- and should return the mode ('v', 'V', or '<c-v>') or a table
 			-- mapping query_strings to modes.
+			-- v = charwise, V = linewise, <c-v> = blockwise
 			selection_modes = {
 				["@parameter.outer"] = "v", -- charwise
-				["@function.outer"] = "V", -- linewise
-				["@class.outer"] = "<c-v>", -- blockwise
 			},
 
 			-- If you set this to `true` (default is `false`) then any textobject is
@@ -84,22 +83,18 @@ require("nvim-treesitter.configs").setup({
 				["]c"] = { query = "@class.outer", desc = "Next class start" },
 				["]s"] = { query = "@scope", desc = "Next scope" },
 				["]z"] = { query = "@fold", desc = "Next fold" },
-				["]b"] = { query = "@block.outer", desc = "Next block start" },
 			},
 			goto_next_end = {
 				["]F"] = { query = "@function.outer", desc = "Next function end" },
 				["]C"] = { query = "@class.outer", desc = "Next class end" },
-				["]B"] = { query = "@block.outer", desc = "Next block end" },
 			},
 			goto_previous_start = {
 				["[f"] = { query = "@function.outer", desc = "Previous function start" },
 				["[c"] = { query = "@class.outer", desc = "Previous class start" },
-				["[b"] = { query = "@block.outer", desc = "Previous block start" },
 			},
 			goto_previous_end = {
 				["[F"] = { query = "@function.outer", desc = "Previous function end" },
 				["[C"] = { query = "@class.outer", desc = "Previous class end" },
-				["[B"] = { query = "@block.outer", desc = "Previous block end" },
 			},
 
 			-- Below will go to either the start or the end, whichever is closer.
@@ -124,3 +119,8 @@ require("nvim-treesitter.configs").setup({
 		},
 	},
 })
+
+-- Treesitter folding
+vim.wo.foldmethod = "expr"
+vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.wo.foldenable = false

@@ -53,24 +53,9 @@ local function switch_gutter_base_default()
 	vim.api.nvim_command("Gitsigns reset_base global")
 end
 
-vim.keymap.set(
-	"n",
-	"<Leader>ggm",
-	switch_gutter_base_main,
-	{ silent = true, desc = "Git: switch gutter base to main branch" }
-)
-vim.keymap.set(
-	"n",
-	"<Leader>ggb",
-	switch_gutter_base_main,
-	{ silent = true, desc = "Git: switch gutter base to main branch" }
-)
-vim.keymap.set(
-	"n",
-	"<Leader>ggd",
-	switch_gutter_base_default,
-	{ silent = true, desc = "Git: switch gutter base to default" }
-)
+vim.keymap.set("n", "<Leader>ggm", switch_gutter_base_main, { silent = true, desc = "Git: switch gutter base to main branch" })
+vim.keymap.set("n", "<Leader>ggb", switch_gutter_base_main, { silent = true, desc = "Git: switch gutter base to main branch" })
+vim.keymap.set("n", "<Leader>ggd", switch_gutter_base_default, { silent = true, desc = "Git: switch gutter base to default" })
 
 -----------------
 -- Octo.nvim

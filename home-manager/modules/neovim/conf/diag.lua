@@ -27,6 +27,7 @@ end
 
 local function trouble_diag_next()
 	if Trouble.is_open("diagnostics") then
+		Trouble.focus()
 		Trouble.next()
 	else
 		vim.diagnostic.goto_next()

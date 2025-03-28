@@ -8,7 +8,7 @@ require("catppuccin").setup({
 	flavour = "mocha",
 	dim_inactive = {
 		enabled = true, -- dims the background color of inactive window
-		percentage = 0.40, -- percentage of the shade to apply to the inactive window
+		percentage = 0.20, -- percentage of the shade to apply to the inactive window
 	},
 	color_overrides = {
 		mocha = {
