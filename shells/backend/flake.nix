@@ -7,6 +7,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
@@ -17,6 +18,7 @@
   outputs =
     {
       nixpkgs,
+      nixpkgs-unstable,
       rust-overlay,
       flake-utils,
       ...
@@ -25,6 +27,14 @@
       system:
       let
         pkgs = import nixpkgs {
+          inherit system;
+          config = {
+            allowUnfree = true;
+          };
+          overlays = [ (import rust-overlay) ];
+        };
+
+        pkgsUnstable = import nixpkgs-unstable {
           inherit system;
           config = {
             allowUnfree = true;
@@ -60,10 +70,11 @@
               (rust-bin.stable.latest.default.override {
                 extensions = [
                   "rust-src"
-                  "rust-analyzer"
+                  #"rust-analyzer" (overridden below)
                   "llvm-tools-preview"
                 ];
               })
+              pkgsUnstable.rust-analyzer # temporay, until RA is bumped to a version that works with tokio::test
 
               stdenv.cc.cc.lib
               llvmPackages.libclang
