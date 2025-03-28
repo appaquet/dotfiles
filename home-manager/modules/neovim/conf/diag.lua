@@ -1,6 +1,5 @@
----------------------------
---- Trouble (diagnostics)
---- https://github.com/folke/trouble.nvim
+-- Trouble (diagnostics)
+-- https://github.com/folke/trouble.nvim
 
 local Trouble = require("trouble")
 Trouble.setup({})

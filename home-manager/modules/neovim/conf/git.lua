@@ -1,8 +1,3 @@
------------------
--- General keymap
-vim.keymap.set("n", "<Leader>gs", ":Git<CR>", { silent = true, desc = "Git: status" })
-
------------------
 -- Diffview
 -- https://github.com/sindrets/diffview.nvim
 require("diffview").setup({})
@@ -29,7 +24,6 @@ vim.keymap.set("n", "<Leader>gdm", open_diffview_main, { desc = "Git: open diff 
 vim.keymap.set("n", "<Leader>gdb", open_diffview_main, { desc = "Git: open diff view against main branch" })
 vim.keymap.set("n", "<Leader>gdq", ":DiffviewClose<CR>", { silent = true, desc = "Git: close diff view" })
 
------------------
 -- Git signs
 -- https://github.com/lewis6991/gitsigns.nvim
 require("gitsigns").setup({
@@ -58,16 +52,17 @@ vim.keymap.set("n", "<Leader>ggm", switch_gutter_base_main, { silent = true, des
 vim.keymap.set("n", "<Leader>ggb", switch_gutter_base_main, { silent = true, desc = "Git: switch gutter base to main branch" })
 vim.keymap.set("n", "<Leader>ggd", switch_gutter_base_default, { silent = true, desc = "Git: switch gutter base to default" })
 
------------------
 -- Octo.nvim
 -- https://github.com/pwntester/octo.nvim
 require("octo").setup()
 vim.keymap.set("n", "<Leader>ghr", ":Octo review<CR>", { silent = true, desc = "Git: github pr review" })
 
--------------------------
 -- Gitlinker
 -- Generates shareable links
 -- https://github.com/ruifm/gitlinker.nvim
 require("gitlinker").setup({
 	mappings = "<leader>gy",
 })
+
+-- General keymap
+vim.keymap.set("n", "<Leader>gs", ":Git<CR>", { silent = true, desc = "Git: status" })

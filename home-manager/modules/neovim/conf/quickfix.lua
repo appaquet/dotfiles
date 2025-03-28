@@ -1,5 +1,4 @@
 -- Quickfix
-
 local function toggle_quickfix()
 	local quickfix_open = false
 	for _, win in ipairs(vim.fn.getwininfo()) do

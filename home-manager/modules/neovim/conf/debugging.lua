@@ -54,8 +54,6 @@ dap.listeners.before.event_exited.dapui_config = function()
 	dapui.close()
 end
 
------------------------
 -- Per language setup
-
 -- https://github.com/leoluz/nvim-dap-go
 require("dap-go").setup()

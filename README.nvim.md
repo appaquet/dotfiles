@@ -16,21 +16,21 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>bh` or `<leader>bl` to move tab to the left/right
 * `<leader>bc` to open a new empty buffer
 * `<leader>bp` to pin a buffer (stays left)
-* `<leader>bqq` to close the current buffer by trying not to mess up the layout
+* `<leader>bq` or `<leader>bqq` to close the current buffer by trying not to mess up the layout
 * `<leader>bqo` to close all buffers except the current one
 * `<leader>bqa` to close all buffers
 * `<leader>bqh` or `<leader>bql` to close all buffers to the left/right
-* `<leader>w` or `<ctrl-s>` to save current buffer
+* `<leader>w`, `<leader>ww`, or `<ctrl-s>` to save current buffer
 * `<leader>wa` to save all buffers
 
 ## Tabs (n)
+* `<leader>nc` to open a new tab
 * `]n` to switch to next tab
 * `[n` to switch to previous tab
-* `<leader>nc` to open a new tab
-* `<leader>nq` to close current tab
 * `<leader>n1 through 5` to switch to tab 1 through 5
+* `<leader>nq` to close current tab
 
-## Layoup
+## Windows
 * `ctrl-w w` to switch between panes
 * `ctrl-w r` or `ctrl-w R` to rotate panes
 * `ctrl-w c` or `ctrl-w o` close current split OR others.
@@ -98,18 +98,15 @@ keymaps, but also default/built-ins that I tend to forget.
 * `:Glog` to show log
 * `:Gblame` to show blame
 * `<leader>gy` yank the current line GitHub URL
-
 * `<leader>gu` undo hunk
 * `<leader>ga` stage hunk
 * `]g` next git hunk
 * `[g` prev git hunk
 * `<leader>ggm` switch gutter base to main branch
 * `<leader>ggd` switch gutter base to default
-
 * `<leader>gdo` diff view open
 * `<leader>gdm` diff view open, diffing against main branch
 * `<leader>gdq` diff view close
-
 * `<leader>ghr` GitHub PR review
 
 ## Diagnostics (x)

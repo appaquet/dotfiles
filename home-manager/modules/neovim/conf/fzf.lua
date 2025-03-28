@@ -1,4 +1,3 @@
--------------
 -- fzf-lua
 -- From https://github.com/jkearse3/dotfiles/blob/e3e53bb0c11daeb33dc5b44609ff46da9dd05b1c/nvim/lua/lazy_plugins/search.lua#L2
 local fzf = require("fzf-lua")

@@ -1,4 +1,3 @@
---------------------------
 -- Auto formatting on save
 -- https://github.com/stevearc/conform.nvim
 require("conform").setup({

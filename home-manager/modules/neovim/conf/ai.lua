@@ -1,4 +1,3 @@
------------
 -- copilot
 -- https://github.com/zbirenbaum/copilot.lua
 require("copilot").setup({
@@ -41,9 +40,8 @@ vim.keymap.set("i", "<S-Tab>", function()
 	passthrough_keymap("<Tab>")
 end, { noremap = true, silent = true })
 
------------
---- avante
---- https://github.com/yetone/avante.nvim
+-- avante
+-- https://github.com/yetone/avante.nvim
 require("avante_lib").load()
 require("avante").setup({
 	-- From https://github.com/yetone/avante.nvim/blob/main/lua/avante/config.lua
