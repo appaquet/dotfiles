@@ -32,20 +32,6 @@ let
     else
       builtins.readFile ./conf/${path};
 
-  # Fork with fix for empty lines
-  # See https://github.com/zbirenbaum/copilot-cmp/issues/5
-  # and https://github.com/zbirenbaum/copilot-cmp/pull/105
-  copilot-cmp = pkgs.vimUtils.buildVimPlugin {
-    pname = "copilot-cmp";
-    version = "2024-06-17";
-    src = pkgs.fetchFromGitHub {
-      owner = "litoj";
-      repo = "cmp-copilot";
-      rev = "9f592b352a9730fdc955c20146a6556096a8659e";
-      sha256 = "sha256-Co5Dy7zGvLOU/B8xxuLU5o4ixJnxxPsRWNcsWoGySKk=";
-    };
-    meta.homepage = "https://github.com/litoj/cmp-copilot";
-  };
 in
 {
   home.packages = with pkgs; [
@@ -112,6 +98,7 @@ in
         cmp-nvim-lsp
         cmp-nvim-lsp-signature-help
         cmp-nvim-lsp-document-symbol
+        cmp-cmdline
 
         # Snippets
         luasnip
@@ -119,10 +106,7 @@ in
         friendly-snippets # easy load from vscode, languages, etc.
 
         # Copilot (use Copilot auth)
-        # See https://github.com/zbirenbaum/copilot.lua
-        # and https://github.com/zbirenbaum/copilot-cmp
         copilot-lua
-        # copilot-cmp (see below)
 
         # Avante and dependencies
         #avante-nvim (unstable)
@@ -166,10 +150,7 @@ in
       ++ (with unstablePkgs.vimPlugins; [
         avante-nvim
         go-nvim
-      ])
-      ++ [
-        copilot-cmp
-      ];
+      ]);
 
     extraConfig = (
       builtins.concatStringsSep "\n" [

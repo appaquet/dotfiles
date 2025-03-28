@@ -2,8 +2,19 @@
 -- copilot
 -- https://github.com/zbirenbaum/copilot.lua
 require("copilot").setup({
-	suggestion = { enabled = false }, -- because we use cmp
-	panel = { enabled = false }, -- because we use cmp
+	suggestion = {
+		enabled = true,
+		auto_trigger = true,
+		keymap = {
+			accept = false, -- See below
+			accept_word = "<C-l>",
+			accept_line = "<C-j>",
+			next = "<M-]>",
+			prev = "<M-[>",
+			dismiss = "<C-]>",
+		},
+	},
+	panel = { enabled = false }, -- prevent interfering with cmp
 	copilot_model = "gpt-4o-copilot",
 
 	filetypes = {
@@ -13,11 +24,22 @@ require("copilot").setup({
 	},
 })
 
--- https://github.com/zbirenbaum/copilot-cmp
--- FIXME: but overriden with https://github.com/litoj/cmp-copilot
-require("cmp_copilot").setup({ -- FIXME: Overriden (see ../default.nix), originally "copilot_cmp"
-	method = "getCompletionsCycling",
-})
+local function passthrough_keymap(keymap)
+	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(keymap, true, false, true), "n", true)
+end
+
+-- Add completion on tab (if visible), but real tab via shift-tab
+local cs = require("copilot.suggestion")
+vim.keymap.set("i", "<Tab>", function()
+	if cs.is_visible() then
+		cs.accept()
+	else
+		passthrough_keymap("<Tab>")
+	end
+end, { noremap = true, silent = true })
+vim.keymap.set("i", "<S-Tab>", function()
+	passthrough_keymap("<Tab>")
+end, { noremap = true, silent = true })
 
 -----------
 --- avante

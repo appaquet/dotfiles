@@ -8,6 +8,7 @@ lspconfig.marksman.setup({})
 lspconfig.nixd.setup({})
 lspconfig.buf_ls.setup({})
 lspconfig.bashls.setup({})
+lspconfig.jsonnet_ls.setup({})
 --lspconfig.gopls.setup {} -- Loaded by go.nvim (see bellow)
 --lspconfig.rust_analyzer.setup {} -- Loaded by rustaceanvim (see bellow)
 
@@ -56,16 +57,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
 -- Enable inlays
 vim.lsp.inlay_hint.enable(true)
-
--- From https://github.com/zbirenbaum/copilot-cmp#tab-completion-configuration-highly-recommended
--- Used bellow to fix tab completion
-local has_words_before = function()
-	if vim.api.nvim_buf_get_option(0, "buftype") == "prompt" then
-		return false
-	end
-	local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-	return col ~= 0 and vim.api.nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]:match("^%s*$") == nil
-end
+vim.keymap.set("n", "<Leader>Ti", function()
+	vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+end, { desc = "LSP: Toggle inlay hints" })
 
 ----------------
 --- Autocomplete
@@ -78,11 +72,6 @@ cmp.setup({
 		expand = function(args)
 			luasnip.lsp_expand(args.body)
 		end,
-	},
-
-	performance = {
-		--throttle = 200, -- delay before it shows
-		--debounce = 200, -- delay to wait completion for grouping
 	},
 
 	preselect = cmp.PreselectMode.None, -- Don't preselect items
@@ -99,20 +88,6 @@ cmp.setup({
 			behavior = cmp.ConfirmBehavior.Replace,
 			select = false, -- don't select unless selected
 		}),
-
-		-- Accept first, a la cursor
-		["<Tab>"] = vim.schedule_wrap(function(fallback)
-			if cmp.visible() then
-				cmp.confirm({
-					behavior = cmp.ConfirmBehavior.Replace,
-					select = true,
-				})
-			elseif luasnip.expand_or_jumpable() then
-				luasnip.expand_or_jump()
-			else
-				fallback()
-			end
-		end, { "i", "s" }),
 	}),
 
 	window = {
@@ -121,7 +96,6 @@ cmp.setup({
 	},
 
 	sources = {
-		{ name = "copilot" }, -- see ai.lua
 		{ name = "nvim_lsp" },
 		{ name = "nvim_lsp_signature_help" },
 		{ name = "luasnip" },
