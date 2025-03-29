@@ -1,13 +1,21 @@
 -- LSP
 -- https://github.com/neovim/nvim-lspconfig
 local lspconfig = require("lspconfig")
-lspconfig.pyright.setup({})
 lspconfig.ts_ls.setup({})
 lspconfig.marksman.setup({})
 lspconfig.nixd.setup({})
 lspconfig.buf_ls.setup({})
 lspconfig.bashls.setup({})
 lspconfig.jsonnet_ls.setup({})
+lspconfig.pyright.setup({
+	python = {
+		analysis = {
+			autoSearchPaths = true,
+			diagnosticMode = "openFilesOnly",
+			useLibraryCodeForTypes = true,
+		},
+	},
+})
 --lspconfig.gopls.setup {} -- Loaded by go.nvim (see bellow)
 --lspconfig.rust_analyzer.setup {} -- Loaded by rustaceanvim (see bellow)
 
