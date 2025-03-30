@@ -2,6 +2,7 @@
   pkgs,
   unstablePkgs,
   config,
+  secrets,
   ...
 }:
 
@@ -32,6 +33,13 @@ let
     else
       builtins.readFile ./conf/${path};
 
+  includeSecrets = ''
+    if filereadable("${secrets.common.nvimSecrets}")
+      lua dofile("${secrets.common.nvimSecrets}")
+    else
+      lua print("nvim secrets not found!!")
+    endif
+  '';
 in
 {
   home.packages = with pkgs; [
@@ -156,6 +164,7 @@ in
       builtins.concatStringsSep "\n" [
         (includeVimFile "base.vim")
         (includeLuaFile "base.lua")
+        includeSecrets
         (includeLuaFile "keymap.lua")
         (includeLuaFile "buffers.lua")
         (includeLuaFile "statusline.lua")

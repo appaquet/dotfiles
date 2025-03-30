@@ -39,7 +39,7 @@ in
       bind -r C-u swap-window -t +1 \; select-window -t +1  # swap current window with the next one
 
       # Ctrl-space to toggle terminal in 2 split panes with editor on top
-      bind-key C-Space run-shell ' \
+      bind-key -n C-Space run-shell ' \
         pane_title=$(tmux display-message -p "#{pane_title}"); \
         in_vim=$(echo $pane_title | grep -c "vim"); \
         is_zoomed=$(tmux display-message -p "#{window_zoomed_flag}"); \

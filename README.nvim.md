@@ -69,6 +69,7 @@ keymaps, but also default/built-ins that I tend to forget.
   * `f` to find file, `F` to clear
   * `q` to close tree
   * `E` to expand all, `W` to collapse
+  * `/` to fuzzy find file
 
 ## Code / LSP
 * `<leader>lgD` LSP: Go to declaration

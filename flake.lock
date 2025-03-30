@@ -570,11 +570,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1742602052,
-        "narHash": "sha256-nXQP461arb6uXivY3KvN22R42G5qcbSVBMxjtfTnKFs=",
+        "lastModified": 1743377958,
+        "narHash": "sha256-OOOG3OYiLKYd2JM7Iu4xEEgBrbqvj44usG3fedCUyzg=",
         "owner": "appaquet",
         "repo": "dotfiles-secrets",
-        "rev": "27b32386281dbee5d75a3220148172e30f0a71b3",
+        "rev": "53c18019a087f2ed4328b8c721484c3c4f58a09d",
         "type": "github"
       },
       "original": {
