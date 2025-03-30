@@ -40,11 +40,23 @@ in
 
       # Ctrl-space to toggle terminal in 2 split panes with editor on top
       bind-key C-Space run-shell ' \
-        if [ "$(tmux display-message -p "#{window_zoomed_flag}")" == "1" ]; then \
-          tmux select-pane -D; \
+        pane_title=$(tmux display-message -p "#{pane_title}"); \
+        in_vim=$(echo $pane_title | grep -c "vim"); \
+        is_zoomed=$(tmux display-message -p "#{window_zoomed_flag}"); \
+        if [ "$in_vim" == "1" ]; then \
+          if [ "$is_zoomed" == "1" ]; then \
+            tmux resize-pane -Z; \
+            tmux select-pane -D; \
+          else \
+            tmux select-pane -D; \
+          fi; \
         else \
-          tmux select-pane -U; \
-          tmux resize-pane -Z; \
+          if [ "$is_zoomed" == "1" ]; then \
+            tmux select-pane -U; \
+          else \
+            tmux select-pane -U; \
+            tmux resize-pane -Z; \
+          fi; \
         fi
       '
 

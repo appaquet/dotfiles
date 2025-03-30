@@ -282,16 +282,25 @@ update)
   shift
   PACKAGE="$1"
   if [[ -z "$PACKAGE" ]]; then
+    echo "Updating all flakes..."
     nix-channel --update
     nix flake update
 
-    for shell in $(ls shells); do
-      pushd "shells/${shell}"
-      nix flake update
-      popd
-    done
+    read -r -p "Do you want to update all shells? (y/n): " confirm
+    if [[ "$confirm" == [yY] ]]; then
+      echo "Updating all shells..."
+      for shell in shells/*; do
+        pushd "shells/${shell}"
+        nix flake update
+        popd
+      done
+    else
+      echo "Skipping shell updates"
+    fi
+
+    echo -e "\n\n!! Don't forget to update explicit package fetches !!"
   else
-    nix flake lock --update-input $PACKAGE
+    nix flake lock --update-input "$PACKAGE"
   fi
   ;;
 
@@ -316,7 +325,7 @@ gc)
   # Cleaning as root collects more stuff as well
   # See https://www.reddit.com/r/NixOS/comments/10107km/how_to_delete_old_generations_on_nixos/?s=8
   ncg=$(which nix-collect-garbage)
-  sudo ${ncg} -d --delete-older-than "7d"
+  sudo "${ncg}" -d --delete-older-than "7d"
   ;;
 
 fmt)
