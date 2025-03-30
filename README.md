@@ -162,6 +162,7 @@ See [README.nvim.md](./README.nvim.md)
   * `<ctrl>b y / u` to swap window left / right
   * `<ctrl>b <tab>` to navigate to last window
   * `<ctrl>b r` to reload config
+  * `<ctrl>b <space>` used to toggle terminal bellow in an editor, moving cursor
   * `<ctrl>b <enter>` to get into copy mode
     * `v` for selection
     * `ctrl-v` to switch between between block and line selection

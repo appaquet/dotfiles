@@ -38,6 +38,16 @@ in
       bind -r C-y swap-window -t -1 \; select-window -t -1  # swap current window with the previous one
       bind -r C-u swap-window -t +1 \; select-window -t +1  # swap current window with the next one
 
+      # Ctrl-space to toggle terminal in 2 split panes with editor on top
+      bind-key C-Space run-shell ' \
+        if [ "$(tmux display-message -p "#{window_zoomed_flag}")" == "1" ]; then \
+          tmux select-pane -D; \
+        else \
+          tmux select-pane -U; \
+          tmux resize-pane -Z; \
+        fi
+      '
+
       # Fixes issue on macOS where shell in tmux is not right
       # See https://github.com/tmux/tmux/issues/4162
       set -gu default-command
