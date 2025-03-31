@@ -73,42 +73,45 @@ keymaps, but also default/built-ins that I tend to forget.
 
 ## Code / LSP
 * `<leader>lgD` LSP: Go to declaration
-* `<leader>lgd` LSP: Go to definition
-* `<leader>lgt` LSP: Go to type definition
+* `<leader>lgd` or `gd` LSP: Go to definition
+* `<leader>lgt` or `gt` LSP: Go to type definition
 * `<leader>lli` LSP: List all implementations
-* `<leader>llr` LSP: List references
+* `<leader>llr` or `gr` LSP: List references
+* `<leader>li` LSP: Displays hover information about a symbol
 * `<leader>ls` LSP: Show signature help
-* `<leader>lis` LSP: Displays hover information about a symbol
 * `<leader>lif` LSP: Peek function definition
 * `<leader>lic` LSP: Peek class definition
 * `<leader>Ti` LSP: Toggle inlay line hints
 * `<leader>lr` LSP: Rename
 * `<leader>lca` LSP: Code action
-* `<leader>lf` LSP: Format
+
 * `<leader>lwa` LSP: Add workspace folder
 * `<leader>lwr` LSP: Remove workspace folder
 * `<leader>lwl` LSP: List workspace folders
 
 ## Git (g)
-* `<leader>gs` show status pane
-* `:Git` or `:G` or `<leader>fgs` git status
-* `<leader>fgb` git branches
+* `<leader>gs` to show git status
+* `:Git` or `:G` or `<leader>fgs` to show git status
+* `<leader>fgb` to list git branches
 * `:Gdiff` to see diff
-* `:Gwrite` stages current file
-* `:Gcommit` to commit
-* `:Glog` to show log
+* `:Gwrite` to stage the current file
+* `:Gcommit` to commit changes
+* `:Glog` to show git log
 * `:Gblame` to show blame
-* `<leader>gy` yank the current line GitHub URL
-* `<leader>gu` undo hunk
-* `<leader>ga` stage hunk
-* `]g` next git hunk
-* `[g` prev git hunk
-* `<leader>ggm` switch gutter base to main branch
-* `<leader>ggd` switch gutter base to default
-* `<leader>gdo` diff view open
-* `<leader>gdm` diff view open, diffing against main branch
-* `<leader>gdq` diff view close
-* `<leader>ghr` GitHub PR review
+* `<leader>gy` to yank the current line GitHub URL
+* `<leader>gu` to revert hunk
+* `<leader>ga` to stage hunk
+* `]g` to navigate to the next git hunk
+* `[g` to navigate to the previous git hunk
+* `<leader>ggm` to switch gutter base against main branch
+* `<leader>ggp` to switch gutter base against previous branch
+* `<leader>ggw` to switch gutter base to working directory
+* `<leader>gdo` to open diff view
+* `<leader>gdm` to open diff view against main branch
+* `<leader>gdp` to open diff view against previous branch
+* `<leader>gdq` to close diff view
+* `<leader>ghr` to review GitHub PR
+* `<leader>gdb` to open buffer diff
 
 ## Diagnostics (x)
 * `<leader>xs` or `<leader>xf` Open diagnostic float
@@ -120,6 +123,7 @@ keymaps, but also default/built-ins that I tend to forget.
 ## Quickfix (k)
 * `<leader>ko` to open quickfix
 * `<leader>kq` to close quickfix
+* `<leader>kc` to clear quickfix
 * `<leader>kn` or `]k` to go to next quickfix
 * `<leader>kp` or `[k` to go to prev quickfix
 * `<leader>kf` to find in quickfix

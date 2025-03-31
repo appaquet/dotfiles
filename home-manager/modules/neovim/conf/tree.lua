@@ -54,4 +54,4 @@ require("nvim-tree").setup({
 	},
 	on_attach = on_attach,
 })
-vim.keymap.set("n", "<Leader>e", ":NvimTreeToggle<CR>zz", { desc = "Tree: Toggle" })
+vim.keymap.set("n", "<Leader>e", ":NvimTreeToggle<CR>zz", { desc = "Tree: Toggle", silent = true })

@@ -55,6 +55,7 @@ lspconfig.lua_ls.setup({
 })
 
 -- Bind keymaps on lsp attach to buffer
+local fzf = require("fzf-lua")
 vim.api.nvim_create_autocmd("LspAttach", {
 	group = vim.api.nvim_create_augroup("UserLspConfig", {}),
 	callback = function(ev)
@@ -65,14 +66,15 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		vim.keymap.set("n", "<leader>lgD", vim.lsp.buf.declaration, { buffer = ev.buf, desc = "LSP: Go to declaration" })
 		vim.keymap.set("n", "<leader>lgt", vim.lsp.buf.type_definition, { buffer = ev.buf, desc = "LSP: Go to type definition" })
 		vim.keymap.set("n", "gt", vim.lsp.buf.type_definition, { buffer = ev.buf, desc = "LSP: Go to type definition" })
+		vim.keymap.set("n", "gr", fzf.lsp_references, { buffer = ev.buf, desc = "LSP: Go to references" })
 
 		-- Info (more in treesietter.lua)
-		vim.keymap.set("n", "<leader>lis", vim.lsp.buf.hover, { buffer = ev.buf, desc = "LSP: Displays hover information about a symbol" })
+		vim.keymap.set("n", "<leader>li", vim.lsp.buf.hover, { buffer = ev.buf, desc = "LSP: Displays hover information about a symbol" })
+		vim.keymap.set("n", "<leader>ls", vim.lsp.buf.signature_help, { buffer = ev.buf, desc = "LSP: Show signature help" })
 
 		-- List
-		vim.keymap.set("n", "<leader>lli", vim.lsp.buf.implementation, { buffer = ev.buf, desc = "LSP: List all implementations" })
-		vim.keymap.set("n", "<leader>llr", vim.lsp.buf.references, { buffer = ev.buf, desc = "LSP: List references" })
-		vim.keymap.set("n", "<leader>ls", vim.lsp.buf.signature_help, { buffer = ev.buf, desc = "LSP: Show signature help" })
+		vim.keymap.set("n", "<leader>lli", fzf.lsp_implementations, { buffer = ev.buf, desc = "LSP: List all implementations" })
+		vim.keymap.set("n", "<leader>llr", fzf.lsp_references, { buffer = ev.buf, desc = "LSP: List references" })
 
 		-- Workspace
 		vim.keymap.set("n", "<leader>lwa", vim.lsp.buf.add_workspace_folder, { buffer = ev.buf, desc = "LSP: Add workspace folder" })
@@ -124,7 +126,7 @@ cmp.setup({
 
 		-- Accept selected
 		["<CR>"] = cmp.mapping.confirm({
-			behavior = cmp.ConfirmBehavior.Replace,
+			behavior = cmp.ConfirmBehavior.Insert,
 			select = false, -- don't select unless selected
 		}),
 	}),

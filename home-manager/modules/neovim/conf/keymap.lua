@@ -19,7 +19,7 @@ vim.keymap.set("n", "<Leader>Tm", function()
 end, { silent = true, desc = "Toggle mouse support" })
 
 -- Marks (m[a-z0-9A-Z], 'a-z0-9A-Z)
-vim.keymap.set("n", "<Leader>mk", ":delmarks a-z0-9<CR>", { silent = true, desc = "Marks: delete all" })
+vim.keymap.set("n", "<Leader>mk", ":delmarks a-z0-9A-Z<CR>", { silent = true, desc = "Marks: delete all" })
 
 -- Command-line mappings for "sudo save" and quick quit commands
 vim.cmd([[

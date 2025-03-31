@@ -65,8 +65,19 @@
         git symbolic-ref --short HEAD
       '';
 
+      git-main-branch = ''
+        git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'
+      '';
+
+      git-stacked-branches = ''
+        git log --pretty='%D' (git-main-branch)... |
+              grep -oE '\b[^, ]+\b' |
+              grep -vE '^(HEAD|origin/)' |
+              sort | uniq
+      '';
+
       git-prev-branch = ''
-        git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/ | grep -v "^$(git symbolic-ref --short HEAD)\$" | head -n 1
+        git-stacked-branches | head -n 1
       '';
 
       git-next-branch = ''
@@ -78,17 +89,6 @@
                 break
             end
         end
-      '';
-
-      git-main-branch = ''
-        git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'
-      '';
-
-      git-stacked-branches = ''
-        git log --pretty='%D' (git-main-branch)... |
-              grep -oE '\b[^, ]+\b' |
-              grep -vE '^(HEAD|origin/)' |
-              sort | uniq
       '';
     };
   };

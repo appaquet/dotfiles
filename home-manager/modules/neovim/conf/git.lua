@@ -3,25 +3,35 @@
 require("diffview").setup({})
 
 vim.g.main_branch_override = ""
-local function get_main_branch()
+local function git_main_branch()
 	if vim.g.main_branch_override ~= "" then
 		return vim.g.main_branch_override
 	end
-
-	local main_branch = vim.fn.system({ "git", "ls-remote", "--symref", "origin", "HEAD" })
-	main_branch = string.match(main_branch, "ref:%s+refs/heads/(%S+)")
-	return main_branch
+	return vim.fn.system("git-main-branch")
 end
 vim.api.nvim_command("command! -nargs=1 SetMainBranch let g:main_branch_override = <args>")
 
-local function open_diffview_main()
-	local main_branch = get_main_branch()
-	vim.api.nvim_command("DiffviewOpen " .. "origin/" .. main_branch)
+local function git_prev_branch()
+	-- Returns the previous branch in the PR branch
+	-- Could be the main branch if the PR is on top of main
+	return vim.fn.system("git-prev-branch")
 end
 
-vim.keymap.set("n", "<Leader>gdo", ":DiffviewOpen<CR>", { silent = true, desc = "Git: open diff view" })
+local function open_diffview_main()
+	local main_branch = git_main_branch()
+	vim.api.nvim_command("DiffviewOpen " .. "origin/" .. main_branch)
+	vim.notify("Diffing against origin/" .. main_branch)
+end
+
+local function open_diffview_prev()
+	local prev_branch = git_prev_branch()
+	vim.api.nvim_command("DiffviewOpen " .. prev_branch)
+	vim.notify("Diffing against " .. prev_branch)
+end
+
+vim.keymap.set("n", "<Leader>gdw", ":DiffviewOpen<CR>", { silent = true, desc = "Git: open diff view against working dir" })
 vim.keymap.set("n", "<Leader>gdm", open_diffview_main, { desc = "Git: open diff view against main branch" })
-vim.keymap.set("n", "<Leader>gdb", open_diffview_main, { desc = "Git: open diff view against main branch" })
+vim.keymap.set("n", "<Leader>gdp", open_diffview_prev, { desc = "Git: open diff view against previous branch" })
 vim.keymap.set("n", "<Leader>gdq", ":DiffviewClose<CR>", { silent = true, desc = "Git: close diff view" })
 
 -- Git signs
@@ -38,19 +48,23 @@ vim.keymap.set("n", "<Leader>gb", ":Gitsigns blame<CR>", { silent = true, desc =
 vim.keymap.set("n", "<Leader>gdb", ":Gitsigns diffthis<CR>", { silent = true, desc = "Git: open buffer diff" })
 
 local function switch_gutter_base_main()
-	local main_branch = get_main_branch()
-	print("Switching gutter base to " .. main_branch)
+	local main_branch = git_main_branch()
 	vim.api.nvim_command("Gitsigns change_base " .. main_branch .. " global")
+	vim.notify("Switching git gutter against " .. main_branch)
 end
-
+local function switch_gutter_base_prev()
+	local prev_branch = git_prev_branch()
+	vim.api.nvim_command("Gitsigns change_base " .. prev_branch .. " global")
+	vim.notify("Switching git gutter against " .. prev_branch)
+end
 local function switch_gutter_base_default()
-	print("Switching gutter base to default")
 	vim.api.nvim_command("Gitsigns reset_base global")
+	vim.notify("Switching git gutter to default")
 end
 
-vim.keymap.set("n", "<Leader>ggm", switch_gutter_base_main, { silent = true, desc = "Git: switch gutter base to main branch" })
-vim.keymap.set("n", "<Leader>ggb", switch_gutter_base_main, { silent = true, desc = "Git: switch gutter base to main branch" })
-vim.keymap.set("n", "<Leader>ggd", switch_gutter_base_default, { silent = true, desc = "Git: switch gutter base to default" })
+vim.keymap.set("n", "<Leader>ggm", switch_gutter_base_main, { silent = true, desc = "Git: switch gutter base gainst main branch" })
+vim.keymap.set("n", "<Leader>ggp", switch_gutter_base_prev, { silent = true, desc = "Git: switch gutter base against previous branch" })
+vim.keymap.set("n", "<Leader>ggw", switch_gutter_base_default, { silent = true, desc = "Git: switch gutter base to working dir" })
 
 -- Octo.nvim
 -- https://github.com/pwntester/octo.nvim

@@ -103,6 +103,15 @@
       vimrg = ''
         vim -c "Rg $argv"
       '';
+
+      # execute a command in a directory
+      "in" = ''
+        set dir $argv[1]
+        set cmd $argv[2..-1]
+        pushd $dir
+        eval $cmd
+        popd
+      '';
     };
   };
 

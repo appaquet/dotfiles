@@ -76,3 +76,4 @@ vim.keymap.set("n", "<Leader>nq", ":tabclose<CR>", { silent = true, desc = "Tab:
 vim.keymap.set("n", "<Leader>qq", ":q<CR>", { silent = true, desc = "Quit current split/window" })
 vim.keymap.set("n", "<Leader>qa", ":qa<CR>", { silent = true, desc = "Quit nvim" })
 vim.keymap.set("n", "<Leader>qs", ":SessionDelete<CR>:qa<CR>", { silent = true, desc = "Clear session & quit nvim" })
+vim.keymap.set("n", "<C-w>z", "<C-w>=50<C-w>>", { noremap = true })
