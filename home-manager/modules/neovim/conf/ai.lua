@@ -29,9 +29,12 @@ end
 
 -- Add completion on tab (if visible), but real tab via shift-tab
 local cs = require("copilot.suggestion")
+local luasnip = require("luasnip")
 vim.keymap.set("i", "<Tab>", function()
 	if cs.is_visible() then
 		cs.accept()
+	elseif luasnip.expand_or_jumpable() then
+		luasnip.expand_or_jump()
 	else
 		passthrough_keymap("<Tab>")
 	end

@@ -53,11 +53,18 @@
       ga = "git add";
       gad = "git add .";
       gmr = "git maintenance run";
+
+      gbc = "git-current-branch";
       gbp = "git-prev-branch";
       gbn = "git-next-branch";
+      gbs = "git-stacked-branches";
     };
 
     functions = {
+      git-current-branch = ''
+        git symbolic-ref --short HEAD
+      '';
+
       git-prev-branch = ''
         git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/ | grep -v "^$(git symbolic-ref --short HEAD)\$" | head -n 1
       '';
@@ -71,6 +78,17 @@
                 break
             end
         end
+      '';
+
+      git-main-branch = ''
+        git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'
+      '';
+
+      git-stacked-branches = ''
+        git log --pretty='%D' (git-main-branch)... |
+              grep -oE '\b[^, ]+\b' |
+              grep -vE '^(HEAD|origin/)' |
+              sort | uniq
       '';
     };
   };

@@ -40,6 +40,18 @@ let
       lua print("nvim secrets not found!!")
     endif
   '';
+
+  # Maintained fork of https://github.com/mrded/nvim-lsp-notify
+  nvim-lsp-notify = pkgs.vimUtils.buildVimPlugin {
+    name = "nvim-lsp-notify";
+    src = pkgs.fetchFromGitHub {
+      owner = "brianhuster";
+      repo = "nvim-lsp-notify";
+      rev = "713df03";
+      sha256 = "sha256-ajuCj9Wm+/SE7ZQkXJhnt8Lb5yTv1eZn2mdlOFS9br4=";
+    };
+  };
+
 in
 {
   home.packages = with pkgs; [
@@ -47,6 +59,7 @@ in
     marksman # markdown lsp
     nodejs # for copilot
     stylua # lua formatting
+    lua-language-server # lua lsp
     bash-language-server # bash lsp
     shfmt # shell formatting
     shellcheck # shell linting
@@ -69,7 +82,6 @@ in
         lualine-lsp-progress
         bufferline-nvim # https://github.com/akinsho/bufferline.nvim
         auto-session # automatically restore last session
-        nvim-notify
 
         # Tools
         fzf-lua # <leader>f*
@@ -80,6 +92,10 @@ in
         nerdcommenter # block comment (<leader>cc, <leader>cu)
         which-key-nvim # show keymap hints
         todo-comments-nvim # highlight TODO, FIXME, etc
+
+        # Notifications
+        nvim-notify
+        # nvim-notify-notify (see below)
 
         # Diagnostics
         trouble-nvim
@@ -158,7 +174,8 @@ in
       ++ (with unstablePkgs.vimPlugins; [
         avante-nvim
         go-nvim
-      ]);
+      ])
+      ++ [ nvim-lsp-notify ];
 
     extraConfig = (
       builtins.concatStringsSep "\n" [

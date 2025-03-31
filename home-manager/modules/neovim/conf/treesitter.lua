@@ -1,3 +1,4 @@
+---@diagnostic disable-next-line: missing-fields
 require("nvim-treesitter.configs").setup({
 	ensure_installed = {}, -- change in neovim/default.nix
 	sync_install = false,

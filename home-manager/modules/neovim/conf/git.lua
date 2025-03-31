@@ -9,7 +9,7 @@ local function get_main_branch()
 	end
 
 	local main_branch = vim.fn.system({ "git", "ls-remote", "--symref", "origin", "HEAD" })
-	local main_branch = string.match(main_branch, "ref:%s+refs/heads/(%S+)")
+	main_branch = string.match(main_branch, "ref:%s+refs/heads/(%S+)")
 	return main_branch
 end
 vim.api.nvim_command("command! -nargs=1 SetMainBranch let g:main_branch_override = <args>")
