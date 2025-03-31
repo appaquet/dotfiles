@@ -44,27 +44,17 @@ let
   # Maintained fork of https://github.com/mrded/nvim-lsp-notify
   nvim-lsp-notify = pkgs.vimUtils.buildVimPlugin {
     name = "nvim-lsp-notify";
-    src = pkgs.fetchFromGitHub {
-      owner = "brianhuster";
-      repo = "nvim-lsp-notify";
-      rev = "713df03";
-      sha256 = "sha256-ajuCj9Wm+/SE7ZQkXJhnt8Lb5yTv1eZn2mdlOFS9br4=";
-    };
+    #src = pkgs.fetchFromGitHub {
+    #owner = "brianhuster";
+    #repo = "nvim-lsp-notify";
+    #rev = "713df03";
+    #sha256 = "sha256-ajuCj9Wm+/SE7ZQkXJhnt8Lb5yTv1eZn2mdlOFS9br4=";
+    #};
+    src = ./plugins/lsp-notify;
   };
 
 in
 {
-  home.packages = with pkgs; [
-    nixd # nix lsp
-    marksman # markdown lsp
-    nodejs # for copilot
-    stylua # lua formatting
-    lua-language-server # lua lsp
-    bash-language-server # bash lsp
-    shfmt # shell formatting
-    shellcheck # shell linting
-  ];
-
   programs.neovim = {
     enable = true;
     viAlias = true;
@@ -114,7 +104,7 @@ in
         neotest-golang
         neotest-python
         rustaceanvim
-        conform-nvim # easy formatting
+        conform-nvim # formatting
 
         # Autocomplete (w/ LSP)
         nvim-cmp # https://github.com/hrsh7th/nvim-cmp
@@ -188,19 +178,30 @@ in
         (includeLuaFile "tree.lua")
         (includeLuaFile "theme.lua")
         (includeLuaFile "sessions.lua")
+        (includeLuaFile "notify.lua")
         (includeLuaFile "fzf.lua")
         (includeLuaFile "treesitter.lua")
-        (includeLuaFile "code.lua")
-        (includeLuaFile "formatting.lua")
         (includeLuaFile "git.lua")
+        (includeLuaFile "lang.lua")
+        (includeLuaFile "formatting.lua")
         (includeLuaFile "ai.lua")
         (includeLuaFile "diag.lua")
-        (includeLuaFile "notify.lua")
         (includeLuaFile "testing.lua")
         (includeLuaFile "quickfix.lua")
         (includeLuaFile "debugging.lua")
       ]
     );
+
+    extraPackages = with pkgs; [
+      nixd # nix lsp
+      marksman # markdown lsp
+      nodejs # for copilot
+      stylua # lua formatting
+      lua-language-server # lua lsp
+      bash-language-server # bash lsp
+      shfmt # shell formatting
+      shellcheck # shell linting
+    ];
   };
 
   home.sessionVariables = {

@@ -1,14 +1,23 @@
 -- LSP
 -- https://github.com/neovim/nvim-lspconfig
 local lspconfig = require("lspconfig")
+
 --lspconfig.gopls.setup {} -- Loaded by go.nvim (see bellow)
+--
 --lspconfig.rust_analyzer.setup {} -- Loaded by rustaceanvim (see bellow)
+--
 lspconfig.ts_ls.setup({})
+
 lspconfig.marksman.setup({})
+
 lspconfig.nixd.setup({})
+
 lspconfig.buf_ls.setup({})
+
 lspconfig.bashls.setup({})
+
 lspconfig.jsonnet_ls.setup({})
+
 lspconfig.pyright.setup({
 	python = {
 		analysis = {
@@ -18,6 +27,7 @@ lspconfig.pyright.setup({
 		},
 	},
 })
+
 lspconfig.lua_ls.setup({
 	-- See https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#lua_ls
 	on_init = function(client)
@@ -55,10 +65,11 @@ lspconfig.lua_ls.setup({
 })
 
 -- Bind keymaps on lsp attach to buffer
-local fzf = require("fzf-lua")
 vim.api.nvim_create_autocmd("LspAttach", {
 	group = vim.api.nvim_create_augroup("UserLspConfig", {}),
 	callback = function(ev)
+		local fzf = require("fzf-lua")
+
 		-- Go to
 		local opts = { buffer = ev.buf }
 		vim.keymap.set("n", "<leader>lgd", vim.lsp.buf.definition, { buffer = ev.buf, desc = "LSP: Go to definition" })
@@ -86,12 +97,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		-- Actions
 		vim.keymap.set("n", "<leader>lr", vim.lsp.buf.rename, { buffer = ev.buf, desc = "LSP: Rename" })
 		vim.keymap.set({ "n", "v" }, "<leader>lca", vim.lsp.buf.code_action, { buffer = ev.buf, desc = "LSP: Code action" })
-
-		-- Formatting
-		-- Replaced by conform, see ./conform.lua
-		--vim.keymap.set('n', '<leader>lf', function()
-		--require('')
-		--end, { buffer = ev.buf, desc = "LSP: Format" })
 	end,
 })
 
@@ -118,10 +123,6 @@ cmp.setup({
 	preselect = cmp.PreselectMode.None, -- Don't preselect items
 
 	mapping = cmp.mapping.preset.insert({
-		["<C-u>"] = cmp.mapping.scroll_docs(-4), -- Up
-		["<C-d>"] = cmp.mapping.scroll_docs(4), -- Down
-
-		-- C-b (back) C-f (forward) for snippet placeholder navigation.
 		["<C-Space>"] = cmp.mapping.complete(),
 
 		-- Accept selected
@@ -129,6 +130,10 @@ cmp.setup({
 			behavior = cmp.ConfirmBehavior.Insert,
 			select = false, -- don't select unless selected
 		}),
+
+		-- Documentation pane navigation
+		["<C-u>"] = cmp.mapping.scroll_docs(-4), -- Up
+		["<C-d>"] = cmp.mapping.scroll_docs(4), -- Down
 	}),
 
 	window = {
@@ -151,17 +156,6 @@ require("luasnip.loaders.from_vscode").lazy_load({})
 -- Golang
 -- https://github.com/ray-x/go.nvim
 if vim.fn.executable("go") == 1 then -- Only load the plugin if `go` is available since it fails otherwise
-	-- Format & cleanup imports on save (replaced by conform)
-	--
-	--local format_sync_grp = vim.api.nvim_create_augroup("goimports", {})
-	--vim.api.nvim_create_autocmd("BufWritePre", {
-	--pattern = "*.go",
-	--callback = function()
-	--require("go.format").goimports()
-	--end,
-	--group = format_sync_grp,
-	--})
-
 	require("go").setup({
 		lsp_keymaps = false, -- conflicts with our remaps
 		lsp_cfg = {
