@@ -24,6 +24,7 @@ vim.keymap.set({ "n", "i", "v", "c", "x" }, "<C-\\>", fzf.commands, { desc = "FZ
 
 -- Long form keybindings
 vim.keymap.set("n", "<leader>ff", fzf.files, { desc = "FZF: Files" })
+vim.keymap.set("n", "<leader>fo", fzf.oldfiles, { desc = "FZF: Old files" })
 vim.keymap.set("n", "<leader>fs", fzf.lgrep_curbuf, { desc = "FZF: Live grep file" })
 vim.keymap.set("n", "<leader>fS", fzf.live_grep_glob, { desc = "FZF: Live grep workspace" })
 vim.keymap.set("n", "<leader>fw", fzf.grep_cword, { desc = "FZF: Grep word" })
