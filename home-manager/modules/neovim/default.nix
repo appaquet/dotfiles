@@ -54,8 +54,10 @@ in
     viAlias = true;
     vimAlias = true;
 
+    package = unstablePkgs.neovim-unwrapped;
+
     plugins =
-      (with pkgs.vimPlugins; [
+      (with unstablePkgs.vimPlugins; [
         # Theme
         catppuccin-nvim
         nvim-web-devicons
@@ -147,8 +149,9 @@ in
           p.vimdoc
         ]))
         nvim-treesitter-textobjects # provider object manipulation
-      ])
-      ++ (with unstablePkgs.vimPlugins; [
+
+        #])
+        #++ (with unstablePkgs.vimPlugins; [
         # !Warning! Make sure that any plugin loaded here aren't loading treesitters. We can't have
         # it from both stable and unstable ( https://github.com/NixOS/nixpkgs/issues/282927 )
 
