@@ -96,7 +96,7 @@ in
         neotest
         neotest-golang
         neotest-python
-        rustaceanvim
+        #rustaceanvim (unstable)
         conform-nvim # formatting
 
         # Autocomplete (w/ LSP)
@@ -112,21 +112,16 @@ in
         cmp_luasnip
         friendly-snippets # easy load from vscode, languages, etc.
 
-        # Copilot (use Copilot auth)
-        copilot-lua
-
-        # Avante and dependencies
-        #avante-nvim (unstable)
-        render-markdown-nvim
-        nui-nvim
-        dressing-nvim
-        plenary-nvim
-        img-clip-nvim
+        # AI
+        #avante-nvim # (unstable)
+        copilot-lua # use `Copilot auth` to login
+        render-markdown-nvim # optional dep
 
         # Debugging
         nvim-dap
         nvim-dap-ui
         nvim-dap-go
+        nvim-dap-virtual-text
 
         # Syntax
         (nvim-treesitter.withPlugins (p: [
@@ -151,12 +146,28 @@ in
           p.toml
           p.typescript
           p.vim
+          p.vimdoc
         ]))
         nvim-treesitter-textobjects # provider object manipulation
       ])
       ++ (with unstablePkgs.vimPlugins; [
-        avante-nvim
+        # !Warning! Make sure that any plugin loaded here aren't loading treesitters. We can't have
+        # it from both stable and unstable ( https://github.com/NixOS/nixpkgs/issues/282927 )
+
+        (avante-nvim.overrideAttrs (_: {
+          # Overriding dependencies to prevent treesitter from being loaded from unstable
+          # https://github.com/NixOS/nixpkgs/blob/913cc2b4558595a4aafaf87a18935b34f79d5429/pkgs/applications/editors/vim/plugins/non-generated/avante-nvim/default.nix#L54
+          dependencies = [
+            dressing-nvim
+            img-clip-nvim
+            nui-nvim
+            #nvim-treesitter # yanked
+            plenary-nvim
+          ];
+        }))
+
         go-nvim
+        rustaceanvim
       ])
       ++ [ nvim-lsp-notify ];
 

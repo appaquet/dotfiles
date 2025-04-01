@@ -37,10 +37,10 @@ Neotest.setup({
 				end
 
 				if fail_count > 0 then
-					vim.notify(string.format("%d test(s) failed", fail_count), "error", { title = "Neotest" })
+					vim.notify(string.format("%d test(s) failed", fail_count), vim.log.levels.ERROR, { title = "Neotest" })
 				end
 				if success_count > 0 then
-					vim.notify(string.format("%d test(s) passed", success_count), "success", { title = "Neotest" })
+					vim.notify(string.format("%d test(s) passed", success_count), vim.log.levels.INFO, { title = "Neotest" })
 				end
 			end
 			return {}

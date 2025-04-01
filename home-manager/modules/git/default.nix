@@ -70,7 +70,7 @@
       '';
 
       git-stacked-branches = ''
-        git log --pretty='%D' (git-main-branch)... |
+        git log --pretty='%D' origin/(git-main-branch)... |
               grep -oE '\b[^, ]+\b' |
               grep -vE '^(HEAD|origin/)' |
               sort | uniq

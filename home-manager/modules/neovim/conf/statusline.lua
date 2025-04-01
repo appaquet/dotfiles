@@ -7,8 +7,8 @@ require("lualine").setup({
 		component_separators = { left = "", right = "" },
 		section_separators = { left = "", right = "" },
 		disabled_filetypes = {
-			statusline = { "NvimTree", "Avante", "AvanteInput", "AvanteSelectedFiles" },
-			winbar = { "NvimTree", "Avante", "AvanteInput", "AvanteSelectedFiles" },
+			statusline = { "NvimTree", "Avante", "AvanteInput", "AvanteSelectedFiles", "trouble" },
+			winbar = { "NvimTree", "Avante", "AvanteInput", "AvanteSelectedFiles", "trouble" },
 		},
 		ignore_focus = {},
 		always_divide_middle = true,
