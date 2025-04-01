@@ -5,13 +5,16 @@ fzf.setup({
 	winopts = {
 		preview = {
 			layout = "vertical",
-			vertical = "down:50%",
+			vertical = "down:60%",
 		},
 	},
 	keymap = {
 		fzf = {
 			["ctrl-k"] = "select-all+accept", -- Sends to quickfix
 		},
+	},
+	oldfiles = {
+		cwd_only = true,
 	},
 })
 
