@@ -1,3 +1,6 @@
+--- Forked from https://github.com/mrded/nvim-lsp-notify
+--- Modified to add debouncing
+
 --- Options for the plugin.
 ---@class LspNotifyConfig
 local options = {
@@ -19,6 +22,14 @@ local options = {
 		--- Icon to show when done.
 		--- Can be set to `= false` to disable only spinner.
 		done = "✓",
+	},
+
+	--- Debounce settings
+	debounce = {
+		--- Enable debouncing of updates
+		enabled = true,
+		--- Debounce time in milliseconds
+		timeout = 100,
 	},
 }
 
@@ -134,6 +145,9 @@ local BaseLspNotification = {
 	clients = {},
 	notification = nil,
 	window = nil,
+
+	-- Flag to indicate pending updates
+	pending_update = false,
 }
 
 ---@return BaseLspNotification
@@ -191,6 +205,9 @@ function BaseLspNotification:notification_progress()
 end
 
 function BaseLspNotification:notification_end()
+	-- First clear the spinner to stop the animation loop
+	self.spinner = nil
+
 	options.notify(self:format(), vim.log.levels.INFO, {
 		replace = self.notification,
 		icon = options.icons and options.icons.done or nil,
@@ -203,15 +220,46 @@ function BaseLspNotification:notification_end()
 
 	-- Clean up and reset
 	self.notification = nil
-	self.spinner = nil
+
 	self.window = nil
 end
 
 function BaseLspNotification:update()
+	-- If debouncing is disabled, update immediately
+	if not options.debounce.enabled then
+		self:_do_update()
+		return
+	end
+
+	-- Mark that we have a pending update
+	self.pending_update = true
+
+	-- Use a static variable to track if a timer is already scheduled
+	if BaseLspNotification._update_timer_active then
+		return
+	end
+
+	-- Create a new timer
+	BaseLspNotification._update_timer_active = true
+	vim.defer_fn(function()
+		-- Only update if there are pending updates
+		if self.pending_update then
+			self:_do_update()
+			self.pending_update = false
+		end
+		BaseLspNotification._update_timer_active = false
+	end, options.debounce.timeout)
+end
+
+-- The actual update function
+function BaseLspNotification:_do_update()
 	if not self.notification then
-		self:notification_start()
-		self.spinner = 1
-		self:spinner_start()
+		-- Only start a notification if we have clients
+		if self:count_clients() > 0 then
+			self:notification_start()
+			self.spinner = 1
+			self:spinner_start()
+		end
 	elseif self:count_clients() > 0 then
 		self:notification_progress()
 	elseif self:count_clients() == 0 then
@@ -223,16 +271,30 @@ function BaseLspNotification:schedule_kill_task(client_id, task_id)
 	-- Wait a bit before hiding the task to show that it's complete
 	vim.defer_fn(function()
 		local client = self.clients[client_id]
+		if not client then
+			return
+		end
+
 		client:kill_task(task_id)
-		self:update()
+		-- Force an immediate update for task completion
+		self.pending_update = true
+		BaseLspNotification._update_timer_active = false
+		self:_do_update()
 
 		if client:count_tasks() == 0 then
 			-- Wait a bit before hiding the client to show that its' tasks are complete
 			vim.defer_fn(function()
-				if client:count_tasks() == 0 then
+				if not client or client:count_tasks() == 0 then
 					-- Make sure we don't hide a client notification if a task appeared in down time
 					self.clients[client_id] = nil
-					self:update()
+
+					-- Check if this was the last client
+					if self:count_clients() == 0 and self.notification then
+						-- Force an immediate update for client completion
+						self.pending_update = true
+						BaseLspNotification._update_timer_active = false
+						self:_do_update()
+					end
 				end
 			end, 2000)
 		end
@@ -253,7 +315,12 @@ function BaseLspNotification:format()
 end
 
 function BaseLspNotification:spinner_start()
-	if self.spinner and options.icons and options.icons.spinner then
+	-- Stop spinner if notification or spinner was cleared
+	if not self.notification or not self.spinner then
+		return
+	end
+
+	if options.icons and options.icons.spinner then
 		self.spinner = (self.spinner % #options.icons.spinner) + 1
 
 		if supports_replace then
@@ -268,7 +335,7 @@ function BaseLspNotification:spinner_start()
 		-- Trigger new spinner frame
 		vim.defer_fn(function()
 			self:spinner_start()
-		end, 100)
+		end, options.debounce.enabled and math.max(100, options.debounce.timeout) or 100)
 	end
 end
 

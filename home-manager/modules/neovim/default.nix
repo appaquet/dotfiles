@@ -41,15 +41,9 @@ let
     endif
   '';
 
-  # Maintained fork of https://github.com/mrded/nvim-lsp-notify
+  # Forked from https://github.com/mrded/nvim-lsp-notify
   nvim-lsp-notify = pkgs.vimUtils.buildVimPlugin {
-    name = "nvim-lsp-notify";
-    #src = pkgs.fetchFromGitHub {
-    #owner = "brianhuster";
-    #repo = "nvim-lsp-notify";
-    #rev = "713df03";
-    #sha256 = "sha256-ajuCj9Wm+/SE7ZQkXJhnt8Lb5yTv1eZn2mdlOFS9br4=";
-    #};
+    name = "lsp-notify";
     src = ./plugins/lsp-notify;
   };
 
