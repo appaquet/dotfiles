@@ -70,33 +70,36 @@ vim.api.nvim_create_autocmd("LspAttach", {
 	callback = function(ev)
 		local fzf = require("fzf-lua")
 
+		local function kopts(buffer, desc)
+			return { buffer = buffer, desc = desc }
+		end
+
 		-- Go to
-		local opts = { buffer = ev.buf }
-		vim.keymap.set("n", "<leader>lgd", vim.lsp.buf.definition, { buffer = ev.buf, desc = "LSP: Go to definition" })
-		vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = ev.buf, desc = "LSP: Go to definition" })
-		vim.keymap.set("n", "<leader>lgD", vim.lsp.buf.declaration, { buffer = ev.buf, desc = "LSP: Go to declaration" })
-		vim.keymap.set("n", "<leader>lgt", vim.lsp.buf.type_definition, { buffer = ev.buf, desc = "LSP: Go to type definition" })
-		vim.keymap.set("n", "gt", vim.lsp.buf.type_definition, { buffer = ev.buf, desc = "LSP: Go to type definition" })
-		vim.keymap.set("n", "gr", fzf.lsp_references, { buffer = ev.buf, desc = "LSP: Go to references" })
+		vim.keymap.set("n", "<leader>lgd", vim.lsp.buf.definition, kopts(ev.buf, "LSP: Go to definition"))
+		vim.keymap.set("n", "gd", vim.lsp.buf.definition, kopts(ev.buf, "LSP: Go to definition"))
+		vim.keymap.set("n", "<leader>lgD", vim.lsp.buf.declaration, kopts(ev.buf, "LSP: Go to declaration"))
+		vim.keymap.set("n", "<leader>lgt", vim.lsp.buf.type_definition, kopts(ev.buf, "LSP: Go to type definition"))
+		vim.keymap.set("n", "gt", vim.lsp.buf.type_definition, kopts(ev.buf, "LSP: Go to type definition"))
+		vim.keymap.set("n", "gr", fzf.lsp_references, kopts(ev.buf, "LSP: Go to references"))
 
 		-- Info (more in treesietter.lua)
-		vim.keymap.set("n", "<leader>li", vim.lsp.buf.hover, { buffer = ev.buf, desc = "LSP: Displays hover information about a symbol" })
-		vim.keymap.set("n", "<leader>ls", vim.lsp.buf.signature_help, { buffer = ev.buf, desc = "LSP: Show signature help" })
+		vim.keymap.set("n", "<leader>li", vim.lsp.buf.hover, kopts(ev.buf, "LSP: Displays hover information about a symbol"))
+		vim.keymap.set("n", "<leader>ls", vim.lsp.buf.signature_help, kopts(ev.buf, "LSP: Show signature help"))
 
 		-- List
-		vim.keymap.set("n", "<leader>lli", fzf.lsp_implementations, { buffer = ev.buf, desc = "LSP: List all implementations" })
-		vim.keymap.set("n", "<leader>llr", fzf.lsp_references, { buffer = ev.buf, desc = "LSP: List references" })
+		vim.keymap.set("n", "<leader>lli", fzf.lsp_implementations, kopts(ev.buf, "LSP: List all implementations"))
+		vim.keymap.set("n", "<leader>llr", fzf.lsp_references, kopts(ev.buf, "LSP: List references"))
 
 		-- Workspace
-		vim.keymap.set("n", "<leader>lwa", vim.lsp.buf.add_workspace_folder, { buffer = ev.buf, desc = "LSP: Add workspace folder" })
-		vim.keymap.set("n", "<leader>lwr", vim.lsp.buf.remove_workspace_folder, { buffer = ev.buf, desc = "LSP: Remove workspace folder" })
+		vim.keymap.set("n", "<leader>lwa", vim.lsp.buf.add_workspace_folder, kopts(ev.buf, "LSP: Add workspace folder"))
+		vim.keymap.set("n", "<leader>lwr", vim.lsp.buf.remove_workspace_folder, kopts(ev.buf, "LSP: Remove workspace folder"))
 		vim.keymap.set("n", "<leader>lwl", function()
 			print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-		end, { buffer = ev.buf, desc = "LSP: List workspace folders" })
+		end, kopts(ev.buf, "LSP: List workspace folders"))
 
 		-- Actions
-		vim.keymap.set("n", "<leader>lr", vim.lsp.buf.rename, { buffer = ev.buf, desc = "LSP: Rename" })
-		vim.keymap.set({ "n", "v" }, "<leader>lca", vim.lsp.buf.code_action, { buffer = ev.buf, desc = "LSP: Code action" })
+		vim.keymap.set("n", "<leader>lr", vim.lsp.buf.rename, kopts(ev.buf, "LSP: Rename"))
+		vim.keymap.set({ "n", "v" }, "<leader>lca", vim.lsp.buf.code_action, kopts(ev.buf, "LSP: Code action"))
 	end,
 })
 

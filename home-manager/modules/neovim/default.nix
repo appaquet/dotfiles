@@ -63,7 +63,6 @@ in
         # Layout
         nvim-tree-lua
         lualine-nvim # https://github.com/nvim-lualine/lualine.nvim
-        lualine-lsp-progress
         bufferline-nvim # https://github.com/akinsho/bufferline.nvim
         auto-session # automatically restore last session
 
