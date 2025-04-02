@@ -126,13 +126,18 @@ in
           # see https://github.com/nvim-treesitter/nvim-treesitter for available languages
           p.bash
           p.c
+          p.comment
           p.css
           p.dockerfile
           p.dot
           p.fish
           p.go
+          p.gomod
+          p.gotmpl
+          p.gowork
           p.html
           p.javascript
+          p.json
           p.jsonnet
           p.lua
           p.markdown

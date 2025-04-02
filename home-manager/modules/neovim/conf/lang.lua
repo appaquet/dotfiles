@@ -7,19 +7,13 @@ require("which-key").add({
 local lspconfig = require("lspconfig")
 
 --lspconfig.gopls.setup {} -- Loaded by go.nvim (see bellow)
---
 --lspconfig.rust_analyzer.setup {} -- Loaded by rustaceanvim (see bellow)
---
+
 lspconfig.ts_ls.setup({})
-
 lspconfig.marksman.setup({})
-
 lspconfig.nixd.setup({})
-
 lspconfig.buf_ls.setup({})
-
 lspconfig.bashls.setup({})
-
 lspconfig.jsonnet_ls.setup({})
 
 lspconfig.pyright.setup({

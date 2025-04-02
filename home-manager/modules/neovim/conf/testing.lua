@@ -24,7 +24,7 @@ Neotest.setup({
 	-- https://github.com/nvim-neotest/neotest/issues/218
 	consumers = {
 		notify = function(client)
-			client.listeners.results = function(adapter_id, results, partial)
+			client.listeners.results = function(_adapter_id, results, partial)
 				-- Partial results can be very frequent
 				if partial then
 					return
@@ -71,6 +71,18 @@ local function debug_file()
 	Neotest.run.run({ vim.fn.expand("%"), strategy = "dap" })
 end
 
+local function run_dir()
+	Neotest.summary.open()
+	local dir = vim.fn.expand("%:p:h")
+	Neotest.run.run(dir)
+end
+
+local function debug_dir()
+	Neotest.summary.open()
+	local dir = vim.fn.expand("%:p:h")
+	Neotest.run.run({ dir, strategy = "dap" })
+end
+
 local function run_last()
 	Neotest.summary.open()
 	Neotest.run.run_last()
@@ -84,6 +96,8 @@ vim.keymap.set("n", "<leader>tc", run_nearest, { desc = "Test: Run nearest / und
 vim.keymap.set("n", "<leader>tdc", debug_nearest, { desc = "Test: Debug nearest" })
 vim.keymap.set("n", "<leader>tf", run_file, { desc = "Test: Run file" })
 vim.keymap.set("n", "<leader>tdf", debug_file, { desc = "Test: Debug file" })
+vim.keymap.set("n", "<leader>tp", run_dir, { desc = "Test: Run package/dir" })
+vim.keymap.set("n", "<leader>tdp", debug_dir, { desc = "Test: Debug package/dir" })
 vim.keymap.set("n", "<leader>tl", run_last, { desc = "Test: Run last" })
 vim.keymap.set("n", "<leader>tdl", debug_last, { desc = "Test: Debug last" })
 vim.keymap.set("n", "<leader>tu", Neotest.run.stop, { desc = "Test: Stop" })

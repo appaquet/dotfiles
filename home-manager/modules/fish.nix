@@ -21,7 +21,7 @@
 
       # Force term color support
       # Some TUI may not appear correctly otherwise
-      set -x TERM xterm-256color
+      set -x TERM tmux-256color
       set -x COLORTERM truecolor
 
       # Source any local stuff from .profile

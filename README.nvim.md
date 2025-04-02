@@ -133,6 +133,8 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>tdc` to debug nearest
 * `<leader>tf` to run file
 * `<leader>tdf` to debug file
+* `<leader>tp` to run package/directory
+* `<leader>tdp` to debug package/directory
 * `<leader>tl` to run last
 * `<leader>tdl` to debug last
 * `<leader>tu` to stop test
