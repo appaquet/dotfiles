@@ -58,5 +58,11 @@ vim.keymap.set("n", "<Leader>Tm", function()
 		vim.o.number = true
 	end
 end, { silent = true, desc = "Toggle mouse support" })
+
 -- Spellcheck
 vim.keymap.set("n", "<Leader>Ts", ":set spell!<CR>", { silent = true, desc = "Toggle spellcheck" })
+
+-- Multicursors
+-- https://github.com/smoka7/multicursors.nvim
+require("multicursors").setup({})
+vim.keymap.set({ "n", "v" }, "<C-n>", "<cmd>MCstart<cr>", { silent = true })

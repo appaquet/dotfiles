@@ -67,13 +67,12 @@ in
         auto-session # automatically restore last session
 
         # Tools
-        fzf-lua # <leader>f*
-        Rename # :Rename <new name>
-        vim-multiple-cursors # ctrl-n multi cursors
+        fzf-lua
         nvim-bufdel # :BufDel, :BufDelOthers (properly close buffers)
         delimitMate # auto close quotes, parens, etc
         which-key-nvim # show keymap hints
         todo-comments-nvim # highlight TODO, FIXME, etc
+        multicursors-nvim
 
         # Notifications
         nvim-notify

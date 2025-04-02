@@ -169,6 +169,13 @@ keymaps, but also default/built-ins that I tend to forget.
 * `gu` to lowercase text (in visual)
 * `gU` to upercase text (in visual)
 * `g~` to toggle casing (in visual)
+* `<ctrl-n>` to start multicursor edit
+  * A keymap helper will show up with the available keymaps
+  * `n`, `N` to go to next/prev match
+  * `q` to skip current match
+  * `c` to change matches
+  * `d` to delete matches
+  * `a` to append after matches
 
 ## Folding
 * `zm` to fold more
@@ -204,9 +211,4 @@ keymaps, but also default/built-ins that I tend to forget.
 * `z=` to see spelling suggestions for word under cursor (built-in)
 * `zg` to add word under cursor to spelling dictionary
 * `zw` to remove word under cursor from spelling dictionary
-
-## Commands
-* `Rename <file name>` to rename current file
-* `New <file name>` to create a file in current buffer dir
-* `Delete` to delete current file
 
