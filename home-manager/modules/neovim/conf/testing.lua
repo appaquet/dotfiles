@@ -1,3 +1,7 @@
+require("which-key").add({
+	{ "<leader>t", group = "Testing" },
+})
+
 -- Neotest
 -- https://github.com/nvim-neotest/neotest
 local Neotest = require("neotest")

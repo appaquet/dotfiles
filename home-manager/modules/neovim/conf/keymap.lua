@@ -1,22 +1,19 @@
+require("which-key").add({
+	{ "<leader>r", group = "Execute" },
+	{ "<leader>T", group = "Toggle" },
+	{ "<leader>m", group = "Marks" },
+	{ "<leader>q", group = "Quit..." },
+	{ "<leader>y", group = "Clipboard" },
+})
+
 -- Setup leader key as space.
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 vim.keymap.set("", "<Space>", "<Nop>")
 
 -- Clipboard operations
-vim.keymap.set("v", "<Leader>y", ":w !pbcopy<CR><CR>", { desc = "Copy current file content to system clipboard" })
-vim.keymap.set("n", "<Leader>yp", ":read !pbpaste<CR>", { desc = "Paste from system clipboard" })
-vim.keymap.set("n", "<Leader>Tm", function()
-	if vim.o.mouse == "a" then
-		vim.o.mouse = ""
-		vim.o.relativenumber = false
-		vim.o.number = false
-	else
-		vim.o.mouse = "a"
-		vim.o.relativenumber = true
-		vim.o.number = true
-	end
-end, { silent = true, desc = "Toggle mouse support" })
+vim.keymap.set("v", "<Leader>yy", ":w !pbcopy<CR><CR>", { desc = "Clipboard: Copy to system clipboard" })
+vim.keymap.set("n", "<Leader>yp", ":read !pbpaste<CR>", { desc = "Clipboard: Paste from system clipboard" })
 
 -- Marks (m[a-z0-9A-Z], 'a-z0-9A-Z)
 vim.keymap.set("n", "<Leader>mk", ":delmarks a-z0-9A-Z<CR>", { silent = true, desc = "Marks: delete all" })
@@ -36,9 +33,10 @@ vim.cmd([[
 ]])
 
 -- Misc
-vim.keymap.set("n", "<Leader>r", ":w<CR>:!./%<CR>", { silent = true, desc = "Save and execute current file" })
-vim.keymap.set("v", "<Leader>r", ":w !sh<CR>", { silent = true, desc = "Execute selected lines in shell" })
+vim.keymap.set("n", "<Leader>rf", ":w<CR>:!./%<CR>", { silent = true, desc = "Execute current file" })
+vim.keymap.set("v", "<Leader>rl", ":w !sh<CR>", { silent = true, desc = "Execute selected lines" })
 
+-- Toggling
 local function toggle_wrap()
 	if vim.wo.wrap then
 		vim.wo.wrap = false
@@ -49,13 +47,16 @@ local function toggle_wrap()
 	end
 end
 vim.keymap.set("n", "<Leader>Tw", toggle_wrap, { silent = true, desc = "Toggle line wrap" })
-
+vim.keymap.set("n", "<Leader>Tm", function()
+	if vim.o.mouse == "a" then
+		vim.o.mouse = ""
+		vim.o.relativenumber = false
+		vim.o.number = false
+	else
+		vim.o.mouse = "a"
+		vim.o.relativenumber = true
+		vim.o.number = true
+	end
+end, { silent = true, desc = "Toggle mouse support" })
 -- Spellcheck
 vim.keymap.set("n", "<Leader>Ts", ":set spell!<CR>", { silent = true, desc = "Toggle spellcheck" })
-
--- Whichkey
--- https://github.com/folke/which-key.nvim
-local wk = require("which-key")
-wk.add({
-	{ "<leader>f", group = "file" }, -- group
-})

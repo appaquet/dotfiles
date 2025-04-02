@@ -1,3 +1,7 @@
+require("which-key").add({
+	{ "<leader>d", group = "Debugging" },
+})
+
 -- nvim-dap
 -- https://github.com/mfussenegger/nvim-dap
 local dap = require("dap")

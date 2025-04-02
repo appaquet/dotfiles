@@ -1,3 +1,7 @@
+require("which-key").add({
+	{ "<leader>a", group = "Avante" },
+})
+
 -- copilot
 -- https://github.com/zbirenbaum/copilot.lua
 require("copilot").setup({
@@ -55,6 +59,10 @@ require("avante").setup({
 	auto_suggestions_provider = "copilot", -- not used
 	behaviour = {
 		auto_suggestions = false, -- Experimental stage
+	},
+
+	web_search_engine = {
+		provider = "tavily",
 	},
 })
 

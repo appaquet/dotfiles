@@ -1,3 +1,7 @@
+require("which-key").add({
+	{ "<leader>k", group = "Quickfix" },
+})
+
 -- Quickfix
 local function toggle_quickfix()
 	local quickfix_open = false

@@ -18,6 +18,10 @@ fzf.setup({
 	},
 })
 
+require("which-key").add({
+	{ "<leader>f", group = "FZF Search" },
+})
+
 -- Quick keybindings
 vim.keymap.set("n", "<C-p>", fzf.files, { desc = "FZF: Files" })
 vim.keymap.set("n", "<C-l>", fzf.lgrep_curbuf, { desc = "FZF: Live grep file" })

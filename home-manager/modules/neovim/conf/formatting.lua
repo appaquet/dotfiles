@@ -1,3 +1,7 @@
+require("which-key").add({
+	{ "<leader>c", group = "Code" },
+})
+
 -- Auto formatting on save
 -- https://github.com/stevearc/conform.nvim
 require("conform").setup({
@@ -26,6 +30,6 @@ require("conform").setup({
 	},
 })
 
-vim.keymap.set("n", "<leader>lf", function()
+vim.keymap.set({ "n", "v" }, "<leader>cf", function()
 	require("conform").format()
-end, { desc = "LSP: Format" })
+end, { desc = "Format (conform)" })

@@ -7,14 +7,14 @@ vim.opt.exrc = true
 
 -- pretty print
 -- https://www.reddit.com/r/neovim/comments/xrovld/display_lua_tables_eg_vimkeymap/
-pprint = function(v)
+function pprint(v)
 	print(vim.inspect(v))
 	return v
 end
 
 ---@param description string
 ---@param fn function
-local try = function(description, fn)
+function try(description, fn)
 	local success, result = pcall(fn)
 	if not success then
 		vim.notify("Failed to execute " .. description .. ": " .. result, vim.log.levels.ERROR)

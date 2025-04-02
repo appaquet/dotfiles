@@ -72,7 +72,6 @@ in
         vim-multiple-cursors # ctrl-n multi cursors
         nvim-bufdel # :BufDel, :BufDelOthers (properly close buffers)
         delimitMate # auto close quotes, parens, etc
-        nerdcommenter # block comment (<leader>cc, <leader>cu)
         which-key-nvim # show keymap hints
         todo-comments-nvim # highlight TODO, FIXME, etc
 

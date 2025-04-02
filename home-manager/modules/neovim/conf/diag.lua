@@ -1,6 +1,9 @@
+require("which-key").add({
+	{ "<leader>x", group = "Diagnostics" },
+})
+
 -- Trouble (diagnostics)
 -- https://github.com/folke/trouble.nvim
-
 local Trouble = require("trouble")
 Trouble.setup({})
 
@@ -25,21 +28,21 @@ local function trouble_diag_toggle()
 end
 
 local function trouble_diag_next()
-	if Trouble.is_open("diagnostics") then
-		Trouble.focus()
-		Trouble.next()
-	else
-		vim.diagnostic.goto_next()
+	if not Trouble.is_open("diagnostics") then
+		Trouble.open("diagnostics")
 	end
+
+	Trouble.focus()
+	Trouble.next()
 end
 
 local function trouble_diag_prev()
-	if Trouble.is_open("diagnostics") then
-		Trouble.focus()
-		Trouble.prev()
-	else
-		vim.diagnostic.goto_prev()
+	if not Trouble.is_open("diagnostics") then
+		Trouble.open("diagnostics")
 	end
+
+	Trouble.focus()
+	Trouble.prev()
 end
 
 -- See `:help vim.diagnostic.*` for documentation on any of the below functions

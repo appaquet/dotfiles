@@ -1,3 +1,9 @@
+require("which-key").add({
+	{ "<leader>b", group = "Buffers" },
+	{ "<leader>n", group = "Tabs" },
+	{ "<leader>w", group = "Save" },
+})
+
 -- bufferline
 -- https://github.com/akinsho/bufferline.nvim
 require("bufferline").setup({

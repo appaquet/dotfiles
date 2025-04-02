@@ -1,3 +1,7 @@
+require("which-key").add({
+	{ "<leader>l", group = "LSP" },
+})
+
 -- LSP
 -- https://github.com/neovim/nvim-lspconfig
 local lspconfig = require("lspconfig")

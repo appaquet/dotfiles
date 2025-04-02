@@ -71,7 +71,7 @@ keymaps, but also default/built-ins that I tend to forget.
   * `E` to expand all, `W` to collapse
   * `/` to fuzzy find file
 
-## Code / LSP
+## LSP
 * `<leader>lgD` LSP: Go to declaration
 * `<leader>lgd` or `gd` LSP: Go to definition
 * `<leader>lgt` or `gt` LSP: Go to type definition
@@ -84,7 +84,6 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>Ti` LSP: Toggle inlay line hints
 * `<leader>lr` LSP: Rename
 * `<leader>lca` LSP: Code action
-
 * `<leader>lwa` LSP: Add workspace folder
 * `<leader>lwr` LSP: Remove workspace folder
 * `<leader>lwl` LSP: List workspace folders
@@ -164,10 +163,9 @@ keymaps, but also default/built-ins that I tend to forget.
 - `<leader>SP`: Swap with previous parameter
 - `<leader>SF`: Swap with previous function
 
-## Text manipulation
-* `<leader>cc` to comment line (via nerdcommenter)
-* `<leader>cu` to uncomment line (via nerdcommenter)
-* `gw` to format text (in visual)
+## Text/code manipulation
+* `gw` to format text (using vim, in visual)
+* `gc` to comment text (in visual)
 * `gu` to lowercase text (in visual)
 * `gU` to upercase text (in visual)
 * `g~` to toggle casing (in visual)
@@ -195,7 +193,7 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>r` to execute current buffer in a shell (normal mode)
 * `<leader>r` to execute current visual selection in a shell (visual mode)
 * `<leader>Tm` to toggle mouse support (useful to allow select + copy)
-* `<leader>y` to yank to clipboard using [bin/pbcopy](bin/pbcopy) util
+* `<leader>yy` to yank to clipboard using [bin/pbcopy](bin/pbcopy) util
 * `<leader>yp` to paste from clipboard using [bin/pbpaste](bin/pbpaste) util
 * `<leader>Tw` to toggle line wrap
 * `zz` to center cursor in the middle of the screen

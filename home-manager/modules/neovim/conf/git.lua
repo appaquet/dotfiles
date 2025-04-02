@@ -1,3 +1,7 @@
+require("which-key").add({
+	{ "<leader>g", group = "Git" },
+})
+
 -- Diffview
 -- https://github.com/sindrets/diffview.nvim
 require("diffview").setup({})
