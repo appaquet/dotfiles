@@ -26,6 +26,7 @@ let
       color_scheme = 'Catppuccin Mocha',
       font = wezterm.font 'FiraCode Nerd Font Mono',
       window_decorations = "RESIZE", -- border less, but allow resizing
+      audible_bell = 'Disabled',
     }
   '';
 in

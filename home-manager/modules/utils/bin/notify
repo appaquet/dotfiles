@@ -4,7 +4,7 @@ MESSAGE="${1:-"<no message>"}"
 
 HOSTNAME=$(uname -n | tr '[:upper:]' '[:lower:] | sed 's/\.local//'')
 if [[ "${HOSTNAME}" == "mbpapp"* ]]; then
-  terminal-notifier --message "${MESSAGE}"
+  terminal-notifier -message "${MESSAGE}"
 else
-  ssh mbpapp.n3x.net terminal-notifier --message "${MESSAGE}"
+  ssh mbpapp.n3x.net notify "${MESSAGE}"
 fi

@@ -60,6 +60,9 @@
       {
         name = "bettertouchtool";
       }
+      {
+        name = "steermouse";
+      }
 
       {
         name = "signal";
@@ -106,6 +109,9 @@
       }
       {
         name = "utm";
+      }
+      {
+        name = "terminal-notifier";
       }
     ];
   };
