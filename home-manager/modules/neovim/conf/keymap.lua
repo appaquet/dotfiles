@@ -35,6 +35,7 @@ vim.cmd([[
 -- Misc
 vim.keymap.set("n", "<Leader>rf", ":w<CR>:!./%<CR>", { silent = true, desc = "Execute current file" })
 vim.keymap.set("v", "<Leader>rl", ":w !sh<CR>", { silent = true, desc = "Execute selected lines" })
+vim.keymap.set("n", "<C-_>", ":nohlsearch<CR>", { silent = true, desc = "Clear search highlight" }) -- C-/
 
 -- Toggling
 local function toggle_wrap()

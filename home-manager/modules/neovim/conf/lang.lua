@@ -80,9 +80,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		vim.keymap.set("n", "gt", vim.lsp.buf.type_definition, kopts(ev.buf, "LSP: Go to type definition"))
 		vim.keymap.set("n", "gr", fzf.lsp_references, kopts(ev.buf, "LSP: Go to references"))
 
-		-- Info (more in treesietter.lua)
-		vim.keymap.set("n", "<leader>li", vim.lsp.buf.hover, kopts(ev.buf, "LSP: Displays hover information about a symbol"))
-		vim.keymap.set("n", "<leader>ls", vim.lsp.buf.signature_help, kopts(ev.buf, "LSP: Show signature help"))
+		-- Info (more in treesitter.lua)
+		vim.keymap.set("n", "<leader>lii", vim.lsp.buf.hover, kopts(ev.buf, "LSP: Displays hover information about a symbol"))
+		vim.keymap.set("n", "<leader>lis", vim.lsp.buf.signature_help, kopts(ev.buf, "LSP: Show signature help"))
 
 		-- List
 		vim.keymap.set("n", "<leader>lli", fzf.lsp_implementations, kopts(ev.buf, "LSP: List all implementations"))

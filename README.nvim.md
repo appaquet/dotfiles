@@ -9,7 +9,7 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>qs` to clear auto-session and quit neovim
 
 ## Buffers (b)
-* `<leader>b 1 through 9` to switch to buffer 1 through 9
+* `<leader> 1 through 9` to switch to buffer 1 through 9
 * `]b` to switch to next buffer
 * `[b` to switch to previous buffer
 * `<leader>b<tab>` to switch to last buffer
@@ -77,8 +77,8 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>lgt` or `gt` LSP: Go to type definition
 * `<leader>lli` LSP: List all implementations
 * `<leader>llr` or `gr` LSP: List references
-* `<leader>li` LSP: Displays hover information about a symbol
-* `<leader>ls` LSP: Show signature help
+* `<leader>lii` LSP: Displays hover information about a symbol
+* `<leader>lis` LSP: Show signature help
 * `<leader>lif` LSP: Peek function definition
 * `<leader>lic` LSP: Peek class definition
 * `<leader>Ti` LSP: Toggle inlay line hints
@@ -207,6 +207,7 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>yp` to paste from clipboard using [bin/pbpaste](bin/pbpaste) util
 * `<leader>Tw` to toggle line wrap
 * `zz` to center cursor in the middle of the screen
+* `<ctrl-/>` to clear search highlights
 
 ## Spelling
 * `<leader>Ts` to toggle spell checking
