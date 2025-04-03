@@ -2,9 +2,11 @@
 
 MESSAGE="${1:-"<no message>"}"
 
+TM="/opt/homebrew/bin/terminal-notifier"
+
 HOSTNAME=$(uname -n | tr '[:upper:]' '[:lower:] | sed 's/\.local//'')
 if [[ "${HOSTNAME}" == "mbpapp"* ]]; then
-  terminal-notifier -message "${MESSAGE}"
+  $TM -message "${MESSAGE}"
 else
-  ssh mbpapp.n3x.net notify "${MESSAGE}"
+  ssh mbpapp.n3x.net "$TM -message \"${MESSAGE}\""
 fi
