@@ -202,6 +202,7 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>r` to execute current buffer in a shell (normal mode)
 * `<leader>r` to execute current visual selection in a shell (visual mode)
 * `<leader>Tm` to toggle mouse support (useful to allow select + copy)
+* `<leader>Tn` to toggle line numbers
 * `<leader>yy` to yank to clipboard using [bin/pbcopy](bin/pbcopy) util
 * `<leader>yp` to paste from clipboard using [bin/pbpaste](bin/pbpaste) util
 * `<leader>Tw` to toggle line wrap

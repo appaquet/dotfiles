@@ -176,7 +176,6 @@ in
 
     extraConfig = (
       builtins.concatStringsSep "\n" [
-        (includeVimFile "base.vim")
         (includeLuaFile "base.lua")
         includeSecrets
         (includeLuaFile "keymap.lua")

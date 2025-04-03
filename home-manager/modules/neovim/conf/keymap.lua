@@ -59,6 +59,17 @@ vim.keymap.set("n", "<Leader>Tm", function()
 	end
 end, { silent = true, desc = "Toggle mouse support" })
 
+local function toggle_numbers()
+	if vim.wo.relativenumber then
+		vim.wo.relativenumber = false
+		vim.wo.number = false
+	else
+		vim.wo.relativenumber = true
+		vim.wo.number = true
+	end
+end
+vim.keymap.set("n", "<Leader>Tn", toggle_numbers, { silent = true, desc = "Toggle line numbers" })
+
 -- Spellcheck
 vim.keymap.set("n", "<Leader>Ts", ":set spell!<CR>", { silent = true, desc = "Toggle spellcheck" })
 
