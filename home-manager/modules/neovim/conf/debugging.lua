@@ -28,23 +28,25 @@ dapui.setup({
 			position = "bottom",
 			size = 15,
 			elements = {
-				{ id = "scopes", size = 0.5 },
-				{ id = "watches", size = 0.5 },
+				{ id = "repl", size = 0.6 },
+				{ id = "scopes", size = 0.4 },
 			},
 		},
 		{
 			position = "right",
 			size = 50,
 			elements = {
-				{ id = "repl", size = 0.1 },
-				{ id = "breakpoints", size = 0.5 },
-				{ id = "stacks", size = 0.4 },
+				{ id = "stacks", size = 0.6 },
+				{ id = "watches", size = 0.2 },
+				{ id = "breakpoints", size = 0.2 },
 			},
 		},
 	},
 	expand_lines = false,
 })
+
 vim.keymap.set("n", "<leader>du", dapui.toggle, { desc = "DAP: Toggle UI" })
+
 dap.listeners.before.attach.dapui_config = function()
 	dapui.open()
 end
