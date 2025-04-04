@@ -4,6 +4,9 @@ require("which-key").add({
 
 -- nvim-dap
 -- https://github.com/mfussenegger/nvim-dap
+--
+-- To setup, just create a `.vscode/launch.json` file in your project (making sure it's valid JSON
+-- without trailing commas)
 local dap = require("dap")
 vim.keymap.set("n", "<leader>db", dap.toggle_breakpoint, { desc = "DAP: Toggle breakpoint" })
 vim.keymap.set("n", "<leader>dc", dap.continue, { desc = "DAP: Start/Continue" })
@@ -60,6 +63,12 @@ dap.listeners.before.event_exited.dapui_config = function()
 	dapui.close()
 end
 
--- Per language setup
+-- Go
 -- https://github.com/leoluz/nvim-dap-go
 require("dap-go").setup()
+
+-- Python
+-- https://github.com/mfussenegger/nvim-dap-python
+-- Add this to the .nvim.lua (get into a poetry shell, then which python)
+-- Make sure to install `debugpy` (add as a dev dependency in pyproject.toml)
+-- require("dap-python").setup('/home/appaquet/.cache/pypoetry/virtualenvs/exotwo-qXN8T3xg-py3.11/bin/python')
