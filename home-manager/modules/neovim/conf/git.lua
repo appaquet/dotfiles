@@ -44,8 +44,8 @@ require("gitsigns").setup({
 	current_line_blame = true,
 })
 
-vim.keymap.set("n", "<Leader>gu", ":Gitsigns reset_hunk<CR>", { silent = true, desc = "Git: revert hunk" })
-vim.keymap.set("n", "<Leader>ga", ":Gitsigns stage_hunk<CR>", { silent = true, desc = "Git: stage hunk" })
+vim.keymap.set({ "n", "v" }, "<Leader>gu", ":Gitsigns reset_hunk<CR>", { silent = true, desc = "Git: revert hunk" })
+vim.keymap.set({ "n", "v" }, "<Leader>ga", ":Gitsigns stage_hunk<CR>", { silent = true, desc = "Git: stage hunk" })
 vim.keymap.set("n", "]g", ":Gitsigns nav_hunk next<CR>", { silent = true, desc = "Git: next hunk" })
 vim.keymap.set("n", "[g", ":Gitsigns nav_hunk prev<CR>", { silent = true, desc = "Git: previous hunk" })
 vim.keymap.set("n", "<Leader>gb", ":Gitsigns blame<CR>", { silent = true, desc = "Git: blame pane" })

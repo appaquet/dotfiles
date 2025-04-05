@@ -92,6 +92,11 @@ local function debug_last()
 	Neotest.run.run_last({ strategy = "dap" })
 end
 
+local function close_all()
+	Neotest.output_panel.close()
+	Neotest.summary.close()
+end
+
 vim.keymap.set("n", "<leader>tc", run_nearest, { desc = "Test: Run nearest / under cursor" })
 vim.keymap.set("n", "<leader>tdc", debug_nearest, { desc = "Test: Debug nearest" })
 vim.keymap.set("n", "<leader>tf", run_file, { desc = "Test: Run file" })
@@ -106,4 +111,4 @@ vim.keymap.set("n", "<leader>ts", Neotest.summary.toggle, { desc = "Test: Toggle
 
 vim.keymap.set("n", "<leader>to", Neotest.output_panel.toggle, { desc = "Test: Toggle output panel" })
 vim.keymap.set("n", "<leader>tk", Neotest.output_panel.clear, { desc = "Test: Clear output panel" })
-vim.keymap.set("n", "<leader>tq", Neotest.output_panel.close, { desc = "Test: Close output panel" })
+vim.keymap.set("n", "<leader>tq", close_all, { desc = "Test: Close output & side panel" })

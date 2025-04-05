@@ -13,6 +13,10 @@ vim.opt.formatoptions:remove("t") -- don't auto-wrap text (but comments will sti
 
 vim.opt.undofile = true -- Persists the undo across sessions
 
+-- Lower cursor hold time (for highlighting)
+-- Should not be too low since it writes to swap with this delay as well
+vim.opt.updatetime = 500 -- time to wait for a write to disk
+
 -- Line numbers (see keymap.lua for toggling)
 vim.opt.relativenumber = true -- relative line numbers
 vim.opt.number = true -- show current absolute number instead of 0

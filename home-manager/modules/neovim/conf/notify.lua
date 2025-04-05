@@ -6,6 +6,10 @@ notify.setup({})
 ---@diagnostic disable-next-line: inject-field
 vim.notify = notify
 
+vim.keymap.set("n", "<leader>qn", function()
+	require("notify").dismiss()
+end, { desc = "Dismiss all notifications" })
+
 -- lsp-notify
 -- Show LSP related messages and progress
 -- https://github.com/brianhuster/nvim-lsp-notify
