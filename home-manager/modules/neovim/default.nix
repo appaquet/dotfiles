@@ -155,7 +155,7 @@ in
         nvim-treesitter-textobjects # provider object manipulation
       ])
       ++ (with unstablePkgs.vimPlugins; [
-        # !Warning! Make sure that any plugin loaded here aren't loading treesitters. We can't have
+        # !Warning! Make sure that any plugin loaded here isn't loading treesitters. We can't have
         # it from both stable and unstable ( https://github.com/NixOS/nixpkgs/issues/282927 )
 
         (avante-nvim.overrideAttrs (_: {
