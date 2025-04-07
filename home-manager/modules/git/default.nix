@@ -65,6 +65,7 @@
         git symbolic-ref --short HEAD
       '';
 
+      # if this fails, run `git remote set-head origin -a`
       git-main-branch = ''
         git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'
       '';

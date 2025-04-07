@@ -34,6 +34,7 @@ keymaps, but also default/built-ins that I tend to forget.
 * `ctrl-w w` to switch between panes
 * `ctrl-w r` or `ctrl-w R` to rotate panes
 * `ctrl-w c` or `ctrl-w o` close current split OR others.
+* `ctrl-w z` to toggle zen mode
 
 ## Fzf (f)
 * `<ctrl-p>` or `<leader>ff` fuzzy finding file names
@@ -206,6 +207,7 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>yy` to yank to clipboard using [bin/pbcopy](bin/pbcopy) util
 * `<leader>yp` to paste from clipboard using [bin/pbpaste](bin/pbpaste) util
 * `<leader>Tw` to toggle line wrap
+* `<leader>Tt` to toggle theme between light and dark
 * `zz` to center cursor in the middle of the screen
 * `<ctrl-/>` to clear search highlights
 

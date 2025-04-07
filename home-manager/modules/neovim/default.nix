@@ -65,6 +65,7 @@ in
         lualine-nvim # https://github.com/nvim-lualine/lualine.nvim
         bufferline-nvim # https://github.com/akinsho/bufferline.nvim
         auto-session # automatically restore last session
+        zen-mode-nvim # zen mode
 
         # Tools
         fzf-lua
@@ -180,10 +181,10 @@ in
         (includeLuaFile "base.lua")
         includeSecrets
         (includeLuaFile "keymap.lua")
+        (includeLuaFile "theme.lua")
         (includeLuaFile "buffers.lua")
         (includeLuaFile "statusline.lua")
         (includeLuaFile "tree.lua")
-        (includeLuaFile "theme.lua")
         (includeLuaFile "sessions.lua")
         (includeLuaFile "notify.lua")
         (includeLuaFile "fzf.lua")

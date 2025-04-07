@@ -23,32 +23,45 @@
           overlays = [ ];
         };
 
-        python3 = (
+        python3_override = (
           (pkgs.python311.withPackages (
             p: with p; [
-              #tensorflow
-              #grpcio-tools
-              #click
-              #keras
-              #mypy-protobuf
+              numpy
+              psycopg
+              pandas
             ]
           )).override
-            ({ ignoreCollisions = true; })
+            {
+              ignoreCollisions = true;
+            }
         );
       in
       {
         devShells = {
-          default = pkgs.mkShell rec {
+          default = pkgs.mkShell {
             name = "exotwo";
 
             buildInputs = with pkgs; [
               pyright
+              stdenv.cc.cc.lib
+              stdenv.cc.cc
             ];
 
             nativeBuildInputs = with pkgs; [
-              python3
+              python3_override
               (poetry.override { python3 = python311; })
             ];
+
+            shellHook = ''
+              # Postgres drivers need stdc++
+              export LD_LIBRARY_PATH="${
+                pkgs.lib.makeLibraryPath [
+                  pkgs.stdenv.cc.cc
+                  pkgs.stdenv.cc.cc.lib
+                ]
+              }"
+            '';
+
           };
         };
       }
