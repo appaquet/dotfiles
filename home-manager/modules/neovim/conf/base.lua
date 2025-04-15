@@ -6,7 +6,7 @@ vim.opt.smartcase = true -- case sensitive when uc present
 vim.opt.ignorecase = true -- case insensitive search
 
 vim.opt.autoindent = true -- indent at the same level of the previous line
-vim.opt.timeoutlen = 500 -- time to wait for a key code sequence to complete
+vim.opt.timeoutlen = 505 -- time to wait for a key code sequence to complete, need to be >500 since whichkey detects recursion with 500ms
 
 vim.opt.textwidth = 100 -- max line length, because we aren't on a mainframe anymore
 vim.opt.formatoptions:remove("t") -- don't auto-wrap text (but comments will still auto-wrap (+c))

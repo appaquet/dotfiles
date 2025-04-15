@@ -64,6 +64,12 @@ in
       # See https://github.com/tmux/tmux/issues/4162
       set -gu default-command
       set -g default-shell "${pkgs.fish}/bin/fish"
+
+      # Prefixes ctrl-a and ctrl-space
+      set-option -g prefix C-a
+      bind C-a send-prefix
+      set-option -g prefix2 C-Space
+      bind C-Space send-prefix
     '';
   };
 }
