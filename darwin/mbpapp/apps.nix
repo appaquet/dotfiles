@@ -34,6 +34,7 @@
       "codec2"
       "zstd"
       "pkg-config"
+      "terminal-notifier"
     ];
 
     casks = [
@@ -109,9 +110,6 @@
       }
       {
         name = "utm";
-      }
-      {
-        name = "terminal-notifier";
       }
     ];
   };

@@ -1,6 +1,6 @@
-vim.opt.termguicolors = true -- Enable 24-bit RGB true colors
-vim.o.background = "dark" -- Defaults to dark theme
 vim.g.base16colorspace = 256 -- Access colors present in 256 colorspace
+vim.o.termguicolors = true -- Enable 24-bit RGB true colors
+vim.o.background = "dark" -- Defaults to dark theme
 
 -- Also need to switch in lualine config (layout.lua)
 -- See https://github.com/catppuccin/nvim#configuration
