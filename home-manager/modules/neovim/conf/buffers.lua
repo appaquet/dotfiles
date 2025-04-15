@@ -6,7 +6,8 @@ require("which-key").add({
 
 -- bufferline
 -- https://github.com/akinsho/bufferline.nvim
-require("bufferline").setup({
+local bufferline = require("bufferline")
+bufferline.setup({
 	options = {
 		show_duplicate_prefix = true,
 
@@ -29,9 +30,31 @@ require("bufferline").setup({
 
 -- Buffer deletion
 -- https://github.com/famiu/bufdelete.nvim
-require("bufdel").setup({
-	quit = false, -- don't quit on last close
-})
+local minibufremove = require("mini.bufremove")
+minibufremove.setup({})
+
+local function bufdelcurrent()
+	minibufremove.delete()
+end
+
+local function bufdelothers()
+	local current = vim.api.nvim_get_current_buf()
+	local bufs = vim.api.nvim_list_bufs()
+	for _, buf in ipairs(bufs) do
+		if buf ~= current and vim.api.nvim_buf_is_loaded(buf) then
+			minibufremove.delete(buf)
+		end
+	end
+end
+
+local function bufdelall()
+	local bufs = vim.api.nvim_list_bufs()
+	for _, buf in ipairs(bufs) do
+		if vim.api.nvim_buf_is_loaded(buf) then
+			minibufremove.delete(buf)
+		end
+	end
+end
 
 -- Buffer management (b)
 vim.keymap.set("n", "<Leader>1", ":BufferLineGoToBuffer 1<CR>", { silent = true, desc = "Buf: Switch 1" })
@@ -46,6 +69,7 @@ vim.keymap.set("n", "<Leader>9", ":BufferLineGoToBuffer 9<CR>", { silent = true,
 vim.keymap.set("n", "]b", ":BufferLineCycleNext<CR>", { silent = true, desc = "Buf: Next" })
 vim.keymap.set("n", "[b", ":BufferLineCyclePrev<CR>", { silent = true, desc = "Buf: Previous" })
 vim.keymap.set("n", "<Leader>b<Tab>", ":b#<CR>", { silent = true, desc = "Buf: Switch to last buffer" })
+vim.keymap.set("n", "<Leader>bg", ":BufferLinePick<CR>", { silent = true, desc = "Buf: Go to pick" })
 
 vim.keymap.set("n", "<Leader>bl", ":BufferLineMoveNext<CR>", { silent = true, desc = "Buf: Move right" })
 vim.keymap.set("n", "<Leader>bh", ":BufferLineMovePrev<CR>", { silent = true, desc = "Buf: Move left" })
@@ -53,10 +77,10 @@ vim.keymap.set("n", "<Leader>bh", ":BufferLineMovePrev<CR>", { silent = true, de
 vim.keymap.set("n", "<Leader>bc", ":enew<CR>", { silent = true, desc = "Buf: New" })
 vim.keymap.set("n", "<Leader>bp", ":BufferLineTogglePin<CR>", { silent = true, desc = "Buf: Toggle pin" })
 
-vim.keymap.set("n", "<Leader>bq", ":BufDel<CR>", { silent = true, desc = "Buf: Close current" })
-vim.keymap.set("n", "<Leader>bqq", ":BufDel<CR>", { silent = true, desc = "Buf: Close current" })
-vim.keymap.set("n", "<Leader>bqo", ":BufDelOthers<CR>", { silent = true, desc = "Buf: Close others" })
-vim.keymap.set("n", "<Leader>bqa", ":BufDelAll<CR>", { silent = true, desc = "Buf: Close all" })
+vim.keymap.set("n", "<Leader>bq", bufdelcurrent, { silent = true, desc = "Buf: Close current" })
+vim.keymap.set("n", "<Leader>bqq", bufdelcurrent, { silent = true, desc = "Buf: Close current" })
+vim.keymap.set("n", "<Leader>bqo", bufdelothers, { silent = true, desc = "Buf: Close others" })
+vim.keymap.set("n", "<Leader>bqa", bufdelall, { silent = true, desc = "Buf: Close all" })
 vim.keymap.set("n", "<Leader>bqh", ":BufferLineCloseLeft<CR>", { silent = true, desc = "Buf: Close at left" })
 vim.keymap.set("n", "<Leader>bql", ":BufferLineCloseRight<CR>", { silent = true, desc = "Buf: Close at right" })
 
@@ -76,7 +100,14 @@ vim.keymap.set("n", "<Leader>n4", ":tabfirst<CR>:tabnext<CR>:tabnext<CR>:tabnext
 vim.keymap.set("n", "<Leader>n5", ":tabfirst<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>", { silent = true, desc = "Tab: Switch to 5" })
 vim.keymap.set("n", "<Leader>n6", ":tabfirst<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>:tabnext<CR>", { silent = true, desc = "Tab: Switch to 6" })
 vim.keymap.set("n", "<Leader>nq", ":tabclose<CR>", { silent = true, desc = "Tab: Close current" })
--- TODO: add rename (`BufferLineTabRename`), but need a way to input text
+
+local function tabrename()
+	local tabname = vim.fn.input("Tab name: ")
+	if tabname ~= "" then
+		vim.cmd("BufferLineTabRename " .. tabname)
+	end
+end
+vim.keymap.set("n", "<Leader>nt", tabrename, { silent = true, desc = "Tab: Rename" })
 
 -- Windows
 vim.keymap.set("n", "<Leader>qq", ":q<CR>", { silent = true, desc = "Quit current split/window" })

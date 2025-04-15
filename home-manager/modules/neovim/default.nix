@@ -69,11 +69,11 @@ in
 
         # Tools
         fzf-lua
-        nvim-bufdel # :BufDel, :BufDelOthers (properly close buffers)
         delimitMate # auto close quotes, parens, etc
         which-key-nvim # show keymap hints
         todo-comments-nvim # highlight TODO, FIXME, etc
         multicursors-nvim
+        mini-nvim # ton of modules (bufremove, etc.)
 
         # Notifications
         nvim-notify

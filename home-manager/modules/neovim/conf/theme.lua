@@ -12,7 +12,7 @@ require("catppuccin").setup({
 	},
 	dim_inactive = {
 		enabled = true, -- dims the background color of inactive window
-		percentage = 0.10, -- percentage of the shade to apply to the inactive window
+		percentage = 0.1, -- percentage of the shade to apply to the inactive window
 	},
 	color_overrides = {
 		mocha = {
