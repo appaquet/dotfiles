@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 
 let
   # See https://stackoverflow.com/questions/53658303/fetchfromgithub-filter-down-and-use-as-environment-etc-file-source
@@ -38,8 +38,9 @@ in
       bind -r C-y swap-window -t -1 \; select-window -t -1  # swap current window with the previous one
       bind -r C-u swap-window -t +1 \; select-window -t +1  # swap current window with the next one
 
-      # Ctrl-space to toggle terminal in 2 split panes with editor on top
-      bind-key C-Space run-shell ' \
+      # Space to toggle terminal in 2 split panes with editor on top
+      unbind Space
+      bind-key Space run-shell ' \
         pane_title=$(tmux display-message -p "#{pane_title}"); \
         in_vim=$(echo $pane_title | grep -c "vim"); \
         is_zoomed=$(tmux display-message -p "#{window_zoomed_flag}"); \
@@ -70,6 +71,9 @@ in
       bind C-a send-prefix
       set-option -g prefix2 C-Space
       bind C-Space send-prefix
+
+      # Rebind r to reload config
+      bind r source-file ${config.home.homeDirectory}"/.config/tmux/tmux.conf"
     '';
   };
 }

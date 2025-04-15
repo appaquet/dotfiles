@@ -139,9 +139,8 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>tl` to run last
 * `<leader>tdl` to debug last
 * `<leader>tu` to stop test
-* `<leader>to` to toggle output
+* `<leader>to` to output pane
 * `<leader>tq` to close output
-* `<leader>tk` to clear output
 
 * `<leader>ts` to toggle side / summary panel, with keymaps:
   * `r` to run a test

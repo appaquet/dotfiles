@@ -15,6 +15,7 @@ fzf.setup({
 	},
 	oldfiles = {
 		cwd_only = true,
+		include_current_session = true,
 	},
 })
 

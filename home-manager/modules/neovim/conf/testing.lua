@@ -20,6 +20,10 @@ Neotest.setup({
 		require("neotest-python"),
 	},
 
+	output = {
+		output_on_run = true,
+	},
+
 	-- Notify on completion
 	-- https://github.com/nvim-neotest/neotest/issues/218
 	consumers = {
@@ -58,6 +62,7 @@ local function run_nearest()
 end
 
 local function debug_nearest()
+	Neotest.summary.open()
 	Neotest.run.run({ strategy = "dap" })
 end
 
@@ -89,11 +94,15 @@ local function run_last()
 end
 
 local function debug_last()
+	Neotest.summary.open()
 	Neotest.run.run_last({ strategy = "dap" })
 end
 
-local function close_all()
-	Neotest.output_panel.close()
+local function open_output()
+	Neotest.output.open({ enter = true })
+end
+
+local function close()
 	Neotest.summary.close()
 end
 
@@ -109,6 +118,5 @@ vim.keymap.set("n", "<leader>tu", Neotest.run.stop, { desc = "Test: Stop" })
 
 vim.keymap.set("n", "<leader>ts", Neotest.summary.toggle, { desc = "Test: Toggle summary / side panel" })
 
-vim.keymap.set("n", "<leader>to", Neotest.output_panel.toggle, { desc = "Test: Toggle output panel" })
-vim.keymap.set("n", "<leader>tk", Neotest.output_panel.clear, { desc = "Test: Clear output panel" })
-vim.keymap.set("n", "<leader>tq", close_all, { desc = "Test: Close output & side panel" })
+vim.keymap.set("n", "<leader>to", open_output, { desc = "Test: Toggle output" })
+vim.keymap.set("n", "<leader>tq", close, { desc = "Test: Close output & side panel" })

@@ -95,7 +95,7 @@ in
         neotest
         neotest-golang
         neotest-python
-        #rustaceanvim (unstable)
+        rustaceanvim
         conform-nvim # formatting
 
         # Autocomplete (w/ LSP)
@@ -172,7 +172,6 @@ in
         }))
 
         go-nvim
-        rustaceanvim
       ])
       ++ [ nvim-lsp-notify ];
 

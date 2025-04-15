@@ -42,7 +42,7 @@ local function bufdelothers()
 	local current = vim.api.nvim_get_current_buf()
 	local bufs = vim.api.nvim_list_bufs()
 	for _, buf in ipairs(bufs) do
-		if buf ~= current and vim.api.nvim_buf_is_loaded(buf) then
+		if buf ~= current then
 			minibufremove.delete(buf)
 		end
 	end
@@ -51,9 +51,7 @@ end
 local function bufdelall()
 	local bufs = vim.api.nvim_list_bufs()
 	for _, buf in ipairs(bufs) do
-		if vim.api.nvim_buf_is_loaded(buf) then
-			minibufremove.delete(buf)
-		end
+		minibufremove.delete(buf)
 	end
 end
 
