@@ -60,10 +60,6 @@ in
         fi
       '
 
-      # Fixes color in nvim ( https://gist.github.com/andersevenrud/015e61af2fd264371032763d4ed965b6 )
-      set -g default-terminal "tmux-256color"
-      set -ag terminal-overrides ",xterm-256color:RGB"
-
       # Fixes issue on macOS where shell in tmux is not right
       # See https://github.com/tmux/tmux/issues/4162
       set -gu default-command
