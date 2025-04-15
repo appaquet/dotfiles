@@ -10,6 +10,7 @@ local bufferline = require("bufferline")
 bufferline.setup({
 	options = {
 		show_duplicate_prefix = true,
+		numbers = "ordinal", -- add ordinal numbers to buffers
 
 		diagnostics = "nvim_lsp",
 		diagnostics_indicator = function(count, level)
