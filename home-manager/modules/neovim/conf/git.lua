@@ -72,7 +72,9 @@ vim.keymap.set("n", "<Leader>ggw", switch_gutter_base_default, { silent = true, 
 
 -- Octo.nvim
 -- https://github.com/pwntester/octo.nvim
-require("octo").setup()
+require("octo").setup({
+	picker = "fzf-lua",
+})
 vim.keymap.set("n", "<Leader>ghr", ":Octo review<CR>", { silent = true, desc = "Git: github pr review" })
 
 -- Gitlinker

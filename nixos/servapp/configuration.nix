@@ -17,7 +17,7 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernel.sysctl = {
-    "kernel.panic" = 60;  # Restart delay after panic
+    "kernel.panic" = 60; # Restart delay after panic
   };
 
   networking.hostName = "servapp";

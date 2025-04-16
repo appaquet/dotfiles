@@ -54,8 +54,10 @@ in
     viAlias = true;
     vimAlias = true;
 
+    package = unstablePkgs.neovim-unwrapped;
+
     plugins =
-      (with pkgs.vimPlugins; [
+      (with unstablePkgs.vimPlugins; [
         # Theme
         catppuccin-nvim
         nvim-web-devicons
@@ -91,7 +93,7 @@ in
 
         # LSP / Languages
         nvim-lspconfig # https://github.com/neovim/nvim-lspconfig
-        #go-nvim (unstable)
+        go-nvim
         neotest
         neotest-golang
         neotest-python
@@ -112,7 +114,7 @@ in
         friendly-snippets # easy load from vscode, languages, etc.
 
         # AI
-        #avante-nvim # (unstable)
+        avante-nvim
         copilot-lua # use `Copilot auth` to login
         render-markdown-nvim # optional dep
 
@@ -155,24 +157,13 @@ in
         ]))
         nvim-treesitter-textobjects # provider object manipulation
       ])
-      ++ (with unstablePkgs.vimPlugins; [
-        # !Warning! Make sure that any plugin loaded here isn't loading treesitters. We can't have
-        # it from both stable and unstable ( https://github.com/NixOS/nixpkgs/issues/282927 )
-
-        (avante-nvim.overrideAttrs (_: {
-          # Overriding dependencies to prevent treesitter from being loaded from unstable
-          # https://github.com/NixOS/nixpkgs/blob/913cc2b4558595a4aafaf87a18935b34f79d5429/pkgs/applications/editors/vim/plugins/non-generated/avante-nvim/default.nix#L54
-          dependencies = [
-            dressing-nvim
-            img-clip-nvim
-            nui-nvim
-            #nvim-treesitter # yanked
-            plenary-nvim
-          ];
-        }))
-
-        go-nvim
-      ])
+      # ++ (with unstablePkgs.vimPlugins; [
+      # !Warning! Make sure that any plugin loaded here isn't loading treesitters. We can't have
+      #])
+      #++ (with unstablePkgs.vimPlugins; [
+      # !Warning! Make sure that any plugin loaded here aren't loading treesitters. We can't have
+      # it from both stable and unstable ( https://github.com/NixOS/nixpkgs/issues/282927 )
+      # ])
       ++ [ nvim-lsp-notify ];
 
     extraConfig = (

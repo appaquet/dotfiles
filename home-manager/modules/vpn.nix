@@ -1,10 +1,18 @@
-{ pkgs, secrets, config, ... }:
+{
+  pkgs,
+  secrets,
+  config,
+  ...
+}:
 
 let
   vpn-shell = pkgs.writeShellApplication {
     name = "vpn-shell";
 
-    bashOptions = [ "errexit" "nounset" ]; # by default it adds pipefail, which is a pain
+    bashOptions = [
+      "errexit"
+      "nounset"
+    ]; # by default it adds pipefail, which is a pain
 
     runtimeInputs = with pkgs; [
       docker
