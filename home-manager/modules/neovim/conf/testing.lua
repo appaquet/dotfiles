@@ -24,6 +24,11 @@ Neotest.setup({
 		output_on_run = true,
 	},
 
+	quickfix = {
+		enabled = false, -- annoying since it opens quickfix at the bottom of the sidebar
+		open = false,
+	},
+
 	-- Notify on completion
 	-- https://github.com/nvim-neotest/neotest/issues/218
 	consumers = {

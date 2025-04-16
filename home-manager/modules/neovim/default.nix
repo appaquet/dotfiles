@@ -93,7 +93,7 @@ in
 
         # LSP / Languages
         nvim-lspconfig # https://github.com/neovim/nvim-lspconfig
-        #go-nvim (unstable)
+        go-nvim
         neotest
         neotest-golang
         neotest-python
@@ -114,7 +114,7 @@ in
         friendly-snippets # easy load from vscode, languages, etc.
 
         # AI
-        #avante-nvim # (unstable)
+        avante-nvim
         copilot-lua # use `Copilot auth` to login
         render-markdown-nvim # optional dep
 
