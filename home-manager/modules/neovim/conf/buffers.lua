@@ -30,7 +30,6 @@ bufferline.setup({
 })
 
 -- Buffer deletion
--- https://github.com/famiu/bufdelete.nvim
 local minibufremove = require("mini.bufremove")
 minibufremove.setup({})
 
@@ -83,10 +82,14 @@ vim.keymap.set("n", "<Leader>bqa", bufdelall, { silent = true, desc = "Buf: Clos
 vim.keymap.set("n", "<Leader>bqh", ":BufferLineCloseLeft<CR>", { silent = true, desc = "Buf: Close at left" })
 vim.keymap.set("n", "<Leader>bql", ":BufferLineCloseRight<CR>", { silent = true, desc = "Buf: Close at right" })
 
+vim.keymap.set("n", "<Leader>bu", ":e!<CR>", { silent = true, desc = "Buf: Undo changes (reload from disk)" })
+
 vim.keymap.set("n", "<Leader>w", ":w<CR>", { silent = true, desc = "Buf: Save" })
 vim.keymap.set("n", "<Leader>ww", ":w<CR>", { silent = true, desc = "Buf: Save" })
 vim.keymap.set("n", "<Leader>wa", ":wa<CR>", { silent = true, desc = "Buf: Save all" })
 vim.keymap.set("n", "<C-s>", ":w<CR>", { silent = true, desc = "Buf: Save" })
+
+vim.keymap.set("n", "<Leader>bm", ":MessagesBuffer<CR>", { silent = true, desc = "Buf: Create buffer from messages" })
 
 -- Tab management (n)
 vim.keymap.set("n", "<Leader>nc", ":tabnew<CR>", { silent = true, desc = "Tab: New" })
@@ -107,6 +110,7 @@ local function tabrename()
 	end
 end
 vim.keymap.set("n", "<Leader>nt", tabrename, { silent = true, desc = "Tab: Rename" })
+vim.keymap.set("n", "<Leader>n<Tab>", "g<Tab>", { silent = true, desc = "Tab: Switch to last tab" })
 
 -- Windows
 vim.keymap.set("n", "<Leader>qq", ":q<CR>", { silent = true, desc = "Quit current split/window" })

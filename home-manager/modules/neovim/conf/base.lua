@@ -50,3 +50,17 @@ function Try(description, fn)
 		vim.notify("Failed to execute " .. description .. ": " .. result, vim.log.levels.ERROR)
 	end
 end
+
+-- Sends messages to a new buffer
+function MessagesBuffer()
+	vim.cmd([[
+    redir => output
+    silent messages
+    redir END
+    new
+    setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile
+    put=output
+    1delete
+  ]])
+end
+vim.api.nvim_create_user_command("MessagesBuffer", MessagesBuffer, {})

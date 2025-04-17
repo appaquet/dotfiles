@@ -61,6 +61,8 @@ require("avante").setup({
 		auto_suggestions = false, -- Experimental stage
 	},
 
+	hints = { enabled = false }, -- Sometimes get messed up by refact
+
 	web_search_engine = {
 		provider = "tavily",
 	},

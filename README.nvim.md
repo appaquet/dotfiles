@@ -16,6 +16,7 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>bh` or `<leader>bl` to move tab to the left/right
 * `<leader>bc` to open a new empty buffer
 * `<leader>bp` to pin a buffer (stays left)
+* `<leader>bu` to undo changes (reload from disk)
 * `<leader>bq` or `<leader>bqq` to close the current buffer by trying not to mess up the layout
 * `<leader>bqo` to close all buffers except the current one
 * `<leader>bqa` to close all buffers
@@ -29,6 +30,7 @@ keymaps, but also default/built-ins that I tend to forget.
 * `[n` to switch to previous tab
 * `<leader>n1 through 5` to switch to tab 1 through 5
 * `<leader>nq` to close current tab
+* `<leader>n<tab>` to switch to last tab
 
 ## Windows
 * `ctrl-w w` to switch between panes

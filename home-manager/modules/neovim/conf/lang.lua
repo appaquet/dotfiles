@@ -131,6 +131,10 @@ cmp.setup({
 			behavior = cmp.ConfirmBehavior.Insert,
 			select = false, -- don't select unless selected
 		}),
+		["<S-CR>"] = cmp.mapping.confirm({
+			behavior = cmp.ConfirmBehavior.Replace,
+			select = false, -- don't select unless selected
+		}),
 
 		-- Documentation pane navigation
 		["<C-u>"] = cmp.mapping.scroll_docs(-4), -- Up
