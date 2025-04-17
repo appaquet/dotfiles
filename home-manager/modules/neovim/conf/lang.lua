@@ -98,6 +98,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		-- Actions
 		vim.keymap.set("n", "<leader>lr", vim.lsp.buf.rename, kopts(ev.buf, "LSP: Rename"))
 		vim.keymap.set({ "n", "v" }, "<leader>lca", vim.lsp.buf.code_action, kopts(ev.buf, "LSP: Code action"))
+		vim.keymap.set({ "i", "v" }, "<C-l>", vim.lsp.buf.code_action, kopts(ev.buf, "LSP: Code action"))
 	end,
 })
 

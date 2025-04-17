@@ -5,6 +5,7 @@ require("which-key").add({
 -- Neotest
 -- https://github.com/nvim-neotest/neotest
 local Neotest = require("neotest")
+local Summary_was_closed = false
 Neotest.setup({
 	adapters = {
 		require("rustaceanvim.neotest"),
@@ -51,6 +52,10 @@ Neotest.setup({
 
 				if fail_count > 0 then
 					vim.notify(string.format("%d test(s) failed", fail_count), vim.log.levels.ERROR, { title = "Neotest" })
+				else
+					if not summary_was_opened then
+						Neotest.summary.close()
+					end
 				end
 				if success_count > 0 then
 					vim.notify(string.format("%d test(s) passed", success_count), vim.log.levels.INFO, { title = "Neotest" })
@@ -61,45 +66,60 @@ Neotest.setup({
 	},
 })
 
+local function is_summary_opened()
+	for _, win in ipairs(vim.api.nvim_list_wins()) do
+		local buf = vim.api.nvim_win_get_buf(win)
+		local ft = vim.bo[buf].filetype
+		if ft == "neotest-summary" then
+			return true
+		end
+	end
+	return false
+end
+
 local function run_nearest()
+	summary_was_opened = is_summary_opened()
 	Neotest.summary.open()
 	Neotest.run.run()
 end
 
 local function debug_nearest()
-	Neotest.summary.open()
+	Neotest.summary.close() -- it gets in the way
 	Neotest.run.run({ strategy = "dap" })
 end
 
 local function run_file()
+	summary_was_opened = is_summary_opened()
 	Neotest.summary.open()
 	Neotest.run.run(vim.fn.expand("%"))
 end
 
 local function debug_file()
-	Neotest.summary.open()
+	Neotest.summary.close() -- it gets in the way
 	Neotest.run.run({ vim.fn.expand("%"), strategy = "dap" })
 end
 
 local function run_dir()
+	summary_was_opened = is_summary_opened()
 	Neotest.summary.open()
 	local dir = vim.fn.expand("%:p:h")
 	Neotest.run.run(dir)
 end
 
 local function debug_dir()
-	Neotest.summary.open()
+	Neotest.summary.close() -- it gets in the way
 	local dir = vim.fn.expand("%:p:h")
 	Neotest.run.run({ dir, strategy = "dap" })
 end
 
 local function run_last()
+	summary_was_opened = is_summary_opened()
 	Neotest.summary.open()
 	Neotest.run.run_last()
 end
 
 local function debug_last()
-	Neotest.summary.open()
+	Neotest.summary.close() -- it gets in the way
 	Neotest.run.run_last({ strategy = "dap" })
 end
 

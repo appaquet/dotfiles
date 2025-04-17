@@ -21,7 +21,7 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>bqo` to close all buffers except the current one
 * `<leader>bqa` to close all buffers
 * `<leader>bqh` or `<leader>bql` to close all buffers to the left/right
-* `<leader>w`, `<leader>ww`, or `<ctrl-s>` to save current buffer
+* `<leader>w`, `<leader>ww` to save current buffer
 * `<leader>wa` to save all buffers
 
 ## Tabs (n)
@@ -43,6 +43,8 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<ctrl-l>` or `<leader>fs` fuzzy find in current file
 * `<ctrl-g>` or `<leader>fS` fuzzy find in workspace (ripgrep)
 * `<ctrl-b>` or `<leader>fb` fuzzy find through buffers
+* `<ctrl-s>` or `<leader>fls` fuzzy find through document symbols
+* `<ctrl-n>` (`n`) or `<leader>fn` fuzzy find through tabs
 * `<leader>w` fuzzy find word under cursor in file
 * `<leader>W` fuzzy find word under cursor in workspace
 * `<leader>fk` fuzzy find through keymaps
@@ -86,7 +88,7 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>lic` LSP: Peek class definition
 * `<leader>Ti` LSP: Toggle inlay line hints
 * `<leader>lr` LSP: Rename
-* `<leader>lca` LSP: Code action
+* `<leader>lca` or `<ctrl-l>` (in insert|visual) LSP: Code action
 * `<leader>lwa` LSP: Add workspace folder
 * `<leader>lwr` LSP: Remove workspace folder
 * `<leader>lwl` LSP: List workspace folders

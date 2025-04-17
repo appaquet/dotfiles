@@ -28,7 +28,9 @@ vim.keymap.set("n", "<C-p>", fzf.files, { desc = "FZF: Files" })
 vim.keymap.set("n", "<C-l>", fzf.lgrep_curbuf, { desc = "FZF: Live grep file" })
 vim.keymap.set("n", "<C-g>", fzf.live_grep_glob, { desc = "FZF: Live grep workspace" })
 vim.keymap.set("n", "<C-b>", fzf.buffers, { desc = "FZF: Buffers" })
+vim.keymap.set("n", "<C-s>", fzf.lsp_document_symbols, { desc = "FZF: LSP document symbols" })
 vim.keymap.set({ "n", "i", "v", "c", "x" }, "<C-\\>", fzf.commands, { desc = "FZF: Neovim commands" })
+vim.keymap.set("n", "<C-n>", fzf.tabs, { desc = "FZF: Tabs" })
 
 -- Long form keybindings
 vim.keymap.set("n", "<leader>ff", fzf.files, { desc = "FZF: Files" })
@@ -38,6 +40,7 @@ vim.keymap.set("n", "<leader>fS", fzf.live_grep_glob, { desc = "FZF: Live grep w
 vim.keymap.set("n", "<leader>fw", fzf.grep_cword, { desc = "FZF: Grep word" })
 vim.keymap.set("n", "<leader>fW", fzf.grep_cWORD, { desc = "FZF: Grep WORD" })
 vim.keymap.set("n", "<leader>fb", fzf.buffers, { desc = "FZF: Buffers" })
+vim.keymap.set("n", "<leader>fn", fzf.tabs, { desc = "FZF: Tabs" })
 vim.keymap.set("n", "<leader>fm", fzf.marks, { desc = "FZF: Marks" })
 vim.keymap.set("n", "<leader>fR", fzf.registers, { desc = "FZF: Registers" })
 vim.keymap.set("n", "<leader>fr", fzf.resume, { desc = "FZF: Resume last search" })

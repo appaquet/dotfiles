@@ -29,12 +29,26 @@ bufferline.setup({
 	},
 })
 
+-- Close all windows but the current and floating windows
+local function wincloseothers()
+	local windows = vim.api.nvim_list_wins()
+	local current_win = vim.api.nvim_get_current_win()
+
+	for _, win in ipairs(windows) do
+		-- Skip the current window and floating windows
+		local is_floating = vim.api.nvim_win_get_config(win).relative ~= ""
+		if win ~= current_win and not is_floating then
+			vim.api.nvim_win_close(win, true)
+		end
+	end
+end
+
 -- Buffer deletion
 local minibufremove = require("mini.bufremove")
 minibufremove.setup({})
 
 local function bufdelcurrent()
-	minibufremove.delete()
+	minibufremove.delete(nil, true)
 end
 
 local function bufdelothers()
@@ -42,15 +56,17 @@ local function bufdelothers()
 	local bufs = vim.api.nvim_list_bufs()
 	for _, buf in ipairs(bufs) do
 		if buf ~= current then
-			minibufremove.delete(buf)
+			minibufremove.delete(buf, true)
 		end
 	end
 end
 
 local function bufdelall()
+	wincloseothers()
+
 	local bufs = vim.api.nvim_list_bufs()
 	for _, buf in ipairs(bufs) do
-		minibufremove.delete(buf)
+		minibufremove.delete(buf, true)
 	end
 end
 
@@ -87,7 +103,6 @@ vim.keymap.set("n", "<Leader>bu", ":e!<CR>", { silent = true, desc = "Buf: Undo 
 vim.keymap.set("n", "<Leader>w", ":w<CR>", { silent = true, desc = "Buf: Save" })
 vim.keymap.set("n", "<Leader>ww", ":w<CR>", { silent = true, desc = "Buf: Save" })
 vim.keymap.set("n", "<Leader>wa", ":wa<CR>", { silent = true, desc = "Buf: Save all" })
-vim.keymap.set("n", "<C-s>", ":w<CR>", { silent = true, desc = "Buf: Save" })
 
 vim.keymap.set("n", "<Leader>bm", ":MessagesBuffer<CR>", { silent = true, desc = "Buf: Create buffer from messages" })
 
