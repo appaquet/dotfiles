@@ -16,14 +16,11 @@ let
         exit 1
     fi
 
-    AWK=${pkgs.gawk}/bin/awk
-    LSPCI=${pkgs.pciutils}/bin/lspci
-    MODPROBE=${pkgs.kmod}/bin/modprobe
-    RMMOD=${pkgs.kmod}/bin/rmmod
+    export PATH="$PATH:/run/current-system/sw/bin/"
 
     function get_bus() {
         # takes a PCI device identifier (ex: 10de:2216) and returns the bus address (ex: 01:00.0)
-        $LSPCI -nn | grep "$1" | $AWK '{print $1}'
+        lspci -nn | grep "$1" | awk '{print $1}'
     }
 
     function format_bus() {
@@ -33,7 +30,7 @@ let
 
     function get_bus_driver() {
         # takes a bus address (ex: 0000:01:00.0) and returns the driver in use (ex: nvidia, vfio-pci)
-        echo $($LSPCI -nn -s $1 -k | grep "Kernel driver in use" | $AWK '{print $5}')
+        echo $(lspci -nn -s $1 -k | grep "Kernel driver in use" | awk '{print $5}')
     }
 
     function switch_driver() {
@@ -65,16 +62,16 @@ let
 
         if [ "$to_driver" == "nvidia" ]; then
             echo "Loading nvidia drivers..."
-            $MODPROBE -r vfio_pci vfio vfio_iommu_type1
-            $MODPROBE -a nvidia nvidia_modeset nvidia_uvm nvidia_drm
+            modprobe -r vfio_pci vfio vfio_iommu_type1
+            modprobe -a nvidia nvidia_modeset nvidia_uvm nvidia_drm
             sleep 5
         elif [ "$to_driver" == "vfio-pci" ]; then
             echo "Loading vfio drivers..."
-            $RMMOD nvidia_drm # modprobe -r doesn't seem to always work... order is important
-            $RMMOD nvidia_uvm
-            $RMMOD nvidia_modeset
-            $RMMOD nvidia
-            $MODPROBE -a vfio_pci vfio vfio_iommu_type1
+            rmmod nvidia_drm # modprobe -r doesn't seem to always work... order is important
+            rmmod nvidia_uvm
+            rmmod nvidia_modeset
+            rmmod nvidia
+            modprobe -a vfio_pci vfio vfio_iommu_type1
             sleep 5
         fi
 
@@ -100,13 +97,14 @@ let
         switch_driver "nvidia"
 
         # Force drivers to persist, preventing high power usage on idle
-        /run/current-system/sw/bin/nvidia-smi -pm 1
+        nvidia-smi -pm 1
 
         # Restart nvidia-container-toolkit-cdi-generator to pick up new driver
-        /run/current-system/sw/bin/systemctl restart nvidia-container-toolkit-cdi-generator.service
+        systemctl restart nvidia-container-toolkit-cdi-generator.service
     }
 
     function vfio() {
+        pkill process-compose || true
         docker kill hf-dev-embeddings || true
 
         switch_driver "vfio-pci"
@@ -165,4 +163,18 @@ in
     };
     wantedBy = [ "multi-user.target" ];
   };
+
+  systemd.services.switch-gpu-boot-after-resume = {
+    description = "Switch GPU to NVIDIA on resume (rebinding it to make sure it works)";
+    after = [ "sleep.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.writeShellScript "start-vms" ''
+        ${gpuSwitch}/bin/gpu-switch vfio
+        ${gpuSwitch}/bin/gpu-switch nvidia
+      ''}";
+    };
+    wantedBy = [ "multi-user.target" ];
+  };
+
 }

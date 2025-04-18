@@ -33,6 +33,9 @@ local function open_diffview_prev()
 	vim.notify("Diffing against " .. prev_branch)
 end
 
+require("which-key").add({
+	{ "<leader>gd", group = "Diff view" },
+})
 vim.keymap.set("n", "<Leader>gdw", ":DiffviewOpen<CR>", { silent = true, desc = "Git: open diff view against working dir" })
 vim.keymap.set("n", "<Leader>gdm", open_diffview_main, { desc = "Git: open diff view against main branch" })
 vim.keymap.set("n", "<Leader>gdp", open_diffview_prev, { desc = "Git: open diff view against previous branch" })
@@ -43,7 +46,9 @@ vim.keymap.set("n", "<Leader>gdq", ":DiffviewClose<CR>", { silent = true, desc =
 require("gitsigns").setup({
 	current_line_blame = true,
 })
-
+require("which-key").add({
+	{ "<leader>gg", group = "Gutter signs" },
+})
 vim.keymap.set({ "n", "v" }, "<Leader>gu", ":Gitsigns reset_hunk<CR>", { silent = true, desc = "Git: revert hunk" })
 vim.keymap.set({ "n", "v" }, "<Leader>ga", ":Gitsigns stage_hunk<CR>", { silent = true, desc = "Git: stage hunk" })
 vim.keymap.set("n", "]g", ":Gitsigns nav_hunk next<CR>", { silent = true, desc = "Git: next hunk" })
@@ -75,7 +80,13 @@ vim.keymap.set("n", "<Leader>ggw", switch_gutter_base_default, { silent = true, 
 require("octo").setup({
 	picker = "fzf-lua",
 })
-vim.keymap.set("n", "<Leader>ghr", ":Octo review<CR>", { silent = true, desc = "Git: github pr review" })
+require("which-key").add({
+	{ "<leader>gp", group = "PR review" },
+})
+vim.keymap.set("n", "<Leader>gpo", ":Octo review open<CR>", { silent = true, desc = "Git: PR review open" })
+vim.keymap.set("n", "<Leader>gpq", ":Octo review close<CR>", { silent = true, desc = "Git: PR review close" })
+vim.keymap.set("n", "<Leader>gpc", ":Octo review comments<CR>", { silent = true, desc = "Git: PR review comments" })
+vim.keymap.set("n", "<Leader>gps", ":Octo review submit<CR>", { silent = true, desc = "Git: PR review submit" })
 
 -- Gitlinker
 -- Generates shareable links

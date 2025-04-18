@@ -24,15 +24,6 @@ let
         END
       '';
 
-  includeVimFile =
-    path:
-    if devMode then
-      ''
-        source ${confDir}/${path}
-      ''
-    else
-      builtins.readFile ./conf/${path};
-
   includeSecrets = ''
     if filereadable("${secrets.common.nvimSecrets}")
       lua dofile("${secrets.common.nvimSecrets}")
@@ -67,7 +58,6 @@ in
         lualine-nvim # https://github.com/nvim-lualine/lualine.nvim
         bufferline-nvim # https://github.com/akinsho/bufferline.nvim
         auto-session # automatically restore last session
-        zen-mode-nvim # zen mode
 
         # Tools
         fzf-lua
@@ -173,6 +163,7 @@ in
         (includeLuaFile "keymap.lua")
         (includeLuaFile "theme.lua")
         (includeLuaFile "buffers.lua")
+        (includeLuaFile "windows.lua")
         (includeLuaFile "statusline.lua")
         (includeLuaFile "tree.lua")
         (includeLuaFile "sessions.lua")

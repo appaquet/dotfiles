@@ -114,8 +114,29 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>gdm` to open diff view against main branch
 * `<leader>gdp` to open diff view against previous branch
 * `<leader>gdq` to close diff view
-* `<leader>ghr` to review GitHub PR
 * `<leader>gdb` to open buffer diff
+
+### PR review
+See [https://github.com/pwntester/octo.nvim/blob/03059cf4d694e2b3065136f074b42ee98ff8e4b2/lua/octo/config.lua#L238]
+* `<leader>gpo` to open PR review mode
+* `<leader>gpq` to close PR review mode
+* Files 
+  * `]q` and `[q` to navigate between files
+  * `]Q` and `[Q` to navigate first and last files
+  * `<leader>space` to toggle file as reviewed
+  * `gf` to open file (unfortunately not in new tab)
+* Comments
+  * `<leader>gpc` to review comments
+  * `<leader>ca` to add a comment (unfocus window to close)
+  * `<leader>cd` to delete a comment
+  * `<leader>sa` to add line suggestion
+  * `<leader>r` to add reaction 
+  * `]c` and `[c` to navigate between comments
+* Review
+  * `<leader>gps` to submit review
+  * `<C-m>` to submit with comment
+  * `<C-a>` to approve
+  * `<C-r>` to request change
 
 ## Diagnostics (x)
 * `<leader>xs` or `<leader>xf` Open diagnostic float

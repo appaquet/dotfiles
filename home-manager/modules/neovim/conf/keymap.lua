@@ -11,7 +11,10 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 vim.keymap.set("", "<Space>", "<Nop>")
 
--- Clipboard operations
+vim.keymap.set("n", "<Leader>qq", ":q<CR>", { silent = true, desc = "Quit current split/window" })
+vim.keymap.set("n", "<Leader>qa", ":qa<CR>", { silent = true, desc = "Quit nvim" })
+vim.keymap.set("n", "<Leader>qs", ":SessionDelete<CR>:qa<CR>", { silent = true, desc = "Clear session & quit nvim" })
+
 vim.keymap.set("v", "<Leader>yy", ":w !pbcopy<CR><CR>", { desc = "Clipboard: Copy to system clipboard" })
 vim.keymap.set("n", "<Leader>yp", ":read !pbpaste<CR>", { desc = "Clipboard: Paste from system clipboard" })
 

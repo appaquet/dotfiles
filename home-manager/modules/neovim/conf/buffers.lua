@@ -29,20 +29,6 @@ bufferline.setup({
 	},
 })
 
--- Close all windows but the current and floating windows
-local function wincloseothers()
-	local windows = vim.api.nvim_list_wins()
-	local current_win = vim.api.nvim_get_current_win()
-
-	for _, win in ipairs(windows) do
-		-- Skip the current window and floating windows
-		local is_floating = vim.api.nvim_win_get_config(win).relative ~= ""
-		if win ~= current_win and not is_floating then
-			vim.api.nvim_win_close(win, true)
-		end
-	end
-end
-
 -- Buffer deletion
 local minibufremove = require("mini.bufremove")
 minibufremove.setup({})
@@ -62,7 +48,7 @@ local function bufdelothers()
 end
 
 local function bufdelall()
-	wincloseothers()
+	WinCloseOthers()
 
 	local bufs = vim.api.nvim_list_bufs()
 	for _, buf in ipairs(bufs) do
@@ -126,12 +112,3 @@ local function tabrename()
 end
 vim.keymap.set("n", "<Leader>nt", tabrename, { silent = true, desc = "Tab: Rename" })
 vim.keymap.set("n", "<Leader>n<Tab>", "g<Tab>", { silent = true, desc = "Tab: Switch to last tab" })
-
--- Windows
-vim.keymap.set("n", "<Leader>qq", ":q<CR>", { silent = true, desc = "Quit current split/window" })
-vim.keymap.set("n", "<Leader>qa", ":qa<CR>", { silent = true, desc = "Quit nvim" })
-vim.keymap.set("n", "<Leader>qs", ":SessionDelete<CR>:qa<CR>", { silent = true, desc = "Clear session & quit nvim" })
-
--- Zenmode
-local zenmode = require("zen-mode")
-vim.keymap.set({ "n", "v" }, "<C-w>z", zenmode.toggle, { silent = true })
