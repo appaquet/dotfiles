@@ -22,6 +22,9 @@ vim.keymap.set("n", "<leader>dr", dap.repl.toggle, { desc = "DAP: Toggle repl" }
 vim.keymap.set("n", "<leader>dl", dap.run_last, { desc = "DAP: Run last" })
 vim.keymap.set("n", "<leader>dC", dap.run_to_cursor, { desc = "DAP: Run to cursor" })
 
+-- Breakpoint sign
+vim.fn.sign_define("DapBreakpoint", { text = "⭕️", texthl = "", linehl = "", numhl = "" })
+
 -- nvim-dap-ui
 -- https://github.com/rcarriga/nvim-dap-ui
 local dapui = require("dapui")
