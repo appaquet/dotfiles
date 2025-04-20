@@ -125,8 +125,6 @@ cmp.setup({
 	preselect = cmp.PreselectMode.None, -- Don't preselect items
 
 	mapping = cmp.mapping.preset.insert({
-		["<C-Space>"] = cmp.mapping.complete(),
-
 		-- Accept selected
 		["<CR>"] = cmp.mapping.confirm({
 			behavior = cmp.ConfirmBehavior.Insert,
