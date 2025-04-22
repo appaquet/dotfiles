@@ -72,12 +72,45 @@ vim.api.nvim_create_autocmd("LspAttach", {
 			return { buffer = buffer, desc = desc }
 		end
 
+		local function goto_definition_float()
+			AwaitBufferChange(function()
+				vim.lsp.buf.definition()
+			end)
+			PopBufferToFloat()
+		end
+
+		local function goto_type_definition_float()
+			AwaitBufferChange(function()
+				vim.lsp.buf.type_definition()
+			end)
+			PopBufferToFloat()
+		end
+
+		local function goto_definition_right()
+			AwaitBufferChange(function()
+				vim.lsp.buf.definition()
+			end)
+			PopBufferToRight()
+		end
+
+		local function goto_type_definition_right()
+			AwaitBufferChange(function()
+				vim.lsp.buf.type_definition()
+			end)
+			PopBufferToRight()
+		end
+
 		-- Go to
 		vim.keymap.set("n", "<leader>lgd", vim.lsp.buf.definition, kopts(ev.buf, "LSP: Go to definition"))
 		vim.keymap.set("n", "gd", vim.lsp.buf.definition, kopts(ev.buf, "LSP: Go to definition"))
-		vim.keymap.set("n", "<leader>lgD", vim.lsp.buf.declaration, kopts(ev.buf, "LSP: Go to declaration"))
+		vim.keymap.set("n", "gfd", goto_definition_float, kopts(ev.buf, "LSP: Go to definition (in floating window)"))
+		vim.keymap.set("n", "gld", goto_definition_right, kopts(ev.buf, "LSP: Go to definition (in right split)"))
+
 		vim.keymap.set("n", "<leader>lgt", vim.lsp.buf.type_definition, kopts(ev.buf, "LSP: Go to type definition"))
 		vim.keymap.set("n", "gt", vim.lsp.buf.type_definition, kopts(ev.buf, "LSP: Go to type definition"))
+		vim.keymap.set("n", "gft", goto_type_definition_float, kopts(ev.buf, "LSP: Go to type definition (in floating window)"))
+		vim.keymap.set("n", "glt", goto_type_definition_right, kopts(ev.buf, "LSP: Go to type definition (in right split)"))
+
 		vim.keymap.set("n", "gr", fzf.lsp_references, kopts(ev.buf, "LSP: Go to references"))
 
 		-- Info (more in treesitter.lua)
@@ -96,9 +129,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		end, kopts(ev.buf, "LSP: List workspace folders"))
 
 		-- Actions
-		vim.keymap.set("n", "<leader>lr", vim.lsp.buf.rename, kopts(ev.buf, "LSP: Rename"))
 		vim.keymap.set({ "n", "v" }, "<leader>lca", vim.lsp.buf.code_action, kopts(ev.buf, "LSP: Code action"))
-		vim.keymap.set({ "i", "v" }, "<C-l>", vim.lsp.buf.code_action, kopts(ev.buf, "LSP: Code action"))
+		vim.keymap.set({ "i", "v" }, "<C-l>ca", vim.lsp.buf.code_action, kopts(ev.buf, "LSP: Code action"))
+		vim.keymap.set({ "n", "v" }, "<leader>lr", vim.lsp.buf.rename, kopts(ev.buf, "LSP: Rename"))
+		vim.keymap.set({ "i", "v" }, "<C-l>r", vim.lsp.buf.rename, kopts(ev.buf, "LSP: Rename"))
 	end,
 })
 

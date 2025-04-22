@@ -15,9 +15,6 @@ vim.keymap.set("n", "<Leader>qq", ":q<CR>", { silent = true, desc = "Quit curren
 vim.keymap.set("n", "<Leader>qa", ":qa<CR>", { silent = true, desc = "Quit nvim" })
 vim.keymap.set("n", "<Leader>qs", ":SessionDelete<CR>:qa<CR>", { silent = true, desc = "Clear session & quit nvim" })
 
-vim.keymap.set("v", "<Leader>yy", ":w !pbcopy<CR><CR>", { desc = "Clipboard: Copy to system clipboard" })
-vim.keymap.set("n", "<Leader>yp", ":read !pbpaste<CR>", { desc = "Clipboard: Paste from system clipboard" })
-
 -- Marks (m[a-z0-9A-Z], 'a-z0-9A-Z)
 vim.keymap.set("n", "<Leader>mk", ":delmarks a-z0-9A-Z<CR>", { silent = true, desc = "Marks: delete all" })
 
@@ -36,9 +33,85 @@ vim.cmd([[
 ]])
 
 -- Misc
-vim.keymap.set("n", "<Leader>rf", ":w<CR>:!./%<CR>", { silent = true, desc = "Execute current file" })
-vim.keymap.set("v", "<Leader>rl", ":w !sh<CR>", { silent = true, desc = "Execute selected lines" })
+local function exec_shell_in_floating(script)
+	local output = vim.fn.system({ "sh", "-c", script })
+
+	local buf_content = script .. "\n\n" .. output
+	local buf = vim.api.nvim_create_buf(false, true) -- scratch
+	vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(buf_content, "\n"))
+
+	local width = math.floor(vim.o.columns * 0.6)
+	local height = math.floor(vim.o.lines * 0.6)
+	local row = math.floor((vim.o.lines - height) / 2)
+	local col = math.floor((vim.o.columns - width) / 2)
+	local win = vim.api.nvim_open_win(buf, true, {
+		relative = "editor",
+		width = width,
+		height = height,
+		row = row,
+		col = col,
+		border = "single",
+		style = "minimal",
+	})
+
+	vim.keymap.set({ "n", "v" }, "q", function()
+		vim.api.nvim_win_close(win, true)
+	end, { buffer = buf, nowait = true })
+end
+
+local function get_selected_visual()
+	-- Get the current mode to check if we're in visual mode
+	local mode = vim.api.nvim_get_mode().mode
+
+	-- If we're in visual mode, we need to exit it to set the marks properly
+	if mode:sub(1, 1) == "v" or mode:sub(1, 1) == "V" or mode == "\22" then -- v, V, or <C-v>
+		-- Exit visual mode to set the marks
+		vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "x", true)
+	end
+
+	local srow, scol = unpack(vim.api.nvim_buf_get_mark(0, "<"))
+	local erow, ecol = unpack(vim.api.nvim_buf_get_mark(0, ">"))
+	if srow <= 0 or erow <= 0 then
+		vim.notify("No selection found", vim.log.levels.WARN)
+		return ""
+	end
+
+	-- Get the selected text
+	local lines = vim.api.nvim_buf_get_text(0, srow - 1, scol, erow - 1, ecol + 1, {})
+	return table.concat(lines, "\n")
+end
+
+local function send_visual_to_sh()
+	local script = get_selected_visual()
+	exec_shell_in_floating(script)
+end
+
+local function send_block_to_sh()
+	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "x", true)
+	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("vib", true, false, true), "x", true)
+
+	send_visual_to_sh()
+end
+
+local function send_file_to_sh()
+	local buf = vim.api.nvim_get_current_buf()
+	local file_lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+	local file_content = table.concat(file_lines, "\n")
+	exec_shell_in_floating(file_content)
+end
+
+vim.keymap.set("n", "<Leader>rf", send_file_to_sh, { silent = true, desc = "Execute current file" })
+vim.keymap.set("v", "<Leader>rl", send_visual_to_sh, { silent = true, desc = "Execute selected lines" })
+vim.keymap.set("n", "<Leader>rb", send_block_to_sh, { silent = true, desc = "Execute code block" })
 vim.keymap.set("n", "<C-_>", ":nohlsearch<CR>", { silent = true, desc = "Clear search highlight" }) -- C-/
+
+-- Clipboard
+local function copy_selection_to_clipboard()
+	local selected = get_selected_visual()
+	vim.fn.system("echo -n '" .. selected .. "' | pbcopy")
+end
+vim.keymap.set("v", "<Leader>yy", copy_selection_to_clipboard, { desc = "Clipboard: Copy to system clipboard" })
+vim.keymap.set("n", "<Leader>yp", ":read !pbpaste<CR>", { desc = "Clipboard: Paste from system clipboard" })
 
 -- Toggling
 local function toggle_wrap()

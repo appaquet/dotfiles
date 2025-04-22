@@ -39,7 +39,7 @@ local function get_side_win(dest)
 end
 
 --- Send the current buffer to the right split window and navigate back the left window
-local function pop_buf_right()
+function PopBufferToRight()
 	local current_buf = vim.api.nvim_get_current_buf()
 	local current_win = vim.api.nvim_get_current_win()
 
@@ -54,6 +54,33 @@ local function pop_buf_right()
 	vim.api.nvim_set_current_win(current_win)
 	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-o>", true, false, true), "nx", false)
 	vim.api.nvim_set_current_win(win_id_right)
+end
+
+--- Send the current buffer to a floating window and navigate back the original window
+function PopBufferToFloat()
+	local current_buf = vim.api.nvim_get_current_buf()
+	local current_win = vim.api.nvim_get_current_win()
+
+	-- Create a floating window
+	local width = math.floor(vim.o.columns * 0.8)
+	local height = math.floor(vim.o.lines * 0.8)
+	local row = math.floor((vim.o.lines - height) / 2)
+	local col = math.floor((vim.o.columns - width) / 2)
+	local opts = {
+		relative = "editor",
+		width = width,
+		height = height,
+		row = row,
+		col = col,
+		style = "minimal",
+		border = "rounded",
+	}
+	local new_win = vim.api.nvim_open_win(current_buf, true, opts)
+
+	vim.api.nvim_win_set_buf(new_win, current_buf)
+	vim.api.nvim_set_current_win(current_win)
+	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-o>", true, false, true), "nx", false)
+	vim.api.nvim_set_current_win(new_win)
 end
 
 local function swap_left_right_win()
@@ -96,7 +123,8 @@ local function win_width_80pc()
 	vim.api.nvim_win_set_width(cur_win, new_width)
 end
 
-vim.keymap.set("n", "<C-w>pl", pop_buf_right, { silent = true, desc = "Pop buffer to right window" })
+vim.keymap.set("n", "<C-w>pl", PopBufferToRight, { silent = true, desc = "Pop buffer to right window" })
+vim.keymap.set("n", "<C-w>pf", PopBufferToFloat, { silent = true, desc = "Pop buffer to a floating window" })
 vim.keymap.set("n", "<C-w>w", swap_left_right_win, { silent = true, desc = "Swap left and right window buffers" })
 vim.keymap.set("n", "<C-w>]", win_width_incr, { silent = true, desc = "Increase window width" })
 vim.keymap.set("n", "<C-w>[", win_width_decr, { silent = true, desc = "Decrease window width" })

@@ -50,7 +50,12 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>fk` fuzzy find through keymaps
 * `<ctrl-\>` or `<leader>fc` fuzzy find through neovim commands
 * `<leader>fr` to resume last search 
-* See [fzf.lua](./home-manager/modules/neovim/conf/fzf.lua) for all keymaps
+* Inside fzf
+  * `<ctrl-k>` to send matches to quickfix list
+  * `<ctrl-v>` to open selection in vertical split
+  * `<ctrl-s>` to open selection in horizontal split
+  * `<alt-i>` to toggle ignored files
+* See [fzf.lua](/home-manager/modules/neovim/conf/fzf.lua) for all keymaps
 
 ### Keymap inside window
 * `<ctrl>k`, sends matches to the quickfix list
@@ -144,6 +149,8 @@ See [https://github.com/pwntester/octo.nvim/blob/03059cf4d694e2b3065136f074b42ee
 * `<leader>xp` or `[x` Go to previous diagnostic
 * `<leader>xo` Open diagnostic panel (Trouble)
 * `<leader>xq` Close diagnostic panel (Trouble)
+* In diagnostic panel
+  * `s` to toggle between severty levels
 
 ## Quickfix (k)
 * `<leader>ko` to open quickfix

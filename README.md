@@ -158,7 +158,7 @@ See [README.nvim.md](./README.nvim.md)
   * `<prefix> L / H / J / K` to resize pane
   * `<prefix> l / h / j / k` to navigate between panes
   * `<prefix> ;` to switch to last pane
-  * `<prefix> y / u` to swap window left / right
+  * `<prefix> <ctrL>y / <ctrl>u` to swap window left / right
   * `<prefix> <tab>` to navigate to last window
   * `<prefix> S` to toggle synchronized panes
   * `<prefix> m` to toggle mouse support (useful to allow select + copy)
