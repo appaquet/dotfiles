@@ -162,6 +162,12 @@ darwin)
   switch)
     shift
     ./result/sw/bin/darwin-rebuild switch --flake .
+
+    # If network setup was changed, we lose connection.
+    # See https://github.com/NixOS/nixpkgs/issues/198267
+    echo "Restarting network-setup in 5s..."
+    sleep 5
+    sudo systemctl restart network-setup
     ;;
   tree)
     shift
@@ -290,7 +296,7 @@ update)
     if [[ "$confirm" == [yY] ]]; then
       echo "Updating all shells..."
       for shell in shells/*; do
-        pushd "shells/${shell}"
+        pushd "${shell}"
         nix flake update
         popd
       done

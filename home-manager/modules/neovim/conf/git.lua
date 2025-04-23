@@ -40,6 +40,7 @@ vim.keymap.set("n", "<Leader>gdw", ":DiffviewOpen<CR>", { silent = true, desc = 
 vim.keymap.set("n", "<Leader>gdm", open_diffview_main, { desc = "Git: open diff view against main branch" })
 vim.keymap.set("n", "<Leader>gdp", open_diffview_prev, { desc = "Git: open diff view against previous branch" })
 vim.keymap.set("n", "<Leader>gdq", ":DiffviewClose<CR>", { silent = true, desc = "Git: close diff view" })
+vim.keymap.set("n", "<Leader>gdf", ":DiffviewFileHistory<CR>", { silent = true, desc = "Git: open file history" })
 
 -- Git signs
 -- https://github.com/lewis6991/gitsigns.nvim
