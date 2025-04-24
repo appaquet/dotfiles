@@ -162,12 +162,6 @@ darwin)
   switch)
     shift
     ./result/sw/bin/darwin-rebuild switch --flake .
-
-    # If network setup was changed, we lose connection.
-    # See https://github.com/NixOS/nixpkgs/issues/198267
-    echo "Restarting network-setup in 5s..."
-    sleep 5
-    sudo systemctl restart network-setup
     ;;
   tree)
     shift
@@ -219,6 +213,12 @@ nixos)
       echo "Activating latest generation"
       sudo nixos-rebuild switch --flake ".#${HOSTNAME}"
     fi
+
+    # If network setup was changed, we lose connection.
+    # See https://github.com/NixOS/nixpkgs/issues/198267
+    echo "Restarting network-setup in 5s..."
+    sleep 5
+    sudo systemctl restart network-setup
     ;;
   diff)
     shift
