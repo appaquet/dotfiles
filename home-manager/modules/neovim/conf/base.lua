@@ -60,14 +60,9 @@ function AwaitBufferChange(fn)
 	end
 end
 
--- Open nvim messages in a floating window
-function MessagesBuffer()
-	-- Capture messages output
-	local output = vim.fn.execute("messages")
-
-	-- Create new buffer with messages
+function FloatingWindowText(content)
 	local buf = vim.api.nvim_create_buf(false, true)
-	vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(output, "\n"))
+	vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(content, "\n"))
 
 	-- Open in floating window
 	local width = math.floor(vim.o.columns * 0.8)
@@ -83,6 +78,12 @@ function MessagesBuffer()
 		style = "minimal",
 		border = "rounded",
 	})
+end
+
+-- Open nvim messages in a floating window
+function MessagesBuffer()
+	local output = vim.fn.execute("messages")
+	FloatingWindowText(output)
 end
 vim.api.nvim_create_user_command("MessagesBuffer", MessagesBuffer, {})
 vim.keymap.set("n", "<Leader>o", MessagesBuffer, { desc = "Open messages in floating window" })

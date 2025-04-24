@@ -104,7 +104,13 @@ let
     }
 
     function vfio() {
-        pkill process-compose || true
+        if pgrep -x "process-compose" > /dev/null; then
+            echo "Stopping process compose..."
+            pkill process-compose || true 
+            sleep 10 # Give it time to stop
+            pkill -9 process-compose || true
+        fi
+
         docker kill hf-dev-embeddings || true
 
         switch_driver "vfio-pci"

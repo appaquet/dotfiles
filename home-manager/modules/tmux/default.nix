@@ -70,8 +70,8 @@ in
       set -g default-shell "${pkgs.fish}/bin/fish"
 
       # Prefixes ctrl-a and ctrl-space
-      set-option -g prefix C-a
-      bind C-a send-prefix
+      set-option -g prefix C-b
+      bind C-b send-prefix
       set-option -g prefix2 C-Space
       bind C-Space send-prefix
 

@@ -108,7 +108,15 @@ vim.keymap.set("n", "<C-_>", ":nohlsearch<CR>", { silent = true, desc = "Clear s
 -- Clipboard
 local function copy_selection_to_clipboard()
 	local selected = get_selected_visual()
-	vim.fn.system("echo -n '" .. selected .. "' | pbcopy")
+
+	-- Write to a temp file
+	local temp_file = os.tmpname()
+	local file = io.open(temp_file, "w")
+	file:write(selected)
+	file:close()
+
+	-- Copy the temp file to the clipboard
+	vim.fn.system("pbcopy < " .. temp_file)
 end
 vim.keymap.set("v", "<Leader>yy", copy_selection_to_clipboard, { desc = "Clipboard: Copy to system clipboard" })
 vim.keymap.set("n", "<Leader>yp", ":read !pbpaste<CR>", { desc = "Clipboard: Paste from system clipboard" })
