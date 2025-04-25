@@ -38,6 +38,10 @@ in
       # Synchronized panes
       bind S setw synchronize-panes\; display-message "Synchronized pane is now #{?synchronize-panes,on,off}"
 
+      # Clear the screen
+      bind C-k setw synchronize-panes\; send-keys C-l \; setw synchronize-panes
+
+      # Move windows right/left
       bind -r C-y swap-window -t -1 \; select-window -t -1  # swap current window with the previous one
       bind -r C-u swap-window -t +1 \; select-window -t +1  # swap current window with the next one
 
@@ -70,8 +74,8 @@ in
       set -g default-shell "${pkgs.fish}/bin/fish"
 
       # Prefixes ctrl-a and ctrl-space
-      set-option -g prefix C-b
-      bind C-b send-prefix
+      set-option -g prefix C-a
+      bind C-a send-prefix
       set-option -g prefix2 C-Space
       bind C-Space send-prefix
 

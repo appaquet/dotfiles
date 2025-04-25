@@ -10,7 +10,7 @@ local function on_attach(bufnr)
 	-- default mappings
 	api.config.mappings.default_on_attach(bufnr)
 
-	-- Fuzzy find in tree ('/')
+	-- Fuzzy find files in tree ('/')
 	-- Adapted from https://github.com/gennaro-tedesco/dotfiles/blob/master/nvim/lua/plugins/nvim_tree.lua
 	vim.keymap.set("n", "/", function()
 		local fzf = require("fzf-lua")
@@ -24,15 +24,34 @@ local function on_attach(bufnr)
 						end
 
 						api.tree.find_file(selected[1])
-
-						---@diagnostic disable-next-line: missing-parameter
-						api.node.open.preview()
 					end,
-					desc = "fuzzy find in tree",
+					desc = "fuzzy find files in tree",
 				},
 			},
 		})
-	end, opts("fuzzy find in tree"))
+	end, opts("fuzzy find files in tree"))
+
+	-- fzf-lua overrides for running on folder nodes
+	local function in_directory(fn)
+		local node = api.tree.get_node_under_cursor()
+		if node and node.type == "directory" then
+			fn(node.absolute_path)
+		elseif node and node.type == "file" then
+			fn(vim.fn.fnamemodify(node.absolute_path, ":h"))
+		else
+			vim.notify("Couldn't determine path", vim.log.levels.WARN)
+		end
+	end
+	vim.keymap.set("n", "<leader>fS", function()
+		in_directory(function(path)
+			require("fzf-lua").live_grep({ cwd = path })
+		end)
+	end, opts("FZF: Live grep in folder"))
+	vim.keymap.set("n", "<leader>ff", function()
+		in_directory(function(path)
+			require("fzf-lua").files({ cwd = path })
+		end)
+	end, opts("FZF: Files in folder"))
 end
 
 require("nvim-tree").setup({
@@ -48,6 +67,9 @@ require("nvim-tree").setup({
 	diagnostics = {
 		enable = true,
 		show_on_dirs = true,
+	},
+	view = {
+		width = 50,
 	},
 	on_attach = on_attach,
 })

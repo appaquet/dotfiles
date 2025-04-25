@@ -39,16 +39,16 @@ keymaps, but also default/built-ins that I tend to forget.
 * `ctrl-w z` to toggle zen mode
 
 ## Fzf (f)
-* `<ctrl-p>` or `<leader>ff` fuzzy finding file names
-* `<ctrl-l>` or `<leader>fs` fuzzy find in current file
-* `<ctrl-g>` or `<leader>fS` fuzzy find in workspace (ripgrep)
+* `<ctrl-p>` or `<leader>ff` fuzzy finding file names (can also be used in tree)
+* `<ctrl-l>` or `<leader>fs` fuzzy find content in current file
+* `<ctrl-g>` or `<leader>fS` fuzzy find content in workspace (can also be used in tree)
 * `<ctrl-b>` or `<leader>fb` fuzzy find through buffers
 * `<ctrl-s>` or `<leader>fls` fuzzy find through document symbols
 * `<ctrl-n>` (`n`) or `<leader>fn` fuzzy find through tabs
 * `<leader>w` fuzzy find word under cursor in file
 * `<leader>W` fuzzy find word under cursor in workspace
 * `<leader>fk` fuzzy find through keymaps
-* `<ctrl-\>` or `<leader>fc` fuzzy find through neovim commands
+* `<leader>fc` fuzzy find through neovim commands
 * `<leader>fr` to resume last search 
 * Inside fzf
   * `<ctrl-k>` to send matches to quickfix list
@@ -179,6 +179,22 @@ See [https://github.com/pwntester/octo.nvim/blob/03059cf4d694e2b3065136f074b42ee
   * `u` to stop a test
   * `i` to open a test source
   * `?` for help
+
+## Debugging (d)
+* `<leader>db` to toggle breakpoint
+* `<leader>dc` to start/continue debugging
+* `<leader>do` to step over
+* `<leader>dI` to step into
+* `<leader>dO` to step out
+* `<leader>dj` to move down in the stack trace
+* `<leader>dk` to move up in the stack trace
+* `<leader>dp` to pause execution
+* `<leader>dt` to terminate the debugging session
+* `<leader>dl` to restart the debugging session
+* `<leader>dr` to toggle the REPL
+* `<leader>dC` to run to cursor
+* `<leader>du` to toggle the DAP UI
+* `<leader>dq` to quit/close the DAP UI
 
 ## Object selection (in visual mode)
 - `aX`: Select around object X  

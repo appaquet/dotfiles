@@ -34,8 +34,9 @@ dapui.setup({
 			position = "bottom",
 			size = 15,
 			elements = {
-				{ id = "repl", size = 0.6 },
-				{ id = "scopes", size = 0.4 },
+				{ id = "repl", size = 0.3 },
+				{ id = "console", size = 0.3 },
+				{ id = "scopes", size = 0.3 },
 			},
 		},
 		{
@@ -52,19 +53,23 @@ dapui.setup({
 })
 
 vim.keymap.set("n", "<leader>du", dapui.toggle, { desc = "DAP: Toggle UI" })
+vim.keymap.set("n", "<leader>dq", dapui.close, { desc = "DAP: Quit / close UI" })
 
+dap.listeners.before.initialized.dapui_config = function()
+	dapui.open()
+end
 dap.listeners.before.attach.dapui_config = function()
 	dapui.open()
 end
 dap.listeners.before.launch.dapui_config = function()
 	dapui.open()
 end
-dap.listeners.before.event_terminated.dapui_config = function()
-	dapui.close()
-end
-dap.listeners.before.event_exited.dapui_config = function()
-	dapui.close()
-end
+-- dap.listeners.before.event_terminated.dapui_config = function()
+-- 	dapui.close()
+-- end
+-- dap.listeners.before.event_exited.dapui_config = function()
+-- 	dapui.close()
+-- end
 
 -- Go
 -- https://github.com/leoluz/nvim-dap-go
