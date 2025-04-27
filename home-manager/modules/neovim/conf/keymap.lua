@@ -105,21 +105,29 @@ vim.keymap.set("v", "<Leader>rl", send_visual_to_sh, { silent = true, desc = "Ex
 vim.keymap.set("n", "<Leader>rb", send_block_to_sh, { silent = true, desc = "Execute code block" })
 vim.keymap.set("n", "<C-_>", ":nohlsearch<CR>", { silent = true, desc = "Clear search highlight" }) -- C-/
 
--- Clipboard
+-- Clipboard / yanking
 local function copy_selection_to_clipboard()
 	local selected = get_selected_visual()
 
 	-- Write to a temp file
 	local temp_file = os.tmpname()
 	local file = io.open(temp_file, "w")
+	if not file then
+		vim.notify("Failed to open temp file for writing", vim.log.levels.ERROR)
+		return
+	end
 	file:write(selected)
 	file:close()
 
 	-- Copy the temp file to the clipboard
 	vim.fn.system("pbcopy < " .. temp_file)
+
+	-- Remove the temp file
+	os.remove(temp_file)
 end
 vim.keymap.set("v", "<Leader>yy", copy_selection_to_clipboard, { desc = "Clipboard: Copy to system clipboard" })
 vim.keymap.set("n", "<Leader>yp", ":read !pbpaste<CR>", { desc = "Clipboard: Paste from system clipboard" })
+vim.keymap.set("n", "<Leader>yc", "yygccp", { remap = true, desc = "Clipboard: Copy line & comment it" })
 
 -- Toggling
 local function toggle_wrap()

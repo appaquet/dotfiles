@@ -253,6 +253,7 @@ See [https://github.com/pwntester/octo.nvim/blob/03059cf4d694e2b3065136f074b42ee
 * `<leader>Tn` to toggle line numbers
 * `<leader>yy` to yank to clipboard using [bin/pbcopy](bin/pbcopy) util
 * `<leader>yp` to paste from clipboard using [bin/pbpaste](bin/pbpaste) util
+* `<leader>yc` to yank the current line and comment the previous one
 * `<leader>Tw` to toggle line wrap
 * `<leader>Tt` to toggle theme between light and dark
 * `zz` to center cursor in the middle of the screen

@@ -89,13 +89,10 @@ vim.api.nvim_create_user_command("MessagesBuffer", MessagesBuffer, {})
 vim.keymap.set("n", "<Leader>o", MessagesBuffer, { desc = "Open messages in floating window" })
 
 -- pretty print
--- https://www.reddit.com/r/neovim/comments/xrovld/display_lua_tables_eg_vimkeymap/
 function PPrint(v)
 	print(vim.inspect(v))
-	return v
 end
 
 function PPrintFloat(v)
-	print(vim.inspect(v))
-	MessagesBuffer()
+	FloatingWindowText(vim.inspect(v))
 end

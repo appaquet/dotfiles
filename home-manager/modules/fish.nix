@@ -21,6 +21,7 @@
 
       # Force term color support
       # Some TUI may not appear correctly otherwise
+      # Check https://gist.github.com/andersevenrud/015e61af2fd264371032763d4ed965b6
       set -x TERM xterm-256color
       set -x COLORTERM truecolor
 

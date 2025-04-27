@@ -29,7 +29,7 @@ in
       # Specify plugins here since tpm looks for plugins in xdg config
       set -g @plugin 'tmux-plugins/tmux-resurrect'
 
-      # Loads gpakosz/.tmux configuration
+      # Loads gpakosz/.tmux configuration & .tmux.conf.local
       source-file ~/.tmux.conf
 
       # Because tmux.conf default's is 600ms, which is too long (ex: moving between panes)
@@ -80,6 +80,7 @@ in
       bind C-Space send-prefix
 
       # Rebind r to reload config
+      unbind r
       bind r source-file ${config.home.homeDirectory}"/.config/tmux/tmux.conf"
     '';
   };
