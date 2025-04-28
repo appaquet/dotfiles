@@ -32,7 +32,9 @@ in
     lanNameservers = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       description = "Lan name servers";
-      default = [ "192.168.0.1" ];
+      default = [
+        "192.168.0.1"
+      ];
     };
   };
 
@@ -47,5 +49,10 @@ in
     ];
     networking.defaultGateway = cfg.lanGateway;
     networking.nameservers = cfg.lanNameservers;
+
+    # Attempt at fixing issue where network drops after switch
+    # See https://github.com/NixOS/nixpkgs/issues/198267
+    # Fix discussed here https://discourse.nixos.org/t/bridge-fails-for-one-boot-after-upgrade-to-24-05/46393
+    networking.networkmanager.enable = false;
   };
 }

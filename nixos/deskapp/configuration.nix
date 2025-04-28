@@ -45,7 +45,6 @@
   ];
 
   # Networking
-  networking.networkmanager.enable = true;
   networking.myBridge = {
     enable = true;
     interface = "eno1";
