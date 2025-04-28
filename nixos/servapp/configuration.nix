@@ -31,7 +31,6 @@
   ];
 
   # Networking
-  networking.networkmanager.enable = true;
   networking.myBridge = {
     enable = true;
     interface = "enp1s0";
