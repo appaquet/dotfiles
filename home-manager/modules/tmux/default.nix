@@ -30,7 +30,7 @@ in
       set -g @plugin 'tmux-plugins/tmux-resurrect'
 
       # Loads gpakosz/.tmux configuration & .tmux.conf.local
-      # source-file ~/.tmux.conf
+      source-file ~/.tmux.conf
 
       # Because tmux.conf default's is 600ms, which is too long (ex: moving between panes)
       set -sg repeat-time 300

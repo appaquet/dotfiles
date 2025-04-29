@@ -16,14 +16,12 @@
       # vi mode
       fish_vi_key_bindings
 
+      # If colors are messed up, check:
+      # https://gist.github.com/andersevenrud/015e61af2fd264371032763d4ed965b6
+      # Don't set TERM here, it should be set via tmux (which is done by .tmux.conf)
+
       # Add support for nix run and nix-shell in fish
       ${pkgs.any-nix-shell}/bin/any-nix-shell fish --info-right | source
-
-      # Force term color support
-      # Some TUI may not appear correctly otherwise
-      # Check https://gist.github.com/andersevenrud/015e61af2fd264371032763d4ed965b6
-      set -x TERM xterm-256color
-      set -x COLORTERM truecolor
 
       # Source any local stuff from .profile
       if test -f ~/.profile

@@ -1,3 +1,6 @@
+-- If colors are messed up, check:
+-- https://gist.github.com/andersevenrud/015e61af2fd264371032763d4ed965b6
+
 vim.g.base16colorspace = 256 -- Access colors present in 256 colorspace
 vim.o.termguicolors = true -- Enable 24-bit RGB true colors
 vim.o.background = "dark" -- Defaults to dark theme
