@@ -9,6 +9,8 @@
 let
   devMode = true; # Include files from dotfiles directly instead of via nix store
 
+  pkgsChannel = unstablePkgs;
+
   confDir = "${config.home.homeDirectory}/dotfiles/home-manager/modules/neovim/conf";
 
   includeLuaFile =
@@ -38,6 +40,9 @@ let
     src = ./plugins/lsp-notify;
   };
 
+  avante-nvim-override = pkgs.callPackage ./plugins/avante.nix {
+    pkgs = pkgsChannel;
+  };
 in
 {
   programs.neovim = {
@@ -45,10 +50,10 @@ in
     viAlias = true;
     vimAlias = true;
 
-    package = unstablePkgs.neovim-unwrapped;
+    package = pkgsChannel.neovim-unwrapped;
 
     plugins =
-      (with unstablePkgs.vimPlugins; [
+      (with pkgsChannel.vimPlugins; [
         # Theme
         catppuccin-nvim
         nvim-web-devicons
@@ -104,7 +109,7 @@ in
         friendly-snippets # easy load from vscode, languages, etc.
 
         # AI
-        avante-nvim
+        avante-nvim-override
         copilot-lua # use `Copilot auth` to login
         render-markdown-nvim # optional dep
 
@@ -147,10 +152,10 @@ in
         ]))
         nvim-treesitter-textobjects # provider object manipulation
       ])
-      # ++ (with unstablePkgs.vimPlugins; [
+      # ++ (with pkgsChannel.vimPlugins; [
       # !Warning! Make sure that any plugin loaded here isn't loading treesitters. We can't have
       #])
-      #++ (with unstablePkgs.vimPlugins; [
+      #++ (with pkgsChannel.vimPlugins; [
       # !Warning! Make sure that any plugin loaded here aren't loading treesitters. We can't have
       # it from both stable and unstable ( https://github.com/NixOS/nixpkgs/issues/282927 )
       # ])

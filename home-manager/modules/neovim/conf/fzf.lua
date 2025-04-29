@@ -71,3 +71,7 @@ vim.keymap.set("n", "<leader>fgB", fzf.git_blame, { desc = "FZF: Git blame" })
 vim.keymap.set("n", "<leader>fgt", fzf.git_tags, { desc = "FZF: Git tags" })
 
 vim.keymap.set("n", "<leader>fdb", fzf.dap_breakpoints, { desc = "FZF: DAP breakpoints" })
+
+vim.keymap.set({ "n", "v", "i" }, "<C-x><C-f>", function()
+	require("fzf-lua").complete_path()
+end, { silent = true, desc = "FZF: Fuzzy complete path" })

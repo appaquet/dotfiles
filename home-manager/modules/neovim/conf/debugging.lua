@@ -17,8 +17,8 @@ vim.keymap.set("n", "<leader>dj", dap.down, { desc = "DAP: Down" })
 vim.keymap.set("n", "<leader>dk", dap.up, { desc = "DAP: Up" })
 vim.keymap.set("n", "<leader>dp", dap.pause, { desc = "DAP: Pause" })
 vim.keymap.set("n", "<leader>dt", dap.terminate, { desc = "DAP: Terminate" })
-vim.keymap.set("n", "<leader>dl", dap.restart, { desc = "DAP: Restart" })
-vim.keymap.set("n", "<leader>dr", dap.repl.toggle, { desc = "DAP: Toggle repl" })
+vim.keymap.set("n", "<leader>dr", dap.restart, { desc = "DAP: Restart" })
+vim.keymap.set("n", "<leader>de", dap.repl.toggle, { desc = "DAP: Toggle repl" })
 vim.keymap.set("n", "<leader>dl", dap.run_last, { desc = "DAP: Run last" })
 vim.keymap.set("n", "<leader>dC", dap.run_to_cursor, { desc = "DAP: Run to cursor" })
 
@@ -52,8 +52,13 @@ dapui.setup({
 	expand_lines = false,
 })
 
-vim.keymap.set("n", "<leader>du", dapui.toggle, { desc = "DAP: Toggle UI" })
-vim.keymap.set("n", "<leader>dq", dapui.close, { desc = "DAP: Quit / close UI" })
+local function quit_dap()
+	dap.terminate()
+	dapui.close()
+end
+
+vim.keymap.set("n", "<leader>do", dapui.open, { desc = "DAP: Open DAP UI" })
+vim.keymap.set("n", "<leader>dq", quit_dap, { desc = "DAP: Terminate & Quit DAP UI" })
 
 dap.listeners.before.initialized.dapui_config = function()
 	dapui.open()

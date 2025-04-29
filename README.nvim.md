@@ -56,6 +56,8 @@ keymaps, but also default/built-ins that I tend to forget.
   * `<ctrl-s>` to open selection in horizontal split
   * `<alt-i>` to toggle ignored files
 * See [fzf.lua](/home-manager/modules/neovim/conf/fzf.lua) for all keymaps
+* Insert-mode completions
+  * `<ctrl-x><ctrl-f>` to fuzzy complete files/paths
 
 ### Keymap inside window
 * `<ctrl>k`, sends matches to the quickfix list
@@ -125,6 +127,7 @@ keymaps, but also default/built-ins that I tend to forget.
 See [https://github.com/pwntester/octo.nvim/blob/03059cf4d694e2b3065136f074b42ee98ff8e4b2/lua/octo/config.lua#L238]
 * `<leader>gpo` to open PR review mode
 * `<leader>gpq` to close PR review mode
+* `<leader>gpl` to list PRs
 * Files 
   * `]q` and `[q` to navigate between files
   * `]Q` and `[Q` to navigate first and last files
@@ -132,8 +135,8 @@ See [https://github.com/pwntester/octo.nvim/blob/03059cf4d694e2b3065136f074b42ee
   * `gf` to open file (unfortunately not in new tab)
 * Comments
   * `<leader>gpc` to review comments
-  * `<leader>ca` to add a comment (unfocus window to close)
-  * `<leader>cd` to delete a comment
+  * `<leader>ca` to add a comment (save + unfocus window to submit)
+  * `<leader>cd` to delete a comment (in comment window)
   * `<leader>sa` to add line suggestion
   * `<leader>r` to add reaction 
   * `]c` and `[c` to navigate between comments
@@ -190,10 +193,10 @@ See [https://github.com/pwntester/octo.nvim/blob/03059cf4d694e2b3065136f074b42ee
 * `<leader>dk` to move up in the stack trace
 * `<leader>dp` to pause execution
 * `<leader>dt` to terminate the debugging session
-* `<leader>dl` to restart the debugging session
-* `<leader>dr` to toggle the REPL
+* `<leader>dr` to restart the debugging session
+* `<leader>de` to toggle the REPL
 * `<leader>dC` to run to cursor
-* `<leader>du` to toggle the DAP UI
+* `<leader>ou` to open the DAP UI
 * `<leader>dq` to quit/close the DAP UI
 
 ## Object selection (in visual mode)

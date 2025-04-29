@@ -30,7 +30,7 @@ in
       set -g @plugin 'tmux-plugins/tmux-resurrect'
 
       # Loads gpakosz/.tmux configuration & .tmux.conf.local
-      source-file ~/.tmux.conf
+      # source-file ~/.tmux.conf
 
       # Because tmux.conf default's is 600ms, which is too long (ex: moving between panes)
       set -sg repeat-time 300
@@ -72,12 +72,6 @@ in
       # See https://github.com/tmux/tmux/issues/4162
       set -gu default-command
       set -g default-shell "${pkgs.fish}/bin/fish"
-
-      # Prefixes ctrl-a and ctrl-space
-      set-option -g prefix C-a
-      bind C-a send-prefix
-      set-option -g prefix2 C-Space
-      bind C-Space send-prefix
 
       # Rebind r to reload config
       unbind r

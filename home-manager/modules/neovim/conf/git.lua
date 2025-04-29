@@ -59,16 +59,16 @@ vim.keymap.set("n", "<Leader>gdb", ":Gitsigns diffthis<CR>", { silent = true, de
 
 local function switch_gutter_base_main()
 	local main_branch = git_main_branch()
-	vim.api.nvim_command("Gitsigns change_base " .. main_branch .. " global")
+	vim.api.nvim_command("Gitsigns change_base " .. main_branch .. " true")
 	vim.notify("Switching git gutter against " .. main_branch)
 end
 local function switch_gutter_base_prev()
 	local prev_branch = git_prev_branch()
-	vim.api.nvim_command("Gitsigns change_base " .. prev_branch .. " global")
+	vim.api.nvim_command("Gitsigns change_base " .. prev_branch .. " true")
 	vim.notify("Switching git gutter against " .. prev_branch)
 end
 local function switch_gutter_base_default()
-	vim.api.nvim_command("Gitsigns reset_base global")
+	vim.api.nvim_command("Gitsigns reset_base true")
 	vim.notify("Switching git gutter to default")
 end
 
@@ -84,6 +84,7 @@ require("octo").setup({
 require("which-key").add({
 	{ "<leader>gp", group = "PR review" },
 })
+vim.keymap.set("n", "<Leader>gpl", ":Octo pr list<CR>", { silent = true, desc = "Git: PR list" })
 vim.keymap.set("n", "<Leader>gpo", ":Octo review open<CR>", { silent = true, desc = "Git: PR review open" })
 vim.keymap.set("n", "<Leader>gpq", ":Octo review close<CR>", { silent = true, desc = "Git: PR review close" })
 vim.keymap.set("n", "<Leader>gpc", ":Octo review comments<CR>", { silent = true, desc = "Git: PR review comments" })
