@@ -70,6 +70,13 @@ require("nvim-tree").setup({
 	},
 	view = {
 		width = 50,
+		float = {
+			enable = true,
+			open_win_config = {
+				width = 50,
+				height = 70,
+			},
+		},
 	},
 	on_attach = on_attach,
 })

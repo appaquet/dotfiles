@@ -78,7 +78,7 @@
       '';
 
       git-prev-branch = ''
-        git-stacked-branches | head -n 1
+        git-stacked-branches | head -n 2 | tail -n 1
       '';
 
       git-next-branch = ''

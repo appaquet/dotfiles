@@ -222,6 +222,7 @@ See [https://github.com/pwntester/octo.nvim/blob/03059cf4d694e2b3065136f074b42ee
 * `gu` to lowercase text (in visual)
 * `gU` to upercase text (in visual)
 * `g~` to toggle casing (in visual)
+* `g;` and `g,` to navigate through last edits
 * `<ctrl-n>` to start multicursor edit
   * A keymap helper will show up with the available keymaps
   * `n`, `N` to go to next/prev match
