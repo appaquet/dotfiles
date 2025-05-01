@@ -99,3 +99,16 @@ require("gitlinker").setup({
 
 -- General keymap
 vim.keymap.set("n", "<Leader>gs", ":Git<CR>", { silent = true, desc = "Git: status" })
+
+local function git_main_branch_ask()
+	local branch = vim.fn.input("Main branch: ")
+	if branch ~= "" then
+		vim.g.main_branch_override = branch
+		vim.notify("Main branch set to " .. branch)
+	else
+		vim.notify("No main branch set")
+	end
+
+	switch_gutter_base_main()
+end
+vim.keymap.set("n", "<Leader>gm", git_main_branch_ask, { silent = true, desc = "Git: change main branch" })

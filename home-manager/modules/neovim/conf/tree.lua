@@ -74,7 +74,7 @@ require("nvim-tree").setup({
 			enable = true,
 			open_win_config = {
 				width = 50,
-				height = 70,
+				height = 65,
 			},
 		},
 	},
