@@ -25,6 +25,13 @@ lspconfig.pyright.setup({
 		},
 	},
 })
+lspconfig.ruff.setup({ -- https://docs.astral.sh/ruff/editors/setup/#neovim
+	init_options = {
+		settings = {
+			logLevel = "debug",
+		},
+	},
+})
 
 lspconfig.lua_ls.setup({
 	-- See https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#lua_ls
