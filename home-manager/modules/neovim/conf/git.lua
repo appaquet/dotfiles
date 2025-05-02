@@ -33,6 +33,16 @@ local function open_diffview_prev()
 	vim.notify("Diffing against " .. prev_branch)
 end
 
+local function open_diffview_rev()
+	local rev = vim.fn.input("Git rev/commit: ")
+	if rev == "" then
+		vim.notify("No git rev/commit entered")
+		return
+	end
+
+	vim.api.nvim_command("DiffviewOpen " .. rev)
+end
+
 require("which-key").add({
 	{ "<leader>gd", group = "Diff view" },
 })
@@ -40,7 +50,8 @@ vim.keymap.set("n", "<Leader>gdw", ":DiffviewOpen<CR>", { silent = true, desc = 
 vim.keymap.set("n", "<Leader>gdm", open_diffview_main, { desc = "Git: open diff view against main branch" })
 vim.keymap.set("n", "<Leader>gdp", open_diffview_prev, { desc = "Git: open diff view against previous branch" })
 vim.keymap.set("n", "<Leader>gdq", ":DiffviewClose<CR>", { silent = true, desc = "Git: close diff view" })
-vim.keymap.set("n", "<Leader>gdf", ":DiffviewFileHistory<CR>", { silent = true, desc = "Git: open file history" })
+vim.keymap.set("n", "<Leader>gdf", ":DiffviewFileHistory %<CR>", { silent = true, desc = "Git: open file history" })
+vim.keymap.set("n", "<Leader>gdc", open_diffview_rev, { silent = true, desc = "Git: open diff view against given rev/commit" })
 
 -- Git signs
 -- https://github.com/lewis6991/gitsigns.nvim

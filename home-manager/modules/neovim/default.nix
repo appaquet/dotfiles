@@ -63,6 +63,7 @@ in
         lualine-nvim # https://github.com/nvim-lualine/lualine.nvim
         bufferline-nvim # https://github.com/akinsho/bufferline.nvim
         auto-session # automatically restore last session
+        zen-mode-nvim
 
         # Tools
         fzf-lua

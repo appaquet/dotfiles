@@ -33,10 +33,15 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>n<tab>` to switch to last tab
 
 ## Windows
-* `ctrl-w w` to switch between panes
+* `ctrl-w w` to swap left and right window buffers
 * `ctrl-w r` or `ctrl-w R` to rotate panes
 * `ctrl-w c` or `ctrl-w o` close current split OR others.
 * `ctrl-w z` to toggle zen mode
+* `ctrl-w pl` to pop current buffer to right window and navigate back
+* `ctrl-w pf` to pop current buffer to a floating window and navigate back
+* `ctrl-w ]` to increase window width
+* `ctrl-w [` to decrease window width
+* `ctrl-w m` to set window width to 80% of screen
 
 ## Fzf (f)
 * `<ctrl-p>` or `<leader>ff` fuzzy finding file names (can also be used in tree)
@@ -148,10 +153,12 @@ See [https://github.com/pwntester/octo.nvim/blob/03059cf4d694e2b3065136f074b42ee
 
 ## Diagnostics (x)
 * `<leader>xs` or `<leader>xf` Open diagnostic float
-* `<leader>xn` or `]x` Go to next diagnostic
-* `<leader>xp` or `[x` Go to previous diagnostic
 * `<leader>xo` Open diagnostic panel (Trouble)
 * `<leader>xq` Close diagnostic panel (Trouble)
+* `]x` Go to next diagnostic (in file)
+* `[x` Go to previous diagnostic (in file)
+* `]X` Go to next diagnostic (global)
+* `[X` Go to previous diagnostic (global)
 * In diagnostic panel
   * `s` to toggle between severty levels
 

@@ -128,4 +128,15 @@ vim.keymap.set("n", "<C-w>pf", PopBufferToFloat, { silent = true, desc = "Pop bu
 vim.keymap.set("n", "<C-w>w", swap_left_right_win, { silent = true, desc = "Swap left and right window buffers" })
 vim.keymap.set("n", "<C-w>]", win_width_incr, { silent = true, desc = "Increase window width" })
 vim.keymap.set("n", "<C-w>[", win_width_decr, { silent = true, desc = "Decrease window width" })
-vim.keymap.set("n", "<C-w>z", win_width_80pc, { silent = true, desc = "Increase window width to 80%" })
+vim.keymap.set("n", "<C-w>m", win_width_80pc, { silent = true, desc = "Increase window width to 80%" })
+
+-- Zenmode
+-- https://github.com/folke/zen-mode.nvim
+local function toggle_zenmode()
+	require("zen-mode").toggle({
+		window = {
+			width = 0.7,
+		},
+	})
+end
+vim.keymap.set({ "n", "v" }, "<C-w>z", toggle_zenmode, { silent = true, desc = "Zen mode" })

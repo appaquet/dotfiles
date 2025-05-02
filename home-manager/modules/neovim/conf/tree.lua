@@ -52,6 +52,13 @@ local function on_attach(bufnr)
 			require("fzf-lua").files({ cwd = path })
 		end)
 	end, opts("FZF: Files in folder"))
+
+	-- file / dir history
+	vim.keymap.set("n", "<leader>gdf", function()
+		in_directory(function(path)
+			vim.cmd("DiffviewFileHistory " .. path)
+		end)
+	end, opts("Git: open file/dir history"))
 end
 
 require("nvim-tree").setup({
@@ -74,7 +81,7 @@ require("nvim-tree").setup({
 			enable = true,
 			open_win_config = {
 				width = 50,
-				height = 65,
+				height = 60,
 			},
 		},
 	},

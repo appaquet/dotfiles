@@ -94,6 +94,8 @@ let
     }
 
     function nvidia() {
+        echo "Switchting to nvidia driver..."
+
         switch_driver "nvidia"
 
         # Force drivers to persist, preventing high power usage on idle
@@ -104,6 +106,8 @@ let
     }
 
     function vfio() {
+        echo "Switchting to vfio-pci driver..."
+
         if pgrep -x "process-compose" > /dev/null; then
             echo "Stopping process compose..."
             pkill process-compose || true 

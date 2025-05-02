@@ -211,6 +211,7 @@ if vim.fn.executable("go") == 1 then -- Only load the plugin if `go` is availabl
 			},
 		},
 	})
+	vim.keymap.set({ "n", "v" }, "<leader>lci", ":GoImports<CR>", { silent = true, desc = "LSP: Fix imports" })
 end
 
 -- Rust

@@ -5,7 +5,7 @@
     gh
     lazygit
 
-    # allows adding filers to prior commits automatically based on directories
+    # allows adding files to prior commits automatically based on directories
     # see https://github.com/tummychow/git-absorb
     git-absorb
 
