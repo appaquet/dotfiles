@@ -32,9 +32,6 @@ in
       # Loads gpakosz/.tmux configuration & .tmux.conf.local
       source-file ~/.tmux.conf
 
-      # Because tmux.conf default's is 600ms, which is too long (ex: moving between panes)
-      set -sg repeat-time 300
-
       # Synchronized panes
       bind S setw synchronize-panes\; display-message "Synchronized pane is now #{?synchronize-panes,on,off}"
 
