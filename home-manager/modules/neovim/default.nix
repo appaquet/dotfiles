@@ -49,6 +49,7 @@ in
     enable = true;
     viAlias = true;
     vimAlias = true;
+    defaultEditor = true;
 
     package = pkgsChannel.neovim-unwrapped;
 
@@ -199,8 +200,9 @@ in
     ];
   };
 
-  home.sessionVariables = {
-    EDITOR = "nvim";
-    VISUAL = "nvim";
-  };
+  # In theory don't need this, see above
+  # home.sessionVariables = {
+  #   EDITOR = "nvim";
+  #   VISUAL = "nvim";
+  # };
 }
