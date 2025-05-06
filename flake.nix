@@ -10,6 +10,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    home-manager-unstable = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
+
     darwin = {
       url = "github:lnl7/nix-darwin/nix-darwin-24.11";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -61,6 +66,7 @@
       nixpkgs,
       nixpkgs-unstable,
       home-manager,
+      home-manager-unstable,
       humanfirst-dots,
       raspberry-pi-nix,
       secrets,
@@ -116,8 +122,8 @@
           in
           {
             homes = {
-              "appaquet@deskapp" = home-manager.lib.homeManagerConfiguration rec {
-                inherit pkgs;
+              "appaquet@deskapp" = home-manager-unstable.lib.homeManagerConfiguration rec {
+                pkgs = unstablePkgs;
                 modules = [
                   ./home-manager/deskapp.nix
                   extraSpecialArgs.secrets.commonHome
