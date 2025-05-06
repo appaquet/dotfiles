@@ -176,15 +176,23 @@ in
 
   systemd.services.switch-gpu-boot-after-resume = {
     description = "Switch GPU to NVIDIA on resume (rebinding it to make sure it works)";
-    after = [ "sleep.service" ];
+    after = [
+      "suspend.target"
+      "hibernate.target"
+      "hybrid-sleep.target"
+    ];
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${pkgs.writeShellScript "start-vms" ''
+      ExecStart = "${pkgs.writeShellScript "switch-gpu-after-resume" ''
         ${gpuSwitch}/bin/gpu-switch vfio
         ${gpuSwitch}/bin/gpu-switch nvidia
       ''}";
     };
-    wantedBy = [ "multi-user.target" ];
+    wantedBy = [
+      "suspend.target"
+      "hibernate.target"
+      "hybrid-sleep.target"
+    ];
   };
 
 }

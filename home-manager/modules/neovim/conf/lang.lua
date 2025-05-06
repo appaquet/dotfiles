@@ -25,13 +25,16 @@ lspconfig.pyright.setup({
 		},
 	},
 })
-lspconfig.ruff.setup({ -- https://docs.astral.sh/ruff/editors/setup/#neovim
-	init_options = {
-		settings = {
-			logLevel = "debug",
+
+if vim.fn.executable("ruff") == 1 then -- Only load if ruff is available
+	lspconfig.ruff.setup({ -- https://docs.astral.sh/ruff/editors/setup/#neovim
+		init_options = {
+			settings = {
+				logLevel = "debug",
+			},
 		},
-	},
-})
+	})
+end
 
 lspconfig.lua_ls.setup({
 	-- See https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#lua_ls
@@ -106,6 +109,14 @@ vim.api.nvim_create_autocmd("LspAttach", {
 			end)
 			PopBufferToRight()
 		end
+
+		require("which-key").add({
+			{ "<leader>li", group = "LSP: Info..." },
+			{ "<leader>ll", group = "LSP: List..." },
+			{ "<leader>lg", group = "LSP: Goto..." },
+			{ "<leader>lw", group = "LSP: Workspace..." },
+			{ "<leader>lc", group = "LSP: Actions..." },
+		})
 
 		-- Go to
 		vim.keymap.set("n", "<leader>lgd", vim.lsp.buf.definition, kopts(ev.buf, "LSP: Go to definition"))
