@@ -111,7 +111,7 @@ in
         friendly-snippets # easy load from vscode, languages, etc.
 
         # AI
-        avante-nvim
+        avante-nvim-override
         copilot-lua # use `Copilot auth` to login
         render-markdown-nvim # optional dep
 
