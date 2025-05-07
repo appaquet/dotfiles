@@ -40,10 +40,10 @@ let
     src = ./plugins/lsp-notify;
   };
 
-  # avante-nvim-override = pkgs.callPackage ./plugins/avante.nix {
-  #   pkgs = pkgsChannel;
-  # };
 in
+# avante-nvim-override = pkgs.callPackage ./plugins/avante.nix {
+#   pkgs = pkgsChannel;
+# };
 {
   programs.neovim = {
     enable = true;
@@ -199,10 +199,4 @@ in
       shellcheck # shell linting
     ];
   };
-
-  # In theory don't need this, see above
-  # home.sessionVariables = {
-  #   EDITOR = "nvim";
-  #   VISUAL = "nvim";
-  # };
 }
