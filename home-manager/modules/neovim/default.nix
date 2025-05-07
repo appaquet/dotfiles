@@ -9,7 +9,7 @@
 let
   devMode = true; # Include files from dotfiles directly instead of via nix store
 
-  pkgsChannel = unstablePkgs;
+  pkgsChannel = pkgs;
 
   confDir = "${config.home.homeDirectory}/dotfiles/home-manager/modules/neovim/conf";
 
@@ -40,10 +40,11 @@ let
     src = ./plugins/lsp-notify;
   };
 
+  avante-nvim-override = pkgs.callPackage ./plugins/avante.nix {
+    pkgs = pkgsChannel;
+  };
+
 in
-# avante-nvim-override = pkgs.callPackage ./plugins/avante.nix {
-#   pkgs = pkgsChannel;
-# };
 {
   programs.neovim = {
     enable = true;
@@ -111,7 +112,7 @@ in
         friendly-snippets # easy load from vscode, languages, etc.
 
         # AI
-        avante-nvim
+        avante-nvim-override
         copilot-lua # use `Copilot auth` to login
         render-markdown-nvim # optional dep
 
