@@ -40,9 +40,9 @@ let
     src = ./plugins/lsp-notify;
   };
 
-  avante-nvim-override = pkgs.callPackage ./plugins/avante.nix {
-    pkgs = pkgsChannel;
-  };
+  # avante-nvim-override = pkgs.callPackage ./plugins/avante.nix {
+  #   pkgs = pkgsChannel;
+  # };
 in
 {
   programs.neovim = {
@@ -111,7 +111,7 @@ in
         friendly-snippets # easy load from vscode, languages, etc.
 
         # AI
-        avante-nvim-override
+        avante-nvim
         copilot-lua # use `Copilot auth` to login
         render-markdown-nvim # optional dep
 

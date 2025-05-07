@@ -45,13 +45,6 @@
         python3 = (
           (pkgs.python310.withPackages (
             p: with p; [
-              #tensorflow
-              #grpcio-tools
-              #click
-              #keras
-              #mypy-protobuf
-              #numpy
-              #spacy
               pandas
               opencv-python
             ]
@@ -74,7 +67,7 @@
                   "llvm-tools-preview"
                 ];
               })
-              pkgsUnstable.rust-analyzer # temporay, until RA is bumped to a version that works with tokio::test
+              pkgsUnstable.rust-analyzer # temporary, until RA is bumped to a version that works with tokio::test
 
               stdenv.cc.cc.lib
               llvmPackages.libclang
@@ -130,7 +123,6 @@
               # Mostly for python fixes
               # https://nixos.wiki/wiki/Packaging/Quirks_and_Caveats#ImportError:_libstdc.2B.2B.so.6:_cannot_open_shared_object_file:_No_such_file
               # https://discourse.nixos.org/t/poetry-pandas-issue-libz-so-1-not-found/17167/5
-              # TODO: move to NIX_LD_LIBRARY_PATH
               LD_LIBRARY_PATH="${
                 pkgs.lib.makeLibraryPath [
                   pkgs.stdenv.cc.cc
