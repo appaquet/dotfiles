@@ -122,8 +122,8 @@
           in
           {
             homes = {
-              "appaquet@deskapp" = home-manager.lib.homeManagerConfiguration rec {
-                inherit pkgs;
+              "appaquet@deskapp" = home-manager-unstable.lib.homeManagerConfiguration rec {
+                pkgs = unstablePkgs;
                 modules = [
                   ./home-manager/deskapp.nix
                   extraSpecialArgs.secrets.commonHome
