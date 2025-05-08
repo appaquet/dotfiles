@@ -11,6 +11,15 @@ fzf.setup({
 	keymap = {
 		fzf = {
 			["ctrl-k"] = "select-all+accept", -- Sends to quickfix
+			["ctrl-d"] = "half-page-down",
+			["ctrl-u"] = "half-page-up",
+		},
+	},
+	actions = {
+		files = {
+			true, -- inherit defaults
+			["ctrl-i"] = fzf.actions.toggle_ignore, -- Because alt may not work everyhwere
+			["ctrl-h"] = fzf.actions.toggle_hidden,
 		},
 	},
 	oldfiles = {

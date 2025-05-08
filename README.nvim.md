@@ -59,7 +59,10 @@ keymaps, but also default/built-ins that I tend to forget.
   * `<ctrl-k>` to send matches to quickfix list
   * `<ctrl-v>` to open selection in vertical split
   * `<ctrl-s>` to open selection in horizontal split
-  * `<alt-i>` to toggle ignored files
+  * `<ctrl-i>` to toggle ignored files
+  * `<ctrl-h>` to toggle hidden files
+  * `<ctrl-d>` or `<ctrl-u>` to page through results
+  * `<shift-up>` or `<shift-down>` to page through preview
 * See [fzf.lua](/home-manager/modules/neovim/conf/fzf.lua) for all keymaps
 * Insert-mode completions
   * `<ctrl-x><ctrl-f>` to fuzzy complete files/paths
