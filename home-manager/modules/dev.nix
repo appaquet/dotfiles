@@ -44,5 +44,5 @@ in
       unstablePkgs.binsider # binary analysis tool
     ];
 
-  # home.file.".cargo/config.toml".text = cargoConfig;
+  home.file.".cargo/config.toml".text = cargoConfig;
 }

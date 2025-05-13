@@ -5,31 +5,46 @@ require("which-key").add({
 -- Trouble (diagnostics)
 -- https://github.com/folke/trouble.nvim
 local Trouble = require("trouble")
-Trouble.setup({})
+Trouble.setup({
+	modes = {
+		-- Only show diagnostics in the current working directory
+		cwd_diagnostics = {
+			mode = "diagnostics",
+			filter = {
+				function(item)
+					local cwd = vim.fn.getcwd()
+					return item.filename:sub(1, #cwd) == cwd
+				end,
+			},
+		},
+	},
+})
+
+local diag_mode = "cwd_diagnostics"
 
 local function trouble_diag_open()
-	Trouble.open("diagnostics")
+	Trouble.open(diag_mode)
 end
 
 local function trouble_diag_focus()
-	if Trouble.is_open("diagnostics") then
+	if Trouble.is_open(diag_mode) then
 		Trouble.focus()
 	else
-		Trouble.open("diagnostics")
+		Trouble.open(diag_mode)
 	end
 end
 
 local function trouble_diag_close()
-	Trouble.close("diagnostics")
+	Trouble.close(diag_mode)
 end
 
 local function trouble_diag_toggle()
-	Trouble.toggle("diagnostics")
+	Trouble.toggle(diag_mode)
 end
 
 local function trouble_diag_next()
-	if not Trouble.is_open("diagnostics") then
-		Trouble.open("diagnostics")
+	if not Trouble.is_open(diag_mode) then
+		Trouble.open(diag_mode)
 	end
 
 	Trouble.focus()
@@ -37,8 +52,8 @@ local function trouble_diag_next()
 end
 
 local function trouble_diag_prev()
-	if not Trouble.is_open("diagnostics") then
-		Trouble.open("diagnostics")
+	if not Trouble.is_open(diag_mode) then
+		Trouble.open(diag_mode)
 	end
 
 	Trouble.focus()

@@ -67,7 +67,7 @@
                   "llvm-tools-preview"
                 ];
               })
-              pkgsUnstable.rust-analyzer # temporary, until RA is bumped to a version that works with tokio::test
+              pkgsUnstable.rust-analyzer # we want the latest goodies
 
               stdenv.cc.cc.lib
               llvmPackages.libclang
@@ -99,7 +99,9 @@
               python3
               (poetry.override { python3 = python310; })
 
+              # LSPs
               pyright
+              ruff
               jsonnet-language-server
             ];
 
@@ -120,20 +122,23 @@
             NIX_LD = builtins.readFile "${pkgs.stdenv.cc}/nix-support/dynamic-linker";
 
             shellHook = ''
-              # Mostly for python fixes
+              # For python. Re-exposed to `LD_LIBRARY_PATH` inside python dirs via .envrc's
               # https://nixos.wiki/wiki/Packaging/Quirks_and_Caveats#ImportError:_libstdc.2B.2B.so.6:_cannot_open_shared_object_file:_No_such_file
               # https://discourse.nixos.org/t/poetry-pandas-issue-libz-so-1-not-found/17167/5
-              LD_LIBRARY_PATH="${
-                pkgs.lib.makeLibraryPath [
-                  pkgs.stdenv.cc.cc
-                  pkgs.zlib
-                  pkgs.openssl
+              export PYTHON_LD_LIBRARY_PATH="${
+                pkgs.lib.makeLibraryPath (
+                  with pkgs;
+                  [
+                    stdenv.cc.cc
+                    zlib
+                    openssl
 
-                  # For unstructured.io
-                  pkgs.libGL
-                  pkgs.glib
-                  pkgs.tesseract
-                ]
+                    # For unstructured.io
+                    libGL
+                    glib
+                    tesseract
+                  ]
+                )
               }"
             '';
           };

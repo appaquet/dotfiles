@@ -205,9 +205,10 @@ See [https://github.com/pwntester/octo.nvim/blob/03059cf4d694e2b3065136f074b42ee
 * `<leader>dt` to terminate the debugging session
 * `<leader>dr` to restart the debugging session
 * `<leader>de` to toggle the REPL
+* `<leader>dl` to run last
 * `<leader>dC` to run to cursor
-* `<leader>ou` to open the DAP UI
-* `<leader>dq` to quit/close the DAP UI
+* `<leader>du` to open the DAP UI
+* `<leader>dq` to terminate & quit the DAP UI
 
 ## Object selection (in visual mode)
 - `aX`: Select around object X  

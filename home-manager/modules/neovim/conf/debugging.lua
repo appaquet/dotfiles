@@ -57,7 +57,7 @@ local function quit_dap()
 	dapui.close()
 end
 
-vim.keymap.set("n", "<leader>do", dapui.open, { desc = "DAP: Open DAP UI" })
+vim.keymap.set("n", "<leader>du", dapui.open, { desc = "DAP: Open DAP UI" })
 vim.keymap.set("n", "<leader>dq", quit_dap, { desc = "DAP: Terminate & Quit DAP UI" })
 
 dap.listeners.before.initialized.dapui_config = function()
