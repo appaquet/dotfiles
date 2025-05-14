@@ -23,7 +23,7 @@
       };
       git = {
         push-new-bookmarks = true; # allow pushing new boomarks without explicit flag
-      }
+      };
       revset-aliases = {
         "closest_bookmark(to)" = "heads(::to & bookmarks())";
       };
