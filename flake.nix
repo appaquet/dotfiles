@@ -137,8 +137,8 @@
                 };
               };
 
-              "appaquet@servapp" = home-manager.lib.homeManagerConfiguration rec {
-                inherit pkgs;
+              "appaquet@servapp" = home-manager-unstable.lib.homeManagerConfiguration rec {
+                pkgs = unstablePkgs;
                 modules = [
                   ./home-manager/servapp.nix
                   extraSpecialArgs.secrets.commonHome
@@ -182,8 +182,8 @@
                 };
               };
 
-              "appaquet@mbpapp" = home-manager.lib.homeManagerConfiguration rec {
-                inherit pkgs;
+              "appaquet@mbpapp" = home-manager-unstable.lib.homeManagerConfiguration rec {
+                pkgs = unstablePkgs;
                 modules = [
                   ./home-manager/mbpapp.nix
                   extraSpecialArgs.secrets.commonHome
