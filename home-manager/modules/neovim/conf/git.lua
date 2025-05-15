@@ -23,8 +23,8 @@ end
 
 local function open_diffview_main()
 	local main_branch = git_main_branch()
-	vim.api.nvim_command("DiffviewOpen " .. "origin/" .. main_branch)
-	vim.notify("Diffing against origin/" .. main_branch)
+	vim.api.nvim_command("DiffviewOpen " .. main_branch)
+	vim.notify("Diffing against " .. main_branch)
 end
 
 local function open_diffview_prev()

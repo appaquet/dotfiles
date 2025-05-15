@@ -18,8 +18,8 @@ let
     repo = "avante.nvim";
     # tag = "v${version}";
     # hash = "sha256-Ud4NkJH7hze5796KjVe5Nj9DzxwQkDQErCJDDiBzAIY=";
-    rev = "f65e72900f4289d6e4c7642309003813ecbdc3fe";
-    hash = "sha256-Dv9Qb8jMAahAJ+Qt2pUBEuB57jJJEZyaAkHvHTLuaYU=";
+    rev = "d4672b7e1ee8bf94df5e1d3482e81418187f42aa";
+    hash = "sha256-Bb7dbkUDwtfdurhEyU3/9vaBnKVYU2+WrmQBfFUopLU=";
   };
   avante-nvim-lib = rustPlatform.buildRustPackage {
     pname = "avante-nvim-lib";

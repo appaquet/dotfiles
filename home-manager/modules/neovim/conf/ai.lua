@@ -52,7 +52,7 @@ end, { noremap = true, silent = true })
 require("avante_lib").load()
 require("avante").setup({
 	-- From https://github.com/yetone/avante.nvim/blob/main/lua/avante/config.lua
-	provider = "claude",
+	provider = "copilot",
 
 	-- Not using auto suggestion for now
 	-- https://github.com/yetone/avante.nvim/issues/1047
