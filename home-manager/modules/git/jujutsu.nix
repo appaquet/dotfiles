@@ -1,7 +1,5 @@
 { unstablePkgs, ... }:
 {
-  # TODO: Better pager (same as git)
-
   programs.jujutsu = {
     enable = true;
 
@@ -9,6 +7,7 @@
 
     # See https://github.com/jj-vcs/jj/blob/main/docs/config.md
     # Some goodies from https://zerowidth.com/2025/jj-tips-and-tricks/#bookmarks-and-branches
+    # To see current + default config: `jj config list --include-defaults`
     settings = {
       user = {
         name = "Andre-Philippe Paquet";
@@ -41,6 +40,10 @@
           "git"
           "fetch"
         ];
+        "push" = [
+          "git"
+          "push"
+        ];
         "rebase-trunk" = [
           "rebase"
           "-s"
@@ -59,12 +62,19 @@
         setCursor = true;
       };
     };
-    # TODO: should they be aliases instead?
+
     functions = {
-      "jj-current-branch" =
-        "jj log --no-graph -r \"closest_bookmark(@)\" -T \"coalesce(local_bookmarks)\"";
-      "jj-stacked-branches" =
-        "jj log --no-graph -r 'trunk()..@ & bookmarks()' -T 'coalesce(local_bookmarks) ++ \"\n\"'";
+      jj-current-branch = "jj log --no-graph -r \"closest_bookmark(@)\" -T \"coalesce(local_bookmarks)\"";
+
+      jj-stacked-branches = "jj log --no-graph -r 'trunk()..@ & bookmarks()' -T 'coalesce(local_bookmarks) ++ \"\n\"'";
+
+      jj-stacked-stats = ''
+        for change in (jj log --reversed -r 'trunk()..@' --no-graph -T 'change_id ++ "\n"')
+             jj log -r $change
+             jj diff --stat -r $change
+             echo -e "\n"
+        end
+      '';
     };
   };
 }
