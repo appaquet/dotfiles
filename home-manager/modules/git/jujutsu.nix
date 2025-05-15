@@ -26,6 +26,7 @@
       };
       revset-aliases = {
         "closest_bookmark(to)" = "heads(::to & bookmarks())";
+        "recent()" = "committer_date(after:\"1 months ago\")";
       };
       aliases = {
         "tug" = [
@@ -35,6 +36,17 @@
           "closest_bookmark(@-)"
           "--to"
           "@-"
+        ];
+        "pull" = [
+          "git"
+          "fetch"
+        ];
+        "rebase-trunk" = [
+          "rebase"
+          "-s"
+          "all:roots(trunk()..@)" # root of any branches that leads us to trunk allowing support for multi-parents
+          "-d"
+          "trunk()" # rebase on trunk
         ];
       };
     };
