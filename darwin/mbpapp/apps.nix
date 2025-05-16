@@ -64,6 +64,9 @@
       {
         name = "steermouse";
       }
+      {
+        name = "macwhisper";
+      }
 
       {
         name = "signal";
@@ -84,6 +87,9 @@
       }
       {
         name = "gimp";
+      }
+      {
+        name = "bambu-studio";
       }
 
       {
