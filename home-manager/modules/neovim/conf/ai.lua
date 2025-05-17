@@ -59,6 +59,7 @@ require("avante").setup({
 	auto_suggestions_provider = "copilot", -- not used
 	behaviour = {
 		auto_suggestions = false, -- Experimental stage
+		use_cwd_as_project_root = true, -- Otherwise files aren't properly referenced
 	},
 
 	hints = { enabled = false }, -- Sometimes get messed up by refact
