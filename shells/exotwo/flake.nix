@@ -17,24 +17,7 @@
       let
         pkgs = import nixpkgs {
           inherit system;
-          config = {
-            allowUnfree = true;
-          };
-          overlays = [ ];
         };
-
-        python3_override = (
-          (pkgs.python313.withPackages (
-            p: with p; [
-              numpy
-              psycopg
-              pandas
-            ]
-          )).override
-            {
-              ignoreCollisions = true;
-            }
-        );
       in
       {
         devShells = {
@@ -43,13 +26,17 @@
 
             buildInputs = with pkgs; [
               pyright
-              stdenv.cc.cc.lib
-              stdenv.cc.cc
             ];
 
             nativeBuildInputs = with pkgs; [
-              python3_override
-              (poetry.override { python3 = python313; })
+              (python3.withPackages (
+                p: with p; [
+                  numpy
+                  psycopg
+                  pandas
+                ]
+              ))
+              (poetry.override { python3 = python3; })
             ];
 
             shellHook = ''
