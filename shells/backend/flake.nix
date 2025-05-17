@@ -54,7 +54,7 @@
       in
       {
         devShells = {
-          default = pkgs.mkShell rec {
+          default = pkgs.mkShell {
             name = "backend";
 
             buildInputs = with pkgs; [
