@@ -219,6 +219,11 @@ if vim.fn.executable("go") == 1 then -- Only load the plugin if `go` is availabl
 			settings = {
 				gopls = {
 					staticcheck = true,
+
+					-- Prevent diags from disappearing when typing
+					-- See https://github.com/ray-x/go.nvim/issues/515
+					diagnosticsDelay = "1s",
+					diagnosticsTrigger = "Edit",
 				},
 			},
 		},
