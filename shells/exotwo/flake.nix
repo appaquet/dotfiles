@@ -6,7 +6,7 @@
   description = "exotwo";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -24,7 +24,7 @@
         };
 
         python3_override = (
-          (pkgs.python311.withPackages (
+          (pkgs.python313.withPackages (
             p: with p; [
               numpy
               psycopg
@@ -49,7 +49,7 @@
 
             nativeBuildInputs = with pkgs; [
               python3_override
-              (poetry.override { python3 = python311; })
+              (poetry.override { python3 = python313; })
             ];
 
             shellHook = ''
