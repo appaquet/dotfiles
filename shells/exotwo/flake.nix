@@ -39,16 +39,15 @@
               (poetry.override { python3 = python3; })
             ];
 
-            shellHook = ''
-              # Postgres drivers need stdc++
-              export LD_LIBRARY_PATH="${
-                pkgs.lib.makeLibraryPath [
-                  pkgs.stdenv.cc.cc
-                  pkgs.stdenv.cc.cc.lib
-                ]
-              }"
-            '';
-
+            # Postgres drivers need stdc++
+            # shellHook = ''
+            #   export LD_LIBRARY_PATH="${
+            #     pkgs.lib.makeLibraryPath [
+            #       pkgs.stdenv.cc.cc
+            #       pkgs.stdenv.cc.cc.lib
+            #     ]
+            #   }"
+            # '';
           };
         };
       }
