@@ -1,6 +1,5 @@
 {
   pkgs,
-  unstablePkgs,
   config,
   secrets,
   ...
@@ -113,6 +112,7 @@ in
 
         # AI
         avante-nvim-override
+        codecompanion-nvim
         copilot-lua # use `Copilot auth` to login
         render-markdown-nvim # optional dep
 

@@ -73,3 +73,16 @@ require("avante").setup({
 require("render-markdown").setup({
 	file_types = { "markdown", "Avante" },
 })
+
+-- codecompanion
+-- https://codecompanion.olimorris.dev/getting-started.html
+require("codecompanion").setup({
+	strategies = {
+		chat = {
+			adapter = "copilot",
+		},
+		inline = {
+			adapter = "copilot",
+		},
+	},
+})
