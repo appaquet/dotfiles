@@ -1,7 +1,9 @@
 {
   pkgs,
+  unstablePkgs,
   config,
   secrets,
+  lib,
   ...
 }:
 
@@ -112,9 +114,9 @@ in
 
         # AI
         avante-nvim-override
-        codecompanion-nvim
         copilot-lua # use `Copilot auth` to login
         render-markdown-nvim # optional dep
+        #codecompanion-nvim # see bellow
 
         # Debugging
         nvim-dap
@@ -155,13 +157,10 @@ in
         ]))
         nvim-treesitter-textobjects # provider object manipulation
       ])
-      # ++ (with pkgsChannel.vimPlugins; [
-      # !Warning! Make sure that any plugin loaded here isn't loading treesitters. We can't have
-      #])
-      #++ (with pkgsChannel.vimPlugins; [
-      # !Warning! Make sure that any plugin loaded here aren't loading treesitters. We can't have
-      # it from both stable and unstable ( https://github.com/NixOS/nixpkgs/issues/282927 )
-      # ])
+      ++ (with unstablePkgs.vimPlugins; [
+        # not available in stable (piapp)
+        codecompanion-nvim
+      ])
       ++ [ nvim-lsp-notify ];
 
     extraConfig = (
