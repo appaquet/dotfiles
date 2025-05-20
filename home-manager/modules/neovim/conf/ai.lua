@@ -10,10 +10,10 @@ require("copilot").setup({
 		auto_trigger = true,
 		keymap = {
 			accept = false, -- See below
-			accept_word = "<C-l>",
-			accept_line = "<C-j>",
-			next = "<M-]>",
-			prev = "<M-[>",
+			accept_word = "<M-l>",
+			accept_line = "<M-j>",
+			next = "<M-j>",
+			prev = "<M-k>",
 			dismiss = "<C-]>",
 		},
 	},
