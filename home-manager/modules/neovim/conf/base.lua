@@ -37,6 +37,11 @@ vim.opt.exrc = true
 vim.opt.splitbelow = true
 vim.opt.splitright = true
 
+-- Setup leader key as space.
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
+vim.keymap.set("", "<Space>", "<Nop>")
+
 function Try(description, fn)
 	local success, result = pcall(fn)
 	if not success then
@@ -69,7 +74,7 @@ function FloatingWindowText(content)
 	local height = math.floor(vim.o.lines * 0.8)
 	local row = math.floor((vim.o.lines - height) / 2)
 	local col = math.floor((vim.o.columns - width) / 2)
-	vim.api.nvim_open_win(buf, true, {
+	local win = vim.api.nvim_open_win(buf, true, {
 		relative = "editor",
 		width = width,
 		height = height,
@@ -78,6 +83,19 @@ function FloatingWindowText(content)
 		style = "minimal",
 		border = "rounded",
 	})
+
+	vim.bo[buf].modifiable = false
+	vim.bo[buf].bufhidden = "wipe"
+
+	vim.api.nvim_buf_set_keymap(buf, "n", "q", "", {
+		noremap = true,
+		silent = true,
+		callback = function()
+			vim.api.nvim_win_close(win, true)
+		end,
+	})
+
+	return buf, win
 end
 
 -- Open nvim messages in a floating window

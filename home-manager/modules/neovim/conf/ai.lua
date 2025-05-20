@@ -54,15 +54,12 @@ require("avante").setup({
 	-- From https://github.com/yetone/avante.nvim/blob/main/lua/avante/config.lua
 	provider = "copilot",
 
-	-- Not using auto suggestion for now
-	-- https://github.com/yetone/avante.nvim/issues/1047
-	auto_suggestions_provider = "copilot", -- not used
 	behaviour = {
-		auto_suggestions = false, -- Experimental stage
-		use_cwd_as_project_root = true, -- Otherwise files aren't properly referenced
+		auto_suggestions = false, -- I use copilot.lua
+		use_cwd_as_project_root = true, -- Fix invalid path if inside sub-directory
 	},
 
-	hints = { enabled = false }, -- Sometimes get messed up by refact
+	hints = { enabled = false }, -- Keymap hints, we know how to use it now, no need...
 
 	web_search_engine = {
 		provider = "tavily",

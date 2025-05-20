@@ -6,11 +6,6 @@ require("which-key").add({
 	{ "<leader>y", group = "Clipboard" },
 })
 
--- Setup leader key as space.
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "
-vim.keymap.set("", "<Space>", "<Nop>")
-
 vim.keymap.set("n", "<Leader>qq", ":q<CR>", { silent = true, desc = "Quit current split/window" })
 vim.keymap.set("n", "<Leader>qa", ":qa!<CR>", { silent = true, desc = "Quit nvim" })
 vim.keymap.set("n", "<Leader>qs", ":SessionDelete<CR>:qa<CR>", { silent = true, desc = "Clear session & quit nvim" })
@@ -37,26 +32,7 @@ local function exec_shell_in_floating(script)
 	local output = vim.fn.system({ "sh", "-c", script })
 
 	local buf_content = script .. "\n\n" .. output
-	local buf = vim.api.nvim_create_buf(false, true) -- scratch
-	vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(buf_content, "\n"))
-
-	local width = math.floor(vim.o.columns * 0.6)
-	local height = math.floor(vim.o.lines * 0.6)
-	local row = math.floor((vim.o.lines - height) / 2)
-	local col = math.floor((vim.o.columns - width) / 2)
-	local win = vim.api.nvim_open_win(buf, true, {
-		relative = "editor",
-		width = width,
-		height = height,
-		row = row,
-		col = col,
-		border = "single",
-		style = "minimal",
-	})
-
-	vim.keymap.set({ "n", "v" }, "q", function()
-		vim.api.nvim_win_close(win, true)
-	end, { buffer = buf, nowait = true })
+	FloatingWindowText(buf_content)
 end
 
 local function get_selected_visual()
