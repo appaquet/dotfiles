@@ -117,6 +117,7 @@ in
         copilot-lua # use `Copilot auth` to login
         render-markdown-nvim # optional dep
         #codecompanion-nvim # see bellow
+        windsurf-nvim # for copilot
 
         # Debugging
         nvim-dap
