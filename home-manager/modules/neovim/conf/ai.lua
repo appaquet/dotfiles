@@ -20,6 +20,12 @@ require("copilot").setup({
 	panel = { enabled = false }, -- prevent interfering with cmp
 	copilot_model = "gpt-4o-copilot",
 
+	-- Logged to ~/.local/state/nvim/copilot-lua.log
+	-- logger = {
+	-- 	file_log_level = vim.log.levels.TRACE,
+	-- 	trace_lsp = "debug",
+	-- },
+
 	filetypes = {
 		-- overrides defaults
 		markdown = true,

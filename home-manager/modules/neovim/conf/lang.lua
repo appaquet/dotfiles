@@ -129,7 +129,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		vim.keymap.set("n", "gft", goto_type_definition_float, kopts(ev.buf, "LSP: Go to type definition (in floating window)"))
 		vim.keymap.set("n", "glt", goto_type_definition_right, kopts(ev.buf, "LSP: Go to type definition (in right split)"))
 
-		vim.keymap.set("n", "gr", fzf.lsp_references, kopts(ev.buf, "LSP: Go to references"))
+		-- vim.keymap.set("n", "gr", fzf.lsp_references, kopts(ev.buf, "LSP: Go to references"))
 
 		-- Info (more in treesitter.lua)
 		vim.keymap.set("n", "<leader>lii", vim.lsp.buf.hover, kopts(ev.buf, "LSP: Displays hover information about a symbol"))

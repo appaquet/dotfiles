@@ -95,18 +95,19 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>lgD` LSP: Go to declaration
 * `<leader>lgd` or `gd` LSP: Go to definition
 * `<leader>lgt` or `gt` LSP: Go to type definition
-* `<leader>lli` LSP: List all implementations
-* `<leader>llr` or `gr` LSP: List references
+* `<leader>lli` or `gri` LSP: List all implementations
+* `<leader>llr` or `grr` LSP: List references
 * `<leader>lii` LSP: Displays hover information about a symbol
 * `<leader>lis` LSP: Show signature help
 * `<leader>lif` LSP: Peek function definition
 * `<leader>lic` LSP: Peek class definition
 * `<leader>Ti` LSP: Toggle inlay line hints
-* `<leader>lr` LSP: Rename
-* `<leader>lca` or `<ctrl-l>` (in insert|visual) LSP: Code action
+* `<leader>lr` or `grn` LSP: Rename
+* `<leader>lca` or `<ctrl-l>` (in insert|visual) or `gra` LSP: Code action
 * `<leader>lwa` LSP: Add workspace folder
 * `<leader>lwr` LSP: Remove workspace folder
 * `<leader>lwl` LSP: List workspace folders
+
 
 ## Git (g)
 * `<leader>gs` to show git status
