@@ -36,19 +36,33 @@
 
 1. Enable flakes: `mkdir -p ~/.config/nix/ && echo 'experimental-features = nix-command flakes fetch-closure' > ~/.config/nix/nix.conf`
 
-1. Clone this repo recursively.
+1. Setup a GitHub personal access token in `~/.config/nix/nix.conf` (see [doc](https://nix.dev/manual/nix/2.18/command-ref/conf-file#conf-access-tokens))
 
-1. Setup home-manager & activate it.
+   ```conf
+    access-tokens = github.com:<YOUR_TOKEN>
+   ```
+
+1. Clone this repo recursively.
 
 1. Install [HomeBrew](https://brew.sh/).
 
-1. Setup nix-darwin & activate it.
+1. Build & activate home.
+
+1. Build & activate darwin.
+
+1. In theory, shell should be changed automatically to fish, but it may not work. Do it manually by
+   adding `/home/appaquet/.nix-profile/bin/fish` to `/etc/shells` and running `chsh -s /home/appaquet/.nix-profile/bin/fish`
 
 ## Initial setup on Non-NixOS Linux
 
 1. Download nix installer & run it with multi-user mode enabled: `curl -L https://nixos.org/nix/install | sh -s -- --daemon`
 
 1. Enable flakes: `mkdir -p ~/.config/nix/ && echo 'experimental-features = nix-command flakes fetch-closure' > ~/.config/nix/nix.conf`
+
+1. Setup a GitHub personal access token in `~/.config/nix/nix.conf` (see [doc](https://nix.dev/manual/nix/2.18/command-ref/conf-file#conf-access-tokens))
+
+   ```conf
+    access-tokens = github.com:<YOUR_TOKEN>
 
 1. On Linux, configure nix by adding to `/etc/nix/nix.conf`.
    No need to do it on Darwin since we already do it nix-darwin (see [configuration.nix](./darwin/mbpapp/configuration.nix))
@@ -64,10 +78,10 @@
       experimental-features = nix-command flakes fetch-closure
    ```
 
-1. Build `./x home build` and activate `./x home switch`
+1. Build & activate home.
 
-1. Activate shell by adding `/home/appaquet/.nix-profile/bin/fish` to `/etc/shells`
-   and running `chsh -s /home/appaquet/.nix-profile/bin/fish`
+1. Switch shell by adding `/home/appaquet/.nix-profile/bin/fish` to `/etc/shells` and running 
+   `chsh -s /home/appaquet/.nix-profile/bin/fish`
 
 ## Initial setup for Raspberry Pi
 

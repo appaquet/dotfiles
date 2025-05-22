@@ -34,7 +34,9 @@
       "codec2"
       "zstd"
       "pkg-config"
-      "terminal-notifier"
+
+      "terminal-notifier" # notify
+      "reattach-to-user-namespace" # pbcopy via tmux
     ];
 
     casks = [
