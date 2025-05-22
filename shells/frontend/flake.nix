@@ -33,7 +33,7 @@
 
             packages = with pkgs; [
               protobuf
-              nodejs_20
+              nodejs_22
               yarn
               playwright-driver.browsers
               typescript-language-server
