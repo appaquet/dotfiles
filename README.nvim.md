@@ -49,20 +49,23 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<ctrl-g>` or `<leader>fS` fuzzy find content in workspace (can also be used in tree)
 * `<ctrl-b>` or `<leader>fb` fuzzy find through buffers
 * `<ctrl-s>` or `<leader>fls` fuzzy find through document symbols
-* `<ctrl-n>` (`n`) or `<leader>fn` fuzzy find through tabs
-* `<leader>w` fuzzy find word under cursor in file
-* `<leader>W` fuzzy find word under cursor in workspace
+* `<ctrl-n>` or `<leader>fn` fuzzy find through tabs
+* `<leader>fw` fuzzy find word under cursor in file
+* `<leader>fW` fuzzy find word under cursor in workspace
 * `<leader>fk` fuzzy find through keymaps
 * `<leader>fc` fuzzy find through neovim commands
 * `<leader>fr` to resume last search 
 * Inside fzf
-  * `<ctrl-k>` to send matches to quickfix list
-  * `<ctrl-v>` to open selection in vertical split
-  * `<ctrl-s>` to open selection in horizontal split
-  * `<ctrl-i>` to toggle ignored files
-  * `<ctrl-h>` to toggle hidden files
   * `<ctrl-d>` or `<ctrl-u>` to page through results
   * `<shift-up>` or `<shift-down>` to page through preview
+  * `<ctrl-i>` to select matches
+  * `<ctrl-k>` to select all + send matches to quickfix list
+  * `<ctrl-v>` to open selection in vertical split
+  * `<ctrl-s>` to open selection in horizontal split
+  * `<ctrl-t>` to open selection in tabs
+  * `<alt-i>` to toggle ignored files
+  * `<alt-h>` to toggle hidden files
+  * `<alt-f>` to toggle follow symlinks
 * See [fzf.lua](/home-manager/modules/neovim/conf/fzf.lua) for all keymaps
 * Insert-mode completions
   * `<ctrl-x><ctrl-f>` to fuzzy complete files/paths
@@ -175,8 +178,8 @@ See [https://github.com/pwntester/octo.nvim/blob/03059cf4d694e2b3065136f074b42ee
 * `<leader>kf` to find in quickfix
 * From any fzf, `<ctrl>k`, sends matches to the quickfix list
 * Run replace in each quickfix match:
-  * `:cdo s/<pattern>/<replacement>/g` to replace in each quickfix match
-  * `:cfdo s/<pattern>/<replacement>/g` to replace in each quickfix match file
+  * `:cdo %s/<pattern>/<replacement>/g` to replace in each quickfix match
+  * `:cfdo %s/<pattern>/<replacement>/g` to replace in each quickfix match file
 
 ## Testing (t)
 * `<leader>tc` to run nearest / under cursor

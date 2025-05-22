@@ -58,11 +58,15 @@ end, { noremap = true, silent = true })
 require("avante_lib").load()
 require("avante").setup({
 	-- From https://github.com/yetone/avante.nvim/blob/main/lua/avante/config.lua
-	provider = "copilot",
+	provider = "claude",
 
 	behaviour = {
 		auto_suggestions = false, -- I use copilot.lua
 		use_cwd_as_project_root = true, -- Fix invalid path if inside sub-directory
+	},
+
+	claude = {
+		model = "claude-sonnet-4-20250514",
 	},
 
 	hints = { enabled = false }, -- Keymap hints, we know how to use it now, no need...
