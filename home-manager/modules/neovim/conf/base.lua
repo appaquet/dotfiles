@@ -49,19 +49,28 @@ function Try(description, fn)
 	end
 end
 
--- Executes a function that is suppose to change the current buffer (ex: goto definition)
--- and waits until the buffer is changed.
+-- Executes a function that is suppose to change the current buffer or buffer position (ex: goto definition)
+-- and waits until it happens.
 function AwaitBufferChange(fn)
 	local current_buf = vim.api.nvim_get_current_buf()
+	local current_cursor = vim.api.nvim_win_get_cursor(0)
 
 	fn()
 
+	local i = 0
 	while true do
 		local new_buf = vim.api.nvim_get_current_buf()
-		if new_buf ~= current_buf then
+		local new_cursor = vim.api.nvim_win_get_cursor(0)
+		if new_buf ~= current_buf or new_cursor[1] ~= current_cursor[1] or new_cursor[2] ~= current_cursor[2] then
 			break
 		end
-		vim.wait(10)
+		vim.wait(50)
+
+		i = i + 1
+		if i > 100 then
+			vim.notify("Buffer or cursor change timed out", vim.log.levels.ERROR)
+			break
+		end
 	end
 end
 

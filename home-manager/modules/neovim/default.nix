@@ -176,11 +176,13 @@ in
         (includeLuaFile "sessions.lua")
         (includeLuaFile "notify.lua")
         (includeLuaFile "fzf.lua")
+
         (includeLuaFile "treesitter.lua")
         (includeLuaFile "git.lua")
         (includeLuaFile "lang.lua")
         (includeLuaFile "formatting.lua")
         (includeLuaFile "ai.lua")
+
         (includeLuaFile "diag.lua")
         (includeLuaFile "testing.lua")
         (includeLuaFile "quickfix.lua")

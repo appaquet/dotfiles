@@ -174,6 +174,9 @@ See [https://github.com/pwntester/octo.nvim/blob/03059cf4d694e2b3065136f074b42ee
 * `<leader>kp` or `[k` to go to prev quickfix
 * `<leader>kf` to find in quickfix
 * From any fzf, `<ctrl>k`, sends matches to the quickfix list
+* Run replace in each quickfix match:
+  * `:cdo s/<pattern>/<replacement>/g` to replace in each quickfix match
+  * `:cfdo s/<pattern>/<replacement>/g` to replace in each quickfix match file
 
 ## Testing (t)
 * `<leader>tc` to run nearest / under cursor
