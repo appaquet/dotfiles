@@ -41,9 +41,6 @@
 
     casks = [
       {
-        name = "iterm2";
-      }
-      {
         name = "wezterm";
       }
 
@@ -67,6 +64,9 @@
         name = "steermouse";
       }
       {
+        name = "istat-menus";
+      }
+      {
         name = "macwhisper";
       }
 
@@ -78,6 +78,9 @@
       }
       {
         name = "chatgpt";
+      }
+      {
+        name = "slack";
       }
 
       {
@@ -93,6 +96,9 @@
       {
         name = "bambu-studio";
       }
+      {
+        name = "synology-drive";
+      }
 
       {
         name = "notion";
@@ -104,6 +110,9 @@
         name = "fellow";
       }
 
+      {
+        name = "docker";
+      }
       {
         name = "postman";
       }

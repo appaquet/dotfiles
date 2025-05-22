@@ -55,6 +55,7 @@
       # Use `defaults read NSGlobalDomain` to list all custom settings
       NSGlobalDomain = {
         AppleInterfaceStyle = "Dark";
+        AppleInterfaceStyleSwitchesAutomatically = false; # don't switch automatically
 
         # Finder
         AppleShowAllExtensions = true; # show all file extensions
