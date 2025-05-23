@@ -31,6 +31,11 @@
         GuestEnabled = false; # disable guest user
       };
 
+      WindowManager = {
+        EnableStandardClickToShowDesktop = false; # prevent expose when clicking on the desktop
+        EnableTiledWindowMargins = false; # disable window margins when snapping / tiling windows
+      };
+
       finder = {
         AppleShowAllExtensions = true; # show all file extensions
         FXEnableExtensionChangeWarning = false; # disable warning when changing file extension
@@ -90,11 +95,6 @@
           # Require password immediately after sleep or screen saver begins
           askForPassword = 1;
           askForPasswordDelay = 0;
-        };
-
-        "com.apple.WindowManager" = {
-          # Remove margins when snapping / tiling windows
-          EnableTiledWindowMargins = 0;
         };
       };
     };

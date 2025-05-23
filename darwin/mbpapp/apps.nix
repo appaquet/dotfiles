@@ -114,6 +114,9 @@
         name = "docker";
       }
       {
+        name = "visual-studio-code";
+      }
+      {
         name = "postman";
       }
       {
