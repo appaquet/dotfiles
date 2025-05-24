@@ -76,12 +76,22 @@
         expansion = "nix run nixpkgs#%";
         setCursor = true;
       };
+      nru = {
+        expansion = "nix run github:NixOS/nixpkgs/nixpkgs-unstable#%";
+        setCursor = true;
+      };
       ns = {
         expansion = "nix shell nixpkgs#%";
         setCursor = true;
       };
+      nsu = {
+        expansion = "nix shell github:NixOS/nixpkgs/nixpkgs-unstable#%";
+        setCursor = true;
+      };
       nrf = "nix run nixpkgs#(fzf-nix)";
+      nrfu = "nix run github:NixOS/nixpkgs/nixpkgs-unstable#(fzf-nix)";
       nsf = "nix shell nixpkgs#(fzf-nix)";
+      nsfu = "nix shell github:NixOS/nixpkgs/nixpkgs-unstable#(fzf-nix)";
       fn = "fzf-nix";
 
       nv = "nvim";
