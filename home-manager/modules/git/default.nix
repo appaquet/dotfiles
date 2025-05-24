@@ -1,5 +1,9 @@
 { pkgs, config, ... }:
 {
+  imports = [
+    ./jujutsu.nix
+  ];
+
   home.packages = with pkgs; [
     git
     gh

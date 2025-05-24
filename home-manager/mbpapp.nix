@@ -4,7 +4,6 @@
   imports = [
     ./modules/base.nix
     ./modules/dev.nix
-    ./modules/git/jujutsu.nix # unstable
     ./modules/work
     ./modules/media.nix
     ./modules/docker.nix
