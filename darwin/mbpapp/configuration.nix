@@ -6,9 +6,6 @@
     ./system.nix
   ];
 
-  # Auto upgrade nix package and the daemon service.
-  services.nix-daemon.enable = true;
-
   nix = {
     package = pkgs.nix;
 
@@ -29,7 +26,7 @@
     };
   };
 
-  security.pam.enableSudoTouchIdAuth = true;
+  security.pam.services.sudo_local.touchIdAuth = true;
 
   time.timeZone = "America/Toronto";
 
@@ -47,6 +44,7 @@
     home = "/Users/appaquet";
     shell = "${pkgs.fish}/bin/fish";
   };
+  system.primaryUser = "appaquet"; # apply user settings to appaquet (root otherwise)
 
   system.stateVersion = 4;
 }
