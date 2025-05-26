@@ -161,7 +161,7 @@ darwin)
     ;;
   switch)
     shift
-    ./result/sw/bin/darwin-rebuild switch --flake .
+    sudo ./result/sw/bin/darwin-rebuild switch --flake .
     ;;
   tree)
     shift

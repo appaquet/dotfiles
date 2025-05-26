@@ -46,5 +46,5 @@
   };
   system.primaryUser = "appaquet"; # apply user settings to appaquet (root otherwise)
 
-  system.stateVersion = 4;
+  system.stateVersion = 5;
 }

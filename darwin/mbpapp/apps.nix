@@ -117,6 +117,9 @@
         name = "visual-studio-code";
       }
       {
+        name = "windsurf";
+      }
+      {
         name = "postman";
       }
       {
