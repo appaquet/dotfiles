@@ -5,7 +5,7 @@ require("which-key").add({
 -- Neotest
 -- https://github.com/nvim-neotest/neotest
 local Neotest = require("neotest")
-local Summary_was_closed = false
+local summary_was_opened = false
 Neotest.setup({
 	adapters = {
 		require("rustaceanvim.neotest"),
@@ -34,7 +34,7 @@ Neotest.setup({
 	-- https://github.com/nvim-neotest/neotest/issues/218
 	consumers = {
 		notify = function(client)
-			client.listeners.results = function(_adapter_id, results, partial)
+			client.listeners.results = function(_, results, partial)
 				-- Partial results can be very frequent
 				if partial then
 					return
@@ -124,7 +124,7 @@ local function debug_last()
 end
 
 local function open_output()
-	Neotest.output.open({ enter = true })
+	Neotest.output.open({ enter = true, last_run = true })
 end
 
 local function close()

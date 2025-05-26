@@ -1,9 +1,7 @@
-{ unstablePkgs, ... }:
+{ pkgs, ... }:
 {
   programs.jujutsu = {
     enable = true;
-
-    package = unstablePkgs.jujutsu; # stable cannot be installed
 
     # See https://github.com/jj-vcs/jj/blob/main/docs/config.md
     # Some goodies from https://zerowidth.com/2025/jj-tips-and-tricks/#bookmarks-and-branches
@@ -54,6 +52,10 @@
       };
     };
   };
+
+  home.packages = with pkgs; [
+    jjui
+  ];
 
   programs.fish = {
     shellAbbrs = {

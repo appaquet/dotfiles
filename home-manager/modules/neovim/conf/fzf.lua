@@ -65,15 +65,24 @@ vim.keymap.set("n", "<leader>fli", fzf.lsp_implementations, { desc = "FZF: LSP t
 vim.keymap.set("n", "<leader>flm", fzf.lsp_document_diagnostics, { desc = "FZF: LSP document diagnostics" })
 vim.keymap.set("n", "<leader>flM", fzf.lsp_workspace_diagnostics, { desc = "FZF: LSP workspace diagnostics" })
 
+vim.keymap.set("n", "<leader>fdb", fzf.dap_breakpoints, { desc = "FZF: DAP breakpoints" })
+
+vim.keymap.set({ "n", "v", "i" }, "<C-x><C-f>", function()
+	require("fzf-lua").complete_path()
+end, { silent = true, desc = "FZF: Fuzzy complete path" })
+
+-- Git related
+-- local function files_from_trunk()
+-- 	local fzf_lua = require("fzf-lua")
+-- 	fzf_lua.fzf_exec("jj diff -r 'trunk()..@' --name-only", {
+-- 		prompt = "Branch files> ",
+-- 		actions = require("fzf-lua.actions").filjj diff --summary -r 'trunk()..@'e_edit,
+-- 		previewer = "builtin",
+-- 	})
+-- end
 vim.keymap.set("n", "<leader>fgs", fzf.git_status, { desc = "FZF: Git status" })
 vim.keymap.set("n", "<leader>fgS", fzf.git_stash, { desc = "FZF: Git stash" })
 vim.keymap.set("n", "<leader>fgf", fzf.git_files, { desc = "FZF: Git files" })
 vim.keymap.set("n", "<leader>fgb", fzf.git_branches, { desc = "FZF: Git branches" })
 vim.keymap.set("n", "<leader>fgB", fzf.git_blame, { desc = "FZF: Git blame" })
 vim.keymap.set("n", "<leader>fgt", fzf.git_tags, { desc = "FZF: Git tags" })
-
-vim.keymap.set("n", "<leader>fdb", fzf.dap_breakpoints, { desc = "FZF: DAP breakpoints" })
-
-vim.keymap.set({ "n", "v", "i" }, "<C-x><C-f>", function()
-	require("fzf-lua").complete_path()
-end, { silent = true, desc = "FZF: Fuzzy complete path" })

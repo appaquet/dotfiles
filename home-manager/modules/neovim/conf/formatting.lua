@@ -9,6 +9,7 @@ require("conform").setup({
 		lua = { "stylua" },
 		python = { "isort", "black" },
 		javascript = { "prettierd", "prettier", stop_after_first = true },
+		typescript = { "prettierd", "prettier", stop_after_first = true },
 		sh = { "shfmt" },
 		rust = { "rustfmt", lsp_format = "fallback" },
 		go = { "hfgofmt", "gofmt", "goimports" },
