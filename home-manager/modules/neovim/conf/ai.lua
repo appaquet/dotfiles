@@ -74,6 +74,18 @@ require("avante").setup({
 	web_search_engine = {
 		provider = "tavily",
 	},
+
+	-- For MCPHub integration
+	-- https://ravitemer.github.io/mcphub.nvim/extensions/avante.html
+	system_prompt = function()
+		local hub = require("mcphub").get_hub_instance()
+		return hub and hub:get_active_servers_prompt() or ""
+	end,
+	custom_tools = function()
+		return {
+			require("mcphub.extensions.avante").mcp_tool(),
+		}
+	end,
 })
 
 -- needed for avante
@@ -93,3 +105,6 @@ require("codecompanion").setup({
 		},
 	},
 })
+
+require("mcphub").setup({})
+vim.keymap.set("n", "<Leader>au", ":<CR>:MCPHub<CR>", { silent = true, desc = "Open MCPHub" })

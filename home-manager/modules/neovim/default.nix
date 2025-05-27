@@ -117,6 +117,7 @@ in
         copilot-lua # use `Copilot auth` to login
         render-markdown-nvim # optional dep
         #codecompanion-nvim # see bellow
+        #mcphub-nvim # see bellow
 
         # Debugging
         nvim-dap
@@ -155,13 +156,16 @@ in
           p.vim
           p.vimdoc
         ]))
-        nvim-treesitter-textobjects # provider object manipulation
+        nvim-treesitter-textobjects # provides object manipulation
       ])
       ++ (with unstablePkgs.vimPlugins; [
         # not available in stable (piapp)
         codecompanion-nvim
       ])
-      ++ [ nvim-lsp-notify ];
+      ++ [
+        nvim-lsp-notify
+        pkgs.mcphub-nvim
+      ];
 
     extraConfig = (
       builtins.concatStringsSep "\n" [
@@ -194,11 +198,14 @@ in
       nixd # nix lsp
       marksman # markdown lsp
       nodejs # for copilot
-      stylua # lua formatting
+      stylua # lua formatting, `npx` for some MCPs
       lua-language-server # lua lsp
       bash-language-server # bash lsp
       shfmt # shell formatting
       shellcheck # shell linting
+
+      mcp-hub
+      uv # for `uvx` for some MCPs
     ];
   };
 }

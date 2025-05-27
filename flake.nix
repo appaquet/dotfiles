@@ -58,6 +58,16 @@
       url = "github:p-zany/nixos-cursor-server";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    mcphub-nvim = {
+      url = "github:ravitemer/mcphub.nvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    mcp-hub = {
+      url = "github:ravitemer/mcp-hub";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -72,6 +82,8 @@
       secrets,
       flake-utils,
       darwin,
+      mcp-hub,
+      mcphub-nvim,
       ...
     }:
     let
@@ -82,6 +94,8 @@
 
       homePackageOverlays = final: prev: {
         exo = prev.callPackage ./overlays/exo { };
+        mcphub-nvim = mcphub-nvim.packages."${prev.system}".default;
+        mcp-hub = mcp-hub.packages."${prev.system}".default;
       };
 
       homeOverlays = [
