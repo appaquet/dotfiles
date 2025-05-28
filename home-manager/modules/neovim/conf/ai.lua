@@ -58,7 +58,7 @@ end, { noremap = true, silent = true })
 require("avante_lib").load()
 require("avante").setup({
 	-- From https://github.com/yetone/avante.nvim/blob/main/lua/avante/config.lua
-	provider = "claude",
+	provider = "copilot",
 
 	behaviour = {
 		auto_suggestions = false, -- I use copilot.lua

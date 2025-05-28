@@ -60,6 +60,7 @@ in
         # Theme
         catppuccin-nvim
         nvim-web-devicons
+        nvim-colorizer-lua # colorize hex codes, etc.
 
         # Layout
         nvim-tree-lua
@@ -98,6 +99,7 @@ in
         neotest-python
         rustaceanvim
         conform-nvim # formatting
+        nvim-navic # symbol breadcrumbs in statusline
 
         # Autocomplete (w/ LSP)
         nvim-cmp # https://github.com/hrsh7th/nvim-cmp

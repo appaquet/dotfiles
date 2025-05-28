@@ -1,3 +1,20 @@
+-- navic symbol breadcrumbs
+-- https://github.com/SmiteshP/nvim-navic
+local navic = require("nvim-navic")
+navic.setup({
+	lsp = {
+		auto_attach = true,
+		-- preference = { "ts_ls", "nil_ls", "jsonnet_ls", "bufls", "marksman", "jsonls", "clangd", "gopls", "rust_analyzer", "pyright", "copilot" },
+	},
+})
+local function navic_get_location()
+	if navic.is_available() == true then
+		return navic.get_location()
+	end
+
+	return ""
+end
+
 -- lualine
 -- https://github.com/nvim-lualine/lualine.nvim
 require("lualine").setup({
@@ -27,6 +44,10 @@ require("lualine").setup({
 			{
 				"filename",
 				path = 1, -- Show relative path
+			},
+			{
+				navic_get_location,
+				cond = navic.is_available,
 			},
 		},
 		lualine_x = { "encoding", "fileformat", "filetype" },
