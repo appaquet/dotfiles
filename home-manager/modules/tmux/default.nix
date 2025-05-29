@@ -70,6 +70,9 @@ in
       set -gu default-command
       set -g default-shell "${pkgs.fish}/bin/fish"
 
+      # Because `tmux-256color` is not supported correctly by all TUIs (Go)
+      set -g default-terminal 'screen-256color'
+
       # Rebind r to reload config
       unbind r
       bind r source-file ${config.home.homeDirectory}"/.config/tmux/tmux.conf"
