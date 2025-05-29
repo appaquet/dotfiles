@@ -71,7 +71,13 @@
       jj-stacked-branches = "jj log --no-graph -r 'trunk()..@ & bookmarks()' -T 'coalesce(local_bookmarks) ++ \"\n\"'";
 
       jj-stacked-stats = ''
-        for change in (jj log --reversed -r 'trunk()..@' --no-graph -T 'change_id ++ "\n"')
+        if test -n "$argv[1]"
+            set from $argv[1]
+        else
+            set from "trunk()"
+        end
+        echo "Changes since $from:"
+        for change in (jj log --reversed -r "$from..@" --no-graph -T 'change_id ++ "\n"')
              jj log -r $change
              jj diff --stat -r $change
              echo -e "\n"

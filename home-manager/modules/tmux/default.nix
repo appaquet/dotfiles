@@ -71,6 +71,7 @@ in
       set -g default-shell "${pkgs.fish}/bin/fish"
 
       # Because `tmux-256color` is not supported correctly by all TUIs (Go)
+      # `COLORTERM=truecolor` is set in fish.nix
       set -g default-terminal 'screen-256color'
 
       # Rebind r to reload config

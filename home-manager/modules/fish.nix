@@ -18,7 +18,8 @@
 
       # If colors are messed up, check:
       # https://gist.github.com/andersevenrud/015e61af2fd264371032763d4ed965b6
-      # Don't set TERM here, it should be set via tmux (which is done by .tmux.conf)
+      # Don't set TERM here, it should be set via tmux (see tmux/default.nix)
+      export COLORTERM=truecolor
 
       # Add support for nix run and nix-shell in fish
       ${pkgs.any-nix-shell}/bin/any-nix-shell fish --info-right | source

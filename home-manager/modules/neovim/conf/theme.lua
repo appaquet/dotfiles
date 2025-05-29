@@ -25,6 +25,13 @@ require("catppuccin").setup({
 			text = "#ffffff", -- Increase contrats a bit
 		},
 	},
+	highlight_overrides = {
+		latte = function(colors)
+			return {
+				CursorLine = { bg = colors.surface1 },
+			}
+		end,
+	},
 })
 vim.cmd.colorscheme("catppuccin") -- Needs to be after setup
 

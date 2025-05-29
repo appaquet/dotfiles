@@ -71,7 +71,7 @@
 
       # if this fails, run `git remote set-head origin -a`
       git-main-branch = ''
-        git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'
+        git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@' | tr -d '\n'
       '';
 
       git-stacked-branches = ''

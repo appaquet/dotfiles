@@ -80,8 +80,8 @@
 
               # static build of go bins
               # some stuff breaks if we enable all the time
-              #glibc
-              #glibc.static
+              # glibc
+              # glibc.static
 
               # unstructured.io deps
               libGL

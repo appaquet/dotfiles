@@ -23,7 +23,7 @@ end
 
 local function open_diffview_main()
 	local main_branch = git_main_branch()
-	vim.api.nvim_command("DiffviewOpen " .. main_branch)
+	vim.api.nvim_command("DiffviewOpen " .. main_branch .. "...")
 	vim.notify("Diffing against " .. main_branch)
 end
 
@@ -90,6 +90,7 @@ vim.keymap.set("n", "<Leader>ggw", switch_gutter_base_default, { silent = true, 
 -- Octo.nvim
 -- https://github.com/pwntester/octo.nvim
 require("octo").setup({
+	use_local_fs = true, -- Use local filesystem for right side, allowing LSP to work and stop error'ing
 	picker = "fzf-lua",
 })
 require("which-key").add({
