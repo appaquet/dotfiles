@@ -96,6 +96,12 @@
           askForPassword = 1;
           askForPasswordDelay = 0;
         };
+
+        "com.apple.HIToolbox" = {
+          AppleGlobalTextInputProperties = {
+            TextInputGlobalPropertyPerContextInput = true;
+          };
+        };
       };
     };
   };

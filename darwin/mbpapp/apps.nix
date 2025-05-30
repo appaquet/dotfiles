@@ -97,6 +97,9 @@
         name = "bambu-studio";
       }
       {
+        name = "autodesk-fusion";
+      }
+      {
         name = "synology-drive";
       }
 
