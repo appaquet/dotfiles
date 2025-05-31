@@ -59,10 +59,11 @@
 
   programs.fish = {
     shellAbbrs = {
-      "jjpr" = {
+      jjpr = {
         expansion = "gh pr create --head (jj-current-branch) --draft --body \"\" --title \"%\"";
         setCursor = true;
       };
+      jjrt = "jj rebase-trunk";
     };
 
     functions = {
