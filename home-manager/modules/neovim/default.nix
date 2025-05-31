@@ -4,6 +4,7 @@
   config,
   secrets,
   lib,
+  cfg,
   ...
 }:
 
@@ -11,6 +12,7 @@ let
   devMode = true; # Include files from dotfiles directly instead of via nix store
 
   pkgsChannel = pkgs;
+  agenticEnabled = !cfg.minimalNvim;
 
   confDir = "${config.home.homeDirectory}/dotfiles/home-manager/modules/neovim/conf";
 
@@ -100,26 +102,21 @@ in
         rustaceanvim
         conform-nvim # formatting
         nvim-navic # symbol breadcrumbs in statusline
+        render-markdown-nvim
 
-        # Autocomplete (w/ LSP)
+        # Autocomplete
         nvim-cmp # https://github.com/hrsh7th/nvim-cmp
         cmp-cmdline
         cmp-nvim-lsp
         cmp-nvim-lsp-signature-help
         cmp-nvim-lsp-document-symbol
         cmp-cmdline
+        copilot-lua # use `Copilot auth` to login
 
         # Snippets
         luasnip
         cmp_luasnip
         friendly-snippets # easy load from vscode, languages, etc.
-
-        # AI
-        avante-nvim-override
-        copilot-lua # use `Copilot auth` to login
-        render-markdown-nvim # optional dep
-        #codecompanion-nvim # see bellow
-        #mcphub-nvim # see bellow
 
         # Debugging
         nvim-dap
@@ -160,54 +157,63 @@ in
         ]))
         nvim-treesitter-textobjects # provides object manipulation
       ])
-      ++ (with unstablePkgs.vimPlugins; [
-        # not available in stable (piapp)
-        codecompanion-nvim
+      ++ (lib.optionals agenticEnabled [
+        # Agentic plugins
+        avante-nvim-override
+        unstablePkgs.vimPlugins.codecompanion-nvim
+        pkgs.mcphub-nvim
       ])
       ++ [
         nvim-lsp-notify
-        pkgs.mcphub-nvim
       ];
 
     extraConfig = (
-      builtins.concatStringsSep "\n" [
-        (includeLuaFile "base.lua")
-        includeSecrets
-        (includeLuaFile "keymap.lua")
-        (includeLuaFile "theme.lua")
-        (includeLuaFile "buffers.lua")
-        (includeLuaFile "windows.lua")
-        (includeLuaFile "statusline.lua")
-        (includeLuaFile "tree.lua")
-        (includeLuaFile "sessions.lua")
-        (includeLuaFile "notify.lua")
-        (includeLuaFile "fzf.lua")
+      builtins.concatStringsSep "\n" (
+        [
+          (includeLuaFile "base.lua")
+          includeSecrets
+          (includeLuaFile "keymap.lua")
+          (includeLuaFile "theme.lua")
+          (includeLuaFile "buffers.lua")
+          (includeLuaFile "windows.lua")
+          (includeLuaFile "statusline.lua")
+          (includeLuaFile "tree.lua")
+          (includeLuaFile "sessions.lua")
+          (includeLuaFile "notify.lua")
+          (includeLuaFile "fzf.lua")
 
-        (includeLuaFile "treesitter.lua")
-        (includeLuaFile "git.lua")
-        (includeLuaFile "lang.lua")
-        (includeLuaFile "formatting.lua")
-        (includeLuaFile "ai.lua")
+          (includeLuaFile "treesitter.lua")
+          (includeLuaFile "git.lua")
+          (includeLuaFile "lang.lua")
+          (includeLuaFile "formatting.lua")
 
-        (includeLuaFile "diag.lua")
-        (includeLuaFile "testing.lua")
-        (includeLuaFile "quickfix.lua")
-        (includeLuaFile "debugging.lua")
-      ]
+          (includeLuaFile "copilot.lua")
+
+          (includeLuaFile "diag.lua")
+          (includeLuaFile "testing.lua")
+          (includeLuaFile "quickfix.lua")
+          (includeLuaFile "debugging.lua")
+        ]
+        ++ (lib.optionals agenticEnabled [
+          (includeLuaFile "agentic.lua")
+        ])
+      )
     );
 
-    extraPackages = with pkgs; [
-      nixd # nix lsp
-      marksman # markdown lsp
-      nodejs # for copilot
-      stylua # lua formatting, `npx` for some MCPs
-      lua-language-server # lua lsp
-      bash-language-server # bash lsp
-      shfmt # shell formatting
-      shellcheck # shell linting
-
-      mcp-hub
-      uv # for `uvx` for some MCPs
-    ];
+    extraPackages =
+      (with pkgs; [
+        nixd # nix lsp
+        marksman # markdown lsp
+        nodejs # for copilot
+        stylua # lua formatting, `npx` for some MCPs
+        lua-language-server # lua lsp
+        bash-language-server # bash lsp
+        shfmt # shell formatting
+        shellcheck # shell linting
+      ])
+      ++ (lib.optionals agenticEnabled [
+        pkgs.mcp-hub # via overlay
+        pkgs.uv # for `uvx` for some MCPs
+      ]);
   };
 }

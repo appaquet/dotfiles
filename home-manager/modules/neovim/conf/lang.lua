@@ -250,3 +250,9 @@ vim.g.rustaceanvim = {
 
 -- highlight todo, fixme, etc
 require("todo-comments").setup({})
+
+-- markdown rendering
+-- also needed for Avante
+require("render-markdown").setup({
+	file_types = { "markdown", "Avante" },
+})

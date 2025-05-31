@@ -132,6 +132,7 @@
 
             cfg = {
               isNixos = false;
+              minimalNvim = false;
             };
           in
           {
@@ -166,18 +167,15 @@
                 };
               };
 
-              "appaquet@utm" = home-manager.lib.homeManagerConfiguration rec {
-                inherit pkgs;
+              "appaquet@mbpapp" = home-manager-unstable.lib.homeManagerConfiguration rec {
+                pkgs = unstablePkgs;
                 modules = [
-                  ./home-manager/utm.nix
+                  ./home-manager/mbpapp.nix
                   extraSpecialArgs.secrets.commonHome
                 ] ++ commonHomeModules;
                 extraSpecialArgs = {
-                  inherit inputs unstablePkgs;
-                  secrets = secrets.init "linux";
-                  cfg = cfg // {
-                    isNixos = true;
-                  };
+                  inherit inputs unstablePkgs cfg;
+                  secrets = secrets.init "darwin";
                 };
               };
 
@@ -192,19 +190,24 @@
                   secrets = secrets.init "linux";
                   cfg = cfg // {
                     isNixos = true;
+                    minimalNvim = true;
                   };
                 };
               };
 
-              "appaquet@mbpapp" = home-manager-unstable.lib.homeManagerConfiguration rec {
-                pkgs = unstablePkgs;
+              "appaquet@utm" = home-manager.lib.homeManagerConfiguration rec {
+                inherit pkgs;
                 modules = [
-                  ./home-manager/mbpapp.nix
+                  ./home-manager/utm.nix
                   extraSpecialArgs.secrets.commonHome
                 ] ++ commonHomeModules;
                 extraSpecialArgs = {
-                  inherit inputs unstablePkgs cfg;
-                  secrets = secrets.init "darwin";
+                  inherit inputs unstablePkgs;
+                  secrets = secrets.init "linux";
+                  cfg = cfg // {
+                    isNixos = true;
+                    minimalNvim = true;
+                  };
                 };
               };
             };
