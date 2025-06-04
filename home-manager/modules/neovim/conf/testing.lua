@@ -85,6 +85,7 @@ end
 
 local function debug_nearest()
 	Neotest.summary.close() -- it gets in the way
+	require("dapui").open()
 	Neotest.run.run({ strategy = "dap" })
 end
 
@@ -96,6 +97,7 @@ end
 
 local function debug_file()
 	Neotest.summary.close() -- it gets in the way
+	require("dapui").open()
 	Neotest.run.run({ vim.fn.expand("%"), strategy = "dap" })
 end
 
@@ -108,6 +110,7 @@ end
 
 local function debug_dir()
 	Neotest.summary.close() -- it gets in the way
+	require("dapui").open()
 	local dir = vim.fn.expand("%:p:h")
 	Neotest.run.run({ dir, strategy = "dap" })
 end
@@ -120,11 +123,20 @@ end
 
 local function debug_last()
 	Neotest.summary.close() -- it gets in the way
+	require("dapui").open()
 	Neotest.run.run_last({ strategy = "dap" })
 end
 
 local function open_output()
 	Neotest.output.open({ enter = true, last_run = true })
+end
+
+local function stop_test()
+	Neotest.run.stop()
+end
+
+local function toggle_summary()
+	Neotest.summary.toggle()
 end
 
 local function close()
@@ -139,9 +151,18 @@ vim.keymap.set("n", "<leader>tp", run_dir, { desc = "Test: Run package/dir" })
 vim.keymap.set("n", "<leader>tdp", debug_dir, { desc = "Test: Debug package/dir" })
 vim.keymap.set("n", "<leader>tl", run_last, { desc = "Test: Run last" })
 vim.keymap.set("n", "<leader>tdl", debug_last, { desc = "Test: Debug last" })
-vim.keymap.set("n", "<leader>tu", Neotest.run.stop, { desc = "Test: Stop" })
 
-vim.keymap.set("n", "<leader>ts", Neotest.summary.toggle, { desc = "Test: Toggle summary / side panel" })
+vim.keymap.set("n", "<leader>tu", stop_test, { desc = "Test: Stop" })
+vim.keymap.set("n", "<leader>ts", toggle_summary, { desc = "Test: Toggle summary / side panel" })
 
 vim.keymap.set("n", "<leader>to", open_output, { desc = "Test: Toggle output" })
 vim.keymap.set("n", "<leader>tq", close, { desc = "Test: Close output & side panel" })
+
+vim.api.nvim_create_autocmd("LspAttach", {
+	once = true,
+	callback = function(args)
+		-- Force test discovery on first LSP attach
+		Neotest.summary.open()
+		Neotest.summary.close()
+	end,
+})

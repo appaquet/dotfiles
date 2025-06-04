@@ -216,6 +216,9 @@ See [https://github.com/pwntester/octo.nvim/blob/03059cf4d694e2b3065136f074b42ee
 * `<leader>dC` to run to cursor
 * `<leader>du` to open the DAP UI
 * `<leader>dq` to terminate & quit the DAP UI
+* In stacks
+  * `o` to open the current stack frame
+  * `t` to toggle hidden stack frames
 
 ## Object selection (in visual mode)
 - `aX`: Select around object X  

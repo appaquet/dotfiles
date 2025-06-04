@@ -12,25 +12,30 @@ require("colorizer").setup()
 -- See https://github.com/catppuccin/nvim#configuration
 require("catppuccin").setup({
 	flavour = "auto", -- latte, frappe, macchiato, mocha
+
 	background = {
 		light = "latte",
 		dark = "mocha",
 	},
+
 	dim_inactive = {
 		enabled = true, -- dims the background color of inactive window
 		percentage = 0.1, -- percentage of the shade to apply to the inactive window
 	},
+
 	color_overrides = {
 		mocha = {
 			text = "#ffffff", -- Increase contrats a bit
 		},
 	},
-	highlight_overrides = {
-		latte = function(colors)
-			return {
-				CursorLine = { bg = colors.surface1 },
-			}
-		end,
+
+	integrations = {
+		neotest = true,
+		notify = true,
+		diffview = true,
+		octo = true,
+		lsp_trouble = true,
+		which_key = true,
 	},
 })
 vim.cmd.colorscheme("catppuccin") -- Needs to be after setup
