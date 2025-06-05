@@ -14,8 +14,10 @@ require("avante").setup({
 		use_cwd_as_project_root = true, -- Fix invalid path if inside sub-directory
 	},
 
-	claude = {
-		model = "claude-sonnet-4-20250514",
+	providers = {
+		claude = {
+			model = "claude-sonnet-4-20250514",
+		},
 	},
 
 	hints = { enabled = false }, -- Keymap hints, we know how to use it now, no need...
