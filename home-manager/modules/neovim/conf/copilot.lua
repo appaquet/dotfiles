@@ -13,7 +13,6 @@ require("copilot").setup({
 			dismiss = "<C-]>",
 		},
 	},
-	panel = { enabled = false }, -- prevent interfering with cmp
 	copilot_model = "gpt-4o-copilot",
 
 	-- Logged to ~/.local/state/nvim/copilot-lua.log
@@ -47,4 +46,8 @@ vim.keymap.set("i", "<Tab>", function()
 end, { noremap = true, silent = true })
 vim.keymap.set("i", "<S-Tab>", function()
 	passthrough_keymap("<Tab>")
+end, { noremap = true, silent = true })
+
+vim.keymap.set("i", "<M-p>", function()
+	vim.cmd("Copilot panel")
 end, { noremap = true, silent = true })
