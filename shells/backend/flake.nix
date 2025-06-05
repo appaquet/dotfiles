@@ -57,37 +57,41 @@
           default = pkgs.mkShell {
             name = "backend";
 
-            buildInputs = with pkgs; [
-              clang
+            buildInputs =
+              (with pkgs; [
+                clang
 
-              (rust-bin.stable.latest.default.override {
-                extensions = [
-                  "rust-src"
-                  #"rust-analyzer" (overridden below)
-                  "llvm-tools-preview"
-                ];
-              })
-              pkgsUnstable.rust-analyzer # we want the latest goodies
+                (rust-bin.stable.latest.default.override {
+                  extensions = [
+                    "rust-src"
+                    #"rust-analyzer" (overridden below)
+                    "llvm-tools-preview"
+                  ];
+                })
+                pkgsUnstable.rust-analyzer # we want the latest goodies
 
-              stdenv.cc.cc.lib
-              llvmPackages.libclang
-              llvmPackages.libcxxClang
-              llvmPackages.bintools-unwrapped # llvm-cov
-              lldb
-              zlib
-              openssl
-              libtensorflow
+                stdenv.cc.cc.lib
+                llvmPackages.libclang
+                llvmPackages.libcxxClang
+                llvmPackages.bintools-unwrapped # llvm-cov
+                lldb
+                zlib
+                openssl
+                libtensorflow
 
-              # static build of go bins
-              # some stuff breaks if we enable all the time
-              # glibc
-              # glibc.static
+                # static build of go bins
+                # some stuff breaks if we enable all the time
+                # glibc
+                # glibc.static
 
-              # unstructured.io deps
-              libGL
-              glib
-              tesseract
-            ];
+                # unstructured.io deps
+                libGL
+                glib
+                tesseract
+              ])
+              ++ [
+                pkgsUnstable.claude-code
+              ];
 
             nativeBuildInputs = with pkgs; [
               pkg-config # required by go for oxidized
