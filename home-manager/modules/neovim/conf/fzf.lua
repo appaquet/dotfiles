@@ -32,6 +32,7 @@ vim.keymap.set("n", "<C-g>", fzf.live_grep_glob, { desc = "FZF: Live grep worksp
 vim.keymap.set("n", "<C-b>", fzf.buffers, { desc = "FZF: Buffers" })
 vim.keymap.set("n", "<C-s>", fzf.lsp_document_symbols, { desc = "FZF: LSP document symbols" })
 vim.keymap.set("n", "<C-n>", fzf.tabs, { desc = "FZF: Tabs" })
+vim.keymap.set("n", "<C-h>", fzf.oldfiles, { desc = "FZF: Old files" })
 
 -- Long form keybindings
 vim.keymap.set("n", "<leader>ff", fzf.files, { desc = "FZF: Files" }) -- Can be used on nvim-tree folder node (see tree.lua)
