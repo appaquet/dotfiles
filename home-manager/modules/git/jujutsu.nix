@@ -42,6 +42,9 @@
           "git"
           "push"
         ];
+        "e" = [
+          "edit"
+        ];
         "rebase-trunk" = [
           "rebase"
           "-s"
