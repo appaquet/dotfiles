@@ -32,12 +32,19 @@ local function passthrough_keymap(keymap)
 	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(keymap, true, false, true), "n", true)
 end
 
+require("copilot-lsp").setup({})
+vim.g.copilot_nes_debounce = 500
+vim.lsp.enable("copilot_ls")
+
 -- Add completion on tab (if visible), but real tab via shift-tab
 local cs = require("copilot.suggestion")
 local luasnip = require("luasnip")
-vim.keymap.set("i", "<Tab>", function()
+vim.keymap.set({ "n", "i" }, "<Tab>", function()
 	if cs.is_visible() then
 		cs.accept()
+	elseif vim.b[vim.api.nvim_get_current_buf()].nes_state then
+		require("copilot-lsp.nes").apply_pending_nes()
+		require("copilot-lsp.nes").walk_cursor_end_edit()
 	elseif luasnip.expand_or_jumpable() then
 		luasnip.expand_or_jump()
 	else

@@ -112,6 +112,7 @@ in
         cmp-nvim-lsp-document-symbol
         cmp-cmdline
         copilot-lua # use `Copilot auth` to login
+        copilot-lsp
 
         # Snippets
         luasnip
@@ -208,6 +209,7 @@ in
         stylua # lua formatting, `npx` for some MCPs
         lua-language-server # lua lsp
         bash-language-server # bash lsp
+        copilot-language-server
         shfmt # shell formatting
         shellcheck # shell linting
       ])
