@@ -19,6 +19,7 @@ jobs:
           - machine: "appaquet@mbpapp"
             os: macos-latest
     runs-on: ${{ matrix.pair.os }}
+    timeout-minutes: 60 # because sometimes it gets stuck
     steps:
       - uses: actions/checkout@v4
 
