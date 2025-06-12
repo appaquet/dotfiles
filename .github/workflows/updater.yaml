@@ -23,19 +23,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Disk usage before
-        run: |
-          df -h
-
-      - name: Cleanup
+      - name: Free up disk space
         if: runner.os == 'Linux'
         run: |
           # See https://carlosbecker.com/posts/github-actions-disk-space/
+          df -h
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
           sudo docker system prune -a -f
-
-      - name: Disk usage after
-        run: |
           df -h
 
       - uses: DeterminateSystems/nix-installer-action@main
@@ -110,6 +104,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Free up disk space
+        if: runner.os == 'Linux'
+        run: |
+          # See https://carlosbecker.com/posts/github-actions-disk-space/
+          df -h
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          sudo docker system prune -a -f
+          df -h
+
       - uses: DeterminateSystems/nix-installer-action@main
         with:
           extra-conf: |
@@ -117,11 +120,13 @@ jobs:
             access-tokens = github.com=${{ secrets.GH_PAT }}
           github-token: ${{ secrets.GH_PAT }}
 
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+
       - name: Add & update nixpkgs channel
         run: |
-          nix-channel --add https://nixos.org/channels/nixos-24.05 nixpkgs
+          nix-channel --add https://nixos.org/channels/nixos-unstable nixpkgs
           nix-channel --update nixpkgs
-          nix profile install nixpkgs#nixos-rebuild nixpkgs#nvd
+          nix profile install nixpkgs#nvd
 
       - name: Building NixOS baseline
         run: |
@@ -183,9 +188,11 @@ jobs:
             access-tokens = github.com=${{ secrets.GH_PAT }}
           github-token: ${{ secrets.GH_PAT }}
 
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+
       - name: Add & update nixpkgs channel
         run: |
-          nix-channel --add https://nixos.org/channels/nixos-24.05 nixpkgs
+          nix-channel --add https://nixos.org/channels/nixos-unstable nixpkgs
           nix-channel --update nixpkgs
           nix profile install nixpkgs#nvd
 
