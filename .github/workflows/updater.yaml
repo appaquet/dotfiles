@@ -39,8 +39,6 @@ jobs:
             access-tokens = github.com=${{ secrets.GH_PAT }}
           github-token: ${{ secrets.GH_PAT }}
 
-      - uses: DeterminateSystems/magic-nix-cache-action@main
-
       - name: Add & update nixpkgs channel
         run: |
           nix-channel --add https://nixos.org/channels/nixos-unstable nixpkgs
@@ -120,8 +118,6 @@ jobs:
             access-tokens = github.com=${{ secrets.GH_PAT }}
           github-token: ${{ secrets.GH_PAT }}
 
-      - uses: DeterminateSystems/magic-nix-cache-action@main
-
       - name: Add & update nixpkgs channel
         run: |
           nix-channel --add https://nixos.org/channels/nixos-unstable nixpkgs
@@ -187,8 +183,6 @@ jobs:
             experimental-features = nix-command flakes
             access-tokens = github.com=${{ secrets.GH_PAT }}
           github-token: ${{ secrets.GH_PAT }}
-
-      - uses: DeterminateSystems/magic-nix-cache-action@main
 
       - name: Add & update nixpkgs channel
         run: |
