@@ -157,7 +157,7 @@ darwin)
     ;;
   build)
     shift
-    ${NIX_BUILDER} build ".#darwinConfigurations.mbpapp.system"
+    ${NIX_BUILDER} build "$@" ".#darwinConfigurations.mbpapp.system"
     ;;
   switch)
     shift
@@ -187,7 +187,7 @@ nixos)
     ;;
   build)
     shift
-    nixos-rebuild build --flake ".#${HOSTNAME}"
+    nixos-rebuild build "$@" --flake ".#${HOSTNAME}"
     ;;
   boot)
     shift

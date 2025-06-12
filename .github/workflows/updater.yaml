@@ -48,7 +48,7 @@ jobs:
       - name: Building Home Manager baseline...
         run: |
           set -xe
-          MACHINE_KEY="${{ matrix.pair.machine }}" ./x home build --cores 0 --max-jobs 1
+          MACHINE_KEY="${{ matrix.pair.machine }}" ./x home build --cores 0 --max-jobs 1 # limiting concurrency to prevent freezes
           mv result result-before
 
       - name: Update flakes
@@ -59,7 +59,7 @@ jobs:
       - name: Building Home Manager new
         run: |
           set -xe
-          MACHINE_KEY="${{ matrix.pair.machine }}" ./x home build --cores 0 --max-jobs 1
+          MACHINE_KEY="${{ matrix.pair.machine }}" ./x home build --cores 0 --max-jobs 1 # limiting concurrency to prevent freezes
           mv result result-after
 
       - name: Diffing...
@@ -127,7 +127,7 @@ jobs:
       - name: Building NixOS baseline
         run: |
           set -xe
-          MACHINE_KEY="${{ matrix.machine }}" ./x nixos build
+          MACHINE_KEY="${{ matrix.machine }}" ./x nixos build --cores 0 --max-jobs 1 # limiting concurrency to prevent freezes
           nix-collect-garbage # free up intermediary, since we're low on disk on gha
           mv result result-before
 
@@ -139,7 +139,7 @@ jobs:
       - name: Building NixOS new
         run: |
           set -xe
-          MACHINE_KEY="${{ matrix.machine }}" ./x nixos build
+          MACHINE_KEY="${{ matrix.machine }}" ./x nixos build --cores 0 --max-jobs 1 # limiting concurrency to prevent freezes
           mv result result-after
 
       - name: Diffing...
