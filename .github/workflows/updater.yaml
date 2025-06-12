@@ -45,16 +45,18 @@ jobs:
             access-tokens = github.com=${{ secrets.GH_PAT }}
           github-token: ${{ secrets.GH_PAT }}
 
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+
       - name: Add & update nixpkgs channel
         run: |
-          nix-channel --add https://nixos.org/channels/nixos-24.05 nixpkgs
+          nix-channel --add https://nixos.org/channels/nixos-unstable nixpkgs
           nix-channel --update nixpkgs
           nix profile install nixpkgs#nvd
 
       - name: Building Home Manager baseline...
         run: |
           set -xe
-          MACHINE_KEY="${{ matrix.pair.machine }}" ./x home build -L
+          MACHINE_KEY="${{ matrix.pair.machine }}" ./x home build -L --cores 0 --max-jobs 1
           mv result result-before
 
       - name: Update flakes
@@ -65,7 +67,7 @@ jobs:
       - name: Building Home Manager new
         run: |
           set -xe
-          MACHINE_KEY="${{ matrix.pair.machine }}" ./x home build -L
+          MACHINE_KEY="${{ matrix.pair.machine }}" ./x home build -L --cores 0 --max-jobs 1
           mv result result-after
 
       - name: Diffing...
