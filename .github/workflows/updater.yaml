@@ -122,7 +122,7 @@ jobs:
         run: |
           nix-channel --add https://nixos.org/channels/nixos-unstable nixpkgs
           nix-channel --update nixpkgs
-          nix profile install nixpkgs#nvd
+          nix profile install nixpkgs#nixos-rebuild nixpkgs#nvd
 
       - name: Building NixOS baseline
         run: |
