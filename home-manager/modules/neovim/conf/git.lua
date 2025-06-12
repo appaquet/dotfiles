@@ -11,14 +11,14 @@ local function git_main_branch()
 	if vim.g.main_branch_override ~= "" then
 		return vim.g.main_branch_override
 	end
-	return vim.fn.system("git-main-branch")
+	return vim.fn.system("jj-main-branch")
 end
 vim.api.nvim_command("command! -nargs=1 SetMainBranch let g:main_branch_override = <args>")
 
 local function git_prev_branch()
 	-- Returns the previous branch in the PR branch
 	-- Could be the main branch if the PR is on top of main
-	return vim.fn.system("git-prev-branch")
+	return vim.fn.system("jj-prev-branch")
 end
 
 local function open_diffview_main()

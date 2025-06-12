@@ -70,10 +70,11 @@
     };
 
     functions = {
+      jj-main-branch = "jj log --no-graph -r 'trunk()' -T 'coalesce(local_bookmarks)'";
       jj-current-branch = "jj log --no-graph -r \"closest_bookmark(@)\" -T \"coalesce(local_bookmarks)\"";
+      jj-prev-branch = "jj-stacked-branches | head -n 2 | tail -n 1";
 
       jj-stacked-branches = "jj log --no-graph -r 'trunk()..@ & bookmarks()' -T 'coalesce(local_bookmarks) ++ \"\n\"'";
-
       jj-stacked-stats = ''
         if test -n "$argv[1]"
             set from $argv[1]
