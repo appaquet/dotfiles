@@ -12,12 +12,12 @@ jobs:
     strategy:
       matrix:
         pair:
-          - machine: "appaquet@deskapp"
-            os: ubuntu-latest
+          # - machine: "appaquet@deskapp"
+          #   os: ubuntu-latest
           - machine: "appaquet@servapp"
             os: ubuntu-latest
-          - machine: "appaquet@mbpapp"
-            os: macos-latest
+          # - machine: "appaquet@mbpapp"
+          #   os: macos-latest
     runs-on: ${{ matrix.pair.os }}
     timeout-minutes: 60 # because sometimes it gets stuck
     steps:
@@ -54,7 +54,7 @@ jobs:
       - name: Building Home Manager baseline...
         run: |
           set -xe
-          MACHINE_KEY="${{ matrix.pair.machine }}" ./x home build -L --debug
+          MACHINE_KEY="${{ matrix.pair.machine }}" ./x home build -L
           mv result result-before
 
       - name: Update flakes
@@ -65,7 +65,7 @@ jobs:
       - name: Building Home Manager new
         run: |
           set -xe
-          MACHINE_KEY="${{ matrix.pair.machine }}" ./x home build -L --debug
+          MACHINE_KEY="${{ matrix.pair.machine }}" ./x home build -L
           mv result result-after
 
       - name: Diffing...
