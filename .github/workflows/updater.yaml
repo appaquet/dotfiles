@@ -32,8 +32,7 @@ jobs:
         run: |
           # See https://carlosbecker.com/posts/github-actions-disk-space/
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
-          sudo docker image prune --all --force
-          sudo docker builder prune -a
+          sudo docker system prune -a -f
 
       - name: Disk usage after
         run: |
