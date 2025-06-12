@@ -55,8 +55,9 @@ vim.keymap.set("n", "<Leader>gdc", open_diffview_rev, { silent = true, desc = "G
 
 -- Git signs
 -- https://github.com/lewis6991/gitsigns.nvim
+local gitsigns = require("gitsigns")
 require("gitsigns").setup({
-	current_line_blame = true,
+	current_line_blame = true, -- show blame info on current line as virtual text
 })
 require("which-key").add({
 	{ "<leader>gg", group = "Gutter signs" },
@@ -66,7 +67,9 @@ vim.keymap.set({ "n", "v" }, "<Leader>ga", ":Gitsigns stage_hunk<CR>", { silent 
 vim.keymap.set("n", "]g", ":Gitsigns nav_hunk next<CR>", { silent = true, desc = "Git: next hunk" })
 vim.keymap.set("n", "[g", ":Gitsigns nav_hunk prev<CR>", { silent = true, desc = "Git: previous hunk" })
 vim.keymap.set("n", "<Leader>gb", ":Gitsigns blame<CR>", { silent = true, desc = "Git: blame pane" })
-vim.keymap.set("n", "<Leader>gdb", ":Gitsigns diffthis<CR>", { silent = true, desc = "Git: open buffer diff" })
+vim.keymap.set("n", "<Leader>gdb", function()
+	gitsigns.diffthis(nil, { vertical = true })
+end, { silent = true, desc = "Git: open buffer diff" })
 
 local function switch_gutter_base_main()
 	local main_branch = git_main_branch()

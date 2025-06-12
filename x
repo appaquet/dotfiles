@@ -98,7 +98,7 @@ home)
     ;;
   build)
     shift
-    ${NIX_BUILDER} build ".#homeConfigurations.${HOME_CONFIG}.activationPackage"
+    ${NIX_BUILDER} build "$@" ".#homeConfigurations.${HOME_CONFIG}.activationPackage"
     ;;
   switch)
     shift
