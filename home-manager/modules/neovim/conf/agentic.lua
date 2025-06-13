@@ -18,6 +18,9 @@ require("avante").setup({
 		claude = {
 			model = "claude-sonnet-4-20250514",
 		},
+		copilot = {
+			model = "gpt-4.1",
+		},
 	},
 
 	hints = { enabled = false }, -- Keymap hints, we know how to use it now, no need...
