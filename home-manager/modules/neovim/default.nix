@@ -159,9 +159,18 @@ in
       ])
       ++ (lib.optionals agenticEnabled [
         # Agentic plugins
-        avante-nvim-override
         unstablePkgs.vimPlugins.codecompanion-nvim
         pkgs.mcphub-nvim
+
+        # Avante
+        avante-nvim-override
+
+        # Avante deps (if dev mode)
+        # pkgs.vimPlugins.dressing-nvim
+        # pkgs.vimPlugins.img-clip-nvim
+        # pkgs.vimPlugins.nui-nvim
+        # pkgs.vimPlugins.nvim-treesitter
+        # pkgs.vimPlugins.plenary-nvim
       ])
       ++ [
         nvim-lsp-notify

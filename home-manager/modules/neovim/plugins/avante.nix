@@ -16,14 +16,22 @@ let
   src = fetchFromGitHub {
     owner = "yetone";
     repo = "avante.nvim";
-    # tag = "v${version}";
-    # hash = "sha256-Ud4NkJH7hze5796KjVe5Nj9DzxwQkDQErCJDDiBzAIY=";
-    rev = "e8aae6c1dd891f404aaaef9297caa9c412f1178c";
-    hash = "sha256-U5od2x8Ms0eCtdva8jXHvDvtxGTcbuKMSrKPVnb5XSY=";
+    rev = "269718b243a5f199ca637d16c86c125e6601849e";
+    hash = "sha256-G7uxd1LZaaHRWMdIzM9YUXhzYx2iFoYx6ZlBjEw+bxw=";
+
+    # owner = "appaquet";
+    # repo = "avante.nvim";
+    # rev = "16bd0111";
+    # hash = "sha256-sqfkNyYz3Bw1bUnxKSFveJ9SMB1AeQN1RXQodL/91BE=";
   };
+
+  # src = /home/appaquet/Projects/avante.nvim;
+
   avante-nvim-lib = rustPlatform.buildRustPackage {
     pname = "avante-nvim-lib";
     inherit version src;
+
+    # buildType = "debug";
 
     useFetchCargoVendor = true;
     cargoHash = "sha256-pmnMoNdaIR0i+4kwW3cf01vDQo39QakTCEG9AXA86ck=";
