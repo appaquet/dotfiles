@@ -37,6 +37,7 @@
         "pull" = [
           "git"
           "fetch"
+          "--all-remotes"
         ];
         "push" = [
           "git"
