@@ -93,21 +93,25 @@
                 pkgsUnstable.claude-code
               ];
 
-            nativeBuildInputs = with pkgs; [
-              pkg-config # required by go for oxidized
+            nativeBuildInputs =
+              (with pkgs; [
+                pkg-config # required by go for oxidized
 
-              nodejs
-              yarn
-              jemalloc # for tooling
+                nodejs
+                yarn
+                jemalloc # for tooling
 
-              python3
-              (poetry.override { python3 = python310; })
+                python3
+                (poetry.override { python3 = python310; })
 
-              # LSPs
-              pyright
-              ruff
-              jsonnet-language-server
-            ];
+                # LSPs
+                pyright
+                ruff
+                jsonnet-language-server
+              ])
+              ++ [
+                pkgsUnstable.codex
+              ];
 
             # fixes go debugging
             # https://github.com/NixOS/nixpkgs/issues/18995
