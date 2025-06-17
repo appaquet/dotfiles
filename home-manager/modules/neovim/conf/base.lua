@@ -11,6 +11,10 @@ vim.opt.timeoutlen = 505 -- time to wait for a key code sequence to complete, ne
 vim.opt.textwidth = 100 -- max line length, because we aren't on a mainframe anymore
 vim.opt.formatoptions:remove("t") -- don't auto-wrap text (but comments will still auto-wrap (+c))
 
+-- Enable spell checking with camel case support
+vim.opt.spell = true
+vim.opt.spelloptions = { "camel", "noplainbuffer" }
+
 vim.opt.undofile = true -- Persists the undo across sessions
 
 -- Lower cursor hold time (for highlighting)

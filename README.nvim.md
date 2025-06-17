@@ -288,6 +288,7 @@ See [https://github.com/pwntester/octo.nvim/blob/03059cf4d694e2b3065136f074b42ee
 * `<leader>Ts` to toggle spell checking
 * `]s` or `[s` to go to next/prev spelling error
 * `z=` to see spelling suggestions for word under cursor (built-in)
-* `zg` to add word under cursor to spelling dictionary
+* `zg` to add word under cursor to spelling dictionary 
+  (`1zg`, `2zg`, if multiple dicts. Check `echo &spellfile` for order)
 * `zw` to remove word under cursor from spelling dictionary
 
