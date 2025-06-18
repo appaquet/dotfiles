@@ -7,6 +7,8 @@ require("which-key").add({
 local Neotest = require("neotest")
 local summary_was_opened = false
 Neotest.setup({
+	-- log_level = vim.log.levels.DEBUG,
+
 	adapters = {
 		require("rustaceanvim.neotest"),
 
@@ -160,7 +162,7 @@ vim.keymap.set("n", "<leader>tq", close, { desc = "Test: Close output & side pan
 
 vim.api.nvim_create_autocmd("LspAttach", {
 	once = true,
-	callback = function(args)
+	callback = function()
 		-- Force test discovery on first LSP attach
 		Neotest.summary.open()
 		Neotest.summary.close()

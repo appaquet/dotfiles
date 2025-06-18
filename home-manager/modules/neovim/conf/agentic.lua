@@ -42,6 +42,13 @@ require("avante").setup({
 	end,
 })
 
+require("which-key").add({
+	{ "<leader>aE", group = "Avante: Pre-defined edits..." },
+})
+vim.keymap.set("v", "<Leader>aEl", function()
+	require("avante.api").edit("Fix any typos or unclear text in the selected lines. Try to keep the original meaning and intent of the text.")
+end, { noremap = true, desc = "Fix typos & unclear text" })
+
 -- codecompanion
 -- https://codecompanion.olimorris.dev/getting-started.html
 require("codecompanion").setup({
