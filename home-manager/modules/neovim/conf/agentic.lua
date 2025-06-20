@@ -42,25 +42,26 @@ require("avante").setup({
 	end,
 })
 
-require("which-key").add({
-	{ "<leader>aE", group = "Avante: Pre-defined edits..." },
-})
-vim.keymap.set("v", "<Leader>aEl", function()
-	require("avante.api").edit("Fix any typos or unclear text in the selected lines. Try to keep the original meaning and intent of the text.")
-end, { noremap = true, desc = "Fix typos & unclear text" })
-
 -- codecompanion
 -- https://codecompanion.olimorris.dev/getting-started.html
 require("codecompanion").setup({
 	strategies = {
 		chat = {
 			adapter = "copilot",
+			model = "gpt-4.1",
 		},
 		inline = {
 			adapter = "copilot",
+			model = "gpt-4.1",
 		},
 	},
 })
+vim.keymap.set(
+	"v",
+	"gs",
+	":'<,'>CodeCompanion Fix any spelling or unclear text in this selected text. Try to keep the original meaning and intent of the text.<CR>",
+	{ silent = true, desc = "CodeCompanion: Fix spelling & unclear text" }
+)
 
 -- MCPHub
 require("mcphub").setup({})

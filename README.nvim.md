@@ -220,6 +220,16 @@ See [https://github.com/pwntester/octo.nvim/blob/03059cf4d694e2b3065136f074b42ee
   * `o` to open the current stack frame
   * `t` to toggle hidden stack frames
 
+## Inline AI code completion (insert mode)
+* `<Alt-l>`: Accept word suggestion
+* `<Alt-o>`: Accept line suggestion
+* `<Alt-j>`: Next suggestion
+* `<Alt-J>`: Show all suggestions in a panel
+* `<Alt-k>`: Previous suggestion
+* `<ctrl-]>`: Dismiss suggestion
+* `<Tab>`: Accept suggestion if visible, otherwise expand/jump snippet or insert tab
+* `<Shift-Tab>`: Force insert a tab instead of expanding a snippet
+
 ## Object selection (in visual mode)
 - `aX`: Select around object X  
 - `iX`: Select inside object X  
@@ -291,4 +301,5 @@ See [https://github.com/pwntester/octo.nvim/blob/03059cf4d694e2b3065136f074b42ee
 * `zg` to add word under cursor to spelling dictionary 
   (`1zg`, `2zg`, if multiple dicts. Check `echo &spellfile` for order)
 * `zw` to remove word under cursor from spelling dictionary
-
+* `gs` use code companion to correct spelling & clarity of current selection 
+  (use `ga` or `gr` to accept/reject)

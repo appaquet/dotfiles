@@ -48,6 +48,6 @@ vim.keymap.set("i", "<S-Tab>", function()
 	passthrough_keymap("<Tab>")
 end, { noremap = true, silent = true })
 
-vim.keymap.set("i", "<M-p>", function()
+vim.keymap.set("i", "<M-J>", function()
 	vim.cmd("Copilot panel")
 end, { noremap = true, silent = true })
