@@ -152,8 +152,8 @@
   * With input `<alt><left>` or `<alt><right>` to between words
   * With input `<ctl>w` to delete previous word
   * With input `<alt>e` or `<alt>v` to open input in editor
-  * `<ctl><alt>n`: fzf nix packages
-  * `<ctl><alt>g`: fzf ripgrep
+  * `<alt>n`: fzf nix packages
+  * `<alt>g`: fzf ripgrep
   * `<ctl><alt>f`: fzf fd (find file)
   * `<ctl><alt>p`: fzf processes
   * `<ctl><alt>l`: fzf git log

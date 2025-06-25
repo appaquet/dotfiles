@@ -67,6 +67,10 @@
         expansion = "gh pr create --head (jj-current-branch) --draft --body \"\" --title \"%\"";
         setCursor = true;
       };
+      jjspr = {
+        expansion = "gh pr create --base (jj-prev-branch) --head (jj-current-branch) --draft --body \"\" --title \"%\"";
+        setCursor = true;
+      };
       jjrt = "jj rebase-trunk";
     };
 
