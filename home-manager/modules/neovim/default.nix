@@ -103,6 +103,7 @@ in
         conform-nvim # formatting
         nvim-navic # symbol breadcrumbs in statusline
         render-markdown-nvim
+        nvim-lint
 
         # Autocomplete
         nvim-cmp # https://github.com/hrsh7th/nvim-cmp
@@ -195,6 +196,7 @@ in
           (includeLuaFile "git.lua")
           (includeLuaFile "lang.lua")
           (includeLuaFile "formatting.lua")
+          (includeLuaFile "linting.lua")
 
           (includeLuaFile "copilot.lua")
 
@@ -217,8 +219,9 @@ in
         stylua # lua formatting, `npx` for some MCPs
         lua-language-server # lua lsp
         bash-language-server # bash lsp
-        shfmt # shell formatting
-        shellcheck # shell linting
+        shfmt # shell formatting (via lsp)
+        shellcheck # shell linting (via lsp)
+        markdownlint-cli # via nvim-lint
       ])
       ++ (lib.optionals agenticEnabled [
         pkgs.mcp-hub # via overlay
