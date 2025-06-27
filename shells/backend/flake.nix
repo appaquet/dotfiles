@@ -90,7 +90,7 @@
                 tesseract
               ])
               ++ [
-                pkgsUnstable.claude-code
+                #pkgsUnstable.claude-code
               ];
 
             nativeBuildInputs =
