@@ -256,7 +256,7 @@ nixos)
   *)
     echo "$0 $COMMAND check: check nixos" >&2
     echo "$0 $COMMAND build: build nixos" >&2
-    echo "$0 $COMMAND boot: rebuild boot (remove old gens)" >&2
+    echo "$0 $COMMAND boot: add new config to boot, but doesn't switch it until reboot" >&2
     echo "$0 $COMMAND diff: diff nixos" >&2
     echo "$0 $COMMAND tree: show nixos tree" >&2
     echo "$0 $COMMAND kernel-versions: show kernel versions" >&2
