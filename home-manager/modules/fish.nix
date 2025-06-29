@@ -38,8 +38,8 @@
       fzf_configure_bindings
 
       # Some shortcuts (ctrl-alt-c, in iTerm2, need to rebind alt to Esc+)
-      bind \cn 'fzf-nix'
-      bind \cg 'fzf-ripgrep'
+      bind -M insert ctrl-alt-n 'fzf-nix'
+      bind -M insert ctrl-alt-g 'fzf-ripgrep'
     '';
 
     plugins = [

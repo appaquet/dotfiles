@@ -152,12 +152,16 @@
   * With input `<alt><left>` or `<alt><right>` to between words
   * With input `<ctl>w` to delete previous word
   * With input `<alt>e` or `<alt>v` to open input in editor
-  * `<alt>n`: fzf nix packages
-  * `<alt>g`: fzf ripgrep
-  * `<ctl><alt>f`: fzf fd (find file)
-  * `<ctl><alt>p`: fzf processes
-  * `<ctl><alt>l`: fzf git log
-  * `<ctl><alt>s`: fzf git status
+  * `<ctl>r`: search history
+  * `<ctl><alt>t`: search files
+  * `<ctl><alt>f`: search directory
+  * `<alt>c`: search cd directory
+  * `<ctl><alt>p`: search processes
+  * `<ctl><alt>l`: search git log
+  * `<ctl><alt>s`: search git status
+  * `<ctrl>v`: search env variables
+  * `<ctl><alt>n`: search nix packages
+  * `<ctl><alt>g`: rigrep search
 
 ### Neovim
 
