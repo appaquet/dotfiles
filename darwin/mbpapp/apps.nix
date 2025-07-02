@@ -105,6 +105,9 @@
       {
         name = "synology-drive";
       }
+      {
+        name = "moonlight";
+      }
 
       {
         name = "notion";
