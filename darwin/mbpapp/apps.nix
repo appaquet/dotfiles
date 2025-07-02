@@ -43,6 +43,9 @@
       {
         name = "wezterm";
       }
+      {
+        name = "ghostty@tip";
+      }
 
       {
         name = "google-chrome";
