@@ -2,6 +2,9 @@ require("auto-session").setup({
 	pre_save_cmds = {
 		-- Close current git diffview since it won't get reloaded correctly
 		"DiffviewClose",
+
+		-- Not useful anyway, it doesn't resume automatically.
+		"ClaudeCodeClose",
 	},
 })
 

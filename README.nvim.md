@@ -94,7 +94,7 @@ keymaps, but also default/built-ins that I tend to forget.
   * `E` to expand all, `W` to collapse
   * `/` to fuzzy find file
 
-## LSP
+## LSP / lang
 * `<leader>lgD` LSP: Go to declaration
 * `<leader>lgd` or `gd` LSP: Go to definition
 * `<leader>lgt` or `gt` LSP: Go to type definition
@@ -110,6 +110,7 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>lwa` LSP: Add workspace folder
 * `<leader>lwr` LSP: Remove workspace folder
 * `<leader>lwl` LSP: List workspace folders
+* `<leader>lf` Format current buffer with conform
 
 
 ## Git (g)

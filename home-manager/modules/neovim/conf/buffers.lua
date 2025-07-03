@@ -18,6 +18,15 @@ bufferline.setup({
 			return " " .. icon .. count
 		end,
 
+		custom_filter = function(buf_number, buf_numbers)
+			local name = vim.fn.bufname(buf_number)
+			if name:match("^term://.*claude") and vim.bo[buf_number].filetype == "" then
+				return false
+			end
+
+			return true
+		end,
+
 		offsets = { -- Don't show tabs over file explorer
 			{
 				filetype = "NvimTree",

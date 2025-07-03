@@ -43,6 +43,15 @@ let
     src = ./plugins/lsp-notify;
   };
 
+  claudecode-nvim = pkgs.vimUtils.buildVimPlugin {
+    name = "claudecode-nvim";
+    src = pkgs.fetchFromGitHub {
+      owner = "coder";
+      repo = "claudecode.nvim";
+      rev = "main";
+      sha256 = "sha256-h56TYz3SvdYw2R6f+NCtiFk3BRRV1+hOVa+BKjnav8E=";
+    };
+  };
   avante-nvim-override = pkgs.callPackage ./plugins/avante.nix {
     pkgs = pkgsChannel;
   };
@@ -162,6 +171,7 @@ in
         # Agentic plugins
         unstablePkgs.vimPlugins.codecompanion-nvim
         pkgs.mcphub-nvim
+        claudecode-nvim
 
         # Avante
         avante-nvim-override

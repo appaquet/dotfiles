@@ -66,3 +66,21 @@ vim.keymap.set(
 -- MCPHub
 require("mcphub").setup({})
 vim.keymap.set("n", "<Leader>au", ":<CR>:MCPHub<CR>", { silent = true, desc = "Open MCPHub" })
+
+-- ClaudeCode.nvim
+-- https://github.com/coder/claudecode.nvim
+require("claudecode").setup({})
+
+require("which-key").add({
+	{ "<leader>c", group = "Claude" },
+})
+
+vim.keymap.set("n", "<leader>cc", "<cmd>ClaudeCode<cr>", { desc = "Toggle Claude" })
+vim.keymap.set("n", "<leader>cf", "<cmd>ClaudeCodeFocus<cr>", { desc = "Focus Claude" })
+vim.keymap.set("n", "<leader>cr", "<cmd>ClaudeCode --resume<cr>", { desc = "Resume Claude" })
+vim.keymap.set("n", "<leader>cC", "<cmd>ClaudeCode --continue<cr>", { desc = "Continue Claude" })
+vim.keymap.set("n", "<leader>cb", "<cmd>ClaudeCodeAdd %<cr>", { desc = "Add current buffer" })
+vim.keymap.set("v", "<leader>cs", "<cmd>ClaudeCodeSend<cr>", { desc = "Send to Claude" })
+vim.keymap.set("n", "<leader>cs", "<cmd>ClaudeCodeTreeAdd<cr>", { desc = "Add file" }) -- , ft = { "NvimTree", "neo-tree", "oil" }
+vim.keymap.set("n", "<leader>ca", "<cmd>ClaudeCodeDiffAccept<cr>", { desc = "Accept diff" })
+vim.keymap.set("n", "<leader>cd", "<cmd>ClaudeCodeDiffDeny<cr>", { desc = "Deny diff" })
