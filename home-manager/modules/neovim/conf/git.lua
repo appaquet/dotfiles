@@ -4,6 +4,7 @@ require("which-key").add({
 
 -- Diffview
 -- https://github.com/sindrets/diffview.nvim
+-- `--imply-local` means it will use the local version of the file on the right side
 require("diffview").setup({})
 
 vim.g.main_branch_override = ""
@@ -23,13 +24,13 @@ end
 
 local function open_diffview_main()
 	local main_branch = git_main_branch()
-	vim.api.nvim_command("DiffviewOpen " .. main_branch .. "...")
+	vim.api.nvim_command("DiffviewOpen " .. main_branch .. "... --imply-local")
 	vim.notify("Diffing against " .. main_branch)
 end
 
 local function open_diffview_prev()
 	local prev_branch = git_prev_branch()
-	vim.api.nvim_command("DiffviewOpen " .. prev_branch)
+	vim.api.nvim_command("DiffviewOpen " .. prev_branch .. " --imply-local")
 	vim.notify("Diffing against " .. prev_branch)
 end
 
@@ -40,7 +41,7 @@ local function open_diffview_rev()
 		return
 	end
 
-	vim.api.nvim_command("DiffviewOpen " .. rev)
+	vim.api.nvim_command("DiffviewOpen " .. rev .. " --imply-local")
 end
 
 require("which-key").add({
