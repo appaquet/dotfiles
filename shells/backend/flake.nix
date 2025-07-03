@@ -103,6 +103,7 @@
 
                 python3
                 (poetry.override { python3 = python310; })
+                uv
 
                 # LSPs
                 pyright

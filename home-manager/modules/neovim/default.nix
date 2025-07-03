@@ -52,6 +52,7 @@ let
       sha256 = "sha256-h56TYz3SvdYw2R6f+NCtiFk3BRRV1+hOVa+BKjnav8E=";
     };
   };
+
   avante-nvim-override = pkgs.callPackage ./plugins/avante.nix {
     pkgs = pkgsChannel;
   };
@@ -224,14 +225,24 @@ in
     extraPackages =
       (with pkgs; [
         nixd # nix lsp
+
         marksman # markdown lsp
+        markdownlint-cli # via nvim-lint
+
         nodejs # for copilot
+        typescript-language-server
+
         stylua # lua formatting, `npx` for some MCPs
         lua-language-server # lua lsp
+
         bash-language-server # bash lsp
         shfmt # shell formatting (via lsp)
         shellcheck # shell linting (via lsp)
-        markdownlint-cli # via nvim-lint
+
+        rust-analyzer
+
+        pyright
+        ruff
       ])
       ++ (lib.optionals agenticEnabled [
         pkgs.mcp-hub # via overlay
