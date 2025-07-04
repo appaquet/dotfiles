@@ -249,4 +249,12 @@ in
         pkgs.uv # for `uvx` for some MCPs
       ]);
   };
+
+  # Force load after the rest
+  # May have to delete session if not working, or check `:scriptnames` / `:set runtimepath?`
+  xdg.configFile."nvim/after/ftplugin" = {
+    recursive = true;
+    source = ./ftplugin;
+  };
+
 }
