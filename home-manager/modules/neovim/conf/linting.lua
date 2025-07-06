@@ -19,4 +19,5 @@ markdownlint.args = {
 	"--stdin",
 	"--disable",
 	"MD013", -- Disable line length check
+	"MD012", -- Disable multiple consecutive blank lines
 }
