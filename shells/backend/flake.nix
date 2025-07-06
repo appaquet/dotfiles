@@ -43,7 +43,7 @@
         };
 
         python3 = (
-          (pkgs.python310.withPackages (
+          (pkgs.python312.withPackages (
             p: with p; [
               pandas
               opencv-python
@@ -102,7 +102,6 @@
                 jemalloc # for tooling
 
                 python3
-                (poetry.override { python3 = python310; })
                 uv
 
                 # LSPs
