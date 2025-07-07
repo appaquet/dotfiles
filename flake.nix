@@ -94,7 +94,6 @@
 
       homePackageOverlays = final: prev: {
         exo = prev.callPackage ./overlays/exo { };
-        opencode = prev.callPackage ./overlays/opencode { };
         mcphub-nvim = mcphub-nvim.packages."${prev.system}".default;
         mcp-hub = mcp-hub.packages."${prev.system}".default;
       };
