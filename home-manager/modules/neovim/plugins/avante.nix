@@ -16,8 +16,8 @@ let
   src = fetchFromGitHub {
     owner = "yetone";
     repo = "avante.nvim";
-    rev = "2ecfe587";
-    hash = "sha256-ABSTHnamilCuoDKRoktxe+0+002CzSiMgroXI9r5nyk=";
+    rev = "6227d5c";
+    hash = "sha256-1Sqv7ekSsSMIvoQ8gVxkNiDzUkZkh03dBjeBsRl2/ZQ=";
 
     # owner = "appaquet";
     # repo = "avante.nvim";
@@ -34,7 +34,7 @@ let
     # buildType = "debug";
 
     useFetchCargoVendor = true;
-    cargoHash = "sha256-pmnMoNdaIR0i+4kwW3cf01vDQo39QakTCEG9AXA86ck=";
+    cargoHash = "sha256-8mBpzndz34RrmhJYezd4hLrJyhVL4S4IHK3plaue1k8=";
 
     nativeBuildInputs = [
       pkg-config
