@@ -16,8 +16,8 @@ let
   src = fetchFromGitHub {
     owner = "yetone";
     repo = "avante.nvim";
-    rev = "6227d5c";
-    hash = "sha256-1Sqv7ekSsSMIvoQ8gVxkNiDzUkZkh03dBjeBsRl2/ZQ=";
+    rev = "30eb77af045015c890094dc514cf49d06f830cbe";
+    hash = "sha256-XSjkrLcZZbADqeYVchCCVTCwYNRI5DBGTYYIesdVeX4=";
 
     # owner = "appaquet";
     # repo = "avante.nvim";
