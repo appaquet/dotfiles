@@ -57,8 +57,9 @@
           default = pkgs.mkShell {
             name = "backend";
 
-            buildInputs =
-              (with pkgs; [
+            buildInputs = (
+              with pkgs;
+              [
                 clang
 
                 (rust-bin.stable.latest.default.override {
@@ -88,10 +89,8 @@
                 libGL
                 glib
                 tesseract
-              ])
-              ++ [
-                #pkgsUnstable.claude-code
-              ];
+              ]
+            );
 
             nativeBuildInputs = (
               with pkgs;
