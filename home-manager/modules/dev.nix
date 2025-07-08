@@ -40,7 +40,6 @@ in
       bintools # ld, objdump, etc.
 
       claude-code
-      codex
       opencode
     ])
     ++ lib.optionals pkgs.stdenv.isLinux [

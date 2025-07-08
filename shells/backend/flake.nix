@@ -93,8 +93,9 @@
                 #pkgsUnstable.claude-code
               ];
 
-            nativeBuildInputs =
-              (with pkgs; [
+            nativeBuildInputs = (
+              with pkgs;
+              [
                 pkg-config # required by go for oxidized
 
                 nodejs
@@ -108,10 +109,8 @@
                 pyright
                 ruff
                 jsonnet-language-server
-              ])
-              ++ [
-                pkgsUnstable.codex
-              ];
+              ]
+            );
 
             # fixes go debugging
             # https://github.com/NixOS/nixpkgs/issues/18995
