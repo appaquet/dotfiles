@@ -1,6 +1,7 @@
 -- fzf-lua
 -- From https://github.com/jkearse3/dotfiles/blob/e3e53bb0c11daeb33dc5b44609ff46da9dd05b1c/nvim/lua/lazy_plugins/search.lua#L2
 local fzf = require("fzf-lua")
+local actions = require("fzf-lua.actions")
 fzf.setup({
 	winopts = {
 		preview = {
@@ -18,6 +19,27 @@ fzf.setup({
 	oldfiles = {
 		cwd_only = true,
 		include_current_session = true,
+	},
+
+	actions = {
+		buffers = {
+			-- Force delete buffer
+			["ctrl-d"] = {
+				fn = function(selected, opts)
+					local bufnr = tonumber(selected[1]:match("%[(%d+)%]"))
+					if bufnr and vim.api.nvim_buf_is_valid(bufnr) then
+						vim.api.nvim_buf_delete(bufnr, { force = true })
+					end
+					return true
+				end,
+				desc = "Force delete buffer",
+				reload = true,
+			},
+
+			-- Have to add them since they get otherwise
+			["default"] = actions.buf_edit,
+			["ctrl-x"] = { fn = actions.buf_del, reload = true },
+		},
 	},
 })
 
