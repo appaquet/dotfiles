@@ -218,7 +218,11 @@ if vim.fn.executable("go") == 1 then -- Only load the plugin if `go` is availabl
 		lsp_cfg = {
 			settings = {
 				gopls = {
-					staticcheck = true,
+					-- via golangci-lint instead
+					staticcheck = false,
+					analyses = {
+						deprecated = false,
+					},
 
 					-- Prevent diags from disappearing when typing
 					-- See https://github.com/ray-x/go.nvim/issues/515
