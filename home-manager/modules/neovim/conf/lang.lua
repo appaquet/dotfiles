@@ -253,7 +253,13 @@ vim.g.rustaceanvim = {
 }
 
 -- highlight todo, fixme, etc
-require("todo-comments").setup({})
+require("todo-comments").setup({
+	keywords = {
+		NOTE = {
+			alt = { "REVIEW" },
+		},
+	},
+})
 
 -- markdown rendering
 -- also needed for Avante
