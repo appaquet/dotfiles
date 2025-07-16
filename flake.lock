@@ -354,11 +354,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1752604308,
-        "narHash": "sha256-ncQ8pzH1CdZl3M2tkxsS4RTf3chSf0/trdwc23bhK3s=",
+        "lastModified": 1752645949,
+        "narHash": "sha256-i+53MmapUw2Lu2sSU3TqBSMexfvhmmphrehIzxEgq4w=",
         "owner": "ravitemer",
         "repo": "mcphub.nvim",
-        "rev": "797952b211f79968029723c905906d1517e66d24",
+        "rev": "95c5abe809887f2479e2bcbf6cdf22d0b0b9a847",
         "type": "github"
       },
       "original": {
