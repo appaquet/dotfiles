@@ -7,13 +7,11 @@ let
     theme = dark:catppuccin-mocha,light:catppuccin-latte
 
     font-family = FiraCode Nerd Font Mono
-    font-size = 12
-    font-thicken = true
+    font-size = 16
+    font-thicken = false
 
-    # Disabling ligature since it's pretty annoyingly making mono non-mono sized
-    font-feature = -calt
-    font-feature = -liga
-    font-feature = -dlig
+    # Scroll on macos with external mouse is way too fast
+    mouse-scroll-multiplier = 0.25
 
     # Parses URLs to allow click
     # Doesn't work at the moment: https://github.com/ghostty-org/ghostty/issues/1972#issuecomment-2240048536
@@ -22,8 +20,8 @@ let
     # Fixes ctrl-alt keybindings (for fish)
     macos-option-as-alt = true
 
-    # Because ghostty isn't well known
-    term = xterm
+    # Because ghostty isn't well known and causes color issues
+    term = xterm-256color
   '';
 in
 {
