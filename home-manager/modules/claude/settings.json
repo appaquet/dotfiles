@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(notify:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr view:*)"
+    ]
+  },
+  "model": "sonnet",
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.message' | xargs -I _ notify \"_\""
+          }
+        ]
+      }
+    ]
+  }
+}
+
