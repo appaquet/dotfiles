@@ -5,6 +5,7 @@ local actions = require("fzf-lua.actions")
 fzf.setup({
 	winopts = {
 		preview = {
+			default = "bat", -- faster than builtin that triggers LSPs
 			layout = "vertical",
 			vertical = "down:60%",
 		},
