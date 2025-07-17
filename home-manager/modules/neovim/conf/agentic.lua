@@ -62,6 +62,12 @@ vim.keymap.set(
 	":'<,'>CodeCompanion Fix any spelling or unclear text in this selected text. Try to keep the original meaning and intent of the text.<CR>",
 	{ silent = true, desc = "CodeCompanion: Fix spelling & unclear text" }
 )
+vim.keymap.set(
+	"v",
+	"gC",
+	":'<,'>CodeCompanion Add documentation to the selected text. If it's a whole function, add proper documentation. If it's just code, add inline comments explaining it. If there are existing documentation, just improve it if needed. @insert_edit_into_file #buffer<CR>",
+	{ silent = true, desc = "CodeCompanion: Comment code" }
+)
 
 -- MCPHub
 require("mcphub").setup({})

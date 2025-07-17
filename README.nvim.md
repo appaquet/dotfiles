@@ -231,6 +231,12 @@ See [https://github.com/pwntester/octo.nvim/blob/03059cf4d694e2b3065136f074b42ee
 * `<Tab>`: Accept suggestion if visible, otherwise expand/jump snippet or insert tab
 * `<Shift-Tab>`: Force insert a tab instead of expanding a snippet
 
+## Visual AI actions
+This uses code companion. Use `ga` and `gr` to accept/reject AI suggestions in visual mode.
+
+* `gs` use Code Companion to correct spelling and improve clarity of the current selection  
+* `gC` generate comments or documentation for the current selection
+
 ## Object selection (in visual mode)
 - `aX`: Select around object X  
 - `iX`: Select inside object X  
