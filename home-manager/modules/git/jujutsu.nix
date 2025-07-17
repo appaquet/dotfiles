@@ -15,6 +15,7 @@
         name = "Andre-Philippe Paquet";
         email = "appaquet@gmail.com";
       };
+
       ui = {
         paginate = "never";
         default-command = [
@@ -22,11 +23,13 @@
           "--reversed"
         ];
       };
+
       git = {
-        push-new-bookmarks = true; # allow pushing new boomarks without explicit flag
       };
+
       revset-aliases = {
       };
+
       aliases = {
         "pull" = [
           "git"
