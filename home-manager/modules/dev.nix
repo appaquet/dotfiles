@@ -40,7 +40,7 @@ in
       bintools # ld, objdump, etc.
 
       claude-code
-      opencode
+      #opencode # FIXE: put back when stable
     ])
     ++ lib.optionals pkgs.stdenv.isLinux [
       pkgs.mold-wrapped
