@@ -3,7 +3,7 @@
 {
   imports = [
     ./modules/base.nix
-    ./modules/claude.nix
+    ./modules/claude
     ./modules/dev.nix
     ./modules/docker.nix
     ./modules/ghostty.nix

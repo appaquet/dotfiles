@@ -176,7 +176,8 @@ in
         claudecode-nvim
 
         # Avante
-        avante-nvim-override
+        #avante-nvim-override
+        unstablePkgs.vimPlugins.avante-nvim
 
         # Avante deps (if dev mode)
         # pkgs.vimPlugins.dressing-nvim

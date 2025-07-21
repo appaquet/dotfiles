@@ -143,17 +143,17 @@ vim.keymap.set("n", "<Leader>Tn", toggle_numbers, { silent = true, desc = "Toggl
 vim.keymap.set("n", "<Leader>Ts", ":set spell!<CR>", { silent = true, desc = "Toggle spellcheck" })
 
 -- Window navigation from terminal mode
-local function term_nav_keymap(lhs, rhs)
-	vim.keymap.set("t", lhs, "<C-\\><C-n>" .. rhs, { noremap = true, silent = true })
-end
-term_nav_keymap("<C-w>h", "<C-w>h")
-term_nav_keymap("<C-w>j", "<C-w>j")
-term_nav_keymap("<C-w>k", "<C-w>k")
-term_nav_keymap("<C-w>l", "<C-w>l")
-term_nav_keymap("<C-w><Left>", "<C-w>h")
-term_nav_keymap("<C-w><Down>", "<C-w>j")
-term_nav_keymap("<C-w><Up>", "<C-w>k")
-term_nav_keymap("<C-w><Right>", "<C-w>l")
+-- local function term_nav_keymap(lhs, rhs)
+-- 	vim.keymap.set("t", lhs, "<C-\\><C-n>" .. rhs, { noremap = true, silent = true })
+-- end
+-- term_nav_keymap("<C-w>h", "<C-w>h")
+-- term_nav_keymap("<C-w>j", "<C-w>j")
+-- term_nav_keymap("<C-w>k", "<C-w>k")
+-- term_nav_keymap("<C-w>l", "<C-w>l")
+-- term_nav_keymap("<C-w><Left>", "<C-w>h")
+-- term_nav_keymap("<C-w><Down>", "<C-w>j")
+-- term_nav_keymap("<C-w><Up>", "<C-w>k")
+-- term_nav_keymap("<C-w><Right>", "<C-w>l")
 
 -- Multicursors
 -- https://github.com/smoka7/multicursors.nvim

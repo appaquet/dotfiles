@@ -25,7 +25,7 @@ require("catppuccin").setup({
 
 	color_overrides = {
 		mocha = {
-			text = "#ffffff", -- Increase contrats a bit
+			text = "#ffffff", -- Increase contrast a bit
 		},
 	},
 
@@ -36,6 +36,7 @@ require("catppuccin").setup({
 		octo = true,
 		lsp_trouble = true,
 		which_key = true,
+		mini = true,
 	},
 })
 vim.cmd.colorscheme("catppuccin") -- Needs to be after setup
