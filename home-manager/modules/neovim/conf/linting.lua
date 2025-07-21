@@ -11,6 +11,16 @@ local auto_linting = true
 vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
 	callback = function()
 		if auto_linting then
+			if vim.bo.readonly then
+				return
+			end
+
+			-- Skip linting for non-disk-file buffers (virtual buffers, terminals, etc.)
+			local bufname = vim.api.nvim_buf_get_name(0)
+			if bufname == "" or bufname:match("^%w+://") or vim.fn.filereadable(bufname) == 0 then
+				return
+			end
+
 			lint.try_lint()
 		end
 	end,
