@@ -4,9 +4,9 @@ MESSAGE="${1:-"<no message>"}"
 
 TM="/opt/homebrew/bin/terminal-notifier"
 
-HOSTNAME=$(uname -n | tr '[:upper:]' '[:lower:] | sed 's/\.local//'')
+HOSTNAME=$(uname -n | tr '[:upper:]' '[:lower:]' | sed 's/\.local//')
 if [[ "${HOSTNAME}" == "mbpapp"* ]]; then
-  $TM -message "${MESSAGE}"
+  $TM -message "${MESSAGE}" -timeout 15 -sound glass
 else
-  ssh mbpapp.n3x.net "$TM -message \"${MESSAGE}\""
+  ssh mbpapp.n3x.net "$TM -message \"${MESSAGE}\" -timeout 15 -sound glass"
 fi
