@@ -3,12 +3,13 @@
 {
   imports = [
     ./modules/base.nix
+    ./modules/claude.nix
     ./modules/dev.nix
-    ./modules/work
-    ./modules/media.nix
     ./modules/docker.nix
-    ./modules/wezterm.nix
     ./modules/ghostty.nix
+    ./modules/media.nix
+    ./modules/wezterm.nix
+    ./modules/work
   ];
 
   home.username = "appaquet";
