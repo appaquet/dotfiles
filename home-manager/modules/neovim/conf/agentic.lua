@@ -49,6 +49,15 @@ require("codecompanion").setup({
 		chat = {
 			adapter = "copilot",
 			model = "gpt-4.1",
+			tools = {
+				["mcp"] = {
+					callback = require("mcphub.extensions.codecompanion"),
+					description = "Call tools and resources from the MCP Servers",
+					opts = {
+						requires_approval = true,
+					},
+				},
+			},
 		},
 		inline = {
 			adapter = "copilot",
