@@ -21,3 +21,8 @@ $ARGUMENTS
 4. Think hard about the plan and ask for clarification questions if needed.
 
 5. Create a high-level development plan that outlines the steps to be taken.
+
+6. Update the `PR.md` file with the plan and the current state of the project.
+
+7. NEVER jump to implementation after. Once our planning is done, let's stop there and leave me the
+   task kick-off the next phase.

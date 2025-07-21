@@ -15,3 +15,6 @@ $ARGUMENTS
 
 3. After each question / answer, update the `PR.md` file think hard about the next questions to ask
    to make sure you have all the information needed to proceed with the task.
+
+4. NEVER jump to implementation after. Once we have the file created, let's stop there and leave me
+   the task kick-off the next phase.

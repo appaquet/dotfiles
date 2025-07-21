@@ -27,6 +27,8 @@ than one pull request if the change is large enough to be split into multiple pu
       section. You must NEVER include generated files (ex: `*.pb.go`, `*.pb.gw.go`, `*_grpc.pb.go`,
       wire generated files, etc.) or PR specific doc files (ex: `PR.md`, feature docs, etc.) in this
       section. Use bullet list format with file paths in bold, followed by a colon and description.
+      You should always include files that are crucial to the completion of this task, even if you
+      didn't modify them.
     * Format:
       * First 1-2 sentences describing what the file is about and its purpose
       * Next 1-2 sentences describing what changes were made to the file (if any) Only include

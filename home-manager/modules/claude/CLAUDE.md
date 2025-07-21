@@ -1,4 +1,3 @@
-
 # Personal rules
 
 ## General
@@ -19,13 +18,13 @@
 
 * Always load the context of the project you are working on. It may be through project readme (often
   PR.md), repository readme (README.md) and architecture documents (ARCHITECTURE.md).
-* In order to request my attention OR notify me of a completed task, you *need* to use the `notify`
-  command, which will send me a notification: `notify "message"`. Such message could be `Task XYZ
-  has been completed`, `I need your attention on task XYZ`, etc.
-* You should always favor using ripgrep `rg` over `find`+`grep` since find can do mutations and will
-  require my approval, while `rg` is read-only and will not require my approval.
+* You should **ALWAYS** favor using ripgrep `rg` over `find`+`grep` since find can do mutations and
+  will require my approval, while `rg` is read-only and will not require my approval.
 * If we have a project documentation (PR.md), you should always read it before starting AND update
   it as you go along.
+* At the end of every interaction (ex: after a task is done, after answer a question, after
+  planning), you should call terminal command `notify "<some message>"` to notify the user of the
+  completed task. Such message could be: `Coding done`, `Planning done`, `Need more context`, etc.
 
 ## Environment
 
@@ -48,3 +47,4 @@
 ## Pull Request / Project documentation
 
 @docs/PR-file.md
+
