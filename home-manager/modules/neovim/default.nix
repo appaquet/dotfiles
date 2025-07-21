@@ -88,6 +88,7 @@ in
         todo-comments-nvim # highlight TODO, FIXME, etc
         multicursors-nvim
         mini-nvim # ton of modules (bufremove, etc.)
+        snacks-nvim # profiler
 
         # Notifications
         nvim-notify
@@ -215,6 +216,8 @@ in
           (includeLuaFile "testing.lua")
           (includeLuaFile "quickfix.lua")
           (includeLuaFile "debugging.lua")
+
+          (includeLuaFile "profiling.lua")
         ]
         ++ (lib.optionals agenticEnabled [
           (includeLuaFile "agentic.lua")
