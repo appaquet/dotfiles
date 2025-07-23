@@ -51,6 +51,41 @@
           )).override
             { ignoreCollisions = true; }
         );
+
+        tfSources = {
+          # x86_64-linux = pkgs.fetchurl {
+          #   url = "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-2.7.0.tar.gz";
+          #   hash = "sha256-7VOb6Wqcbkze4sBVoe6isr6JUsumG/0Q56g6tl4MfbM=";
+          # };
+          # aarch64-darwin = pkgs.fetchurl {
+          #   url = "https://github.com/zia-ai/tensorflow-go/releases/download/v2.7.0/libtensorflow-macos-2.7.0.tar.gz";
+          #   hash = "sha256-7+xE07+EgZeiIiTYknmTMUeHqGv4amo5j9SguVK9o8=";
+          # };
+          # version = "2.7.0";
+
+          x86_64-linux = pkgs.fetchurl {
+            url = "https://storage.googleapis.com/tensorflow/versions/2.18.0/libtensorflow-cpu-linux-x86_64.tar.gz";
+            hash = "sha256-YFv8s3DH5+yYHqutqID2B4Tj3gGDlb6VyVw+VZLD2aI=";
+          };
+          aarch64-darwin = pkgs.fetchurl {
+            url = "https://storage.googleapis.com/tensorflow/versions/2.18.0/libtensorflow-cpu-darwin-arm64.tar.gz";
+            hash = "sha256-RiJX0nknMNyxMfzyG8gmGSrlosQYU19jR9BR8Q/Ivoo=";
+          };
+          version = "2.18.0";
+        };
+
+        tfSrc = tfSources.${pkgs.stdenv.hostPlatform.system};
+        libtensorflow218 = pkgs.stdenv.mkDerivation {
+          name = "libtensorflow";
+          dontUnpack = true;
+          installPhase = ''
+            mkdir -p $out
+            cd $out
+            tar -zxvf ${tfSrc}
+          '';
+
+          nativeBuildInputs = pkgs.lib.optional pkgs.stdenv.hostPlatform.isDarwin pkgs.fixDarwinDylibNames;
+        };
       in
       {
         devShells = {
@@ -78,7 +113,9 @@
                 lldb
                 zlib
                 openssl
-                libtensorflow
+
+                #libtensorflow
+                libtensorflow218
 
                 # static build of go bins
                 # some stuff breaks if we enable all the time
