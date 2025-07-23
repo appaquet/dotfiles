@@ -26,7 +26,8 @@ Here's my usual development workflow, which I'll detail through commands when st
   Ex: `// TODO: MERGE_SEGMENTS -`. This allows us to search for `MERGE_SEGMENTS` in the codebase and find
   all the TODOs related to that specific project
 
-* Make sure to come up with a good plan and note all TODOs before starting the implementation
+* Make sure to come up with a good and very detailed plan and note all TODOs before starting the
+  implementation
 
 * You should try to use `jj` ability to quickly create changes when you are developing so that you
   can easily review and revert your changes.
@@ -40,12 +41,9 @@ Here's my usual development workflow, which I'll detail through commands when st
   non-overlapping tests. I'd rather have a few tests that test golden path than a lot of tests that
   don't have a clear purpose.
 
-* Check and fix diagnostics before running tests
-  * Don't try to fix unrelated diagnostics, focus on current task
-
 * Remove TODOs once implemented and add more if needed
 
-* Failing implementation
+* If you can't get an implementation to work because you're lacking knowledge or context
   * Comment out failing code or tests instead of deleting if you cannot fix them by yourself
   * Notify me that the implementation is incomplete
 
@@ -54,5 +52,8 @@ Here's my usual development workflow, which I'll detail through commands when st
   * Make sure that strictly follows the code style guidelines
   * Run formatting, linting and tests
   * Fix any issues that aren't expected
+
+* Don't stop until everything is working and all tests are passing, unless it's something you are
+  blocked on and need more context or insights
 
 * Update `PR.md` (if it exists, at root of repo)

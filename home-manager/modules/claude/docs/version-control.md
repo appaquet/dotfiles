@@ -27,5 +27,9 @@
   * `jj-stacked-branches` to get the list of branches from the trunk branch to the current branch
   * `jj-stacked-stats` list all files changed in each changes of the stacked branches
 
+* Very important note about `gh`: since `jj` is almost always in a detached head state, you should
+  use `jj-current-branch` to get the current branch name and pass it to `gh` commands that require a
+  branch name. For example, `gh pr view $(jj-current-branch)`.
+
 * Cheat sheet
   * Create a new change: `jj new -m "private: claude: description of the change"`

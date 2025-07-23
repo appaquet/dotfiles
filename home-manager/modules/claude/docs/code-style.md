@@ -29,3 +29,9 @@
 
   ```
 
+* When adding code to a file, always make sure that it's being added to the right place, and that it
+  follows the existing code style. I like code to be top-down, from public to private, with
+  dependency code being at the bottom of the file.
+
+  When you are modifying an existing file, check the structure of the file first and list
+  functions/structs if needed before.
