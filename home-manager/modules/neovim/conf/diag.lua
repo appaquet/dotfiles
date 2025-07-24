@@ -2,18 +2,56 @@ require("which-key").add({
 	{ "<leader>x", group = "Diagnostics" },
 })
 
+-- Per-project diagnostic exclusions
+local function is_file_excluded(filepath)
+	local default_exclusions = {
+		"/node_modules/",
+		"/vendor/",
+		"/.git/",
+		"/target/",
+		"/build/",
+	}
+	for _, pattern in ipairs(default_exclusions) do
+		if filepath:match(pattern) then
+			return true
+		end
+	end
+
+	-- Check project-specific exclusions from vim.g.diagnostic_excluded_dirs
+	-- Set via `vim.g.diagnostic_excluded_dirs = { ... }` in `.nvim.lua`
+	if vim.g.diagnostic_excluded_dirs then
+		for _, pattern in ipairs(vim.g.diagnostic_excluded_dirs) do
+			if filepath:match(pattern) then
+				return true
+			end
+		end
+	end
+
+	return false
+end
+
 -- Trouble (diagnostics)
 -- https://github.com/folke/trouble.nvim
 local Trouble = require("trouble")
 Trouble.setup({
 	modes = {
-		-- Only show diagnostics in the current working directory
 		cwd_diagnostics = {
 			mode = "diagnostics",
 			filter = {
 				function(item)
+					-- Only show diagnostics in the current working directory
 					local cwd = vim.fn.getcwd()
-					return item.filename:sub(1, #cwd) == cwd
+					if item.filename:sub(1, #cwd) ~= cwd then
+						return false
+					end
+
+					-- If file is excluded, only show if it's the currently active buffer
+					if is_file_excluded(item.filename) then
+						local current_file = vim.api.nvim_buf_get_name(0)
+						return item.filename == current_file
+					end
+
+					return true
 				end,
 			},
 		},
