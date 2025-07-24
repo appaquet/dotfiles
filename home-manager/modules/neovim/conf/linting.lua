@@ -30,7 +30,7 @@ vim.keymap.set("n", "<leader>lt", function()
 	lint.try_lint()
 end, { desc = "Run linting on demand" })
 
-vim.keymap.set("n", "<leader>St", function()
+vim.keymap.set("n", "<leader>Tt", function()
 	auto_linting = not auto_linting
 	if auto_linting then
 		vim.notify("Automatic linting enabled", vim.log.levels.INFO)

@@ -39,7 +39,6 @@ in
       gnumake
       bintools # ld, objdump, etc.
 
-      claude-code
       #opencode # FIXE: put back when stable
     ])
     ++ lib.optionals pkgs.stdenv.isLinux [

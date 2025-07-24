@@ -159,12 +159,3 @@ vim.keymap.set("n", "<leader>ts", toggle_summary, { desc = "Test: Toggle summary
 
 vim.keymap.set("n", "<leader>to", open_output, { desc = "Test: Toggle output" })
 vim.keymap.set("n", "<leader>tq", close, { desc = "Test: Close output & side panel" })
-
-vim.api.nvim_create_autocmd("LspAttach", {
-	once = true,
-	callback = function()
-		-- Force test discovery on first LSP attach
-		Neotest.summary.open()
-		Neotest.summary.close()
-	end,
-})
