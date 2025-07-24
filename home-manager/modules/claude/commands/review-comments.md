@@ -9,10 +9,10 @@ each language) to mark comments that need to be reviewed and addressed.
    If you can't find any comments, make sure you are indeed at the root of the repository and that
    you aren't limiting by file type.
 
-   If you still can't find any comments, check for comments on the pull request itself. Use the
-   proper method to get the current branch via `jj`, then use `gh` to get the pull request and its
-   comments. Also make sure you look for draft comments using the API or the `gh` command
-   (ex: `gh api repos/someorg/somerepo/pulls/5913/comments`)
+   If, and only if, you still can't find any comments OR I explicitly asked you, check for comments
+   on the pull request itself. Use the proper method to get the current branch via `jj`, then use
+   `gh` to get the pull request and its comments. Also make sure you look for draft comments using
+   the API or the `gh` command (ex: `gh api repos/someorg/somerepo/pulls/5913/comments`)
 
 2. Review each comment, there are a few types:
     - Ones that you need to address by fixing the code, implementing a feature, etc.

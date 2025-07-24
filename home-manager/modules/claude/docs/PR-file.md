@@ -47,8 +47,10 @@ than one pull request if the change is large enough to be split into multiple pu
 
   * **Pull requests** (optional): section where description of different pull requests created out of the
     changes are listed
-    * **Summary section only**: Start with "In this PR, I implemented..." followed by technical implementation details
+    * **Summary section only**: Start with "In this PR, I implemented..." followed by high-level technical overview
     * Focus on what was technically implemented rather than business value
-    * Use specific component names and technical terms
-    * Keep it concise but technically precise
+    * Describe the feature or capability that was built, not how it works internally
+    * Keep it concise and high-level - answer "what did you build?" not "how does it work?"
+    * Use general system/component terms, avoid specific function names, algorithms, code logic, or parameter details
+    * Think of it as explaining to another engineer what capability you added, not teaching them the implementation
     * Do NOT include test plans, generated attribution, or other sections

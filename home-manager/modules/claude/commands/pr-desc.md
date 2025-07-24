@@ -5,6 +5,6 @@
 
 * Make sure the "Files" section is up-to-date
 
-* Create a high-level, concise PR description following the established structure
+* Create a high-level, concise PR description following the established structure (see `PR-file.md`)
 
 * Write it to `PR.md` in the appropriate "Pull requests" section if the file already exists
