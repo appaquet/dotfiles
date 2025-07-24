@@ -20,6 +20,10 @@ let
     # Fixes ctrl-alt keybindings (for fish)
     macos-option-as-alt = true
 
+    # Unbding alt-left/right to make it work with fish
+    keybind = alt+left=unbind
+    keybind = alt+right=unbind
+
     # Because ghostty isn't well known and causes color issues
     term = xterm-256color
   '';
