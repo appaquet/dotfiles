@@ -77,7 +77,6 @@ in
         # Layout
         nvim-tree-lua
         lualine-nvim # https://github.com/nvim-lualine/lualine.nvim
-        bufferline-nvim # https://github.com/akinsho/bufferline.nvim
         auto-session # automatically restore last session
         zen-mode-nvim
 
@@ -87,7 +86,7 @@ in
         which-key-nvim # show keymap hints
         todo-comments-nvim # highlight TODO, FIXME, etc
         multicursors-nvim
-        mini-nvim # ton of modules (bufremove, etc.)
+        mini-nvim # tabline, bufremove, etc.
         snacks-nvim # profiler
 
         # Notifications
