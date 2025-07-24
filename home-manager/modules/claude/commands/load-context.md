@@ -1,22 +1,34 @@
-
-# Load context / project
+---
+name: load-context
+description: Load comprehensive project context including docs, PR info, and branch status
+tools: Read, Glob, Bash
+---
 
 Load as much context as possible about the project and task at hand.
 
-1. Read the `PR.md` file at the root of the repository. There may be none if we haven't started
-   working on a new task yet, but it's fine.
+1. Read the `PR.md` file at the root of the repository:
+   * File may not exist if no task has been started yet - this is fine
+   * If it exists, understand current task context, requirements, and progress
 
-2. Load and read the relevant repository documentations by **looking recursively** for the following
-   files using your find method. If you have a `PR.md` with files in it, focus on the relevant
-   sections of the repository.
-    * README.md
-    * ARCHITECTURE.md
+2. Load relevant repository documentation:
+   * Use `Glob` tool to **recursively** find and read:
+     - `README.md`
+     - `ARCHITECTURE.md`
+   * If `PR.md` exists with a "Files" section, focus on those relevant areas
 
-3. Check if we're on a branch and list all changed files using the fish `jj-stacked-stats` function,
-   which will also tell us if we're on a stacked branch
+3. Analyze current branch status:
+   * Use `jj-stacked-stats` to list all changed files and understand branch structure
+   * Determine if we're on a stacked branch or standalone branch
 
-4. Load the PR from GitHub for the current branch (using `jj-current-branch`), analyse it's
-   description and comments. There may be none yet, and it's fine. It is important to get PR for the
-   current branch since `gh` won't find one because of detached head.
+4. Load GitHub PR information:
+   * Get current branch name: `jj-current-branch`
+   * Load PR details: `gh pr view $(jj-current-branch)`
+   * Analyze PR description and comments if they exist
+   * **Important**: Use branch name explicitly since jj uses detached head
 
-5. If it exists, propose next tasks to be done based on the PR.md file
+5. Synthesize and propose next steps:
+   * If `PR.md` exists, propose next tasks based on TODO section
+   * If no clear direction, ask for clarification on goals
+   * Provide summary of current project state and context
+
+6. Notify completion with `notify "Context loaded"`

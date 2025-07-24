@@ -1,5 +1,7 @@
-
-# Pull Request documentation initialization
+---
+name: pr-init
+description: Initialize PR.md file by conversing with user to gather requirements
+---
 
 Create a `PR.md` file at the root of the repository with the appropriate sections by conversing with
 me. You should *ALWAYS* use the documented structure as defined in your rules.
