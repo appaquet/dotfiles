@@ -74,6 +74,9 @@ in
       # `COLORTERM=truecolor` is set in fish.nix
       set -g default-terminal 'screen-256color'
 
+      # Unbind config edit since it's read-only anyway, and it messes up with overriden configs here
+      unbind e
+
       # Rebind r to reload config
       unbind r
       bind r source-file ${config.home.homeDirectory}"/.config/tmux/tmux.conf"
