@@ -94,6 +94,7 @@
 
       homePackageOverlays = final: prev: {
         exo = prev.callPackage ./overlays/exo { };
+        claude-code = prev.callPackage ./overlays/claude-code { };
         mcphub-nvim = mcphub-nvim.packages."${prev.system}".default;
         mcp-hub = mcp-hub.packages."${prev.system}".default;
       };
@@ -142,7 +143,8 @@
                 modules = [
                   ./home-manager/deskapp.nix
                   extraSpecialArgs.secrets.commonHome
-                ] ++ commonHomeModules;
+                ]
+                ++ commonHomeModules;
                 extraSpecialArgs = {
                   inherit inputs unstablePkgs;
                   secrets = secrets.init "linux";
@@ -157,7 +159,8 @@
                 modules = [
                   ./home-manager/servapp.nix
                   extraSpecialArgs.secrets.commonHome
-                ] ++ commonHomeModules;
+                ]
+                ++ commonHomeModules;
                 extraSpecialArgs = {
                   inherit inputs unstablePkgs;
                   secrets = secrets.init "linux";
@@ -172,7 +175,8 @@
                 modules = [
                   ./home-manager/mbpapp.nix
                   extraSpecialArgs.secrets.commonHome
-                ] ++ commonHomeModules;
+                ]
+                ++ commonHomeModules;
                 extraSpecialArgs = {
                   inherit inputs unstablePkgs cfg;
                   secrets = secrets.init "darwin";
@@ -184,7 +188,8 @@
                 modules = [
                   ./home-manager/piapp.nix
                   extraSpecialArgs.secrets.commonHome
-                ] ++ commonHomeModules;
+                ]
+                ++ commonHomeModules;
                 extraSpecialArgs = {
                   inherit inputs unstablePkgs;
                   secrets = secrets.init "linux";
@@ -200,7 +205,8 @@
                 modules = [
                   ./home-manager/utm.nix
                   extraSpecialArgs.secrets.commonHome
-                ] ++ commonHomeModules;
+                ]
+                ++ commonHomeModules;
                 extraSpecialArgs = {
                   inherit inputs unstablePkgs;
                   secrets = secrets.init "linux";
