@@ -36,6 +36,7 @@
                   pandas
                 ]
               ))
+              uv
               (pkgs.poetry.withPlugins (
                 ps: with ps; [
                   poetry-plugin-shell

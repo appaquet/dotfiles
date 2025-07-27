@@ -3,9 +3,11 @@
 {
   imports = [
     ./modules/base.nix
-    ./modules/vms.nix
-    ./modules/media.nix
+    ./modules/claude
+    ./modules/dev.nix
     ./modules/docker.nix
+    ./modules/media.nix
+    ./modules/vms.nix
     ./modules/vpn.nix
   ];
 
