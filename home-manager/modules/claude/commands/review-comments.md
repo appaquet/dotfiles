@@ -8,10 +8,11 @@ each language) to mark comments that need to be reviewed and addressed.
 
 1. Search for REVIEW comments in the codebase:
    * At the **root of the repository**, use `rg -n "// REVIEW:"`
+     * **NEVER** look for comments in other directories, always start at the root of the repository
    * If no comments found, verify you're at repository root and not limiting by file type
    * If still no comments OR explicitly requested, check PR comments using:
-     * Get current branch: `jj-current-branch`
-     * Check PR comments: `gh pr view $(jj-current-branch)` and `gh api repos/owner/repo/pulls/PR_NUMBER/comments`
+     * Get current branch: `fish -c "jj-current-branch"`
+     * Check PR comments: `gh pr view $(fish -c "jj-current-branch")` and `gh api repos/owner/repo/pulls/PR_NUMBER/comments`
 
 2. Categorize each review comment:
    * **Action items**: Code fixes, feature implementations, refactoring needed
@@ -19,6 +20,11 @@ each language) to mark comments that need to be reviewed and addressed.
    * **Questions**: Clarifications needed about the code
 
    **Note**: Don't reply in code comments - communicate directly with me for questions
+
+   **NEVER** Take decision of not taking action on a comment that was an action item on the premise
+   that you think it is not needed. If you want to pushback on a comment, you must communicate with
+   me. You can fix the rest of the comments, but then clearly tell me that you did not address the
+   comment and why you think it is not needed. I will then decide if it is needed or not.
 
 3. Create action plan:
    * Build internal TODO list from review comments

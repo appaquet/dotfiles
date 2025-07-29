@@ -10,7 +10,7 @@ repository while respecting the established structure and guidelines.
 1. Read the current `PR.md` file at the root of the repository
 
 2. Update the "Files" section with the current state of the project:
-   * Use `jj-diff-branch --stat` to get the list of modified files in the current branch
+   * Use `fish -c "jj-diff-branch --stat"` to get the list of modified files in the current branch
    * Include any files that are not necessarily modified but are very important or relevant for the task
    * Follow the established format: `- **path/to/file**: Description of file purpose. Description of changes made.`
 

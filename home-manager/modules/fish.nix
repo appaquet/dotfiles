@@ -54,11 +54,14 @@
     ];
 
     shellAliases = {
-      l = "ls";
-      ll = "ls -lash";
-      b = "bat";
       randstr = "tr -cd \"[:alnum:]\" < /dev/urandom | fold -w30 | head -n1";
       x = "~/dotfiles/x";
+
+      b = "bat";
+      c = "bat";
+
+      l = "lsd";
+      ll = "lsd -l";
     };
 
     shellAbbrs = {
@@ -69,9 +72,11 @@
       "...." = "cd ../../..";
       "....." = "cd ../../../..";
 
-      llt = "ll -t"; # sort by time
-      llth = "ll -t | head -n 20"; # sort by time, only top 20
-      lls = "ll -S"; # sort by size
+      lla = "lsd -lA";
+      llt = "lsd -lt"; # sort by time
+      llth = "lsd -lt --color=always | head -n 20"; # sort by time, top 20
+      lls = "lsd -lS"; # sort by size
+      llsh = "lsd -lS --color=always | head -n 20"; # sort by size, top 20
 
       nr = {
         expansion = "nix run nixpkgs#%";

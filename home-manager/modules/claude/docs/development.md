@@ -48,10 +48,13 @@ Here's my usual development workflow, which I'll detail through commands when st
   * Comment out failing code or tests instead of deleting if you cannot fix them by yourself
   * Notify me that the implementation is incomplete
 
+* If a file is too big for your context, ask me if you can split it to optimize your context use
+
 * Remove TODOs once implemented and add more if needed
 
 * Before considering the task complete, *ALWAYS*:
-  * Review your code with by diffing the current working changes (`jj-diff-working`)
+  * Review the initial plan, TODOs and instructions
+  * Review your code with by diffing the current working changes (`fish -c "jj-diff-working"`)
   * Make sure that strictly follows the code style guidelines
   * Run formatting, linting and tests
   * Fix any issues that aren't expected
@@ -61,5 +64,9 @@ Here's my usual development workflow, which I'll detail through commands when st
 
 * **NEVER** stop until everything is working and all tests are passing, unless it's something you
   are blocked on and need more context or insights
+
+* **ALWAYS** tell me if an implementation is incomplete at the end of the process. Never tell me
+  that the feature is complete unless it is 100% finished, follows the plan exactly, and all
+  lints/tests are passing.
 
 * Update `PR.md` (if it exists, at root of repo)

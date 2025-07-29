@@ -19,7 +19,7 @@
 ## General instructions
 
 * *ALWAYS* load the context of the project you are working on before *ANY* interaction with the
-  user. See @commands/load-context.md for how to do so.
+  user. Follow the step-by-step process described in @commands/load-context.md.
 
 * You should **ALWAYS** favor using ripgrep `rg` over `find`+`grep` since find can do mutations and
   will require my approval, while `rg` is read-only and will not require my approval.

@@ -38,6 +38,7 @@
       nix-direnv
 
       bat # cat replacement
+      lsd # ls replacement
       hexyl
 
       fzf

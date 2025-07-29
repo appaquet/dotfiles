@@ -7,6 +7,7 @@
       "Bash(gh pr checks:*)"
     ]
   },
+  "model": "sonnet",
   "hooks": {
     "Notification": [
       {
@@ -19,6 +20,5 @@
         ]
       }
     ]
-  },
-  "model": "sonnet"
+  }
 }

@@ -23,12 +23,14 @@ local function git_prev_branch()
 end
 
 local function open_diffview_main()
+	vim.api.nvim_command("DiffviewClose")
 	local main_branch = git_main_branch()
 	vim.api.nvim_command("DiffviewOpen " .. main_branch .. "... --imply-local")
 	vim.notify("Diffing against " .. main_branch)
 end
 
 local function open_diffview_prev()
+	vim.api.nvim_command("DiffviewClose")
 	local prev_branch = git_prev_branch()
 	vim.api.nvim_command("DiffviewOpen " .. prev_branch .. " --imply-local")
 	vim.notify("Diffing against " .. prev_branch)
@@ -41,18 +43,29 @@ local function open_diffview_rev()
 		return
 	end
 
+	vim.api.nvim_command("DiffviewClose")
 	vim.api.nvim_command("DiffviewOpen " .. rev .. " --imply-local")
+end
+
+local function open_diffview_working()
+	vim.api.nvim_command("DiffviewClose")
+	vim.api.nvim_command("DiffviewOpen")
+end
+
+local function open_diffview_file_history()
+	vim.api.nvim_command("DiffviewClose")
+	vim.api.nvim_command("DiffviewFileHistory %")
 end
 
 require("which-key").add({
 	{ "<leader>gd", group = "Diff view" },
 })
-vim.keymap.set("n", "<Leader>gdw", ":DiffviewOpen<CR>", { silent = true, desc = "Git: open diff view against working dir" })
+vim.keymap.set("n", "<Leader>gdw", open_diffview_working, { desc = "Git: open diff view against working dir" })
 vim.keymap.set("n", "<Leader>gdm", open_diffview_main, { desc = "Git: open diff view against main branch" })
 vim.keymap.set("n", "<Leader>gdp", open_diffview_prev, { desc = "Git: open diff view against previous branch" })
+vim.keymap.set("n", "<Leader>gdf", open_diffview_file_history, { desc = "Git: open file history" })
+vim.keymap.set("n", "<Leader>gdc", open_diffview_rev, { desc = "Git: open diff view against given rev/commit" })
 vim.keymap.set("n", "<Leader>gdq", ":DiffviewClose<CR>", { silent = true, desc = "Git: close diff view" })
-vim.keymap.set("n", "<Leader>gdf", ":DiffviewFileHistory %<CR>", { silent = true, desc = "Git: open file history" })
-vim.keymap.set("n", "<Leader>gdc", open_diffview_rev, { silent = true, desc = "Git: open diff view against given rev/commit" })
 
 -- Git signs
 -- https://github.com/lewis6991/gitsigns.nvim

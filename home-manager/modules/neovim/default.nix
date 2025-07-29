@@ -48,8 +48,8 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "coder";
       repo = "claudecode.nvim";
-      rev = "main";
-      sha256 = "sha256-h56TYz3SvdYw2R6f+NCtiFk3BRRV1+hOVa+BKjnav8E=";
+      rev = "d0f9748";
+      sha256 = "sha256-qmZPjZJ9UFxAWCY3NQwsu0nEniG/UasV/iCrG3S5tPQ=";
     };
   };
 
