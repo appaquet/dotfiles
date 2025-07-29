@@ -28,7 +28,22 @@ vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
 
 vim.keymap.set("n", "<leader>lt", function()
 	lint.try_lint()
-end, { desc = "Run linting on demand" })
+end, { desc = "Lint: Run" })
+
+vim.keymap.set("n", "<leader>lT", function()
+	local filetype = vim.bo.filetype
+	local filename = vim.api.nvim_buf_get_name(0)
+	if filename == "" or vim.fn.filereadable(filename) == 0 then
+		return
+	end
+
+	if filetype == "markdown" then
+		vim.fn.system("markdownlint --fix " .. vim.fn.shellescape(filename))
+		vim.cmd("edit!") -- Reload the file to show the changes
+	else
+		vim.notify("Unsupported file type", vim.log.levels.WARN)
+	end
+end, { desc = "Lint: Fix" })
 
 vim.keymap.set("n", "<leader>Tl", function()
 	auto_linting = not auto_linting
@@ -37,7 +52,7 @@ vim.keymap.set("n", "<leader>Tl", function()
 	else
 		vim.notify("Automatic linting disabled", vim.log.levels.WARN)
 	end
-end, { desc = "Toggle automatic linting" })
+end, { desc = "Lint: Toggle" })
 
 -- Override markdownlint args to disable line length check
 -- https://github.com/mfussenegger/nvim-lint/blob/2b0039b8be9583704591a13129c600891ac2c596/lua/lint/linters/markdownlint.lua#L6
