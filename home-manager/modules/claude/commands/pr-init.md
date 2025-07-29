@@ -7,6 +7,7 @@ Create a `PR.md` file at the root of the repository with the appropriate section
 me. You should *ALWAYS* use the documented structure as defined in your rules.
 
 Task (may be empty)
+
 ```markdown
 $ARGUMENTS
 ```

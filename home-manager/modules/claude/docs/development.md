@@ -4,6 +4,7 @@
 ## Development Workflow
 
 Here's my usual development workflow, which I'll detail through commands when starting them:
+
 1. Planning phrase: load relevant docs and context, create high-level plan and potentially project
    documentation (ex: PR.md)
 2. Scaffolding phase: add TODOs, scaffold structure (interfaces, structs, functions), write tests

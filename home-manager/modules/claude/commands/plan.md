@@ -6,6 +6,7 @@ description: Load repository context and create high-level development plans
 Load repository context, current task context, and create high-level plans for the task at hand:
 
 Task (may be empty):
+
 ```markdown
 $ARGUMENTS
 ```

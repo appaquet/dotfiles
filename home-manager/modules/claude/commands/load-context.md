@@ -12,8 +12,8 @@ Load as much context as possible about the project and task at hand.
 
 2. Load relevant repository documentation:
    * Use `Glob` tool to **recursively** find and read:
-     - `README.md`
-     - `ARCHITECTURE.md`
+     * `README.md`
+     * `ARCHITECTURE.md`
    * If `PR.md` exists with a "Files" section, focus on those relevant areas
 
 3. Analyze current branch status:
