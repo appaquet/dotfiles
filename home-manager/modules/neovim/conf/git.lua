@@ -59,6 +59,14 @@ vim.keymap.set("n", "<Leader>gdc", open_diffview_rev, { silent = true, desc = "G
 local gitsigns = require("gitsigns")
 require("gitsigns").setup({
 	current_line_blame = true, -- show blame info on current line as virtual text
+	on_attach = function(bufnr)
+		local buf_name = vim.api.nvim_buf_get_name(bufnr)
+		if buf_name:match("^diffview://") then
+			return false
+		end
+
+		return true
+	end,
 })
 require("which-key").add({
 	{ "<leader>gg", group = "Gutter signs" },

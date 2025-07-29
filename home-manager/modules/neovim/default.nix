@@ -53,10 +53,21 @@ let
     };
   };
 
-  avante-nvim-override = pkgs.callPackage ./plugins/avante.nix {
-    pkgs = pkgsChannel;
+  # Fixes perf issues
+  gitsigns-nvim = pkgs.vimUtils.buildVimPlugin {
+    name = "gitsigns-nvim";
+    src = pkgs.fetchFromGitHub {
+      owner = "lewis6991";
+      repo = "gitsigns.nvim";
+      rev = "b014331";
+      sha256 = "sha256-7BKwxHoFWGepqm8/J+RB6zu+7IpGUUmgLP4a2O2lIuA=";
+    };
   };
 
+  # avante-nvim-override = pkgs.callPackage ./plugins/avante.nix {
+  #   pkgs = pkgsChannel;
+  # };
+  #
 in
 {
   programs.neovim = {
