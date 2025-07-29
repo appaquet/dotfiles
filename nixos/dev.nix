@@ -8,7 +8,6 @@
 {
   imports = [
     inputs.vscode-server.nixosModule
-    inputs.cursor-server.nixosModule
   ];
 
   environment.systemPackages =
@@ -22,5 +21,4 @@
   # Automatically patches vscode-server nodejs
   # See https://github.com/nix-community/nixos-vscode-server
   services.vscode-server.enable = true;
-  services.cursor-server.enable = true;
 }

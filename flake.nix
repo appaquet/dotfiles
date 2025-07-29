@@ -54,11 +54,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    cursor-server = {
-      url = "github:p-zany/nixos-cursor-server";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     mcphub-nvim = {
       url = "github:ravitemer/mcphub.nvim";
       inputs.nixpkgs.follows = "nixpkgs";
