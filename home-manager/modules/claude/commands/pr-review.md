@@ -11,7 +11,7 @@ description: Review changes in the current branch / PR for code style, architect
     * Agent 3: launch the "architecture-reviewer" agent
 
 3. Once the agents are done, collect the feedback from the agents and:
-    * Add `// REVIEW: <agent name> - <comment>` comments for all issues found in the code
+    * Add any missing `// REVIEW: <agent name> - <comment>` for issues raised by agents
     * Update `PR.md` (if it exists, at root of repo)
       * Update "Files" with modified files (bold paths + descriptions)
       * Update "TODO" with checkmark lists with completed items

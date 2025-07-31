@@ -24,7 +24,7 @@
 * You should **ALWAYS** favor using ripgrep `rg` over `find`+`grep` since find can do mutations and
   will require my approval, while `rg` is read-only and will not require my approval.
 
-* If we have a project documentation (PR.md), you should always read it before starting AND update
+* If we have a project documentation (`PR.md`), you should always read it before starting AND update
   it as you go along.
 
 * At the end of every interaction (ex: after a task is done, after answer a question, after
@@ -41,21 +41,24 @@
 ## Environment
 
 * I'm on NixOS most of the time, but may be on MacOS as well when I interact with you.
-* I use fish, so you may be asked to execute fish functions, which means that you'll have to use
-  `fish -c "the function with params"`
+* I use fish, so you may be asked to execute fish functions, which means that you'll *NEED* to use
+  `fish -c "the function with params"` to execute them
 
 ## Version control
 
-@docs/version-control.md
+As soon as you start working on a project, you *MUST* use version control to interact with its
+codebase. Check this documentation for more information: @docs/version-control.md
 
 ## Development instructions
 
-@docs/development.md
+Before starting any development task (planning, coding, testing, etc.), you *MUST* read this
+documentation: @docs/development.md
 
 ## General code style guidelines
 
-@docs/code-style.md
+Before writing any code, you *MUST* read this documentation: @docs/code-style.md
 
 ## Pull Request / Project documentation
 
-@docs/PR-file.md
+Tasks / branches / features are documented via a `PR.md` file. You *MUST* read this documentation
+before starting any task: @docs/PR-file.md
