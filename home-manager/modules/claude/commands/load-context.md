@@ -1,7 +1,6 @@
 ---
 name: load-context
 description: Load comprehensive project context including docs, PR info, and branch status
-tools: Read, Glob, Bash
 ---
 
 Load as much context as possible about the project and task at hand.
@@ -21,7 +20,7 @@ Load as much context as possible about the project and task at hand.
 3. Analyze current branch status:
    * Use `fish -c "jj-stacked-stats"` to list all changed files in the current branch, as well as in other
      stacked branches at the base of this one if it is part of a stack of branches.
-   * Use can use `fish -c "jj-diff-branch"` to see the diff of the current branch against the previous branch
+   * Use can use `fish -c "jj-diff-branch --git"` to see the diff of the current branch against the previous branch
 
 4. Load GitHub PR information:
    * Get current branch name: `fish -c "jj-current-branch"`

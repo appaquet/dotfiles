@@ -1,7 +1,6 @@
 ---
 name: save-context
 description: Update PR.md with current project state, files, and TODO progress
-tools: Read, Edit, Bash
 ---
 
 Our goal is to save the current context of the project into the `PR.md` file at the root of the
