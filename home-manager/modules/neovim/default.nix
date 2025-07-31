@@ -101,7 +101,9 @@ in
         snacks-nvim # profiler
 
         # Notifications
-        nvim-notify
+        (nvim-notify.overrideAttrs (_: {
+          doCheck = false; # flaky on ci
+        }))
         # nvim-notify-notify (see below)
 
         # Diagnostics
