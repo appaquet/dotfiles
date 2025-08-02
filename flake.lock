@@ -239,17 +239,14 @@
         ]
       },
       "locked": {
-        "lastModified": 1752772313,
-        "narHash": "sha256-RcwDTwlWmYXVdFoOYepJxUtLqScQJlIh72w6E9COeQU=",
-        "owner": "zia-ai",
-        "repo": "shared-dotfiles",
-        "rev": "ebc01ded7751702767ca8e8708b4ed93a76532d9",
-        "type": "github"
+        "lastModified": 1754141491,
+        "narHash": "sha256-xqXkdQXyqyhgJejSw8Xbvay0eoctv0V48CGDg1iWT9U=",
+        "path": "/Users/appaquet/dotfiles/humanfirst-dots",
+        "type": "path"
       },
       "original": {
-        "owner": "zia-ai",
-        "repo": "shared-dotfiles",
-        "type": "github"
+        "path": "/Users/appaquet/dotfiles/humanfirst-dots",
+        "type": "path"
       }
     },
     "libcamera-src": {

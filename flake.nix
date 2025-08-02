@@ -24,7 +24,7 @@
 
     humanfirst-dots = {
       url = "github:zia-ai/shared-dotfiles";
-      # url = "path:/home/appaquet/dotfiles/humanfirst-dots";
+      #url = "path:/Users/appaquet/dotfiles/humanfirst-dots";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
