@@ -54,7 +54,7 @@ Here's my usual development workflow, which I'll detail through commands when st
 
 * Before considering the task complete, *ALWAYS*:
   * Review the initial plan, TODOs and instructions
-  * Review your code with by diffing the current working changes (`fish -c "jj-diff-working --git"`)
+  * Review your code with by diffing the current working changes (`jj-diff-working --git`)
   * Make sure that strictly follows the code style guidelines
   * Run formatting, linting and tests
   * Fix any issues that aren't expected

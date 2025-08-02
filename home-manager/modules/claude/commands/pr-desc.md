@@ -6,7 +6,7 @@ description: Generate concise PR description from PR.md file
 1. Read `PR.md` (if it exists, at root of repo)
 
 2. Ensure the "Files" section is up-to-date:
-   * Use `fish -c "jj-diff-branch --stat"` to get current branch changes
+   * Use `jj-diff-branch --stat` to get current branch changes
    * Verify all modified files are documented with proper descriptions
    * Include any crucial unmodified files relevant to the task
 

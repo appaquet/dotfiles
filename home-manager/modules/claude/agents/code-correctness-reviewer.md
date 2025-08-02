@@ -27,11 +27,11 @@ they seem. Every potential issue deserves attention - there is no such thing as 
    4. Write to `code-correctness-reviewer.local.md` in a TODO list format with the code snippets
 
 4. Diff the current **branch** to list the modified files (but not the content yet) using
-   `fish -c "jj-diff-branch --stat"`
+   `jj-diff-branch --stat`
    * **Add each file to your TODO list to be reviewed**
 
 5. For **EACH** changed file, **ONE BY ONE**:
-   1. Load its diff to see the changes made to it (using `fish -c "jj-diff-branch --git <file>"`)
+   1. Load its diff to see the changes made to it (using `jj-diff-branch --git <file>`)
       * If the file is too large, you need to still scan the whole file. Don't use `head` or `tail`
         to limit the output, as you need to review the whole file.
    2. Load the whole file if you don't feel you have enough context from the diff alone

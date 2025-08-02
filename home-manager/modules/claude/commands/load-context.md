@@ -18,13 +18,13 @@ Load as much context as possible about the project and task at hand.
    * If `PR.md` exists with a "Files" section, focus on those relevant areas
 
 3. Analyze current branch status:
-   * Use `fish -c "jj-stacked-stats"` to list all changed files in the current branch, as well as in other
+   * Use `jj-stacked-stats` to list all changed files in the current branch, as well as in other
      stacked branches at the base of this one if it is part of a stack of branches.
-   * Use can use `fish -c "jj-diff-branch --git"` to see the diff of the current branch against the previous branch
+   * Use can use `jj-diff-branch --git` to see the diff of the current branch against the previous branch
 
 4. Load GitHub PR information:
-   * Get current branch name: `fish -c "jj-current-branch"`
-   * Load PR details: `gh pr view $(fish -c "jj-current-branch")`
+   * Get current branch name: `jj-current-branch`
+   * Load PR details: `gh pr view $(jj-current-branch)`
    * Analyze PR description and comments if they exist
    * **Important**: Use branch name explicitly since jj uses detached head
 

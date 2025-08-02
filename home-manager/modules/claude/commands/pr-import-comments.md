@@ -7,7 +7,7 @@ description: Import unresolved PR review comments as inline code comments with m
 
 ```bash
 # Get current PR number
-BRANCH=$(fish -c "jj-current-branch")
+BRANCH=$(jj-current-branch)
 PR_NUMBER=$(gh pr view $BRANCH --json number --jq '.number')
 
 # Fetch unresolved comments

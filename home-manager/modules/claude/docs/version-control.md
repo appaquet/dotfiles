@@ -18,21 +18,21 @@
 * When diffing using `jj`, prefer using `--git` to get a more comprehensible output that is similar
   to git's output.
 
-* I have a few extra *fish functions* to help dealing with branches:
-  * `fish -c "jj-main-branch"` to get the main/trunk branch name
-  * `fish -c "jj-current-branch"` to get the current branch name
-  * `fish -c "jj-prev-branch"` to get the name of the previous branch. Useful for stacked PRs, and will return
+* I have a few extra shell functions to help dealing with branches:
+  * `jj-main-branch` to get the main/trunk branch name
+  * `jj-current-branch` to get the current branch name
+  * `jj-prev-branch` to get the name of the previous branch. Useful for stacked PRs, and will return
     `dev` if the PR isn't stacked
-  * `fish -c "jj-diff-working --git"` to diff the current working changes from last bookmarked
+  * `jj-diff-working --git` to diff the current working changes from last bookmarked
     change (use `--stat` for list of files)
-  * `fish -c "jj-diff-branch --git"` to diff the current branch with the previous branch, which
+  * `jj-diff-branch --git` to diff the current branch with the previous branch, which
     works with stacked PRs or standalone ones (use `--stat` for list of files)
-  * `fish -c "jj-stacked-branches"` to get the list of branches from the trunk branch to the current branch
-  * `fish -c "jj-stacked-stats"` list all files changed in each changes of the stacked branches
+  * `jj-stacked-branches` to get the list of branches from the trunk branch to the current branch
+  * `jj-stacked-stats` list all files changed in each changes of the stacked branches
 
 * Very important note about `gh`: since `jj` is almost always in a detached head state, you should
-  use `fish -c "jj-current-branch"` to get the current branch name and pass it to `gh` commands that require a
-  branch name. For example, `gh pr view $(fish -c "jj-current-branch")`.
+  use `jj-current-branch` to get the current branch name and pass it to `gh` commands that require a
+  branch name. For example, `gh pr view $(jj-current-branch)`.
 
 * Cheat sheet
   * Create a new change: `jj new -m "private: claude: description of the change"`

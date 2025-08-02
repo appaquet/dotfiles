@@ -11,8 +11,8 @@ each language) to mark comments that need to be reviewed and addressed.
      * **NEVER** look for comments in other directories, always start at the root of the repository
    * If no comments found, verify you're at repository root and not limiting by file type
    * If still no comments OR explicitly requested, check PR comments using:
-     * Get current branch: `fish -c "jj-current-branch"`
-     * Check PR comments: `gh pr view $(fish -c "jj-current-branch")` and `gh api repos/owner/repo/pulls/PR_NUMBER/comments`
+     * Get current branch: `jj-current-branch`
+     * Check PR comments: `gh pr view $(jj-current-branch)` and `gh api repos/owner/repo/pulls/PR_NUMBER/comments`
 
 2. Categorize each review comment:
    * **Action items**: Code fixes, feature implementations, refactoring needed
