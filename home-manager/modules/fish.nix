@@ -21,6 +21,9 @@
       # Don't set TERM here, it should be set via tmux (see tmux/default.nix)
       export COLORTERM=truecolor
 
+      # Since it doesn't seem to always work in neovim setup
+      export EDITOR="nvim"
+
       # Add support for nix run and nix-shell in fish
       ${pkgs.any-nix-shell}/bin/any-nix-shell fish --info-right | source
 

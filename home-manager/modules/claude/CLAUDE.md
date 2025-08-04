@@ -41,8 +41,6 @@
 ## Environment
 
 * I'm on NixOS most of the time, but may be on MacOS as well when I interact with you.
-* I use fish, so you may be asked to execute fish functions, which means that you'll *NEED* to use
-  `fish -c "the function with params"` to execute them
 
 ## Version control
 
