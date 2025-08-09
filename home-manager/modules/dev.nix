@@ -39,7 +39,8 @@ in
       gnumake
       bintools # ld, objdump, etc.
 
-      #opencode # FIXE: put back when stable
+      opencode
+      codex
     ])
     ++ lib.optionals pkgs.stdenv.isLinux [
       pkgs.mold-wrapped

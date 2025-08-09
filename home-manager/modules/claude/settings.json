@@ -7,7 +7,7 @@
       "Bash(gh pr checks:*)"
     ]
   },
-  "model": "sonnet",
+  "model": "opusplan",
   "hooks": {
     "Notification": [
       {
