@@ -11,9 +11,12 @@
 * `jj` uses the concept of bookmarks that are like branches, but they can be seen like tags that can
   be moved over time onto different changes.
 
-* Before going into a big code change, always create a new change with a description starting with
-  `private: claude:`:
-  * `jj new -m "private: claude: description of the change"`.
+* Before making ANY code modifications (regardless of size), ALWAYS create a new change with a description starting with `private: claude:`:
+  * `jj new -m "private: claude: description of the change"`
+  * This applies to: bug fixes, feature additions, refactoring, addressing linting issues, documentation updates, etc.
+  * Exception: Only skip this for read-only operations (viewing files, running tests without changes, checking status)
+
+* If you're already working in an existing `private: claude:` change and the user asks for something different, create a new change for the new task
 
 * When diffing using `jj`, prefer using `--git` to get a more comprehensible output that is similar
   to git's output.
