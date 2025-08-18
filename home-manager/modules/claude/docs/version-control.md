@@ -11,10 +11,11 @@
 * `jj` uses the concept of bookmarks that are like branches, but they can be seen like tags that can
   be moved over time onto different changes.
 
-* Before making ANY code modifications (regardless of size), ALWAYS create a new change with a description starting with `private: claude:`:
+* Before making ANY file modifications (regardless of size), ALWAYS create a new change with a description starting with `private: claude:`:
   * `jj new -m "private: claude: description of the change"`
-  * This applies to: bug fixes, feature additions, refactoring, addressing linting issues, documentation updates, etc.
-  * Exception: Only skip this for read-only operations (viewing files, running tests without changes, checking status)
+  * This applies to: ANY Write, Edit, MultiEdit, or file creation operations
+  * Examples: bug fixes, feature additions, refactoring, addressing linting issues, documentation updates, configuration changes, etc.
+  * Exception: Only skip this for read-only operations (viewing files, running tests without changes, checking status, searching)
 
 * If you're already working in an existing `private: claude:` change and the user asks for something different, create a new change for the new task
 

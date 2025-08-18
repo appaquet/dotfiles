@@ -4,7 +4,14 @@
       "Bash(notify:*)",
       "Bash(gh pr list:*)",
       "Bash(gh pr view:*)",
-      "Bash(gh pr checks:*)"
+      "Bash(gh pr checks:*)",
+      "Bash(jj-main-branch:*)",
+      "Bash(jj-current-branch:*)",
+      "Bash(jj-prev-branch:*)",
+      "Bash(jj-stacked-branches:*)",
+      "Bash(jj-diff-working:*)",
+      "Bash(jj-diff-branch:*)",
+      "Bash(jj-stacked-stats:*)"
     ]
   },
   "model": "sonnet",
