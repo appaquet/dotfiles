@@ -14,7 +14,7 @@
       "Bash(jj-stacked-stats:*)"
     ]
   },
-  "model": "sonnet",
+  "model": "opusplan",
   "hooks": {
     "Notification": [
       {
