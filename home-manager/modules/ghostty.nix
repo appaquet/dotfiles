@@ -24,6 +24,9 @@ let
     keybind = alt+left=unbind
     keybind = alt+right=unbind
 
+    # Don't show qui confirmation dialog on close
+    confirm-close-surface = false
+
     # Because ghostty isn't well known and causes color issues
     term = xterm-256color
   '';
