@@ -68,7 +68,7 @@ let
 
   # Creates a sandboxed version of claude that we can use to skip permissions. This isn't protecting
   # it from the network, but we can at least be sure it doesn't wipe the system and home.
-  sandboxed-version = "9";
+  sandboxed-version = "11";
   claude-sandboxed = pkgs.writeShellApplication {
     name = "claude-sandboxed";
 
@@ -100,7 +100,7 @@ let
       if ! docker images | grep -q "$IMAGE_NAME"; then
         echo "Building $IMAGE_NAME with current PATH..."
         cat << EOF > /tmp/Dockerfile.claude-"$PATH_HASH"
-      FROM alpine:3.20
+      FROM alpine:latest
       RUN apk add --no-cache bash fish
 
       ${mkDockerProfileExports passthrough-env-vars}
@@ -113,8 +113,11 @@ let
       # Use ENTRYPOINT if defined, otherwise default to wrapped claude
       if [ -n "''${ENTRYPOINT:-}" ]; then
         EXEC_CMD="$ENTRYPOINT"
+        ARGS=("$@")
       else
+      # REVIEW: we should always pass --dangerously-skip-permissions --add-dir MY HOME DIR as args
         EXEC_CMD="${claude-wrapped}/bin/claude"
+        ARGS=(--dangerously-skip-permissions --add-dir "${config.home.homeDirectory}" "$@")
       fi
 
       docker run --rm -it \
@@ -128,12 +131,16 @@ let
         --volume "${config.home.homeDirectory}/.cargo:${config.home.homeDirectory}/.cargo:rw" \
         --volume "${config.home.homeDirectory}/go:${config.home.homeDirectory}/go:rw" \
         --volume "${config.home.homeDirectory}/dotfiles/home-manager/modules/claude:${config.home.homeDirectory}/dotfiles/home-manager/modules/claude:rw" \
+        --volume "/etc/nix:/etc/nix:ro" \
+        --volume "/etc/static/nix:/etc/static/nix:ro" \
         --volume "/nix:/nix:ro" \
         --volume "/run:/run:ro" \
         --env "CLAUDE_CONFIG_DIR" \
+        --network host \
+        --pid host \
         ${mkDockerEnvArgs passthrough-env-vars} \
         "$IMAGE_NAME" \
-        "$EXEC_CMD" "$@"
+        "$EXEC_CMD" ''${ARGS[@]}
     '';
   };
 in
