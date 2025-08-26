@@ -90,7 +90,6 @@
       homePackageOverlays = final: prev: {
         exo = prev.callPackage ./overlays/exo { };
         claude-code = prev.callPackage ./overlays/claude-code { };
-        codex = prev.callPackage ./overlays/codex.nix { };
         mcphub-nvim = mcphub-nvim.packages."${prev.system}".default;
         mcp-hub = mcp-hub.packages."${prev.system}".default;
       };
