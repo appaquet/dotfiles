@@ -44,7 +44,7 @@
         name = "wezterm";
       }
       {
-        name = "ghostty@tip";
+        name = "ghostty";
       }
 
       {
