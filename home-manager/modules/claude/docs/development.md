@@ -28,7 +28,13 @@ Here's my usual development workflow, which I'll detail through commands when st
   all the TODOs related to that specific project
 
 * Make sure to come up with a good and very detailed plan and note all TODOs before starting the
-  implementation
+  implementation. If I ask you to make a plan or write the plan to a PR.md without explicitly
+  telling you to start the implementation after, you should **NEVER** start the implementation until
+  I tell you to.
+
+* Before jumping into the implementation, **ALWAYS** ask yourself if your understanding of the task
+  is 10/10. If it is not, you **MUST** ask me for clarification questions one by one until your
+  understanding is at 10/10. Never assume anything, **ALWAYS** ask questions.
 
 * Before doing any changes to the code, always make sure you are working on a `private: claude:`
   `jj` change so that I can revert after. **IMPORTANT** Create a new one every time you start
@@ -52,10 +58,10 @@ Here's my usual development workflow, which I'll detail through commands when st
 
 * Remove TODOs once implemented and add more if needed
 
-* Before considering the task complete, *ALWAYS*:
+* Before considering a task or ask complete, *ALWAYS*:
   * Review the initial plan, TODOs and instructions
   * Review your code with by diffing the current working changes (`jj-diff-working --git`)
-  * Make sure that strictly follows the code style guidelines
+  * Make sure that **strictly** follows the code style guidelines
   * Run formatting, linting and tests
   * Fix any issues that aren't expected
   * If you create temporary files for debugging purpose (ex: temporary tests, binaries, etc.), make

@@ -68,7 +68,7 @@ let
 
   # Creates a sandboxed version of claude that we can use to skip permissions. This isn't protecting
   # it from the network, but we can at least be sure it doesn't wipe the system and home.
-  sandboxed-version = "11";
+  sandboxed-version = "12";
   claude-sandboxed = pkgs.writeShellApplication {
     name = "claude-sandboxed";
 
@@ -129,6 +129,7 @@ let
         --volume "${config.home.homeDirectory}/.claude:${config.home.homeDirectory}/.claude:rw" \
         --volume "${config.home.homeDirectory}/.cache:${config.home.homeDirectory}/.cache:rw" \
         --volume "${config.home.homeDirectory}/.cargo:${config.home.homeDirectory}/.cargo:rw" \
+        --volume "${config.home.homeDirectory}/.npm:${config.home.homeDirectory}/.npm:rw" \
         --volume "${config.home.homeDirectory}/go:${config.home.homeDirectory}/go:rw" \
         --volume "${config.home.homeDirectory}/dotfiles/home-manager/modules/claude:${config.home.homeDirectory}/dotfiles/home-manager/modules/claude:rw" \
         --volume "/etc/nix:/etc/nix:ro" \
