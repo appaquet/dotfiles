@@ -51,7 +51,7 @@ jobs:
       - name: Building Home Manager baseline...
         run: |
           set -xe
-          MACHINE_KEY="${{ matrix.pair.machine }}" ./x home build --cores 0 --max-jobs 1 --verbose --show-build-logs 2>&1 | tee build.log
+          MACHINE_KEY="${{ matrix.pair.machine }}" ./x home build --cores 0 --max-jobs 1 --print-build-logs --verbose 2>&1 | tee build.log
           mv result result-before
 
       - name: Update flakes
@@ -62,7 +62,7 @@ jobs:
       - name: Building Home Manager new
         run: |
           set -xe
-          MACHINE_KEY="${{ matrix.pair.machine }}" ./x home build --cores 0 --max-jobs 1 --verbose --show-build-logs 2>&1 | tee build-new.log
+          MACHINE_KEY="${{ matrix.pair.machine }}" ./x home build --cores 0 --max-jobs 1 --print-build-logs --verbose 2>&1 | tee build-new.log
           mv result result-after
 
       - name: Diffing...
