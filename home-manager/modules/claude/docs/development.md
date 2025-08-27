@@ -62,7 +62,7 @@ Here's my usual development workflow, which I'll detail through commands when st
   * Review the initial plan, TODOs and instructions
   * Review your code with by diffing the current working changes (`jj-diff-working --git`)
   * Make sure that **strictly** follows the code style guidelines
-  * Run formatting, linting and tests
+  * **VERY IMPORTANT:** Run formatting, linting and tests
   * Fix any issues that aren't expected
   * If you create temporary files for debugging purpose (ex: temporary tests, binaries, etc.), make
     you to **always** remove them when you are done debugging. Temporary files should not be committed
