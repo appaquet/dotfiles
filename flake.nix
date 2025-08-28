@@ -179,7 +179,7 @@
               };
 
               "appaquet@piapp" = home-manager-unstable.lib.homeManagerConfiguration rec {
-                inherit unstablePkgs;
+                pkgs = unstablePkgs;
                 modules = [
                   ./home-manager/piapp.nix
                   extraSpecialArgs.secrets.commonHome
@@ -196,7 +196,7 @@
               };
 
               "appaquet@utm" = home-manager-unstable.lib.homeManagerConfiguration rec {
-                inherit unstablePkgs;
+                pkgs = unstablePkgs;
                 modules = [
                   ./home-manager/utm.nix
                   extraSpecialArgs.secrets.commonHome
