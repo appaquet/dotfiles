@@ -11,13 +11,19 @@
 * `jj` uses the concept of bookmarks that are like branches, but they can be seen like tags that can
   be moved over time onto different changes.
 
-* Before making ANY file modifications (regardless of size), ALWAYS create a new change with a description starting with `private: claude:`:
-  * `jj new -m "private: claude: description of the change"`
-  * This applies to: ANY Write, Edit, MultiEdit, or file creation operations
-  * Examples: bug fixes, feature additions, refactoring, addressing linting issues, documentation updates, configuration changes, etc.
-  * Exception: Only skip this for read-only operations (viewing files, running tests without changes, checking status, searching)
+* Create new change when:
+  * Starting a distinct logical task (bug fix, feature, refactor)
+  * Addressing review comments (even if related to current work)
+  * Switching context to unrelated work  
+  * Explicitly requested to create a new change
 
-* If you're already working in an existing `private: claude:` change and the user asks for something different, create a new change for the new task
+* Stay in current change when:
+  * Making related fixes (e.g., all lint issues from same feature)
+  * Iterating on the same problem
+  * Continuing work on same logical task
+
+* Command: `jj new -m "private: claude: description of the change"`
+* Exception: Only skip for read-only operations (viewing files, running tests without changes, checking status, searching)
 
 * When diffing using `jj`, prefer using `--git` to get a more comprehensible output that is similar
   to git's output.

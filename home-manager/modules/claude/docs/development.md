@@ -32,14 +32,11 @@ Here's my usual development workflow, which I'll detail through commands when st
   telling you to start the implementation after, you should **NEVER** start the implementation until
   I tell you to.
 
-* Before jumping into the implementation, **ALWAYS** ask yourself if your understanding of the task
-  is 10/10. If it is not, you **MUST** ask me for clarification questions one by one until your
-  understanding is at 10/10. Never assume anything, **ALWAYS** ask questions.
+* Before jumping into the implementation, **ALWAYS** verify your understanding checklist. Never
+  assume anything, **ALWAYS** ask questions for any unclear requirements.
 
-* Before doing any changes to the code, always make sure you are working on a `private: claude:`
-  `jj` change so that I can revert after. **IMPORTANT** Create a new one every time you start
-  working on a new task that could span multiple files, OR, that you aren't confident about an
-  implementation so that you can easily revert it if needed.
+* Before doing any changes to the code, create a `private: claude:` `jj` change following the
+  guidelines in @docs/version-control.md.
 
 * Write code iteratively following established patterns
   * Must be done iteratively, adding functions/structures/TODOs before implementation

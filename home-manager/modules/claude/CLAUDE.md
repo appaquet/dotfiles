@@ -19,36 +19,66 @@
 
 ## General instructions
 
-* *ALWAYS* load the context of the project you are working on before *ANY* interaction with the
-  user. Follow the step-by-step process described in @commands/load-context.md.
-
-* You should **ALWAYS** favor using ripgrep `rg` over `find`+`grep` since find can do mutations and
-  will require my approval, while `rg` is read-only and will not require my approval.
+* **Search tools preference**:
+  * Use the Grep tool for searching (optimized and doesn't need approval)
+  * Use `rg` command directly only when Grep tool isn't sufficient
+  * Never use `find`+`grep` (requires approval and can mutate)
 
 * If we have a project documentation (`PR.md`), you should always read it before starting AND update
   it as you go along.
 
-* At the end of every interaction (ex: after a task is done, after answer a question, after
-  planning), you should call terminal command `notify "<some message>"` to notify the user of the
-  completed task. Such message could be: `Coding done`, `Planning done`, `Need more context`, etc.
+* Call terminal command `notify "<some message>"` to notify the user of important milestones.
+  Call `notify` only for:
+  * Task completion (e.g., "Feature implemented", "Bug fixed")
+  * Major phase transitions (e.g., "Planning complete", "Tests passing")
+  * When blocked and need input (e.g., "Need clarification on X")
 
-* **TODO preservation rule**: NEVER replace TODO/FIXME comments with explanatory notes. TODO/FIXME
-  comments must remain as actionable TODOs until either:
+* **TODO preservation rule**: NEVER replace TODO/FIXME comments with explanatory notes.
+  TODO/FIXME comments must remain until either:
     1. The task is actually implemented
-    2. The TODO is explicitly tracked in an external TODO list (like PR.md) to ensure it won't be
-       forgotten and i told you to remove it.
-       Comments like "// Note: this is intentional" are not sufficient to replace TODOs.
+    2. The TODO is tracked in PR.md AND you explicitly tell me to remove it
 
-* **IMPORTANT**: For ANY problem or issue, ALWAYS:
-  1. **Understand WHY** the problem exists
+  **NEVER** replace REVIEW comments with "// Note:" explanations - this loses tracking.
+
+* **IMPORTANT**: For ANY problem or issue or failing test, ALWAYS:
+  1. **Understand WHY** the problem exists (trace data flow, check recent changes)
   2. **Fix the root cause**, not the symptom
   3. Never disable features as a first solution - ask why they're conflicting
 
-  This applies to everything - bugs, performance issues, architecture problems, failing builds, etc.
-  Always dig deeper before applying fixes. 
+  Example: if a test is failing, don't just fix the test - check if recent code changes or existing
+  code is at fault before fixing the test.
 
-  Example: if a test is failing, don't just try to band-aid it, try to understand if it's not a symptom
-  of a real problem in the codebase.
+## Context Determination
+
+* **VERY VERY VERY IMPORTANT**: Always make sure that the context is loaded before:
+  * Starting work on code/features
+  * Executing commands (triggered with /command)
+  * Explicitly asked to load context
+
+Context loading instructions: @commands/load-context.md
+
+## Understanding Requirements
+
+**VERY VERY VERY IMPORTANT**: Before starting any work (planning, implementation, etc.), ask
+yourself: "On a scale of 1-10, how well do I understand this task?"
+
+After each clarification or new information, ask yourself the 10/10 question again. If not 10/10,
+continue iterating by asking clarifying questions one by one (search code/web for context first if
+needed) and using this checklist as a guide:
+
+### Understanding Checklist
+
+* [ ] Clear on business goal/user need
+* [ ] Know which files need modification
+* [ ] Understand existing patterns to follow
+* [ ] Have test strategy defined
+* [ ] Know success criteria
+* [ ] Ask any clarifying questions that would bring me to 10/10 understanding
+
+### Pre-Edit Check (before each file modification)
+
+* [ ] Re-read file structure to identify where code belongs (top-down, main-to-dependencies)
+* [ ] List existing functions/classes to understand current organization
 
 ## Environment
 

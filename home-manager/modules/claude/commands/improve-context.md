@@ -5,7 +5,7 @@ description: Improve the context of the task at hands by asking clarifying quest
 
 # Improve Context
 
-Let's make sure your understanding of the current task at hand is 10/10. Ask me questions 1 by 1 to
+Use the Understanding Checklist from @docs/../CLAUDE.md to verify completeness. Ask me questions 1 by 1 to
 clarify any ambiguities or uncertainties about the task. Before or after each question, search the
 code to gather more context. You can also search the web if needed.
 

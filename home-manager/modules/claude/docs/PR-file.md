@@ -7,8 +7,14 @@ the repository and that describe the current task / feature / project that we ar
 This file is used throughout the development of a new change in the repository. It may contain more
 than one pull request if the change is large enough to be split into multiple pull requests.
 
-* Unless requested I requested it, if it doesn't exist, don't create a `PR.md` file on your own. You
-  can ask me if you should create one.
+## When to Create PR.md
+
+* **Creation**: Only create when explicitly requested with phrases like:
+  * "create a PR.md"
+  * "let's document this in PR.md" 
+  * "initialize PR documentation"
+* **Updates**: Always update after file modifications if PR.md exists
+* **Never** create PR.md proactively, even for complex multi-file tasks
 
 * The file should be located at the root of the repository.
 
