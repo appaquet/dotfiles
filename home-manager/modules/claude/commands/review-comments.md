@@ -30,7 +30,7 @@ each language) to mark comments that need to be reviewed and addressed.
    comment and why you think it is not needed. I will then decide if it is needed or not.
 
 3. Verify you fully understand the context and required modifications using the Understanding
-   Checklist from @docs/../CLAUDE.md.
+   Checklist.
 
    If you don't understand it fully, ask me questions 1 by 1 to clarify any ambiguities or
    uncertainties about the task. Before or after each question, search the code to gather more

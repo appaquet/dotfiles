@@ -23,7 +23,7 @@ $ARGUMENTS
    * Consider dependencies and potential challenges
 
 4. Ask clarification questions if the requirements are unclear or incomplete. Use the Understanding
-   Checklist from @docs/../CLAUDE.md to verify you have all necessary information
+   Checklist from to verify you have all necessary information
 
 5. Update or create the `PR.md` file with:
    * Context section describing the task
