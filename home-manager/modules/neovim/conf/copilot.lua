@@ -51,3 +51,13 @@ end, { noremap = true, silent = true })
 vim.keymap.set("i", "<M-J>", function()
 	vim.cmd("Copilot panel")
 end, { noremap = true, silent = true })
+
+vim.keymap.set("n", "<leader>Tp", function()
+	if require("copilot.client").is_disabled() then
+		require("copilot.command").enable()
+		vim.notify("Copilot enabled", vim.log.levels.INFO)
+	else
+		require("copilot.command").disable()
+		vim.notify("Copilot disabled", vim.log.levels.WARN)
+	end
+end, { desc = "Copilot: Toggle" })
