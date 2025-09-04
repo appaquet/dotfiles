@@ -34,6 +34,7 @@ deserves thorough analysis and feedback.
 5. Diff the current **branch** to list the modified files (but not the content yet) using
    `jj-diff-branch --stat`
    * **Add each file to your TODO list to be reviewed**
+   * Don't review PR.md or documentation files. We need to focus on code files only.
 
 6. For **EACH** changed file, **ONE BY ONE**:
    1. Load its diff to see the changes made to it (using `jj-diff-branch --git <file>`)
@@ -62,6 +63,15 @@ aspects that demonstrate excellent style and quality.
 *IMPORTANT* For each issue found, add `// REVIEW: code-style-reviewer - <comment>` comment in the
 code where the issue is found, including the description of the problem, potential consequences, and
 suggested fix. You also need to report it verbally in the summary of your review.
+
+Correct ✅
+
+* `// REVIEW: code-style-reviewer - <comment>`
+
+Incorrect ❌
+
+* `// ARCHITECTURE: ...`
+* `// CORRECTNESS: ...`
 
 ## Agent specific checklist
 

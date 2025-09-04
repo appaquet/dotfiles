@@ -29,6 +29,7 @@ they seem. Every potential issue deserves attention - there is no such thing as 
 4. Diff the current **branch** to list the modified files (but not the content yet) using
    `jj-diff-branch --stat`
    * **Add each file to your TODO list to be reviewed**
+   * Don't review PR.md or documentation files. We need to focus on code files only.
 
 5. For **EACH** changed file, **ONE BY ONE**:
    1. Load its diff to see the changes made to it (using `jj-diff-branch --git <file>`)
@@ -61,6 +62,15 @@ code meets high standards.
 *IMPORTANT* For each issue found, add `// REVIEW: code-correctness-reviewer - <comment>` comment in the
 code where the issue is found, including the description of the problem, potential consequences, and
 suggested fix. You also need to report it verbally in the summary of your review.
+
+Correct ✅
+
+* `// REVIEW: code-correctness-reviewer - <comment>`
+
+Incorrect ❌
+
+* `// ARCHITECTURE: ...`
+* `// CORRECTNESS: ...`
 
 ## Agent specific checklist
 
