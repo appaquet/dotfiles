@@ -1,6 +1,5 @@
 {
   pkgs,
-  unstablePkgs,
   lib,
   inputs,
   ...
@@ -41,6 +40,8 @@
       lsd # ls replacement
       hexyl
 
+      aichat # cli llm tool
+
       fzf
       ripgrep
       ripgrep-all # supports pdf, docs, etc.
@@ -79,9 +80,6 @@
 
       rsync
       rclone
-    ])
-    ++ (with unstablePkgs; [
-      aichat # cli llm tool
     ])
     ++ lib.optionals pkgs.stdenv.isLinux [
       pkgs.libtree # recursive ldd

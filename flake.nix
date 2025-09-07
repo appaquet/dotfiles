@@ -1,26 +1,16 @@
 {
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
-    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # nixpkgs-unstable is used instead of nixos-unstable since it has no guarantee of being cached
+    # use nixos-25.05 for nixos systems to have a stable system
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixos.url = "github:nixos/nixpkgs/nixos-25.05";
 
     flake-utils.url = "github:numtide/flake-utils";
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.05";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    home-manager-unstable = {
       url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
-
-    darwin = {
-      url = "github:lnl7/nix-darwin/nix-darwin-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix";
 
     humanfirst-dots = {
       url = "github:zia-ai/shared-dotfiles";
@@ -36,11 +26,6 @@
 
     fzf-nix = {
       url = "github:mrene/fzf-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    nixvirt = {
-      url = "github:AshleyYakeley/NixVirt";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -63,15 +48,28 @@
       url = "github:ravitemer/mcp-hub";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nixvirt = {
+      url = "github:AshleyYakeley/NixVirt";
+      inputs.nixpkgs.follows = "nixos";
+    };
+
+    darwin = {
+      url = "github:lnl7/nix-darwin/nix-darwin-25.05";
+    };
+
+    raspberry-pi-nix = {
+      url = "github:nix-community/raspberry-pi-nix";
+      inputs.nixpkgs.follows = "nixos";
+    };
   };
 
   outputs =
     inputs@{
       self,
       nixpkgs,
-      nixpkgs-unstable,
+      nixos,
       home-manager,
-      home-manager-unstable,
       humanfirst-dots,
       raspberry-pi-nix,
       secrets,
@@ -121,11 +119,6 @@
               overlays = homeOverlays;
             };
 
-            unstablePkgs = import nixpkgs-unstable {
-              inherit system config;
-              overlays = homeOverlays;
-            };
-
             cfg = {
               isNixos = false;
               minimalNvim = false;
@@ -133,15 +126,15 @@
           in
           {
             homes = {
-              "appaquet@deskapp" = home-manager-unstable.lib.homeManagerConfiguration rec {
-                pkgs = unstablePkgs;
+              "appaquet@deskapp" = home-manager.lib.homeManagerConfiguration rec {
+                inherit pkgs;
                 modules = [
                   ./home-manager/deskapp.nix
                   extraSpecialArgs.secrets.commonHome
                 ]
                 ++ commonHomeModules;
                 extraSpecialArgs = {
-                  inherit inputs unstablePkgs;
+                  inherit inputs;
                   secrets = secrets.init "linux";
                   cfg = cfg // {
                     isNixos = true;
@@ -149,15 +142,15 @@
                 };
               };
 
-              "appaquet@servapp" = home-manager-unstable.lib.homeManagerConfiguration rec {
-                pkgs = unstablePkgs;
+              "appaquet@servapp" = home-manager.lib.homeManagerConfiguration rec {
+                inherit pkgs;
                 modules = [
                   ./home-manager/servapp.nix
                   extraSpecialArgs.secrets.commonHome
                 ]
                 ++ commonHomeModules;
                 extraSpecialArgs = {
-                  inherit inputs unstablePkgs;
+                  inherit inputs;
                   secrets = secrets.init "linux";
                   cfg = cfg // {
                     isNixos = true;
@@ -165,28 +158,28 @@
                 };
               };
 
-              "appaquet@mbpapp" = home-manager-unstable.lib.homeManagerConfiguration rec {
-                pkgs = unstablePkgs;
+              "appaquet@mbpapp" = home-manager.lib.homeManagerConfiguration rec {
+                inherit pkgs;
                 modules = [
                   ./home-manager/mbpapp.nix
                   extraSpecialArgs.secrets.commonHome
                 ]
                 ++ commonHomeModules;
                 extraSpecialArgs = {
-                  inherit inputs unstablePkgs cfg;
+                  inherit inputs cfg;
                   secrets = secrets.init "darwin";
                 };
               };
 
-              "appaquet@piapp" = home-manager-unstable.lib.homeManagerConfiguration rec {
-                pkgs = unstablePkgs;
+              "appaquet@piapp" = home-manager.lib.homeManagerConfiguration rec {
+                inherit pkgs;
                 modules = [
                   ./home-manager/piapp.nix
                   extraSpecialArgs.secrets.commonHome
                 ]
                 ++ commonHomeModules;
                 extraSpecialArgs = {
-                  inherit inputs unstablePkgs;
+                  inherit inputs;
                   secrets = secrets.init "linux";
                   cfg = cfg // {
                     isNixos = true;
@@ -195,15 +188,15 @@
                 };
               };
 
-              "appaquet@utm" = home-manager-unstable.lib.homeManagerConfiguration rec {
-                pkgs = unstablePkgs;
+              "appaquet@utm" = home-manager.lib.homeManagerConfiguration rec {
+                inherit pkgs;
                 modules = [
                   ./home-manager/utm.nix
                   extraSpecialArgs.secrets.commonHome
                 ]
                 ++ commonHomeModules;
                 extraSpecialArgs = {
-                  inherit inputs unstablePkgs;
+                  inherit inputs;
                   secrets = secrets.init "linux";
                   cfg = cfg // {
                     isNixos = true;
@@ -213,7 +206,6 @@
               };
             };
           }
-
         )
       )
     // {
@@ -230,19 +222,20 @@
       darwinConfigurations = {
         mbpapp = darwin.lib.darwinSystem {
           system = "aarch64-darwin";
-          pkgs = import nixpkgs {
-            inherit config;
-            system = "aarch64-darwin";
-          };
+          # pkgs = import nixpkgs-darwin {
+          #   inherit config;
+          #   system = "aarch64-darwin";
+          # };
           modules = [
             ./darwin/mbpapp/configuration.nix
           ];
-          inputs = { inherit inputs darwin; };
+          # inputs = { inherit inputs darwin; };
+          specialArgs = { inherit inputs; };
         };
       };
 
       nixosConfigurations = {
-        deskapp = nixpkgs.lib.nixosSystem {
+        deskapp = nixos.lib.nixosSystem {
           specialArgs = {
             inherit (self) common;
             inherit inputs;
@@ -254,7 +247,7 @@
           ];
         };
 
-        servapp = nixpkgs.lib.nixosSystem {
+        servapp = nixos.lib.nixosSystem {
           specialArgs = {
             inherit (self) common;
             inherit inputs;
@@ -266,7 +259,7 @@
           ];
         };
 
-        utm = nixpkgs.lib.nixosSystem {
+        utm = nixos.lib.nixosSystem {
           specialArgs = {
             inherit (self) common;
             inherit inputs;
@@ -278,7 +271,7 @@
           ];
         };
 
-        piapp = nixpkgs.lib.nixosSystem {
+        piapp = nixos.lib.nixosSystem {
           system = "aarch64-linux";
           specialArgs = {
             inherit (self) common;

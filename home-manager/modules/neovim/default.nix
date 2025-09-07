@@ -1,6 +1,5 @@
 {
   pkgs,
-  unstablePkgs,
   config,
   secrets,
   lib,
@@ -183,13 +182,13 @@ in
       ])
       ++ (lib.optionals agenticEnabled [
         # Agentic plugins
-        unstablePkgs.vimPlugins.codecompanion-nvim
+        pkgs.vimPlugins.codecompanion-nvim
         pkgs.mcphub-nvim
         claudecode-nvim
 
         # Avante
         #avante-nvim-override
-        unstablePkgs.vimPlugins.avante-nvim
+        pkgs.vimPlugins.avante-nvim
 
         # Avante deps (if dev mode)
         # pkgs.vimPlugins.dressing-nvim

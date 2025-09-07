@@ -1,6 +1,5 @@
 {
   pkgs,
-  unstablePkgs,
   lib,
   secrets,
   ...
@@ -44,7 +43,7 @@ in
     ])
     ++ lib.optionals pkgs.stdenv.isLinux [
       pkgs.mold-wrapped
-      unstablePkgs.binsider # binary analysis tool
+      pkgs.binsider # binary analysis tool
     ];
 
   home.file.".cargo/config.toml".text = cargoConfig;

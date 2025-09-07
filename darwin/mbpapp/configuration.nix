@@ -1,4 +1,4 @@
-{ pkgs, inputs, ... }:
+{ pkgs, ... }:
 {
   imports = [
     ./apps.nix
@@ -7,8 +7,6 @@
   ];
 
   nix = {
-    package = pkgs.nix;
-
     settings = {
       experimental-features = [
         "flakes"
@@ -19,10 +17,6 @@
       keep-outputs = true;
       keep-derivations = true;
       builders-use-substitutes = true; # allow use of cached builds, require fast internet
-    };
-
-    registry = {
-      nixpkgs.flake = inputs.inputs.nixpkgs;
     };
   };
 
