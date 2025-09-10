@@ -198,6 +198,14 @@ nixos)
   switch)
     shift
 
+    read -r -p "Are you sure you want to switch now. Switching on next boot is recommended (y/n): " confirm
+    if [[ "$confirm" == [yY] ]]; then
+      echo "Switching now..."
+    else
+      echo "Aborting switch"
+      exit 1
+    fi
+
     prime_sudo
     GENERATION="${1:-}"
     if [[ -n "$GENERATION" ]]; then
