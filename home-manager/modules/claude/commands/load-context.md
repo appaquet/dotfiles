@@ -3,6 +3,8 @@ name: load-context
 description: Load comprehensive project context including docs, PR info, and branch status
 ---
 
+# Load Context
+
 Load as much context as possible about the project and task at hand.
 
 1. Read the `PR.md` file at the root of the repository:

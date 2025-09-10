@@ -9,7 +9,6 @@
   over time associated to them.
 
 * `jj` uses the concept of bookmarks that are like branches, but they can be seen like tags that can
-  be moved over time onto different changes.
 
 * Create new change when:
   * Starting a distinct logical task (bug fix, feature, refactor)
@@ -46,3 +45,7 @@
 
 * Cheat sheet
   * Create a new change: `jj new -m "private: claude: description of the change"`
+
+* If you notice a change in the code that wasn't done by you **DON'T REVERT IT**. You have to
+  remember that you are an AI assistant, and I or other AI assistants may have made changes to the
+  code. If you think the change is wrong, ask for clarification instead of reverting it.
