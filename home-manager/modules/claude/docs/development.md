@@ -19,13 +19,13 @@ Here's my usual development workflow, which I'll detail through commands when st
 
 ## Implementation Guidelines
 
-* I use a mix of TODO-driven development and Test-Driven Development (TDD). Before tackling a big
+* Use a mix of TODO-driven development and Test-Driven Development (TDD). Before tackling a big
   change, add TODOs to the codebase. Then write tests (if they can't compile yet, comment out the
   failing code), and finally implement the code
 
-* In order to make sure we can find the TODOs easily, I always use a project specific code.
-  Ex: `// TODO: MERGE_SEGMENTS -`. This allows us to search for `MERGE_SEGMENTS` in the codebase and find
-  all the TODOs related to that specific project
+* In order to make sure we can find the TODOs easily, always use a project specific code.
+  Ex: `// TODO: MERGE_SEGMENTS -`. This allows us to search for `MERGE_SEGMENTS` in the codebase and
+  find all the TODOs related to that specific project
 
 * Make sure to come up with a good and very detailed plan and note all TODOs before starting the
   implementation. If I ask you to make a plan or write the plan to a PR.md without explicitly
@@ -33,7 +33,7 @@ Here's my usual development workflow, which I'll detail through commands when st
   I tell you to.
 
 * Before jumping into the implementation, **ALWAYS** verify your understanding checklist. Never
-  assume anything, **ALWAYS** ask questions for any unclear requirements.
+  assume anything, **ALWAYS** ask questions for any unclear requirements
 
 * Before doing any changes to the code, create a `private: claude:` `jj` change following the
   guidelines in @docs/version-control.md.
@@ -51,10 +51,6 @@ Here's my usual development workflow, which I'll detail through commands when st
   * Comment out failing code or tests instead of deleting if you cannot fix them by yourself
   * Notify me that the implementation is incomplete
 
-* If a file is too big for your context, ask me if you can split it to optimize your context use
-
-* Remove TODOs once implemented and add more if needed
-
 * Before considering a task or ask complete, *ALWAYS*:
   * Review the initial plan, TODOs and instructions
   * Review your code with by diffing the current working changes (`jj-diff-working --git`)
@@ -66,11 +62,13 @@ Here's my usual development workflow, which I'll detail through commands when st
     you to **always** remove them when you are done debugging. Temporary files should not be committed
     to the codebase
 
-* **NEVER** stop until everything is working and all tests are passing, unless it's something you
-  are blocked on and need more context or insights
+* **STOP IMMEDIATELY when you encounter a fundamental design problem you can't solve:**
+  * Architectural mismatches (e.g., mutable vs immutable, different data structures)
+  * API incompatibilities that require significant redesign
+  * When you find yourself trying multiple failed workarounds
+  * **Don't try workarounds, don't revert, don't keep coding blindly. ASK FOR HELP.**
 
-* **ALWAYS** tell me if an implementation is incomplete at the end of the process. Never tell me
-  that the feature is complete unless it is 100% finished, follows the plan exactly, and all
-  lints/tests are passing.
+* **NEVER** considerate a task complete and tell me so if it is not. Always be honest about the
+  state of your work. This is **VERY VERY VERY IMPORTANT** for trust and collaboration.
 
 * Update `PR.md` (if it exists, at root of repo)

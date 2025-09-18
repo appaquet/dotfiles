@@ -7,6 +7,14 @@ description: Load comprehensive project context including docs, PR info, and bra
 
 Load as much context as possible about the project and task at hand.
 
+## State
+
+* Current branch: !`jj-current-branch`
+* List of changes in current branch and stacked branches: !`jj-stacked-stats`
+* GitHub PR info for current branch: !`gh pr view $(jj-current-branch) --json number,title,body,comments`
+
+## Instructions
+
 1. Read the `PR.md` file at the root of the repository:
    * The file may not exist if no task has been started yet. It may also be a markdown file included
      in the pull request, so check for this as well. Otherwise, it's fine, as it may be a new
@@ -14,23 +22,19 @@ Load as much context as possible about the project and task at hand.
    * If it exists, understand current task context, requirements, and progress
 
 2. Load relevant repository documentation:
-   * Use `Glob` tool to **recursively** find and read:
+   * Use `Glob` tool to **recursively** find:
      * `README.md`
      * `ARCHITECTURE.md`
-   * If `PR.md` exists with a "Files" section, focus on those relevant areas
+   * Read relevant files based on the changed components that would help you understand the project
+     and the task at hand.
 
-3. Analyze current branch status:
-   * Use `jj-stacked-stats` to list all changed files in the current branch, as well as in other
-     stacked branches at the base of this one if it is part of a stack of branches.
-   * Use can use `jj-diff-branch --git` to see the diff of the current branch against the previous branch
+3. Launch the branch-diff-summarizer agent to analyze and summarize branch changes:
+   * Ask the agent to use the branch-diff-summarizer agent
+   * The agent will check if PR.md already has file summaries and update if needed
+   * This provides a detailed understanding of what changed without bloating main context
 
-4. Load GitHub PR information:
-   * Get current branch name: `jj-current-branch`
-   * Load PR details: `gh pr view $(jj-current-branch)`
-   * Analyze PR description and comments if they exist
-   * **Important**: Use branch name explicitly since jj uses detached head
-
-5. Synthesize and propose next steps:
+4. Synthesize and propose next steps:
    * If `PR.md` exists, propose next tasks based on TODO section
+   * Propose `PR.md` updates if it's missing information like changed files or TODOs
    * If no clear direction, ask for clarification on goals
    * Provide summary of current project state and context

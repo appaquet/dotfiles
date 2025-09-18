@@ -7,6 +7,10 @@ the repository and that describe the current task / feature / project that we ar
 This file is used throughout the development of a new change in the repository. It may contain more
 than one pull request if the change is large enough to be split into multiple pull requests.
 
+It should be written in a way that any developer can understand the context, requirements and
+current status of the change. The developer should be able to pick up the work at any time and
+understand what has been done and what needs to be done in details.
+
 ## When to Create PR.md
 
 * **Creation**: Only create when explicitly requested with phrases like:
@@ -23,9 +27,12 @@ than one pull request if the change is large enough to be split into multiple pu
 
 * This file contains these sections (in the exact order):
   * **Context** (mandatory): context of the changes
+
   * **Requirements** (optional): requirements of the changes
+
   * **Questions** (optional): as check list, questions (and potential answers) that need to be
     answered throughout the development of the changes
+
   * **Files** (mandatory): section with modified files OR important files needed for the context of
     the changes..
 
@@ -35,6 +42,7 @@ than one pull request if the change is large enough to be split into multiple pu
       section. Use bullet list format with file paths in bold, followed by a colon and description.
       You should always include files that are crucial to the completion of this task, even if you
       didn't modify them.
+
     * Format:
       * First 1-2 sentences describing what the file is about and its purpose
       * Next 1-2 sentences describing what changes were made to the file (if any) Only include
@@ -50,6 +58,8 @@ than one pull request if the change is large enough to be split into multiple pu
         * Completed item: `- [x]`
       * Mark items as complete when they are fully implemented and working
       * Add new items when you discover additional work needed
+      * It should be detailed enough for a developer to pick up the work later
+      * Each item should represent a discrete piece of work that can be completed independently
 
   * **Pull requests** (optional): section where description of different pull requests created out of the
     changes are listed

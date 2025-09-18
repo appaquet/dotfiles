@@ -3,13 +3,18 @@ name: plan
 description: Load repository context and create high-level development plans
 ---
 
-Load repository context, current task context, and create high-level plans for the task at hand:
+# Plan
+
+Load repository context, current task context, and create high-level plans for the task at hand. You
+need to ultrathink when doing this task.
 
 Task (may be empty):
 
 ```markdown
 $ARGUMENTS
 ```
+
+## Instructions
 
 1. If the task above is empty and the context isn't clear about the task at hand from the rest of
    our conversation, ask me about the task to be worked on
