@@ -5,6 +5,9 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixos.url = "github:nixos/nixpkgs/nixos-25.05";
 
+    # pinned, issue with neotest
+    nixpkgs-nvim.url = "github:NixOS/nixpkgs/e11bf63f3dc6c4c218ae32332496871f07c20329";
+
     flake-utils.url = "github:numtide/flake-utils";
 
     home-manager = {
@@ -68,6 +71,7 @@
     inputs@{
       self,
       nixpkgs,
+      nixpkgs-nvim,
       nixos,
       home-manager,
       humanfirst-dots,
@@ -119,6 +123,10 @@
               inherit system config;
               overlays = homeOverlays;
             };
+            pkgs-nvim = import nixpkgs-nvim {
+              inherit system config;
+              overlays = homeOverlays;
+            };
 
             cfg = {
               isNixos = false;
@@ -136,6 +144,7 @@
                 ++ commonHomeModules;
                 extraSpecialArgs = {
                   inherit inputs;
+                  pkgs-nvim = pkgs-nvim;
                   secrets = secrets.init "linux";
                   cfg = cfg // {
                     isNixos = true;
@@ -153,6 +162,7 @@
                 extraSpecialArgs = {
                   inherit inputs;
                   secrets = secrets.init "linux";
+                  pkgs-nvim = pkgs-nvim;
                   cfg = cfg // {
                     isNixos = true;
                   };
@@ -168,6 +178,7 @@
                 ++ commonHomeModules;
                 extraSpecialArgs = {
                   inherit inputs cfg;
+                  pkgs-nvim = pkgs-nvim;
                   secrets = secrets.init "darwin";
                 };
               };
@@ -182,6 +193,7 @@
                 extraSpecialArgs = {
                   inherit inputs;
                   secrets = secrets.init "linux";
+                  pkgs-nvim = pkgs-nvim;
                   cfg = cfg // {
                     isNixos = true;
                     minimalNvim = true;
@@ -199,6 +211,7 @@
                 extraSpecialArgs = {
                   inherit inputs;
                   secrets = secrets.init "linux";
+                  pkgs-nvim = pkgs-nvim;
                   cfg = cfg // {
                     isNixos = true;
                     minimalNvim = true;

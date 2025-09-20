@@ -1,5 +1,5 @@
 {
-  pkgs,
+  pkgs-nvim,
   config,
   secrets,
   lib,
@@ -10,7 +10,7 @@
 let
   devMode = true; # Include files from dotfiles directly instead of via nix store
 
-  pkgsChannel = pkgs;
+  pkgsChannel = pkgs-nvim;
   agenticEnabled = !cfg.minimalNvim;
 
   confDir = "${config.home.homeDirectory}/dotfiles/home-manager/modules/neovim/conf";
@@ -37,32 +37,47 @@ let
   '';
 
   # Forked from https://github.com/mrded/nvim-lsp-notify
-  nvim-lsp-notify = pkgs.vimUtils.buildVimPlugin {
+  nvim-lsp-notify = pkgsChannel.vimUtils.buildVimPlugin {
     name = "lsp-notify";
     src = ./plugins/lsp-notify;
   };
 
-  claudecode-nvim = pkgs.vimUtils.buildVimPlugin {
-    name = "claudecode-nvim";
-    src = pkgs.fetchFromGitHub {
-      owner = "coder";
-      repo = "claudecode.nvim";
-      rev = "d0f9748";
-      sha256 = "sha256-qmZPjZJ9UFxAWCY3NQwsu0nEniG/UasV/iCrG3S5tPQ=";
-    };
-  };
+  # claudecode-nvim = pkgsChannel.vimUtils.buildVimPlugin {
+  #   name = "claudecode-nvim";
+  #   src = pkgsChannel.fetchFromGitHub {
+  #     owner = "coder";
+  #     repo = "claudecode.nvim";
+  #     rev = "d0f9748";
+  #     sha256 = "sha256-qmZPjZJ9UFxAWCY3NQwsu0nEniG/UasV/iCrG3S5tPQ=";
+  #   };
+  # };
 
   # Fixes perf issues
-  gitsigns-nvim = pkgs.vimUtils.buildVimPlugin {
-    name = "gitsigns-nvim";
-    src = pkgs.fetchFromGitHub {
-      owner = "lewis6991";
-      repo = "gitsigns.nvim";
-      rev = "b014331";
-      sha256 = "sha256-7BKwxHoFWGepqm8/J+RB6zu+7IpGUUmgLP4a2O2lIuA=";
-    };
-  };
+  # gitsigns-nvim = pkgsChannel.vimUtils.buildVimPlugin {
+  #   name = "gitsigns-nvim";
+  #   src = pkgsChannel.fetchFromGitHub {
+  #     owner = "lewis6991";
+  #     repo = "gitsigns.nvim";
+  #     rev = "b014331";
+  #     sha256 = "sha256-7BKwxHoFWGepqm8/J+RB6zu+7IpGUUmgLP4a2O2lIuA=";
+  #   };
+  # };
 
+  # Override to use feat/treesitter-main branch for latest Go parser support
+  # neotest-golang-override =
+  #   (pkgsChannel.vimUtils.buildVimPlugin {
+  #     name = "neotest-golang";
+  #     src = pkgsChannel.fetchFromGitHub {
+  #       owner = "fredrikaverpil";
+  #       repo = "neotest-golang";
+  #       rev = "feat/treesitter-main";
+  #       sha256 = "sha256-2IeENow4Cu5lRtnyUhFLOFur02UmT0QWdKAMm2QiGUY=";
+  #     };
+  #   }).overrideAttrs
+  #     {
+  #       doCheck = false;
+  #     };
+  #
   # avante-nvim-override = pkgs.callPackage ./plugins/avante.nix {
   #   pkgs = pkgsChannel;
   # };
@@ -160,6 +175,7 @@ in
           p.fish
           p.go
           p.gomod
+          p.gosum
           p.gotmpl
           p.gowork
           p.html
@@ -177,18 +193,19 @@ in
           p.typescript
           p.vim
           p.vimdoc
+          p.yaml
         ]))
         nvim-treesitter-textobjects # provides object manipulation
       ])
       ++ (lib.optionals agenticEnabled [
         # Agentic plugins
-        pkgs.vimPlugins.codecompanion-nvim
-        pkgs.mcphub-nvim
-        claudecode-nvim
+        pkgsChannel.vimPlugins.codecompanion-nvim
+        pkgsChannel.mcphub-nvim
+        pkgsChannel.vimPlugins.claudecode-nvim
 
         # Avante
         #avante-nvim-override
-        pkgs.vimPlugins.avante-nvim
+        pkgsChannel.vimPlugins.avante-nvim
 
         # Avante deps (if dev mode)
         # pkgs.vimPlugins.dressing-nvim
@@ -238,7 +255,7 @@ in
     );
 
     extraPackages =
-      (with pkgs; [
+      (with pkgsChannel; [
         nixd # nix lsp
 
         marksman # markdown lsp
@@ -260,8 +277,8 @@ in
         ruff
       ])
       ++ (lib.optionals agenticEnabled [
-        pkgs.mcp-hub # via overlay
-        pkgs.uv # for `uvx` for some MCPs
+        pkgsChannel.mcp-hub # via overlay
+        pkgsChannel.uv # for `uvx` for some MCPs
       ]);
   };
 
