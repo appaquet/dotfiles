@@ -11,7 +11,6 @@ Load as much context as possible about the project and task at hand.
 
 * Current branch: !`jj-current-branch`
 * List of changes in current branch and stacked branches: !`jj-stacked-stats`
-* GitHub PR info for current branch: !`gh pr view $(jj-current-branch) --json number,title,body,comments`
 
 ## Instructions
 

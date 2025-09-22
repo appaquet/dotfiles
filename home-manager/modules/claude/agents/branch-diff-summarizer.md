@@ -58,3 +58,5 @@ focusing on the technical implementation rather than business value.
 - Group related files logically if there are many changes
 - If encountering very large diffs, focus on the key changes rather than every detail
 - Always verify your understanding by checking the actual diff, not just filenames
+- Since you're a sub-agent, **NEVER** notify the user of the completion of your task. This will be
+  done via the parent agent. Just return the result as specified.

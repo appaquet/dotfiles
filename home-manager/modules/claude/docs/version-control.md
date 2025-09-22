@@ -17,6 +17,11 @@
   * Explicitly requested to create a new change
   * Exception: Only skip for read-only operations (viewing files, running tests without changes, checking status, searching)
 
+  * **ALL** commit messages you create MUST start with "private: claude: " prefix when Claude is making changes
+    * ✅ Correct: `jj commit -m "private: claude: fix validation loop bug"`
+    * ❌ Wrong: `jj commit -m "fix(component): correct validation loop bug"`
+    * This applies to BOTH `jj new -m` and `jj commit -m` commands
+
 * Stay in current change when:
   * Making related fixes (e.g., all lint issues from same feature)
   * Iterating on the same problem
