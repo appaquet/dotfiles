@@ -42,6 +42,32 @@ let
     src = ./plugins/lsp-notify;
   };
 
+  copilot-lsp = pkgsChannel.vimUtils.buildVimPlugin {
+    pname = "copilot-lsp";
+    version = "2025-09-20";
+    src = pkgsChannel.fetchFromGitHub {
+      owner = "copilotlsp-nvim";
+      repo = "copilot-lsp";
+      rev = "5030766af6dce2181d48b928537ebe1919ec8d22";
+      sha256 = "sha256-AJGpzPkf+A+tcAQMcD9wLAuNyBL8r8x/ydqQJ9sqTP0";
+    };
+    meta.homepage = "https://github.com/copilotlsp-nvim/copilot-lsp/";
+    meta.hydraPlatforms = [ ];
+  };
+
+  copilot-lua = pkgsChannel.vimUtils.buildVimPlugin {
+    pname = "copilot.lua";
+    version = "2025-09-20";
+    src = pkgsChannel.fetchFromGitHub {
+      owner = "zbirenbaum";
+      repo = "copilot.lua";
+      rev = "6fba2272a2ddb18488dd927d3848d8219124854a";
+      sha256 = "sha256-ptbedGYFOWLBsPV+WqAXYSjOSdodiMBCudoSJPB5WVU=";
+    };
+    meta.homepage = "https://github.com/zbirenbaum/copilot.lua/";
+    meta.hydraPlatforms = [ ];
+  };
+
   # claudecode-nvim = pkgsChannel.vimUtils.buildVimPlugin {
   #   name = "claudecode-nvim";
   #   src = pkgsChannel.fetchFromGitHub {
@@ -62,21 +88,6 @@ let
   #     sha256 = "sha256-7BKwxHoFWGepqm8/J+RB6zu+7IpGUUmgLP4a2O2lIuA=";
   #   };
   # };
-
-  # Override to use feat/treesitter-main branch for latest Go parser support
-  # neotest-golang-override =
-  #   (pkgsChannel.vimUtils.buildVimPlugin {
-  #     name = "neotest-golang";
-  #     src = pkgsChannel.fetchFromGitHub {
-  #       owner = "fredrikaverpil";
-  #       repo = "neotest-golang";
-  #       rev = "feat/treesitter-main";
-  #       sha256 = "sha256-2IeENow4Cu5lRtnyUhFLOFur02UmT0QWdKAMm2QiGUY=";
-  #     };
-  #   }).overrideAttrs
-  #     {
-  #       doCheck = false;
-  #     };
   #
   # avante-nvim-override = pkgs.callPackage ./plugins/avante.nix {
   #   pkgs = pkgsChannel;
@@ -150,6 +161,7 @@ in
         cmp-nvim-lsp-document-symbol
         cmp-cmdline
         copilot-lua # use `Copilot auth` to login
+        copilot-lsp # needed for NES on copilot-lua
 
         # Snippets
         luasnip

@@ -1,5 +1,6 @@
 -- copilot
 -- https://github.com/zbirenbaum/copilot.lua
+vim.g.copilot_nes_debounce = 500
 require("copilot").setup({
 	suggestion = {
 		enabled = true,
@@ -13,13 +14,22 @@ require("copilot").setup({
 			dismiss = "<C-]>",
 		},
 	},
-	copilot_model = "gpt-4o-copilot",
+	copilot_model = "gpt-41-copilot",
+
+	nes = {
+		enabled = true,
+		keymap = {
+			accept_and_goto = "<M-n>",
+			accept = false,
+			dismiss = "<Esc>",
+		},
+	},
 
 	-- Logged to ~/.local/state/nvim/copilot-lua.log
-	-- logger = {
-	-- 	file_log_level = vim.log.levels.TRACE,
-	-- 	trace_lsp = "debug",
-	-- },
+	logger = {
+		file_log_level = vim.log.levels.TRACE,
+		trace_lsp = "debug",
+	},
 
 	filetypes = {
 		-- overrides defaults
@@ -33,11 +43,16 @@ local function passthrough_keymap(keymap)
 end
 
 -- Add completion on tab (if visible), but real tab via shift-tab
-local cs = require("copilot.suggestion")
+local cpsug = require("copilot.suggestion")
+local cpnes = require("copilot.nes.api")
 local luasnip = require("luasnip")
 vim.keymap.set("i", "<Tab>", function()
-	if cs.is_visible() then
-		cs.accept()
+	if cpsug.is_visible() then
+		-- Copilot Inline suggestion
+		cpsug.accept()
+	elseif cpnes.nes_apply_pending_nes() then
+		-- Copilot Next Edit Suggestion
+		cpnes.nes_walk_cursor_end_edit()
 	elseif luasnip.expand_or_jumpable() then
 		luasnip.expand_or_jump()
 	else
