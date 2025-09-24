@@ -4,7 +4,7 @@ let
   ghosttyConfig = ''
     # See: https://ghostty.org/docs/config/reference
     # and: ghostty +list-themes
-    theme = dark:catppuccin-mocha,light:catppuccin-latte
+    theme = dark:Catppuccin Mocha,light:Catppuccin Latte
 
     font-family = FiraCode Nerd Font Mono
     font-size = 16
