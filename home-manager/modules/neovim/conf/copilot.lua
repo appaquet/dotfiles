@@ -17,7 +17,7 @@ require("copilot").setup({
 	copilot_model = "gpt-41-copilot",
 
 	nes = {
-		enabled = true,
+		enabled = false,
 		keymap = {
 			accept_and_goto = "<M-n>",
 			accept = false,
