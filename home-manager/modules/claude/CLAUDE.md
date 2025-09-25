@@ -55,8 +55,7 @@
   * Starting work on code/features
   * Executing commands (triggered with /command)
   * Explicitly asked to load context
-
-Context loading instructions: @commands/load-context.md
+  * If it's not loaded, call `/load-context` command
 
 ## Understanding Requirements
 
