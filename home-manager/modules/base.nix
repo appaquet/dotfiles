@@ -32,6 +32,7 @@
       nix-tree # explore nix derivations dependencies (https://github.com/utdemir/nix-tree)
       cachix
       nix-index # nix-locate "libsomelib.so.0"
+      comma
 
       direnv
       nix-direnv
