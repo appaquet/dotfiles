@@ -12,23 +12,11 @@ Update the README.nvim.md file at the root of the repository to ensure all keybi
    - Add missing keybindings from config files to README
    - Remove keybindings from README that are not in the config files
 
-4. Add plugin/source indicators in parentheses after keybinding descriptions:
-   - `(native)` for built-in Neovim keybindings
-   - `(plugin-name)` for keybindings provided by specific plugins (e.g., `(treesitter)`, `(gitlinker)`, etc.)
-   - No indicator needed for custom keybindings defined in the config files
+4. Organize keybindings logically by category and maintain consistent formatting.
 
-5. Organize keybindings logically by category and maintain consistent formatting.
+5. Propose removal of any keybindings that are documented but not actually available in the configuration.
 
-6. Propose removal of any keybindings that are documented but not actually available in the configuration.
-
-## Plugin Indicators Reference
-
-Common plugins that provide keybindings:
-- `(native)` - Built-in Neovim functionality
-- `(treesitter)` - nvim-treesitter plugin functions
-- `(gitlinker)` - gitlinker.nvim plugin
-- `(which-key)` - Enhanced with which-key display
-- Add others as discovered during the update
+6. Keep descriptions clean and concise without adding plugin indicators in parentheses.
 
 ## Notes
 
