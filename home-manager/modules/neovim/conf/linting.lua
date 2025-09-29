@@ -37,6 +37,11 @@ vim.keymap.set("n", "<leader>lT", function()
 		return
 	end
 
+	-- Save the file before fixing
+	if not vim.bo.readonly and vim.bo.modifiable and vim.bo.modified then
+		vim.cmd("write")
+	end
+
 	if filetype == "markdown" then
 		vim.fn.system("markdownlint --fix " .. vim.fn.shellescape(filename))
 		vim.cmd("edit!") -- Reload the file to show the changes
