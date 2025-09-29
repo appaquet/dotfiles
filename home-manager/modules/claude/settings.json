@@ -18,7 +18,6 @@
       "Bash(jj-stacked-stats:*)"
     ]
   },
-  "model": "opusplan",
   "hooks": {
     "Notification": [
       {
