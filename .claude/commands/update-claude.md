@@ -23,3 +23,4 @@ All of these steps must be done inside `overlays/claude-code` directory, except 
    expected values. You'll have to run it twice to get the two values
 
 5. At the root of the repo, create a new jj change: `jj commit -m "claude++" overlays/claude-code`
+   **IMPORTANT**: don't prefix with `private: claude:`, `claude++` is what it needs to be!

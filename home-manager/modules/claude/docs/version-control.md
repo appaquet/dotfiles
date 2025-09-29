@@ -22,6 +22,9 @@
     * ❌ Wrong: `jj commit -m "fix(component): correct validation loop bug"`
     * This applies to BOTH `jj new -m` and `jj commit -m` commands
 
+  * **CRITICAL**: ALWAYS use `jj commit -m "message"` - NEVER use `jj commit` or `jj new` alone as
+    it will try to open an editor which doesn't work in this environment.
+
 * Stay in current change when:
   * Making related fixes (e.g., all lint issues from same feature)
   * Iterating on the same problem
@@ -41,9 +44,6 @@
 * Cheat sheet
   * Create a new empty change with a description: `jj new -m "private: claude: description of the change"`
   * Commit current changes to current change with a message: `jj commit -m "private: claude: description of the change"`
-    * **NEVER** use jj commit without `-m` and a proper message. You don't have an editor to write
-      the commit message, so you have to provide it in the command line.
-
   * I have a few extra shell functions to help dealing with branches:
     * `jj-main-branch` to get the main/trunk branch name
     * `jj-current-branch` to get the current branch name

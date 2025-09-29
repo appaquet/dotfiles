@@ -1,4 +1,7 @@
 {
+  "env": {
+    "DISABLE_AUTOUPDATER": "1"
+  },
   "permissions": {
     "allow": [
       "Bash(notify:*)",
@@ -28,8 +31,5 @@
         ]
       }
     ]
-  },
-  "env": {
-    "DISABLE_AUTOUPDATER": "1"
   }
 }
