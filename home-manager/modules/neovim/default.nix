@@ -44,12 +44,12 @@ let
 
   copilot-lsp = pkgsChannel.vimUtils.buildVimPlugin {
     pname = "copilot-lsp";
-    version = "2025-09-20";
+    version = "2025-10-01";
     src = pkgsChannel.fetchFromGitHub {
       owner = "copilotlsp-nvim";
       repo = "copilot-lsp";
-      rev = "5030766af6dce2181d48b928537ebe1919ec8d22";
-      sha256 = "sha256-AJGpzPkf+A+tcAQMcD9wLAuNyBL8r8x/ydqQJ9sqTP0";
+      rev = "a80e0c17e7366614d39506825f49a25d285fead9";
+      sha256 = "sha256-Mch675Wmx+8EbvsQ/y5H/eyObsKjotlEe26JKhwBfEA=";
     };
     meta.homepage = "https://github.com/copilotlsp-nvim/copilot-lsp/";
     meta.hydraPlatforms = [ ];
@@ -57,12 +57,12 @@ let
 
   copilot-lua = pkgsChannel.vimUtils.buildVimPlugin {
     pname = "copilot.lua";
-    version = "2025-09-20";
+    version = "2025-10-01";
     src = pkgsChannel.fetchFromGitHub {
       owner = "zbirenbaum";
       repo = "copilot.lua";
-      rev = "6fba2272a2ddb18488dd927d3848d8219124854a";
-      sha256 = "sha256-ptbedGYFOWLBsPV+WqAXYSjOSdodiMBCudoSJPB5WVU=";
+      rev = "3cd5086c28c5769f5db147721f457a3e081de254";
+      sha256 = "sha256-7YquTg3DwdM5jOnkFg9xR3X/xono6/J6vqeMKTw2GAU=";
     };
     meta.homepage = "https://github.com/zbirenbaum/copilot.lua/";
     meta.hydraPlatforms = [ ];

@@ -17,7 +17,7 @@ require("copilot").setup({
 	copilot_model = "gpt-41-copilot",
 
 	nes = {
-		enabled = false,
+		enabled = true,
 		keymap = {
 			accept_and_goto = "<M-n>",
 			accept = false,
@@ -59,6 +59,16 @@ vim.keymap.set("i", "<Tab>", function()
 		passthrough_keymap("<Tab>")
 	end
 end, { noremap = true, silent = true })
+
+vim.keymap.set("n", "<Tab>", function()
+	if cpnes.nes_apply_pending_nes() then
+		-- Copilot Next Edit Suggestion
+		cpnes.nes_walk_cursor_end_edit()
+	else
+		passthrough_keymap("<Tab>")
+	end
+end, { noremap = true, silent = true })
+
 vim.keymap.set("i", "<S-Tab>", function()
 	passthrough_keymap("<Tab>")
 end, { noremap = true, silent = true })
