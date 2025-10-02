@@ -63,6 +63,7 @@
 
    ```conf
     access-tokens = github.com:<YOUR_TOKEN>
+   ```
 
 1. On Linux, configure nix by adding to `/etc/nix/nix.conf`.
    No need to do it on Darwin since we already do it nix-darwin (see [configuration.nix](./darwin/mbpapp/configuration.nix))
@@ -80,18 +81,19 @@
 
 1. Build & activate home.
 
-1. Switch shell by adding `/home/appaquet/.nix-profile/bin/fish` to `/etc/shells` and running 
+1. Switch shell by adding `/home/appaquet/.nix-profile/bin/fish` to `/etc/shells` and running
    `chsh -s /home/appaquet/.nix-profile/bin/fish`
 
 ## Initial setup for Raspberry Pi
 
 ### Notes
+
 * <https://github.com/nix-community/raspberry-pi-nix> is used to simplify a lot of the quirks for Rpi.
 * Because of the use of `raspberry-pi-nix`, there is no need for a `hardware-configuration.nix` as it's automatically generated & included.
 * I use a Mac VM to build the initial SD card to prevent potentially recompiling the whole kernel on a poor Rpi.
 
-
 ### Steps
+
 1. On a UTM NixOS host, create the Rpi NixOS config, and then build and SD card: `nix build '.#nixosConfigurations.piapp.config.system.build.sdImage'`
 
 1. Copy the result image to a SD / USB Stick or Nvme (via USB adapter): `zstdcat result/the-image.img.zstd | dd of=/dev/the-device status=progress`
@@ -120,10 +122,12 @@
   
 1. `failed: unable to open database file at ... command-not-found`
    As root, run:
-   ```
-   nix-channel --add https://nixos.org/channels/nixos-unstable nixos
-   nix-channel --update
-   ```
+
+    ```bash
+     nix-channel --add https://nixos.org/channels/nixos-unstable nixos
+     nix-channel --update
+     ```
+
 1. On MacOS, we may end up with an older version of nix installed, leading to flakes
    not working because of use of newer syntax in the lock files (see <https://github.com/LnL7/nix-darwin/issues/931>)
 
