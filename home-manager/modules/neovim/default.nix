@@ -196,6 +196,7 @@ in
           p.jsonnet
           p.lua
           p.markdown
+          p.markdown_inline
           p.nix
           p.proto
           p.python
