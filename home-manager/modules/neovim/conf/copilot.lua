@@ -60,7 +60,7 @@ vim.keymap.set("i", "<Tab>", function()
 	end
 end, { noremap = true, silent = true })
 
-vim.keymap.set("n", "<Tab>", function()
+vim.keymap.set({ "n", "v" }, "<Tab>", function()
 	if cpnes.nes_apply_pending_nes() then
 		-- Copilot Next Edit Suggestion
 		cpnes.nes_walk_cursor_end_edit()
