@@ -6,8 +6,7 @@
   description = "HF backend";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
-    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
@@ -18,7 +17,6 @@
   outputs =
     {
       nixpkgs,
-      nixpkgs-unstable,
       rust-overlay,
       flake-utils,
       ...
@@ -27,14 +25,6 @@
       system:
       let
         pkgs = import nixpkgs {
-          inherit system;
-          config = {
-            allowUnfree = true;
-          };
-          overlays = [ (import rust-overlay) ];
-        };
-
-        pkgsUnstable = import nixpkgs-unstable {
           inherit system;
           config = {
             allowUnfree = true;
@@ -104,7 +94,7 @@
                     "llvm-tools-preview"
                   ];
                 })
-                pkgsUnstable.rust-analyzer # we want the latest goodies
+                rust-analyzer # we want the latest goodies
 
                 stdenv.cc.cc.lib
                 llvmPackages.libclang
