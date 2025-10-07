@@ -57,12 +57,12 @@ let
 
   copilot-lua = pkgsChannel.vimUtils.buildVimPlugin {
     pname = "copilot.lua";
-    version = "2025-10-01";
+    version = "2025-10-07";
     src = pkgsChannel.fetchFromGitHub {
       owner = "zbirenbaum";
       repo = "copilot.lua";
-      rev = "3cd5086c28c5769f5db147721f457a3e081de254";
-      sha256 = "sha256-7YquTg3DwdM5jOnkFg9xR3X/xono6/J6vqeMKTw2GAU=";
+      rev = "30b98a4c25d6152c14084020f703b6d56e1f1122";
+      sha256 = "sha256-PwqJ7/FCfK4AqFgguZ2Tac5RWhehSEfI1N6ySSuTbZc=";
     };
     meta.homepage = "https://github.com/zbirenbaum/copilot.lua/";
     meta.hydraPlatforms = [ ];
