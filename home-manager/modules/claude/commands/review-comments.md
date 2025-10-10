@@ -11,6 +11,8 @@ each language) to mark comments that need to be reviewed and addressed.
 1. Search for REVIEW comments in the codebase:
    * At the **root of the repository**, use `rg -n "// REVIEW:"`
      * **NEVER** look for comments in sub-directories directly, always start at the root of the repository
+     * **NEVER** assume that there aren't any comments left. If you can't find them, it means you are not
+       searching correctly.
    * If no comments found, verify you're at repository root and not limiting by file type
    * If, and only if, still no comments OR that I explicitly requested it, check PR comments using:
      * Get current branch: `jj-current-branch`

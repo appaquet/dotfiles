@@ -3,6 +3,8 @@ name: pr-reply-comments
 description: Reply to imported PR review comments and clean up inline comments
 ---
 
+# PR Reply Comments
+
 ## Prerequisites
 
 Must have imported comments using `pr-import-comments` command first.
