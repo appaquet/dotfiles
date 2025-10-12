@@ -1,9 +1,11 @@
 ---
-name: branch-review
+name: pr-review
 description: Review changes in the current branch / PR for code style, architecture and correctness.
 ---
 
-1. Load the context of the project and PR
+# PR Review
+
+1. Load the context of the project and pull request / current branch
 
 2. Create a new jj change for the review
 

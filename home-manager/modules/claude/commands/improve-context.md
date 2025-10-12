@@ -7,7 +7,7 @@ description: Improve the context of the task at hands by asking clarifying quest
 
 Use the Understanding Checklist to verify completeness. Ask me questions **1 by 1** to clarify any
 ambiguities or uncertainties about the task. I should be able to answer easily without having to
-reference to part of your question, so the 1 by 1 is important here. 
+reference to part of your question, so the 1 by 1 is important here.
 
 Before or after each question, search the code to gather more context. You can also search the web
 if needed.

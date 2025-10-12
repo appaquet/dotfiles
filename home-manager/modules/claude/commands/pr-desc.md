@@ -3,6 +3,8 @@ name: pr-desc
 description: Generate concise PR description from PR.md file
 ---
 
+# PR Description
+
 1. Read `PR.md` (if it exists, at root of repo)
 
 2. Ensure the "Files" section is up-to-date:

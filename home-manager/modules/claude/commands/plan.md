@@ -23,7 +23,7 @@ $ARGUMENTS
    documentation files
 
 3. Analyze the task requirements and create a high-level development plan:
-   * Break down the task into logical phases (scaffolding, implementation, testing, etc.)
+   * Break down the task into logical phases (scaffolding, testing, implementation, etc.)
    * Identify key files and components that will need modification
    * Consider dependencies and potential challenges
 
