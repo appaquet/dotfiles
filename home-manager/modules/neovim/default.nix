@@ -1,4 +1,5 @@
 {
+  pkgs,
   pkgs-nvim,
   config,
   secrets,
@@ -10,7 +11,7 @@
 let
   devMode = true; # Include files from dotfiles directly instead of via nix store
 
-  pkgsChannel = pkgs-nvim;
+  pkgsChannel = pkgs;
   agenticEnabled = !cfg.minimalNvim;
 
   confDir = "${config.home.homeDirectory}/dotfiles/home-manager/modules/neovim/conf";
@@ -146,7 +147,7 @@ in
         go-nvim
         neotest
         neotest-golang
-        neotest-python
+        # neotest-python
         rustaceanvim
         conform-nvim # formatting
         nvim-navic # symbol breadcrumbs in statusline

@@ -7,7 +7,7 @@ require("which-key").add({
 local Neotest = require("neotest")
 local summary_was_opened = false
 Neotest.setup({
-	-- log_level = vim.log.levels.DEBUG,
+	log_level = vim.log.levels.DEBUG,
 
 	adapters = {
 		require("rustaceanvim.neotest"),
@@ -20,7 +20,7 @@ Neotest.setup({
 			},
 		}),
 
-		require("neotest-python"),
+		-- require("neotest-python"),
 	},
 
 	output = {
