@@ -11,7 +11,7 @@ let
     font-thicken = false
 
     # Scroll on macos with external mouse is way too fast
-    mouse-scroll-multiplier = 0.25
+    mouse-scroll-multiplier = 0.50
 
     # Parses URLs to allow click
     # Doesn't work at the moment: https://github.com/ghostty-org/ghostty/issues/1972#issuecomment-2240048536
