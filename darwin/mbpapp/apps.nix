@@ -120,7 +120,7 @@
       }
 
       {
-        name = "docker";
+        name = "docker-desktop";
       }
       {
         name = "visual-studio-code";
@@ -132,7 +132,7 @@
         name = "postman";
       }
       {
-        name = "wireshark";
+        name = "wireshark-app";
       }
       {
         name = "appcleaner";
