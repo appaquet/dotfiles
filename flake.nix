@@ -101,12 +101,12 @@
         vimPlugins = prev.vimPlugins // {
           neotest = prev.vimUtils.buildVimPlugin {
             pname = "neotest";
-            version = "5.13.0";
+            version = "5.13.0-patched1";
             src = prev.fetchFromGitHub {
-              owner = "nvim-neotest";
+              owner = "appaquet";
               repo = "neotest";
-              rev = "v5.13.0";
-              sha256 = "sha256-IzR32B0B+0DYGc7SRgIalWNJjMCM51NjcL0RT7SlzdU=";
+              rev = "fix/add-subprocess-default-init-back";
+              sha256 = "sha256-Udf0RZIrll9VGi30YXTKa9Ozj9xb5ZBDMBj6/ikfm8A=";
             };
             propagatedBuildInputs = with prev.vimPlugins; [
               nvim-nio
@@ -126,7 +126,7 @@
               sha256 = "sha256-dWIkH/miHixN3BTGg0MR51gvD8NFrxjUoB4vD34MJow=";
             };
             propagatedBuildInputs = [
-              final.vimPlugins.neotest  # Use our custom neotest from this overlay
+              final.vimPlugins.neotest # Use our custom neotest from this overlay
             ];
             doCheck = false;
             meta.homepage = "https://github.com/fredrikaverpil/neotest-golang/";
