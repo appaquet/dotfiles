@@ -97,42 +97,7 @@
         mcp-hub = mcp-hub.packages."${prev.system}".default;
       };
 
-      vimPluginsOverlay = final: prev: {
-        vimPlugins = prev.vimPlugins // {
-          neotest = prev.vimUtils.buildVimPlugin {
-            pname = "neotest";
-            version = "5.13.0-patched1";
-            src = prev.fetchFromGitHub {
-              owner = "appaquet";
-              repo = "neotest";
-              rev = "fix/add-subprocess-default-init-back";
-              sha256 = "sha256-Udf0RZIrll9VGi30YXTKa9Ozj9xb5ZBDMBj6/ikfm8A=";
-            };
-            propagatedBuildInputs = with prev.vimPlugins; [
-              nvim-nio
-              plenary-nvim
-            ];
-            doCheck = false;
-            meta.homepage = "https://github.com/nvim-neotest/neotest";
-          };
-
-          neotest-golang = prev.vimUtils.buildVimPlugin {
-            pname = "neotest-golang";
-            version = "2.2.0";
-            src = prev.fetchFromGitHub {
-              owner = "fredrikaverpil";
-              repo = "neotest-golang";
-              rev = "v2.2.0";
-              sha256 = "sha256-dWIkH/miHixN3BTGg0MR51gvD8NFrxjUoB4vD34MJow=";
-            };
-            propagatedBuildInputs = [
-              final.vimPlugins.neotest # Use our custom neotest from this overlay
-            ];
-            doCheck = false;
-            meta.homepage = "https://github.com/fredrikaverpil/neotest-golang/";
-          };
-        };
-      };
+      vimPluginsOverlay = import ./home-manager/modules/neovim/plugins-overlay.nix;
 
       homeOverlays = [
         homePackageOverlays

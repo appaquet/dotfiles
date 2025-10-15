@@ -36,64 +36,6 @@ let
       lua print("nvim secrets not found!!")
     endif
   '';
-
-  # Forked from https://github.com/mrded/nvim-lsp-notify
-  nvim-lsp-notify = pkgsChannel.vimUtils.buildVimPlugin {
-    name = "lsp-notify";
-    src = ./plugins/lsp-notify;
-  };
-
-  copilot-lsp = pkgsChannel.vimUtils.buildVimPlugin {
-    pname = "copilot-lsp";
-    version = "2025-10-01";
-    src = pkgsChannel.fetchFromGitHub {
-      owner = "copilotlsp-nvim";
-      repo = "copilot-lsp";
-      rev = "a80e0c17e7366614d39506825f49a25d285fead9";
-      sha256 = "sha256-Mch675Wmx+8EbvsQ/y5H/eyObsKjotlEe26JKhwBfEA=";
-    };
-    meta.homepage = "https://github.com/copilotlsp-nvim/copilot-lsp/";
-    meta.hydraPlatforms = [ ];
-  };
-
-  copilot-lua = pkgsChannel.vimUtils.buildVimPlugin {
-    pname = "copilot.lua";
-    version = "2025-10-10";
-    src = pkgsChannel.fetchFromGitHub {
-      owner = "zbirenbaum";
-      repo = "copilot.lua";
-      rev = "92e08cd472653beaece28ad9c8508a851a613358";
-      sha256 = "sha256-Jw4Q76FolG3F/AN7WZn/mNNde/21uAJ+yqESmOlyNww=";
-    };
-    meta.homepage = "https://github.com/zbirenbaum/copilot.lua/";
-    meta.hydraPlatforms = [ ];
-  };
-
-  # claudecode-nvim = pkgsChannel.vimUtils.buildVimPlugin {
-  #   name = "claudecode-nvim";
-  #   src = pkgsChannel.fetchFromGitHub {
-  #     owner = "coder";
-  #     repo = "claudecode.nvim";
-  #     rev = "d0f9748";
-  #     sha256 = "sha256-qmZPjZJ9UFxAWCY3NQwsu0nEniG/UasV/iCrG3S5tPQ=";
-  #   };
-  # };
-
-  # Fixes perf issues
-  # gitsigns-nvim = pkgsChannel.vimUtils.buildVimPlugin {
-  #   name = "gitsigns-nvim";
-  #   src = pkgsChannel.fetchFromGitHub {
-  #     owner = "lewis6991";
-  #     repo = "gitsigns.nvim";
-  #     rev = "b014331";
-  #     sha256 = "sha256-7BKwxHoFWGepqm8/J+RB6zu+7IpGUUmgLP4a2O2lIuA=";
-  #   };
-  # };
-  #
-  # avante-nvim-override = pkgs.callPackage ./plugins/avante.nix {
-  #   pkgs = pkgsChannel;
-  # };
-  #
 in
 {
   programs.neovim = {
@@ -101,8 +43,6 @@ in
     viAlias = true;
     vimAlias = true;
     defaultEditor = true;
-
-    package = pkgsChannel.neovim-unwrapped;
 
     plugins =
       (with pkgsChannel.vimPlugins; [
@@ -130,7 +70,7 @@ in
         (nvim-notify.overrideAttrs (_: {
           doCheck = false; # flaky on ci
         }))
-        # nvim-notify-notify (see below)
+        nvim-lsp-notify
 
         # Diagnostics
         trouble-nvim
@@ -227,10 +167,7 @@ in
         # pkgs.vimPlugins.nui-nvim
         # pkgs.vimPlugins.nvim-treesitter
         # pkgs.vimPlugins.plenary-nvim
-      ])
-      ++ [
-        nvim-lsp-notify
-      ];
+      ]);
 
     extraConfig = (
       builtins.concatStringsSep "\n" (
