@@ -38,7 +38,7 @@ in
       gnumake
       bintools # ld, objdump, etc.
 
-      opencode
+      #opencode # disabled for now as build is not always reproducible
       codex
     ])
     ++ lib.optionals pkgs.stdenv.isLinux [
