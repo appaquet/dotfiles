@@ -2,41 +2,83 @@ require("which-key").add({
 	{ "<leader>l", group = "LSP" },
 })
 
--- LSP
--- https://github.com/neovim/nvim-lspconfig
-local lspconfig = require("lspconfig")
+-- TypeScript
+vim.lsp.config["ts_ls"] = {
+	cmd = { "typescript-language-server", "--stdio" },
+	root_markers = { "package.json", "tsconfig.json", "jsconfig.json", ".git" },
+	filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+}
 
---lspconfig.gopls.setup {} -- Loaded by go.nvim (see bellow)
---lspconfig.rust_analyzer.setup {} -- Loaded by rustaceanvim (see bellow)
+-- Markdown
+vim.lsp.config["marksman"] = {
+	cmd = { "marksman", "server" },
+	root_markers = { ".marksman.toml", ".git" },
+	filetypes = { "markdown", "markdown.mdx" },
+}
 
-lspconfig.ts_ls.setup({})
-lspconfig.marksman.setup({})
-lspconfig.nixd.setup({})
-lspconfig.buf_ls.setup({})
-lspconfig.bashls.setup({})
-lspconfig.jsonnet_ls.setup({})
+-- Nix
+vim.lsp.config["nixd"] = {
+	cmd = { "nixd" },
+	root_markers = { "flake.nix", "flake.lock", ".git" },
+	filetypes = { "nix" },
+}
 
-lspconfig.pyright.setup({
-	python = {
-		analysis = {
-			autoSearchPaths = true,
-			diagnosticMode = "openFilesOnly",
-			useLibraryCodeForTypes = true,
+-- Protobuf
+vim.lsp.config["buf_ls"] = {
+	cmd = { "bufls", "serve" },
+	root_markers = { "buf.work.yaml", "buf.yaml", ".git" },
+	filetypes = { "proto" },
+}
+
+-- Bash
+vim.lsp.config["bashls"] = {
+	cmd = { "bash-language-server", "start" },
+	root_markers = { ".git" },
+	filetypes = { "sh", "bash" },
+}
+
+-- Jsonnet
+vim.lsp.config["jsonnet_ls"] = {
+	cmd = { "jsonnet-language-server" },
+	root_markers = { "jsonnetfile.json", ".git" },
+	filetypes = { "jsonnet", "libsonnet" },
+}
+
+-- Python
+vim.lsp.config["pyright"] = {
+	cmd = { "pyright-langserver", "--stdio" },
+	root_markers = { "pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", "Pipfile", ".git" },
+	filetypes = { "python" },
+	settings = {
+		python = {
+			analysis = {
+				autoSearchPaths = true,
+				diagnosticMode = "openFilesOnly",
+				useLibraryCodeForTypes = true,
+			},
 		},
 	},
-})
+}
 
+-- Python linting/formatting
 if vim.fn.executable("ruff") == 1 then -- Only load if ruff is available
-	lspconfig.ruff.setup({ -- https://docs.astral.sh/ruff/editors/setup/#neovim
+	vim.lsp.config["ruff"] = {
+		cmd = { "ruff", "server", "--preview" },
+		root_markers = { "pyproject.toml", "ruff.toml", ".ruff.toml", ".git" },
+		filetypes = { "python" },
 		init_options = {
 			settings = {
 				logLevel = "debug",
 			},
 		},
-	})
+	}
 end
 
-lspconfig.lua_ls.setup({
+-- Native LSP config for lua_ls
+vim.lsp.config["lua_ls"] = {
+	cmd = { "lua-language-server" },
+	root_markers = { ".luarc.json", ".luarc.jsonc", ".luacheckrc", ".stylua.toml", "stylua.toml", "selene.toml", "selene.yml", ".git" },
+	filetypes = { "lua" },
 	-- See https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#lua_ls
 	on_init = function(client)
 		if client.workspace_folders then
@@ -70,9 +112,22 @@ lspconfig.lua_ls.setup({
 	settings = {
 		Lua = {},
 	},
-})
+}
 
--- Bind keymaps on lsp attach to buffer
+-- Enable all LSP servers
+vim.lsp.enable("ts_ls")
+vim.lsp.enable("marksman")
+vim.lsp.enable("nixd")
+vim.lsp.enable("buf_ls")
+vim.lsp.enable("bashls")
+vim.lsp.enable("jsonnet_ls")
+vim.lsp.enable("pyright")
+if vim.fn.executable("ruff") == 1 then
+	vim.lsp.enable("ruff")
+end
+vim.lsp.enable("lua_ls")
+
+-- Bind keymap on LSP attach to buffer
 vim.api.nvim_create_autocmd("LspAttach", {
 	group = vim.api.nvim_create_augroup("UserLspConfig", {}),
 	callback = function(ev)
@@ -242,9 +297,6 @@ end
 vim.g.rustaceanvim = {
 	tools = {},
 	server = {
-		on_attach = function(client, bufnr)
-			--
-		end,
 		default_settings = {
 			["rust-analyzer"] = {},
 		},

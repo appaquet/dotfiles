@@ -1,6 +1,5 @@
 {
   pkgs,
-  pkgs-nvim,
   config,
   secrets,
   lib,
@@ -83,7 +82,6 @@ in
         gitlinker-nvim
 
         # LSP / Languages
-        nvim-lspconfig # https://github.com/neovim/nvim-lspconfig
         go-nvim
         neotest
         neotest-golang
