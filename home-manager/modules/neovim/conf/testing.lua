@@ -21,7 +21,7 @@ Neotest.setup({
 			warn_test_name_dupes = false,
 		}),
 
-		-- require("neotest-python"),
+		require("neotest-python"),
 	},
 
 	output = {

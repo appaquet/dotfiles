@@ -64,5 +64,22 @@ final: prev: {
       doCheck = false;
       meta.homepage = "https://github.com/fredrikaverpil/neotest-golang/";
     };
+
+    neotest-python = prev.vimUtils.buildVimPlugin {
+      pname = "neotest-python";
+      version = "2025-09-27";
+      src = prev.fetchFromGitHub {
+        owner = "nvim-neotest";
+        repo = "neotest-python";
+        rev = "7cab6e2ecc260bf61b97ca147574a470bd880cbd";
+        sha256 = "0sks1fj7bwpdzgwb3ahj1ki8kql9wwhds617b1ial6fk0s0b56iy";
+      };
+      propagatedBuildInputs = [
+        final.vimPlugins.neotest # Use our custom neotest from this overlay
+      ];
+      doCheck = false;
+      meta.homepage = "https://github.com/nvim-neotest/neotest-python/";
+      meta.hydraPlatforms = [ ];
+    };
   };
 }

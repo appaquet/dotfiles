@@ -87,7 +87,7 @@ in
         go-nvim
         neotest
         neotest-golang
-        # neotest-python
+        neotest-python
         rustaceanvim
         conform-nvim # formatting
         nvim-navic # symbol breadcrumbs in statusline
