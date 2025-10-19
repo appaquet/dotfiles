@@ -1,4 +1,4 @@
-# Neovim README
+# Neovim sheet cheat
 
 This is a collection of keymaps and commands for my Neovim setup. It doesn't contain only personal
 keymaps, but also default/built-ins that I tend to forget.
