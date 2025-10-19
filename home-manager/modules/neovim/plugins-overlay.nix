@@ -81,5 +81,22 @@ final: prev: {
       meta.homepage = "https://github.com/nvim-neotest/neotest-python/";
       meta.hydraPlatforms = [ ];
     };
+
+    rustaceanvim = prev.vimUtils.buildVimPlugin {
+      pname = "rustaceanvim";
+      version = "6.0.5";
+      src = prev.fetchFromGitHub {
+        owner = "mrcjkb";
+        repo = "rustaceanvim";
+        rev = "v6.0.5";
+        sha256 = "1gma1gxcs3h2l16dalv0d0iz953cyn65b6c6m8fli8jfk1av9sq0";
+      };
+      doCheck = false;
+      meta = {
+        homepage = "https://github.com/mrcjkb/rustaceanvim";
+        description = "Supercharge your Rust experience in Neovim! A heavily modified fork of rust-tools.nvim";
+        license = prev.lib.licenses.gpl2Only;
+      };
+    };
   };
 }
