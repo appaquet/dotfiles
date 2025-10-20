@@ -63,8 +63,8 @@
 yourself: "On a scale of 1-10, how well do I understand this task?"
 
 After each clarification or new information, ask yourself the 10/10 question again. If not 10/10,
-continue iterating by asking clarifying questions one by one (search code/web for context first if
-needed) and using this checklist as a guide:
+continue iterating using `AskUserQuestion` tool (search code/web for context first if needed) and
+using this checklist as a guide:
 
 ### Understanding Checklist
 
@@ -74,7 +74,7 @@ needed) and using this checklist as a guide:
 * [ ] Understand existing patterns to follow
 * [ ] Have test strategy defined
 * [ ] Know success criteria
-* [ ] Ask any clarifying questions that would bring me to 10/10 understanding
+* [ ] Use `AskUserQuestion` tool for any clarifying questions that would bring me to 10/10 understanding
 
 ### Pre-Edit Check (before each file modification)
 

@@ -35,5 +35,5 @@ Load as much context as possible about the project and task at hand.
 4. Synthesize and propose next steps:
    * If `PR.md` exists, propose next tasks based on TODO section
    * Propose `PR.md` updates if it's missing information like changed files or TODOs
-   * If no clear direction, ask for clarification on goals
+   * If no clear direction, use `AskUserQuestion` tool for clarification on goals
    * Provide summary of current project state and context

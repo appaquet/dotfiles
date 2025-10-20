@@ -33,7 +33,7 @@ Here's my usual development workflow, which I'll detail through commands when st
   I tell you to.
 
 * Before jumping into the implementation, **ALWAYS** verify your understanding checklist. Never
-  assume anything, **ALWAYS** ask questions for any unclear requirements
+  assume anything, **ALWAYS** use `AskUserQuestion` tool for any unclear requirements
 
 * Before doing any changes to the code, create a `private: claude:` `jj` change following the
   guidelines in @docs/version-control.md.

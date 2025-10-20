@@ -19,8 +19,8 @@ each language) to mark comments that need to be reviewed and addressed.
      * Check PR comments: `gh pr view $(jj-current-branch)` and `gh api repos/owner/repo/pulls/PR_NUMBER/comments`
 
 2. For each comment found, **ALWAYS** look at the surrounding and/or related code to fully
-   understand the context. If you aren't sure about a comment, **ALWAYS** ask me questions to
-   clarify, 1 by 1. You **MUST** fully understand the context before taking any action, using the
+   understand the context. If you aren't sure about a comment, **ALWAYS** use `AskUserQuestion`
+   tool to clarify. You **MUST** fully understand the context before taking any action, using the
    context understanding checklist.
 
 3. **ALWAYS** create an action plan:

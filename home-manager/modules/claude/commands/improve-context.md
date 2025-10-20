@@ -5,12 +5,11 @@ description: Improve the context of the task at hands by asking clarifying quest
 
 # Improve Context
 
-Use the Understanding Checklist to verify completeness. Ask me questions **1 by 1** to clarify any
-ambiguities or uncertainties about the task. I should be able to answer easily without having to
-reference to part of your question, so the 1 by 1 is important here.
+Use the Understanding Checklist to verify completeness. Use the `AskUserQuestion` tool to clarify
+any ambiguities or uncertainties about the task.
 
-Before or after each question, search the code to gather more context. You can also search the web
-if needed.
+Before or after asking questions, search the code to gather more context. You can also search the
+web if needed.
 
 Unless I told you so, don't start the implementation right away. You should **NEVER** start doing
 modifications to the codebase until you have a crystal clear understanding of the task at hand.
