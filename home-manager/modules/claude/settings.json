@@ -9,6 +9,8 @@
       "Bash(gh pr view:*)",
       "Bash(gh pr checks:*)",
       "Bash(jj log:*)",
+      "Bash(jj show:*)",
+      "Bash(jj diff:*)",
       "Bash(jj-main-branch:*)",
       "Bash(jj-current-branch:*)",
       "Bash(jj-prev-branch:*)",
