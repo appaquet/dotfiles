@@ -61,9 +61,8 @@
       url = "github:lnl7/nix-darwin/nix-darwin-25.05";
     };
 
-    raspberry-pi-nix = {
-      url = "github:nix-community/raspberry-pi-nix";
-      inputs.nixpkgs.follows = "nixos";
+    nixos-raspberrypi = {
+      url = "github:nvmd/nixos-raspberrypi";
     };
   };
 
@@ -75,7 +74,7 @@
       nixos,
       home-manager,
       humanfirst-dots,
-      raspberry-pi-nix,
+      nixos-raspberrypi,
       secrets,
       flake-utils,
       darwin,
@@ -288,17 +287,38 @@
           ];
         };
 
-        piapp = nixos.lib.nixosSystem {
+        piapp = nixos-raspberrypi.lib.nixosSystem {
           system = "aarch64-linux";
           specialArgs = {
             inherit (self) common;
-            inherit inputs;
+            inherit inputs nixos-raspberrypi;
             secrets = secrets.init "linux";
           };
           modules = [
-            nixosOverlaysModule
-            raspberry-pi-nix.nixosModules.raspberry-pi
-            raspberry-pi-nix.nixosModules.sd-image
+            {
+              imports = with nixos-raspberrypi.nixosModules; [
+                raspberry-pi-5.base
+              ];
+            }
+            ./nixos/piapp/configuration.nix
+          ];
+        };
+
+        # SD card image configuration for piapp
+        piapp-sdimage = nixos-raspberrypi.lib.nixosSystem {
+          system = "aarch64-linux";
+          specialArgs = {
+            inherit (self) common;
+            inherit inputs nixos-raspberrypi;
+            secrets = secrets.init "linux";
+          };
+          modules = [
+            {
+              imports = with nixos-raspberrypi.nixosModules; [
+                raspberry-pi-5.base
+                sd-image
+              ];
+            }
             ./nixos/piapp/configuration.nix
           ];
         };

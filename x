@@ -189,6 +189,27 @@ nixos)
     shift
     nixos-rebuild build "$@" --flake ".#${HOSTNAME}"
     ;;
+  sdimage)
+    shift
+    echo "Building SD card image for ${HOSTNAME}..."
+    ${NIX_BUILDER} build ".#nixosConfigurations.${HOSTNAME}-sdimage.config.system.build.sdImage"
+
+    if [[ -L ./result ]]; then
+      IMAGE=$(find ./result -name "*.img.zst" -o -name "*.img" | head -1)
+      if [[ -n "$IMAGE" ]]; then
+        echo ""
+        echo "SD image built successfully!"
+        echo "Image: $IMAGE"
+        echo ""
+        echo "To write to SD card:"
+        if [[ "$IMAGE" == *.zst ]]; then
+          echo "  zstdcat $IMAGE | sudo dd of=/dev/sdX bs=4M status=progress"
+        else
+          echo "  sudo dd if=$IMAGE of=/dev/sdX bs=4M status=progress"
+        fi
+      fi
+    fi
+    ;;
   boot)
     shift
 
@@ -264,6 +285,7 @@ nixos)
   *)
     echo "$0 $COMMAND check: check nixos" >&2
     echo "$0 $COMMAND build: build nixos" >&2
+    echo "$0 $COMMAND sdimage: build SD card image (use MACHINE_KEY=user@host to override)" >&2
     echo "$0 $COMMAND boot: add new config to boot, but doesn't switch it until reboot" >&2
     echo "$0 $COMMAND diff: diff nixos" >&2
     echo "$0 $COMMAND tree: show nixos tree" >&2

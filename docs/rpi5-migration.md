@@ -185,14 +185,25 @@ ls -la result/
 
 #### Phase 3: In-Place Upgrade
 
+**Important:** If the binary cache isn't yet in your system configuration, you can add it via command-line flags to avoid rebuilding everything:
+
 ```bash
-# On the piapp system
-sudo nixos-rebuild switch --flake github:appaquet/dotfiles#piapp
+# On the piapp system - dry run with binary cache
+sudo nixos-rebuild dry-activate --flake .#piapp \
+  --option extra-substituters "https://cache.nixos.org/ https://nix-community.cachix.org https://nixos-raspberrypi.cachix.org" \
+  --option extra-trusted-public-keys "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI="
+
+# After verifying dry-run, do actual switch with same flags
+sudo nixos-rebuild switch --flake .#piapp \
+  --option extra-substituters "https://cache.nixos.org/ https://nix-community.cachix.org https://nixos-raspberrypi.cachix.org" \
+  --option extra-trusted-public-keys "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI="
 
 # Verify system is running correctly
 systemctl status
 journalctl -b
 ```
+
+**Note:** `/etc/nix/nix.conf` is read-only on NixOS (managed by the system), so you cannot manually edit it. Use command-line options instead when the cache isn't yet in your configuration.
 
 ### 5. Update Documentation
 
