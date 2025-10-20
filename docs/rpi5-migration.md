@@ -143,9 +143,64 @@ piapp = nixpkgs.lib.nixosSystem {
 };
 ```
 
-### 3. Update Hardware Configuration
+### 3. Create Hardware Configuration
 
-Remove the raspberry-pi-nix configuration block from `nixos/piapp/configuration.nix`:
+**CRITICAL:** Create `nixos/piapp/hardware-configuration.nix` with explicit filesystem definitions:
+
+```bash
+# On piapp system, generate hardware config
+sudo nixos-generate-config --show-hardware-config
+```
+
+Create the file with `lib.mkDefault` for all filesystem options (required for sd-image compatibility):
+
+```nix
+{ config, lib, pkgs, modulesPath, ... }:
+
+{
+  imports = [
+    (modulesPath + "/installer/scan/not-detected.nix")
+  ];
+
+  boot.initrd.availableKernelModules = [ ];
+  boot.initrd.kernelModules = [ ];
+  boot.kernelModules = [ ];
+  boot.extraModulePackages = [ ];
+
+  # Note: lib.mkDefault is used here because this hardware-configuration.nix is shared
+  # by both the regular piapp config (uses NVMe UUIDs below) and piapp-sdimage config
+  # (needs to override with /dev/disk/by-label/NIXOS_SD for SD card images).
+  # Without mkDefault, the two configurations would conflict.
+  fileSystems."/" = {
+    device = lib.mkDefault "/dev/disk/by-uuid/YOUR-ROOT-UUID";
+    fsType = lib.mkDefault "ext4";
+  };
+
+  fileSystems."/boot/firmware" = {
+    device = lib.mkDefault "/dev/disk/by-uuid/YOUR-BOOT-UUID";
+    fsType = lib.mkDefault "vfat";
+    options = lib.mkDefault [ "fmask=0022" "dmask=0022" ];
+  };
+
+  swapDevices = [ ];
+
+  nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
+}
+```
+
+Import it in `nixos/piapp/configuration.nix`:
+
+```nix
+{
+  imports = [
+    ./hardware-configuration.nix  # Add this line first
+    ../common.nix
+    # ... other imports
+  ];
+}
+```
+
+Remove the raspberry-pi-nix configuration block:
 
 ```nix
 # Remove this entire block:
@@ -155,44 +210,98 @@ raspberry-pi-nix = {
 };
 ```
 
-The nvmd modules automatically handle the RPi5 configuration, including:
+### 3a. Configure Boot Partition Limits
 
-- Boot loader setup (defaults to kernelboot for RPi5)
-- Firmware partition management at `/boot/firmware`
-- Hardware-specific kernel and device tree configuration
+**CRITICAL for 128MB boot partitions:** Limit generations to avoid filling the boot partition.
+
+Each generation requires ~74MB (53MB kernel/initrd + 21MB firmware). With a 128MB partition, you can only fit 1 generation safely.
+
+Add to `nixos/piapp/configuration.nix`:
+
+```nix
+# Limit boot generations to 1 due to small 128MB boot partition
+# (each generation is ~74MB: 53MB kernel/initrd + 21MB firmware)
+boot.loader.raspberryPi.configurationLimit = 1;
+```
+
+**Note:** This means you won't have boot-time rollback ability. Consider resizing the boot partition to 256MB or 512MB if you need multiple generations.
 
 ### 4. Testing Strategy
 
 #### Phase 1: Local Build Test
 
-```bash
-# Dry run to check for configuration issues
-nix build '.#nixosConfigurations.piapp.config.system.build.toplevel' --dry-run
-
-# Full build test
-nix build '.#nixosConfigurations.piapp.config.system.build.toplevel'
-```
-
-#### Phase 2: SD Card Image Test
+**Use MACHINE_KEY to test from any system:**
 
 ```bash
-# Build SD card image
-nix build '.#nixosConfigurations.piapp.config.system.build.sdImage'
+# Test piapp configuration builds correctly
+MACHINE_KEY=appaquet@piapp ./x nixos check
 
-# Check image is created successfully
-ls -la result/
+# Test SD image configuration builds correctly
+nix eval --raw ".#nixosConfigurations.piapp-sdimage.config.system.build.toplevel"
 ```
+
+**IMPORTANT:** Always test with `MACHINE_KEY=appaquet@piapp ./x nixos check` before pushing changes to production. This validates the entire configuration locally.
+
+#### Phase 2: SD Card Image Separation
+
+**CRITICAL:** Separate SD image configuration from running system to avoid conflicts.
+
+Create a separate `piapp-sdimage` configuration in flake.nix that includes the sd-image module:
+
+```nix
+piapp-sdimage = nixos-raspberrypi.lib.nixosSystem {
+  system = "aarch64-linux";
+  specialArgs = {
+    inherit (self) common;
+    inherit inputs nixos-raspberrypi;
+    secrets = secrets.init "linux";
+  };
+  modules = [
+    {
+      imports = with nixos-raspberrypi.nixosModules; [
+        raspberry-pi-5.base
+        sd-image  # Only include this in the SD image config
+      ];
+    }
+    ./nixos/piapp/configuration.nix
+  ];
+};
+```
+
+Update the `x` script sdimage command to use this config:
+
+```bash
+sdimage)
+  shift
+  echo "Building SD card image for ${HOSTNAME}..."
+  ${NIX_BUILDER} build ".#nixosConfigurations.${HOSTNAME}-sdimage.config.system.build.sdImage"
+  # ... rest of script
+  ;;
+```
+
+**Why this is needed:** The sd-image module adds `-sd-card` to the system name and overrides filesystem definitions. This conflicts with the running system configuration.
 
 #### Phase 3: In-Place Upgrade
 
+**Important:** If the binary cache isn't yet in your system configuration, you can add it via command-line flags to avoid rebuilding everything:
+
 ```bash
-# On the piapp system
-sudo nixos-rebuild switch --flake github:appaquet/dotfiles#piapp
+# On the piapp system - dry run with binary cache
+sudo nixos-rebuild dry-activate --flake .#piapp \
+  --option extra-substituters "https://cache.nixos.org/ https://nix-community.cachix.org https://nixos-raspberrypi.cachix.org" \
+  --option extra-trusted-public-keys "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI="
+
+# After verifying dry-run, do actual switch with same flags
+sudo nixos-rebuild switch --flake .#piapp \
+  --option extra-substituters "https://cache.nixos.org/ https://nix-community.cachix.org https://nixos-raspberrypi.cachix.org" \
+  --option extra-trusted-public-keys "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI="
 
 # Verify system is running correctly
 systemctl status
 journalctl -b
 ```
+
+**Note:** `/etc/nix/nix.conf` is read-only on NixOS (managed by the system), so you cannot manually edit it. Use command-line options instead when the cache isn't yet in your configuration.
 
 ### 5. Update Documentation
 
@@ -286,6 +395,41 @@ nixos-raspberrypi.nixosModules.raspberry-pi-5.base
 
 ### Boot Issues
 
+#### Problem: Boot partition full during migration
+
+```
+cp: error writing '/boot/firmware/nixos-kernels/xxx.tmp': No space left on device
+```
+
+**This is the most common migration issue with 128MB boot partitions.**
+
+**Immediate Solution:**
+
+1. Check space: `df -h /boot/firmware`
+2. Remove old kernel files from previous boot method:
+   ```bash
+   sudo rm /boot/firmware/kernel.img /boot/firmware/initrd /boot/firmware/cmdline.txt
+   sudo rm /boot/firmware/*.tmp*
+   ```
+3. If still full and stuck mid-migration, use the nuclear option:
+   ```bash
+   # WARNING: Only do this if you're stuck mid-migration
+   sudo rm -rf /boot/firmware/*
+   # Then retry: sudo nixos-rebuild switch --flake .#piapp ...
+   # NixOS will regenerate everything from the nix store
+   ```
+
+**Preventive Solution:**
+
+Add `boot.loader.raspberryPi.configurationLimit = 1` to your configuration BEFORE migrating (see Step 3a above).
+
+**Long-term Solution:**
+
+Resize boot partition to 256MB or 512MB:
+1. Boot from SD card
+2. Use fdisk/parted to resize /boot/firmware partition on NVMe
+3. This allows keeping multiple generations for rollback
+
 #### Problem: System won't boot after migration
 
 **Solution:** Boot into older generation:
@@ -301,6 +445,30 @@ mount: /boot/firmware: mount point does not exist
 ```
 
 **Solution:** The nvmd modules manage `/boot/firmware` automatically. If you had custom `/boot` mounts, remove them.
+
+### Service Failures After Migration
+
+#### Problem: UPS services fail with systemd credentials error
+
+```
+upsd.service: Failed to set up credentials: Protocol error
+upsmon.service: Failed to set up credentials: Protocol error
+```
+
+**Cause:** Systemd version upgrade (257.5 → 257.9) changed credentials handling behavior. This is not a migration issue but triggered by the systemd upgrade.
+
+**Solution:**
+
+This issue is under investigation. The UPS services use systemd LoadCredential to load secrets, which may need updates for systemd 257.9.
+
+**Workaround:** If UPS monitoring isn't critical, you can temporarily disable the services:
+
+```nix
+systemd.services.upsd.enable = false;
+systemd.services.upsmon.enable = false;
+```
+
+The rest of the system (WiFi, SSH, networking) should work normally despite this failure.
 
 ### Network Issues
 
@@ -462,17 +630,49 @@ Monitor binary cache availability:
 
 ## Migration Checklist
 
-- [ ] Update flake.nix input
-- [ ] Update nixosConfiguration modules  
-- [ ] Remove old raspberry-pi-nix config block
-- [ ] Test local build
-- [ ] Test SD card image creation
-- [ ] Update README.md documentation
-- [ ] Perform in-place system upgrade
-- [ ] Verify all services work correctly
-- [ ] Test network connectivity
+### Pre-Migration
+- [ ] Update flake.nix input from raspberry-pi-nix to nixos-raspberrypi
+- [ ] Update nixosConfiguration to use nixos-raspberrypi.lib.nixosSystem helper
+- [ ] Remove raspberry-pi-nix overlays from nixosOverlays
+- [ ] Remove raspberry-pi-nix config block from piapp/configuration.nix
+- [ ] Add Raspberry Pi tools (libraspberrypi, raspberrypi-eeprom) to system packages
+- [ ] Update binary cache configuration in nixos/cachix.nix
+
+### Hardware Configuration
+- [ ] Generate hardware-configuration.nix on running piapp system
+- [ ] Create hardware-configuration.nix with lib.mkDefault for all filesystem options
+- [ ] Import hardware-configuration.nix in piapp/configuration.nix
+- [ ] Add boot.loader.raspberryPi.configurationLimit = 1 for 128MB boot partitions
+
+### SD Image Separation
+- [ ] Create separate piapp-sdimage nixosConfiguration in flake.nix
+- [ ] Include sd-image module only in piapp-sdimage config
+- [ ] Update x script sdimage command to use ${HOSTNAME}-sdimage pattern
+
+### Testing
+- [ ] Test with MACHINE_KEY=appaquet@piapp ./x nixos check
+- [ ] Test SD image config: nix eval --raw ".#nixosConfigurations.piapp-sdimage.config.system.build.toplevel"
+- [ ] Verify nvd diff shows expected changes (kernel upgrade, firmware, etc.)
+
+### Migration Execution
+- [ ] Clean old boot files if boot partition is near full
+- [ ] Run dry-activate with binary cache flags
+- [ ] Review service restart warnings
+- [ ] Execute nixos-rebuild switch with binary cache flags
+- [ ] Monitor for boot partition space errors
+- [ ] If stuck, use nuclear option: sudo rm -rf /boot/firmware/*
+
+### Post-Migration
+- [ ] Verify system booted successfully
+- [ ] Test network connectivity (WiFi/Ethernet)
 - [ ] Test SSH access
-- [ ] Verify boot process
-- [ ] Document any custom changes needed
-- [ ] Update binary cache configuration
-- [ ] Test rollback procedure
+- [ ] Check boot logs: journalctl -b
+- [ ] Verify RPi tools work (vcgencmd, rpi-eeprom-update)
+- [ ] Test UPS services if applicable (may need systemd credentials fix)
+- [ ] Document any service failures for future investigation
+- [ ] Update README.md documentation
+
+### Future Considerations
+- [ ] Consider resizing boot partition to 256MB or 512MB for multiple generations
+- [ ] Test SD card image creation: MACHINE_KEY=appaquet@piapp ./x nixos sdimage
+- [ ] Test rollback procedure (limited with configurationLimit=1)

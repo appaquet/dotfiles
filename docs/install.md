@@ -64,7 +64,7 @@
 1. In theory, shell should be changed automatically to fish, but it may not work. Do it manually by
    adding `/home/appaquet/.nix-profile/bin/fish` to `/etc/shells` and running `chsh -s /home/appaquet/.nix-profile/bin/fish`
 
-## Initial setup on Non-NixOS Linux
+## Non-NixOS Linux
 
 1. Download nix installer & run it with multi-user mode enabled:
    `curl -L https://nixos.org/nix/install | sh -s -- --daemon`
@@ -80,7 +80,8 @@
    ```
 
 1. On Linux, configure nix by adding to `/etc/nix/nix.conf`.
-   No need to do it on Darwin since we already do it nix-darwin (see [configuration.nix](./darwin/mbpapp/configuration.nix))
+   No need to do it on Darwin since we already do it nix-darwin
+   (see [configuration.nix](./darwin/mbpapp/configuration.nix))
 
    ```conf
       keep-outputs = true
@@ -98,27 +99,48 @@
 1. Switch shell by adding `/home/appaquet/.nix-profile/bin/fish` to `/etc/shells` and running
    `chsh -s /home/appaquet/.nix-profile/bin/fish`
 
-## Initial setup for Raspberry Pi
+## NixOS on Raspberry Pi
 
-### Notes
-
-* <https://github.com/nix-community/raspberry-pi-nix> is used to simplify a lot of the quirks for Rpi.
-* Because of the use of `raspberry-pi-nix`, there is no need for a `hardware-configuration.nix` as it's automatically generated & included.
+* <https://github.com/nvmd/nixos-raspberrypi> is used to provide comprehensive Raspberry Pi support with optimized packages and active maintenance.
 * I use a Mac VM to build the initial SD card to prevent potentially recompiling the whole kernel on a poor Rpi.
+* A cachix cache is used to speed up builds.
 
-### Steps
+### Building SD Card Image
 
-1. On a UTM NixOS host, create the Rpi NixOS config, and then build and SD card:
-   `nix build '.#nixosConfigurations.piapp.config.system.build.sdImage'`
+1. On a UTM NixOS host, use the `-sdimage` configuration to build an SD card:
 
-1. Copy the result image to a SD / USB Stick or Nvme (via USB adapter):
-   `zstdcat result/the-image.img.zstd | dd of=/dev/the-device status=progress`
+   ```bash
+   MACHINE_KEY=appaquet@piapp ./x nixos sdimage
+   ```
 
-1. Boot the Rpi and change password.
+1. Copy the result image to a SD card:
+
+   ```bash
+   zstdcat result/*.img.zst | sudo dd of=/dev/sdX bs=4M status=progress
+   ```
+
+### Initial Boot and Configuration
+
+1. Boot the RPi from SD card and change password.
+
+1. **NVMe Migration** (Optional): If using NVMe, copy system to NVMe and update boot:
+
+   ```bash
+   # Format NVMe drive
+   sudo fdisk /dev/nvme0n1  # Create partitions matching SD layout
+
+   # Copy system to NVMe
+   sudo dd if=/dev/mmcblk0 of=/dev/nvme0n1 bs=4M status=progress
+
+   # NVMe boot is handled automatically by nvmd/nixos-raspberrypi
+   ```
+
+1. Generate hardware configuration on the running system:
+
+   ```bash
+   sudo nixos-generate-config --show-hardware-config
+   ```
+
+   Copy the output to `nixos/piapp/hardware-configuration.nix` with `lib.mkDefault` for all filesystem options.
 
 1. Follow normal procedure to setup home-manager & rebuild NixOS.
-
-## Common
-
-1. The [nix-community](https://app.cachix.org/cache/nix-community) cachix cache may need to be configured and enabled manually before building nixos for the
-   first time (`cachix use nix-community`).

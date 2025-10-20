@@ -1,24 +1,17 @@
-{ secrets, ... }:
+{ secrets, pkgs, ... }:
 
 {
   imports = [
+    ./hardware-configuration.nix
     ../common.nix
     ../nasapp.nix
     ../netconsole/receiver.nix
     ./ups-server.nix
   ];
 
-  # From https://github.com/NixOS/nixpkgs/issues/260754
-  # and https://github.com/nix-community/raspberry-pi-nix
-  #
-  # See the docs at:
-  #   bcm2711 for rpi 3, 3+, 4, zero 2 w
-  #   bcm2712 for rpi 5
-  #   https://www.raspberrypi.com/documentation/computers/linux_kernel.html#native-build-configuration
-  raspberry-pi-nix = {
-    uboot.enable = false;
-    board = "bcm2712";
-  };
+  # Limit boot generations to 1 due to small 128MB boot partition
+  # (each generation is ~74MB: 53MB kernel/initrd + 21MB firmware)
+  boot.loader.raspberryPi.configurationLimit = 1;
 
   networking = {
     hostName = "piapp";
@@ -49,6 +42,11 @@
   };
 
   services.openssh.enable = true;
+
+  environment.systemPackages = with pkgs; [
+    libraspberrypi # Provides vcgencmd, GPU tools
+    raspberrypi-eeprom # Provides rpi-eeprom-update, rpi-eeprom-config
+  ];
 
   system.stateVersion = "24.11";
 }
