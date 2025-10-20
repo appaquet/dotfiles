@@ -1,4 +1,4 @@
-{ config, lib, pkgs, modulesPath, ... }:
+{ lib, modulesPath, ... }:
 
 {
   imports = [
@@ -22,7 +22,10 @@
   fileSystems."/boot/firmware" = {
     device = lib.mkDefault "/dev/disk/by-uuid/2178-694E";
     fsType = lib.mkDefault "vfat";
-    options = lib.mkDefault [ "fmask=0022" "dmask=0022" ];
+    options = lib.mkDefault [
+      "fmask=0022"
+      "dmask=0022"
+    ];
   };
 
   swapDevices = [ ];

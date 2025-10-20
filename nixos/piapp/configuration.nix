@@ -1,4 +1,8 @@
-{ secrets, pkgs, ... }:
+{
+  secrets,
+  pkgs,
+  ...
+}:
 
 {
   imports = [
@@ -9,8 +13,6 @@
     ./ups-server.nix
   ];
 
-  # Limit boot generations to 1 due to small 128MB boot partition
-  # (each generation is ~74MB: 53MB kernel/initrd + 21MB firmware)
   boot.loader.raspberryPi.configurationLimit = 1;
 
   networking = {
