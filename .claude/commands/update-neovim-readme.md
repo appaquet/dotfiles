@@ -1,16 +1,16 @@
-# Update Neovim README
+# Update Neovim Cheat Sheet
 
-Update the README.nvim.md file at the root of the repository to ensure all keybindings are documented and accurate.
+Update my neovim cheat sheet file to ensure all keybindings are documented and accurate.
 
 ## Instructions
 
-1. Read the README.nvim.md file at the root of the repository.
+1. Read the ./docs/cheatsheets/nvim.md from the root of the repository.
 
 2. For each file in home-manager/modules/neovim/conf/, extract all keybindings defined in the config files.
 
-3. Compare keybindings in config files with those documented in README and:
-   - Add missing keybindings from config files to README
-   - Remove keybindings from README that are not in the config files
+3. Compare keybindings in config files with those documented in my cheat sheet and:
+   - Add missing keybindings from config files to the cheat sheet
+   - Remove keybindings from the cheat sheet that are not in the config files
 
 4. Organize keybindings logically by category and maintain consistent formatting.
 
@@ -21,6 +21,6 @@ Update the README.nvim.md file at the root of the repository to ensure all keybi
 ## Notes
 
 - Focus on keybindings that users would actually press, not internal configuration
-- Maintain the existing section structure in the README
+- Maintain the existing section structure in the cheat sheet
 - Keep descriptions concise but informative
 - Ensure all leader key mappings are correctly documented
