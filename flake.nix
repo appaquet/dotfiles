@@ -298,24 +298,6 @@
             {
               imports = with nixos-raspberrypi.nixosModules; [
                 raspberry-pi-5.base
-              ];
-            }
-            ./nixos/piapp/configuration.nix
-          ];
-        };
-
-        # SD card image configuration for piapp
-        piapp-sdimage = nixos-raspberrypi.lib.nixosSystem {
-          system = "aarch64-linux";
-          specialArgs = {
-            inherit (self) common;
-            inherit inputs nixos-raspberrypi;
-            secrets = secrets.init "linux";
-          };
-          modules = [
-            {
-              imports = with nixos-raspberrypi.nixosModules; [
-                raspberry-pi-5.base
                 sd-image
               ];
             }

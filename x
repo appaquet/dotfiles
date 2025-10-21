@@ -192,7 +192,7 @@ nixos)
   sdimage)
     shift
     echo "Building SD card image for ${HOSTNAME}..."
-    ${NIX_BUILDER} build ".#nixosConfigurations.${HOSTNAME}-sdimage.config.system.build.sdImage"
+    ${NIX_BUILDER} build ".#nixosConfigurations.${HOSTNAME}.config.system.build.sdImage"
 
     if [[ -L ./result ]]; then
       IMAGE=$(find ./result -name "*.img.zst" -o -name "*.img" | head -1)
