@@ -104,6 +104,7 @@
 * <https://github.com/nvmd/nixos-raspberrypi> is used to provide comprehensive Raspberry Pi support with optimized packages and active maintenance.
 * I use a Mac VM to build the initial SD card to prevent potentially recompiling the whole kernel on a poor Rpi.
 * A cachix cache is used to speed up builds.
+* Check [this](https://github.com/appaquet/dotfiles/blob/2e5cb2d78cc92ca77b1c33aee0f659027612bbdc/docs/rpi5-migration.md) for more details on the setup.
 
 ### Building SD Card Image
 
