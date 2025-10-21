@@ -21,12 +21,12 @@ final: prev: {
 
     copilot-lua = prev.vimUtils.buildVimPlugin {
       pname = "copilot.lua";
-      version = "2025-10-10";
+      version = "2025-10-17";
       src = prev.fetchFromGitHub {
         owner = "zbirenbaum";
         repo = "copilot.lua";
-        rev = "92e08cd472653beaece28ad9c8508a851a613358";
-        sha256 = "sha256-Jw4Q76FolG3F/AN7WZn/mNNde/21uAJ+yqESmOlyNww=";
+        rev = "3123983d00ae6859f8bc987d14ebb524bb41b618";
+        sha256 = "sha256-LM7JFBhBQ9uSWODzVJYT29cT6ra5fLFz/5uoto4/K30=";
       };
       meta.homepage = "https://github.com/zbirenbaum/copilot.lua/";
       meta.hydraPlatforms = [ ];
@@ -51,12 +51,12 @@ final: prev: {
 
     neotest-golang = prev.vimUtils.buildVimPlugin {
       pname = "neotest-golang";
-      version = "2.2.0";
+      version = "2.4.0";
       src = prev.fetchFromGitHub {
         owner = "fredrikaverpil";
         repo = "neotest-golang";
-        rev = "v2.2.0";
-        sha256 = "sha256-dWIkH/miHixN3BTGg0MR51gvD8NFrxjUoB4vD34MJow=";
+        rev = "v2.4.0";
+        sha256 = "sha256-zDkV0QKZN3B04owMNG8QcjK86wV7DkN/MP/y0oHs6X8=";
       };
       propagatedBuildInputs = [
         final.vimPlugins.neotest # Use our custom neotest from this overlay
@@ -67,12 +67,12 @@ final: prev: {
 
     neotest-python = prev.vimUtils.buildVimPlugin {
       pname = "neotest-python";
-      version = "2025-09-27";
+      version = "2024-10-02";
       src = prev.fetchFromGitHub {
         owner = "nvim-neotest";
         repo = "neotest-python";
-        rev = "7cab6e2ecc260bf61b97ca147574a470bd880cbd";
-        sha256 = "0sks1fj7bwpdzgwb3ahj1ki8kql9wwhds617b1ial6fk0s0b56iy";
+        rev = "a2861ab3c9a0bf75a56b11835c2bfc8270f5be7e";
+        sha256 = "1m78f9bxsl548f1pcrmbndmnwdplvhqynpm86pv080272ci9msgy";
       };
       propagatedBuildInputs = [
         final.vimPlugins.neotest # Use our custom neotest from this overlay
@@ -80,23 +80,6 @@ final: prev: {
       doCheck = false;
       meta.homepage = "https://github.com/nvim-neotest/neotest-python/";
       meta.hydraPlatforms = [ ];
-    };
-
-    rustaceanvim = prev.vimUtils.buildVimPlugin {
-      pname = "rustaceanvim";
-      version = "6.0.5";
-      src = prev.fetchFromGitHub {
-        owner = "mrcjkb";
-        repo = "rustaceanvim";
-        rev = "v6.0.5";
-        sha256 = "1gma1gxcs3h2l16dalv0d0iz953cyn65b6c6m8fli8jfk1av9sq0";
-      };
-      doCheck = false;
-      meta = {
-        homepage = "https://github.com/mrcjkb/rustaceanvim";
-        description = "Supercharge your Rust experience in Neovim! A heavily modified fork of rust-tools.nvim";
-        license = prev.lib.licenses.gpl2Only;
-      };
     };
   };
 }
