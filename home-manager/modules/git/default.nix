@@ -100,20 +100,12 @@
 
   programs.git = {
     enable = true;
-    userName = "Andre-Philippe Paquet";
-    userEmail = "appaquet@gmail.com";
 
-    delta = {
-      enable = true;
-      options = {
-        navigate = true; # N to switch files
-        syntax-theme = "Nord";
-        side-by-side = false;
-        features = "chameleon-mod";
+    settings = {
+      user = {
+        name = "Andre-Philippe Paquet";
+        email = "appaquet@gmail.com";
       };
-    };
-
-    extraConfig = {
       # Popular options here: https://jvns.ca/blog/2024/02/16/popular-git-config-options/
       # For some more: https://blog.gitbutler.com/git-tips-and-tricks/
       # For all options: https://git-scm.com/docs/git-config
@@ -149,6 +141,17 @@
       include = {
         path = "${./delta-theme.gitconfig}";
       };
+    };
+  };
+
+  programs.delta = {
+    enable = true;
+    enableGitIntegration = true;
+    options = {
+      navigate = true; # N to switch files
+      syntax-theme = "Nord";
+      side-by-side = false;
+      features = "chameleon-mod";
     };
   };
 
