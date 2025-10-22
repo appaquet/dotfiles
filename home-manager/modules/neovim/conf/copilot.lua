@@ -1,6 +1,14 @@
+-- copilot-lsp (for NES bellow, not used directly)
+-- https://github.com/copilotlsp-nvim/copilot-lsp/
+vim.g.copilot_nes_debounce = 500
+require("copilot-lsp").setup({
+	nes = {
+		move_count_threshold = 5, -- Clear after 3 cursor movements
+	},
+})
+
 -- copilot
 -- https://github.com/zbirenbaum/copilot.lua
-vim.g.copilot_nes_debounce = 500
 require("copilot").setup({
 	suggestion = {
 		enabled = true,
@@ -14,7 +22,7 @@ require("copilot").setup({
 			dismiss = "<C-]>",
 		},
 	},
-	copilot_model = "gpt-41-copilot",
+	copilot_model = "",
 
 	nes = {
 		enabled = true,
