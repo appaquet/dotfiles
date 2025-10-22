@@ -29,7 +29,10 @@
 
     fzf-nix = {
       url = "github:mrene/fzf-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
+
+      # use slower channel, but more stable and prevent rebuilding often
+      # since it needs to reindex nix packages on each update
+      inputs.nixpkgs.follows = "nixos";
     };
 
     nixd = {
