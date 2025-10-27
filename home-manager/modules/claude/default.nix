@@ -157,5 +157,12 @@ in
   home.packages = [
     claude-wrapped
     claude-sandboxed
+
+    # Native sandboxing
+    pkgs.socat
+  ]
+  ++ lib.optionals pkgs.stdenv.isLinux [
+    # Native sandboxing
+    pkgs.bubblewrap
   ];
 }
