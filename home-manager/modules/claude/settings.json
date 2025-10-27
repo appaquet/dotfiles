@@ -19,7 +19,15 @@
       "Bash(jj-stacked-branches:*)",
       "Bash(jj-diff-working:*)",
       "Bash(jj-diff-branch:*)",
-      "Bash(jj-stacked-stats:*)"
+      "Bash(jj-stacked-stats:*)",
+
+      "Edit(~/Library/Caches/**)",
+      "Edit(~/.cache/**)",
+      "Edit(~/.claude/**)",
+      "Edit(~/.cargo/**)",
+      "Edit(~/.npm/**)",
+      "Edit(~/go/**)",
+      "Edit(~/dotfiles/**)"
     ]
   },
   "hooks": {
@@ -35,5 +43,9 @@
       }
     ]
   },
-  "alwaysThinkingEnabled": false
+  "alwaysThinkingEnabled": true,
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true
+  }
 }
