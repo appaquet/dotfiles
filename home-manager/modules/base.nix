@@ -72,6 +72,7 @@
       bzip2
       gnutar
       bc
+      killall
 
       curl
       wget
