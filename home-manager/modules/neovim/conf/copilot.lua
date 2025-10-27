@@ -1,6 +1,6 @@
 -- copilot-lsp (for NES bellow, not used directly)
 -- https://github.com/copilotlsp-nvim/copilot-lsp/
-vim.g.copilot_nes_debounce = 700
+vim.g.copilot_nes_debounce = 2000
 require("copilot-lsp").setup({
 	nes = {
 		move_count_threshold = 2, -- Clear after 2 cursor movements
