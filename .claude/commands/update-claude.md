@@ -1,7 +1,10 @@
 ---
 name: update-claude
 description: Update claude code's version
+model: haiku
 ---
+
+# Update claude code
 
 ## Context
 I have an overlay for claude code that make sure I use the latest version. This task is about

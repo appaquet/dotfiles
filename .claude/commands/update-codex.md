@@ -1,7 +1,10 @@
 ---
 name: update-codex
 description: Update openai codex's version
+model: haiku
 ---
+
+# Update codex
 
 ## Context
 
