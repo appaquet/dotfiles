@@ -5,6 +5,7 @@
   "permissions": {
     "allow": [
       "Bash(notify:*)",
+      "Bash(lsof:*)",
       "Bash(gh pr list:*)",
       "Bash(gh pr view:*)",
       "Bash(gh pr checks:*)",
@@ -32,6 +33,9 @@
       "WebFetch(domain:channels.nixos.org)",
       "WebFetch(domain:registry.npmjs.org)",
       "WebSearch"
+    ],
+    "ask": [
+      "Bash(kill:*)",
     ]
   },
   "hooks": {
@@ -49,7 +53,10 @@
   },
   "sandbox": {
     "autoAllowBashIfSandboxed": true,
-    "enabled": true
+    "enabled": true,
+    "network": {
+      "allowLocalBinding": true
+    }
   },
   "alwaysThinkingEnabled": false
 }
