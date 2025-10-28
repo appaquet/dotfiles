@@ -20,14 +20,18 @@
       "Bash(jj-diff-working:*)",
       "Bash(jj-diff-branch:*)",
       "Bash(jj-stacked-stats:*)",
-
       "Edit(~/Library/Caches/**)",
       "Edit(~/.cache/**)",
       "Edit(~/.claude/**)",
       "Edit(~/.cargo/**)",
       "Edit(~/.npm/**)",
       "Edit(~/go/**)",
-      "Edit(~/dotfiles/**)"
+      "Edit(~/dotfiles/**)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:channels.nixos.org)",
+      "WebFetch(domain:registry.npmjs.org)",
+      "WebSearch"
     ]
   },
   "hooks": {
@@ -43,9 +47,9 @@
       }
     ]
   },
-  "alwaysThinkingEnabled": true,
   "sandbox": {
-    "enabled": true,
-    "autoAllowBashIfSandboxed": true
-  }
+    "autoAllowBashIfSandboxed": true,
+    "enabled": true
+  },
+  "alwaysThinkingEnabled": false
 }
