@@ -33,9 +33,6 @@
       "WebFetch(domain:channels.nixos.org)",
       "WebFetch(domain:registry.npmjs.org)",
       "WebSearch"
-    ],
-    "ask": [
-      "Bash(kill:*)",
     ]
   },
   "hooks": {
@@ -52,11 +49,11 @@
     ]
   },
   "sandbox": {
-    "autoAllowBashIfSandboxed": true,
-    "enabled": true,
     "network": {
       "allowLocalBinding": true
-    }
+    },
+    "autoAllowBashIfSandboxed": true,
+    "enabled": true
   },
   "alwaysThinkingEnabled": false
 }
