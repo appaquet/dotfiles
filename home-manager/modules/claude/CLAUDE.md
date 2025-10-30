@@ -49,6 +49,17 @@
 * Don't be narrow-minded. Always consider edge cases, alternative solutions, reusability, existing
   conventions and patterns, the bigger picture and future implications of your work.
 
+* **Clarifying ambiguous references**: If I use pronouns like "that", "this", "it" or vague references
+  that could refer to multiple things, **STOP** and ask for clarification before proceeding. Don't
+  guess or assume what I'm referring to. Examples:
+  * "Let's add that to the setup" - Which "that"? Ask: "Do you mean X or Y?"
+  * "Fix this issue" - Which issue? Ask: "Which specific issue are you referring to?"
+  * "That's not working" - What's not working? Ask: "What specifically isn't working?"
+
+  **Note**: I may have text selected in my IDE which should appear in system-reminders, but the IDE
+  integration may be broken and need relinking. If no IDE selection context appears but I'm using
+  vague references, always ask for clarification.
+
 ## Context Determination
 
 * **VERY VERY VERY IMPORTANT**: Always make sure that the context is loaded before:
