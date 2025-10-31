@@ -1,72 +1,44 @@
 
-# Pull Request / Project documentation
+# PR.md Structure
 
-This describes the structure and content of the `PR.md` file that should be created at the root of
-the repository and that describe the current task / feature / project that we are working on.
+Project documentation at repo root. Documents current task/feature (may span multiple PRs).
 
-This file is used throughout the development of a new change in the repository. It may contain more
-than one pull request if the change is large enough to be split into multiple pull requests.
+## When to Create
 
-It should be written in a way that any developer can understand the context, requirements and
-current status of the change. The developer should be able to pick up the work at any time and
-understand what has been done and what needs to be done in details.
+* **Create**: Only when explicitly requested ("create PR.md", "document in PR.md")
+* **Update**: Always after file modifications if exists
+* **Never**: Create proactively
 
-## When to Create PR.md
+## Sections (exact order)
 
-* **Creation**: Only create when explicitly requested with phrases like:
-  * "create a PR.md"
-  * "let's document this in PR.md" 
-  * "initialize PR documentation"
-* **Updates**: Always update after file modifications if PR.md exists
-* **Never** create PR.md proactively, even for complex multi-file tasks
+### Context (mandatory)
+Context of changes
 
-* The file should be located at the root of the repository.
+### Requirements (optional)
+Requirements of changes
 
-* If you need more context, you MUST ask me and add the learned information to the `PR.md` (if it
-  exists, at the root of the repo) file so you can refer to it later.
+### Questions (optional)
+Checklist of questions (and answers) to resolve during development
 
-* This file contains these sections (in the exact order):
-  * **Context** (mandatory): context of the changes
+### Files (mandatory)
+Modified OR important context files
 
-  * **Requirements** (optional): requirements of the changes
+MANDATORY: Update after file modifications. Exclude generated files (`*.pb.go`, `*.pb.gw.go`, `*_grpc.pb.go`, wire, etc.) and PR docs (`PR.md`). Include crucial files even if unmodified.
 
-  * **Questions** (optional): as check list, questions (and potential answers) that need to be
-    answered throughout the development of the changes
+Format: `- **path/to/file.ext**: 1-2 sentences on purpose. 1-2 sentences on changes (if any).`
 
-  * **Files** (mandatory): section with modified files OR important files needed for the context of
-    the changes..
+### TODO (mandatory)
+Checkmark list of work items
 
-    * **MANDATORY**: After finishing any request that modifies or useful files, you MUST update this
-      section. You must NEVER include generated files (ex: `*.pb.go`, `*.pb.gw.go`, `*_grpc.pb.go`,
-      wire generated files, etc.) or PR specific doc files (ex: `PR.md`, feature docs, etc.) in this
-      section. Use bullet list format with file paths in bold, followed by a colon and description.
-      You should always include files that are crucial to the completion of this task, even if you
-      didn't modify them.
+MANDATORY: Update after starting/completing work.
+- `[ ]` incomplete | `[~]` in progress | `[x]` complete
+- Detail sufficient for developer to pick up later
+- Each item = discrete, independent work unit
 
-    * Format:
-      * First 1-2 sentences describing what the file is about and its purpose
-      * Next 1-2 sentences describing what changes were made to the file (if any) Only include
-        hand-written source files, specifications, and configuration files.
-        Example format: `- **path/to/file.go**: Brief description of file purpose. Description of
-        changes made.`
+### Pull Requests (optional)
+PR descriptions
 
-  * **TODO** (mandatory): as checkmark list, section with checkmark lists for work items
-    * **MANDATORY**: After starting or completing work items, update this section:
-      * Format:
-        * Incomplete item: `- [ ]`
-        * In progress item: `- [~]`
-        * Completed item: `- [x]`
-      * Mark items as complete when they are fully implemented and working
-      * Add new items when you discover additional work needed
-      * It should be detailed enough for a developer to pick up the work later
-      * Each item should represent a discrete piece of work that can be completed independently
-
-  * **Pull requests** (optional): section where description of different pull requests created out of the
-    changes are listed
-    * **Summary section only**: Start with "In this PR, I implemented..." followed by high-level technical overview
-    * Focus on what was technically implemented rather than business value
-    * Describe the feature or capability that was built, not how it works internally
-    * Keep it concise and high-level - answer "what did you build?" not "how does it work?"
-    * Use general system/component terms, avoid specific function names, algorithms, code logic, or parameter details
-    * Think of it as explaining to another engineer what capability you added, not teaching them the implementation
-    * Do NOT include test plans, generated attribution, or other sections
+Summary only: Start "In this PR, I implemented..." then high-level technical overview.
+Focus: what was built (capability), not how (implementation details).
+High-level: use system/component terms; avoid function names, algorithms, parameters.
+Omit: test plans, generated attribution.
