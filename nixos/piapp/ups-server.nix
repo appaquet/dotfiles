@@ -10,7 +10,7 @@ in
     mode = "netserver";
 
     ups.ups = {
-      # ups name "ups" expect by synology
+      # ups name "ups" expected by synology
       description = "CyberPower CP1500 AVR UPS";
       driver = "usbhid-ups";
       port = "auto";

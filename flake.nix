@@ -206,6 +206,24 @@
                 };
               };
 
+              "appaquet@piups" = home-manager.lib.homeManagerConfiguration rec {
+                inherit pkgs;
+                modules = [
+                  ./home-manager/piups.nix
+                  extraSpecialArgs.secrets.commonHome
+                ]
+                ++ commonHomeModules;
+                extraSpecialArgs = {
+                  inherit inputs;
+                  secrets = secrets.init "linux";
+                  pkgs-nvim = pkgs-nvim;
+                  cfg = cfg // {
+                    isNixos = true;
+                    minimalNvim = true;
+                  };
+                };
+              };
+
               "appaquet@utm" = home-manager.lib.homeManagerConfiguration rec {
                 inherit pkgs;
                 modules = [
@@ -233,9 +251,10 @@
       homeConfigurations = {
         "appaquet@deskapp" = self.homes.x86_64-linux."appaquet@deskapp";
         "appaquet@servapp" = self.homes.x86_64-linux."appaquet@servapp";
+        "appaquet@mbpapp" = self.homes.aarch64-darwin."appaquet@mbpapp";
         "appaquet@utm" = self.homes.aarch64-linux."appaquet@utm";
         "appaquet@piapp" = self.homes.aarch64-linux."appaquet@piapp";
-        "appaquet@mbpapp" = self.homes.aarch64-darwin."appaquet@mbpapp";
+        "appaquet@piups" = self.homes.aarch64-linux."appaquet@piups";
       };
 
       darwinConfigurations = {
@@ -305,6 +324,24 @@
               ];
             }
             ./nixos/piapp/configuration.nix
+          ];
+        };
+
+        piups = nixos-raspberrypi.lib.nixosSystem {
+          system = "aarch64-linux";
+          specialArgs = {
+            inherit (self) common;
+            inherit inputs nixos-raspberrypi;
+            secrets = secrets.init "linux";
+          };
+          modules = [
+            {
+              imports = with nixos-raspberrypi.nixosModules; [
+                raspberry-pi-3.base
+                sd-image
+              ];
+            }
+            ./nixos/piups/configuration.nix
           ];
         };
       };

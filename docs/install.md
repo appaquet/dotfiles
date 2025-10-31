@@ -117,12 +117,14 @@
 1. Copy the result image to a SD card:
 
    ```bash
-   zstdcat result/*.img.zst | sudo dd of=/dev/sdX bs=4M status=progress
+   zstdcat result/sd-image/*.img.zst | sudo dd of=/dev/sdX bs=4M status=progress
    ```
 
 ### Initial Boot and Configuration
 
-1. Boot the RPi from SD card and change password.
+1. Boot the RPi from SD card.
+
+1. Change password from default `carpediem`.
 
 1. **NVMe Migration** (Optional): If using NVMe, copy system to NVMe and update boot:
 
@@ -145,3 +147,10 @@
    Copy the output to `nixos/piapp/hardware-configuration.nix` with `lib.mkDefault` for all filesystem options.
 
 1. Follow normal procedure to setup home-manager & rebuild NixOS.
+
+### Build remotely
+
+1. On fast machine, `REMOTE_KEY=appaquet@somepi ./x home build`
+1. Copy the result, `nix copy --to ssh:appaquet@somepi ./result`
+1. Check for symlink of `./result` on fast machine, copy link
+1. On slow machine, `/nix/.../.. activate`
