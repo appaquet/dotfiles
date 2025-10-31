@@ -41,9 +41,6 @@
 
     casks = [
       {
-        name = "wezterm";
-      }
-      {
         name = "ghostty";
       }
 
