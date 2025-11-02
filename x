@@ -6,8 +6,9 @@ pushd "$ROOT"
 
 HOSTNAME=$(uname -n | tr '[:upper:]' '[:lower:] | sed 's/\.local//'')
 
+LOCAL_MACHINE_KEY="${USER}@${HOSTNAME}"
 if [[ -z "${MACHINE_KEY}" ]]; then
-  MACHINE_KEY="${USER}@${HOSTNAME}"
+  MACHINE_KEY="${LOCAL_MACHINE_KEY}"
 fi
 
 HOME_CONFIG=""
@@ -373,9 +374,33 @@ optimize)
   nix store optimise
   ;;
 
-fetch-deskapp)
+copy)
   shift
-  rsync -avz --delete appaquet@deskapp.n3x.net:dotfiles/ ~/dotfiles/
+  if [[ "$MACHINE_KEY" == "$LOCAL_MACHINE_KEY" ]]; then
+    echo "MACHINE_KEY is the same as local machine. Aborting copy."
+    exit 1
+  fi
+
+  if [[ -z "${DEST_MACHINE_KEY}" ]]; then
+    DEST_MACHINE_KEY="${MACHINE_KEY}"
+  fi
+
+  echo "Copying ./result to ${DEST_MACHINE_KEY}..."
+  nix copy --to "ssh:${DEST_MACHINE_KEY}" ./result
+
+  # Check if result is nixos or home manager by checking for `kernel` in result
+  IS_NIXOS=0
+  if [[ -f ./result/kernel ]]; then
+    IS_NIXOS=1
+  fi
+
+  DEST_PATH=$(readlink ./result)
+  echo "On the destination machine, run:"
+  if [[ $IS_NIXOS -eq 1 ]]; then
+    echo "  sudo ${DEST_PATH}/bin/switch-to-configuration switch"
+  else
+    echo "  ${DEST_PATH}/activate"
+  fi
   ;;
 
 *)
@@ -388,7 +413,7 @@ fetch-deskapp)
   echo "$0 gc: run garbage collection" >&2
   echo "$0 fmt: format nix files" >&2
   echo "$0 optimize: optimize store" >&2
-  echo "$0 fetch-deskapp: fetch latest dotfiles from deskapp" >&2
+  echo "$0 copy: copy result to another machine" >&2
   exit 1
   ;;
 esac
