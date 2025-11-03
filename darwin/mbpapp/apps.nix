@@ -93,12 +93,17 @@
       {
         name = "gimp";
       }
+
       {
         name = "bambu-studio";
       }
       {
+        name = "thumbhost3mf"; # 3mf finder preview
+      }
+      {
         name = "autodesk-fusion";
       }
+
       {
         name = "synology-drive";
       }
