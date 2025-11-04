@@ -89,6 +89,6 @@
       pkgs.wol # wake on lan
     ]
     ++ lib.optionals (pkgs.stdenv.isDarwin || pkgs.stdenv.isx86_64) [
-      inputs.fzf-nix.packages.${pkgs.system}.fzf-nix # fzf-nix, somehow doesn't work on linux arm
+      inputs.fzf-nix.packages.${pkgs.stdenv.hostPlatform.system}.fzf-nix # fzf-nix, somehow doesn't work on linux arm
     ];
 }
