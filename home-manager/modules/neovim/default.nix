@@ -150,21 +150,9 @@ in
         nvim-treesitter-textobjects # provides object manipulation
       ])
       ++ (lib.optionals agenticEnabled [
-        # Agentic plugins
         pkgsChannel.vimPlugins.codecompanion-nvim
         pkgsChannel.mcphub-nvim
         pkgsChannel.vimPlugins.claudecode-nvim
-
-        # Avante
-        #avante-nvim-override
-        pkgsChannel.vimPlugins.avante-nvim
-
-        # Avante deps (if dev mode)
-        # pkgs.vimPlugins.dressing-nvim
-        # pkgs.vimPlugins.img-clip-nvim
-        # pkgs.vimPlugins.nui-nvim
-        # pkgs.vimPlugins.nvim-treesitter
-        # pkgs.vimPlugins.plenary-nvim
       ]);
 
     extraConfig = (

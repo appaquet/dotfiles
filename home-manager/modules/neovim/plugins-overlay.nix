@@ -21,12 +21,12 @@ final: prev: {
 
     copilot-lua = prev.vimUtils.buildVimPlugin {
       pname = "copilot.lua";
-      version = "2025-10-24";
+      version = "2025-11-04";
       src = prev.fetchFromGitHub {
         owner = "zbirenbaum";
         repo = "copilot.lua";
-        rev = "7fe314ffa6c7bbf1b7d1dc6836d9603fd9623f07";
-        sha256 = "sha256-MIPHNBVW84zG5xY/E0kTtvtKbr+QwH7lIGiLKKuGjHw=";
+        rev = "389cfc58122b076e2aad1f9f34d1dfdd5a5bfd0e";
+        sha256 = "sha256-1cMcUpTkFfJJ0NHklYDsMd8l1uZ94XENc46TqjhhAAw=";
       };
       meta.homepage = "https://github.com/zbirenbaum/copilot.lua/";
       meta.hydraPlatforms = [ ];
@@ -34,12 +34,12 @@ final: prev: {
 
     neotest = prev.vimUtils.buildVimPlugin {
       pname = "neotest";
-      version = "5.13.0-patched1";
+      version = "5.13.1-patched1";
       src = prev.fetchFromGitHub {
         owner = "appaquet";
         repo = "neotest";
         rev = "fix/add-subprocess-default-init-back";
-        sha256 = "sha256-Udf0RZIrll9VGi30YXTKa9Ozj9xb5ZBDMBj6/ikfm8A=";
+        sha256 = "sha256-NA0uBb9vu79yOjRDJdtK4S8eLqL0nRehwn8bLn7yPIs=";
       };
       propagatedBuildInputs = with prev.vimPlugins; [
         nvim-nio
@@ -51,12 +51,12 @@ final: prev: {
 
     neotest-golang = prev.vimUtils.buildVimPlugin {
       pname = "neotest-golang";
-      version = "2.4.0";
+      version = "2.5.1";
       src = prev.fetchFromGitHub {
         owner = "fredrikaverpil";
         repo = "neotest-golang";
-        rev = "v2.4.0";
-        sha256 = "sha256-zDkV0QKZN3B04owMNG8QcjK86wV7DkN/MP/y0oHs6X8=";
+        rev = "v2.5.1";
+        sha256 = "sha256-rUuhpV/sOeIXEzuIl1nKlMQ98qrY+gE7Ng2mKu82mBA=";
       };
       propagatedBuildInputs = [
         final.vimPlugins.neotest # Use our custom neotest from this overlay
@@ -67,12 +67,12 @@ final: prev: {
 
     neotest-python = prev.vimUtils.buildVimPlugin {
       pname = "neotest-python";
-      version = "2024-10-02";
+      version = "2025-11-04";
       src = prev.fetchFromGitHub {
         owner = "nvim-neotest";
         repo = "neotest-python";
-        rev = "a2861ab3c9a0bf75a56b11835c2bfc8270f5be7e";
-        sha256 = "1m78f9bxsl548f1pcrmbndmnwdplvhqynpm86pv080272ci9msgy";
+        rev = "b0d3a861bd85689d8ed73f0590c47963a7eb1bf9";
+        sha256 = "sha256-3rK561yVzrof0WKxsKfVPeOazShllkPRVqnguNQs/x4=";
       };
       propagatedBuildInputs = [
         final.vimPlugins.neotest # Use our custom neotest from this overlay
