@@ -37,11 +37,13 @@
               yarn
               playwright-driver.browsers
               typescript-language-server
+              chromium # for mcp
             ];
 
             shellHook = ''
               export PLAYWRIGHT_BROWSERS_PATH=${pkgs.playwright-driver.browsers}
               export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true
+              export DISPLAY=:0.0
             '';
           };
         };
