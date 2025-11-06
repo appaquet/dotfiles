@@ -24,7 +24,5 @@ Convert planning into code TODOs with clear prefixes and structure.
 
 4. Update `PR.md` TODO section with scaffolding tasks to be completed
 
-5. Notify completion with `notify "Scaffolding complete"`
-
 **Important**: Never jump into the implementation phase unless explicitly asked. Stop after
 scaffolding is complete.

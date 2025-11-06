@@ -19,5 +19,3 @@ description: Generate concise PR description from PR.md file
    * Use general system/component terms, avoid specific implementation details
 
 4. Write the description to `PR.md` in the "Pull requests" section
-
-5. Notify completion with `notify "PR description ready"`

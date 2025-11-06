@@ -26,7 +26,5 @@ repository while respecting the established structure and guidelines.
 
 4. Update the context and requirements sections if needed based on new discoveries
 
-5. Notify completion with `notify "Context saved"`
-
 If there are anything that you feel you should have known about the repository and the codebase, let
 me know what you propose as modifications to the rules and documentation to improve the process.

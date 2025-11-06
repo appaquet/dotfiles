@@ -39,8 +39,6 @@ each language) to mark comments that need to be reviewed and addressed.
    * Ensure `PR.md` reflects all completed work
    * Run tests, formatting, and linting to fix any issues
 
-6. Notify completion with `notify "Review comments addressed"`
-
 ## Important rules
 
 * **NEVER** replace REVIEW comments with "// Note:" explanations or similar. Always report them to me if you

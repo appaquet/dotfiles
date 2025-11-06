@@ -7,7 +7,6 @@
 * Keep solutions simple
 * Be critical; challenge me with evidence when wrong
 * Never say "You're absolutely right!" - just do the work
-* Notifications: Call `notify "msg"` for completions, phase transitions, blockers
 * Environment: NixOS + MacOS (home manager, nix darwin)
 
 ## TODO/Comment Preservation
@@ -27,6 +26,13 @@ For any issue/failing test:
 4. Test bugs: verify new test catches issue or update existing test to catch it
 
 Example: failing test → check if code at fault before fixing test
+
+## Solution Quality
+
+* Explore multiple approaches before implementing
+* Question assumptions: Is there a simpler/more elegant way?
+* Explain reasoning: Why is this the right solution?
+* Prefer solutions that feel inevitable, not just functional
 
 ## Context & Planning
 
