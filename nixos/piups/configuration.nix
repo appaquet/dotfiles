@@ -1,5 +1,4 @@
 {
-  pkgs,
   config,
   ...
 }:
@@ -7,6 +6,7 @@
 {
   imports = [
     ../common.nix
+    ../common-pi.nix
   ];
 
   networking = {
@@ -20,12 +20,6 @@
   };
 
   services.openssh.enable = true;
-
-  # TODO: move common-rpi.nix
-  environment.systemPackages = with pkgs; [
-    libraspberrypi # Provides vcgencmd, GPU tools
-    raspberrypi-eeprom # Provides rpi-eeprom-update, rpi-eeprom-config
-  ];
 
   # OS will reside on sd
   fileSystems = {

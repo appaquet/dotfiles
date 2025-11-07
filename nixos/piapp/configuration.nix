@@ -1,6 +1,5 @@
 {
   secrets,
-  pkgs,
   ...
 }:
 
@@ -8,12 +7,16 @@
   imports = [
     ./hardware-configuration.nix
     ../common.nix
+    ../common-pi.nix
     ../nasapp.nix
     ../netconsole/receiver.nix
     ./ups-server.nix
   ];
 
+  # /boot is too small, limit to 1 configuration
   boot.loader.raspberryPi.configurationLimit = 1;
+
+  services.openssh.enable = true;
 
   networking = {
     hostName = "piapp";
@@ -42,13 +45,6 @@
   services.netconsole.receiver = {
     enable = true;
   };
-
-  services.openssh.enable = true;
-
-  environment.systemPackages = with pkgs; [
-    libraspberrypi # Provides vcgencmd, GPU tools
-    raspberrypi-eeprom # Provides rpi-eeprom-update, rpi-eeprom-config
-  ];
 
   system.stateVersion = "24.11";
 }
