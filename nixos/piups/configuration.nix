@@ -21,6 +21,40 @@
 
   services.openssh.enable = true;
 
+  # CUPS printing service for Samsung ML-2240
+  services.printing = {
+    enable = true;
+    drivers = [ pkgs.splix ];
+
+    # Network sharing configuration
+    listenAddresses = [ "*:631" ];
+    allowFrom = [ "all" ];
+    browsing = true;
+    defaultShared = true;
+    openFirewall = true;
+
+    # Disable SSL to avoid certificate errors in web interface
+    extraConf = ''
+      DefaultEncryption Never
+    '';
+
+    logLevel = "info";
+  };
+
+  # Avahi for printer discovery on Linux/macOS
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    openFirewall = true;
+    publish = {
+      enable = true;
+      userServices = true;
+    };
+  };
+
+  # Add user to printer admin group
+  users.users.appaquet.extraGroups = [ "lp" ];
+
   # OS will reside on sd
   fileSystems = {
     "/boot/firmware" = {
