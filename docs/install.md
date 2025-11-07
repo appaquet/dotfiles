@@ -152,8 +152,8 @@
 
 1. On fast machine, `REMOTE_KEY=appaquet@somepi ./x home build`
 
-1. Copy the result, `MACHINE_KEY=appaquet@piups ./x copy`
-   In case the host cannot be resolved, `MACHINE_KEY=appaquet@piups DEST_MACHINE_KEY=appaquet@192.168.1.226 ./x copy`
+1. Copy the result, `MACHINE_KEY=appaquet@piprint ./x copy`
+   In case the host cannot be resolved, `MACHINE_KEY=appaquet@piprint DEST_MACHINE_KEY=appaquet@192.168.1.226 ./x copy`
 
 1. Copy the printed activate command and run it on destination.
 

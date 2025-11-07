@@ -11,7 +11,7 @@
   ];
 
   networking = {
-    hostName = "piups";
+    hostName = "piprint";
     useDHCP = false;
     interfaces = {
       wlan0.useDHCP = false;
@@ -22,19 +22,19 @@
 
   services.openssh.enable = true;
 
-  # CUPS printing service for Samsung ML-2240
   services.printing = {
     enable = true;
-    drivers = [ pkgs.splix ];
+    drivers = with pkgs; [ 
+      splix 
+      cups-filters
+      cups-browsed
+    ];
 
-    # Network sharing configuration
-    listenAddresses = [ "*:631" ];
+    listenAddresses = [ "0.0.0.0:631" ];
     allowFrom = [ "all" ];
     browsing = true;
     defaultShared = true;
     openFirewall = true;
-
-    # Disable SSL to avoid certificate errors in web interface
     extraConf = ''
       DefaultEncryption Never
     '';
@@ -42,7 +42,14 @@
     logLevel = "info";
   };
 
-  # Avahi for printer discovery on Linux/macOS
+  hardware.printers.ensurePrinters = [
+    {
+      name = "Samsung_ML2240";
+      deviceUri = "usb://Samsung/ML-2240%20Series";
+      model = "samsung/ml2240.ppd";
+    }
+  ];
+
   services.avahi = {
     enable = true;
     nssmdns4 = true;
@@ -53,17 +60,7 @@
     };
   };
 
-  # Add user to printer admin group
   users.users.appaquet.extraGroups = [ "lp" ];
-
-  # Configure Samsung ML-2240 printer
-  hardware.printers.ensurePrinters = [
-    {
-      name = "Samsung_ML2240";
-      deviceUri = "usb://Samsung/ML-2240%20Series";
-      model = "samsung/ml2240.ppd";
-    }
-  ];
 
   # OS will reside on sd
   fileSystems = {

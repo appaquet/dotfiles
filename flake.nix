@@ -206,10 +206,10 @@
                 };
               };
 
-              "appaquet@piups" = home-manager.lib.homeManagerConfiguration rec {
+              "appaquet@piprint" = home-manager.lib.homeManagerConfiguration rec {
                 inherit pkgs;
                 modules = [
-                  ./home-manager/piups.nix
+                  ./home-manager/piprint.nix
                   extraSpecialArgs.secrets.commonHome
                 ]
                 ++ commonHomeModules;
@@ -254,7 +254,7 @@
         "appaquet@mbpapp" = self.homes.aarch64-darwin."appaquet@mbpapp";
         "appaquet@utm" = self.homes.aarch64-linux."appaquet@utm";
         "appaquet@piapp" = self.homes.aarch64-linux."appaquet@piapp";
-        "appaquet@piups" = self.homes.aarch64-linux."appaquet@piups";
+        "appaquet@piprint" = self.homes.aarch64-linux."appaquet@piprint";
       };
 
       darwinConfigurations = {
@@ -327,7 +327,7 @@
           ];
         };
 
-        piups = nixos-raspberrypi.lib.nixosSystem {
+        piprint = nixos-raspberrypi.lib.nixosSystem {
           system = "aarch64-linux";
           specialArgs = {
             inherit (self) common;
@@ -341,7 +341,7 @@
                 sd-image
               ];
             }
-            ./nixos/piups/configuration.nix
+            ./nixos/piprint/configuration.nix
           ];
         };
       };

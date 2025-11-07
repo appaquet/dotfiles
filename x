@@ -28,9 +28,9 @@ elif [[ "${MACHINE_KEY}" == "appaquet@piapp"* ]]; then
   HOME_CONFIG="appaquet@piapp"
   HOSTNAME="piapp"
 
-elif [[ "${MACHINE_KEY}" == "appaquet@piups"* ]]; then
-  HOME_CONFIG="appaquet@piups"
-  HOSTNAME="piups"
+elif [[ "${MACHINE_KEY}" == "appaquet@piprint"* ]]; then
+  HOME_CONFIG="appaquet@piprint"
+  HOSTNAME="piprint"
 
 elif [[ "${MACHINE_KEY}" == "appaquet@mbpapp"* || "${MACHINE_KEY}" == "appaquet@mbpvmapp"* ]]; then
   HOME_CONFIG="appaquet@mbpapp"
