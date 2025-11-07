@@ -56,6 +56,15 @@
   # Add user to printer admin group
   users.users.appaquet.extraGroups = [ "lp" ];
 
+  # Configure Samsung ML-2240 printer
+  hardware.printers.ensurePrinters = [
+    {
+      name = "Samsung_ML2240";
+      deviceUri = "usb://Samsung/ML-2240%20Series";
+      model = "samsung/ml2240.ppd";
+    }
+  ];
+
   # OS will reside on sd
   fileSystems = {
     "/boot/firmware" = {
