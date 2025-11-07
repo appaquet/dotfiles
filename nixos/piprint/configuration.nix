@@ -30,6 +30,8 @@
       cups-browsed
     ];
 
+    startWhenNeeded = false; # don't wait for first connection to start
+
     listenAddresses = [ "0.0.0.0:631" ];
     allowFrom = [ "all" ];
     browsing = true;
