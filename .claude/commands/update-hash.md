@@ -6,7 +6,9 @@ model: haiku
 
 # Update nix hashes
 
-1. Run `./x home build`
-2. For any error that a hash is invalid, take the expected hash, update the nix files with the
-   expected hash and re-run build.
-3. Only stop when all hashes are updated by re-running step 1
+1. Run `./x home build 2>&1 | grep "got:" | head -1` to get the hash mismatch error. It's notmal to
+   take time, don't use timeout.
+2. Look for the line that says `got:    sha256-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX=`
+3. Copy that hash value and update the corresponding field in the nix file that had the error
+4. Repeat steps 1-3 until no more hash errors (usually 1-2 iterations)
+5. DONE. Do NOT run additional verification builds.
