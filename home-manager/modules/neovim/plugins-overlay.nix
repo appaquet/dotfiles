@@ -12,8 +12,8 @@ final: prev: {
       src = prev.fetchFromGitHub {
         owner = "copilotlsp-nvim";
         repo = "copilot-lsp";
-        rev = "a80e0c17e7366614d39506825f49a25d285fead9";
-        sha256 = "sha256-Mch675Wmx+8EbvsQ/y5H/eyObsKjotlEe26JKhwBfEA=";
+        rev = "884034b23c3716d55b417984ad092dc2b011115b";
+        sha256 = "sha256-g9/yQ7wsyJQHCp+nKTy5WFGoHPtXEEIMwfyuCasmHTY=";
       };
       meta.homepage = "https://github.com/copilotlsp-nvim/copilot-lsp/";
       meta.hydraPlatforms = [ ];
@@ -25,8 +25,8 @@ final: prev: {
       src = prev.fetchFromGitHub {
         owner = "zbirenbaum";
         repo = "copilot.lua";
-        rev = "389cfc58122b076e2aad1f9f34d1dfdd5a5bfd0e";
-        sha256 = "sha256-1cMcUpTkFfJJ0NHklYDsMd8l1uZ94XENc46TqjhhAAw=";
+        rev = "5bde2cfe01f049f522eeb8b52c5c723407db8bdf";
+        sha256 = "sha256-/8baBZIhZdQ4B0hoTmh68I2p08rJJ7INil77qIu9vCU=";
       };
       meta.homepage = "https://github.com/zbirenbaum/copilot.lua/";
       meta.hydraPlatforms = [ ];
@@ -34,12 +34,12 @@ final: prev: {
 
     neotest = prev.vimUtils.buildVimPlugin {
       pname = "neotest";
-      version = "5.13.1-patched1";
+      version = "5.13.1-patched2";
       src = prev.fetchFromGitHub {
         owner = "appaquet";
         repo = "neotest";
         rev = "fix/add-subprocess-default-init-back";
-        sha256 = "sha256-NA0uBb9vu79yOjRDJdtK4S8eLqL0nRehwn8bLn7yPIs=";
+        sha256 = "sha256-UVXje4ENyKtLbL8lWrnacYdHFqE/rEiHkOhGzdwpN1U=";
       };
       propagatedBuildInputs = with prev.vimPlugins; [
         nvim-nio

@@ -57,5 +57,5 @@
     "autoAllowBashIfSandboxed": true,
     "enabled": true
   },
-  "alwaysThinkingEnabled": false
+  "alwaysThinkingEnabled": true
 }
