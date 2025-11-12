@@ -34,6 +34,7 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebFetch(domain:channels.nixos.org)",
       "WebFetch(domain:registry.npmjs.org)",
+      "WebFetch(domain:code.claude.com)",
       "WebSearch"
     ]
   },

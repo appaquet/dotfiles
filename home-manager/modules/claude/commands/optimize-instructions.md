@@ -22,10 +22,10 @@ Target file: `$ARGUMENTS`
 2. **Deep analysis**:
    - Read target file and all linked files (@docs references)
    - Identify optimization opportunities:
-     * Token efficiency (verbose phrases, redundancy, filler words)
-     * Structure (lists vs prose, clarity, organization)
-     * Clarity (imperative mood, explicit instructions, examples)
-     * Cross-file redundancy
+     - Token efficiency (verbose phrases, redundancy, filler words)
+     - Structure (lists vs prose, clarity, organization)
+     - Clarity (imperative mood, explicit instructions, examples)
+     - Cross-file redundancy
    - Compare against best practices from step 1
 
 3. **Report findings**:
