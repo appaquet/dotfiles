@@ -32,10 +32,13 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:api.github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:codeload.github.com)",
       "WebFetch(domain:channels.nixos.org)",
       "WebFetch(domain:registry.npmjs.org)",
       "WebFetch(domain:code.claude.com)",
-      "WebSearch"
+      "WebFetch(domain:www.anthropic.com)",
+      "WebSearch",
+      "Skill(instruction-writer)"
     ]
   },
   "hooks": {
@@ -58,5 +61,5 @@
     "autoAllowBashIfSandboxed": true,
     "enabled": true
   },
-  "alwaysThinkingEnabled": true
+  "alwaysThinkingEnabled": false
 }

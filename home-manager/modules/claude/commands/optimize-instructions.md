@@ -6,49 +6,25 @@ argument-hint: [file-path]
 
 # Optimize Instructions
 
-Optimize the specified instruction file using latest Claude prompt engineering best practices.
+Optimize the specified instruction file using the instruction-writer skill.
 
 Target file: `$ARGUMENTS`
 
 ## Instructions
 
+Use the instruction-writer skill to apply best practices.
+
 ### Phase 1: Analysis (DO NOT MODIFY FILES)
 
-1. **Fetch latest best practices**:
-   - Search web for latest Claude prompt engineering best practices
-   - Fetch Claude Code documentation on instruction writing
-   - Review Anthropic's official prompt engineering guidelines
-
-2. **Deep analysis**:
-   - Read target file and all linked files (@docs references)
-   - Identify optimization opportunities:
-     - Token efficiency (verbose phrases, redundancy, filler words)
-     - Structure (lists vs prose, clarity, organization)
-     - Clarity (imperative mood, explicit instructions, examples)
-     - Cross-file redundancy
-   - Compare against best practices from step 1
-
-3. **Report findings**:
-   - List specific issues found with examples
-   - Explain what optimizations would be applied
-   - Estimate token savings
-   - Show before/after examples for key changes
+1. Read target file and all linked files (@docs references)
+2. Apply instruction-writer skill's optimization workflow to identify issues
+3. Report findings with before/after examples and estimated token savings
 
 **STOP HERE** - Wait for user approval before proceeding to Phase 2
 
 ### Phase 2: Implementation (Only after user approval)
 
-4. **Apply optimizations**:
-   - Create jj change
-   - Remove meta-commentary and verbose explanations
-   - Consolidate redundant examples (1 per rule)
-   - Convert prose to lists/tables where clearer
-   - Use imperative mood ("Do X" not "You should do X")
-   - Front-load critical rules
-   - Single emphasis level (CRITICAL/Important/plain)
-   - Preserve all salient information
-   - Commit changes
-
-5. **Report results**:
-   - Final metrics (tokens saved, key improvements)
-   - Notify completion
+4. Create jj change
+5. Apply optimizations preserving all salient information
+6. Commit changes
+7. Report results (tokens saved, key improvements)

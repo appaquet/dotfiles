@@ -1,0 +1,322 @@
+# Instruction Writing Best Practices for Claude 4.x
+
+Comprehensive guidelines for writing effective instructions, skills, slash commands, and memory files for Claude Code.
+
+## Core Principles
+
+### 1. Minimal, High-Signal Information
+
+**Find the smallest set of high-signal tokens that maximize desired outcomes.** Every token depletes the model's attention budget.
+
+- Start with minimal prompt using best available model
+- Add clarity and examples based on observed failures
+- Don't anticipate every edge case upfront
+- Remove meta-commentary and verbose explanations
+
+### 2. Be Explicit and Direct
+
+Claude 4.x models excel with clear, specific instructions.
+
+**Good**: "Include as many relevant features and interactions as possible. Go beyond basics to create fully-featured implementation."
+
+**Bad**: "Create an analytics dashboard" (too vague)
+
+**Action Language**:
+
+- Use "Change X" not "Can you suggest changes to X"
+- Default to imperative mood: "Do X" not "You should do X"
+- Avoid tentative phrasing: "Fix the bug" not "Maybe you could look at fixing the bug"
+
+### 3. Provide Context and Motivation
+
+Explain *why* instructions matter—helps Claude understand goals.
+
+**Good**: "Your response will be read aloud by text-to-speech engine, so never use ellipses since the engine won't know how to pronounce them."
+
+**Bad**: "NEVER use ellipses."
+
+### 4. Structured Organization
+
+Use clear delineation through XML tags or Markdown headers.
+
+```xml
+<background_information>
+Context about the system and conventions
+</background_information>
+
+<instructions>
+Step-by-step tasks to perform
+</instructions>
+
+<examples>
+Canonical examples demonstrating expected behavior
+</examples>
+```
+
+Benefits:
+
+- Helps model parse intent effectively
+- Separates concerns (context vs. instructions vs. examples)
+- Improves token efficiency through clear boundaries
+
+## Examples: The "Pictures" Worth a Thousand Words
+
+### Canonical Examples Over Edge Cases
+
+Provide diverse, representative examples rather than exhaustive exception lists.
+
+**Key Guidelines**:
+
+- Claude 4.x pays close attention to details in examples
+- Ensure examples align perfectly with desired behaviors
+- Models are highly sensitive to subtle patterns in examples
+- 1-2 well-chosen examples better than many redundant ones
+
+**Format**:
+
+```xml
+<example>
+User: [realistic user input]
+Assistant: [ideal response demonstrating all principles]
+</example>
+```
+
+Or contrast good vs. bad:
+
+```xml
+<good-example>
+Concise, explicit instruction that triggers correct behavior
+</good-example>
+
+<bad-example>
+Verbose, vague instruction that leads to confusion
+</bad-example>
+```
+
+### Scrutinize Your Examples
+
+- Do they demonstrate the exact behavior you want?
+- Are there subtle patterns that could mislead?
+- Do they cover the most common use cases (not rare edge cases)?
+
+## Output Style Control
+
+### Reverse Negatives
+
+**Bad**: "Don't use markdown"
+
+**Good**: "Write in clear, flowing prose using complete paragraphs and sentences"
+
+### Match Style to Output
+
+The formatting style of your prompt influences response formatting.
+
+- Remove markdown from prompts to reduce markdown in responses
+- Use prose in prompts to encourage prose in responses
+- "Write in prose rather than lists unless presenting truly discrete items where list format is best option"
+
+### Minimize Verbosity
+
+Claude 4.5 is naturally concise. Reinforce when needed:
+
+- "Provide fact-based progress reports without unnecessary verbosity"
+- "No superlatives or excessive praise"
+- "Never say 'You're absolutely right!' - just do the work"
+
+## Structure for Different Instruction Types
+
+### Skills (SKILL.md)
+
+```yaml
+---
+name: skill-name-here
+description: Specific capability with trigger phrases. Include file types, concrete capabilities, and natural phrases users would say. Keep under 1024 chars.
+---
+
+# Skill Title
+
+Brief purpose statement.
+
+## When to Use
+
+Specific triggers and scenarios.
+
+## Core Principles
+
+Key guidelines (reference supporting docs with @filename.md).
+
+## Workflow
+
+Clear steps for different scenarios.
+
+## Supporting Files
+
+- @referenced-file.md: Purpose
+```
+
+**Description Guidelines**:
+
+- Make specific and discoverable
+- Include file types/formats (PDF, .xlsx, etc.)
+- List concrete capabilities
+- Specify trigger phrases users would naturally say
+- Bad: "Helps with documents"
+- Good: "Extract text and tables from PDF files, fill forms, merge documents. Use when working with PDFs or mentioning document extraction."
+
+**SKILL.md vs Supporting Files**:
+
+Claude Code uses **progressive disclosure** - SKILL.md loads on activation, supporting files load only when referenced.
+
+**SKILL.md should contain**:
+- Quick-start guidance Claude needs immediately
+- Essential instructions and workflow steps
+- Concrete usage examples
+- References to supporting files with @filename.md
+
+**Supporting files handle**:
+- Extended documentation (best-practices.md, reference.md)
+- Additional examples (examples.md)
+- Detailed API specifications
+- Utility scripts and templates
+
+**Avoiding Duplication**:
+- Keep detailed principles in supporting files
+- SKILL.md provides brief overview with cross-references
+- Example: "Apply principles from @best-practices.md" instead of repeating them
+- Pattern: "For detailed X, see @reference.md"
+
+This prevents token waste while maintaining access to comprehensive information when needed.
+
+### Slash Commands
+
+```markdown
+---
+name: command-name
+description: Brief one-line purpose
+argument-hint: [optional-arg]
+---
+
+# Command Title
+
+Clear purpose statement.
+
+Target: $ARGUMENTS (if applicable)
+
+## Instructions
+
+1. **Phase 1: Analysis (DO NOT MODIFY FILES)**
+   - Clear steps
+   - What to analyze
+   - **STOP HERE** - Wait for approval
+
+2. **Phase 2: Implementation (Only after approval)**
+   - Action steps
+   - What to modify
+   - Verification steps
+```
+
+**Command Guidelines**:
+
+- Front-load critical rules (STOP points, approval gates)
+- Use phases for multi-step workflows
+- Single emphasis level (CRITICAL or Important, not both)
+- Imperative mood throughout
+
+### Memory Files (CLAUDE.md, docs/*.md)
+
+```markdown
+# Section Title
+
+Brief context.
+
+## Subsection
+
+- Concise bullet points
+- Avoid prose where lists suffice
+- One emphasis level (CRITICAL for critical items)
+
+## Examples
+
+<example>
+User: scenario
+Assistant: ideal response
+</example>
+
+## Important Notes
+
+- Front-load critical rules
+- Reference other docs: @docs/filename.md
+```
+
+## Quality & Reliability
+
+### Prevent Hallucinations
+
+"Never speculate about code you have not opened. If the user references a specific file, you MUST read the file before answering."
+
+### Avoid Hard-Coding
+
+"Implement general-purpose solutions using standard tools, not workarounds tailored to specific test cases."
+
+### Token Budget Awareness
+
+"Your context window will be automatically compacted as it approaches its limit, allowing you to continue working indefinitely."
+
+## Optimization Workflow
+
+When optimizing existing instructions:
+
+1. **Analysis Phase**
+   - Read target file and all linked files (@docs references)
+   - Identify issues: verbosity, unclear structure, weak examples, cross-file redundancy
+   - Compare against these best practices
+   - List specific issues with examples
+   - Show before/after for key changes
+   - Estimate token savings
+
+2. **Wait for Approval**
+
+3. **Implementation Phase**
+   - Apply optimizations systematically
+   - Remove meta-commentary
+   - Consolidate redundant examples
+   - Convert prose to lists/tables where clearer
+   - Use imperative mood
+   - Front-load critical rules
+   - Single emphasis level
+   - **Preserve all salient information**
+
+## Tool Design Principles
+
+For skills that use tools:
+
+- Tools should be self-contained and robust to error
+- Avoid overlapping tool functionality
+- Curated minimal viable set enables better maintenance
+- Use `allowed-tools` to restrict access when appropriate
+
+## Common Anti-Patterns
+
+❌ **Verbose explanations**: "It is important to note that you should..."
+✅ **Direct**: "Use X for Y"
+
+❌ **Multiple emphasis**: "CRITICAL: Important: Note that..."
+✅ **Single level**: "CRITICAL: Do X"
+
+❌ **Tentative language**: "You might want to consider..."
+✅ **Imperative**: "Do X"
+
+❌ **Many redundant examples**: 5 examples of the same pattern
+✅ **Canonical examples**: 1-2 diverse, representative examples
+
+❌ **Prose for discrete items**: "First do this, then do that, and after that..."
+✅ **Lists for steps**: "1. Do this\n2. Do that"
+
+❌ **Vague descriptions**: "Helps with files"
+✅ **Specific descriptions**: "Parse CSV files, convert to JSON, handle encoding. Use when working with CSV data."
+
+## References
+
+- [Claude 4.x Best Practices](https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/claude-4-best-practices)
+- [Effective Context Engineering for AI Agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
+- [Claude Code Skills Documentation](https://code.claude.com/docs/en/skills.md)
