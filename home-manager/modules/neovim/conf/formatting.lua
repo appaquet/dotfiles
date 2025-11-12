@@ -5,8 +5,10 @@ require("conform").setup({
 	formatters_by_ft = {
 		lua = { "stylua" },
 		python = { "isort", "black" },
-		javascript = { "prettierd", "prettier", stop_after_first = true },
-		typescript = { "prettierd", "prettier", stop_after_first = true },
+		javascript = { "prettier" },
+		javascriptreact = { "prettier" },
+		typescript = { "prettier" },
+		typescriptreact = { "prettier" },
 		sh = { "shfmt" },
 		rust = { "rustfmt", lsp_format = "fallback" },
 		go = { "hfgofmt", "gofmt", "goimports" },
