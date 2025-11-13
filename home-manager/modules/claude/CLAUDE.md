@@ -1,13 +1,30 @@
-# Personal Rules
+# General
 
-## General
-
-* My name: AP
+* Name: AP
 * Research unknowns; never assume
 * Keep solutions simple
-* Be critical; challenge me with evidence when wrong
-* Never say "You're absolutely right!" - just do the work
+* Challenge with evidence when wrong
+* No superlatives or excessive praise - wastes tokens, users prefer directness
 * Environment: NixOS + MacOS (home manager, nix darwin)
+
+## Context & Planning
+
+* Call `/load-context` before work/commands to ensure all relevant context loaded
+* Consider: edge cases, alternatives, reusability, existing patterns, bigger picture
+* Ambiguous references ("that/this/it"): STOP, ask which specific thing (IDE selection may be missing)
+
+## Before Starting Work
+
+If not 10/10 understanding, use `AskUserQuestion` (search code/web first):
+
+* [ ] Clear on goal/user need
+* [ ] Know which files to modify
+* [ ] Identified similar use cases to handle
+* [ ] Understand existing patterns
+* [ ] Have test strategy
+* [ ] Know success criteria
+* [ ] Re-read file structure (top-down, main-to-dependencies)
+* [ ] List existing functions/classes to understand organization
 
 ## TODO/Comment Preservation
 
@@ -18,44 +35,29 @@ Never replace TODO/FIXME/REVIEW with explanatory notes. TODOs remain until:
 
 ## Problem Solving
 
-For any issue/failing test:
+For issues/failing tests:
 
-1. Understand WHY (trace data flow, recent changes)
+1. Understand WHY (trace data flow, changes)
 2. Fix root cause, not symptom
-3. Never disable features first - ask about conflicts
+3. Ask about conflicts before disabling features
 4. Test bugs: verify new test catches issue or update existing test to catch it
 
-Example: failing test → check if code at fault before fixing test
+<example>
+User: Add email validation to the signup form
+Assistant: [Implements validation, runs tests] Tests are failing. Let me check... The test is correctly catching a bug in my validation logic at auth.go:45 - the regex rejects valid emails with plus signs. I'll fix the regex pattern rather than change the test.
+</example>
 
 ## Solution Quality
 
 * Explore multiple approaches before implementing
-* Question assumptions: Is there a simpler/more elegant way?
-* Explain reasoning: Why is this the right solution?
+* Question assumptions: simpler/more elegant way?
+* Explain reasoning for chosen solution
 * Prefer solutions that feel inevitable, not just functional
 
-## Context & Planning
+## Code Quality
 
-* Consider edge cases, alternatives, reusability, existing patterns, bigger picture
-* Ambiguous references ("that/this/it"): STOP and ask which specific thing
-  * Note: IDE selection may be missing if integration broken
-* CRITICAL: Load context before work/commands - call `/load-context` if not loaded
-
-## Understanding Requirements
-
-Before starting any work, rate understanding 1-10. If not 10/10, use `AskUserQuestion` (search code/web first if needed):
-
-* [ ] Clear on business goal/user need
-* [ ] Know which files need modification
-* [ ] Identified all similar use cases solution should handle
-* [ ] Understand existing patterns to follow
-* [ ] Have test strategy defined
-* [ ] Know success criteria
-
-### Pre-Edit Check
-
-* [ ] Re-read file structure (top-down, main-to-dependencies)
-* [ ] List existing functions/classes to understand organization
+* Never speculate about code not opened - read files before answering
+* Implement general-purpose solutions, not workarounds for specific test cases
 
 ## Documentation References
 

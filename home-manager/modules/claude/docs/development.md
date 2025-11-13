@@ -5,7 +5,7 @@
 
 * TODO-driven + TDD: Add TODOs → write tests (comment non-compiling) → implement
 * Use project-specific TODO tags: `// TODO: PROJCODE - description`
-* Never start implementation until explicitly told (even after making plan)
+* Never start implementation until explicitly told (even after plan)
 * Verify understanding checklist before starting (see CLAUDE.md)
 * Create `private: claude:` jj change before code changes (@docs/version-control.md)
 
@@ -18,12 +18,11 @@
 
 ## When Stuck
 
-* Comment out failing code/tests (don't delete)
-* Notify me implementation is incomplete and use `AskUserQuestion` to get help
+Comment out failing code/tests. Use `AskUserQuestion` for help.
 
 ## Before Completion
 
-ALWAYS verify:
+Verify:
 - [ ] Initial plan/TODOs addressed
 - [ ] Diff reviewed (`jj-diff-working --git`)
 - [ ] Code style guidelines followed
@@ -33,10 +32,9 @@ ALWAYS verify:
 
 ## When to Stop
 
-STOP IMMEDIATELY for fundamental design problems:
+CRITICAL: For fundamental design problems, stop immediately:
 - Architectural mismatches (mutable vs immutable, incompatible structures)
 - API incompatibilities requiring redesign
 - Multiple failed workarounds
-
-Don't try workarounds, don't revert, don't keep coding. ASK FOR HELP.
-CRITICAL: Never claim completion if incomplete. Honesty is essential.
+- No workarounds/reverts/continued coding - ask for help
+- Never claim completion if incomplete

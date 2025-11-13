@@ -1,27 +1,25 @@
 
 # Version Control (Jujutsu)
 
-Using `jj` (collocated with git). Note: always detached head state.
+Using `jj` (collocated with git). Always detached head state.
 
 ## Commit Messages
 
 ALL commits: prefix `"private: claude: "` for `jj new -m` and `jj commit -m`
-✓ `jj commit -m "private: claude: fix validation bug"`
+Always use `-m "message"` (never `jj commit` alone - opens editor)
 
-CRITICAL: Always use `-m "message"` - never `jj commit` alone (tries to open editor)
+✓ `jj commit -m "private: claude: fix validation bug"`
 
 ## When to Create New Change
 
 Create when:
-
 - Starting distinct task (bug fix, feature, refactor)
 - Addressing review comments (even if related)
 - Switching context
 - Explicitly requested
-- Exception: Skip for read-only ops (viewing, testing without changes, searching)
+- Exception: skip for read-only ops (viewing, testing without changes, searching)
 
 Stay in current when:
-
 - Making related fixes
 - Iterating same problem
 - Continuing same task

@@ -32,12 +32,13 @@ Apply all principles from @best-practices.md when writing or optimizing instruct
 
 ### For Optimization
 
-1. Read target file and any linked files (@docs references)
-2. Identify issues: verbosity, unclear structure, weak examples, redundancy
-3. Compare against @best-practices.md
-4. Report findings with before/after examples
-5. Wait for approval before applying changes
-6. Apply optimizations preserving all salient information
+1. Read target file first to identify all linked files (@ references)
+2. Read all linked files from target
+3. Read @best-practices.md for comparison
+4. Identify issues: verbosity, unclear structure, weak examples, cross-file redundancy
+5. Report findings with before/after examples
+6. Wait for approval before applying changes
+7. Apply optimizations preserving all salient information
 
 ## Supporting Files
 
