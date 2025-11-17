@@ -67,4 +67,8 @@ jobs:
           experimental-features = nix-command flakes
           access-tokens = github.com=${{ secrets.GH_PAT }}
         github-token: ${{ secrets.GH_PAT }}
-    - run: MACHINE_KEY="${{ matrix.machine }}" ./x nixos check
+    - name: Check
+      run:
+        MACHINE_KEY="${{ matrix.machine }}" ./x nixos check
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
