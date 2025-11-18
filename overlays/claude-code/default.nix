@@ -7,13 +7,13 @@
 
 buildNpmPackage rec {
   pname = "claude-code";
-  version = "2.0.42";
+  version = "2.0.44";
 
   nodejs = nodejs_20; # required for sandboxed Nix builds on Darwin
 
   src = fetchzip {
     url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-${version}.tgz";
-    hash = "sha256-Xn1h9Phw4FLrF0EfrY5MLA0RnOuA6Dk+PWqP7fN1DUU=";
+    hash = "sha256-4MRaH/Dbm9z0xvnfRMdi8u39eeHaTMh6y7h5AtLYNXs=";
   };
 
   npmDepsHash = "sha256-PFc+MxnnCTGTYfTd/dxNq54JzBoqb3+AEg+11PWIDrg=";
