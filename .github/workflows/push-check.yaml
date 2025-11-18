@@ -27,6 +27,7 @@ jobs:
   home_check:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         machine: ["appaquet@mbpapp", "appaquet@deskapp", "appaquet@servapp", "appaquet@piapp"]
     steps:
@@ -42,6 +43,7 @@ jobs:
   darwin_check:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         machine: ["appaquet@mbpapp"]
     steps:
@@ -57,6 +59,7 @@ jobs:
   nixos_check:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         machine: ["appaquet@deskapp", "appaquet@servapp", "appaquet@piapp"]
     steps:
