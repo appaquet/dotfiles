@@ -1,6 +1,6 @@
 ---
 name: instruction-writer
-description: Write and optimize instructions for Claude Code (skills, slash commands, memory files, CLAUDE.md). Use when creating or editing instruction files, writing skill descriptions, or optimizing prompts for clarity and token efficiency. Triggers on phrases like "write a skill", "create a command", "optimize instructions", or "improve this prompt".
+description: Write and optimize instructions for Claude Code (skills, slash commands, memory files, CLAUDE.md). **ALWAYS use before creating or modifying any CLAUDE.md file, SKILL.md file, command file, or instruction documentation.** Triggers when writing skill descriptions, optimizing prompts for clarity/token efficiency, or when user mentions "write a skill", "create a command", "optimize instructions", or "improve this prompt".
 ---
 
 # Instruction Writer Skill
@@ -9,10 +9,12 @@ Expertise in writing effective instructions for Claude Code using latest prompt 
 
 ## When to Use This Skill
 
-Automatically invoked when:
+**MANDATORY** - Automatically invoked when:
 
-- Creating new skills, slash commands, or memory files
-- Editing existing instruction files
+- Creating or modifying ANY CLAUDE.md file (project, global, or package-level)
+- Creating or modifying SKILL.md files
+- Creating or modifying slash command files
+- Creating or modifying any instruction/documentation files meant for Claude
 - Optimizing prompts for clarity or token efficiency
 - User mentions "write instructions", "create a skill/command", or "optimize this prompt"
 
