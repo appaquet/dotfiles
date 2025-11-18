@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  secrets,
   ...
 }:
 
@@ -14,18 +15,19 @@
     hostName = "piprint";
     useDHCP = false;
     interfaces = {
-      wlan0.useDHCP = false;
+      wlan0.useDHCP = true;
       eth0.useDHCP = true;
     };
     firewall.enable = false;
-  };
+  }
+  // secrets.nixos.wifi.home_2_4;
 
   services.openssh.enable = true;
 
   services.printing = {
     enable = true;
-    drivers = with pkgs; [ 
-      splix 
+    drivers = with pkgs; [
+      splix
       cups-filters
       cups-browsed
     ];

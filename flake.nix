@@ -23,7 +23,7 @@
 
     secrets = {
       url = "github:appaquet/dotfiles-secrets";
-      #url = "path:/home/appaquet/dotfiles/secrets";
+      # url = "path:/Users/appaquet/dotfiles/secrets";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -65,7 +65,7 @@
     };
 
     nixos-raspberrypi = {
-      url = "github:nvmd/nixos-raspberrypi/9f47b3065f218d33460d3b2bc29e4639d1fee7e4";
+      url = "github:nvmd/nixos-raspberrypi/main";
     };
   };
 
