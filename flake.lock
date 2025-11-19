@@ -356,7 +356,9 @@
       "inputs": {
         "argononed": "argononed",
         "nixos-images": "nixos-images",
-        "nixpkgs": "nixpkgs_3"
+        "nixpkgs": [
+          "nixos-raspberrypi-nixpkgs"
+        ]
       },
       "locked": {
         "lastModified": 1758967172,
@@ -370,6 +372,22 @@
         "owner": "nvmd",
         "ref": "main",
         "repo": "nixos-raspberrypi",
+        "type": "github"
+      }
+    },
+    "nixos-raspberrypi-nixpkgs": {
+      "locked": {
+        "lastModified": 1761934558,
+        "narHash": "sha256-0gB7tv25nPv+Vkr9YNi6gOEpX5cuDTnaTZlRNHZfgqA=",
+        "owner": "nvmd",
+        "repo": "nixpkgs",
+        "rev": "791ec2ce5034ba9658e12ee4c33a001a38f5280a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nvmd",
+        "ref": "modules-with-keys-25.05",
+        "repo": "nixpkgs",
         "type": "github"
       }
     },
@@ -453,22 +471,6 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1758583444,
-        "narHash": "sha256-OnYthHIsVIMrZDWtCEp6Zde8ZtMcEBnpyCIdtTKU7bo=",
-        "owner": "nvmd",
-        "repo": "nixpkgs",
-        "rev": "d8551a2038e21091fce8157e070bdb25dca0a94f",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nvmd",
-        "ref": "modules-with-keys-25.05",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
-    "nixpkgs_4": {
-      "locked": {
         "lastModified": 1762844143,
         "narHash": "sha256-SlybxLZ1/e4T2lb1czEtWVzDCVSTvk9WLwGhmxFmBxI=",
         "owner": "NixOS",
@@ -515,7 +517,8 @@
         "nixd": "nixd",
         "nixos": "nixos",
         "nixos-raspberrypi": "nixos-raspberrypi",
-        "nixpkgs": "nixpkgs_4",
+        "nixos-raspberrypi-nixpkgs": "nixos-raspberrypi-nixpkgs",
+        "nixpkgs": "nixpkgs_3",
         "nixpkgs-nvim": "nixpkgs-nvim",
         "nixvirt": "nixvirt",
         "secrets": "secrets",
