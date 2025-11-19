@@ -29,7 +29,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        machine: ["appaquet@mbpapp", "appaquet@deskapp", "appaquet@servapp", "appaquet@piapp"]
+        machine: ["appaquet@mbpapp", "appaquet@deskapp", "appaquet@servapp", "appaquet@piapp", "appaquet@piprint"]
     steps:
     - uses: actions/checkout@v4
     - uses: DeterminateSystems/nix-installer-action@main
@@ -61,7 +61,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        machine: ["appaquet@deskapp", "appaquet@servapp", "appaquet@piapp"]
+        machine: ["appaquet@deskapp", "appaquet@servapp", "appaquet@piapp", "appaquet@piprint"]
     steps:
     - uses: actions/checkout@v4
     - uses: DeterminateSystems/nix-installer-action@main
