@@ -446,17 +446,14 @@
         ]
       },
       "locked": {
-        "lastModified": 1763392496,
-        "narHash": "sha256-t9KOFgBtoK+vFBeELSd9BR0ncIsBFGC5RzsnmolyVsE=",
-        "owner": "appaquet",
-        "repo": "dotfiles-secrets",
-        "rev": "46c5d5f59e6a3af4b7263acba05c5851040c08c7",
-        "type": "github"
+        "lastModified": 1763606312,
+        "narHash": "sha256-2PKdq1e16m7Gp3mlb0xKHtZNYEjfCuL57/VI0UUbNZ0=",
+        "path": "/Users/appaquet/dotfiles/secrets",
+        "type": "path"
       },
       "original": {
-        "owner": "appaquet",
-        "repo": "dotfiles-secrets",
-        "type": "github"
+        "path": "/Users/appaquet/dotfiles/secrets",
+        "type": "path"
       }
     },
     "systems": {
