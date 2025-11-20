@@ -309,7 +309,6 @@ See [https://github.com/pwntester/octo.nvim/blob/03059cf4d694e2b3065136f074b42ee
 
 ## AI Tools
 
-* `<leader>au` to open MCPHub
 * `<leader>aa` to show CodeCompanion actions
 * `<leader>ae` inline edit with prompt in visual mode
 

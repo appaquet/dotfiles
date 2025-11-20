@@ -45,16 +45,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    mcphub-nvim = {
-      url = "github:ravitemer/mcphub.nvim";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    mcp-hub = {
-      url = "github:ravitemer/mcp-hub";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     nixvirt = {
       url = "github:AshleyYakeley/NixVirt";
       inputs.nixpkgs.follows = "nixos";
@@ -85,8 +75,6 @@
       secrets,
       flake-utils,
       darwin,
-      mcp-hub,
-      mcphub-nvim,
       ...
     }:
     let
@@ -98,8 +86,6 @@
       homePackageOverlays = final: prev: {
         exo = prev.callPackage ./overlays/exo { };
         claude-code = prev.callPackage ./overlays/claude-code { };
-        mcphub-nvim = mcphub-nvim.packages."${prev.stdenv.hostPlatform.system}".default;
-        mcp-hub = mcp-hub.packages."${prev.stdenv.hostPlatform.system}".default;
       };
 
       vimPluginsOverlay = import ./home-manager/modules/neovim/plugins-overlay.nix;

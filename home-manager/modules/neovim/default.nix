@@ -151,7 +151,6 @@ in
       ])
       ++ (lib.optionals agenticEnabled [
         pkgsChannel.vimPlugins.codecompanion-nvim
-        pkgsChannel.mcphub-nvim
         pkgsChannel.vimPlugins.claudecode-nvim
       ]);
 
@@ -191,8 +190,9 @@ in
       )
     );
 
-    extraPackages =
-      (with pkgsChannel; [
+    extraPackages = (
+      with pkgsChannel;
+      [
         nixd # nix lsp
 
         marksman # markdown lsp
@@ -212,11 +212,8 @@ in
 
         pyright
         ruff
-      ])
-      ++ (lib.optionals agenticEnabled [
-        pkgsChannel.mcp-hub # via overlay
-        pkgsChannel.uv # for `uvx` for some MCPs
-      ]);
+      ]
+    );
   };
 
   # Force load after the rest

@@ -9,15 +9,7 @@ require("codecompanion").setup({
 		chat = {
 			adapter = "copilot",
 			model = "gpt-5",
-			tools = {
-				["mcp"] = {
-					callback = require("mcphub.extensions.codecompanion"),
-					description = "Call tools and resources from the MCP Servers",
-					opts = {
-						requires_approval = true,
-					},
-				},
-			},
+			tools = {},
 		},
 		inline = {
 			adapter = "copilot",
@@ -48,10 +40,6 @@ vim.keymap.set("v", "<leader>ae", function()
 		end
 	end)
 end, { silent = true, desc = "CodeCompanion: Inline edit with prompt" })
-
--- MCPHub
-require("mcphub").setup({})
-vim.keymap.set("n", "<Leader>au", ":<CR>:MCPHub<CR>", { silent = true, desc = "Open MCPHub" })
 
 -- ClaudeCode.nvim
 -- https://github.com/coder/claudecode.nvim
