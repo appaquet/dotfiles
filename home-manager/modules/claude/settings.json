@@ -38,7 +38,8 @@
       "WebFetch(domain:code.claude.com)",
       "WebFetch(domain:www.anthropic.com)",
       "WebSearch",
-      "Skill(instruction-writer)"
+      "Skill(instruction-writer)",
+      "Skill(load-context)"
     ]
   },
   "hooks": {
