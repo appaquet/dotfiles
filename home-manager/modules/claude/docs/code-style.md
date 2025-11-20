@@ -5,6 +5,7 @@
 
 * Explain "why" not "what" - avoid obvious/redundant
 * For complex logic blocks (7+ lines), use delimiter comments for "what"
+* Comments describe current state, not evolution - no "now uses", "changed to", "updated to" (that's git history's job)
 
 ## No Section Delimiters
 
