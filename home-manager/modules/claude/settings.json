@@ -56,11 +56,11 @@
     ]
   },
   "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true,
     "network": {
       "allowLocalBinding": true
-    },
-    "autoAllowBashIfSandboxed": true,
-    "enabled": true
+    }
   },
-  "alwaysThinkingEnabled": false
+  "alwaysThinkingEnabled": true
 }

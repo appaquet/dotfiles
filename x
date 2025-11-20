@@ -50,6 +50,11 @@ check_home() {
   check_eval ".#homeConfigurations.${1}.activationPackage"
 }
 
+check_nixos() {
+  echo "Checking nixos ${1}"
+  check_eval ".#nixosConfigurations.${1}.config.system.build.toplevel"
+}
+
 prime_sudo() {
   sudo echo # prime pw for nom redirects to work
 }
@@ -294,8 +299,18 @@ nixos)
 check)
   shift
   check_home "appaquet@deskapp"
-  check_eval ".#nixosConfigurations.deskapp.config.system.build.toplevel"
+  check_nixos "deskapp"
 
+  check_home "appaquet@utm"
+  check_nixos "utm"
+
+  check_nixos "piapp"
+  check_home "appaquet@piapp"
+
+  check_nixos "piprint"
+  check_home "appaquet@piprint"
+
+  check_nixos "servapp"
   check_home "appaquet@servapp"
 
   check_home "appaquet@mbpapp"
