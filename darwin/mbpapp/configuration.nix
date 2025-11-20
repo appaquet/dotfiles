@@ -17,6 +17,10 @@
       keep-outputs = true;
       keep-derivations = true;
       builders-use-substitutes = true; # allow use of cached builds, require fast internet
+      trusted-users = [
+        "root"
+        "@admin"
+      ];
     };
   };
 
