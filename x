@@ -41,17 +41,6 @@ if [[ -x ~/.nix-profile/bin/nom ]]; then
   NIX_BUILDER="nom"
 fi
 
-if [[ ! -f "$ROOT/secrets/flake.nix" ]]; then
-  echo "Secrets aren't checked out. Make sure you checkout & decrypt them after activation"
-  sleep 2
-fi
-
-SECRETS_CHANGED=$(git diff --submodule=log secrets | grep "Submodule" || true)
-if [[ -n "$SECRETS_CHANGED" ]]; then
-  echo "Secrets submodule has changes. Make sure to update prior to building"
-  sleep 1
-fi
-
 check_eval() {
   nix eval --raw "${1}"
 }
