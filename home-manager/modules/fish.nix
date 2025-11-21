@@ -104,16 +104,6 @@
       fn = "fzf-nix";
 
       nv = "nvim";
-
-      ai = {
-        expansion = "aichat \"%\"";
-        setCursor = true;
-      };
-      aie = {
-        expansion = "aichat -e \"%\"";
-        setCursor = true;
-      };
-      aif = "aichat -f";
     };
 
     functions = {

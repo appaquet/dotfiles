@@ -41,8 +41,6 @@
       lsd # ls replacement
       hexyl
 
-      aichat # cli llm tool
-
       fzf
       ripgrep
       ripgrep-all # supports pdf, docs, etc.
@@ -77,8 +75,6 @@
       curl
       wget
       socat
-
-      tealdeer # rust version of tldr
 
       rsync
       rclone
