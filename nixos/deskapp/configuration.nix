@@ -2,13 +2,13 @@
 
 {
   imports = [
-    ../common.nix
-    ../dev.nix
-    ../docker.nix
-    ../nasapp.nix
-    ../network-bridge.nix
-    ../ups/client.nix
-    ../netconsole/sender.nix
+    ../modules/common.nix
+    ../modules/dev.nix
+    ../modules/docker.nix
+    ../modules/nasapp.nix
+    ../modules/network-bridge.nix
+    ../modules/ups/client.nix
+    ../modules/netconsole/sender.nix
     ./backups
     ./gpu-switch.nix
     ./ha-ctrl.nix

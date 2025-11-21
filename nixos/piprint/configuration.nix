@@ -7,8 +7,8 @@
 
 {
   imports = [
-    ../common.nix
-    ../common-pi.nix
+    ../modules/common.nix
+    ../modules/common-pi.nix
   ];
 
   networking = {

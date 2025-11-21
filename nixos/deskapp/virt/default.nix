@@ -7,8 +7,8 @@
 
 {
   imports = [
-    ../../virt.nix
-    ../../virt-gpu-passthrough.nix
+    ../../modules/virt.nix
+    ../../modules/virt-gpu-passthrough.nix
     inputs.nixvirt.nixosModules.default
   ];
 

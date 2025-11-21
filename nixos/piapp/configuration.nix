@@ -6,10 +6,10 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ../common.nix
-    ../common-pi.nix
-    ../nasapp.nix
-    ../netconsole/receiver.nix
+    ../modules/common.nix
+    ../modules/common-pi.nix
+    ../modules/nasapp.nix
+    ../modules/netconsole/receiver.nix
     ./ups-server.nix
   ];
 
