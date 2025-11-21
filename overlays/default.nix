@@ -18,16 +18,5 @@
           (import ../home-manager/modules/neovim/plugins-overlay.nix)
         ];
       };
-
-      _module.args.pkgs-nvim = import inputs.nixpkgs-nvim {
-        inherit system;
-        config = {
-          permittedInsecurePackages = [ ];
-          allowUnfree = true;
-        };
-        overlays = [
-          (import ../home-manager/modules/neovim/plugins-overlay.nix)
-        ];
-      };
     };
 }

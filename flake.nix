@@ -5,9 +5,6 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixos.url = "github:nixos/nixpkgs/nixos-25.05";
 
-    # pinned, issue with neotest
-    nixpkgs-nvim.url = "github:NixOS/nixpkgs/e11bf63f3dc6c4c218ae32332496871f07c20329";
-
     flake-parts.url = "github:hercules-ci/flake-parts";
 
     home-manager = {

@@ -368,22 +368,6 @@
         "url": "https://github.com/NixOS/nixpkgs/archive/5487e69da40cbd611ab2cadee0b4637225f7cfae.tar.gz"
       }
     },
-    "nixpkgs-nvim": {
-      "locked": {
-        "lastModified": 1755234688,
-        "narHash": "sha256-b7qzQRAUl0320xRFEqVn0Yk56Jwd46vjh80mNVQ+9Vg=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "e11bf63f3dc6c4c218ae32332496871f07c20329",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "e11bf63f3dc6c4c218ae32332496871f07c20329",
-        "type": "github"
-      }
-    },
     "nixpkgs_2": {
       "locked": {
         "lastModified": 1675115703,
@@ -448,7 +432,6 @@
         "nixos-raspberrypi": "nixos-raspberrypi",
         "nixos-raspberrypi-nixpkgs": "nixos-raspberrypi-nixpkgs",
         "nixpkgs": "nixpkgs_3",
-        "nixpkgs-nvim": "nixpkgs-nvim",
         "nixvirt": "nixvirt",
         "secrets": "secrets",
         "vscode-server": "vscode-server"
