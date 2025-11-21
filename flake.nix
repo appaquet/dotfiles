@@ -19,8 +19,8 @@
     };
 
     secrets = {
-      #url = "github:appaquet/dotfiles-secrets";
-      url = "path:/Users/appaquet/dotfiles/secrets";
+      url = "github:appaquet/dotfiles-secrets";
+      #url = "path:/Users/appaquet/dotfiles/secrets";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
