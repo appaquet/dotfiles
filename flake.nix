@@ -5,10 +5,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixos.url = "github:nixos/nixpkgs/nixos-25.05";
 
-    # pinned, issue with neotest
-    nixpkgs-nvim.url = "github:NixOS/nixpkgs/e11bf63f3dc6c4c218ae32332496871f07c20329";
-
-    flake-utils.url = "github:numtide/flake-utils";
+    flake-parts.url = "github:hercules-ci/flake-parts";
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -65,274 +62,24 @@
 
   outputs =
     inputs@{
-      self,
-      nixpkgs,
-      nixpkgs-nvim,
-      nixos,
-      home-manager,
-      humanfirst-dots,
-      nixos-raspberrypi,
-      secrets,
-      flake-utils,
-      darwin,
+      flake-parts,
       ...
     }:
-    let
-      config = {
-        permittedInsecurePackages = [ ];
-        allowUnfree = true;
-      };
+    flake-parts.lib.mkFlake { inherit inputs; } (
+      { ... }:
+      {
+        systems = [
+          "x86_64-linux"
+          "aarch64-linux"
+          "aarch64-darwin"
+        ];
 
-      homePackageOverlays = final: prev: {
-        exo = prev.callPackage ./overlays/exo { };
-        claude-code = prev.callPackage ./overlays/claude-code { };
-      };
-
-      vimPluginsOverlay = import ./home-manager/modules/neovim/plugins-overlay.nix;
-
-      homeOverlays = [
-        homePackageOverlays
-        vimPluginsOverlay
-      ];
-
-      commonHomeModules = [
-        humanfirst-dots.homeManagerModule
-      ];
-
-      nixosOverlays = [
-      ];
-      nixosOverlaysModule = (
-        _: {
-          nixpkgs.overlays = nixosOverlays;
-        }
-      );
-    in
-
-    flake-utils.lib.eachDefaultSystem # prevent having to hard-code system by iterating on available systems
-      (
-        system:
-        (
-          let
-            pkgs = import nixpkgs {
-              inherit system config;
-              overlays = homeOverlays;
-            };
-            pkgs-nvim = import nixpkgs-nvim {
-              inherit system config;
-              overlays = homeOverlays;
-            };
-
-            cfg = {
-              isNixos = false;
-              minimalNvim = false;
-            };
-          in
-          {
-            homes = {
-              "appaquet@deskapp" = home-manager.lib.homeManagerConfiguration rec {
-                inherit pkgs;
-                modules = [
-                  ./home-manager/deskapp.nix
-                  extraSpecialArgs.secrets.commonHome
-                ]
-                ++ commonHomeModules;
-                extraSpecialArgs = {
-                  inherit inputs;
-                  pkgs-nvim = pkgs-nvim;
-                  secrets = secrets.init "linux";
-                  cfg = cfg // {
-                    isNixos = true;
-                  };
-                };
-              };
-
-              "appaquet@servapp" = home-manager.lib.homeManagerConfiguration rec {
-                inherit pkgs;
-                modules = [
-                  ./home-manager/servapp.nix
-                  extraSpecialArgs.secrets.commonHome
-                ]
-                ++ commonHomeModules;
-                extraSpecialArgs = {
-                  inherit inputs;
-                  secrets = secrets.init "linux";
-                  pkgs-nvim = pkgs-nvim;
-                  cfg = cfg // {
-                    isNixos = true;
-                  };
-                };
-              };
-
-              "appaquet@mbpapp" = home-manager.lib.homeManagerConfiguration rec {
-                inherit pkgs;
-                modules = [
-                  ./home-manager/mbpapp.nix
-                  extraSpecialArgs.secrets.commonHome
-                ]
-                ++ commonHomeModules;
-                extraSpecialArgs = {
-                  inherit inputs cfg;
-                  pkgs-nvim = pkgs-nvim;
-                  secrets = secrets.init "darwin";
-                };
-              };
-
-              "appaquet@piapp" = home-manager.lib.homeManagerConfiguration rec {
-                inherit pkgs;
-                modules = [
-                  ./home-manager/piapp.nix
-                  extraSpecialArgs.secrets.commonHome
-                ]
-                ++ commonHomeModules;
-                extraSpecialArgs = {
-                  inherit inputs;
-                  secrets = secrets.init "linux";
-                  pkgs-nvim = pkgs-nvim;
-                  cfg = cfg // {
-                    isNixos = true;
-                    minimalNvim = true;
-                  };
-                };
-              };
-
-              "appaquet@piprint" = home-manager.lib.homeManagerConfiguration rec {
-                inherit pkgs;
-                modules = [
-                  ./home-manager/piprint.nix
-                  extraSpecialArgs.secrets.commonHome
-                ]
-                ++ commonHomeModules;
-                extraSpecialArgs = {
-                  inherit inputs;
-                  secrets = secrets.init "linux";
-                  pkgs-nvim = pkgs-nvim;
-                  cfg = cfg // {
-                    isNixos = true;
-                    minimalNvim = true;
-                  };
-                };
-              };
-
-              "appaquet@utm" = home-manager.lib.homeManagerConfiguration rec {
-                inherit pkgs;
-                modules = [
-                  ./home-manager/utm.nix
-                  extraSpecialArgs.secrets.commonHome
-                ]
-                ++ commonHomeModules;
-                extraSpecialArgs = {
-                  inherit inputs;
-                  secrets = secrets.init "linux";
-                  pkgs-nvim = pkgs-nvim;
-                  cfg = cfg // {
-                    isNixos = true;
-                    minimalNvim = true;
-                  };
-                };
-              };
-            };
-          }
-        )
-      )
-    // {
-
-      # properly expose home configurations with appropriate expected system
-      homeConfigurations = {
-        "appaquet@deskapp" = self.homes.x86_64-linux."appaquet@deskapp";
-        "appaquet@servapp" = self.homes.x86_64-linux."appaquet@servapp";
-        "appaquet@mbpapp" = self.homes.aarch64-darwin."appaquet@mbpapp";
-        "appaquet@utm" = self.homes.aarch64-linux."appaquet@utm";
-        "appaquet@piapp" = self.homes.aarch64-linux."appaquet@piapp";
-        "appaquet@piprint" = self.homes.aarch64-linux."appaquet@piprint";
-      };
-
-      darwinConfigurations = {
-        mbpapp = darwin.lib.darwinSystem {
-          system = "aarch64-darwin";
-          # pkgs = import nixpkgs-darwin {
-          #   inherit config;
-          #   system = "aarch64-darwin";
-          # };
-          modules = [
-            ./darwin/mbpapp/configuration.nix
-          ];
-          # inputs = { inherit inputs darwin; };
-          specialArgs = { inherit inputs; };
-        };
-      };
-
-      nixosConfigurations = {
-        deskapp = nixos.lib.nixosSystem {
-          specialArgs = {
-            inherit (self) common;
-            inherit inputs;
-            secrets = secrets.init "linux";
-          };
-          modules = [
-            nixosOverlaysModule
-            ./nixos/deskapp/configuration.nix
-          ];
-        };
-
-        servapp = nixos.lib.nixosSystem {
-          specialArgs = {
-            inherit (self) common;
-            inherit inputs;
-            secrets = secrets.init "linux";
-          };
-          modules = [
-            nixosOverlaysModule
-            ./nixos/servapp/configuration.nix
-          ];
-        };
-
-        utm = nixos.lib.nixosSystem {
-          specialArgs = {
-            inherit (self) common;
-            inherit inputs;
-            secrets = secrets.init "linux";
-          };
-          modules = [
-            nixosOverlaysModule
-            ./nixos/utm/configuration.nix
-          ];
-        };
-
-        piapp = nixos-raspberrypi.lib.nixosSystem {
-          system = "aarch64-linux";
-          specialArgs = {
-            inherit (self) common;
-            inherit inputs nixos-raspberrypi;
-            secrets = secrets.init "linux";
-          };
-          modules = [
-            {
-              imports = with nixos-raspberrypi.nixosModules; [
-                raspberry-pi-5.base
-                sd-image
-              ];
-            }
-            ./nixos/piapp/configuration.nix
-          ];
-        };
-
-        piprint = nixos-raspberrypi.lib.nixosSystem {
-          system = "aarch64-linux";
-          specialArgs = {
-            inherit (self) common;
-            inherit inputs nixos-raspberrypi;
-            secrets = secrets.init "linux";
-          };
-          modules = [
-            {
-              imports = with nixos-raspberrypi.nixosModules; [
-                raspberry-pi-3.base
-                sd-image
-              ];
-            }
-            ./nixos/piprint/configuration.nix
-          ];
-        };
-      };
-    };
+        imports = [
+          ./overlays
+          ./home-manager
+          ./nixos
+          ./darwin
+        ];
+      }
+    );
 }

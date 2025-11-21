@@ -18,7 +18,6 @@ let
       }) paths
     );
 
-
   # Environment variables to pass through to the sandboxed container
   passthrough-env-vars = [
     "HOME"
