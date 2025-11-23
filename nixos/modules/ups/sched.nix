@@ -20,32 +20,40 @@ let
     text = ''
       log_event () {
         logger -t upssched-cmd "$1"
-        #echo "$1" >> /tmp/upssched-cmd.log
+        echo "$1" >> /tmp/upssched.log
       }
 
       case $1 in
         upsgone)
-          log_event "The UPS has been gone for a while"
+          log_event "UPS GONE"
           ;;
         replacebat)
-          log_event "The UPS needs its battery replaced"
+          log_event "UPS REPLACE BAT"
           ;;
         lowbat)
-          log_event "The UPS has LOW BAT"
-          upsmon -c fsd
+          status=$(cat /tmp/upssched-status 2>/dev/null || echo "unknown")
+          if [ "$status" = "onbatt" ]; then
+            log_event "UPS LOW BAT, SHUTTING DOWN"
+            upsmon -c fsd
+          else
+            log_event "UPS LOW BAT, BUT NOT ON BATTERY (status: $status), NOT SHUTTING DOWN"
+          fi
           ;;
         onbatt)
-          log_event "The UPS is ON BATT"
+          log_event "UPS ON BAT"
+          echo "onbatt" > /tmp/upssched-status
           ;;
         online)
-          log_event  "The UPS is ONLINE"
+          log_event  "UPS ONLINE"
+          echo "online" > /tmp/upssched-status
           ;;
+
         timeonbatt)
-          log_event "The UPS is ON BAT for a while"
+          log_event "UPS ON BAT FOR TOO LONG - SHUTTING DOWN"
           upsmon -c fsd
           ;;
         timeonline)
-          log_event "The UPS is back ONLINE"
+          log_event "UPS BACK ONLINE"
           ;;
         *)
           log_event "Unrecognized command: $1"
