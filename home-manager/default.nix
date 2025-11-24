@@ -5,14 +5,14 @@ let
   mkHomeConfig =
     system: modules: extraArgs:
     withSystem system (
-      { pkgs, ... }:
+      { pkgs, inputs', ... }:
       inputs.home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
 
         modules = modules ++ commonHomeModules;
 
         extraSpecialArgs = {
-          inherit inputs;
+          inherit inputs inputs';
         }
         // extraArgs;
       }
