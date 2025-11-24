@@ -20,7 +20,6 @@ let
 in
 {
   flake.homeConfigurations = {
-
     "appaquet@deskapp" =
       mkHomeConfig "x86_64-linux"
         [

@@ -2,6 +2,7 @@
   pkgs,
   lib,
   secrets,
+  inputs',
   ...
 }:
 
@@ -38,8 +39,8 @@ in
       gnumake
       bintools # ld, objdump, etc.
 
-      #opencode # disabled for now as build is not always reproducible
-      codex
+      inputs'.nix-ai-tools.packages.codex
+      inputs'.nix-ai-tools.packages.opencode
     ])
     ++ lib.optionals pkgs.stdenv.isLinux [
       pkgs.mold-wrapped

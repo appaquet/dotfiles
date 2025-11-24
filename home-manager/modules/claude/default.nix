@@ -2,6 +2,7 @@
   pkgs,
   config,
   lib,
+  inputs',
   ...
 }:
 
@@ -58,12 +59,14 @@ let
 
   mkDockerEnvArgs = vars: lib.concatMapStringsSep " \\\n        " (var: "--env \"${var}\"") vars;
 
+  claude-code = inputs'.nix-ai-tools.packages.claude-code;
+
   # Override claude with overridden config dir. This prevents it to write its config to
   # ~/.claude.json so that we can mount ~/.claude as a volume in the container. We cannot mount the
   # config itself since it's swapped (probably to prevent corruption across instances).
   claude-wrapped = pkgs.writeShellScriptBin "claude" ''
     export CLAUDE_CONFIG_DIR="${config.home.homeDirectory}/.claude"
-    exec ${pkgs.claude-code}/bin/claude "$@"
+    exec ${claude-code}/bin/claude "$@"
   '';
 
   # Creates a sandboxed version of claude that we can use to skip permissions. This isn't protecting

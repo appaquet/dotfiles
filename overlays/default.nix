@@ -12,7 +12,7 @@
         overlays = [
           (final: prev: {
             exo = prev.callPackage ./exo { };
-            claude-code = prev.callPackage ./claude-code { };
+            #claude-code = prev.callPackage ./claude-code { };
           })
 
           (import ../home-manager/modules/neovim/plugins-overlay.nix)

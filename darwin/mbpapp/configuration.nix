@@ -4,6 +4,7 @@
     ./apps.nix
     ./fonts.nix
     ./system.nix
+    ../../nixos/modules/cachix.nix
   ];
 
   nix = {
@@ -16,7 +17,7 @@
       auto-optimise-store = false; # TODO: Turn back on when https://github.com/NixOS/nix/issues/7273
       keep-outputs = true;
       keep-derivations = true;
-      builders-use-substitutes = true; # allow use of cached builds, require fast internet
+      builders-use-substitutes = true;
       trusted-users = [
         "root"
         "@admin"

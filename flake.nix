@@ -37,6 +37,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nix-ai-tools = {
+      url = "github:numtide/nix-ai-tools";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nixvirt = {
       url = "github:AshleyYakeley/NixVirt";
       inputs.nixpkgs.follows = "nixos";

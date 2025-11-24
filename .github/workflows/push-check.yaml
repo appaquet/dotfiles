@@ -37,6 +37,8 @@ jobs:
         extra-conf: |
           experimental-features = nix-command flakes
           access-tokens = github.com=${{ secrets.GH_PAT }}
+          substituters = https://cache.nixos.org https://cache.nixos.org/ https://nix-community.cachix.org https://nixos-raspberrypi.cachix.org https://numtide.cachix.org
+          trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI= numtide.cachix.org-1:2ps1kLBUWjxIneOy1Ik6cQjb41X0iXVXeHigGmycPPE=
         github-token: ${{ secrets.GH_PAT }}
     - run: MACHINE_KEY="${{ matrix.machine }}" ./x home check
 
