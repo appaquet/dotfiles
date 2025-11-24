@@ -23,8 +23,8 @@ in
         # Check `upsc ups` to see all values
         "override.battery.charge.low = 10" # default 10%
         "override.battery.charge.warning = 50" # default 20%
-        "override.battery.runtime.low = 240" # default 300, but it stops if desktop draws too much
-        "ignorelb"
+        "override.battery.runtime.low = 300" # default 300, but it stops if desktop draws too much
+        "ignorelb" # ignore ups own low battery signal
       ];
     };
 
