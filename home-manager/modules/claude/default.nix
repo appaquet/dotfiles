@@ -59,8 +59,8 @@ let
 
   mkDockerEnvArgs = vars: lib.concatMapStringsSep " \\\n        " (var: "--env \"${var}\"") vars;
 
-  #claude-code = inputs'.nix-ai-tools.packages.claude-code;
-  claude-code = pkgs.claude-code;
+  claude-code = inputs'.nix-ai-tools.packages.claude-code;
+  #claude-code = pkgs.claude-code; # overlay version
 
   # Override claude with overridden config dir. This prevents it to write its config to
   # ~/.claude.json so that we can mount ~/.claude as a volume in the container. We cannot mount the
