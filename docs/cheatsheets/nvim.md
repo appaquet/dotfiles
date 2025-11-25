@@ -178,7 +178,7 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>ggp` to switch gutter base against previous branch
 * `<leader>ggw` to switch gutter base to working directory
 
-### Diffview
+### Diff view
 
 * `<leader>gdw` to open diff view against working directory
 * `<leader>gdm` to open diff view against main branch
@@ -187,6 +187,7 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>gdq` to close diff view
 * `<leader>gdf` to open file history
 * `<leader>gdb` to open buffer diff
+* `<leader>Tdw` to toggle whitespace visibility
 
 ### PR review
 
@@ -306,9 +307,11 @@ See [https://github.com/pwntester/octo.nvim/blob/03059cf4d694e2b3065136f074b42ee
 * `<leader>Tf` to toggle auto-formatting
 * `<leader>Tl` to toggle auto linting
 * `<leader>Tt` to toggle theme between light and dark
+* `<leader>Tdw` to toggle whitespace visibility
 
 ## AI Tools
 
+* `<leader>au` to open MCPHub
 * `<leader>aa` to show CodeCompanion actions
 * `<leader>ae` inline edit with prompt in visual mode
 
@@ -379,6 +382,7 @@ This uses code companion. Use `ga` and `gr` to accept/reject AI suggestions in v
 * `<leader>yy` to yank to clipboard using [bin/pbcopy](bin/pbcopy) util
 * `<leader>yp` to paste from clipboard using [bin/pbpaste](bin/pbpaste) util
 * `<leader>yc` to yank the current line and comment the previous one
+* `<leader>yf` to yank current file's absolute path
 
 ## Marks (m)
 

@@ -139,8 +139,28 @@ local function toggle_numbers()
 end
 vim.keymap.set("n", "<Leader>Tn", toggle_numbers, { silent = true, desc = "Toggle line numbers" })
 
+-- Diff ignore whitespace with toggling
+vim.opt.diffopt:append("iwhite")
+vim.keymap.set("n", "<Leader>Tdw", function()
+	local has_iwhite = vim.tbl_contains(vim.opt.diffopt:get(), "iwhite")
+	if has_iwhite then
+		vim.opt.diffopt:remove("iwhite")
+		vim.notify("Diff: Ignoring whitespace OFF")
+	else
+		vim.opt.diffopt:append("iwhite")
+		vim.notify("Diff: Ignoring whitespace ON")
+	end
+end, { silent = true, desc = "Toggle diff ignore whitespace" })
+
 -- Spellcheck
 vim.keymap.set("n", "<Leader>Ts", ":set spell!<CR>", { silent = true, desc = "Toggle spellcheck" })
+
+-- Show and copy current file's absolute path
+vim.keymap.set("n", "<Leader>yf", function()
+	local path = vim.fn.expand("%:p")
+	vim.fn.setreg("+", path)
+	vim.notify(path)
+end, { silent = true, desc = "Yank file path" })
 
 -- Window navigation from terminal mode
 -- local function term_nav_keymap(lhs, rhs)

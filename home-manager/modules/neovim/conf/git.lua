@@ -143,7 +143,8 @@ local function git_main_branch_ask()
 		vim.g.main_branch_override = branch
 		vim.notify("Main branch set to " .. branch)
 	else
-		vim.notify("No main branch set")
+		vim.g.main_branch_override = ""
+		vim.notify("Defaulting to default main branch")
 	end
 
 	switch_gutter_base_main()
