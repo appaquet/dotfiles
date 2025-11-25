@@ -7,6 +7,7 @@
 {
   imports = [
     ../../modules/virt.nix
+    ../../modules/virt-usb-persist.nix
     inputs.nixvirt.nixosModules.default
   ];
 
@@ -30,6 +31,24 @@
         ];
       };
     };
+  };
+
+  virtualisation.usbPassthrough = {
+    enable = true;
+    devices = [
+      {
+        vm = "homeassistant";
+        name = "zigbee-silicon-labs-cp210x-skyconnect";
+        vendor = "10c4";
+        product = "ea60";
+      }
+      {
+        vm = "homeassistant";
+        name = "zwave-aeotec-zw090";
+        vendor = "0658";
+        product = "0200";
+      }
+    ];
   };
 
   boot.kernel.sysctl = {
@@ -71,21 +90,20 @@
         ${pkgs.iptables}/bin/ip6tables -A FORWARD -i br0 -o br0 -j ACCEPT
         ${pkgs.iptables}/bin/ip6tables -A FORWARD -i br0 -j ACCEPT
 
-        sleep 30 # Really make sure usb is ready
         echo "Starting VMs"
         ${pkgs.libvirt}/bin/virsh start homeassistant || true
         ${pkgs.libvirt}/bin/virsh start pihole || true
 
         # Restart VMs, because of that weird USB bug
-        echo "Waiting before restarting VMs"
-        sleep 120
-        echo "Shutting down and restarting homeassistant VM"
-        ${pkgs.libvirt}/bin/virsh shutdown homeassistant
-        echo "Waiting before starting homeassistant VM again"
-        sleep 60
-        echo "Starting homeassistant VM again"
-        ${pkgs.libvirt}/bin/virsh start homeassistant
-        echo "Done"
+        # echo "Waiting before restarting VMs"
+        # sleep 120
+        # echo "Shutting down and restarting homeassistant VM"
+        # ${pkgs.libvirt}/bin/virsh shutdown homeassistant
+        # echo "Waiting before starting homeassistant VM again"
+        # sleep 60
+        # echo "Starting homeassistant VM again"
+        # ${pkgs.libvirt}/bin/virsh start homeassistant
+        # echo "Done"
 
         touch /tmp/virt-start-vms
       ''}";
