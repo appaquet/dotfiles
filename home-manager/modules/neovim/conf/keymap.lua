@@ -158,7 +158,7 @@ vim.keymap.set("n", "<Leader>Ts", ":set spell!<CR>", { silent = true, desc = "To
 -- Show and copy current file's absolute path
 vim.keymap.set("n", "<Leader>yf", function()
 	local path = vim.fn.expand("%:p")
-	vim.fn.setreg("+", path)
+	vim.fn.system("echo -n " .. vim.fn.shellescape(path) .. " | pbcopy")
 	vim.notify(path)
 end, { silent = true, desc = "Yank file path" })
 
