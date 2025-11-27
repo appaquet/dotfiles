@@ -37,7 +37,8 @@
       direnv
       nix-direnv
 
-      tealdeer # rust version of tldr
+      #FIXME: tealdeer # rust version of tldr
+      tldr
 
       bat # cat replacement
       lsd # ls replacement
