@@ -81,7 +81,7 @@ copy_files() {
 
 COMMAND=$1
 case $COMMAND in
-home)
+h | home)
   shift
 
   if [[ -z "$HOME_CONFIG" ]]; then
@@ -95,11 +95,11 @@ home)
     shift
     check_home $HOME_CONFIG
     ;;
-  build)
+  b | build)
     shift
     ${NIX_BUILDER} build "$@" ".#homeConfigurations.${HOME_CONFIG}.activationPackage"
     ;;
-  switch)
+  s | switch)
     shift
 
     GENERATION="${1:-}"
@@ -116,6 +116,10 @@ home)
       echo "Activating latest generation"
       ./result/activate
     fi
+    ;;
+  bs | build-switch)
+    shift
+    "$0" home build "$@" && "$0" home switch
     ;;
   diff)
     shift
@@ -135,8 +139,9 @@ home)
     ;;
   *)
     echo "$0 $COMMAND check: check home" >&2
-    echo "$0 $COMMAND build: build home" >&2
-    echo "$0 $COMMAND switch: switch home" >&2
+    echo "$0 $COMMAND build (b): build home" >&2
+    echo "$0 $COMMAND switch (s): switch home" >&2
+    echo "$0 $COMMAND build-switch (bs): build and switch" >&2
     echo "$0 $COMMAND diff: diff last build with current" >&2
     echo "$0 $COMMAND tree: show home tree" >&2
     echo "$0 $COMMAND generations: list generations" >&2
@@ -146,7 +151,7 @@ home)
   esac
   ;;
 
-darwin)
+d | darwin)
   shift
   SUBCOMMAND=$1
   case $SUBCOMMAND in
@@ -154,29 +159,34 @@ darwin)
     shift
     check_eval ".#darwinConfigurations.mbpapp.system"
     ;;
-  build)
+  b | build)
     shift
     ${NIX_BUILDER} build "$@" ".#darwinConfigurations.mbpapp.system"
     ;;
-  switch)
+  s | switch)
     shift
     sudo ./result/sw/bin/darwin-rebuild switch --flake .
+    ;;
+  bs | build-switch)
+    shift
+    "$0" darwin build "$@" && "$0" darwin switch
     ;;
   tree)
     shift
     nix-tree ~/.nix-profile
     ;;
   *)
-    echo "$0 $COMMAND check: check home" >&2
-    echo "$0 $COMMAND build: build home" >&2
-    echo "$0 $COMMAND switch: switch home" >&2
-    echo "$0 $COMMAND tree: show home tree" >&2
+    echo "$0 $COMMAND check: check darwin" >&2
+    echo "$0 $COMMAND build (b): build darwin" >&2
+    echo "$0 $COMMAND switch (s): switch darwin" >&2
+    echo "$0 $COMMAND build-switch (bs): build and switch" >&2
+    echo "$0 $COMMAND tree: show darwin tree" >&2
     exit 1
     ;;
   esac
   ;;
 
-nixos)
+n | nixos)
   shift
   SUBCOMMAND=$1
   case $SUBCOMMAND in
@@ -184,7 +194,7 @@ nixos)
     shift
     check_eval ".#nixosConfigurations.${HOSTNAME}.config.system.build.toplevel"
     ;;
-  build)
+  b | build)
     shift
     nixos-rebuild build "$@" --flake ".#${HOSTNAME}"
     ;;
@@ -215,7 +225,7 @@ nixos)
     prime_sudo
     sudo nixos-rebuild boot --flake ".#${HOSTNAME}"
     ;;
-  switch)
+  s | switch)
     shift
 
     read -r -p "Are you sure you want to switch now. Switching on next boot is recommended (y/n): " confirm
@@ -241,6 +251,10 @@ nixos)
       echo "Activating latest generation"
       sudo nixos-rebuild switch --flake ".#${HOSTNAME}"
     fi
+    ;;
+  bs | build-switch)
+    shift
+    "$0" nixos build "$@" && "$0" nixos switch
     ;;
   diff)
     shift
@@ -283,20 +297,21 @@ nixos)
     ;;
   *)
     echo "$0 $COMMAND check: check nixos" >&2
-    echo "$0 $COMMAND build: build nixos" >&2
+    echo "$0 $COMMAND build (b): build nixos" >&2
     echo "$0 $COMMAND sdimage: build SD card image (use MACHINE_KEY=user@host to override)" >&2
     echo "$0 $COMMAND boot: add new config to boot, but doesn't switch it until reboot" >&2
+    echo "$0 $COMMAND switch (s): switch nixos" >&2
+    echo "$0 $COMMAND build-switch (bs): build and switch" >&2
     echo "$0 $COMMAND diff: diff nixos" >&2
     echo "$0 $COMMAND tree: show nixos tree" >&2
     echo "$0 $COMMAND kernel-versions: show kernel versions" >&2
-    echo "$0 $COMMAND generations: diff nixos" >&2
-    echo "$0 $COMMAND switch: switch nixos" >&2
+    echo "$0 $COMMAND generations: list generations" >&2
     exit 1
     ;;
   esac
   ;;
 
-check)
+c | check)
   shift
   check_home "appaquet@deskapp"
   check_nixos "deskapp"
@@ -317,7 +332,7 @@ check)
   check_eval ".#darwinConfigurations.mbpapp.system"
   ;;
 
-update)
+u | update)
   shift
   PACKAGE="$1"
   if [[ -z "$PACKAGE" ]]; then
@@ -378,7 +393,7 @@ optimize)
   nix store optimise
   ;;
 
-copy)
+cp | copy)
   shift
   if [[ "$MACHINE_KEY" == "$LOCAL_MACHINE_KEY" ]]; then
     echo "MACHINE_KEY is the same as local machine. Aborting copy."
@@ -408,16 +423,16 @@ copy)
   ;;
 
 *)
-  echo "$0 home: home manager sub commands" >&2
-  echo "$0 darwin: darwin sub commands" >&2
-  echo "$0 nixos: nixos sub commands" >&2
-  echo "$0 check: eval home & nixos & darwin configs for all hosts" >&2
-  echo "$0 update: update nix channels" >&2
+  echo "$0 home (h): home manager sub commands" >&2
+  echo "$0 darwin (d): darwin sub commands" >&2
+  echo "$0 nixos (n): nixos sub commands" >&2
+  echo "$0 check (c): eval home & nixos & darwin configs for all hosts" >&2
+  echo "$0 update (u): update nix channels" >&2
   echo "$0 link: link system files" >&2
   echo "$0 gc: run garbage collection" >&2
   echo "$0 fmt: format nix files" >&2
   echo "$0 optimize: optimize store" >&2
-  echo "$0 copy: copy result to another machine" >&2
+  echo "$0 copy (cp): copy result to another machine" >&2
   exit 1
   ;;
 esac
