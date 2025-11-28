@@ -1,11 +1,11 @@
 ---
-name: pr-review
-description: Review changes in the current branch / PR for code style, architecture and correctness.
+name: review-do
+description: Review changes in the current branch for code style, architecture and correctness.
 ---
 
 # PR Review
 
-1. Load the context of the project and pull request / current branch
+1. Ensure context is loaded. If not, run `/ctx-load` and `/ctx-improve`.
 
 2. Create a new jj change for the review
 

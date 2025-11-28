@@ -1,5 +1,5 @@
 ---
-name: optimize-instructions
+name: mem-optimize
 description: Optimize instruction file using latest best practices
 argument-hint: [file-path]
 ---

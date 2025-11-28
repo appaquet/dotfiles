@@ -1,0 +1,50 @@
+# Claude Guide
+
+## TODO
+
+- [x] Rename -context to ctx-
+- [x] /go
+- [x] /continue
+- [x] /review-load
+- [x] /optimize-instructions -> /mem-optimize
+- [x] /pr-split
+- [ ] auto create pr.md in right place
+  - Give default location, unless specificed in project
+  - Create symlinks
+
+## Workflows
+
+- Actions
+  - `/plan`: Plan a high-level development plan for the task at hand
+  - `/go`: Start implement the next task / work item / phase
+  - `/continue`: Continue working on what you were doing before being interrupted
+
+- Reviewing
+  - `/review-do`: Perform a code review of the current branch using agents
+  - `/review-load`: Search for review comments in the codebase
+  - `/review-cat`: Categorize code review findings
+  - `/review-act`: Act on the code review findings
+
+- Context management
+  - `/ctx-load`: Load repository and task context
+  - `/ctx-save`: Save important context from conversation to PR.md and sub-files
+  - `/ctx-improve`: Improve context by asking clarifying questions to user
+
+- Project/tasks management
+  - `/pr-init`: Initialize a PR.md file for the current task
+  - `/pr-split`: Split a phase from PR.md into a sub-file
+  - `/pr-desc`: Generate PR description for current branch
+
+- Instructions / Memory
+  - `/mem-optimize`: Optimize instructions and memory usage
+
+- Pull requests
+  - `/pr-import-comments`: Import PR comments into codebase as REVIEW comments
+  - `/pr-reply-comments`: Reply to PR comments based on code changes
+
+## Agents
+
+- `branch-diff-summarizer`: Analyzes branch changes and generates file-by-file summaries for PR.md
+- `code-style-reviewer`: Reviews code for style, formatting, and syntax issues
+- `code-correctness-reviewer`: Reviews code for logic errors, bugs, and runtime issues
+- `architecture-reviewer`: Reviews code for architectural consistency and design patterns

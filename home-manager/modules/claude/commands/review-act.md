@@ -1,22 +1,15 @@
 ---
-name: review-comments
+name: review-act
 description: Review and address REVIEW comments left in code or pull requests
 ---
 
-# Review Comments
+# Act on review comments
 
 We want to review and fix the comments I've left in the code. I use `// REVIEW:` prefix (adapt to
 each language) to mark comments that need to be reviewed and addressed.
 
-1. Search for REVIEW comments in the codebase:
-   * At the **root of the repository**, use `rg -n "// REVIEW:"`
-     * **NEVER** look for comments in sub-directories directly, always start at the root of the repository
-     * **NEVER** assume that there aren't any comments left. If you can't find them, it means you are not
-       searching correctly.
-   * If no comments found, verify you're at repository root and not limiting by file type
-   * If, and only if, still no comments OR that I explicitly requested it, check PR comments using:
-     * Get current branch: `jj-current-branch`
-     * Check PR comments: `gh pr view $(jj-current-branch)` and `gh api repos/owner/repo/pulls/PR_NUMBER/comments`
+1. Unless we just loaded or decided on review comments, call `/review-load` to find all REVIEW
+   comments in the codebase.
 
 2. For each comment found, **ALWAYS** look at the surrounding and/or related code to fully
    understand the context. If you aren't sure about a comment, **ALWAYS** use `AskUserQuestion`
@@ -25,7 +18,7 @@ each language) to mark comments that need to be reviewed and addressed.
 
 3. **ALWAYS** create an action plan:
    * Build internal TODO list from review comments
-   * Update `PR.md` TODO section with identified tasks
+   * Update `PR.md` (and sub-PR files) TODO section with identified tasks
    * Prioritize tasks based on dependencies
 
 4. Execute tasks systematically:

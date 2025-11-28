@@ -1,15 +1,16 @@
 ---
 name: plan
 description: Load repository context and create high-level development plans
+argument-hint: [task-description]
 ---
 
 # Plan
 
-Load repository context, current task context, and create high-level plans for the task at hand. You
-need to ultrathink when doing this task.
+**Requires PLANNING mode.** Stop immediately if not in planning mode.
+
+If context unclear, run `/ctx-load` first. Ultrathink throughout this task.
 
 Task (may be empty):
-
 ```markdown
 $ARGUMENTS
 ```
@@ -17,7 +18,7 @@ $ARGUMENTS
 ## Instructions
 
 1. If the task above is empty and the context isn't clear about the task at hand from the rest of
-   our conversation, ask me about the task to be worked on
+   our conversation, ask me about the task to be worked on using the `AskUserQuestion` tool.
 
 2. Make sure to read and understand the full context of the task, repository and relevant
    documentation files
@@ -26,6 +27,8 @@ $ARGUMENTS
    * Break down the task into logical phases (scaffolding, testing, implementation, etc.)
    * Identify key files and components that will need modification
    * Consider dependencies and potential challenges
+   * ultrathink each phase, step, how they can be tested and validated
+   * Unless told otherwise, always insert validation tasks, asking for my feedback after each phase
 
 4. Use `AskUserQuestion` tool if the requirements are unclear or incomplete. Use the Understanding
    Checklist to verify you have all necessary information

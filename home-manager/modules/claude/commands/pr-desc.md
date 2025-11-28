@@ -5,7 +5,7 @@ description: Generate concise PR description from PR.md file
 
 # PR Description
 
-1. Read `PR.md` (if it exists, at root of repo)
+1. Make sure you have `PR.md` (and sub-files if any) loaded for current task.
 
 2. Ensure the "Files" section is up-to-date:
    * Use `jj-diff-branch --stat` to get current branch changes

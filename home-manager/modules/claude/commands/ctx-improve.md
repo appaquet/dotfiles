@@ -1,5 +1,5 @@
 ---
-name: improve-context
+name: ctx-improve
 description: Improve the context of the task at hands by asking clarifying questions
 ---
 

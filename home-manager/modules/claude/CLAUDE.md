@@ -9,7 +9,7 @@
 
 ## Context & Planning
 
-* Call `/load-context` before work/commands to ensure all relevant context loaded
+* Call `/ctx-load` before work/commands to ensure all relevant context loaded
 * Consider: edge cases, alternatives, reusability, existing patterns, bigger picture
 * Ambiguous references ("that/this/it"): STOP, ask which specific thing (IDE selection may be missing)
 

@@ -1,5 +1,5 @@
 ---
-name: save-context
+name: ctx-save
 description: Update PR.md with current project state, files, and TODO progress
 ---
 

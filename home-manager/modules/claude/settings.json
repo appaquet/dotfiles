@@ -39,7 +39,7 @@
       "WebFetch(domain:www.anthropic.com)",
       "WebSearch",
       "Skill(instruction-writer)",
-      "Skill(load-context)"
+      "Skill(ctx-load)"
     ]
   },
   "hooks": {
