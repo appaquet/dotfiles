@@ -176,11 +176,11 @@ keymaps, but also default/built-ins that I tend to forget.
 * `[g` to navigate to the previous git hunk
 * `<leader>ggm` to switch gutter base against main branch
 * `<leader>ggp` to switch gutter base against previous branch
-* `<leader>ggw` to switch gutter base to working directory
+* `<leader>ggw` to switch gutter base to working set
 
 ### Diff view
 
-* `<leader>gdw` to open diff view against working directory
+* `<leader>gdw` to open diff view against working set
 * `<leader>gdm` to open diff view against main branch
 * `<leader>gdp` to open diff view against previous branch
 * `<leader>gdc` to open diff view against given rev/commit
