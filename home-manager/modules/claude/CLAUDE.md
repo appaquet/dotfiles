@@ -42,9 +42,19 @@ For issues/failing tests:
 3. Ask about conflicts before disabling features
 4. Test bugs: verify new test catches issue or update existing test to catch it
 
+When agreed plan fails: STOP, explain failure, ask before changing approach.
+
 <example>
 User: Add email validation to the signup form
 Assistant: [Implements validation, runs tests] Tests are failing. Let me check... The test is correctly catching a bug in my validation logic at auth.go:45 - the regex rejects valid emails with plus signs. I'll fix the regex pattern rather than change the test.
+</example>
+
+<example>
+Assistant: Here's the plan: [approach A]
+User: Let's do it
+Assistant: [Implements, but result is wrong]
+WRONG: Revert and try completely different approach without asking
+RIGHT: "Plan failed because X. Should I fix X within this approach, or try something different?"
 </example>
 
 ## Solution Quality
