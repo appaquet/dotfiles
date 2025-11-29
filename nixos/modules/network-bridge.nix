@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ lib, config, pkgs, ... }:
 
 let
   cfg = config.networking.myBridge;
@@ -54,5 +54,27 @@ in
     # See https://github.com/NixOS/nixpkgs/issues/198267
     # Fix discussed here https://discourse.nixos.org/t/bridge-fails-for-one-boot-after-upgrade-to-24-05/46393
     networking.networkmanager.enable = false;
+
+    # Enable IPv6 forwarding on the bridge for VMs
+    boot.kernel.sysctl = {
+      "net.ipv6.conf.all.forwarding" = "1";
+      "net.ipv6.conf.all.accept_ra" = "2";
+      "net.ipv6.conf.default.accept_ra" = "2";
+    };
+
+    # IPv6 forwarding iptables rules for the bridge
+    systemd.services.bridge-ipv6-forward = {
+      description = "Enable IPv6 forwarding on bridge";
+      after = [ "network.target" ];
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        ExecStart = "${pkgs.writeShellScript "bridge-ipv6-forward" ''
+          ${pkgs.iptables}/bin/ip6tables -A FORWARD -i br0 -o br0 -j ACCEPT
+          ${pkgs.iptables}/bin/ip6tables -A FORWARD -i br0 -j ACCEPT
+        ''}";
+      };
+    };
   };
 }

@@ -8,6 +8,9 @@
   virtualisation.libvirtd = {
     enable = true;
     onBoot = "ignore"; # don't resume running vms automatically
+    onShutdown = "shutdown"; # cleanly shutdown VMs (not suspend) to avoid USB passthrough issues
+    parallelShutdown = 10; # shutdown all VMs in parallel
+    shutdownTimeout = 120; # wait max 120s per VM before force killing
 
     qemu = {
       package = pkgs.qemu_kvm;
