@@ -83,5 +83,25 @@ in
         ./piprint/configuration.nix
       ];
     };
+
+    piups = inputs.nixos-raspberrypi.lib.nixosSystem {
+      system = "aarch64-linux";
+
+      specialArgs = {
+        inherit inputs;
+        inherit (inputs) nixos-raspberrypi;
+        secrets = inputs.secrets.init "linux";
+      };
+
+      modules = [
+        {
+          imports = with inputs.nixos-raspberrypi.nixosModules; [
+            raspberry-pi-3.base
+            sd-image
+          ];
+        }
+        ./piups/configuration.nix
+      ];
+    };
   };
 }

@@ -32,6 +32,10 @@ elif [[ "${MACHINE_KEY}" == "appaquet@piprint"* ]]; then
   HOME_CONFIG="appaquet@piprint"
   HOSTNAME="piprint"
 
+elif [[ "${MACHINE_KEY}" == "appaquet@piups"* ]]; then
+  HOME_CONFIG="appaquet@piups"
+  HOSTNAME="piups"
+
 elif [[ "${MACHINE_KEY}" == "appaquet@mbpapp"* || "${MACHINE_KEY}" == "appaquet@mbpvmapp"* ]]; then
   HOME_CONFIG="appaquet@mbpapp"
 fi
@@ -324,6 +328,9 @@ c | check)
 
   check_nixos "piprint"
   check_home "appaquet@piprint"
+
+  check_nixos "piups"
+  check_home "appaquet@piups"
 
   check_nixos "servapp"
   check_home "appaquet@servapp"
