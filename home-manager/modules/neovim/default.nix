@@ -8,15 +8,14 @@
 }:
 
 let
-  devMode = true; # Include files from dotfiles directly instead of via nix store
-
   pkgsChannel = pkgs;
 
   confDir = "${config.home.homeDirectory}/dotfiles/home-manager/modules/neovim/conf";
 
+  # nvimDevMode: include files from dotfiles directly instead of via nix store
   includeLuaFile =
     path:
-    if devMode then
+    if cfg.nvimDevMode then
       ''
         lua dofile("${confDir}/${path}")
       ''
@@ -28,7 +27,7 @@ let
       '';
 
   nvimEnv = ''
-    let g:minimal_nvim = ${if cfg.minimalNvim then "v:true" else "v:false"}
+    let g:minimal_nvim = ${if cfg.nvimMinimal then "v:true" else "v:false"}
 
     if filereadable("${secrets.common.nvimSecrets}")
       lua dofile("${secrets.common.nvimSecrets}")
@@ -122,7 +121,7 @@ in
         nvim-treesitter-textobjects # provides object manipulation
       ])
       # Full plugins
-      ++ (lib.optionals (!cfg.minimalNvim) (
+      ++ (lib.optionals (!cfg.nvimMinimal) (
         with pkgsChannel.vimPlugins;
         [
           # LSP / Languages
@@ -189,7 +188,7 @@ in
           (includeLuaFile "quickfix.lua")
           (includeLuaFile "diag.lua")
         ]
-        ++ (lib.optionals (!cfg.minimalNvim) [
+        ++ (lib.optionals (!cfg.nvimMinimal) [
           (includeLuaFile "lang.lua")
           (includeLuaFile "formatting.lua")
           (includeLuaFile "linting.lua")
@@ -204,7 +203,7 @@ in
       )
     );
 
-    extraPackages = lib.optionals (!cfg.minimalNvim) (
+    extraPackages = lib.optionals (!cfg.nvimMinimal) (
       with pkgsChannel;
       [
         nixd # nix lsp

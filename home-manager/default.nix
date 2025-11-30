@@ -31,7 +31,8 @@ in
 
           cfg = {
             isNixos = true;
-            minimalNvim = false;
+            nvimMinimal = false;
+            nvimDevMode = true;
           };
         };
 
@@ -45,7 +46,8 @@ in
           secrets = inputs.secrets.init "linux";
           cfg = {
             isNixos = true;
-            minimalNvim = false;
+            nvimMinimal = false;
+            nvimDevMode = false;
           };
         };
 
@@ -59,7 +61,8 @@ in
           secrets = inputs.secrets.init "darwin";
           cfg = {
             isNixos = false; # macOS, not NixOS
-            minimalNvim = false;
+            nvimMinimal = false;
+            nvimDevMode = true;
           };
         };
 
@@ -73,7 +76,8 @@ in
           secrets = inputs.secrets.init "linux";
           cfg = {
             isNixos = true;
-            minimalNvim = true;
+            nvimMinimal = true;
+            nvimDevMode = false;
           };
         };
 
@@ -87,7 +91,8 @@ in
           secrets = inputs.secrets.init "linux";
           cfg = {
             isNixos = true;
-            minimalNvim = true;
+            nvimMinimal = true;
+            nvimDevMode = false;
           };
         };
 
@@ -101,7 +106,8 @@ in
           secrets = inputs.secrets.init "linux";
           cfg = {
             isNixos = true;
-            minimalNvim = true;
+            nvimMinimal = true;
+            nvimDevMode = false;
           };
         };
   };
