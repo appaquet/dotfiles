@@ -196,7 +196,7 @@ n | nixos)
     ;;
   b | build)
     shift
-    nixos-rebuild build "$@" --flake ".#${HOSTNAME}"
+    ${NIX_BUILDER} build "$@" ".#nixosConfigurations.${HOSTNAME}.config.system.build.toplevel"
     ;;
   sdimage)
     shift
