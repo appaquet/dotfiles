@@ -34,11 +34,7 @@
       nix-index # nix-locate "libsomelib.so.0"
       comma
 
-      direnv
-      nix-direnv
-
-      #FIXME: tealdeer # rust version of tldr
-      tldr
+      tealdeer # rust version of tldr
 
       bat # cat replacement
       lsd # ls replacement
