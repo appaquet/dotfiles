@@ -6,5 +6,7 @@
     yt-dlp
     imagemagick
     graphviz
+
+    ripgrep-all # supports pdf, docs, etc.
   ];
 }

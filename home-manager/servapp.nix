@@ -9,6 +9,7 @@
     ./modules/media.nix
     ./modules/vms.nix
     ./modules/vpn.nix
+    ./modules/mise.nix
   ];
 
   home.username = "appaquet";

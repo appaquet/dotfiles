@@ -11,7 +11,6 @@
     ./tmux
     ./git
     ./neovim
-    ./mise.nix
     ./utils
     ./autojump.nix
     ./ssh.nix
@@ -42,7 +41,6 @@
 
       fzf
       ripgrep
-      ripgrep-all # supports pdf, docs, etc.
       fd # replacement for find
 
       dua
@@ -54,7 +52,6 @@
       ookla-speedtest
       mtr
       gping
-      fastfetch
       bandwhich
       dig
       whois
