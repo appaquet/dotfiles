@@ -11,7 +11,6 @@ let
   devMode = true; # Include files from dotfiles directly instead of via nix store
 
   pkgsChannel = pkgs;
-  agenticEnabled = !cfg.minimalNvim;
 
   confDir = "${config.home.homeDirectory}/dotfiles/home-manager/modules/neovim/conf";
 
@@ -28,7 +27,9 @@ let
         END
       '';
 
-  includeSecrets = ''
+  nvimEnv = ''
+    let g:minimal_nvim = ${if cfg.minimalNvim then "v:true" else "v:false"}
+
     if filereadable("${secrets.common.nvimSecrets}")
       lua dofile("${secrets.common.nvimSecrets}")
     else
@@ -43,7 +44,12 @@ in
     vimAlias = true;
     defaultEditor = true;
 
+    # We only have lua and vimscript configs
+    withRuby = false;
+    withNodeJs = false;
+
     plugins =
+      # Base plugins
       (with pkgsChannel.vimPlugins; [
         # Theme
         catppuccin-nvim
@@ -52,9 +58,10 @@ in
 
         # Layout
         nvim-tree-lua
-        lualine-nvim # https://github.com/nvim-lualine/lualine.nvim
-        auto-session # automatically restore last session
         zen-mode-nvim
+        mini-nvim # tabline, bufremove, etc.
+        lualine-nvim # https://github.com/nvim-lualine/lualine.nvim
+        nvim-navic # symbol breadcrumbs in statusline
 
         # Tools
         fzf-lua
@@ -62,14 +69,12 @@ in
         which-key-nvim # show keymap hints
         todo-comments-nvim # highlight TODO, FIXME, etc
         multicursors-nvim
-        mini-nvim # tabline, bufremove, etc.
-        snacks-nvim # profiler
+        auto-session # automatically restore last session
 
         # Notifications
         (nvim-notify.overrideAttrs (_: {
           doCheck = false; # flaky on ci
         }))
-        nvim-lsp-notify
 
         # Diagnostics
         trouble-nvim
@@ -81,40 +86,7 @@ in
         octo-nvim
         gitlinker-nvim
 
-        # LSP / Languages
-        go-nvim
-        neotest
-        neotest-golang
-        neotest-python
-        rustaceanvim
-        conform-nvim # formatting
-        nvim-navic # symbol breadcrumbs in statusline
-        render-markdown-nvim
-        nvim-lint
-
-        # Autocomplete
-        nvim-cmp # https://github.com/hrsh7th/nvim-cmp
-        cmp-cmdline
-        cmp-nvim-lsp
-        cmp-nvim-lsp-signature-help
-        cmp-nvim-lsp-document-symbol
-        cmp-cmdline
-        copilot-lua # use `Copilot auth` to login
-        copilot-lsp # needed for NES on copilot-lua
-
-        # Snippets
-        luasnip
-        cmp_luasnip
-        friendly-snippets # easy load from vscode, languages, etc.
-
-        # Debugging
-        nvim-dap
-        nvim-dap-ui
-        nvim-dap-go
-        nvim-dap-python
-        nvim-dap-virtual-text
-
-        # Syntax
+        # Treesitter
         (nvim-treesitter.withPlugins (p: [
           # see https://github.com/nvim-treesitter/nvim-treesitter for available languages
           p.bash
@@ -149,16 +121,58 @@ in
         ]))
         nvim-treesitter-textobjects # provides object manipulation
       ])
-      ++ (lib.optionals agenticEnabled [
-        pkgsChannel.vimPlugins.codecompanion-nvim
-        pkgsChannel.vimPlugins.claudecode-nvim
-      ]);
+      # Full plugins
+      ++ (lib.optionals (!cfg.minimalNvim) (
+        with pkgsChannel.vimPlugins;
+        [
+          # LSP / Languages
+          go-nvim
+          neotest
+          neotest-golang
+          neotest-python
+          rustaceanvim
+          conform-nvim # formatting
+          render-markdown-nvim
+          nvim-lint # linting
+          nvim-lsp-notify # lsp notifications
+
+          # Autocomplete
+          nvim-cmp # https://github.com/hrsh7th/nvim-cmp
+          cmp-cmdline
+          cmp-nvim-lsp
+          cmp-nvim-lsp-signature-help
+          cmp-nvim-lsp-document-symbol
+          cmp-cmdline
+          copilot-lua # use `Copilot auth` to login
+          copilot-lsp # needed for NES on copilot-lua
+
+          # Snippets
+          luasnip
+          cmp_luasnip
+          friendly-snippets # easy load from vscode, languages, etc.
+
+          # AI assistants
+          codecompanion-nvim
+          claudecode-nvim
+
+          # Debugging
+          nvim-dap
+          nvim-dap-ui
+          nvim-dap-go
+          nvim-dap-python
+          nvim-dap-virtual-text
+
+          # Profiling
+          snacks-nvim # nvim profiler
+        ]
+      ));
 
     extraConfig = (
       builtins.concatStringsSep "\n" (
         [
+          nvimEnv
           (includeLuaFile "base.lua")
-          includeSecrets
+
           (includeLuaFile "keymap.lua")
           (includeLuaFile "theme.lua")
           (includeLuaFile "buffers.lua")
@@ -171,26 +185,26 @@ in
 
           (includeLuaFile "treesitter.lua")
           (includeLuaFile "git.lua")
+
+          (includeLuaFile "quickfix.lua")
+          (includeLuaFile "diag.lua")
+        ]
+        ++ (lib.optionals (!cfg.minimalNvim) [
           (includeLuaFile "lang.lua")
           (includeLuaFile "formatting.lua")
           (includeLuaFile "linting.lua")
 
           (includeLuaFile "copilot.lua")
-
-          (includeLuaFile "diag.lua")
-          (includeLuaFile "testing.lua")
-          (includeLuaFile "quickfix.lua")
-          (includeLuaFile "debugging.lua")
-
-          (includeLuaFile "profiling.lua")
-        ]
-        ++ (lib.optionals agenticEnabled [
           (includeLuaFile "agentic.lua")
+
+          (includeLuaFile "testing.lua")
+          (includeLuaFile "debugging.lua")
+          (includeLuaFile "profiling.lua")
         ])
       )
     );
 
-    extraPackages = (
+    extraPackages = lib.optionals (!cfg.minimalNvim) (
       with pkgsChannel;
       [
         nixd # nix lsp
@@ -222,5 +236,4 @@ in
     recursive = true;
     source = ./ftplugin;
   };
-
 }
