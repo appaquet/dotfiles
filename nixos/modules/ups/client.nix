@@ -21,10 +21,16 @@ in
   options.power.myUps = {
     enable = lib.mkEnableOption "Enable UPS client listening after network UPS";
 
+    name = lib.mkOption {
+      type = lib.types.str;
+      description = "Name of the UPS";
+      default = "ups"; # ups (servers) or network
+    };
+
     server = lib.mkOption {
       type = lib.types.str;
       description = "IP of the server";
-      default = "192.168.0.27"; # piapp
+      default = "192.168.0.10"; # piups
     };
 
     shutdownDelay = lib.mkOption {
@@ -72,7 +78,7 @@ in
             };
 
             monitor.main = {
-              system = "ups@${cfg.server}";
+              system = "${cfg.name}@${cfg.server}";
               user = "monuser";
               passwordFile = secrets.upsPw;
             };
