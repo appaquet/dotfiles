@@ -45,8 +45,11 @@
     serviceConfig = {
       Type = "oneshot";
       ExecStart = "${pkgs.writeShellScript "start-vms" ''
-        ${pkgs.libvirt}/bin/virsh start pihole || true
-        ${pkgs.libvirt}/bin/virsh start homeassistant || true
+        for i in $(seq 1 5); do
+          ${pkgs.libvirt}/bin/virsh start pihole || true
+          ${pkgs.libvirt}/bin/virsh start homeassistant || true
+          sleep 5
+        done
       ''}";
     };
     wantedBy = [ "multi-user.target" ];
