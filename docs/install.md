@@ -125,6 +125,7 @@
 1. Boot the RPi from SD card.
 
 1. Change password from default `carpediem`.
+   SSH may not work until a physical login is done.
 
 1. **NVMe Migration** (Optional): If using NVMe, copy system to NVMe and update boot:
 
@@ -147,6 +148,7 @@
    Copy the output to `nixos/piapp/hardware-configuration.nix` with `lib.mkDefault` for all filesystem options.
 
 1. Follow normal procedure to setup home-manager & rebuild NixOS.
+   Note: WiFi will not work until home & ssh is setup for keys.
 
 ### Build remotely
 

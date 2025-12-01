@@ -13,11 +13,7 @@
 
   networking = {
     hostName = "piprint";
-    useDHCP = false;
-    interfaces = {
-      wlan0.useDHCP = true;
-      eth0.useDHCP = true;
-    };
+    useDHCP = true;
     firewall.enable = false;
   }
   // secrets.nixos.wifi.home_2_4;

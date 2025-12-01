@@ -1,7 +1,5 @@
 {
   config,
-  pkgs,
-  secrets,
   ...
 }:
 
@@ -14,11 +12,7 @@
 
   networking = {
     hostName = "piups";
-    useDHCP = false;
-    interfaces = {
-      wlan0.useDHCP = true;
-      eth0.useDHCP = true;
-    };
+    useDHCP = true;
     firewall.enable = false;
   };
 
