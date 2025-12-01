@@ -110,5 +110,20 @@ in
             nvimDevMode = false;
           };
         };
+
+    "appaquet@piups" =
+      mkHomeConfig "aarch64-linux"
+        [
+          ./piups.nix
+          (inputs.secrets.init "linux").commonHome
+        ]
+        {
+          secrets = inputs.secrets.init "linux";
+          cfg = {
+            isNixos = true;
+            nvimMinimal = true;
+            nvimDevMode = false;
+          };
+        };
   };
 }
