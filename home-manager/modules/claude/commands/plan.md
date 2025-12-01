@@ -21,7 +21,7 @@ $ARGUMENTS
    our conversation, ask me about the task to be worked on using the `AskUserQuestion` tool.
 
 2. Make sure to read and understand the full context of the task, repository and relevant
-   documentation files
+   documentation files. Use the `/ctx-improve` command if necessary to clarify any uncertainties.
 
 3. Analyze the task requirements and create a high-level development plan:
    * Break down the task into logical phases (scaffolding, testing, implementation, etc.)
