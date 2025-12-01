@@ -6,25 +6,38 @@ argument-hint: [task-description]
 
 # PR Initialization
 
-Create a `PR.md` file at the root of the repository with the appropriate sections by conversing with
-me. You should *ALWAYS* use the documented structure as defined in your rules. If file too big,
-propose splitting into phases and sub-files (`PR-<subphase>.md`).
+Create a `PR.md` file with appropriate sections by conversing with me. Use documented structure from
+@docs/PR-file.md. If too big, propose splitting into phases and sub-files (`PR-<phase-name>.md`).
 
 Task (may be empty, ask me if so):
 ```markdown
 $ARGUMENTS
 ```
 
-1. If the task above is empty, ask me about the task to be worked on.
+## File Location
 
-2. Use the `/ctx-improve` command to improve the context of the task at hand by asking
-   clarifying questions until you have a crystal clear understanding of the task.
+Unless project instructions specify otherwise:
 
-3. Create a `PR.md` file at the root of the repository with the appropriate sections.
-   If project too big, propose splitting into phases and sub-files (`PR-<subphase>.md`).
+1. Derive project name from `jj-current-branch`, use `AskUserQuestion` to confirm/adjust
+2. Get current date via `date +%Y/%m/%d` and create directory: `docs/feats/<date>-<project-name>/`
+3. Create `PR.md` in that directory
+4. Commit docs in private jj change: `jj new -m "private: claude: docs - <project-name>"`
+5. Create symlink at repo root: `ln -s docs/feats/.../PR.md PR.md`
+6. Commit symlink in private jj change: `jj new -m "private: PR.md - <project-name>"`
 
-4. After each question / answer, update the `PR.md` file think hard about the next questions to ask
-   to make sure you have all the information needed to proceed with the task.
+**Important**: Both changes stay private - never include in actual PRs
 
-5. NEVER jump to implementation after. Once we have the file created, let's stop there and leave me
-   the task kick-off the next phase.
+## Instructions
+
+1. If task empty, ask about the task to be worked on.
+
+2. Determine file location per above, create directory and symlink.
+
+3. Use `/ctx-improve` to clarify requirements until crystal clear understanding.
+
+4. Create `PR.md` with appropriate sections. If too big, propose splitting into phases with
+   sub-files (`PR-<phase-name>.md` in same directory).
+
+5. After each Q&A, update `PR.md` and think hard about next questions.
+
+6. NEVER jump to implementation. Stop after file creation.

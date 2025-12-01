@@ -5,7 +5,8 @@ description: Generate concise PR description from PR.md file
 
 # PR Description
 
-1. Make sure you have `PR.md` (and sub-files if any) loaded for current task.
+1. Find and load `PR.md` (check root symlink → follow to actual location, or per project instructions).
+   Load phase sub-file (`PR-<phase-name>.md`) only if relevant to current work.
 
 2. Ensure the "Files" section is up-to-date:
    * Use `jj-diff-branch --stat` to get current branch changes

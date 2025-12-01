@@ -1,9 +1,9 @@
 ---
-name: review-act
-description: Review and address REVIEW comments left in code or pull requests
+name: review-fix
+description: Fix REVIEW comments left in code or pull requests
 ---
 
-# Act on review comments
+# Fix review comments
 
 We want to review and fix the comments I've left in the code. I use `// REVIEW:` prefix (adapt to
 each language) to mark comments that need to be reviewed and addressed.

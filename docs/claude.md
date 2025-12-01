@@ -8,8 +8,8 @@
 - [x] /review-load
 - [x] /optimize-instructions -> /mem-optimize
 - [x] /pr-split
-- [ ] auto create pr.md in right place
-  - Give default location, unless specificed in project
+- [x] auto create pr.md in right place
+  - Give default location, unless specified in project
   - Create symlinks
 
 ## Workflows
@@ -23,7 +23,7 @@
   - `/review-do`: Perform a code review of the current branch using agents
   - `/review-load`: Search for review comments in the codebase
   - `/review-cat`: Categorize code review findings
-  - `/review-act`: Act on the code review findings
+  - `/review-fix`: Fix code review findings
 
 - Context management
   - `/ctx-load`: Load repository and task context

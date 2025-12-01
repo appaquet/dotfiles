@@ -1,12 +1,12 @@
 ---
 name: pr-split
-description: Split a phase from PR.md into a sub-file (pr-<subphase>.md)
+description: Split a phase from PR.md into a sub-file (PR-<phase-name>.md)
 argument-hint: [phase-name]
 ---
 
 # PR Split
 
-Split a phase from PR.md into a dedicated sub-file.
+Split a phase from PR.md into a dedicated sub-file in the **same directory** as PR.md.
 
 Phase (may be empty if clear from context):
 ```markdown
@@ -18,13 +18,15 @@ $ARGUMENTS
 2. If phase not specified or clear from context, list phases from PR.md TODO section and use
    `AskUserQuestion`.
 
-3. Create `pr-<phase>.md` with:
+3. Determine phase name: 2-3 words describing the phase (e.g., "auth-validation", "api-endpoints").
+
+4. Create `PR-<phase-name>.md` in **same directory as PR.md** (not repo root) with:
    * Context (brief, reference parent PR.md)
    * Files (relevant to this phase)
    * TODO (moved from PR.md)
 
-4. Update `PR.md`:
-   * Replace phase TODOs with: `See [pr-<phase>.md](pr-<phase>.md)`
+5. Update `PR.md`:
+   * Replace phase TODOs with relative link: `See [PR-<phase-name>.md](PR-<phase-name>.md)`
    * Keep phase header for navigation
 
-5. NEVER jump to implementation after. Report changes and wait for instruction.
+6. NEVER jump to implementation. Report changes and wait for instruction.

@@ -39,7 +39,7 @@
       "WebFetch(domain:www.anthropic.com)",
       "WebSearch",
       "Skill(instruction-writer)",
-      "Skill(ctx-load)"
+      "SlashCommand:/ctx-load:*"
     ]
   },
   "hooks": {
@@ -62,5 +62,5 @@
       "allowLocalBinding": true
     }
   },
-  "alwaysThinkingEnabled": false
+  "alwaysThinkingEnabled": true
 }
