@@ -12,7 +12,7 @@
   <os>
     <type arch='x86_64' machine='q35'>hvm</type>
     <loader readonly='yes' type='pflash'>/mnt/secondary/vms/OVMF_CODE.fd</loader>
-    <nvram template='/run/libvirt/nix-ovmf/OVMF_VARS.fd'>/mnt/secondary/vms/OVMF_VARS.fd</nvram>
+    <nvram template='/run/libvirt/nix-ovmf/edk2-i386-vars.fd'>/mnt/secondary/vms/OVMF_VARS.fd</nvram>
     <bootmenu enable='no'/>
   </os>
   <features>

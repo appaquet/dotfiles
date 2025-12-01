@@ -62,5 +62,5 @@
       "allowLocalBinding": true
     }
   },
-  "alwaysThinkingEnabled": false
+  "alwaysThinkingEnabled": true
 }
