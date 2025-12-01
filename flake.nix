@@ -50,12 +50,8 @@
       url = "github:lnl7/nix-darwin/nix-darwin-25.05";
     };
 
-    nixos-raspberrypi-nixpkgs = {
-      url = "github:nvmd/nixpkgs/modules-with-keys-25.05";
-    };
     nixos-raspberrypi = {
       url = "github:nvmd/nixos-raspberrypi/main";
-      inputs.nixpkgs.follows = "nixos-raspberrypi-nixpkgs";
     };
   };
 
