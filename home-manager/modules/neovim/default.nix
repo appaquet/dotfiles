@@ -9,10 +9,8 @@
 
 let
   pkgsChannel = pkgs;
-
   confDir = "${config.home.homeDirectory}/dotfiles/home-manager/modules/neovim/conf";
 
-  # nvimDevMode: include files from dotfiles directly instead of via nix store
   includeLuaFile =
     path:
     if cfg.nvimDevMode then
