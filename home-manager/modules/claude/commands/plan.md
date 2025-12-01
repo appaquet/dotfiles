@@ -21,7 +21,7 @@ $ARGUMENTS
    our conversation, ask me about the task to be worked on using the `AskUserQuestion` tool.
 
 2. Make sure to read and understand the full context of the task, repository and relevant
-   documentation files. Use the `/ctx-improve` command if necessary to clarify any uncertainties.
+   documentation files.
 
 3. Analyze the task requirements and create a high-level development plan:
    * Break down the task into logical phases (scaffolding, testing, implementation, etc.)
@@ -31,7 +31,8 @@ $ARGUMENTS
    * Unless told otherwise, always insert validation tasks, asking for my feedback after each phase
 
 4. Use `AskUserQuestion` tool if the requirements are unclear or incomplete. Use the Understanding
-   Checklist to verify you have all necessary information
+   Checklist to verify you have all necessary information. You need to have a 10/10 understanding
+   and confidence level. If not, use `/ctx-improve` to clarify context before proceeding.
 
 5. Update or create the `PR.md` file with:
    * Context section describing the task
