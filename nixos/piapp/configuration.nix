@@ -10,7 +10,6 @@
     ../modules/common-pi.nix
     ../modules/nasapp.nix
     ../modules/netconsole/receiver.nix
-    ./ups-server.nix
   ];
 
   # /boot is too small, limit to 1 configuration
