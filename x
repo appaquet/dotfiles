@@ -380,8 +380,9 @@ gc)
   shift
   echo "Garbage collecting..."
 
-  nix-collect-garbage --delete-older-than "7d"
   home-manager expire-generations "-7 days"
+
+  nix-collect-garbage --delete-older-than "7d"
 
   # Cleaning as root collects more stuff as well
   # See https://www.reddit.com/r/NixOS/comments/10107km/how_to_delete_old_generations_on_nixos/?s=8
