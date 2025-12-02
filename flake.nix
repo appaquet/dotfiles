@@ -1,9 +1,8 @@
 {
   inputs = {
-    # nixpkgs-unstable is used instead of nixos-unstable since it has no guarantee of being cached
-    # use nixos-25.05 for nixos systems to have a stable system
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixos.url = "github:nixos/nixpkgs/nixos-25.05";
+
+    nixos.url = "github:nixos/nixpkgs/nixos-25.11";
 
     flake-parts.url = "github:hercules-ci/flake-parts";
 
@@ -51,12 +50,8 @@
       url = "github:lnl7/nix-darwin/nix-darwin-25.05";
     };
 
-    nixos-raspberrypi-nixpkgs = {
-      url = "github:nvmd/nixpkgs/modules-with-keys-25.05";
-    };
     nixos-raspberrypi = {
       url = "github:nvmd/nixos-raspberrypi/main";
-      inputs.nixpkgs.follows = "nixos-raspberrypi-nixpkgs";
     };
   };
 

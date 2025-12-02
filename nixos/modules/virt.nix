@@ -16,10 +16,6 @@
       package = pkgs.qemu_kvm;
       swtpm.enable = true;
       runAsRoot = false;
-      ovmf = {
-        enable = true;
-        packages = [ pkgs.OVMFFull.fd ]; # they will be accessible via /run/libvirt/nix-ovmf/
-      };
     };
   };
   programs.virt-manager.enable = true;

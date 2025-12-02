@@ -12,7 +12,7 @@
   <os>
     <type arch='x86_64' machine='q35'>hvm</type>
     <loader readonly='yes' type='pflash'>/mnt/secondary/vms/OVMF_CODE.fd</loader>
-    <nvram template='/run/libvirt/nix-ovmf/OVMF_VARS.fd'>/mnt/secondary/vms/OVMF_VARS.fd</nvram>
+    <nvram template='/run/libvirt/nix-ovmf/edk2-i386-vars.fd'>/mnt/secondary/vms/OVMF_VARS.fd</nvram>
     <bootmenu enable='no'/>
   </os>
   <features>
@@ -205,7 +205,7 @@
     </hostdev>
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <source>
-        <address domain='0x0000' bus='0x05' slot='0x00' function='0x0'/>
+        <address domain='0x0000' bus='0x03' slot='0x00' function='0x0'/>
       </source>
       <address type='pci' domain='0x0000' bus='0x01' slot='0x00' function='0x0'/>
     </hostdev>
