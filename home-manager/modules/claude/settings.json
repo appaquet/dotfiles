@@ -13,6 +13,7 @@
       "Bash(jj show:*)",
       "Bash(jj diff:*)",
       "Bash(jj commit:*)",
+      "Bash(jj status:*)",
       "Bash(jj new:*)",
       "Bash(jj-main-branch:*)",
       "Bash(jj-current-branch:*)",
