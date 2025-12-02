@@ -1,9 +1,7 @@
 {
   inputs = {
-    # nixpkgs-unstable is used instead of nixos-unstable since it has no guarantee of being cached
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    # use rolling channels for system for more stability
     nixos.url = "github:nixos/nixpkgs/nixos-25.11";
 
     flake-parts.url = "github:hercules-ci/flake-parts";
