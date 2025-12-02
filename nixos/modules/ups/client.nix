@@ -30,7 +30,7 @@ in
     server = lib.mkOption {
       type = lib.types.str;
       description = "IP of the server";
-      default = "192.168.0.10"; # piups
+      default = "192.168.0.11"; # piups
     };
 
     shutdownDelay = lib.mkOption {
