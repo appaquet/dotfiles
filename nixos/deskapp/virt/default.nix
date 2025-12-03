@@ -26,9 +26,6 @@
       "qemu:///system" = {
         domains = [
           {
-            definition = ./domains/embed.xml;
-          }
-          {
             definition = ./domains/win10.xml;
           }
         ];
@@ -53,7 +50,6 @@
     let
       gpuDomains = [
         "win10"
-        "embed"
       ];
 
       qemuHook = pkgs.writeScript "qemu-hook" ''

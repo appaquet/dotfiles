@@ -115,8 +115,6 @@ let
             pkill -9 process-compose || true
         fi
 
-        docker kill hf-dev-embeddings || true
-
         switch_driver "vfio-pci"
     }
 
