@@ -13,6 +13,10 @@ Comprehensive guidelines for writing effective instructions, skills, slash comma
 - Don't anticipate every edge case upfront
 - Remove meta-commentary and verbose explanations
 
+**Instruction Budget**: LLMs reliably follow only 150-200 instructions. Claude Code's system prompt uses ~50, so CLAUDE.md should stay well under 150 instructions.
+
+**Line Count**: Keep CLAUDE.md under 300 lines; under 60 lines is optimal. Put detailed docs in separate files.
+
 ### 2. Be Explicit and Direct
 
 Claude 4.x models excel with clear, specific instructions.
@@ -58,6 +62,24 @@ Benefits:
 - Helps model parse intent effectively
 - Separates concerns (context vs. instructions vs. examples)
 - Improves token efficiency through clear boundaries
+
+### 5. Universal Applicability
+
+CLAUDE.md loads in every conversation. Include only instructions that apply to most tasks.
+
+- Move task-specific guidance to separate files Claude reads on-demand
+- If instruction applies to <50% of sessions, it doesn't belong in CLAUDE.md
+- The more irrelevant content, the more Claude filters out everything uniformly
+
+## What NOT to Include in CLAUDE.md
+
+### Don't Auto-Generate
+
+Avoid `/init` or auto-generation. Each line affects every interaction—manually craft content.
+
+### Don't Embed Code Snippets
+
+Prefer `file:line` references over code copies. Snippets become outdated; references stay accurate.
 
 ## Examples: The "Pictures" Worth a Thousand Words
 
@@ -248,6 +270,26 @@ Assistant: ideal response
 - Reference other docs: @docs/filename.md
 ```
 
+**CLAUDE.md Structure: WHY, WHAT, HOW**
+
+- **WHAT**: Tech stack, project structure, monorepo layout
+- **WHY**: Project purpose, component functions, design rationale
+- **HOW**: Build commands, test procedures, verification steps
+
+**Progressive Disclosure for CLAUDE.md**
+
+Create a docs directory for detailed information:
+
+```
+agent_docs/
+  ├─ building.md
+  ├─ testing.md
+  ├─ conventions.md
+  └─ architecture.md
+```
+
+CLAUDE.md points to these files; Claude reads relevant ones per-task.
+
 ## Quality & Reliability
 
 ### Prevent Hallucinations
@@ -320,3 +362,4 @@ For skills that use tools:
 - [Claude 4.x Best Practices](https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/claude-4-best-practices)
 - [Effective Context Engineering for AI Agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
 - [Claude Code Skills Documentation](https://code.claude.com/docs/en/skills.md)
+- [Writing a Good CLAUDE.md](https://www.humanlayer.dev/blog/writing-a-good-claude-md)
