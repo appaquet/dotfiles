@@ -5,6 +5,7 @@ require("which-key").add({
 -- codecompanion
 -- https://codecompanion.olimorris.dev/getting-started.html
 require("codecompanion").setup({
+	ignore_warnings = true, -- ignore future deprecation warnings from 18.0.0 (https://github.com/olimorris/codecompanion.nvim/pull/2439)
 	strategies = {
 		chat = {
 			adapter = "copilot",
