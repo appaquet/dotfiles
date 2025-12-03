@@ -15,7 +15,7 @@
 ## Workflows
 
 - Actions
-  - `/plan`: Plan a high-level development plan for the task at hand
+  - `/ctx-plan`: Plan a high-level development plan for the task at hand
   - `/go`: Start implement the next task / work item / phase
   - `/continue`: Continue working on what you were doing before being interrupted
 
