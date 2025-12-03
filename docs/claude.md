@@ -5,7 +5,7 @@
 - [x] Rename -context to ctx-
 - [x] /go
 - [x] /continue
-- [x] /review-load
+- [x] /review-load -> /review-search
 - [x] /optimize-instructions -> /mem-optimize
 - [x] /pr-split
 - [x] auto create pr.md in right place
@@ -20,8 +20,8 @@
   - `/continue`: Continue working on what you were doing before being interrupted
 
 - Reviewing
-  - `/review-do`: Perform a code review of the current branch using agents
-  - `/review-load`: Search for review comments in the codebase
+  - `/review-launch`: Launch review agents for code style, architecture and correctness
+  - `/review-search`: Search for REVIEW comments in the codebase
   - `/review-cat`: Categorize code review findings
   - `/review-fix`: Fix code review findings
 

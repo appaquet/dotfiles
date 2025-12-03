@@ -1,9 +1,9 @@
 ---
-name: review-do
-description: Review changes in the current branch for code style, architecture and correctness.
+name: review-launch
+description: Launch review agents for code style, architecture and correctness.
 ---
 
-# PR Review
+# Launch Review
 
 1. Ensure context is loaded. If not, run `/ctx-load` and `/ctx-improve`.
 

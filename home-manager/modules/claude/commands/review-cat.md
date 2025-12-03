@@ -5,7 +5,7 @@ description: Categorize code review findings
 
 # Categorize Code Review Findings
 
-1. Call `/review-load` to find all REVIEW comments in the codebase.
+1. Call `/review-search` to find all REVIEW comments in the codebase.
 
 2. For each comment found, categorize into priorities and efforts:
     * Priority:

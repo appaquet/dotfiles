@@ -1,9 +1,9 @@
 ---
-name: review-load
-description: Load code review findings from the codebase
+name: review-search
+description: Search for REVIEW comments in the codebase
 ---
 
-# Load Code Review Findings
+# Search Review Comments
 
 1. Search for REVIEW comments in the codebase:
    * At the **root of the repository**, use `rg -n "// REVIEW:"`
