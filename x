@@ -175,6 +175,10 @@ d | darwin)
     shift
     "$0" darwin build "$@" && "$0" darwin switch
     ;;
+  diff)
+    shift
+    nvd diff /run/current-system result
+    ;;
   tree)
     shift
     nix-tree ~/.nix-profile
@@ -184,6 +188,7 @@ d | darwin)
     echo "$0 $COMMAND build (b): build darwin" >&2
     echo "$0 $COMMAND switch (s): switch darwin" >&2
     echo "$0 $COMMAND build-switch (bs): build and switch" >&2
+    echo "$0 $COMMAND diff: diff last build with current" >&2
     echo "$0 $COMMAND tree: show darwin tree" >&2
     exit 1
     ;;
