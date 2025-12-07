@@ -40,7 +40,8 @@
       "WebFetch(domain:www.anthropic.com)",
       "WebSearch",
       "Skill(instruction-writer)",
-      "SlashCommand:/ctx-load:*"
+      "SlashCommand:/ctx-load:*",
+      "SlashCommand:/review-search:*"
     ]
   },
   "hooks": {
