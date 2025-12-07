@@ -88,6 +88,12 @@ in
 
       (lib.mkIf (cfg.shutdownDelay > 0) {
         power.ups.schedulerRules = (import ./sched.nix { inherit config pkgs lib; }).outPath;
+
+        # Run upsmon as root to avoid upssched permission issues with PID/pipe files
+        # Keep nutmon group for udev rules
+        power.ups.upsmon.user = "root";
+        power.ups.upsmon.group = "root";
+        users.groups.nutmon = { };
       })
     ]
   );

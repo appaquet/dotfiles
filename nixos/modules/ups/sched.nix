@@ -20,7 +20,6 @@ let
     text = ''
       log_event () {
         logger -t upssched-cmd "$1"
-        echo "$1" >> /tmp/upssched.log
       }
 
       case $1 in
@@ -31,26 +30,19 @@ let
           log_event "UPS REPLACE BAT"
           ;;
         lowbat)
-          status=$(cat /tmp/upssched-status 2>/dev/null || echo "unknown")
-          if [ "$status" = "onbatt" ]; then
-            log_event "UPS LOW BAT, SHUTTING DOWN"
-            upsmon -c fsd
-          else
-            log_event "UPS LOW BAT, BUT NOT ON BATTERY (status: $status), NOT SHUTTING DOWN"
-          fi
+          log_event "UPS LOW BAT WHILE ON BATTERY - SHUTTING DOWN"
+          ${cfg.shutdownCmd}
           ;;
         onbatt)
           log_event "UPS ON BAT"
-          echo "onbatt" > /tmp/upssched-status
           ;;
         online)
-          log_event  "UPS ONLINE"
-          echo "online" > /tmp/upssched-status
+          log_event "UPS ONLINE"
           ;;
 
         timeonbatt)
           log_event "UPS ON BAT FOR TOO LONG - SHUTTING DOWN"
-          upsmon -c fsd
+          ${cfg.shutdownCmd}
           ;;
         timeonline)
           log_event "UPS BACK ONLINE"
@@ -74,5 +66,5 @@ pkgs.writeText "upssched.conf" ''
   AT COMMOK * EXECUTE online
   AT NOCOMM * EXECUTE upsgone
   AT REPLBATT * EXECUTE replacebat
-  AT LOWBATT * EXECUTE lowbat
+  AT ONBATT+LOWBATT * EXECUTE lowbat
 ''
