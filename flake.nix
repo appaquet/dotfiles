@@ -48,7 +48,7 @@
 
     darwin = {
       url = "github:lnl7/nix-darwin/nix-darwin-25.11";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixos"; # need to be on same channel
     };
 
     nixos-raspberrypi = {
