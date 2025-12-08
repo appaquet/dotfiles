@@ -77,9 +77,6 @@
         name = "discord";
       }
       {
-        name = "chatgpt";
-      }
-      {
         name = "slack";
       }
 
@@ -114,24 +111,12 @@
       {
         name = "notion";
       }
-      {
-        name = "notion-calendar";
-      }
-      {
-        name = "fellow";
-      }
 
       {
         name = "docker-desktop";
       }
       {
         name = "visual-studio-code";
-      }
-      {
-        name = "windsurf";
-      }
-      {
-        name = "postman";
       }
       {
         name = "wireshark-app";
