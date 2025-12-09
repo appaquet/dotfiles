@@ -41,6 +41,7 @@ in
 
       inputs'.nix-ai-tools.packages.codex
       inputs'.nix-ai-tools.packages.opencode
+      inputs'.nix-ai-tools.packages.gemini-cli
     ])
     ++ lib.optionals pkgs.stdenv.isLinux [
       pkgs.mold-wrapped
