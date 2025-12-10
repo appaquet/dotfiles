@@ -43,6 +43,7 @@ For issues/failing tests:
 4. Test bugs: verify new test catches issue or update existing test to catch it
 
 When agreed plan fails: STOP, explain failure, ask before changing approach.
+User-specified approaches are constraints - a working workaround is still a failure if it deviates.
 
 <example>
 User: Add email validation to the signup form

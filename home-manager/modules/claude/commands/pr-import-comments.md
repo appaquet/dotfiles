@@ -5,12 +5,6 @@ description: Import unresolved PR review comments as inline code comments with m
 
 # PR Import Comments
 
-The goal of this command is to import unresolved GitHub PR review comments into the codebase as inline comments with metadata.
+Launch the `pr-import-comments` agent. Do not add instructions - the agent knows what to do.
 
-## Instructions
-
-1. Launch the "pr-import-comments" agent to handle the import process
-
-2. Wait for the agent to complete and report the results
-
-**Note**: The agent will fetch unresolved PR review comments.
+Wait for the agent to complete and report the results to the user.

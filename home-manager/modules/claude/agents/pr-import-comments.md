@@ -66,17 +66,14 @@ You are a specialized agent that fetches unresolved GitHub PR review comments an
      4. Handle multi-line comment bodies by prefixing each line with `//`
      5. Preserve proper indentation matching the surrounding code
 
-4. **Create a jj change**:
-   - Create a new change with: `jj new -m "private: claude: import PR review comments"`
-   - Commit the imported comments
-
-5. **Report results**:
+4. **Report results**:
    - Count of comments imported
    - List of files modified
    - Any errors encountered during import
 
 ## Important Notes
 
+- **STOP after reporting results** - Do not fix, address, or respond to imported comments; this agent imports only
 - This agent runs in the background/parallel
 - Only import unresolved comments (isResolved == false)
 - Preserve exact line numbers from the API response

@@ -12,17 +12,15 @@ Always use `-m "message"` (never `jj commit` alone - opens editor)
 
 ## When to Create New Change
 
-Create when:
-- Starting distinct task (bug fix, feature, refactor)
-- Addressing review comments (even if related)
-- Switching context
-- Explicitly requested
-- Exception: skip for read-only ops (viewing, testing without changes, searching)
+Create new change at milestones:
+- Before starting implementation (after planning)
+- After tests pass
+- Before refactoring working code
+- Before addressing review comments
+- When switching to different area of codebase
+- Skip for: read-only ops, iteration within same logical step
 
-Stay in current when:
-- Making related fixes
-- Iterating same problem
-- Continuing same task
+Default to creating changes - easier to squash later than split.
 
 ## Commands
 

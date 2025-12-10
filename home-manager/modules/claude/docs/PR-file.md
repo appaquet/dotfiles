@@ -66,6 +66,9 @@ Management:
 
 * Each item = discrete, independent work unit
 
+* Never remove useful information from completed TODOs
+* Proactively propose `/pr-split` when TODO section has 15+ items or a completed phase has 5+ items
+
 ### Pull Requests (optional)
 
 PR descriptions
