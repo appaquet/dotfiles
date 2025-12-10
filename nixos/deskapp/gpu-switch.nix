@@ -94,26 +94,42 @@ let
     }
 
     function nvidia() {
-        echo "Switchting to nvidia driver..."
+        echo "Switching to nvidia driver..."
+
+        # Remove vfio blacklist to allow nvidia modules to load
+        rm -f /run/modprobe.d/nvidia-vfio-blacklist.conf
 
         switch_driver "nvidia"
 
         # Force drivers to persist, preventing high power usage on idle
         nvidia-smi -pm 1
 
-        # Restart nvidia-container-toolkit-cdi-generator to pick up new driver
-        systemctl restart nvidia-container-toolkit-cdi-generator.service
+        # Restart nvidia docker related stuff to make sure they get rebound
+        systemctl reset-failed docker.service
+        systemctl restart docker.service
     }
 
     function vfio() {
-        echo "Switchting to vfio-pci driver..."
+        echo "Switching to vfio-pci driver..."
 
         if pgrep -x "process-compose" > /dev/null; then
             echo "Stopping process compose..."
-            pkill process-compose || true 
+            pkill process-compose || true
             sleep 10 # Give it time to stop
             pkill -9 process-compose || true
         fi
+
+        # Blacklist nvidia modules to prevent udev/cdi-generator from loading them
+        mkdir -p /run/modprobe.d
+        echo "blacklist nvidia" > /run/modprobe.d/nvidia-vfio-blacklist.conf
+        echo "blacklist nvidia_drm" >> /run/modprobe.d/nvidia-vfio-blacklist.conf
+        echo "blacklist nvidia_modeset" >> /run/modprobe.d/nvidia-vfio-blacklist.conf
+        echo "blacklist nvidia_uvm" >> /run/modprobe.d/nvidia-vfio-blacklist.conf
+
+        # Nvidia containers will keep trying to use the nvidia driver if it's loaded
+        # Leading to spammy errors in the logs. We don't need it while we're gaming anyway.
+        systemctl stop nvidia-container-toolkit-cdi-generator.service
+        systemctl stop docker.service
 
         switch_driver "vfio-pci"
     }
