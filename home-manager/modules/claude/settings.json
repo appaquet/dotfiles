@@ -22,6 +22,7 @@
       "Bash(jj-diff-working:*)",
       "Bash(jj-diff-branch:*)",
       "Bash(jj-stacked-stats:*)",
+      "Bash(nix eval:*)",
       "Edit(~/Library/Caches/**)",
       "Edit(~/.cache/**)",
       "Edit(~/.claude/**)",
