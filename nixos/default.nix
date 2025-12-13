@@ -11,7 +11,7 @@ in
     deskapp = inputs.nixos.lib.nixosSystem {
       specialArgs = {
         inherit inputs;
-        secrets = inputs.secrets.init "linux";
+        secrets = inputs.secrets.linux;
       };
 
       modules = [
@@ -23,7 +23,7 @@ in
     servapp = inputs.nixos.lib.nixosSystem {
       specialArgs = {
         inherit inputs;
-        secrets = inputs.secrets.init "linux";
+        secrets = inputs.secrets.linux;
       };
 
       modules = [
@@ -35,7 +35,7 @@ in
     utm = inputs.nixos.lib.nixosSystem {
       specialArgs = {
         inherit inputs;
-        secrets = inputs.secrets.init "linux";
+        secrets = inputs.secrets.linux;
       };
 
       modules = [
@@ -50,7 +50,7 @@ in
       specialArgs = {
         inherit inputs;
         inherit (inputs) nixos-raspberrypi;
-        secrets = inputs.secrets.init "linux";
+        secrets = inputs.secrets.linux;
       };
 
       modules = [
@@ -70,7 +70,7 @@ in
       specialArgs = {
         inherit inputs;
         inherit (inputs) nixos-raspberrypi;
-        secrets = inputs.secrets.init "linux";
+        secrets = inputs.secrets.linux;
       };
 
       modules = [
@@ -90,7 +90,7 @@ in
       specialArgs = {
         inherit inputs;
         inherit (inputs) nixos-raspberrypi;
-        secrets = inputs.secrets.init "linux";
+        secrets = inputs.secrets.linux;
       };
 
       modules = [

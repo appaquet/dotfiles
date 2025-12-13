@@ -1,7 +1,7 @@
 {
   pkgs,
   lib,
-  secrets,
+  inputs,
   inputs',
   ...
 }:
@@ -25,7 +25,7 @@ let
 in
 {
   imports = [
-    secrets.devHome
+    inputs.secrets.homeManager.dev
   ];
 
   home.packages =

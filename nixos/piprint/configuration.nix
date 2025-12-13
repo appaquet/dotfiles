@@ -1,7 +1,7 @@
 {
   config,
   pkgs,
-  secrets,
+  inputs,
   ...
 }:
 
@@ -16,7 +16,7 @@
     useDHCP = true;
     firewall.enable = false;
   }
-  // secrets.nixos.wifi.home_2_4;
+  // inputs.secrets.nixos.wifi.home_2_4;
 
   services.openssh.enable = true;
 

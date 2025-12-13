@@ -24,10 +24,10 @@ in
       mkHomeConfig "x86_64-linux"
         [
           ./deskapp.nix
-          (inputs.secrets.init "linux").commonHome
+          inputs.secrets.homeManager.common
         ]
         {
-          secrets = inputs.secrets.init "linux";
+          secrets = inputs.secrets.linux;
 
           cfg = {
             isNixos = true;
@@ -40,10 +40,10 @@ in
       mkHomeConfig "x86_64-linux"
         [
           ./servapp.nix
-          (inputs.secrets.init "linux").commonHome
+          inputs.secrets.homeManager.common
         ]
         {
-          secrets = inputs.secrets.init "linux";
+          secrets = inputs.secrets.linux;
           cfg = {
             isNixos = true;
             nvimMinimal = false;
@@ -55,10 +55,10 @@ in
       mkHomeConfig "aarch64-darwin"
         [
           ./mbpapp.nix
-          (inputs.secrets.init "darwin").commonHome
+          inputs.secrets.homeManager.common
         ]
         {
-          secrets = inputs.secrets.init "darwin";
+          secrets = inputs.secrets.darwin;
           cfg = {
             isNixos = false; # macOS, not NixOS
             nvimMinimal = false;
@@ -70,10 +70,10 @@ in
       mkHomeConfig "aarch64-linux"
         [
           ./utm.nix
-          (inputs.secrets.init "linux").commonHome
+          inputs.secrets.homeManager.common
         ]
         {
-          secrets = inputs.secrets.init "linux";
+          secrets = inputs.secrets.linux;
           cfg = {
             isNixos = true;
             nvimMinimal = true;
@@ -85,10 +85,10 @@ in
       mkHomeConfig "aarch64-linux"
         [
           ./piapp.nix
-          (inputs.secrets.init "linux").commonHome
+          inputs.secrets.homeManager.common
         ]
         {
-          secrets = inputs.secrets.init "linux";
+          secrets = inputs.secrets.linux;
           cfg = {
             isNixos = true;
             nvimMinimal = true;
@@ -100,10 +100,10 @@ in
       mkHomeConfig "aarch64-linux"
         [
           ./piprint.nix
-          (inputs.secrets.init "linux").commonHome
+          inputs.secrets.homeManager.common
         ]
         {
-          secrets = inputs.secrets.init "linux";
+          secrets = inputs.secrets.linux;
           cfg = {
             isNixos = true;
             nvimMinimal = true;
@@ -115,10 +115,10 @@ in
       mkHomeConfig "aarch64-linux"
         [
           ./piups.nix
-          (inputs.secrets.init "linux").commonHome
+          inputs.secrets.homeManager.common
         ]
         {
-          secrets = inputs.secrets.init "linux";
+          secrets = inputs.secrets.linux;
           cfg = {
             isNixos = true;
             nvimMinimal = true;
