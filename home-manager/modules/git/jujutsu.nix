@@ -39,7 +39,6 @@
         "push" = [
           "git"
           "push"
-          "--allow-new"
         ];
         "e" = [
           "edit"
