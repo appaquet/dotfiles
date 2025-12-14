@@ -16,7 +16,7 @@ let
         ''
           [target.x86_64-unknown-linux-gnu]
           linker = "clang"
-          rustflags = ["-Clink-arg=-fuse-ld=${pkgs.mold-wrapped}/bin/mold", "-Clink-arg=-Wl,--no-rosegment"]
+          rustflags = ["-Clink-arg=-fuse-ld=${pkgs.mold}/bin/mold", "-Clink-arg=-Wl,--no-rosegment"]
         ''
       else
         ""
@@ -44,7 +44,7 @@ in
       inputs'.nix-ai-tools.packages.gemini-cli
     ])
     ++ lib.optionals pkgs.stdenv.isLinux [
-      pkgs.mold-wrapped
+      pkgs.mold
       pkgs.binsider # binary analysis tool
     ];
 
