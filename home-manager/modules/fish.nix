@@ -143,11 +143,21 @@
         format = "[$hostname ]($style)";
       };
 
+      direnv = {
+        disabled = false;
+        format = "[$symbol$allowed]($style) ";
+        symbol = "direnv ";
+        allowed_msg = "✓";
+        not_allowed_msg = "⚠️";
+        denied_msg = "🚫";
+        style = "dimmed green";
+      };
+
       gcloud = {
         disabled = true;
       };
       nix_shell = {
-        format = "via [$symbol\($name\)]($style) ";
+        disabled = true;
       };
       package = {
         disabled = true;
