@@ -23,6 +23,11 @@
       "Bash(jj-diff-branch:*)",
       "Bash(jj-stacked-stats:*)",
       "Bash(nix eval:*)",
+      "Bash(nix build:*)",
+      "Bash(nix flake:*)",
+      "Bash(nix develop:*)",
+      "Bash(nix run:*)",
+      "Bash(nix shell:*)",
       "Read(~/Library/Caches/**)",
       "Edit(~/Library/Caches/**)",
       "Read(~/.cache/**)",
@@ -69,8 +74,17 @@
   "sandbox": {
     "enabled": true,
     "autoAllowBashIfSandboxed": true,
+    "excludedCommands": [
+      "nix eval",
+      "nix build",
+      "nix flake",
+      "nix develop",
+      "nix run",
+      "nix shell"
+    ],
     "network": {
-      "allowLocalBinding": true
+      "allowLocalBinding": true,
+      "allowUnixSockets": ["/nix/var/nix/daemon-socket/socket"]
     }
   },
   "alwaysThinkingEnabled": true

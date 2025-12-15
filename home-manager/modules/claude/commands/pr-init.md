@@ -40,4 +40,4 @@ Unless project instructions specify otherwise:
 
 5. After each Q&A, update `PR.md` and think hard about next questions.
 
-6. NEVER jump to implementation. Stop after file creation.
+6. NEVER jump to implementation. **Use AskUserQuestion** to ask if user wants to proceed to planning or implementation.

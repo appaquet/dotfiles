@@ -5,11 +5,10 @@ description: Fix REVIEW comments left in code or pull requests
 
 # Fix review comments
 
-We want to review and fix the comments I've left in the code. I use `// REVIEW:` prefix (adapt to
-each language) to mark comments that need to be reviewed and addressed.
+We want to review and fix the REVIEW comments I've left in the code.
 
 1. Unless we just searched or decided on review comments, call `/review-search` to find all REVIEW
-   comments in the codebase.
+   comments in the codebase. **DON'T** just use the find method, you need to use the command.
 
 2. For each comment found, **ALWAYS** look at the surrounding and/or related code to fully
    understand the context. If you aren't sure about a comment, **ALWAYS** use `AskUserQuestion`

@@ -20,7 +20,7 @@ Use the instruction-writer skill to apply best practices.
 2. Apply instruction-writer skill's optimization workflow to identify issues
 3. Report findings with before/after examples and estimated token savings
 
-**STOP HERE** - Wait for user approval before proceeding to Phase 2
+**Use AskUserQuestion** to ask if user wants to proceed to Phase 2
 
 ### Phase 2: Implementation (Only after user approval)
 

@@ -1,21 +1,8 @@
 # Claude Guide
 
-## TODO
-
-- [x] Rename -context to ctx-
-- [x] /go
-- [x] /continue
-- [x] /review-load -> /review-search
-- [x] /optimize-instructions -> /mem-optimize
-- [x] /pr-split
-- [x] auto create pr.md in right place
-  - Give default location, unless specified in project
-  - Create symlinks
-
 ## Workflows
 
 - Actions
-  - `/ctx-plan`: Plan a high-level development plan for the task at hand
   - `/go`: Start implement the next task / work item / phase
   - `/continue`: Continue working on what you were doing before being interrupted
 
@@ -28,6 +15,7 @@
 - Context management
   - `/ctx-load`: Load repository and task context
   - `/ctx-save`: Save important context from conversation to PR.md and sub-files
+  - `/ctx-plan`: Plan a high-level development plan for the task at hand
   - `/ctx-improve`: Improve context by asking clarifying questions to user
 
 - Project/tasks management

@@ -10,6 +10,7 @@ description: Search for REVIEW comments in the codebase
      * **NEVER** look for comments in sub-directories directly, always start at the root of the repository
      * **NEVER** assume that there aren't any comments left. If you can't find them, it means you are not
        searching correctly.
+     * Exclude the ones found in feature documentation files (e.g., `PR.md`, sub-PR files, etc.)
    * If no comments found, verify you're at repository root and not limiting by file type
    * If, and only if, still no comments OR that I explicitly requested it, check PR comments using:
      * Get current branch: `jj-current-branch`

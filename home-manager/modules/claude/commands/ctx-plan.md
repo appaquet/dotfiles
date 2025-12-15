@@ -40,4 +40,4 @@ $ARGUMENTS
    * TODO section with planned work items
    * Files section with relevant files identified
 
-**Important**: NEVER jump to implementation after planning. Stop here and wait for explicit instruction to proceed to the next phase.
+**Important**: NEVER jump to implementation after planning. **Use AskUserQuestion** to ask if user wants to proceed to implementation.
