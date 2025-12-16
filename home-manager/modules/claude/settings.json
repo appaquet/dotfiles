@@ -45,6 +45,7 @@
       "Read(/tmp/**)",
       "Edit(/tmp/**)",
       "Read(/nix/**)",
+      "WebSearch",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:api.github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
@@ -53,10 +54,9 @@
       "WebFetch(domain:registry.npmjs.org)",
       "WebFetch(domain:code.claude.com)",
       "WebFetch(domain:www.anthropic.com)",
-      "WebSearch",
       "Skill(instruction-writer)",
-      "SlashCommand:/ctx-load:*",
-      "SlashCommand:/review-search:*"
+      "SlashCommand(/ctx-load)",
+      "SlashCommand(/review-search)"
     ]
   },
   "hooks": {

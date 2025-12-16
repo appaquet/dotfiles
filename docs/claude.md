@@ -5,6 +5,7 @@
 - Actions
   - `/go`: Start implement the next task / work item / phase
   - `/continue`: Continue working on what you were doing before being interrupted
+  - `/ask`: Think about a topic and provide feedback without acting
 
 - Reviewing
   - `/review-launch`: Launch review agents for code style, architecture and correctness
