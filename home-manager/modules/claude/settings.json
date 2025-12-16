@@ -44,6 +44,7 @@
       "Edit(~/dotfiles/**)",
       "Read(/tmp/**)",
       "Edit(/tmp/**)",
+      "Read(/nix/**)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:api.github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
