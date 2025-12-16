@@ -6,6 +6,7 @@ final: prev: {
       src = ./plugins/lsp-notify;
     };
 
+    # https://github.com/copilotlsp-nvim/copilot-lsp
     copilot-lsp = prev.vimUtils.buildVimPlugin {
       pname = "copilot-lsp";
       version = "2025-10-01";
@@ -19,19 +20,21 @@ final: prev: {
       meta.hydraPlatforms = [ ];
     };
 
+    # https://github.com/zbirenbaum/copilot.lua
     copilot-lua = prev.vimUtils.buildVimPlugin {
       pname = "copilot.lua";
       version = "2025-11-04";
       src = prev.fetchFromGitHub {
         owner = "zbirenbaum";
         repo = "copilot.lua";
-        rev = "5bde2cfe01f049f522eeb8b52c5c723407db8bdf";
-        sha256 = "sha256-/8baBZIhZdQ4B0hoTmh68I2p08rJJ7INil77qIu9vCU=";
+        rev = "508d8b00390ff3046323f61187a57069910c6e17";
+        sha256 = "sha256-tPCBAju6mWUNQxGiRcclWNhan3NkFWT7UlENVlGBcX0=";
       };
       meta.homepage = "https://github.com/zbirenbaum/copilot.lua/";
       meta.hydraPlatforms = [ ];
     };
 
+    # https://github.com/nvim-neotest/neotest
     neotest = prev.vimUtils.buildVimPlugin {
       pname = "neotest";
       version = "5.13.1-patched2";
@@ -49,14 +52,15 @@ final: prev: {
       meta.homepage = "https://github.com/nvim-neotest/neotest";
     };
 
+    # https://github.com/fredrikaverpil/neotest-golang
     neotest-golang = prev.vimUtils.buildVimPlugin {
       pname = "neotest-golang";
       version = "2.5.1";
       src = prev.fetchFromGitHub {
         owner = "fredrikaverpil";
         repo = "neotest-golang";
-        rev = "v2.5.1";
-        sha256 = "sha256-rUuhpV/sOeIXEzuIl1nKlMQ98qrY+gE7Ng2mKu82mBA=";
+        rev = "v2.6.0";
+        sha256 = "sha256-aIiyJbJaB8YLfgt0S/MvP2AM32qE34WRfTa7249K5BQ=";
       };
       propagatedBuildInputs = [
         final.vimPlugins.neotest # Use our custom neotest from this overlay
@@ -65,6 +69,7 @@ final: prev: {
       meta.homepage = "https://github.com/fredrikaverpil/neotest-golang/";
     };
 
+    # https://github.com/nvim-neotest/neotest-python
     neotest-python = prev.vimUtils.buildVimPlugin {
       pname = "neotest-python";
       version = "2025-11-04";
