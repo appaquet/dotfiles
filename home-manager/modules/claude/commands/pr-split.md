@@ -27,11 +27,11 @@ $ARGUMENTS
    * TODO (moved from PR.md - preserve all details including completed items)
 
 5. Update `PR.md`:
-   * Replace phase TODOs with task linking to sub-file:
+   * Replace phase TODOs with header + link to sub-file:
      ```
-     ### Phase Name
-     - [ ] [PR-<phase-name>.md](PR-<phase-name>.md)
+     ### 🔄 Phase: Name
+     [PR-<phase-name>.md](PR-<phase-name>.md)
      ```
-   * Use `[x]` if phase already completed, `[ ]` otherwise
+   * Phase indicators: `⬜` To Do | `🔄` In Progress | `✅` Done
 
 6. NEVER jump to implementation. Report changes and wait for instruction.

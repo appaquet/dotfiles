@@ -1,83 +1,79 @@
-
 # PR.md Structure
 
-Project/feature documentation. Documents current task/feature (may span multiple PRs).
-This file and its sub-files are kept throughout development, never deleted.
+Project/feature documentation spanning multiple PRs. File and sub-files kept throughout development.
 
 ## File Location
 
 Unless project instructions specify otherwise:
 
-* **Default path**: `docs/feats/<date>-<project-name>/PR.md` (date via `date +%Y/%m/%d`)
-* **Symlink**: Create at repo root pointing to actual file
-* **Private change**: Symlink lives in `private: PR.md` jj change - never committed to PRs
-* **Sub-files**: Same directory as PR.md, named `PR-<phase-name>.md`
+* **Default**: `docs/feats/<date>-<project-name>/PR.md` (date via `date +%Y/%m/%d`)
+* **Symlink**: At repo root pointing to actual file
+* **Private change**: Symlink in `private: PR.md` jj change - never committed
+* **Sub-files**: Same directory, named `PR-<phase-name>.md`
 
 ### Finding PR.md
 
-1. Check if root `PR.md` is a symlink → follow it
+1. Check if root `PR.md` is symlink → follow it
 2. If project instructions specify location → use that
 3. Otherwise assume repo root
 
 ## When to Create
 
-* **Create**: Only when explicitly requested (via `/pr-init`)
-* **Update**: Always after file modifications if exists
-* **Never**: Create proactively
+* **Create**: Only via `/pr-init`
+* **Update**: After file modifications if exists
+* **Never**: Proactively
 
-## Sections (exact order)
+## Sections
 
-### Context (mandatory)
+Order: Context ★, Requirements, Questions, Files ★, TODO ★, Pull Requests (★ = mandatory)
 
-Context of changes
+### Context
 
-### Requirements (optional)
+Purpose and scope of changes
+
+### Requirements
 
 Requirements of changes
 
-### Questions (optional)
+### Questions
 
-Checklist of questions (and answers) to resolve during development
+Checklist of questions/answers to resolve during development
 
-### Files (mandatory)
+### Files
 
-Modified OR important context files
+Modified or important context files. Update after modifications.
 
-Update after file modifications. Exclude generated files (`*.pb.go`, `*.pb.gw.go`, `*_grpc.pb.go`, wire, etc.) and PR docs (`PR.md`). Include crucial files even if unmodified.
+* Exclude: generated files (`*.pb.go`, `*_grpc.pb.go`, wire), PR docs
+* Include: crucial files even if unmodified
+* Format: `- **path/file.ext**: Purpose. Changes (if any).`
+* If many files + sub-files: abbreviate, mention sub-file
 
-Format: `- **path/to/file.ext**: 1-2 sentences on purpose. 1-2 sentences on changes (if any).`
+### TODO
 
-If too many files and have sub-files, abbreviate desc and mention sub-file (without link)
+Checkmark list of work items. Split phases into `PR-<phase-name>.md` if too big.
 
-### TODO (mandatory)
+**Phase indicators** (prefix):
+* `### ⬜ Phase Name` - To Do
+* `### 🔄 Phase Name` - In Progress
+* `### ✅ Phase Name` - Done
 
-Checkmark list of work items
-Split in phases if needed
-If phase too big, split into `PR-<phase-name>.md` files (same directory). Link as task with status:
+Sub-file link under header:
 ```
-### Phase Name
-- [ ] [PR-<phase-name>.md](PR-<phase-name>.md)
+### 🔄 Phase: Auth
+[PR-auth.md](PR-auth.md)
 ```
-Should reflect steps taken during development, including dead ends, research, discoveries,
-decisions, etc.
 
-Management:
-
-* Update after starting/completing work.
-  * `[ ]` incomplete | `[~]` in progress | `[x]` complete
-  * Detail sufficient for developer to pick up later
-  * If split into sub file, make sure to update both files
-
+**Management:**
+* Task indicators: `[ ]` incomplete | `[~]` in progress | `[x]` complete
+* Update after starting/completing; detail sufficient for pickup
+* If split into sub file, update both
 * Each item = discrete, independent work unit
+* Never remove useful info from completed TODOs
+* Propose `/pr-split` at 15+ items or completed phase with 5+ items
 
-* Never remove useful information from completed TODOs
-* Proactively propose `/pr-split` when TODO section has 15+ items or a completed phase has 5+ items
+### Pull Requests
 
-### Pull Requests (optional)
-
-PR descriptions
-
-Summary only: Start "In this PR, I implemented..." then high-level technical overview.
-Focus on what was built (capability), not how (implementation details).
-Use system/component terms; avoid function names, algorithms, parameters.
-Omit test plans and generated attribution.
+* Start "In this PR, I implemented..." + high-level technical overview
+* Focus on capability, not implementation details
+* Use system/component terms; avoid function names/algorithms
+* Omit test plans and generated attribution
