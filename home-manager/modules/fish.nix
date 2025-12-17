@@ -12,45 +12,46 @@
     enable = true;
     package = pkgs.fish;
 
-    interactiveShellInit = ''
-      # Disable greeting
-      set fish_greeting
+    interactiveShellInit = # fish
+      ''
+        # Disable greeting
+        set fish_greeting
 
-      # vi mode
-      fish_vi_key_bindings
+        # vi mode
+        fish_vi_key_bindings
 
-      # If colors are messed up, check:
-      # https://gist.github.com/andersevenrud/015e61af2fd264371032763d4ed965b6
-      # Don't set TERM here, it should be set via tmux (see tmux/default.nix)
-      export COLORTERM=truecolor
+        # If colors are messed up, check:
+        # https://gist.github.com/andersevenrud/015e61af2fd264371032763d4ed965b6
+        # Don't set TERM here, it should be set via tmux (see tmux/default.nix)
+        export COLORTERM=truecolor
 
-      # Since it doesn't seem to always work in neovim setup
-      export EDITOR="nvim"
+        # Since it doesn't seem to always work in neovim setup
+        export EDITOR="nvim"
 
-      # Add support for nix run and nix-shell in fish
-      ${pkgs.any-nix-shell}/bin/any-nix-shell fish --info-right | source
+        # Add support for nix run and nix-shell in fish
+        ${pkgs.any-nix-shell}/bin/any-nix-shell fish --info-right | source
 
-      # Source any local stuff from .profile
-      if test -f ~/.profile
-        fenv source ~/.profile
-      end
+        # Source any local stuff from .profile
+        if test -f ~/.profile
+          fenv source ~/.profile
+        end
 
-      # Enable direnv
-      if command -v direnv &>/dev/null
-          eval (direnv hook fish)
-      end
+        # Enable direnv
+        if command -v direnv &>/dev/null
+            eval (direnv hook fish)
+        end
 
-      # Apparently the plugin doesn't do this for us on MacOS for some reason
-      fzf_configure_bindings
+        # Apparently the plugin doesn't do this for us on MacOS for some reason
+        fzf_configure_bindings
 
-      # Some shortcuts (ctrl-alt-c, in iTerm2, need to rebind alt to Esc+)
-      bind -M insert ctrl-alt-n 'fzf-nix'
-      bind -M insert ctrl-alt-g 'fzf-ripgrep'
+        # Some shortcuts (ctrl-alt-c, in iTerm2, need to rebind alt to Esc+)
+        bind -M insert ctrl-alt-n 'fzf-nix'
+        bind -M insert ctrl-alt-g 'fzf-ripgrep'
 
-      # Fish AI bindings aren't working in vi mode
-      bind -M insert ctrl-p _fish_ai_codify_or_explain
-      bind -M insert ctrl-alt-space _fish_ai_autocomplete_or_fix
-    '';
+        # Fish AI bindings aren't working in vi mode
+        bind -M insert ctrl-p _fish_ai_codify_or_explain
+        bind -M insert ctrl-alt-space _fish_ai_autocomplete_or_fix
+      '';
 
     plugins = [
       {
