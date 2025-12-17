@@ -75,14 +75,6 @@
   "sandbox": {
     "enabled": true,
     "autoAllowBashIfSandboxed": true,
-    "excludedCommands": [
-      "nix eval",
-      "nix build",
-      "nix flake",
-      "nix develop",
-      "nix run",
-      "nix shell"
-    ],
     "network": {
       "allowLocalBinding": true,
       "allowUnixSockets": ["/nix/var/nix/daemon-socket/socket"]
