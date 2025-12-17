@@ -31,6 +31,7 @@
 
 - Instructions / Memory
   - `/mem-optimize`: Optimize instructions and memory usage
+  - `/introspect`: Reflect on errors to propose instruction improvements
 
 - Pull requests
   - `/pr-import-comments`: Import PR comments into codebase as REVIEW comments

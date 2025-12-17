@@ -357,6 +357,15 @@ For skills that use tools:
 ❌ **Vague descriptions**: "Helps with files"
 ✅ **Specific descriptions**: "Parse CSV files, convert to JSON, handle encoding. Use when working with CSV data."
 
+❌ **Split numbered lists across headers**: Headers break list continuity
+```markdown
+### Phase 1
+1. Step one
+### Phase 2
+2. Step two  <!-- invalid: restarts at 1 in rendered markdown -->
+```
+✅ **Continuous list with inline phases or separate lists per section**
+
 ## References
 
 - [Claude 4.x Best Practices](https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/claude-4-best-practices)
