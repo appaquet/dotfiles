@@ -17,6 +17,7 @@ We want to review and fix the REVIEW comments I've left in the code.
 
 3. **ALWAYS** create an action plan:
    * Build internal TODO list from review comments
+   * Create a new empty jj change on which to make the fixes
    * Update `PR.md` (and sub-PR files) TODO section with identified tasks
    * Prioritize tasks based on dependencies
 
@@ -27,9 +28,10 @@ We want to review and fix the REVIEW comments I've left in the code.
    * Update `PR.md` TODO section progress as you go
 
 5. Final verification:
-   * Search again for any remaining review comments: `rg -n "// REVIEW:"`
+   * Search again for any remaining review comments
    * Ensure `PR.md` reflects all completed work
    * Run tests, formatting, and linting to fix any issues
+   * Commit the jj change with a clear message summarizing the fixes
 
 ## Important rules
 

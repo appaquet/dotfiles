@@ -1,5 +1,10 @@
 # Claude Guide
 
+## TODO
+
+- [ ] Better project files. Rename from PR to 00-project.md and then have sub-files sequenced.
+- [ ] Make clear that project.md at root is always a symlink to actual file
+
 ## Workflows
 
 - Actions

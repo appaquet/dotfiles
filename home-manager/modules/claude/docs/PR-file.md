@@ -53,7 +53,11 @@ If too many files and have sub-files, abbreviate desc and mention sub-file (with
 
 Checkmark list of work items
 Split in phases if needed
-If phase too big, split into `PR-<phase-name>.md` files (same directory), link in this section.
+If phase too big, split into `PR-<phase-name>.md` files (same directory). Link as task with status:
+```
+### Phase Name
+- [ ] [PR-<phase-name>.md](PR-<phase-name>.md)
+```
 Should reflect steps taken during development, including dead ends, research, discoveries,
 decisions, etc.
 
