@@ -1,6 +1,7 @@
 [submodule "secrets"]
 	path = secrets
 	url = git@github.com:appaquet/dotfiles-secrets.git
+	branch = main
 [submodule "shared-dotfiles"]
 	path = humanfirst-dots
 	url = git@github.com:zia-ai/shared-dotfiles.git
