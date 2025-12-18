@@ -2,8 +2,10 @@
 
 ## TODO
 
-- [ ] Better project files. Rename from PR to 00-project.md and then have sub-files sequenced.
-- [ ] Make clear that project.md at root is always a symlink to actual file
+- [x] Better project docs. Rename from PR to 00-project.md and then have sub-docs sequenced.
+  - `proj/` symlink at root → `docs/feats/<date>-<project-name>/`
+  - Main doc: `00-<project-name>.md`, sub-docs: `01-phase.md`, `02-phase.md`, etc.
+- [x] Make clear that project folder at root is always a symlink to actual folder
 
 ## Workflows
 
@@ -14,14 +16,15 @@
 
 - Context management
   - `/ctx-load`: Load repository and task context
-  - `/ctx-save`: Save important context from conversation to PR.md and sub-files
+  - `/ctx-save`: Save important context from conversation to project docs
   - `/ctx-plan`: Plan a high-level development plan for the task at hand
   - `/ctx-improve`: Improve context by asking clarifying questions to user
 
 - Project/tasks management
-  - `/pr-init`: Initialize a PR.md file for the current task
-  - `/pr-split`: Split a phase from PR.md into a sub-file
-  - `/pr-desc`: Generate PR description for current branch
+  - `/proj-init`: Initialize project folder and main doc
+  - `/proj-split`: Split a phase into a numbered sub-doc
+  - `/proj-desc`: Generate PR description for current branch
+  - `/proj-migrate`: Migrate existing PR.md project to new structure
 
 - Reviewing
   - `/review-launch`: Launch review agents for code style, architecture and correctness
@@ -39,7 +42,7 @@
 
 ## Agents
 
-- `branch-diff-summarizer`: Analyzes branch changes and generates file-by-file summaries for PR.md
+- `branch-diff-summarizer`: Analyzes branch changes and generates file-by-file summaries for project docs
 - `code-style-reviewer`: Reviews code for style, formatting, and syntax issues
 - `code-correctness-reviewer`: Reviews code for logic errors, bugs, and runtime issues
 - `architecture-reviewer`: Reviews code for architectural consistency and design patterns

@@ -21,6 +21,8 @@ Comprehensive guidelines for writing effective instructions, skills, slash comma
 
 Claude 4.x models excel with clear, specific instructions.
 
+**System prompt sensitivity**: Claude 4.x is highly responsive to system prompts. Dial back aggressive language—where you might have said "CRITICAL: You MUST...", use normal prompting like "Use this tool when...".
+
 **Good**: "Include as many relevant features and interactions as possible. Go beyond basics to create fully-featured implementation."
 
 **Bad**: "Create an analytics dashboard" (too vague)
@@ -294,7 +296,7 @@ CLAUDE.md points to these files; Claude reads relevant ones per-task.
 
 ### Prevent Hallucinations
 
-"Never speculate about code you have not opened. If the user references a specific file, you MUST read the file before answering."
+"Never speculate about code you have not opened. If the user references a specific file, read the file before answering."
 
 ### Avoid Hard-Coding
 
@@ -343,7 +345,7 @@ For skills that use tools:
 ✅ **Direct**: "Use X for Y"
 
 ❌ **Multiple emphasis**: "CRITICAL: Important: Note that..."
-✅ **Single level**: "CRITICAL: Do X"
+✅ **Single level**: "Do X" (Claude 4.x rarely needs CRITICAL)
 
 ❌ **Tentative language**: "You might want to consider..."
 ✅ **Imperative**: "Do X"
@@ -368,7 +370,7 @@ For skills that use tools:
 
 ## References
 
-- [Claude 4.x Best Practices](https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/claude-4-best-practices)
+- [Claude 4.x Best Practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-4-best-practices)
 - [Effective Context Engineering for AI Agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
 - [Claude Code Skills Documentation](https://code.claude.com/docs/en/skills.md)
 - [Writing a Good CLAUDE.md](https://www.humanlayer.dev/blog/writing-a-good-claude-md)

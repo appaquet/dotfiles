@@ -35,10 +35,10 @@ $ARGUMENTS
    Checklist to verify you have all necessary information. You need to have a 10/10 understanding
    and confidence level. If not, use `/ctx-improve` to clarify context before proceeding.
 
-5. Update or create `PR.md` (following `@docs/PR-file.md` structure, symlinked).
+5. Update or create project doc (following `@docs/project-doc.md` structure).
    Include:
    * Context section describing the task
-   * TODO section with planned work items
+   * TODO section with planned work items (flat list, no phases unless asked)
    * Files section with relevant files identified
 
 **Important**: NEVER jump to implementation after planning. **Use AskUserQuestion** to ask if user wants to proceed to implementation.

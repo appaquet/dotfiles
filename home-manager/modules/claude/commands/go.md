@@ -18,3 +18,5 @@ description: Proceed to implementation of the plan or task at hand
    IMMEDIATELY and update me about the situation.
 
    Make sure to create appropriate jj changes as you go along.
+
+4. After completing, make sure the project doc reflects the current state.

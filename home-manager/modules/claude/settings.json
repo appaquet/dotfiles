@@ -56,9 +56,11 @@
       "WebFetch(domain:www.anthropic.com)",
       "Skill(instruction-writer)",
       "SlashCommand(/ctx-load)",
-      "SlashCommand(/review-search)",
       "Skill(ctx-load)",
-      "Skill(review-search)"
+      "SlashCommand(/review-search)",
+      "Skill(review-search)",
+      "SlashCommand(/review-cat)",
+      "Skill(review-cat)"
     ]
   },
   "hooks": {

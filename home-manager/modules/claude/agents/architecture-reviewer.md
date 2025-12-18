@@ -30,7 +30,7 @@ detail is too small when it comes to system design integrity.
 4. Diff the current **branch** to list the modified files (but not the content yet) using
    `jj-diff-branch --stat`
    * **Add each file to your TODO list to be reviewed**
-   * Don't review PR.md or documentation files. We need to focus on code files only.
+   * Don't review project docs or documentation files. We need to focus on code files only.
 
 5. For **EACH** changed file, **ONE BY ONE**:
    1. Load its diff to see the changes made to it (using `jj-diff-branch --git <file>`)
