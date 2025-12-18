@@ -15,29 +15,36 @@ HOME_CONFIG=""
 if [[ "${MACHINE_KEY}" == "appaquet@deskapp"* ]]; then
   HOME_CONFIG="appaquet@deskapp"
   HOSTNAME="deskapp"
+  OS_TYPE="nixos"
 
 elif [[ "${MACHINE_KEY}" == "appaquet@servapp"* ]]; then
   HOME_CONFIG="appaquet@servapp"
   HOSTNAME="servapp"
+  OS_TYPE="nixos"
 
 elif [[ "${MACHINE_KEY}" == "appaquet@utm"* ]]; then
   HOME_CONFIG="appaquet@utm"
   HOSTNAME="utm"
+  OS_TYPE="nixos"
 
 elif [[ "${MACHINE_KEY}" == "appaquet@piapp"* ]]; then
   HOME_CONFIG="appaquet@piapp"
   HOSTNAME="piapp"
+  OS_TYPE="nixos"
 
 elif [[ "${MACHINE_KEY}" == "appaquet@piprint"* ]]; then
   HOME_CONFIG="appaquet@piprint"
   HOSTNAME="piprint"
+  OS_TYPE="nixos"
 
 elif [[ "${MACHINE_KEY}" == "appaquet@piups"* ]]; then
   HOME_CONFIG="appaquet@piups"
   HOSTNAME="piups"
+  OS_TYPE="nixos"
 
 elif [[ "${MACHINE_KEY}" == "appaquet@mbpapp"* || "${MACHINE_KEY}" == "appaquet@mbpvmapp"* ]]; then
   HOME_CONFIG="appaquet@mbpapp"
+  OS_TYPE="darwin"
 fi
 
 NIX_BUILDER="nix"
@@ -406,6 +413,49 @@ optimize)
   nix store optimise
   ;;
 
+b | build)
+  shift
+  if [[ -z "$HOME_CONFIG" ]]; then
+    echo "No home configuration for ${MACHINE_KEY}"
+    exit 1
+  fi
+  if [[ -z "$OS_TYPE" ]]; then
+    echo "No OS type for ${MACHINE_KEY}"
+    exit 1
+  fi
+
+  "$0" home build "$@"
+  if [[ "$OS_TYPE" == "nixos" ]]; then
+    "$0" nixos build "$@"
+  elif [[ "$OS_TYPE" == "darwin" ]]; then
+    "$0" darwin build "$@"
+  fi
+  ;;
+
+s | switch)
+  shift
+  if [[ -z "$HOME_CONFIG" ]]; then
+    echo "No home configuration for ${MACHINE_KEY}"
+    exit 1
+  fi
+  if [[ -z "$OS_TYPE" ]]; then
+    echo "No OS type for ${MACHINE_KEY}"
+    exit 1
+  fi
+
+  "$0" home switch "$@"
+  if [[ "$OS_TYPE" == "nixos" ]]; then
+    "$0" nixos switch "$@"
+  elif [[ "$OS_TYPE" == "darwin" ]]; then
+    "$0" darwin switch "$@"
+  fi
+  ;;
+
+bs | build-switch)
+  shift
+  "$0" build "$@" && "$0" switch
+  ;;
+
 cp | copy)
   shift
   if [[ "$MACHINE_KEY" == "$LOCAL_MACHINE_KEY" ]]; then
@@ -439,6 +489,9 @@ cp | copy)
   echo "$0 home (h): home manager sub commands" >&2
   echo "$0 darwin (d): darwin sub commands" >&2
   echo "$0 nixos (n): nixos sub commands" >&2
+  echo "$0 build (b): build home + system (nixos/darwin)" >&2
+  echo "$0 switch (s): switch home + system (nixos/darwin)" >&2
+  echo "$0 build-switch (bs): build and switch home + system (nixos/darwin)" >&2
   echo "$0 check (c): eval home & nixos & darwin configs for all hosts" >&2
   echo "$0 update (u): update nix channels" >&2
   echo "$0 link: link system files" >&2
