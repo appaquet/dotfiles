@@ -11,6 +11,7 @@ argument-hint: [task-description]
 If context unclear, run `/ctx-load` first. Ultrathink throughout this task.
 
 Task (may be empty):
+
 ```markdown
 $ARGUMENTS
 ```
@@ -34,9 +35,9 @@ $ARGUMENTS
    Checklist to verify you have all necessary information. You need to have a 10/10 understanding
    and confidence level. If not, use `/ctx-improve` to clarify context before proceeding.
 
-5. Update or create the `PR.md` file with:
+5. Update or create `PR.md` (following `@docs/PR-file.md` structure, symlinked).
+   Include:
    * Context section describing the task
-   * Requirements section (if applicable)
    * TODO section with planned work items
    * Files section with relevant files identified
 

@@ -33,6 +33,15 @@ Never replace TODO/FIXME/REVIEW with explanatory notes. TODOs remain until:
 1. Implemented, OR
 2. Tracked in PR.md AND you tell me to remove
 
+## Destructive Operations
+
+Before deleting files/content: confirm preserved elsewhere OR explicitly disposable.
+
+<example>
+WRONG: rm PR.md (assuming task done = content unneeded)
+RIGHT: "Should I move PR.md to docs/feats/ or is it safe to delete?"
+</example>
+
 ## Problem Solving
 
 For issues/failing tests:
