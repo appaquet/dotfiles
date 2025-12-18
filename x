@@ -432,7 +432,7 @@ b | build)
   fi
   ;;
 
-s | switch)
+bs | build-switch)
   shift
   if [[ -z "$HOME_CONFIG" ]]; then
     echo "No home configuration for ${MACHINE_KEY}"
@@ -443,17 +443,12 @@ s | switch)
     exit 1
   fi
 
-  "$0" home switch "$@"
+  "$0" home build "$@" && "$0" home switch
   if [[ "$OS_TYPE" == "nixos" ]]; then
-    "$0" nixos switch "$@"
+    "$0" nixos build "$@" && "$0" nixos switch
   elif [[ "$OS_TYPE" == "darwin" ]]; then
-    "$0" darwin switch "$@"
+    "$0" darwin build "$@" && "$0" darwin switch
   fi
-  ;;
-
-bs | build-switch)
-  shift
-  "$0" build "$@" && "$0" switch
   ;;
 
 cp | copy)
@@ -490,7 +485,6 @@ cp | copy)
   echo "$0 darwin (d): darwin sub commands" >&2
   echo "$0 nixos (n): nixos sub commands" >&2
   echo "$0 build (b): build home + system (nixos/darwin)" >&2
-  echo "$0 switch (s): switch home + system (nixos/darwin)" >&2
   echo "$0 build-switch (bs): build and switch home + system (nixos/darwin)" >&2
   echo "$0 check (c): eval home & nixos & darwin configs for all hosts" >&2
   echo "$0 update (u): update nix channels" >&2
