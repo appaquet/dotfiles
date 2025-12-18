@@ -7,7 +7,7 @@
 
 {
   imports = [
-    ./fish.nix
+    ./fish
     ./tmux
     ./git
     ./neovim

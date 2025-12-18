@@ -1,19 +1,27 @@
-{
-  pkgs,
-  fetchFromGitHub,
-  python,
-  pythonPackages,
-  iterfzf,
-}:
+{ pkgs, ... }:
 let
   version = "2.5.0";
 
-  src = fetchFromGitHub {
+  src = pkgs.fetchFromGitHub {
     owner = "Realiserad";
     repo = "fish-ai";
     rev = "v${version}";
     sha256 = "sha256-PuCYaNpKr9vk+AKfDg0YYQtepyjcHFvgwKLZMwTRb8c=";
   };
+
+  python = pkgs.python312;
+  pythonPackages = pkgs.python312Packages;
+
+  # Patch iterfzf to use system fzf instead of bundled (which doesn't exist in nixpkgs)
+  iterfzf = pythonPackages.iterfzf.overridePythonAttrs (old: {
+    doCheck = false; # Fails on MacOS
+    postPatch =
+      (old.postPatch or "")
+      + ''
+        substituteInPlace iterfzf/__init__.py \
+          --replace-fail "Path(__file__).parent / EXECUTABLE_NAME" "None"
+      '';
+  });
 
   # Build fish-ai as a Python package
   fishAiPython = pythonPackages.buildPythonApplication {
@@ -58,13 +66,27 @@ let
   '';
 
   # Fish plugin
-  fishPlugin = pkgs.fishPlugins.buildFishPlugin {
+  fishAiPlugin = pkgs.fishPlugins.buildFishPlugin {
     pname = "fish-ai";
     inherit version src;
   };
 in
-fishPlugin.overrideAttrs (old: {
-  passthru = (old.passthru or { }) // {
-    env = fishAiEnv;
+{
+  # Deploy fish-ai data files to ~/.local/share/fish-ai
+  xdg.dataFile."fish-ai".source = fishAiEnv;
+
+  programs.fish = {
+    plugins = [
+      {
+        name = "fish-ai";
+        src = fishAiPlugin.src;
+      }
+    ];
+
+    # Fish AI bindings (don't work in vi mode by default)
+    interactiveShellInit = ''
+      bind -M insert ctrl-p _fish_ai_codify_or_explain
+      bind -M insert ctrl-alt-space _fish_ai_autocomplete_or_fix
+    '';
   };
-})
+}

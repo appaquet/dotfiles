@@ -1,8 +1,9 @@
 { pkgs, ... }:
 
 {
-  # It expects its file to be at ~/.local/share/fish-ai
-  xdg.dataFile."fish-ai".source = pkgs.fish-ai.env;
+  imports = [
+    ./fish-ai.nix
+  ];
 
   home.packages = with pkgs; [
     any-nix-shell # allows using fish for `nix shell`
@@ -47,10 +48,6 @@
         # Some shortcuts (ctrl-alt-c, in iTerm2, need to rebind alt to Esc+)
         bind -M insert ctrl-alt-n 'fzf-nix'
         bind -M insert ctrl-alt-g 'fzf-ripgrep'
-
-        # Fish AI bindings aren't working in vi mode
-        bind -M insert ctrl-p _fish_ai_codify_or_explain
-        bind -M insert ctrl-alt-space _fish_ai_autocomplete_or_fix
       '';
 
     plugins = [
@@ -61,10 +58,6 @@
       {
         name = "foreign-env";
         src = pkgs.fishPlugins.foreign-env.src;
-      }
-      {
-        name = "fish-ai";
-        src = pkgs.fish-ai.src;
       }
     ];
 

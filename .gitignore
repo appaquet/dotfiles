@@ -5,3 +5,5 @@ result
 .env
 .luarc.json
 .opencode
+PR.md
+docs/feats/
