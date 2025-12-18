@@ -12,12 +12,6 @@
   - `/continue`: Continue working on what you were doing before being interrupted
   - `/ask`: Think about a topic and provide feedback without acting
 
-- Reviewing
-  - `/review-launch`: Launch review agents for code style, architecture and correctness
-  - `/review-search`: Search for REVIEW comments in the codebase
-  - `/review-cat`: Categorize code review findings
-  - `/review-fix`: Fix code review findings
-
 - Context management
   - `/ctx-load`: Load repository and task context
   - `/ctx-save`: Save important context from conversation to PR.md and sub-files
@@ -28,6 +22,12 @@
   - `/pr-init`: Initialize a PR.md file for the current task
   - `/pr-split`: Split a phase from PR.md into a sub-file
   - `/pr-desc`: Generate PR description for current branch
+
+- Reviewing
+  - `/review-launch`: Launch review agents for code style, architecture and correctness
+  - `/review-search`: Search for REVIEW comments in the codebase
+  - `/review-cat`: Categorize code review findings
+  - `/review-fix`: Fix code review findings
 
 - Instructions / Memory
   - `/mem-optimize`: Optimize instructions and memory usage
