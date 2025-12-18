@@ -1,13 +1,13 @@
 ---
-name: pr-init
-description: Initialize PR.md file by conversing with user to gather requirements
+name: proj-init
+description: Initialize project folder and main doc by conversing with user to gather requirements
 argument-hint: [task-description]
 ---
 
-# PR Initialization
+# Project Initialization
 
-Create a `PR.md` file with appropriate sections by conversing with me. Use documented structure from
-@docs/PR-file.md. If too big, propose splitting into phases and sub-files (`PR-<phase-name>.md`).
+Create a project folder with `00-<project-name>.md` main doc by conversing with me. Use documented
+structure from @docs/project-doc.md.
 
 Task (may be empty, ask me if so):
 ```markdown
@@ -20,10 +20,10 @@ Unless project instructions specify otherwise:
 
 1. Derive project name from `jj-current-branch`, use `AskUserQuestion` to confirm/adjust
 2. Get current date via `date +%Y/%m/%d` and create directory: `docs/feats/<date>-<project-name>/`
-3. Create `PR.md` in that directory
+3. Create `00-<project-name>.md` in that directory
 4. Commit docs in private jj change: `jj new -m "private: claude: docs - <project-name>"`
-5. Create symlink at repo root: `ln -s docs/feats/.../PR.md PR.md`
-6. Commit symlink in private jj change: `jj new -m "private: PR.md - <project-name>"`
+5. Create folder symlink at repo root: `ln -s docs/feats/<date>-<project-name> proj`
+6. Commit symlink in private jj change: `jj new -m "private: project - <project-name>"`
 
 **Important**: Both changes stay private - never include in actual PRs
 
@@ -35,9 +35,9 @@ Unless project instructions specify otherwise:
 
 3. Use `/ctx-improve` to clarify requirements until crystal clear understanding.
 
-4. Create `PR.md` with appropriate sections. If too big, propose splitting into phases with
-   sub-files (`PR-<phase-name>.md` in same directory).
+4. Create `00-<project-name>.md` with appropriate sections. Do NOT create sub-docs unless
+   explicitly requested via `/proj-split` or after asking user.
 
-5. After each Q&A, update `PR.md` and think hard about next questions.
+5. After each Q&A, update the project doc and think hard about next questions.
 
 6. NEVER jump to implementation. **Use AskUserQuestion** to ask if user wants to proceed to planning or implementation.

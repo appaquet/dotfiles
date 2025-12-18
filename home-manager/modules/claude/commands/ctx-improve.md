@@ -14,5 +14,5 @@ the task, or ask questions.
 Unless I told you so, don't start the implementation right away. You should **NEVER** start doing
 modifications to the codebase until you have a crystal clear understanding of the task at hand.
 
-If what we are working on is planned into a PR.md or a sub PR.md file, update it with the new
-context you gathered.
+If what we are working on is planned into a project doc or sub-doc, update it with the new context
+you gathered.

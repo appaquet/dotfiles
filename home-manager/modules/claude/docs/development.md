@@ -28,7 +28,7 @@ Verify:
 - [ ] Code style guidelines followed
 - [ ] Formatting, linting, tests pass (including affected modules)
 - [ ] Temporary debug files/code removed
-- [ ] PR.md updated (if exists)
+- [ ] Project doc updated (if exists)
 
 ## When to Stop
 

@@ -31,15 +31,16 @@ If not 10/10 understanding, use `AskUserQuestion` (search code/web first):
 Never replace TODO/FIXME/REVIEW with explanatory notes. TODOs remain until:
 
 1. Implemented, OR
-2. Tracked in PR.md AND you tell me to remove
+2. Tracked in project doc AND you tell me to remove
 
 ## Destructive Operations
 
 Before deleting files/content: confirm preserved elsewhere OR explicitly disposable.
+Before rewriting/refactoring files: diff old vs new to verify no content lost.
 
 <example>
-WRONG: rm PR.md (assuming task done = content unneeded)
-RIGHT: "Should I move PR.md to docs/feats/ or is it safe to delete?"
+WRONG: rm file.md (assuming task done, file unneeded)
+RIGHT: "Should I archive file.md or is it safe to delete?"
 </example>
 
 ## Problem Solving
@@ -84,4 +85,4 @@ RIGHT: "Plan failed because X. Should I fix X within this approach, or try somet
 * Version control: @docs/version-control.md
 * Development: @docs/development.md
 * Code style: @docs/code-style.md
-* PR.md structure: @docs/PR-file.md
+* Project doc structure: @docs/project-doc.md

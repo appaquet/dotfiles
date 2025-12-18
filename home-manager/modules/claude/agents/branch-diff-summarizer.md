@@ -17,14 +17,14 @@ focusing on the technical implementation rather than business value.
    - Get current branch name: !`jj-current-branch`
    - Get list of all changed files: !`jj-stacked-stats`
 
-2. **Read existing PR.md** (if it exists):
-   - Check for `PR.md` at repository root
+2. **Read existing project doc** (if it exists):
+   - Check for `proj/` symlink at repository root → find `00-*.md` main doc
    - Note if it already has a Files section with summaries
    - If Files section exists and seems complete, ask if you should update it
 
 3. **Analyze changed files**:
    - Get overview of changes: !`jj-diff-branch --stat`
-   - For each changed file (excluding PR.md and generated files):
+   - For each changed file (excluding project docs and generated files):
      1. Run !`jj-diff-branch --git <file>` to see the actual changes
      2. If needed for context, read the full file or surrounding files
      3. Understand both what the file does and what changes were made
@@ -44,13 +44,13 @@ focusing on the technical implementation rather than business value.
    - Focus on technical implementation, not business value
    - Be specific but concise (1-2 sentences per file)
    - Exclude generated files (*.pb.go, wire_gen.go, etc.)
-   - Exclude PR.md itself
+   - Exclude project docs (in `proj/` folder)
    - Include important context files even if not modified
 
 5. **Return the summary**:
-   - If updating PR.md directly was requested: update the Files section and confirm completion
+   - If updating project doc directly was requested: update the Files section and confirm completion
    - Otherwise: return the formatted Files section for the caller to use
-   - If PR.md already has good summaries: report that no update is needed
+   - If project doc already has good summaries: report that no update is needed
 
 ## Important Notes
 

@@ -1,12 +1,12 @@
 ---
-name: pr-desc
-description: Generate concise PR description from PR.md file
+name: proj-desc
+description: Generate concise PR description from project doc
 ---
 
 # PR Description
 
-1. Find and load `PR.md` (check root symlink → follow to actual location, or per project instructions).
-   Load phase sub-file (`PR-<phase-name>.md`) only if relevant to current work.
+1. Find and load project doc (check `proj/` symlink → find `00-*.md` main doc).
+   Load sub-docs (`01-*.md`, etc.) only if relevant to current work.
 
 2. Ensure the "Files" section is up-to-date:
    * Use `jj-diff-branch --stat` to get current branch changes
@@ -19,4 +19,4 @@ description: Generate concise PR description from PR.md file
    * Keep it concise and high-level - answer "what did you build?" not "how does it work?"
    * Use general system/component terms, avoid specific implementation details
 
-4. Write the description to `PR.md` in the "Pull requests" section
+4. Write the description to the main project doc in the "Pull requests" section
