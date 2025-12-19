@@ -1,18 +1,23 @@
 ---
 name: ctx-improve
-description: Improve the context of the task at hands by asking clarifying questions
+description: Improve context by asking clarifying questions
 ---
 
 # Improve Context
 
+Ultrathink. Use sub-agents (Task tool) for codebase exploration if needed.
+
 Use the Understanding Checklist to verify completeness.
 
-Before or after asking questions, search the code to gather more context. You can also search the
-web if needed. Always use the `AskUserQuestion` tool to clarify any ambiguities, uncertainties about
-the task, or ask questions.
+## Instructions
 
-Unless I told you so, don't start the implementation right away. You should **NEVER** start doing
-modifications to the codebase until you have a crystal clear understanding of the task at hand.
+1. Research full context: task, repository, documentation.
+   * Consider launching sub-agents (Task tool) to explore codebase, find patterns
+   * Search web for external dependencies or unfamiliar concepts if needed
 
-If what we are working on is planned into a project doc or sub-doc, update it with the new context
-you gathered.
+2. Use `AskUserQuestion` to clarify requirements. 
+   Research and ask until 10/10 understanding.
+
+3. Update project doc with new context gathered (if working on a planned task).
+
+4. **STOP** - Use `AskUserQuestion` to ask if user wants to proceed to implementation.

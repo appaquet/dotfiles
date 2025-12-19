@@ -8,29 +8,30 @@ argument-hint: [task-description]
 
 Task: $ARGUMENTS
 
+Ultrathink. Use sub-agents (Task tool) for codebase exploration if needed.
+
 ## Instructions
 
-Ultrathink throughout this task.
+1. Run `/ctx-load` if context not sufficiently loaded.
 
-1. Call `EnterPlanMode` tool. Do not proceed without entering plan mode.
+2. Clarify task if empty or unclear via `AskUserQuestion`.
 
-2. Run `/ctx-load` to load project context.
+3. Research full context: task, repository, documentation.
+   * Consider launching sub-agents (Task tool) to explore codebase, find patterns
+   * Search web for external dependencies or unfamiliar concepts if needed
 
-3. If task is empty and context isn't clear, use `AskUserQuestion` to clarify.
+4. Use `AskUserQuestion` to clarify requirements.
+   Research and ask until 10/10 understanding.
 
-4. Read and understand full context: task, repository, relevant documentation.
-
-5. Use `AskUserQuestion` if requirements unclear. Need 10/10 understanding before proceeding.
-
-6. Create high-level development plan:
+5. Create high-level development plan:
    * Break down into logical phases
    * Identify key files and components
    * Consider dependencies and challenges
    * Insert validation tasks after each phase
 
-7. Write plan to project doc (per @docs/project-doc.md structure):
+6. Write plan to project doc (per @docs/project-doc.md structure):
    * Context section describing the task
    * TODO section with planned work items
    * Files section with relevant files
 
-8. Call `ExitPlanMode` when plan is ready for user approval.
+7. **STOP** - Use `AskUserQuestion` to ask if user wants to proceed to implementation.
