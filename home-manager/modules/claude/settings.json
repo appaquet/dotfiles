@@ -80,9 +80,14 @@
     "enabled": true,
     "autoAllowBashIfSandboxed": true,
     "network": {
-      "allowLocalBinding": true,
-      "allowUnixSockets": ["/nix/var/nix/daemon-socket/socket"]
+      "allowUnixSockets": [
+        "/nix/var/nix/daemon-socket/socket"
+      ],
+      "allowLocalBinding": true
     }
   },
-  "alwaysThinkingEnabled": true
+  "alwaysThinkingEnabled": true,
+  "enabledPlugins": {
+    "plugin-dev@claude-plugins-official": true
+  }
 }

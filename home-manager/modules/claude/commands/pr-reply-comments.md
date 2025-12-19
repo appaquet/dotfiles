@@ -26,9 +26,7 @@ PR_NUMBER=1234           # From "PR: 1234"
 # Craft reply (must start with robot emoji)
 REPLY_BODY="🤖 Generated with Claude 🤖
 
-You're absolutely right about [specific issue].
-
-Here's a fix that addresses this:
+Here's a fix that addresses [specific issue]:
 
 \`\`\`rust
 // Your code fix here

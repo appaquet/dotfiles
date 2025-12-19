@@ -12,18 +12,14 @@ Save current project context into project docs while respecting established stru
 1. Find project docs (check `proj/` symlink → find `00-*.md` main doc).
    Also identify any sub-docs (`01-*.md`, `02-*.md`, ..., in same directory).
 
-2. Update the "Files" section with the current state of the project:
-   * Ask the agent to use the branch-diff-summarizer agent
-   * The agent will analyze all changed files and generate proper summaries
-   * It will follow the established format: `- **path/to/file**: Description of file purpose. Description of changes made.`
-   * Update project doc with the agent's output for the Files section
+2. Update the "Files" section:
+   * Launch the `branch-diff-summarizer` agent to analyze changed files
+   * Update project doc with agent's output (format per @docs/project-doc.md)
 
-3. Update the TODO section in both main doc and current sub-doc (if working on a phase):
-   * Mark completed tasks as `- [x]`
-   * Mark ongoing tasks as `- [~]`
-   * Mark incomplete tasks as `- [ ]`
+3. Update the TODO section (format per @docs/project-doc.md):
+   * Update task and phase status in both main doc and current sub-doc
    * Add any new tasks discovered during development
-   * Keep both files in sync
+   * Phase transitions: use `AskUserQuestion` before changing phase status
 
 4. Update context and requirements sections if needed based on new discoveries
 

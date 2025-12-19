@@ -10,16 +10,12 @@ argument-hint: [task-description]
 
 If context unclear, run `/ctx-load` first. Ultrathink throughout this task.
 
-Task (may be empty):
-
-```markdown
-$ARGUMENTS
-```
+Task: $ARGUMENTS
 
 ## Instructions
 
-1. If the task above is empty and the context isn't clear about the task at hand from the rest of
-   our conversation, ask me about the task to be worked on using the `AskUserQuestion` tool.
+1. If the task is empty and the context isn't clear about the task at hand from the rest of our
+   conversation, ask me about the task to be worked on using the `AskUserQuestion` tool.
 
 2. Make sure to read and understand the full context of the task, repository and relevant
    documentation files.

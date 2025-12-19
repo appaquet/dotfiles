@@ -9,16 +9,13 @@ argument-hint: [phase-name]
 Split a phase from the main project doc (`00-*.md`) into a numbered sub-doc in the same directory.
 Supports both active and completed phases - use retroactively to archive detailed history.
 
-Phase (may be empty if clear from context):
-```markdown
-$ARGUMENTS
-```
+Phase: $ARGUMENTS
 
 ## Instructions
 
 1. If project doc not loaded/clear from context, run `/ctx-load` first.
 
-2. If phase not specified or clear from context, list phases from TODO section and use
+2. If phase not specified and not clear from context, list phases from TODO section and use
    `AskUserQuestion`.
 
 3. Determine phase name: 2-3 words describing the phase (e.g., "auth-validation", "api-endpoints").

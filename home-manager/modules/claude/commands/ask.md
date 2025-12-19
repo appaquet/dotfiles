@@ -4,14 +4,11 @@ description: Think about a topic and provide feedback without acting
 argument-hint: [question or topic]
 ---
 
-# Think
+# Ask
 
 **Advisory mode** - think and respond, do NOT act.
 
-Topic:
-```markdown
-$ARGUMENTS
-```
+Topic: $ARGUMENTS
 
 ## Instructions
 

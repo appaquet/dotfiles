@@ -9,10 +9,7 @@ argument-hint: [task-description]
 Create a project folder with `00-<project-name>.md` main doc by conversing with me. Use documented
 structure from @docs/project-doc.md.
 
-Task (may be empty, ask me if so):
-```markdown
-$ARGUMENTS
-```
+Task: $ARGUMENTS
 
 ## File Location
 
