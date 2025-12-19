@@ -10,7 +10,10 @@
 ## Context & Planning
 
 * Call `/ctx-load` before work/commands to ensure all relevant context loaded
+* Plan and track work using project docs (@docs/project-doc.md)
 * Consider: edge cases, alternatives, reusability, existing patterns, bigger picture
+* After context compaction ("continued from previous conversation"): ALWAYS call `/ctx-load` first
+  and then continue with your work if that was the intended next step
 * Ambiguous references ("that/this/it"): STOP, ask which specific thing (IDE selection may be missing)
 
 ## Before Starting Work
