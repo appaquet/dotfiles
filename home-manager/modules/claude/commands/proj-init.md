@@ -18,9 +18,9 @@ Unless project instructions specify otherwise:
 1. Derive project name from `jj-current-branch`, use `AskUserQuestion` to confirm/adjust
 2. Get current date via `date +%Y/%m/%d` and create directory: `docs/features/<date>-<project-name>/`
 3. Create `00-<project-name>.md` in that directory
-4. Commit docs in private jj change: `jj new -m "private: claude: docs - <project-name>"`
+4. Commit docs in private change: `private: claude: docs - <project-name>`
 5. Create folder symlink at repo root: `ln -s docs/features/<date>-<project-name> proj`
-6. Commit symlink in private jj change: `jj new -m "private: project - <project-name>"`
+6. Commit symlink in private change: `private: project - <project-name>`
 
 **Important**: Both changes stay private - never include in actual PRs
 

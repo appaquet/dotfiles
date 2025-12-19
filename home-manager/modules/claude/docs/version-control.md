@@ -1,18 +1,19 @@
-
 # Version Control (Jujutsu)
 
 Using `jj` (collocated with git). Always detached head state.
 
-## Commit Messages
+## Creating Changes
 
-ALL commits: prefix `"private: claude: "` for `jj new -m` and `jj commit -m`
-Always use `-m "message"` (never `jj commit` alone - opens editor)
+**jj commit vs jj new:**
 
-✓ `jj commit -m "private: claude: fix validation bug"`
+- `jj commit -m "msg"` - Finalize CURRENT changes with message, create new empty change
+- `jj new -m "msg"` - Create NEW empty change with message (current changes stay in parent)
 
-## When to Create New Change
+Use `commit` after changes. Use `new` before changes.
+Run `jj status` before committing to verify changes are in expected place.
 
-Create new change at milestones:
+**When to create changes:**
+
 - Before starting implementation (after planning)
 - After tests pass
 - Before refactoring working code
@@ -20,25 +21,32 @@ Create new change at milestones:
 - When switching to different area of codebase
 - Skip for: read-only ops, iteration within same logical step
 
-Default to creating changes - easier to squash later than split.
+Default to more changes - easier to squash than split.
+
+## Commit Messages
+
+Prefix ALL commits with `"private: claude: "`
+Always use `-m "message"` (never `jj commit` alone - opens editor)
+
+✓ `jj commit -m "private: claude: fix validation bug"`
 
 ## Commands
 
 | Purpose | Command |
 |---------|---------|
-| New change | `jj new -m "private: claude: description"` |
 | Commit current | `jj commit -m "private: claude: description"` |
-| Diff with git style | `jj diff --git` |
-| Main branch name | `jj-main-branch` |
+| New empty change | `jj new -m "private: claude: description"` |
+| Diff (git style) | `jj diff --git` |
+| Diff working | `jj-diff-working --git` (`--stat` for files) |
+| Diff branch | `jj-diff-branch --git` |
 | Current branch | `jj-current-branch` |
-| Previous branch | `jj-prev-branch` (for stacked PRs, returns `dev` if not stacked) |
-| Diff working changes | `jj-diff-working --git` (add `--stat` for files) |
-| Diff branch | `jj-diff-branch --git` (works with stacked/standalone PRs) |
-| Stacked branches list | `jj-stacked-branches` |
-| Stacked file stats | `jj-stacked-stats` |
+| Main branch | `jj-main-branch` |
+| Previous branch | `jj-prev-branch` |
+| Stacked branches | `jj-stacked-branches` |
+| Stacked stats | `jj-stacked-stats` |
 
-## Important Notes
+## Notes
 
-- Use `--git` flag for comprehensible diff output
-- For `gh` commands: Use `$(jj-current-branch)` since always detached
+- Use `--git` flag for readable diff output
+- For `gh` commands: use `$(jj-current-branch)` since always detached
 - Never revert changes not made by you - ask for clarification
