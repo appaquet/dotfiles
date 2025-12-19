@@ -6,35 +6,31 @@ argument-hint: [task-description]
 
 # Plan
 
-**Requires PLANNING mode.** Stop immediately if not in planning mode.
-
-If context unclear, run `/ctx-load` first. Ultrathink throughout this task.
-
 Task: $ARGUMENTS
 
 ## Instructions
 
-1. If the task is empty and the context isn't clear about the task at hand from the rest of our
-   conversation, ask me about the task to be worked on using the `AskUserQuestion` tool.
+Ultrathink throughout this task.
 
-2. Make sure to read and understand the full context of the task, repository and relevant
-   documentation files.
+1. Call `EnterPlanMode` tool. Do not proceed without entering plan mode.
 
-3. Analyze the task requirements and create a high-level development plan:
-   * Break down the task into logical phases (scaffolding, testing, implementation, etc.)
-   * Identify key files and components that will need modification
-   * Consider dependencies and potential challenges
-   * ultrathink each phase, step, how they can be tested and validated
-   * Unless told otherwise, always insert validation tasks, asking for my feedback after each phase
+2. Run `/ctx-load` to load project context.
 
-4. Use `AskUserQuestion` tool if the requirements are unclear or incomplete. Use the Understanding
-   Checklist to verify you have all necessary information. You need to have a 10/10 understanding
-   and confidence level. If not, use `/ctx-improve` to clarify context before proceeding.
+3. If task is empty and context isn't clear, use `AskUserQuestion` to clarify.
 
-5. Update or create project doc (following `@docs/project-doc.md` structure).
-   Include:
+4. Read and understand full context: task, repository, relevant documentation.
+
+5. Use `AskUserQuestion` if requirements unclear. Need 10/10 understanding before proceeding.
+
+6. Create high-level development plan:
+   * Break down into logical phases
+   * Identify key files and components
+   * Consider dependencies and challenges
+   * Insert validation tasks after each phase
+
+7. Write plan to project doc (per @docs/project-doc.md structure):
    * Context section describing the task
-   * TODO section with planned work items (flat list, no phases unless asked)
-   * Files section with relevant files identified
+   * TODO section with planned work items
+   * Files section with relevant files
 
-**Important**: NEVER jump to implementation after planning. **Use AskUserQuestion** to ask if user wants to proceed to implementation.
+8. Call `ExitPlanMode` when plan is ready for user approval.
