@@ -3,7 +3,7 @@
 ## TODO
 
 - [x] Better project docs. Rename from PR to 00-project.md and then have sub-docs sequenced.
-  - `proj/` symlink at root → `docs/feats/<date>-<project-name>/`
+  - `proj/` symlink at root → `docs/features/<date>-<project-name>/`
   - Main doc: `00-<project-name>.md`, sub-docs: `01-phase.md`, `02-phase.md`, etc.
 - [x] Make clear that project folder at root is always a symlink to actual folder
 

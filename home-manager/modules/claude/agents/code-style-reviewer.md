@@ -17,11 +17,10 @@ deserves thorough analysis and feedback.
 
 1. Load the context of the project and PR
 
-2. *Very important*: Search project-specific style guideline files (from the root of the repository)
-   and read them (ex: `**/*style*.md`, `**/*guide*.md`, etc.)
+2. Search project-specific style guideline files (from the root of the repository) and read them
+   (ex: `**/*style*.md`, `**/*guide*.md`, etc.)
 
-3. *Very important*: Search for my personal code style guidelines (see @../docs/code-style.md) and read
-   them. This is a critical step to ensure adherence to my personal coding standards.
+3. Search for my personal code style guidelines (see @../docs/code-style.md) and read them.
 
 4. Create a master checklist of code style issues to review:
    1. For **EACH** item of the project-specific style guidelines loaded in step 2
