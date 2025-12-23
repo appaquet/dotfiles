@@ -24,10 +24,11 @@ in
       mkHomeConfig "x86_64-linux"
         [
           ./deskapp.nix
-          inputs.secrets.homeManager.common
+          inputs.secrets.homeManagerModules.sops
+          inputs.secrets.homeManager.common # LEGACY: remove after full migration
         ]
         {
-          secrets = inputs.secrets.linux;
+          secrets = inputs.secrets.linux; # LEGACY: remove after full migration
 
           cfg = {
             isNixos = true;
@@ -40,6 +41,7 @@ in
       mkHomeConfig "x86_64-linux"
         [
           ./servapp.nix
+          inputs.secrets.homeManagerModules.sops
           inputs.secrets.homeManager.common
         ]
         {
@@ -55,6 +57,7 @@ in
       mkHomeConfig "aarch64-darwin"
         [
           ./mbpapp.nix
+          inputs.secrets.homeManagerModules.sops
           inputs.secrets.homeManager.common
         ]
         {
@@ -70,6 +73,7 @@ in
       mkHomeConfig "aarch64-linux"
         [
           ./utm.nix
+          inputs.secrets.homeManagerModules.sops
           inputs.secrets.homeManager.common
         ]
         {
@@ -85,6 +89,7 @@ in
       mkHomeConfig "aarch64-linux"
         [
           ./piapp.nix
+          inputs.secrets.homeManagerModules.sops
           inputs.secrets.homeManager.common
         ]
         {
@@ -100,6 +105,7 @@ in
       mkHomeConfig "aarch64-linux"
         [
           ./piprint.nix
+          inputs.secrets.homeManagerModules.sops
           inputs.secrets.homeManager.common
         ]
         {
@@ -115,6 +121,7 @@ in
       mkHomeConfig "aarch64-linux"
         [
           ./piups.nix
+          inputs.secrets.homeManagerModules.sops
           inputs.secrets.homeManager.common
         ]
         {

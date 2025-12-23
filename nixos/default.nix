@@ -11,11 +11,12 @@ in
     deskapp = inputs.nixos.lib.nixosSystem {
       specialArgs = {
         inherit inputs;
-        secrets = inputs.secrets.linux;
+        secrets = inputs.secrets.linux; # LEGACY: remove after full migration
       };
 
       modules = [
         nixosOverlaysModule
+        inputs.secrets.nixosModules.sops
         ./deskapp/configuration.nix
       ];
     };
@@ -23,11 +24,12 @@ in
     servapp = inputs.nixos.lib.nixosSystem {
       specialArgs = {
         inherit inputs;
-        secrets = inputs.secrets.linux;
+        secrets = inputs.secrets.linux; # LEGACY: remove after full migration
       };
 
       modules = [
         nixosOverlaysModule
+        inputs.secrets.nixosModules.sops
         inputs.secrets.nixos.servapp
         ./servapp/configuration.nix
       ];
@@ -36,11 +38,12 @@ in
     utm = inputs.nixos.lib.nixosSystem {
       specialArgs = {
         inherit inputs;
-        secrets = inputs.secrets.linux;
+        secrets = inputs.secrets.linux; # LEGACY: remove after full migration
       };
 
       modules = [
         nixosOverlaysModule
+        inputs.secrets.nixosModules.sops
         ./utm/configuration.nix
       ];
     };
@@ -51,7 +54,7 @@ in
       specialArgs = {
         inherit inputs;
         inherit (inputs) nixos-raspberrypi;
-        secrets = inputs.secrets.linux;
+        secrets = inputs.secrets.linux; # LEGACY: remove after full migration
       };
 
       modules = [
@@ -61,6 +64,7 @@ in
             sd-image
           ];
         }
+        inputs.secrets.nixosModules.sops
         ./piapp/configuration.nix
       ];
     };
@@ -71,7 +75,7 @@ in
       specialArgs = {
         inherit inputs;
         inherit (inputs) nixos-raspberrypi;
-        secrets = inputs.secrets.linux;
+        secrets = inputs.secrets.linux; # LEGACY: remove after full migration
       };
 
       modules = [
@@ -81,6 +85,7 @@ in
             sd-image
           ];
         }
+        inputs.secrets.nixosModules.sops
         ./piprint/configuration.nix
       ];
     };
@@ -91,7 +96,7 @@ in
       specialArgs = {
         inherit inputs;
         inherit (inputs) nixos-raspberrypi;
-        secrets = inputs.secrets.linux;
+        secrets = inputs.secrets.linux; # LEGACY: remove after full migration
       };
 
       modules = [
@@ -101,6 +106,7 @@ in
             sd-image
           ];
         }
+        inputs.secrets.nixosModules.sops
         ./piups/configuration.nix
       ];
     };

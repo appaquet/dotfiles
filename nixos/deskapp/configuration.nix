@@ -1,6 +1,8 @@
-{ pkgs, secrets, ... }:
+{ pkgs, config, secrets, ... }:
 
 {
+  # sops-nix secrets
+  sops.secrets.nasapp_cifs = { };
   imports = [
     ../modules/common.nix
     ../modules/dev.nix
@@ -61,7 +63,7 @@
   # NasAPP mounts
   nasapp = {
     enable = true;
-    credentials = secrets.deskapp.nasappCifs;
+    credentials = config.sops.secrets.nasapp_cifs.path;
     uid = "appaquet";
     gid = "users";
   };
