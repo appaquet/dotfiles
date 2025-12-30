@@ -1,11 +1,14 @@
 { pkgs, ... }:
 {
   imports = [
+    ../modules/home-manager.nix
     ./apps.nix
     ./fonts.nix
     ./system.nix
     ../../nixos/modules/cachix.nix
   ];
+
+  home-manager.users.appaquet = import ../../home-manager/mbpapp.nix;
 
   nix = {
     settings = {
