@@ -89,6 +89,8 @@
             "en-CA"
             "fr-CA"
           ];
+
+          SLSMenuBarUseBlurredAppearance = true; # enable translucent menu bar, fixes white bars in tahoe
         };
 
         "com.apple.screensaver" = {
