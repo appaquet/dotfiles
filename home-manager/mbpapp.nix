@@ -1,10 +1,7 @@
-{ inputs, ... }:
+{ ... }:
 
 {
   imports = [
-    # REVIEW: Remove from each host and move to base since we want it everywhere
-    inputs.humanfirst-dots.homeManagerModule
-    inputs.secrets.homeManager.common
     ./modules/base.nix
     ./modules/claude
     ./modules/dev.nix
