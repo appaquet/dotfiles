@@ -1,12 +1,14 @@
 {
   pkgs,
   lib,
-  inputs',
+  inputs,
   ...
 }:
 
 {
   imports = [
+    inputs.humanfirst-dots.homeManagerModule
+    inputs.secrets.homeManager.common
     ./fish
     ./tmux
     ./git
@@ -81,6 +83,6 @@
       pkgs.wol # wake on lan
     ]
     ++ lib.optionals (pkgs.stdenv.isDarwin || pkgs.stdenv.isx86_64) [
-      inputs'.fzf-nix.packages.fzf-nix # fzf-nix, somehow doesn't work on linux arm
+      pkgs.fzf-nix # fzf-nix, somehow doesn't work on linux arm
     ];
 }

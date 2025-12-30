@@ -2,17 +2,17 @@
   pkgs,
   config,
   lib,
-  cfg,
   ...
 }:
 
 let
+  cfg = config.dotfiles.neovim;
   pkgsChannel = pkgs;
   confDir = "${config.home.homeDirectory}/dotfiles/home-manager/modules/neovim/conf";
 
   includeLuaFile =
     path:
-    if cfg.nvimDevMode then
+    if cfg.devMode then
       ''
         lua dofile("${confDir}/${path}")
       ''
@@ -24,7 +24,7 @@ let
       '';
 
   nvimEnv = ''
-    let g:minimal_nvim = ${if cfg.nvimMinimal then "v:true" else "v:false"}
+    let g:minimal_nvim = ${if !cfg.full then "v:true" else "v:false"}
 
     if filereadable("${config.sops.secrets.nvim_secrets.path}")
       lua dofile("${config.sops.secrets.nvim_secrets.path}")
@@ -34,7 +34,28 @@ let
   '';
 in
 {
-  sops.secrets.nvim_secrets.sopsFile = config.sops.secretsFiles.common;
+  options.dotfiles.neovim = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Enable neovim configuration.";
+    };
+
+    full = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Enable full neovim configuration with LSP, autocomplete, etc.";
+    };
+
+    devMode = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable dev mode for neovim - loads Lua files via dofile() for live editing.";
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
+    sops.secrets.nvim_secrets.sopsFile = config.sops.secretsFiles.common;
 
   programs.neovim = {
     enable = true;
@@ -120,7 +141,7 @@ in
         nvim-treesitter-textobjects # provides object manipulation
       ])
       # Full plugins
-      ++ (lib.optionals (!cfg.nvimMinimal) (
+      ++ (lib.optionals cfg.full (
         with pkgsChannel.vimPlugins;
         [
           # LSP / Languages
@@ -187,7 +208,7 @@ in
           (includeLuaFile "quickfix.lua")
           (includeLuaFile "diag.lua")
         ]
-        ++ (lib.optionals (!cfg.nvimMinimal) [
+        ++ (lib.optionals cfg.full [
           (includeLuaFile "lang.lua")
           (includeLuaFile "formatting.lua")
           (includeLuaFile "linting.lua")
@@ -202,7 +223,7 @@ in
       )
     );
 
-    extraPackages = lib.optionals (!cfg.nvimMinimal) (
+    extraPackages = lib.optionals cfg.full (
       with pkgsChannel;
       [
         nixd # nix lsp
@@ -233,5 +254,6 @@ in
   xdg.configFile."nvim/after/ftplugin" = {
     recursive = true;
     source = ./ftplugin;
+  };
   };
 }

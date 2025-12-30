@@ -1,4 +1,4 @@
-{ cfg, pkgs, ... }:
+{ pkgs, ... }:
 
 let
   miseConfig = ''
@@ -6,12 +6,10 @@ let
     legacy_version_file = false
   ''
   +
-
-    # should not install python or node via mise on nixos since
-    # it needs to compile from scratch.
-    # we're better off using nixpkgs instead
+    # Disable python/node on NixOS to use nixpkgs versions
+    # and prevent mise from compiling them from source
     (
-      if cfg.isNixos then
+      if pkgs.stdenv.isLinux then
         ''
           disable_tools = ["python", "node"]
         ''

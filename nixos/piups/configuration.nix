@@ -7,8 +7,11 @@
   imports = [
     ../modules/common.nix
     ../modules/common-pi.nix
+    ../modules/home-manager.nix
     ./ups-server.nix
   ];
+
+  home-manager.users.appaquet = import ../../home-manager/piups.nix;
 
   sops.secrets.ups_pw.sopsFile = config.sops.secretsFiles.home;
 

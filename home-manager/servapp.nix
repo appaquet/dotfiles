@@ -1,7 +1,9 @@
-{ ... }:
+{ inputs, ... }:
 
 {
   imports = [
+    inputs.humanfirst-dots.homeManagerModule
+    inputs.secrets.homeManager.common
     ./modules/base.nix
     ./modules/claude
     ./modules/dev.nix

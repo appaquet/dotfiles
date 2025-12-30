@@ -2,7 +2,6 @@
   pkgs,
   lib,
   inputs,
-  inputs',
   ...
 }:
 
@@ -39,9 +38,9 @@ in
       gnumake
       bintools # ld, objdump, etc.
 
-      inputs'.nix-ai-tools.packages.codex
-      inputs'.nix-ai-tools.packages.opencode
-      inputs'.nix-ai-tools.packages.gemini-cli
+      codex
+      opencode
+      gemini-cli
     ])
     ++ lib.optionals pkgs.stdenv.isLinux [
       pkgs.mold
