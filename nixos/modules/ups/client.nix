@@ -2,7 +2,6 @@
   config,
   pkgs,
   lib,
-  secrets,
   ...
 }:
 
@@ -49,13 +48,15 @@ in
   config = lib.mkIf cfg.enable (
     lib.mkMerge [
       {
+        sops.secrets.ups_pw.sopsFile = config.sops.secretsFiles.home;
+
         power.ups = {
           enable = true;
           mode = "netclient";
 
           users.monuser = {
             upsmon = "primary";
-            passwordFile = secrets.upsPw;
+            passwordFile = config.sops.secrets.ups_pw.path;
           };
 
           upsmon = {
@@ -80,7 +81,7 @@ in
             monitor.main = {
               system = "${cfg.name}@${cfg.server}";
               user = "monuser";
-              passwordFile = secrets.upsPw;
+              passwordFile = config.sops.secrets.ups_pw.path;
             };
           };
         };

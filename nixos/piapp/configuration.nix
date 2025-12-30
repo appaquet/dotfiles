@@ -1,5 +1,5 @@
 {
-  secrets,
+  config,
   ...
 }:
 
@@ -27,9 +27,11 @@
     firewall.enable = false;
   };
 
+  sops.secrets.nasapp_cifs.sopsFile = config.sops.secretsFiles.home;
+
   nasapp = {
     enable = true;
-    credentials = secrets.piapp.nasappCifs;
+    credentials = config.sops.secrets.nasapp_cifs.path;
     uid = "appaquet";
     gid = "users";
 

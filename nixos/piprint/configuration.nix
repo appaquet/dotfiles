@@ -1,7 +1,6 @@
 {
-  config,
   pkgs,
-  inputs,
+  config,
   ...
 }:
 
@@ -15,8 +14,7 @@
     hostName = "piprint";
     useDHCP = true;
     firewall.enable = false;
-  }
-  // inputs.secrets.nixos.wifi.home_2_4;
+  };
 
   services.openssh.enable = true;
 

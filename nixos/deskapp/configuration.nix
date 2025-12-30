@@ -1,4 +1,8 @@
-{ pkgs, secrets, ... }:
+{
+  pkgs,
+  config,
+  ...
+}:
 
 {
   imports = [
@@ -58,10 +62,12 @@
   };
   networking.firewall.enable = false;
 
+  sops.secrets.nasapp_cifs.sopsFile = config.sops.secretsFiles.home;
+
   # NasAPP mounts
   nasapp = {
     enable = true;
-    credentials = secrets.deskapp.nasappCifs;
+    credentials = config.sops.secrets.nasapp_cifs.path;
     uid = "appaquet";
     gid = "users";
   };

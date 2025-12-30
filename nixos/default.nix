@@ -9,38 +9,32 @@ in
 {
   flake.nixosConfigurations = {
     deskapp = inputs.nixos.lib.nixosSystem {
-      specialArgs = {
-        inherit inputs;
-        secrets = inputs.secrets.linux;
-      };
+      specialArgs = { inherit inputs; };
 
       modules = [
         nixosOverlaysModule
+        inputs.secrets.nixos.common
         ./deskapp/configuration.nix
       ];
     };
 
     servapp = inputs.nixos.lib.nixosSystem {
-      specialArgs = {
-        inherit inputs;
-        secrets = inputs.secrets.linux;
-      };
+      specialArgs = { inherit inputs; };
 
       modules = [
         nixosOverlaysModule
+        inputs.secrets.nixos.common
         inputs.secrets.nixos.servapp
         ./servapp/configuration.nix
       ];
     };
 
     utm = inputs.nixos.lib.nixosSystem {
-      specialArgs = {
-        inherit inputs;
-        secrets = inputs.secrets.linux;
-      };
+      specialArgs = { inherit inputs; };
 
       modules = [
         nixosOverlaysModule
+        inputs.secrets.nixos.common
         ./utm/configuration.nix
       ];
     };
@@ -51,7 +45,6 @@ in
       specialArgs = {
         inherit inputs;
         inherit (inputs) nixos-raspberrypi;
-        secrets = inputs.secrets.linux;
       };
 
       modules = [
@@ -61,6 +54,7 @@ in
             sd-image
           ];
         }
+        inputs.secrets.nixos.common
         ./piapp/configuration.nix
       ];
     };
@@ -71,7 +65,6 @@ in
       specialArgs = {
         inherit inputs;
         inherit (inputs) nixos-raspberrypi;
-        secrets = inputs.secrets.linux;
       };
 
       modules = [
@@ -81,6 +74,8 @@ in
             sd-image
           ];
         }
+        inputs.secrets.nixos.common
+        inputs.secrets.nixos.wifi
         ./piprint/configuration.nix
       ];
     };
@@ -91,7 +86,6 @@ in
       specialArgs = {
         inherit inputs;
         inherit (inputs) nixos-raspberrypi;
-        secrets = inputs.secrets.linux;
       };
 
       modules = [
@@ -101,6 +95,7 @@ in
             sd-image
           ];
         }
+        inputs.secrets.nixos.common
         ./piups/configuration.nix
       ];
     };

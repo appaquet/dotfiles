@@ -1,4 +1,7 @@
-{ secrets, ... }:
+{
+  config,
+  ...
+}:
 
 {
   imports = [
@@ -49,10 +52,12 @@
     extraSetFlags = [ "--advertise-exit-node" ];
   };
 
+  sops.secrets.nasapp_cifs.sopsFile = config.sops.secretsFiles.home;
+
   # NasAPP mounts
   nasapp = {
     enable = true;
-    credentials = secrets.servapp.nasappCifs;
+    credentials = config.sops.secrets.nasapp_cifs.path;
     uid = "appaquet";
     gid = "users";
     shares = [

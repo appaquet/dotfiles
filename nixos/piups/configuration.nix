@@ -10,6 +10,8 @@
     ./ups-server.nix
   ];
 
+  sops.secrets.ups_pw.sopsFile = config.sops.secretsFiles.home;
+
   networking = {
     hostName = "piups";
     useDHCP = true;

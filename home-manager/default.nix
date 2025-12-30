@@ -27,8 +27,6 @@ in
           inputs.secrets.homeManager.common
         ]
         {
-          secrets = inputs.secrets.linux;
-
           cfg = {
             isNixos = true;
             nvimMinimal = false;
@@ -43,7 +41,6 @@ in
           inputs.secrets.homeManager.common
         ]
         {
-          secrets = inputs.secrets.linux;
           cfg = {
             isNixos = true;
             nvimMinimal = false;
@@ -58,7 +55,6 @@ in
           inputs.secrets.homeManager.common
         ]
         {
-          secrets = inputs.secrets.darwin;
           cfg = {
             isNixos = false; # macOS, not NixOS
             nvimMinimal = false;
@@ -73,7 +69,6 @@ in
           inputs.secrets.homeManager.common
         ]
         {
-          secrets = inputs.secrets.linux;
           cfg = {
             isNixos = true;
             nvimMinimal = true;
@@ -88,7 +83,6 @@ in
           inputs.secrets.homeManager.common
         ]
         {
-          secrets = inputs.secrets.linux;
           cfg = {
             isNixos = true;
             nvimMinimal = true;
@@ -103,7 +97,6 @@ in
           inputs.secrets.homeManager.common
         ]
         {
-          secrets = inputs.secrets.linux;
           cfg = {
             isNixos = true;
             nvimMinimal = true;
@@ -118,7 +111,6 @@ in
           inputs.secrets.homeManager.common
         ]
         {
-          secrets = inputs.secrets.linux;
           cfg = {
             isNixos = true;
             nvimMinimal = true;

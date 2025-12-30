@@ -1,6 +1,5 @@
 {
   pkgs,
-  secrets,
   config,
   ...
 }:
@@ -46,7 +45,7 @@ let
       fi
 
       # shellcheck source=/dev/null
-      source ${secrets.common.nordvpn}
+      source ${config.sops.secrets.nordvpn.path}
 
       # Start the vpn container if it doesn't already run
       if ! docker ps | grep -q openvpn-shell; then
@@ -93,5 +92,7 @@ let
 
 in
 {
+  sops.secrets.nordvpn.sopsFile = config.sops.secretsFiles.work;
+
   home.packages = [ vpn-shell ];
 }

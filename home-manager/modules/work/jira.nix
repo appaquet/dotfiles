@@ -1,6 +1,8 @@
-{ pkgs, secrets, ... }:
+{ pkgs, config, ... }:
 
 {
+  sops.secrets.jira_token.sopsFile = config.sops.secretsFiles.work;
+
   home.packages = with pkgs; [
     jira-cli-go
   ];
@@ -15,6 +17,6 @@
   };
 
   programs.fish.interactiveShellInit = ''
-    set -x JIRA_API_TOKEN (cat ${secrets.work.jiraToken})
+    set -x JIRA_API_TOKEN (cat ${config.sops.secrets.jira_token.path})
   '';
 }

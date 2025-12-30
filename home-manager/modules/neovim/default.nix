@@ -1,7 +1,6 @@
 {
   pkgs,
   config,
-  secrets,
   lib,
   cfg,
   ...
@@ -27,14 +26,16 @@ let
   nvimEnv = ''
     let g:minimal_nvim = ${if cfg.nvimMinimal then "v:true" else "v:false"}
 
-    if filereadable("${secrets.common.nvimSecrets}")
-      lua dofile("${secrets.common.nvimSecrets}")
+    if filereadable("${config.sops.secrets.nvim_secrets.path}")
+      lua dofile("${config.sops.secrets.nvim_secrets.path}")
     else
       lua print("nvim secrets not found!!")
     endif
   '';
 in
 {
+  sops.secrets.nvim_secrets.sopsFile = config.sops.secretsFiles.common;
+
   programs.neovim = {
     enable = true;
     viAlias = true;

@@ -1,4 +1,4 @@
-{ secrets, ... }:
+{ config, ... }:
 {
   power.ups = {
     enable = true;
@@ -49,7 +49,7 @@
 
     users.monuser = {
       upsmon = "primary";
-      passwordFile = secrets.upsPw;
+      passwordFile = config.sops.secrets.ups_pw.path;
     };
 
     upsmon = {
@@ -58,14 +58,14 @@
           system = "ups";
           type = "primary";
           user = "monuser";
-          passwordFile = secrets.upsPw;
+          passwordFile = config.sops.secrets.ups_pw.path;
         };
 
         network = {
           system = "network";
           type = "primary";
           user = "monuser";
-          passwordFile = secrets.upsPw;
+          passwordFile = config.sops.secrets.ups_pw.path;
         };
       };
 
