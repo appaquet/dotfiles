@@ -8,10 +8,7 @@
   imports = [
     ../modules/common.nix
     ../modules/common-pi.nix
-    ../modules/home-manager.nix
   ];
-
-  home-manager.users.appaquet = import ../../home-manager/piprint.nix;
 
   networking = {
     hostName = "piprint";

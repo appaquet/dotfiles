@@ -8,7 +8,6 @@
     ../modules/common.nix
     ../modules/dev.nix
     ../modules/docker.nix
-    ../modules/home-manager.nix
     ../modules/nasapp.nix
     ../modules/network-bridge.nix
     ../modules/ups/client.nix
@@ -17,8 +16,6 @@
     ./hardware-configuration.nix
     ./virt
   ];
-
-  home-manager.users.appaquet = import ../../home-manager/servapp.nix;
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;

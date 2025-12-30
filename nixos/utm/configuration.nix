@@ -3,11 +3,8 @@
 {
   imports = [
     ../modules/common.nix
-    ../modules/home-manager.nix
     ./hardware-configuration.nix
   ];
-
-  home-manager.users.appaquet = import ../../home-manager/utm.nix;
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;

@@ -8,12 +8,9 @@
     ./hardware-configuration.nix
     ../modules/common.nix
     ../modules/common-pi.nix
-    ../modules/home-manager.nix
     ../modules/nasapp.nix
     ../modules/netconsole/receiver.nix
   ];
-
-  home-manager.users.appaquet = import ../../home-manager/piapp.nix;
 
   # /boot is too small, limit to 1 configuration
   boot.loader.raspberryPi.configurationLimit = 1;
