@@ -18,7 +18,13 @@
   };
 
   networking.firewall.enable = true;
-  services.openssh.enable = true;
+  networking.firewall.allowedTCPPorts = [ 22222 ];
+
+  services.openssh = {
+    enable = true;
+    ports = [ 22222 ];
+    settings.PasswordAuthentication = false;
+  };
 
   environment.systemPackages = map lib.lowPrio [
     pkgs.curl
@@ -32,13 +38,6 @@
         "nix-command"
       ];
     };
-  };
-
-  # TODO: REmove + password
-  users.users.root = {
-    openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHNXBK1YpLeuIKx+tpVLpZOhKbMcqLeMx15SvcBG0jcR appaquet@gmail.com"
-    ];
   };
 
   system.stateVersion = "25.11";
