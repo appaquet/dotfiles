@@ -99,5 +99,17 @@ in
         ./piups/configuration.nix
       ];
     };
+
+    vps = inputs.nixos.lib.nixosSystem {
+      specialArgs = { inherit inputs; };
+
+      modules = [
+        nixosOverlaysModule
+        inputs.secrets.nixos.common
+        inputs.secrets.nixos.vps
+        inputs.disko.nixosModules.disko
+        ./vps/configuration.nix
+      ];
+    };
   };
 }

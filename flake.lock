@@ -59,6 +59,26 @@
         "type": "github"
       }
     },
+    "disko": {
+      "inputs": {
+        "nixpkgs": [
+          "nixos"
+        ]
+      },
+      "locked": {
+        "lastModified": 1766150702,
+        "narHash": "sha256-P0kM+5o+DKnB6raXgFEk3azw8Wqg5FL6wyl9jD+G5a4=",
+        "owner": "nix-community",
+        "repo": "disko",
+        "rev": "916506443ecd0d0b4a0f4cf9d40a3c22ce39b378",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "disko",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "locked": {
         "lastModified": 1761588595,
@@ -449,6 +469,7 @@
     "root": {
       "inputs": {
         "darwin": "darwin",
+        "disko": "disko",
         "flake-parts": "flake-parts",
         "fzf-nix": "fzf-nix",
         "home-manager": "home-manager",
@@ -470,11 +491,11 @@
         "sops-nix": "sops-nix"
       },
       "locked": {
-        "lastModified": 1767063792,
-        "narHash": "sha256-IxMlSdlU4gvh4wfxPyhyQRHxPHhny8oZB57hyP6A7Xg=",
+        "lastModified": 1767148832,
+        "narHash": "sha256-OqePGgVQ8GbYsurHKqNHe0i9fiE39DS0VWHcPOi93A4=",
         "owner": "appaquet",
         "repo": "dotfiles-secrets",
-        "rev": "c98d3bd43a1a6069447ce78ea413fcf086f75d19",
+        "rev": "edaf784ce485fc0356d5740fffc426224c3171a7",
         "type": "github"
       },
       "original": {

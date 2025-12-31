@@ -1,4 +1,5 @@
-{ ... }:
+# Two disk setup: main (OS) + data
+{ lib, ... }:
 {
   disko.devices = {
     disk.main = {
@@ -26,8 +27,14 @@
             name = "main-root";
             size = "100%";
             content = {
-              type = "lvm_pv";
-              vg = "pool";
+              type = "luks";
+              name = "cryptroot";
+              passwordFile = "/tmp/secret.key";
+              settings.allowDiscards = true;
+              content = {
+                type = "lvm_pv";
+                vg = "pool";
+              };
             };
           };
         };

@@ -42,7 +42,12 @@ elif [[ "${MACHINE_KEY}" == "appaquet@piups"* ]]; then
   HOSTNAME="piups"
   OS_TYPE="nixos"
 
-elif [[ "${MACHINE_KEY}" == "appaquet@mbpapp"* || "${MACHINE_KEY}" == "appaquet@mbpvmapp"* ]]; then
+elif [[ "${MACHINE_KEY}" == "appaquet@vps"* ]]; then
+  HOME_CONFIG="appaquet@vps"
+  HOSTNAME="vps"
+  OS_TYPE="nixos"
+
+elif [[ "${MACHINE_KEY}" == "appaquet@mbpapp"* ]]; then
   HOME_CONFIG="appaquet@mbpapp"
   OS_TYPE="darwin"
 fi

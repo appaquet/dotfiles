@@ -62,9 +62,8 @@
   };
   networking.firewall.enable = false;
 
-  sops.secrets.nasapp_cifs.sopsFile = config.sops.secretsFiles.home;
-
   # NasAPP mounts
+  sops.secrets.nasapp_cifs.sopsFile = config.sops.secretsFiles.home;
   nasapp = {
     enable = true;
     credentials = config.sops.secrets.nasapp_cifs.path;
