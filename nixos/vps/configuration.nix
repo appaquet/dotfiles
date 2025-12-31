@@ -18,13 +18,13 @@
   };
 
   networking.firewall.enable = true;
-  networking.firewall.allowedTCPPorts = [ 22222 ];
 
   services.openssh = {
     enable = true;
     ports = [ 22222 ];
     settings.PasswordAuthentication = false;
   };
+  networking.firewall.allowedTCPPorts = [ 22222 ];
 
   environment.systemPackages = map lib.lowPrio [
     pkgs.curl

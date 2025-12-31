@@ -90,25 +90,6 @@ check_eval() {
   nix eval --raw "${1}"
 }
 
-copy_files() {
-  local host="$1"
-  local file
-  find "${ROOT}/files/${host}" -type f | while read -r file; do
-    local target_file="${file/${ROOT}\/files\/${host}/}"
-    local target_path="${target_file}"
-
-    echo "Copy ${file} to ${target_path}"
-
-    if [[ "${target_path}" != "${HOME}/"* ]]; then
-      sudo mkdir -p "$(dirname "${target_path}")"
-      sudo cp "${file}" "${target_path}"
-    else
-      mkdir -p "$(dirname "${target_path}")"
-      cp "${file}" "${target_path}"
-    fi
-  done
-}
-
 # Remote operation functions
 remote_copy() {
   local result_path
@@ -194,14 +175,18 @@ cmd_home_diff_generations() {
 }
 
 cmd_home_help() {
-  echo "$0 home check: check home" >&2
-  echo "$0 home build (b): build home" >&2
-  echo "$0 home switch (s): switch home" >&2
-  echo "$0 home build-switch (bs): build and switch" >&2
-  echo "$0 home diff: diff last build with current" >&2
-  echo "$0 home tree: show home tree" >&2
-  echo "$0 home generations: list generations" >&2
-  echo "$0 home diff-generations: diff last generations" >&2
+  cat >&2 <<EOF
+usage: $0 home <command> [args]
+
+  check             Eval home config
+  build (b)         Build home config
+  switch (s)        Activate home config (or generation N)
+  build-switch (bs) Build and switch
+  diff              Diff ./result with current
+  tree              Show dependency tree
+  generations       List generations
+  diff-generations  Diff between generations
+EOF
   exit 1
 }
 
@@ -229,12 +214,16 @@ cmd_darwin_tree() {
 }
 
 cmd_darwin_help() {
-  echo "$0 darwin check: check darwin" >&2
-  echo "$0 darwin build (b): build darwin" >&2
-  echo "$0 darwin switch (s): switch darwin" >&2
-  echo "$0 darwin build-switch (bs): build and switch" >&2
-  echo "$0 darwin diff: diff last build with current" >&2
-  echo "$0 darwin tree: show darwin tree" >&2
+  cat >&2 <<EOF
+usage: $0 darwin <command> [args]
+
+  check             Eval darwin config
+  build (b)         Build darwin config
+  switch (s)        Switch darwin config
+  build-switch (bs) Build and switch
+  diff              Diff ./result with current
+  tree              Show dependency tree
+EOF
   exit 1
 }
 
@@ -350,16 +339,20 @@ cmd_nixos_generations() {
 }
 
 cmd_nixos_help() {
-  echo "$0 nixos check: check nixos" >&2
-  echo "$0 nixos build (b): build nixos" >&2
-  echo "$0 nixos sdimage: build SD card image (use HOST=name to override)" >&2
-  echo "$0 nixos boot: add new config to boot, but doesn't switch it until reboot" >&2
-  echo "$0 nixos switch (s): switch nixos" >&2
-  echo "$0 nixos build-switch (bs): build and switch" >&2
-  echo "$0 nixos diff: diff nixos" >&2
-  echo "$0 nixos tree: show nixos tree" >&2
-  echo "$0 nixos kernel-versions: show kernel versions" >&2
-  echo "$0 nixos generations: list generations" >&2
+  cat >&2 <<EOF
+usage: $0 nixos <command> [args]
+
+  check             Eval nixos config
+  build (b)         Build nixos config
+  boot              Add to boot (activate on reboot)
+  switch (s)        Switch nixos config now
+  build-switch (bs) Build and switch
+  sdimage           Build SD card image
+  diff              Diff ./result with current
+  tree              Show dependency tree
+  kernel-versions   Show kernel version info
+  generations       List generations
+EOF
   exit 1
 }
 
@@ -407,16 +400,6 @@ cmd_update() {
   else
     nix flake lock --update-input "$package"
   fi
-}
-
-cmd_link() {
-  if [[ ! -d "${ROOT}/files/${HOST}" ]]; then
-    echo "No files for ${HOST}"
-    exit 1
-  fi
-
-  prime_sudo
-  copy_files "$HOST"
 }
 
 cmd_gc() {
@@ -494,18 +477,28 @@ cmd_copy() {
 }
 
 cmd_help() {
-  echo "$0 home (h): home manager sub commands" >&2
-  echo "$0 darwin (d): darwin sub commands" >&2
-  echo "$0 nixos (n): nixos sub commands" >&2
-  echo "$0 build (b): build home + system (nixos/darwin)" >&2
-  echo "$0 build-switch (bs): build and switch home + system (nixos/darwin)" >&2
-  echo "$0 check (c): eval home & nixos & darwin configs for all hosts" >&2
-  echo "$0 update (u): update nix channels" >&2
-  echo "$0 link: link system files" >&2
-  echo "$0 gc: run garbage collection" >&2
-  echo "$0 fmt: format nix files" >&2
-  echo "$0 optimize: optimize store" >&2
-  echo "$0 copy (cp): copy result to another machine" >&2
+  cat >&2 <<EOF
+usage: $0 <command> [args]
+
+System Targets:
+  home (h)     check|build|switch|diff|tree|generations
+  darwin (d)   check|build|switch|diff|tree
+  nixos (n)    check|build|switch|boot|diff|tree|sdimage
+
+Unified:
+  build (b)         Build home + system for current host
+  build-switch (bs) Build and switch all
+  check (c)         Eval all configs for all hosts
+  copy (cp)         Copy result to remote host
+
+Utilities:
+  fmt          Format nix files
+  update (u)   Update flake inputs
+  gc           Garbage collect
+  optimize     Optimize nix store
+
+Environment: HOST=<name> to target remote machine
+EOF
   exit 1
 }
 
@@ -561,7 +554,6 @@ n | nixos)
 
 c | check)      shift; cmd_check_all "$@" ;;
 u | update)     shift; cmd_update "$@" ;;
-link)           shift; cmd_link "$@" ;;
 gc)             shift; cmd_gc "$@" ;;
 fmt)            shift; cmd_fmt "$@" ;;
 optimize)       shift; cmd_optimize "$@" ;;

@@ -1,5 +1,4 @@
-# Two disk setup: main (OS) + data
-{ lib, ... }:
+{ ... }:
 {
   disko.devices = {
     disk.main = {
