@@ -22,7 +22,7 @@ jobs:
     - name: Install formatter & format
       run: |
         nix profile install nixpkgs#nixfmt-rfc-style
-        ./x fmt --check
+        HOST=deskapp ./x fmt --check
 
   home_check:
     runs-on: ubuntu-latest
