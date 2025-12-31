@@ -19,7 +19,7 @@
 
     secrets = {
       url = "github:appaquet/dotfiles-secrets";
-      #url = "path:/home/appaquet/dotfiles/secrets";
+      # url = "path:/home/appaquet/dotfiles/secrets";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -34,6 +34,11 @@
     nixd = {
       url = "github:nix-community/nixd";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixos";
     };
 
     nix-ai-tools = {

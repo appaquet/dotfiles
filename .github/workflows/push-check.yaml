@@ -16,20 +16,20 @@ jobs:
           access-tokens = github.com=${{ secrets.GH_PAT }}
         github-token: ${{ secrets.GH_PAT }}
     - name: Add & update nixpkgs channel
-      run: | 
+      run: |
         nix-channel --add https://nixos.org/channels/nixos-24.05 nixpkgs
         nix-channel --update nixpkgs
     - name: Install formatter & format
-      run: | 
+      run: |
         nix profile install nixpkgs#nixfmt-rfc-style
-        ./x fmt --check
+        HOST=deskapp ./x fmt --check
 
   home_check:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        machine: ["appaquet@mbpapp", "appaquet@deskapp", "appaquet@servapp", "appaquet@piapp", "appaquet@piprint", "appaquet@piups"]
+        host: ["mbpapp", "deskapp", "servapp", "piapp", "piprint", "piups", "vps"]
     steps:
     - uses: actions/checkout@v4
     - uses: DeterminateSystems/nix-installer-action@main
@@ -40,14 +40,14 @@ jobs:
           substituters = https://cache.nixos.org https://cache.nixos.org/ https://nix-community.cachix.org https://nixos-raspberrypi.cachix.org https://numtide.cachix.org
           trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI= numtide.cachix.org-1:2ps1kLBUWjxIneOy1Ik6cQjb41X0iXVXeHigGmycPPE=
         github-token: ${{ secrets.GH_PAT }}
-    - run: MACHINE_KEY="${{ matrix.machine }}" ./x home check
+    - run: HOST="${{ matrix.host }}" ./x home check
 
   darwin_check:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        machine: ["appaquet@mbpapp"]
+        host: ["mbpapp"]
     steps:
     - uses: actions/checkout@v4
     - uses: DeterminateSystems/nix-installer-action@main
@@ -56,14 +56,14 @@ jobs:
           experimental-features = nix-command flakes
           access-tokens = github.com=${{ secrets.GH_PAT }}
         github-token: ${{ secrets.GH_PAT }}
-    - run: MACHINE_KEY="${{ matrix.machine }}" ./x darwin check
+    - run: HOST="${{ matrix.host }}" ./x darwin check
 
   nixos_check:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        machine: ["appaquet@deskapp", "appaquet@servapp", "appaquet@piapp", "appaquet@piprint", "appaquet@piups"]
+        host: ["deskapp", "servapp", "piapp", "piprint", "piups", "vps"]
     steps:
     - uses: actions/checkout@v4
     - uses: DeterminateSystems/nix-installer-action@main
@@ -74,6 +74,6 @@ jobs:
         github-token: ${{ secrets.GH_PAT }}
     - name: Check
       run:
-        MACHINE_KEY="${{ matrix.machine }}" ./x nixos check
+        HOST="${{ matrix.host }}" ./x nixos check
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

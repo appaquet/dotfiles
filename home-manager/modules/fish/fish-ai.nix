@@ -15,12 +15,10 @@ let
   # Patch iterfzf to use system fzf instead of bundled (which doesn't exist in nixpkgs)
   iterfzf = pythonPackages.iterfzf.overridePythonAttrs (old: {
     doCheck = false; # Fails on MacOS
-    postPatch =
-      (old.postPatch or "")
-      + ''
-        substituteInPlace iterfzf/__init__.py \
-          --replace-fail "Path(__file__).parent / EXECUTABLE_NAME" "None"
-      '';
+    postPatch = (old.postPatch or "") + ''
+      substituteInPlace iterfzf/__init__.py \
+        --replace-fail "Path(__file__).parent / EXECUTABLE_NAME" "None"
+    '';
   });
 
   # Build fish-ai as a Python package

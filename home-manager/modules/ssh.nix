@@ -14,17 +14,16 @@
         forwardAgent = true;
       };
 
-      "exocore1.n3x.net" = {
-        user = "root";
-        port = 22943;
-      };
-
       "pihole.n3x.net" = {
         user = "root";
       };
 
       "pikvm.n3x.net" = {
         user = "root";
+      };
+
+      "vps.n3x.net" = {
+        port = 22222;
       };
 
       "github.com" = {

@@ -12,11 +12,11 @@ jobs:
     strategy:
       matrix:
         pair:
-          - machine: "appaquet@deskapp"
+          - host: "deskapp"
             os: ubuntu-latest
-          - machine: "appaquet@servapp"
+          - host: "servapp"
             os: ubuntu-latest
-          - machine: "appaquet@mbpapp"
+          - host: "mbpapp"
             os: macos-latest
     runs-on: ${{ matrix.pair.os }}
     timeout-minutes: 60 # because sometimes it gets stuck
@@ -53,7 +53,7 @@ jobs:
       - name: Building Home Manager baseline...
         run: |
           set -xe
-          MACHINE_KEY="${{ matrix.pair.machine }}" ./x home build --cores 0 --max-jobs 1 --print-build-logs --verbose 2>&1 | tee build.log
+          HOST="${{ matrix.pair.host }}" ./x home build --cores 0 --max-jobs 1 --print-build-logs --verbose 2>&1 | tee build.log
           mv result result-before
 
       - name: Update flakes
@@ -64,7 +64,7 @@ jobs:
       - name: Building Home Manager new
         run: |
           set -xe
-          MACHINE_KEY="${{ matrix.pair.machine }}" ./x home build --cores 0 --max-jobs 1 --print-build-logs --verbose 2>&1 | tee build-new.log
+          HOST="${{ matrix.pair.host }}" ./x home build --cores 0 --max-jobs 1 --print-build-logs --verbose 2>&1 | tee build-new.log
           mv result result-after
 
       - name: Diffing...
@@ -79,31 +79,31 @@ jobs:
           #   Closure size: 716 -> 716 (10 paths added, 10 paths removed, delta +0, disk usage +287.0KiB).
           NB_CHANGES=$(grep -vcE "(Version changes|No version|Closure size|<<<|>>>)" diff || true)
           if [ $NB_CHANGES -gt 0 ]; then
-            echo "Changes for ${{ matrix.pair.machine }} home:" > diff-out
+            echo "Changes for ${{ matrix.pair.host }} home:" > diff-out
             cat diff >> diff-out
             echo -n " " >> diff-out
             echo -n "------------------" >> diff-out
-            cat diff-out > "${{ matrix.pair.machine }}-home-diff"
+            cat diff-out > "${{ matrix.pair.host }}-home-diff"
           fi
 
       - name: Add diff as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: "${{ matrix.pair.machine }}-home-diff"
-          path: "${{ matrix.pair.machine }}-home-diff"
+          name: "${{ matrix.pair.host }}-home-diff"
+          path: "${{ matrix.pair.host }}-home-diff"
           if-no-files-found: ignore # no files means no diff
 
       - name: Add flake.lock
         uses: actions/upload-artifact@v4
         with:
-          name: "${{ matrix.pair.machine }}-flake"
+          name: "${{ matrix.pair.host }}-flake"
           path: "flake.lock"
 
   update_nixos:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        machine: ["appaquet@deskapp", "appaquet@servapp"]
+        host: ["deskapp", "servapp"]
     steps:
       - uses: actions/checkout@v4
 
@@ -132,7 +132,7 @@ jobs:
       - name: Building NixOS baseline
         run: |
           set -xe
-          MACHINE_KEY="${{ matrix.machine }}" ./x nixos build --cores 0 --max-jobs 1 # limiting concurrency to prevent freezes
+          HOST="${{ matrix.host }}" ./x nixos build --cores 0 --max-jobs 1 # limiting concurrency to prevent freezes
           nix-collect-garbage # free up intermediary, since we're low on disk on gha
           mv result result-before
 
@@ -144,7 +144,7 @@ jobs:
       - name: Building NixOS new
         run: |
           set -xe
-          MACHINE_KEY="${{ matrix.machine }}" ./x nixos build --cores 0 --max-jobs 1 # limiting concurrency to prevent freezes
+          HOST="${{ matrix.host }}" ./x nixos build --cores 0 --max-jobs 1 # limiting concurrency to prevent freezes
           mv result result-after
 
       - name: Diffing...
@@ -160,25 +160,25 @@ jobs:
           #   Closure size: 1637 -> 1637 (29 paths added, 29 paths removed, delta +0, disk usage +7.5KiB).
           NB_CHANGES=$(grep -vcE "(Version changes|No version|nixos-system|Closure size|<<<|>>>)" diff || true)
           if [ $NB_CHANGES -gt 0 ]; then
-            echo "Changes for ${{ matrix.machine }} nixos:" > diff-out
+            echo "Changes for ${{ matrix.host }} nixos:" > diff-out
             cat diff >> diff-out
             echo -n " " >> diff-out
             echo -n "------------------" >> diff-out
-            cat diff-out > "${{ matrix.machine }}-nixos-diff"
+            cat diff-out > "${{ matrix.host }}-nixos-diff"
           fi
 
       - name: Add as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: "${{ matrix.machine }}-nixos-diff"
-          path: "${{ matrix.machine }}-nixos-diff"
+          name: "${{ matrix.host }}-nixos-diff"
+          path: "${{ matrix.host }}-nixos-diff"
           if-no-files-found: ignore # no files means no diff
 
   update_darwin:
     runs-on: macos-latest
     strategy:
       matrix:
-        machine: ["appaquet@mbpapp"]
+        host: ["mbpapp"]
     steps:
       - uses: actions/checkout@v4
 
@@ -198,7 +198,7 @@ jobs:
       - name: Building baseline...
         run: |
           set -xe
-          MACHINE_KEY="${{ matrix.machine }}" ./x darwin build
+          HOST="${{ matrix.host }}" ./x darwin build
           mv result darwin-result-before
 
       - name: Update flakes
@@ -209,7 +209,7 @@ jobs:
       - name: Building new...
         run: |
           set -xe
-          MACHINE_KEY="${{ matrix.machine }}" ./x darwin build
+          HOST="${{ matrix.host }}" ./x darwin build
           mv result darwin-result-after
 
       - name: Diffing...
@@ -225,18 +225,18 @@ jobs:
           #   Closure size: 169 -> 169 (10 paths added, 10 paths removed, delta +0, disk usage +3.7KiB).
           NB_CHANGES=$(grep -vcE "(Version changes|No version|darwin-system|Closure size|<<<|>>>)" diff || true)
           if [ $NB_CHANGES -gt 0 ]; then
-            echo "Changes for ${{ matrix.machine }} darwin:" > diff-out
+            echo "Changes for ${{ matrix.host }} darwin:" > diff-out
             cat diff >> diff-out
             echo -n " " >> diff-out
             echo -n "------------------" >> diff-out
-            cat diff-out > "${{ matrix.machine }}-darwin-diff"
+            cat diff-out > "${{ matrix.host }}-darwin-diff"
           fi
 
       - name: Add as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: "${{ matrix.machine }}-darwin-diff"
-          path: "${{ matrix.machine }}-darwin-diff"
+          name: "${{ matrix.host }}-darwin-diff"
+          path: "${{ matrix.host }}-darwin-diff"
           if-no-files-found: ignore # no files means no diff
 
   # test_incoming:
