@@ -24,7 +24,6 @@
 
       "vps.n3x.net" = {
         port = 22222;
-        forwardAgent = true;
       };
 
       "github.com" = {
