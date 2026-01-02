@@ -46,15 +46,36 @@
       content = {
         type = "gpt";
         partitions = {
-          data = {
-            name = "data";
+          zfs = {
             size = "100%";
             content = {
-              type = "filesystem";
-              format = "ext4";
-              mountpoint = "/data";
+              type = "zfs";
+              pool = "datapool";
             };
           };
+        };
+      };
+    };
+
+    zpool.datapool = {
+      type = "zpool";
+      options.ashift = "12";
+      rootFsOptions = {
+        compression = "zstd";
+        acltype = "posixacl";
+        xattr = "sa";
+        encryption = "aes-256-gcm";
+        keyformat = "passphrase";
+        keylocation = "prompt";
+        canmount = "off";
+        mountpoint = "none";
+      };
+
+      datasets.data = {
+        type = "zfs_fs";
+        options = {
+          mountpoint = "/data";
+          canmount = "on";
         };
       };
     };

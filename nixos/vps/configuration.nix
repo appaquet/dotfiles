@@ -11,6 +11,21 @@
   ];
 
   networking.hostName = "vps";
+  networking.hostId = "2f1f15c1"; # used for zfs, preventing accidental pool import conflicts
+
+  boot.supportedFilesystems = [ "zfs" ];
+  boot.zfs.extraPools = [ "datapool" ];
+
+  services.zfs = {
+    autoScrub = {
+      enable = true;
+      interval = "weekly";
+    };
+    trim = {
+      enable = true;
+      interval = "weekly";
+    };
+  };
 
   boot.loader.grub = {
     efiSupport = true;
