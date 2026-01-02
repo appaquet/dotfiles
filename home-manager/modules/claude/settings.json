@@ -54,6 +54,7 @@
       "WebFetch(domain:registry.npmjs.org)",
       "WebFetch(domain:code.claude.com)",
       "WebFetch(domain:www.anthropic.com)",
+      "WebFetch(domain:wiki.nixos.org)",
       "Skill(instruction-writer)",
       "SlashCommand(/ctx-load)",
       "Skill(ctx-load)",
