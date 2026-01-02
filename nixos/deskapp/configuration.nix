@@ -11,6 +11,7 @@
     ../modules/docker.nix
     ../modules/nasapp.nix
     ../modules/network-bridge.nix
+    ../modules/restic-backup.nix
     ../modules/ups/client.nix
     ../modules/netconsole/sender.nix
     ./backups
@@ -69,6 +70,12 @@
     credentials = config.sops.secrets.nasapp_cifs.path;
     uid = "appaquet";
     gid = "users";
+  };
+
+  restic-backup = {
+    enable = true;
+    sopsFile = config.sops.secretsFiles.home;
+    backups.home.paths = [ "/home/appaquet" ];
   };
 
   # Display

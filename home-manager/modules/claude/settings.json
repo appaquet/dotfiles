@@ -28,6 +28,7 @@
       "Bash(nix develop:*)",
       "Bash(nix run:*)",
       "Bash(nix shell:*)",
+      "Bash(readlink:*)",
       "Read(~/Library/Caches/**)",
       "Edit(~/Library/Caches/**)",
       "Read(~/.cache/**)",
