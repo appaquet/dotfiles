@@ -106,7 +106,7 @@ remote_nixos_switch() {
   result_path=$(remote_copy)
 
   echo "Switching on ${SSH_HOST}..."
-  ssh -t "${SSH_HOST}" "sudo ${result_path}/bin/switch-to-configuration switch"
+  ssh -t "${SSH_HOST}" "sudo nix-env --profile /nix/var/nix/profiles/system --set ${result_path} && sudo ${result_path}/bin/switch-to-configuration switch"
 }
 
 remote_nixos_boot() {
@@ -114,7 +114,7 @@ remote_nixos_boot() {
   result_path=$(remote_copy)
 
   echo "Adding to boot on ${SSH_HOST}..."
-  ssh -t "${SSH_HOST}" "sudo ${result_path}/bin/switch-to-configuration boot"
+  ssh -t "${SSH_HOST}" "sudo nix-env --profile /nix/var/nix/profiles/system --set ${result_path} && sudo ${result_path}/bin/switch-to-configuration boot"
 }
 
 remote_home_switch() {
