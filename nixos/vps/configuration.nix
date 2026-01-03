@@ -55,7 +55,7 @@
       autoprune = true;
       daily = 30;
       hourly = 0;
-      monthly = 0;
+      monthly = 3;
       yearly = 0;
       recursive = true;
     };

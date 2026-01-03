@@ -5,6 +5,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 
@@ -31,30 +32,44 @@ in
       type = lib.types.path;
       description = "Sops file containing restic_server/htpasswd secret";
     };
+
+    appendOnly = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable append-only mode (prevents deletion from clients)";
+    };
   };
 
   config = lib.mkIf cfg.enable {
-    # Sops secret for htpasswd file
     sops.secrets."restic_server/htpasswd" = {
       sopsFile = cfg.sopsFile;
-      # htpasswd file needs to be readable by restic user
       owner = "restic";
       group = "restic";
     };
 
-    # Restic REST server configuration
     services.restic.server = {
       enable = true;
+
       dataDir = cfg.dataDir;
+
       listenAddress = toString cfg.port;
-      appendOnly = true;
-      privateRepos = true;
+
+      appendOnly = cfg.appendOnly;
+
+      privateRepos = true; # per-user repository (username/repo)
+
       htpasswd-file = config.sops.secrets."restic_server/htpasswd".path;
     };
 
-    # Firewall: only allow on Tailscale interface (if firewall is enabled)
-    networking.firewall.interfaces."tailscale0".allowedTCPPorts = lib.mkIf config.networking.firewall.enable [
-      cfg.port
+    # Only allow on Tailscale interface (if firewall is enabled)
+    networking.firewall.interfaces."tailscale0".allowedTCPPorts =
+      lib.mkIf config.networking.firewall.enable
+        [
+          cfg.port
+        ];
+
+    environment.systemPackages = with pkgs; [
+      restic
     ];
   };
 }

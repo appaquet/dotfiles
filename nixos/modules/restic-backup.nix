@@ -93,8 +93,6 @@ let
     ".venv"
     ".devenv"
     "*.pyc"
-    ".git"
-    ".jj"
     "perf.data*"
   ];
 
