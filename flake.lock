@@ -491,8 +491,8 @@
         "sops-nix": "sops-nix"
       },
       "locked": {
-        "lastModified": 1767385505,
-        "narHash": "sha256-Is0DrY+XhJ82yFEhC8TbycmYomWj46+XYs7xsVzeOt0=",
+        "lastModified": 1767411847,
+        "narHash": "sha256-vs3M0QsAhkao7Uzrq7MS3WTdX990L1GOIpTDfGyE4Wg=",
         "path": "/home/appaquet/dotfiles/secrets",
         "type": "path"
       },

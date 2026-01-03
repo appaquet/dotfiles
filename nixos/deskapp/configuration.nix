@@ -63,21 +63,6 @@
   };
   networking.firewall.enable = false;
 
-  # NasAPP mounts
-  sops.secrets.nasapp_cifs.sopsFile = config.sops.secretsFiles.home;
-  nasapp = {
-    enable = true;
-    credentials = config.sops.secrets.nasapp_cifs.path;
-    uid = "appaquet";
-    gid = "users";
-  };
-
-  restic-backup = {
-    enable = true;
-    sopsFile = config.sops.secretsFiles.home;
-    backups.home.paths = [ "/home/appaquet" ];
-  };
-
   # Display
   services.xserver.enable = true;
   services.xserver.displayManager.lightdm.enable = true;
@@ -103,6 +88,20 @@
   programs.firefox.enable = true;
   services.printing.enable = false;
   services.openssh.enable = true;
+
+  sops.secrets.nasapp_cifs.sopsFile = config.sops.secretsFiles.home;
+  nasapp = {
+    enable = true;
+    credentials = config.sops.secrets.nasapp_cifs.path;
+    uid = "appaquet";
+    gid = "users";
+  };
+
+  restic-backup = {
+    enable = true;
+    sopsFile = config.sops.secretsFiles.home;
+    backups.home.paths = [ "/home/appaquet" ];
+  };
 
   # UPS
   power.myUps = {

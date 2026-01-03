@@ -68,6 +68,9 @@
     lsof
     pciutils # lspci
     usbutils # lsusb
+    curl
+    git
+    neovim
   ];
 
   # Some programs (ex: Go) expects /etc/mime.types
