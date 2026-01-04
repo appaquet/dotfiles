@@ -491,14 +491,17 @@
         "sops-nix": "sops-nix"
       },
       "locked": {
-        "lastModified": 1767466701,
-        "narHash": "sha256-kT5R+Q138n5eO5zB4A41p8pwq9luc8AsHBCxSxtjfrg=",
-        "path": "/home/appaquet/dotfiles/secrets",
-        "type": "path"
+        "lastModified": 1767465195,
+        "narHash": "sha256-kIKYL1BKNgGw/JeLvjg826T5rJ86lbYTPTZUCTyFyDU=",
+        "owner": "appaquet",
+        "repo": "dotfiles-secrets",
+        "rev": "8c6b8f36e6f76c4f50fb2c073e52968b3f319c94",
+        "type": "github"
       },
       "original": {
-        "path": "/home/appaquet/dotfiles/secrets",
-        "type": "path"
+        "owner": "appaquet",
+        "repo": "dotfiles-secrets",
+        "type": "github"
       }
     },
     "sops-nix": {
