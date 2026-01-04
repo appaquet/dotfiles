@@ -29,20 +29,6 @@
 
   sops.secrets.nasapp_cifs.sopsFile = config.sops.secretsFiles.home;
 
-  nasapp = {
-    enable = true;
-    credentials = config.sops.secrets.nasapp_cifs.path;
-    uid = "appaquet";
-    gid = "users";
-
-    shares = [
-      {
-        share = "backup_piapp";
-        mount = "/mnt/piapp_backup";
-      }
-    ];
-  };
-
   services.netconsole.receiver = {
     enable = true;
   };
