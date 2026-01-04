@@ -5,7 +5,7 @@
 {
   imports = [
     ../modules/common.nix
-    ../modules/restic-server.nix
+    ../modules/restic/server.nix
     ./disk-config.nix
     ./hardware-configuration.nix
   ];

@@ -1,5 +1,3 @@
-# TODO: DENDRITIC - Consider merging with restic-backup.nix when migrating to dendritic pattern
-#
 # Restic REST server module for receiving backups from clients.
 # Wraps services.restic.server with sops-nix integration and Tailscale-only access.
 {
