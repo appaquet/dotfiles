@@ -12,6 +12,7 @@
     ../modules/network-bridge.nix
     ../modules/ups/client.nix
     ../modules/netconsole/sender.nix
+    ../modules/restic/backup.nix
     ./backup.nix
     ./hardware-configuration.nix
     ./virt
@@ -66,6 +67,31 @@
         mount = "/mnt/video";
       }
     ];
+  };
+
+  restic-backup = {
+    enable = true;
+    sopsFile = config.sops.secretsFiles.home;
+
+    backups.home = {
+      paths = [ "/home/appaquet" ];
+      exclude = [
+        "homeassistant"
+        "pihole"
+      ];
+    };
+
+    backups.vms = {
+      paths = [
+        "/home/appaquet/homeassistant"
+        "/home/appaquet/pihole"
+      ];
+      schedule = "weekly";
+      pruneOpts = [
+        "--keep-weekly 4"
+        "--keep-monthly 12"
+      ];
+    };
   };
 
   # Display
