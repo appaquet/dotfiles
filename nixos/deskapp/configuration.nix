@@ -100,7 +100,20 @@
   restic-backup = {
     enable = true;
     sopsFile = config.sops.secretsFiles.home;
-    backups.home.paths = [ "/home/appaquet" ];
+
+    backups.home = {
+      paths = [ "/home/appaquet" ];
+    };
+
+    backups.vms = {
+      paths = [
+        "/mnt/secondary/vms"
+      ];
+      schedule = "weekly";
+      pruneOpts = [
+        "--keep-weekly 4"
+      ];
+    };
   };
 
   # UPS

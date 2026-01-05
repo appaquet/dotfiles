@@ -89,7 +89,6 @@
       schedule = "weekly";
       pruneOpts = [
         "--keep-weekly 4"
-        "--keep-monthly 12"
       ];
     };
   };
