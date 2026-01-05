@@ -10,7 +10,7 @@
 ## Context & Planning
 
 * Call `/ctx-load` before work/commands to ensure all relevant context loaded
-* Plan and track work using project docs (@docs/project-doc.md)
+* Plan and track work using project docs
 * Consider: edge cases, alternatives, reusability, existing patterns, bigger picture
 * After context compaction ("continued from previous conversation"): ALWAYS call `/ctx-load` first
   and then continue with your work if that was the intended next step
@@ -83,9 +83,3 @@ RIGHT: "Plan failed because X. Should I fix X within this approach, or try somet
 * Never speculate about code not opened - read files before answering
 * Implement general-purpose solutions, not workarounds for specific test cases
 
-## Documentation References
-
-* Version control: @docs/version-control.md
-* Development: @docs/development.md
-* Code style: @docs/code-style.md
-* Project doc structure: @docs/project-doc.md

@@ -29,7 +29,7 @@ Ultrathink. Use sub-agents (Task tool) for codebase exploration if needed.
    * Consider dependencies and challenges
    * Insert validation tasks after each phase
 
-6. Write plan to project doc (per @docs/project-doc.md structure):
+6. Write plan to project doc:
    * Context section describing the task
    * TODO section with planned work items
    * Files section with relevant files

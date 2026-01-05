@@ -6,8 +6,7 @@ argument-hint: [task-description]
 
 # Project Initialization
 
-Create a project folder with `00-<project-name>.md` main doc by conversing with me. Use documented
-structure from @docs/project-doc.md.
+Create a project folder with `00-<project-name>.md` main doc by conversing with me.
 
 Task: $ARGUMENTS
 
