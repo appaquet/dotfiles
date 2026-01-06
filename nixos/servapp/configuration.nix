@@ -13,7 +13,6 @@
     ../modules/ups/client.nix
     ../modules/netconsole/sender.nix
     ../modules/restic/backup.nix
-    ./backup.nix
     ./hardware-configuration.nix
     ./virt
   ];

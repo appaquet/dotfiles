@@ -14,7 +14,6 @@
     ../modules/restic/backup.nix
     ../modules/ups/client.nix
     ../modules/netconsole/sender.nix
-    ./backups
     ./gpu-switch.nix
     ./ha-ctrl.nix
     ./hardware-configuration.nix
