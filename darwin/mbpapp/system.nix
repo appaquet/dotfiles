@@ -65,12 +65,12 @@
         # Finder
         AppleShowAllExtensions = true; # show all file extensions
 
-        # Keybord
+        # Keyboard
         InitialKeyRepeat = 15; # normal minimum is 15 (225 ms), maximum is 120 (1800 ms)
         KeyRepeat = 2; # normal minimum is 2 (30 ms), maximum is 120 (1800 ms)
         ApplePressAndHoldEnabled = false; # long press doesn't show accented chars selector
         "com.apple.keyboard.fnState" = true; # use F1, F2, etc. keys as standard function keys
-        NSAutomaticPeriodSubstitutionEnabled = false; # prevent adding a . after two consecutive space
+        NSAutomaticPeriodSubstitutionEnabled = false; # prevent adding a `.` after two consecutive spaces
 
         # Trackpad
         "com.apple.swipescrolldirection" = true; # enable natural scrolling
@@ -101,7 +101,7 @@
 
         "com.apple.HIToolbox" = {
           AppleGlobalTextInputProperties = {
-            TextInputGlobalPropertyPerContextInput = true;
+            TextInputGlobalPropertyPerContextInput = true; # per-input source language
           };
         };
       };

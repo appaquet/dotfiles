@@ -1,5 +1,3 @@
-# Home-manager restic backup module (script-only, no scheduler)
-# User sets up cron manually for scheduling.
 {
   config,
   lib,
@@ -65,6 +63,12 @@ let
     name: _backup:
     pkgs.writeShellScriptBin "redu-${hostname}-${name}" ''
       set -euo pipefail
+
+      export PATH="${
+        lib.makeBinPath [
+          pkgs.restic
+        ]
+      }:$PATH"
       export RESTIC_REPOSITORY=$(cat ${config.sops.secrets.${repoSecret name}.path})
       export RESTIC_PASSWORD_FILE=${config.sops.secrets.${resticLib.passwordSecret}.path}
       exec ${pkgs.redu}/bin/redu "$@"

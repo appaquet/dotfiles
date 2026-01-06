@@ -7,6 +7,8 @@
     "Downloads"
     "node_modules"
     ".npm"
+    ".next"
+    ".bun"
     ".cargo"
     ".rustup"
     "**/target/debug"
