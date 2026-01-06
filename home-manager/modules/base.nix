@@ -9,6 +9,7 @@
   imports = [
     inputs.humanfirst-dots.homeManagerModule
     inputs.secrets.homeManager.common
+    inputs.nix-index-database.homeModules.default
     ./fish
     ./tmux
     ./git
@@ -24,6 +25,10 @@
   programs.direnv.enable = true;
   programs.direnv.nix-direnv.enable = true;
 
+  # pre-built nix-index (nix-locate <file>, comma (,))
+  programs.nix-index-database.comma.enable = true;
+  programs.nix-index.enable = true;
+
   home.packages =
     (with pkgs; [
       manix # nix doc cli searcher
@@ -32,8 +37,6 @@
       nvd # nix package diff tool
       nix-tree # explore nix derivations dependencies (https://github.com/utdemir/nix-tree)
       cachix
-      nix-index # nix-locate "libsomelib.so.0"
-      comma
 
       tealdeer # rust version of tldr
 
