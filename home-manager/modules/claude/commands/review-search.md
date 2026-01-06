@@ -16,4 +16,5 @@ description: Search for REVIEW comments in the codebase
      * Get current branch: `jj-current-branch`
      * Check PR comments: `gh pr view $(jj-current-branch)` and `gh api repos/owner/repo/pulls/PR_NUMBER/comments`
 
-**STOP after loading.** Report findings and wait for instruction.
+**If invoked directly by user, STOP** after reporting findings. If invoked from another command,
+continue with that command's workflow.

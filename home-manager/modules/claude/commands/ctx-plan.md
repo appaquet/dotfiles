@@ -6,9 +6,7 @@ argument-hint: [task-description]
 
 # Plan
 
-Task: $ARGUMENTS
-
-Ultrathink. Use sub-agents (Task tool) for codebase exploration if needed.
+Build a full plan for the task at hand: $ARGUMENTS
 
 ## Instructions
 
@@ -19,9 +17,11 @@ Ultrathink. Use sub-agents (Task tool) for codebase exploration if needed.
 3. Research full context: task, repository, documentation.
    * Consider launching sub-agents (Task tool) to explore codebase, find patterns
    * Search web for external dependencies or unfamiliar concepts if needed
+   * ultrathink about requirements, constraints, edge cases
 
 4. Use `AskUserQuestion` to clarify requirements.
    Research and ask until 10/10 understanding.
+   * Clarification ≠ approval—continue to steps 5-7 after answers
 
 5. Create high-level development plan:
    * Break down into logical phases
@@ -34,4 +34,8 @@ Ultrathink. Use sub-agents (Task tool) for codebase exploration if needed.
    * TODO section with planned work items
    * Files section with relevant files
 
-7. **STOP** - Use `AskUserQuestion` to ask if user wants to proceed to implementation.
+7. Tell me your understanding of the task on a 10/10 scale.
+   If still not 10/10, propose /ctx-improve to reach full understanding.
+   Use `AskUserQuestion` to confirm any choices, uncertainties and assumptions made.
+
+8. **STOP** - Use `AskUserQuestion` to ask if user wants to proceed to implementation.

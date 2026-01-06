@@ -15,11 +15,13 @@
 * After context compaction ("continued from previous conversation"): ALWAYS call `/ctx-load` first
   and then continue with your work if that was the intended next step
 * Ambiguous references ("that/this/it"): STOP, ask which specific thing (IDE selection may be missing)
+* User answers with questions ("would this work?", "makes sense?"): investigate/analyze first, don't jump to implementation
 
-## Before Starting Work
+## Context understanding
 
 If not 10/10 understanding, use `AskUserQuestion` (search code/web first):
 
+<full-understanding-checklist>
 * [ ] Clear on goal/user need
 * [ ] Know which files to modify
 * [ ] Identified similar use cases to handle
@@ -28,6 +30,7 @@ If not 10/10 understanding, use `AskUserQuestion` (search code/web first):
 * [ ] Know success criteria
 * [ ] Re-read file structure (top-down, main-to-dependencies)
 * [ ] List existing functions/classes to understand organization
+</full-understanding-checklist>
 
 ## TODO/Comment Preservation
 
@@ -41,35 +44,19 @@ Never replace TODO/FIXME/REVIEW with explanatory notes. TODOs remain until:
 Before deleting files/content: confirm preserved elsewhere OR explicitly disposable.
 Before rewriting/refactoring files: diff old vs new to verify no content lost.
 
-<example>
-WRONG: rm file.md (assuming task done, file unneeded)
-RIGHT: "Should I archive file.md or is it safe to delete?"
-</example>
-
 ## Problem Solving
 
-For issues/failing tests:
+For problems/issues/failing tests:
 
-1. Understand WHY (trace data flow, changes)
-2. Fix root cause, not symptom
-3. Ask about conflicts before disabling features
+<problem-solving-checklist>
+1. Understand WHY (trace data flow, logging, changes)
+2. Fix root cause, not symptom. Generic solution over specific case and bespoke fixes.
+3. Ask user before destructive changes
 4. Test bugs: verify new test catches issue or update existing test to catch it
+</problem-solving-checklist>
 
 When agreed plan fails: STOP, explain failure, ask before changing approach.
 User-specified approaches are constraints - a working workaround is still a failure if it deviates.
-
-<example>
-User: Add email validation to the signup form
-Assistant: [Implements validation, runs tests] Tests are failing. Let me check... The test is correctly catching a bug in my validation logic at auth.go:45 - the regex rejects valid emails with plus signs. I'll fix the regex pattern rather than change the test.
-</example>
-
-<example>
-Assistant: Here's the plan: [approach A]
-User: Let's do it
-Assistant: [Implements, but result is wrong]
-WRONG: Revert and try completely different approach without asking
-RIGHT: "Plan failed because X. Should I fix X within this approach, or try something different?"
-</example>
 
 ## Solution Quality
 
@@ -77,9 +64,3 @@ RIGHT: "Plan failed because X. Should I fix X within this approach, or try somet
 * Question assumptions: simpler/more elegant way?
 * Explain reasoning for chosen solution
 * Prefer solutions that feel inevitable, not just functional
-
-## Code Quality
-
-* Never speculate about code not opened - read files before answering
-* Implement general-purpose solutions, not workarounds for specific test cases
-
