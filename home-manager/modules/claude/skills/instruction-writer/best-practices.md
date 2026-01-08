@@ -2,9 +2,9 @@
 
 Comprehensive guidelines for writing effective instructions, skills, slash commands, and memory files for Claude Code.
 
-## Core Principles
+## Core Philosophy
 
-### 1. Minimal, High-Signal Information
+### Minimal, High-Signal Information
 
 **Find the smallest set of high-signal tokens that maximize desired outcomes.** Every token depletes the model's attention budget.
 
@@ -17,23 +17,7 @@ Comprehensive guidelines for writing effective instructions, skills, slash comma
 
 **Line Count**: Keep CLAUDE.md under 300 lines; under 60 lines is optimal. Put detailed docs in separate files.
 
-### 2. Be Explicit and Direct
-
-Claude 4.x models excel with clear, specific instructions.
-
-**System prompt sensitivity**: Claude 4.x is highly responsive to system prompts. Dial back aggressive language—where you might have said "CRITICAL: You MUST...", use normal prompting like "Use this tool when...".
-
-**Good**: "Include as many relevant features and interactions as possible. Go beyond basics to create fully-featured implementation."
-
-**Bad**: "Create an analytics dashboard" (too vague)
-
-**Action Language**:
-
-- Use "Change X" not "Can you suggest changes to X"
-- Default to imperative mood: "Do X" not "You should do X"
-- Avoid tentative phrasing: "Fix the bug" not "Maybe you could look at fixing the bug"
-
-### 3. Provide Context and Motivation
+### Provide Context and Motivation
 
 Explain *why* instructions matter—helps Claude understand goals.
 
@@ -41,9 +25,77 @@ Explain *why* instructions matter—helps Claude understand goals.
 
 **Bad**: "NEVER use ellipses."
 
-### 4. Structured Organization
+### Universal Applicability
 
-Use clear delineation through XML tags or Markdown headers.
+CLAUDE.md loads in every conversation. Include only instructions that apply to most tasks.
+
+- Move task-specific guidance to separate files Claude reads on-demand
+- If instruction applies to <50% of sessions, it doesn't belong in CLAUDE.md
+- The more irrelevant content, the more Claude filters out everything uniformly
+
+## Structured Prompting
+
+Claude 4.x was trained to understand XML tags as cognitive containers, not just code. Proper structure significantly improves output quality.
+
+### XML Tags vs Markdown Headers
+
+**Use XML tags when**:
+- Complex multi-part tasks requiring explicit boundaries
+- Constraints that must be enforced (validation rules)
+- Preventing context bleed between sections
+- Chain-of-thought reasoning needs exposure
+
+**Use Markdown headers when**:
+- Simple, linear structure
+- Human-readable documentation
+- Single-purpose files
+- Content flows naturally between sections
+
+### Tag Hierarchy and Priority
+
+Outer tags receive higher priority weighting. Structure critical constraints at outer levels, details nested within:
+
+```xml
+<task>
+  <constraints>  <!-- High priority - processed first -->
+    Never exceed 100 words
+    Output must be valid JSON
+  </constraints>
+  <context>  <!-- Lower priority - provides background -->
+    Additional details and background...
+  </context>
+</task>
+```
+
+### Content Isolation
+
+Separate tags prevent context contamination. Better than narrative comparisons:
+
+```xml
+<good_example>
+Concise, explicit instruction that triggers correct behavior
+</good_example>
+
+<bad_example>
+Verbose, vague instruction that leads to confusion
+</bad_example>
+```
+
+### Constraint and Validation Tags
+
+Validation rules within tags become enforceable constraints:
+
+```xml
+<output_format>
+  <validation>
+    - Must be valid JSON
+    - Array length between 1-10
+    - Each item under 50 characters
+  </validation>
+</output_format>
+```
+
+### Basic Structure Pattern
 
 ```xml
 <background_information>
@@ -60,30 +112,51 @@ Canonical examples demonstrating expected behavior
 ```
 
 Benefits:
-
 - Helps model parse intent effectively
 - Separates concerns (context vs. instructions vs. examples)
 - Improves token efficiency through clear boundaries
 
-### 5. Universal Applicability
+## Writing Style
 
-CLAUDE.md loads in every conversation. Include only instructions that apply to most tasks.
+### Be Explicit and Direct
 
-- Move task-specific guidance to separate files Claude reads on-demand
-- If instruction applies to <50% of sessions, it doesn't belong in CLAUDE.md
-- The more irrelevant content, the more Claude filters out everything uniformly
+Claude 4.x excels with clear, specific instructions.
 
-## What NOT to Include in CLAUDE.md
+**System prompt sensitivity**: Claude 4.x is highly responsive to system prompts. Dial back aggressive language—where you might have said "CRITICAL: You MUST...", use normal prompting like "Use this tool when...".
 
-### Don't Auto-Generate
+**Good**: "Include as many relevant features and interactions as possible. Go beyond basics to create fully-featured implementation."
 
-Avoid `/init` or auto-generation. Each line affects every interaction—manually craft content.
+**Bad**: "Create an analytics dashboard" (too vague)
 
-### Don't Embed Code Snippets
+### Action Language
 
-Prefer `file:line` references over code copies. Snippets become outdated; references stay accurate.
+- Use "Change X" not "Can you suggest changes to X"
+- Default to imperative mood: "Do X" not "You should do X"
+- Avoid tentative phrasing: "Fix the bug" not "Maybe you could look at fixing the bug"
 
-## Examples: The "Pictures" Worth a Thousand Words
+### Reverse Negatives
+
+**Bad**: "Don't use markdown"
+
+**Good**: "Write in clear, flowing prose using complete paragraphs and sentences"
+
+### Match Style to Output
+
+The formatting style of your prompt influences response formatting.
+
+- Remove markdown from prompts to reduce markdown in responses
+- Use prose in prompts to encourage prose in responses
+- "Write in prose rather than lists unless presenting truly discrete items where list format is best option"
+
+### Minimize Verbosity
+
+Claude 4.5 is naturally concise. Reinforce when needed:
+
+- "Provide fact-based progress reports without unnecessary verbosity"
+- "No superlatives or excessive praise"
+- "Never say 'You're absolutely right!' - just do the work"
+
+## Examples
 
 ### Canonical Examples Over Edge Cases
 
@@ -123,31 +196,33 @@ Verbose, vague instruction that leads to confusion
 - Are there subtle patterns that could mislead?
 - Do they cover the most common use cases (not rare edge cases)?
 
-## Output Style Control
+## Instruction Types
 
-### Reverse Negatives
+### CLAUDE.md Structure
 
-**Bad**: "Don't use markdown"
+**WHY, WHAT, HOW**:
+- **WHAT**: Tech stack, project structure, monorepo layout
+- **WHY**: Project purpose, component functions, design rationale
+- **HOW**: Build commands, test procedures, verification steps
 
-**Good**: "Write in clear, flowing prose using complete paragraphs and sentences"
+**Progressive Disclosure**:
 
-### Match Style to Output
+Create a docs directory for detailed information:
 
-The formatting style of your prompt influences response formatting.
+```
+agent_docs/
+  ├─ building.md
+  ├─ testing.md
+  ├─ conventions.md
+  └─ architecture.md
+```
 
-- Remove markdown from prompts to reduce markdown in responses
-- Use prose in prompts to encourage prose in responses
-- "Write in prose rather than lists unless presenting truly discrete items where list format is best option"
+CLAUDE.md points to these files; Claude reads relevant ones per-task.
 
-### Minimize Verbosity
+**What NOT to Include**:
 
-Claude 4.5 is naturally concise. Reinforce when needed:
-
-- "Provide fact-based progress reports without unnecessary verbosity"
-- "No superlatives or excessive praise"
-- "Never say 'You're absolutely right!' - just do the work"
-
-## Structure for Different Instruction Types
+- Don't auto-generate via `/init`. Each line affects every interaction—manually craft content.
+- Don't embed code snippets. Prefer `file:line` references over code copies. Snippets become outdated; references stay accurate.
 
 ### Skills (SKILL.md)
 
@@ -209,8 +284,6 @@ Claude Code uses **progressive disclosure** - SKILL.md loads on activation, supp
 - Example: "Apply principles from @best-practices.md" instead of repeating them
 - Pattern: "For detailed X, see @reference.md"
 
-This prevents token waste while maintaining access to comprehensive information when needed.
-
 ### Slash Commands
 
 ```markdown
@@ -246,7 +319,7 @@ Target: $ARGUMENTS (if applicable)
 - Single emphasis level (CRITICAL or Important, not both)
 - Imperative mood throughout
 
-### Memory Files (CLAUDE.md, docs/*.md)
+### Memory Files (docs/*.md)
 
 ```markdown
 # Section Title
@@ -272,26 +345,6 @@ Assistant: ideal response
 - Reference other docs: @docs/filename.md
 ```
 
-**CLAUDE.md Structure: WHY, WHAT, HOW**
-
-- **WHAT**: Tech stack, project structure, monorepo layout
-- **WHY**: Project purpose, component functions, design rationale
-- **HOW**: Build commands, test procedures, verification steps
-
-**Progressive Disclosure for CLAUDE.md**
-
-Create a docs directory for detailed information:
-
-```
-agent_docs/
-  ├─ building.md
-  ├─ testing.md
-  ├─ conventions.md
-  └─ architecture.md
-```
-
-CLAUDE.md points to these files; Claude reads relevant ones per-task.
-
 ## Quality & Reliability
 
 ### Prevent Hallucinations
@@ -305,6 +358,15 @@ CLAUDE.md points to these files; Claude reads relevant ones per-task.
 ### Token Budget Awareness
 
 "Your context window will be automatically compacted as it approaches its limit, allowing you to continue working indefinitely."
+
+### Tool Design Principles
+
+For skills that use tools:
+
+- Tools should be self-contained and robust to error
+- Avoid overlapping tool functionality
+- Curated minimal viable set enables better maintenance
+- Use `allowed-tools` to restrict access when appropriate
 
 ## Optimization Workflow
 
@@ -329,15 +391,6 @@ When optimizing existing instructions:
    - Front-load critical rules
    - Single emphasis level
    - **Preserve all salient information**
-
-## Tool Design Principles
-
-For skills that use tools:
-
-- Tools should be self-contained and robust to error
-- Avoid overlapping tool functionality
-- Curated minimal viable set enables better maintenance
-- Use `allowed-tools` to restrict access when appropriate
 
 ## Common Anti-Patterns
 

@@ -12,20 +12,25 @@ Issue: `$ARGUMENTS`
 
 ## Instructions
 
-**DO NOT MODIFY FILES** until Phase 4.
+Apply @instruction-writer best practices for all changes.
 
-1. If issue empty, use `AskUserQuestion` to get description of what went wrong
-2. Ultrathink: analyze what happened in this conversation
-   - What was the specific error or undesired behavior?
-   - What was the root cause (wrong assumption, missing context, unclear instruction)?
+1. If issue empty, use `AskUserQuestion` to get description
+
+2. Ultrathink: analyze conversation
+   - Specific error/behavior?
+   - Root cause (wrong assumption, missing context, unclear instruction)?
    - Which instruction file(s) could prevent this?
-3. Summarize findings to user
-4. Use `AskUserQuestion` if root cause unclear or need more info
-5. Load relevant instruction files if not in context
-6. Use instruction-writer skill to draft changes
-7. Present proposal: target file(s), before/after, rationale
 
-**STOP** - Use `AskUserQuestion` to confirm user wants to apply changes
+3. Summarize findings; use `AskUserQuestion` if unclear
 
-1. Create empty jj change (if not already in one)
-2. Apply changes
+4. Load relevant instruction files if needed
+
+5. Draft changes **in memory** using instruction-writer skill
+
+6. Present proposal: target file(s), before/after, rationale
+
+**STOP** - Use `AskUserQuestion` to confirm changes.
+
+**If approved:**
+- Create jj change
+- Apply changes

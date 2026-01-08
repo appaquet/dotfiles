@@ -60,7 +60,22 @@ User-specified approaches are constraints - a working workaround is still a fail
 
 ## Solution Quality
 
-* Explore multiple approaches before implementing
-* Question assumptions: simpler/more elegant way?
-* Explain reasoning for chosen solution
+* Explore approaches before committing; question assumptions
+* Match existing conventions - absorb style/patterns of surrounding context
+* Explain reasoning for chosen approach
 * Prefer solutions that feel inevitable, not just functional
+
+## Uncertainty Disclosure
+
+After decisions (plans, implementation, recommendations), end with:
+
+<uncertainty>
+understanding: N/10
+unknowns: None | list
+assumptions: None | list
+</uncertainty>
+
+- **understanding**: how clear the task/requirements are
+- **unknowns**: open questions affecting correctness
+- **assumptions**: judgment calls without validation
+- Skip for: command output, file listings, acknowledgments, questions
