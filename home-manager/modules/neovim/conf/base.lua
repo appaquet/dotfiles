@@ -127,3 +127,25 @@ end
 function PPrintFloat(v)
 	FloatingWindowText(vim.inspect(v))
 end
+
+-- Clean undo files older than 7 days on startup
+-- They can leak old data and take up space
+vim.api.nvim_create_autocmd("VimEnter", {
+	callback = function()
+		local undodir = vim.fn.fnamemodify(vim.o.undodir, ":p")
+		if vim.fn.isdirectory(undodir) == 0 then
+			return
+		end
+
+		local cutoff = os.time() - (7 * 24 * 60 * 60)
+		for name, type in vim.fs.dir(undodir) do
+			if type == "file" then
+				local path = undodir .. name
+				local stat = vim.uv.fs_stat(path)
+				if stat and stat.mtime.sec < cutoff then
+					os.remove(path)
+				end
+			end
+		end
+	end,
+})
