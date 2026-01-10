@@ -39,12 +39,19 @@
     ];
 
     openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHNXBK1YpLeuIKx+tpVLpZOhKbMcqLeMx15SvcBG0jcR appaquet@gmail.com"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHNXBK1YpLeuIKx+tpVLpZOhKbMcqLeMx15SvcBG0jcR ssh 1pw"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIITLlZL+L2M3ckRBajb4lMjRX5K+5EbiAz6uXPkvYAws ssh breakglass"
     ];
   };
   programs.fish.enable = true;
+
+  # Enable sudo, and allow passwordless sudo when SSH'ing with user-defined keys
   security.sudo.enable = true;
   security.sudo.wheelNeedsPassword = true;
+  security.pam.sshAgentAuth = {
+    enable = true;
+    authorizedKeysFiles = [ "/etc/ssh/authorized_keys.d/%u" ];
+  };
 
   # Enable linger
   # See https://discourse.nixos.org/t/adding-nixos-option-for-systemd-user-lingering/28762/3
