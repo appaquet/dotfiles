@@ -25,7 +25,10 @@
     };
   };
 
-  security.pam.services.sudo_local.touchIdAuth = true;
+  security.pam.services.sudo_local = {
+    touchIdAuth = true;
+    reattach = true; # enables pam_reattach for Touch ID in tmux
+  };
 
   time.timeZone = "America/Toronto";
 
