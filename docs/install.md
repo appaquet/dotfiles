@@ -28,7 +28,7 @@
     access-tokens = github.com:<YOUR_TOKEN>
    ```
 
-1. Setup SSH keys
+1. Setup SSH keys. Rekey sops secrets + commit + push.
 
 1. Clone repo: `git clone --recursive git@github.com:appaquet/dotfiles.git`
 
@@ -52,6 +52,8 @@
    ```conf
     access-tokens = github.com:<YOUR_TOKEN>
    ```
+
+1. Setup SSH keys. Rekey sops secrets + commit + push.
 
 1. Clone repo: `git clone --recursive git@github.com:appaquet/dotfiles.git`
 
@@ -93,6 +95,8 @@
 
       experimental-features = nix-command flakes fetch-closure
    ```
+
+1. Setup SSH keys. Rekey sops secrets + commit + push.
 
 1. Clone repo, configure home & activate it.
 
@@ -150,12 +154,14 @@
 1. Follow normal procedure to setup home-manager & rebuild NixOS.
    Note: WiFi will not work until home & ssh is setup for keys.
 
+1. Setup SSH keys, rekey sops secrets, commit & push.
+
 ### Build remotely
 
-1. On fast machine, `REMOTE_KEY=appaquet@somepi ./x home build`
+1. On fast machine, `HOST=somepi ./x home build`
 
-1. Copy the result, `MACHINE_KEY=appaquet@piprint ./x copy`
-   In case the host cannot be resolved, `MACHINE_KEY=appaquet@piprint DEST_MACHINE_KEY=appaquet@192.168.1.226 ./x copy`
+1. Copy the result, `HOST=piprint ./x copy`
+   In case the host cannot be resolved, `HOST=piprint SSH_HOST=192.168.1.226 ./x copy`
 
 1. Copy the printed activate command and run it on destination.
 
