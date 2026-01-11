@@ -135,8 +135,6 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>llr` or `grr` LSP: List references
 * `<leader>lii` LSP: Displays hover information about a symbol
 * `<leader>lis` LSP: Show signature help
-* `<leader>lif` LSP: Peek function definition
-* `<leader>lic` LSP: Peek class definition
 * `<leader>Ti` LSP: Toggle inlay line hints
 * `<leader>lr` or `grn` LSP: Rename
 * `<ctrl-l>r` LSP: Rename (insert|visual mode)
