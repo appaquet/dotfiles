@@ -61,6 +61,36 @@
     };
   };
 
+  # ha-lab: Home Assistant Lab Monitor
+  sops.secrets."ha-lab/mqtt" = {
+    sopsFile = config.sops.secretsFiles."ha-lab";
+    key = "mqtt_credentials";
+  };
+
+  ha-lab = {
+    enable = true;
+    user = "appaquet";
+    mqtt = {
+      host = "haos.n3x.net";
+      port = 1883;
+      credentialsFile = config.sops.secrets."ha-lab/mqtt".path;
+    };
+    reporters = {
+      restic = {
+        enable = true;
+        backups = [
+          "home"
+          "vms"
+        ];
+        interval = 3600;
+      };
+      system = {
+        enable = true;
+        interval = 3600;
+      };
+    };
+  };
+
   # Programs & services
   programs.firefox.enable = true;
   services.openssh.enable = true;

@@ -6,3 +6,6 @@
 [submodule "shared-dotfiles"]
 	path = humanfirst-dots
 	url = git@github.com:zia-ai/shared-dotfiles.git
+[submodule "ha-lab"]
+	path = ha-lab
+	url = git@github.com:appaquet/ha-lab.git

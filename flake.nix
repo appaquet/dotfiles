@@ -18,8 +18,14 @@
     };
 
     secrets = {
-      url = "github:appaquet/dotfiles-secrets";
-      #url = "path:/home/appaquet/dotfiles/secrets";
+      # url = "github:appaquet/dotfiles-secrets";
+      url = "path:/home/appaquet/dotfiles/secrets";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    ha-lab = {
+      # url = "github:appaquet/ha-lab";
+      url = "path:/home/appaquet/dotfiles/ha-lab";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
