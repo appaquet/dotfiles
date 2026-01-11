@@ -19,7 +19,7 @@ jobs:
           - host: "mbpapp"
             os: macos-latest
     runs-on: ${{ matrix.pair.os }}
-    timeout-minutes: 60 # because sometimes it gets stuck
+    timeout-minutes: 90 # because sometimes it gets stuck
     steps:
       - uses: actions/checkout@v4
 
