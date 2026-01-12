@@ -37,10 +37,6 @@ in
 
       gnumake
       bintools # ld, objdump, etc.
-
-      codex
-      opencode
-      gemini-cli
     ])
     ++ lib.optionals pkgs.stdenv.isLinux [
       pkgs.mold
