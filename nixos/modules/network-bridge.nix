@@ -81,5 +81,21 @@ in
         ''}";
       };
     };
+
+    # Enable UDP GRO forwarding for Tailscale performance on exit nodes/subnet routers.
+    # Applied to both the physical interface and the bridge (Tailscale checks default route).
+    # See https://tailscale.com/kb/1320/performance-best-practices
+    systemd.services.tailscale-udp-gro = {
+      description = "Enable UDP GRO forwarding for Tailscale";
+      wantedBy = [ "network-pre.target" ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        ExecStart = "${pkgs.writeShellScript "tailscale-udp-gro" ''
+          ${pkgs.ethtool}/bin/ethtool -K ${cfg.interface} rx-udp-gro-forwarding on rx-gro-list off
+          ${pkgs.ethtool}/bin/ethtool -K br0 rx-udp-gro-forwarding on rx-gro-list off
+        ''}";
+      };
+    };
   };
 }
