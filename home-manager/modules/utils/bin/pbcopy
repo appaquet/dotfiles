@@ -5,9 +5,8 @@ if [[ "$os" == "Linux" ]]; then
   if [[ "$DISPLAY" != "" ]]; then
     xclip -selection clipboard
   else
-    ssh mbpapp.n3x.net /usr/bin/pbcopy
+    ssh -o ConnectTimeout=5 -o PasswordAuthentication=no -o KbdInteractiveAuthentication=no mbpapp.n3x.net /usr/bin/pbcopy
   fi
 elif [[ "$os" == "Darwin" ]]; then
   reattach-to-user-namespace /usr/bin/pbcopy
 fi
-

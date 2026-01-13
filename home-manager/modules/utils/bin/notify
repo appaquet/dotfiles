@@ -8,5 +8,5 @@ HOSTNAME=$(uname -n | tr '[:upper:]' '[:lower:]' | sed 's/\.local//')
 if [[ "${HOSTNAME}" == "mbpapp"* ]]; then
   $TM -message "${MESSAGE}" -timeout 15 -sound glass
 else
-  ssh -o ConnectTimeout=5 mbpapp.n3x.net "$TM -message \"${MESSAGE}\" -timeout 15 -sound glass" 2>/dev/null || true
+  ssh -o ConnectTimeout=5 -o PasswordAuthentication=no -o KbdInteractiveAuthentication=no mbpapp.n3x.net "$TM -message \"${MESSAGE}\" -timeout 15 -sound glass" 2>/dev/null || true
 fi
