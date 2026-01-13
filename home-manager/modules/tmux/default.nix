@@ -74,6 +74,10 @@ in
       # `COLORTERM=truecolor` is set in fish.nix
       set -g default-terminal 'screen-256color'
 
+      # Force tmux to resize windows to the most recently active client
+      set -g window-size latest
+      setw -g aggressive-resize on
+
       # Unbind config edit since it's read-only anyway, and it messes up with overriden configs here
       unbind e
 
