@@ -14,9 +14,9 @@ Save current project context into project docs while respecting established stru
 
 2. Update the "Files" section:
    * Launch the `branch-diff-summarizer` agent to analyze changed files
-   * Update project doc with agent's output
+   * Update project doc with agent's output (format per @docs/project-doc.md)
 
-3. Update the TODO section:
+3. Update the TODO section (format per @docs/project-doc.md):
    * Update task and phase status in both main doc and current sub-doc
    * Add any new tasks discovered during development
    * Phase transitions: use `AskUserQuestion` before changing phase status

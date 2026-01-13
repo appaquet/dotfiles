@@ -31,7 +31,7 @@ in
   home.file = mkClaudeConfSymlinks [
     "settings.json"
     "commands"
-    "rules"
+    "docs"
     "agents"
     "skills"
     "CLAUDE.md"

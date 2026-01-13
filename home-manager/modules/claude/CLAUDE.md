@@ -79,3 +79,10 @@ assumptions: None | list
 - **unknowns**: open questions affecting correctness
 - **assumptions**: judgment calls without validation - MUST disclose, not state as fact
 - Skip for: command output, file listings, acknowledgments, questions
+
+## Documentation References
+
+* Version control: @docs/version-control.md
+* Development: @docs/development.md
+* Code style: @docs/code-style.md
+* Project doc structure: @docs/project-doc.md

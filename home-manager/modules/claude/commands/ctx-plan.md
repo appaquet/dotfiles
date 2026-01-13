@@ -29,7 +29,7 @@ Build a full plan for the task at hand: $ARGUMENTS
    * Consider dependencies and challenges
    * Insert validation tasks after each phase
 
-6. Write plan to project doc:
+6. Write plan to project doc (per @docs/project-doc.md structure):
    * Context section describing the task
    * TODO section with planned work items
    * Files section with relevant files
