@@ -11,15 +11,15 @@
    `sudo nvim /etc/nixos/configuration.nix`:
    * Enable sshd
    * Change hostname
-   * Enable flakes: `nix.settings.experimental-features = [ "flakes" ];`
+   * Enable flakes: `nix.settings.experimental-features = [ "flakes" "nix-command" ];`
 
 1. Rebuild NixOS
    `sudo nixos-rebuild switch`
 
-1. SSH to the machine
+1. SSH to the machine (with agent forwarding)
 
 1. Start neovim & git shells
-   `nix shell --extra-experimental-features nix-command --extra-experimental-features flakes nixpkgs#neovim nixpkgs#git`
+   `nix shell nixpkgs#neovim nixpkgs#git`
 
 1. Setup a GitHub personal access token in `~/.config/nix/nix.conf`
    (see [doc](https://nix.dev/manual/nix/2.18/command-ref/conf-file#conf-access-tokens))

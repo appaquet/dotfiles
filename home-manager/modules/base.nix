@@ -37,7 +37,7 @@
     (with pkgs; [
       manix # nix doc cli searcher
       nix-output-monitor # better nix build output (nom)
-      nixfmt-rfc-style
+      nixfmt
       nvd # nix package diff tool
       nix-tree # explore nix derivations dependencies (https://github.com/utdemir/nix-tree)
       cachix
