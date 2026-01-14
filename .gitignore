@@ -6,3 +6,4 @@ result
 .luarc.json
 .opencode
 docs/features
+*.local.*
