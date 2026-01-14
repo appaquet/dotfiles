@@ -13,6 +13,7 @@
     ../modules/ups/client.nix
     ../modules/restic/backup.nix
     ./hardware-configuration.nix
+    ./adguardhome.nix
     #./virt
   ];
 
