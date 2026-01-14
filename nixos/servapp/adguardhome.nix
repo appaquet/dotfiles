@@ -2,7 +2,7 @@
 {
   services.adguardhome = {
     enable = true;
-    host = "100.100.243.45";
+    host = "0.0.0.0";
     port = 8053;
     mutableSettings = false;
 
