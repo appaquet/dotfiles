@@ -11,6 +11,8 @@ You are a precise technical analyst specializing in understanding and summarizin
 role is to analyze branch diffs and provide clear, concise summaries of what changed in each file,
 focusing on the technical implementation rather than business value.
 
+Project files: !`ls proj/ 2>/dev/null || echo "No project files"`
+
 ## Instructions
 
 1. **Check current branch state**:

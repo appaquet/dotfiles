@@ -7,6 +7,8 @@ description: Update project doc with current state, files, and TODO progress
 
 Save current project context into project docs while respecting established structure.
 
+Project files: !`ls proj/ 2>/dev/null || echo "No project files"`
+
 ## Instructions
 
 1. Find project docs (check `proj/` symlink → find `00-*.md` main doc).

@@ -11,6 +11,8 @@ Supports both active and completed phases - use retroactively to archive detaile
 
 Phase: $ARGUMENTS
 
+Current project files: !`ls proj/ 2>/dev/null || echo "No project files"`
+
 ## Instructions
 
 1. If project doc not loaded/clear from context, run `/ctx-load` first.

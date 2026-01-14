@@ -8,6 +8,8 @@ argument-hint: [task-description]
 
 Build a full plan for the task at hand: $ARGUMENTS
 
+Project files: !`ls proj/ 2>/dev/null || echo "No project files"`
+
 ## Instructions
 
 1. Run `/ctx-load` if context not sufficiently loaded.
