@@ -7,6 +7,13 @@
     mutableSettings = false;
 
     settings = {
+      users = [
+        {
+          name = "appaquet";
+          password = "$2y$05$aZKGyCD4nGzYWvl7avCoiOR3/YyWaiRZi3AiFbhfpCyZNIRc9Bp3i";
+        }
+      ];
+
       dns = {
         bind_hosts = [ "0.0.0.0" ];
         port = 53;
