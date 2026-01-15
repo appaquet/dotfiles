@@ -16,6 +16,14 @@
   and then continue with your work if that was the intended next step
 * Ambiguous references ("that/this/it"): STOP, ask which specific thing (IDE selection may be missing)
 * User answers with questions ("would this work?", "makes sense?"): investigate/analyze first, don't jump to implementation
+* When summarizing conversation for compaction, always include the reference to project doc and phase (`@proj/...`)
+
+## Instructions files
+
+* Project doc structure: @docs/project-doc.md
+* Version control: @docs/version-control.md
+* Development: @docs/development.md
+* Code style: @docs/code-style.md
 
 ## Context understanding
 
@@ -79,10 +87,3 @@ assumptions: None | list
 - **unknowns**: open questions affecting correctness
 - **assumptions**: judgment calls without validation - MUST disclose, not state as fact
 - Skip for: command output, file listings, acknowledgments, questions
-
-## Documentation References
-
-* Version control: @docs/version-control.md
-* Development: @docs/development.md
-* Code style: @docs/code-style.md
-* Project doc structure: @docs/project-doc.md
