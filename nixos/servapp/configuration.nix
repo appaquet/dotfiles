@@ -61,6 +61,30 @@
     };
   };
 
+  # dotblip: Home Assistant Lab Monitor
+  sops.secrets.mqtt.sopsFile = config.sops.secretsFiles.dotblip;
+
+  dotblip = {
+    enable = true;
+    user = "appaquet";
+    mqtt = {
+      host = "haos.n3x.net";
+      port = 1883;
+      credentialsFile = config.sops.secrets.mqtt.path;
+    };
+    reporters = {
+      system = {
+        enable = true;
+        interval = 3600;
+      };
+      restic = {
+        enable = true;
+        backups = [ "home" ];
+        interval = 3600;
+      };
+    };
+  };
+
   # Programs & services
   programs.firefox.enable = true;
   services.openssh.enable = true;

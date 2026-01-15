@@ -23,6 +23,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    dotblip = {
+      url = "github:appaquet/dotblip";
+      #url = "path:/home/appaquet/dotfiles/dotblip";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     fzf-nix = {
       url = "github:mrene/fzf-nix";
 
