@@ -2,7 +2,7 @@
 set -e
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-pushd "$ROOT" > /dev/null
+pushd "$ROOT" >/dev/null
 
 LOCAL_HOSTNAME=$(uname -n | tr '[:upper:]' '[:lower:]' | sed 's/\.local//')
 HOST="${HOST:-$LOCAL_HOSTNAME}"
@@ -62,7 +62,7 @@ resolve_host() {
   HOME_CONFIG=""
   OS_TYPE=""
 
-  if declare -f "host_config_${host}" > /dev/null; then
+  if declare -f "host_config_${host}" >/dev/null; then
     "host_config_${host}"
     : "${SSH_HOST:=${host}.n3x.net}"
   else
@@ -83,7 +83,7 @@ require_local() {
 }
 
 prime_sudo() {
-  sudo echo > /dev/null
+  sudo echo >/dev/null
 }
 
 check_eval() {
@@ -365,14 +365,14 @@ cmd_check_all() {
       check_eval ".#homeConfigurations.${HOME_CONFIG}.activationPackage"
     }
     case "$OS_TYPE" in
-      nixos)
-        echo "Checking nixos ${host}"
-        check_eval ".#nixosConfigurations.${host}.config.system.build.toplevel"
-        ;;
-      darwin)
-        echo "Checking darwin ${host}"
-        check_eval ".#darwinConfigurations.${host}.system"
-        ;;
+    nixos)
+      echo "Checking nixos ${host}"
+      check_eval ".#nixosConfigurations.${host}.config.system.build.toplevel"
+      ;;
+    darwin)
+      echo "Checking darwin ${host}"
+      check_eval ".#darwinConfigurations.${host}.system"
+      ;;
     esac
   done
 }
@@ -388,9 +388,9 @@ cmd_update() {
     if [[ "$confirm" == [yY] ]]; then
       echo "Updating all shells..."
       for shell in shells/*; do
-        pushd "${shell}" > /dev/null
+        pushd "${shell}" >/dev/null
         nix flake update
-        popd > /dev/null
+        popd >/dev/null
       done
     else
       echo "Skipping shell updates"
@@ -434,8 +434,8 @@ cmd_build_all() {
 
   "$0" home build "$@"
   case "$OS_TYPE" in
-    nixos)  "$0" nixos build "$@" ;;
-    darwin) "$0" darwin build "$@" ;;
+  nixos) "$0" nixos build "$@" ;;
+  darwin) "$0" darwin build "$@" ;;
   esac
 }
 
@@ -451,8 +451,8 @@ cmd_build_switch_all() {
 
   "$0" home build "$@" && "$0" home switch
   case "$OS_TYPE" in
-    nixos)  "$0" nixos build "$@" && "$0" nixos switch ;;
-    darwin) "$0" darwin build "$@" && "$0" darwin switch ;;
+  nixos) "$0" nixos build "$@" && "$0" nixos switch ;;
+  darwin) "$0" darwin build "$@" && "$0" darwin switch ;;
   esac
 }
 
@@ -510,55 +510,155 @@ case $COMMAND in
 h | home)
   shift
   case $1 in
-    check)              shift; cmd_home_check "$@" ;;
-    b | build)          shift; cmd_home_build "$@" ;;
-    s | switch)         shift; cmd_home_switch "$@" ;;
-    bs | build-switch)  shift; cmd_home_build "$@" && cmd_home_switch ;;
-    diff)               shift; cmd_home_diff ;;
-    tree)               shift; cmd_home_tree ;;
-    generations)        shift; cmd_home_generations ;;
-    diff-generations)   shift; cmd_home_diff_generations ;;
-    *)                  cmd_home_help ;;
+  check)
+    shift
+    cmd_home_check "$@"
+    ;;
+  b | build)
+    shift
+    cmd_home_build "$@"
+    ;;
+  s | switch)
+    shift
+    cmd_home_switch "$@"
+    ;;
+  bs | build-switch)
+    shift
+    cmd_home_build "$@" && cmd_home_switch
+    ;;
+  diff)
+    shift
+    cmd_home_diff
+    ;;
+  tree)
+    shift
+    cmd_home_tree
+    ;;
+  generations)
+    shift
+    cmd_home_generations
+    ;;
+  diff-generations)
+    shift
+    cmd_home_diff_generations
+    ;;
+  *) cmd_home_help ;;
   esac
   ;;
 
 d | darwin)
   shift
   case $1 in
-    check)              shift; cmd_darwin_check "$@" ;;
-    b | build)          shift; cmd_darwin_build "$@" ;;
-    s | switch)         shift; cmd_darwin_switch "$@" ;;
-    bs | build-switch)  shift; cmd_darwin_build "$@" && cmd_darwin_switch ;;
-    diff)               shift; cmd_darwin_diff ;;
-    tree)               shift; cmd_darwin_tree ;;
-    *)                  cmd_darwin_help ;;
+  check)
+    shift
+    cmd_darwin_check "$@"
+    ;;
+  b | build)
+    shift
+    cmd_darwin_build "$@"
+    ;;
+  s | switch)
+    shift
+    cmd_darwin_switch "$@"
+    ;;
+  bs | build-switch)
+    shift
+    cmd_darwin_build "$@" && cmd_darwin_switch
+    ;;
+  diff)
+    shift
+    cmd_darwin_diff
+    ;;
+  tree)
+    shift
+    cmd_darwin_tree
+    ;;
+  *) cmd_darwin_help ;;
   esac
   ;;
 
 n | nixos)
   shift
   case $1 in
-    check)              shift; cmd_nixos_check "$@" ;;
-    b | build)          shift; cmd_nixos_build "$@" ;;
-    s | switch)         shift; cmd_nixos_switch "$@" ;;
-    boot)               shift; cmd_nixos_boot "$@" ;;
-    bs | build-switch)  shift; cmd_nixos_build "$@" && cmd_nixos_switch ;;
-    sdimage)            shift; cmd_nixos_sdimage "$@" ;;
-    diff)               shift; cmd_nixos_diff ;;
-    tree)               shift; cmd_nixos_tree ;;
-    kernel-versions)    shift; cmd_nixos_kernel_versions ;;
-    generations)        shift; cmd_nixos_generations ;;
-    *)                  cmd_nixos_help ;;
+  check)
+    shift
+    cmd_nixos_check "$@"
+    ;;
+  b | build)
+    shift
+    cmd_nixos_build "$@"
+    ;;
+  s | switch)
+    shift
+    cmd_nixos_switch "$@"
+    ;;
+  boot)
+    shift
+    cmd_nixos_boot "$@"
+    ;;
+  bs | build-switch)
+    shift
+    cmd_nixos_build "$@" && cmd_nixos_switch
+    ;;
+  bb | build-boot)
+    shift
+    cmd_nixos_build "$@" && cmd_nixos_boot
+    ;;
+  sdimage)
+    shift
+    cmd_nixos_sdimage "$@"
+    ;;
+  diff)
+    shift
+    cmd_nixos_diff
+    ;;
+  tree)
+    shift
+    cmd_nixos_tree
+    ;;
+  kernel-versions)
+    shift
+    cmd_nixos_kernel_versions
+    ;;
+  generations)
+    shift
+    cmd_nixos_generations
+    ;;
+  *) cmd_nixos_help ;;
   esac
   ;;
 
-c | check)      shift; cmd_check_all "$@" ;;
-u | update)     shift; cmd_update "$@" ;;
-gc)             shift; cmd_gc "$@" ;;
-fmt)            shift; cmd_fmt "$@" ;;
-optimize)       shift; cmd_optimize "$@" ;;
-b | build)      shift; cmd_build_all "$@" ;;
-bs | build-switch) shift; cmd_build_switch_all "$@" ;;
-cp | copy)      shift; cmd_copy "$@" ;;
-*)              cmd_help ;;
+c | check)
+  shift
+  cmd_check_all "$@"
+  ;;
+u | update)
+  shift
+  cmd_update "$@"
+  ;;
+gc)
+  shift
+  cmd_gc "$@"
+  ;;
+fmt)
+  shift
+  cmd_fmt "$@"
+  ;;
+optimize)
+  shift
+  cmd_optimize "$@"
+  ;;
+b | build)
+  shift
+  cmd_build_all "$@"
+  ;;
+bs | build-switch)
+  shift
+  cmd_build_switch_all "$@"
+  ;;
+cp | copy)
+  shift
+  cmd_copy "$@"
+  ;;
+*) cmd_help ;;
 esac
