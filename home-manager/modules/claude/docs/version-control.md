@@ -25,10 +25,18 @@ Default to more changes - easier to squash than split.
 
 ## Commit Messages
 
-Prefix ALL commits with `"private: claude: "`
+Prefix commits with `"private: claude: "` so they can be easily identified and squashed before PR.
 Always use `-m "message"` (never `jj commit` alone - opens editor)
 
-✓ `jj commit -m "private: claude: fix validation bug"`
+<good-example>
+jj commit -m "private: claude: fix validation bug"
+jj commit -m "private: claude: feat(workspace): add collections API"
+</good-example>
+
+<bad-example>
+jj commit -m "fix validation bug"
+jj commit -m "feat(workspace): add collections API"
+</bad-example>
 
 ## Commands
 
