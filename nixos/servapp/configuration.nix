@@ -14,7 +14,6 @@
     ../modules/restic/backup.nix
     ./hardware-configuration.nix
     ./adguardhome.nix
-    #./virt
   ];
 
   boot.loader.systemd-boot.enable = true;
@@ -58,7 +57,7 @@
 
     backups.home = {
       paths = [ "/home/appaquet" ];
-      schedule = "yearly"; # FIXME: Re-enable when we're done
+      schedule = "daily";
     };
   };
 
