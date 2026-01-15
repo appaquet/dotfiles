@@ -87,7 +87,8 @@ in
     # See https://tailscale.com/kb/1320/performance-best-practices
     systemd.services.tailscale-udp-gro = {
       description = "Enable UDP GRO forwarding for Tailscale";
-      wantedBy = [ "network-pre.target" ];
+      after = [ "network.target" ];
+      wantedBy = [ "multi-user.target" ];
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
