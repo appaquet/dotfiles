@@ -79,10 +79,13 @@ Implement OAuth2 flow with JWT tokens. Adds login/logout endpoints and session m
 * Always include 2-3 sentence summary after link - provides context without opening sub-doc
 * Maintain summary as phase progresses - update when scope changes significantly
 
-**Phase status transitions** (use `AskUserQuestion` tool):
+**Progress Tracking Rules:**
 
-* All tasks completed → ask user to mark phase ✅
-* Any activity (new task, task state change) in ✅ phase → ask user to re-open (🔄)
+* When starting work on a task → mark it `[~]` immediately
+* When starting work in a phase → mark it 🔄 immediately
+* Claude can mark tasks `[x]` after completing them
+* Claude NEVER marks phases ✅ → use `AskUserQuestion` to ask user
+* When resuming: if multiple items are `[~]` or 🔄, ask user which to focus on
 
 **Management:**
 

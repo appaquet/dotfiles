@@ -11,7 +11,7 @@ Load as much context as possible about the project and task at hand.
 
 * Current branch: !`jj-current-branch`
 * List of changes in current branch and stacked branches: !`jj-stacked-stats`
-* Project files: !`ls proj/ 2>/dev/null || echo "No project files"`
+* Project files: !`ls "$PROJECT_ROOT/proj/" 2>/dev/null || echo "No project files"`
 
 ## Instructions
 
@@ -22,7 +22,11 @@ Load as much context as possible about the project and task at hand.
    * If it exists, understand context, requirements, progress, and current phase
    * Load any sub-docs (`01-*.md`, `02-*.md`, ..., in same directory) if planning to work on them
 
-2. Synthesize and propose next steps:
+2. Resolve ambiguity if multiple items in-progress:
+   * If multiple tasks `[~]` or phases 🔄, use `AskUserQuestion` to clarify which to focus on
+   * Mark the chosen task/phase as in-progress per @docs/project-doc.md rules
+
+3. Synthesize and propose next steps:
    * If project doc exists, propose next tasks based on TODO section
    * Propose project doc updates if missing information
    * If no clear direction, use `AskUserQuestion` tool for clarification on goals

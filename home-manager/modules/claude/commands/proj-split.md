@@ -11,7 +11,7 @@ Supports both active and completed phases - use retroactively to archive detaile
 
 Phase: $ARGUMENTS
 
-Current project files: !`ls proj/ 2>/dev/null || echo "No project files"`
+Current project files: !`ls "$PROJECT_ROOT/proj/" 2>/dev/null || echo "No project files"`
 
 ## Instructions
 

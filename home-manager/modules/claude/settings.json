@@ -65,6 +65,16 @@
     ]
   },
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'if [ -n \"$CLAUDE_ENV_FILE\" ]; then echo \"export PROJECT_ROOT=\\\"$CLAUDE_PROJECT_DIR\\\"\" >> \"$CLAUDE_ENV_FILE\"; fi; exit 0'"
+          }
+        ]
+      }
+    ],
     "Notification": [
       {
         "matcher": "",

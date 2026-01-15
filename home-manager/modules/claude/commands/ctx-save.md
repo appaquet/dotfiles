@@ -7,7 +7,7 @@ description: Update project doc with current state, files, and TODO progress
 
 Save current project context into project docs while respecting established structure.
 
-Project files: !`ls proj/ 2>/dev/null || echo "No project files"`
+Project files: !`ls "$PROJECT_ROOT/proj/" 2>/dev/null || echo "No project files"`
 
 ## Instructions
 
@@ -19,9 +19,9 @@ Project files: !`ls proj/ 2>/dev/null || echo "No project files"`
    * Update project doc with agent's output (format per @docs/project-doc.md)
 
 3. Update the TODO section (format per @docs/project-doc.md):
-   * Update task and phase status in both main doc and current sub-doc
+   * Mark completed tasks as `[x]` (no approval needed)
+   * Mark phases ✅ ONLY after `AskUserQuestion` confirms with user
    * Add any new tasks discovered during development
-   * Phase transitions: use `AskUserQuestion` before changing phase status
 
 4. Update context and requirements sections if needed based on new discoveries
 
