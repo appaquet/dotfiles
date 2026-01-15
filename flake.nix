@@ -47,7 +47,8 @@
     };
 
     nix-ai-tools = {
-      url = "github:numtide/nix-ai-tools?rev=81029ab8342b927a453d888676dc53247affa2c2";
+      #url = "github:numtide/nix-ai-tools?rev=81029ab8342b927a453d888676dc53247affa2c2"; 2.0.76
+      url = "github:numtide/nix-ai-tools";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
