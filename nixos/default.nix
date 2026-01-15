@@ -25,7 +25,7 @@ in
         nixosOverlaysModule
         inputs.secrets.nixos.common
         inputs.secrets.nixos.servapp
-        inputs.ha-lab.nixosModules.default
+        inputs.dotblip.nixosModules.default
         ./servapp/configuration.nix
       ];
     };

@@ -79,6 +79,24 @@
         "type": "github"
       }
     },
+    "dotblip": {
+      "inputs": {
+        "flake-utils": "flake-utils",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1768440657,
+        "narHash": "sha256-ku6aK8kimFp0GBoO2rrMdrhOtfJwI92QEZI62Xx1KVo=",
+        "path": "/home/appaquet/dotfiles/dotblip",
+        "type": "path"
+      },
+      "original": {
+        "path": "/home/appaquet/dotfiles/dotblip",
+        "type": "path"
+      }
+    },
     "flake-compat": {
       "locked": {
         "lastModified": 1767039857,
@@ -200,24 +218,6 @@
         "owner": "mrene",
         "repo": "fzf-nix",
         "type": "github"
-      }
-    },
-    "ha-lab": {
-      "inputs": {
-        "flake-utils": "flake-utils",
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1768439170,
-        "narHash": "sha256-2Q/u8mRAxZBMmHmg0ueZCfGW2OSeYS3zOAlsWsH1rcA=",
-        "path": "/home/appaquet/dotfiles/ha-lab",
-        "type": "path"
-      },
-      "original": {
-        "path": "/home/appaquet/dotfiles/ha-lab",
-        "type": "path"
       }
     },
     "home-manager": {
@@ -526,9 +526,9 @@
       "inputs": {
         "darwin": "darwin",
         "disko": "disko",
+        "dotblip": "dotblip",
         "flake-parts": "flake-parts",
         "fzf-nix": "fzf-nix",
-        "ha-lab": "ha-lab",
         "home-manager": "home-manager",
         "humanfirst-dots": "humanfirst-dots",
         "nix-ai-tools": "nix-ai-tools",
@@ -549,8 +549,8 @@
         "sops-nix": "sops-nix"
       },
       "locked": {
-        "lastModified": 1768439028,
-        "narHash": "sha256-z/kYAAS/ngTIoKbSkHiROcMessUopSqCeVpNsgny8ro=",
+        "lastModified": 1768441018,
+        "narHash": "sha256-WwfmRS69E8kdbytd3sZqYLb3h+eZobRfJJNHs24u2Tk=",
         "path": "/home/appaquet/dotfiles/secrets",
         "type": "path"
       },

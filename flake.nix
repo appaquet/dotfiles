@@ -23,9 +23,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    ha-lab = {
-      # url = "github:appaquet/ha-lab";
-      url = "path:/home/appaquet/dotfiles/ha-lab";
+    dotblip = {
+      # url = "github:appaquet/dotblip";
+      url = "path:/home/appaquet/dotfiles/dotblip";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

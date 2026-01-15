@@ -9,3 +9,6 @@
 [submodule "ha-lab"]
 	path = ha-lab
 	url = git@github.com:appaquet/ha-lab.git
+[submodule "dotblip"]
+	path = dotblip
+	url = git@github.com:appaquet/dotblip.git

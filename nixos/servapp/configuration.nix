@@ -61,10 +61,10 @@
     };
   };
 
-  # ha-lab: Home Assistant Lab Monitor
-  sops.secrets.mqtt.sopsFile = config.sops.secretsFiles."ha-lab";
+  # dotblip: Home Assistant Lab Monitor
+  sops.secrets.mqtt.sopsFile = config.sops.secretsFiles.dotblip;
 
-  ha-lab = {
+  dotblip = {
     enable = true;
     user = "appaquet";
     mqtt = {
