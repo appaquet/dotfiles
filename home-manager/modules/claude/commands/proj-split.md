@@ -32,11 +32,14 @@ Phase: $ARGUMENTS
    * TODO (moved from main doc - preserve all details including completed items)
 
 6. Update main project doc:
-   * Replace phase TODOs with header + link to sub-doc:
+   * Replace phase TODOs with header + link + summary blurb (2-3 sentences):
      ```
      ### Phase: Name
      [01-phase-name.md](01-phase-name.md)
+
+     Brief summary of what this phase accomplishes. Key deliverables or changes.
      ```
+   * Summary should be maintained even as phase progresses - update when scope changes
 
 7. If resequencing was chosen:
    * Rename docs in order (e.g., `02-*.md` → `03-*.md`)

@@ -72,7 +72,12 @@ Flat checkmark list of work items.
 ```
 ### 🔄 Phase: Auth
 [01-auth.md](01-auth.md)
+
+Implement OAuth2 flow with JWT tokens. Adds login/logout endpoints and session management.
 ```
+
+* Always include 2-3 sentence summary after link - provides context without opening sub-doc
+* Maintain summary as phase progresses - update when scope changes significantly
 
 **Phase status transitions** (use `AskUserQuestion` tool):
 
