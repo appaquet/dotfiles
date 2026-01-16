@@ -15,12 +15,11 @@ Load as much context as possible about the project and task at hand.
 
 ## Instructions
 
-1. Find and read project docs:
-   * Check if `proj/` symlink exists at repo root → find `00-*.md` main doc
-   * If project instructions specify a different location, use that
-   * May not exist if no task started yet - that's fine for new features.
-   * If it exists, understand context, requirements, progress, and current phase
-   * Load any sub-docs (`01-*.md`, `02-*.md`, ..., in same directory) if planning to work on them
+1. Read project docs (use State above - don't re-discover):
+   * If "No project files" shown, check if project instructions specify a different location
+   * May not exist if no task started yet - that's fine for new features
+   * If files exist, read `00-*.md` main doc to understand context, requirements, progress
+   * Load sub-docs (`01-*.md`, `02-*.md`, ...) only if planning to work on them
 
 2. Resolve ambiguity if multiple items in-progress:
    * If multiple tasks `[~]` or phases 🔄, use `AskUserQuestion` to clarify which to focus on
