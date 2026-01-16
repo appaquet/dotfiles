@@ -15,7 +15,8 @@ deserves thorough analysis and feedback.
 
 ## Instructions
 
-1. Load the context of the project and PR
+1. Run the `/ctx-load` skill to load project context, branch state, and project docs. This gives you
+   access to requirements and current progress.
 
 2. Search project-specific style guideline files (from the root of the repository) and read them
    (ex: `**/*style*.md`, `**/*guide*.md`, etc.)

@@ -9,10 +9,11 @@ description: Launch review agents for code style, architecture and correctness.
 
 2. Create a new jj change for the review
 
-3. Launch 3 specialized agents in **parallel**:
+3. Launch 4 specialized agents in **parallel**:
     * Agent 1: launch the "code-style-reviewer" agent
-    * Agent 2: launch the "code-correctness-reviewer" agent  
+    * Agent 2: launch the "code-correctness-reviewer" agent
     * Agent 3: launch the "architecture-reviewer" agent
+    * Agent 4: launch the "requirements-reviewer" agent
 
    Note: If an agent doesn't return any results but has finished, don't assume that it failed and
    just consider it as "no issues found". Don't restart the agents as they consume many tokens.
