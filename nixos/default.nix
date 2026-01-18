@@ -109,6 +109,7 @@ in
         inputs.secrets.nixos.common
         inputs.secrets.nixos.vps
         inputs.disko.nixosModules.disko
+        inputs.dotblip.nixosModules.default
         ./vps/configuration.nix
       ];
     };

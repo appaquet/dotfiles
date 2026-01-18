@@ -61,9 +61,7 @@
     };
   };
 
-  # dotblip: Home Assistant Lab Monitor
   sops.secrets.mqtt.sopsFile = config.sops.secretsFiles.dotblip;
-
   dotblip = {
     enable = true;
     user = "appaquet";
@@ -79,7 +77,7 @@
       };
       restic = {
         enable = true;
-        backups = [ "home" ];
+        localBackups = [ "home" ];
         interval = 3600;
       };
     };

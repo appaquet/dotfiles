@@ -67,5 +67,29 @@
     sopsFile = config.sops.secretsFiles.vps;
   };
 
+  sops.secrets.mqtt.sopsFile = config.sops.secretsFiles.dotblip;
+  dotblip = {
+    enable = true;
+    user = "appaquet";
+    mqtt = {
+      host = "haos.n3x.net";
+      port = 1883;
+      credentialsFile = config.sops.secrets.mqtt.path;
+    };
+    reporters = {
+      system = {
+        enable = true;
+        interval = 3600;
+      };
+      restic = {
+        enable = true;
+        directoryBackups = [
+          { root = "/data/restic/nasapp"; }
+        ];
+        interval = 3600;
+      };
+    };
+  };
+
   system.stateVersion = "25.11";
 }
