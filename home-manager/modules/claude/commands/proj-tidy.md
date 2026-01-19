@@ -1,6 +1,7 @@
 ---
 name: proj-tidy
 description: Validate and fix project doc consistency against standard structure
+context: fork
 ---
 
 # Project Tidy

@@ -36,6 +36,4 @@ Focus: $ARGUMENTS
      * **Removed**: Deleted files, deprecated features
    * Skip empty categories
 
-4. Write to project doc "Pull Requests" section (create if missing).
-
-5. Present summary to user - this is for reference, not copy-paste into PR.
+4. Present summary to user - this is for reference, not copy-paste into PR.

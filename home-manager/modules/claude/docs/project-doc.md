@@ -78,16 +78,6 @@ Use MoSCoW prioritization with numbered requirements for traceability.
 
 Checklist of questions/answers to resolve
 
-### Files
-
-Modified or important context files. Update after modifications.
-
-* Exclude: generated files (`*.pb.go`, `*_grpc.pb.go`, wire), project docs
-* Include: crucial files even if unmodified
-* Format: `- **path/file.ext**: Purpose. Changes (if any).`
-* With sub-docs: use shorter descriptions, reference sub-doc for details
-* Never replace files list with redirects like "See [sub-doc] for details"
-
 ### Tasks
 
 Flat checkmark list of work items.
@@ -135,9 +125,13 @@ Implement OAuth2 flow with JWT tokens. Adds login/logout endpoints and session m
 * Never remove useful info from completed tasks
 * Propose `/proj-split` at 15+ items or completed phase with 5+ items
 
-### Pull Requests (optional)
+### Files
 
-* Start "In this PR, I implemented..." + high-level technical overview
-* Focus on capability, not implementation details
-* Use system/component terms; avoid function names/algorithms
-* Omit test plans and generated attribution
+Modified or important context files. Update after modifications.
+
+* Exclude: generated files (`*.pb.go`, `*_grpc.pb.go`, wire), project docs
+* Include: crucial files even if unmodified
+* Format: `- **path/file.ext**: Purpose. Changes (if any).`
+* With sub-docs: use shorter descriptions, reference sub-doc for details
+* Never replace files list with redirects like "See [sub-doc] for details"
+

@@ -2,6 +2,7 @@
 name: pr-import-comments
 description: Import unresolved PR review comments as inline code comments with metadata for replies
 context: fork
+model: haiku
 ---
 
 # PR Import Comments
