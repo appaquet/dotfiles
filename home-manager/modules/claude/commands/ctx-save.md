@@ -30,6 +30,8 @@ Project files: !`ls "$PROJECT_ROOT/proj/" 2>/dev/null || echo "No project files"
    * This helps resume work quickly in future sessions
 
 5. Update context and requirements sections if needed based on new discoveries
+   * Maintain MoSCoW structure and Rn numbering in requirements
+   * Add new requirements with next available number
 
 If there are anything that you feel you should have known about the repository and the codebase, let
 me know what you propose as modifications to the rules and documentation to improve the process.

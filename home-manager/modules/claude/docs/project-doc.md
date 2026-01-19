@@ -35,7 +35,30 @@ Purpose and scope of changes
 
 ### Requirements (optional)
 
-Specific requirements
+Use MoSCoW prioritization with numbered requirements for traceability.
+
+**Format:**
+
+```markdown
+#### Must Have
+* R1: Core feature description
+  * R1.1: Sub-requirement if hierarchical
+* R2: Another essential feature
+
+#### Should Have
+* R3: Important but not blocking
+
+#### Could Have
+* R4: Nice to have
+
+#### Won't Have (this scope)
+* R5: Explicitly out of scope
+```
+
+**Rules:**
+* Number requirements sequentially (R1, R2, R3...) with sub-levels (R1.1, R1.2) when needed
+* TODOs reference requirements they address: `- [ ] Implement X (R1, R2.1)`
+* "Won't Have" explicitly scopes what's excluded to prevent scope creep
 
 ### Questions (optional)
 
