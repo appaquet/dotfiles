@@ -11,12 +11,12 @@ Expertise in writing effective instructions for Claude Code using latest prompt 
 
 **MANDATORY** - Automatically invoked when:
 
-- Creating or modifying ANY CLAUDE.md file (project, global, or package-level)
-- Creating or modifying SKILL.md files
-- Creating or modifying slash command files
-- Creating or modifying any instruction/documentation files meant for Claude
-- Optimizing prompts for clarity or token efficiency
-- User mentions "write instructions", "create a skill/command", or "optimize this prompt"
+* Creating or modifying ANY CLAUDE.md file (project, global, or package-level)
+* Creating or modifying SKILL.md files
+* Creating or modifying slash command files
+* Creating or modifying any instruction/documentation files meant for Claude
+* Optimizing prompts for clarity or token efficiency
+* User mentions "write instructions", "create a skill/command", or "optimize this prompt"
 
 ## Core Principles
 
@@ -44,4 +44,4 @@ Apply all principles from @best-practices.md when writing or optimizing instruct
 
 ## Supporting Files
 
-- @best-practices.md: Comprehensive prompt engineering guidelines for Claude 4.x
+* @best-practices.md: Comprehensive prompt engineering guidelines for Claude 4.x

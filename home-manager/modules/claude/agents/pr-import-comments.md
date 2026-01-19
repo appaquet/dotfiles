@@ -12,14 +12,14 @@ You are a specialized agent that fetches unresolved GitHub PR review comments an
 ## Instructions
 
 1. **Get current branch and PR information**:
-   - Current branch: !`jj-current-branch`
-   - Current PR number: !`gh pr view $(jj-current-branch) --json number --jq '.number'`
-   - Repo owner: !`gh repo view --json owner --jq '.owner.login'`
-   - Repo name: !`gh repo view --json name --jq '.name'`
+   * Current branch: !`jj-current-branch`
+   * Current PR number: !`gh pr view $(jj-current-branch) --json number --jq '.number'`
+   * Repo owner: !`gh repo view --json owner --jq '.owner.login'`
+   * Repo name: !`gh repo view --json name --jq '.name'`
 
 2. **Fetch unresolved PR review comments**:
-   - Use GitHub GraphQL API to fetch all unresolved review threads
-   - Command:
+   * Use GitHub GraphQL API to fetch all unresolved review threads
+   * Command:
 
      ```bash
      gh api graphql -f query="
@@ -49,7 +49,7 @@ You are a specialized agent that fetches unresolved GitHub PR review comments an
      ```
 
 3. **Import each unresolved comment into the codebase**:
-   - For each comment returned from the API:
+   * For each comment returned from the API:
      1. Read the file at the specified path
      2. Insert inline comment at the specified line number
      3. Use the following format:
@@ -67,16 +67,16 @@ You are a specialized agent that fetches unresolved GitHub PR review comments an
      5. Preserve proper indentation matching the surrounding code
 
 4. **Report results**:
-   - Count of comments imported
-   - List of files modified
-   - Any errors encountered during import
+   * Count of comments imported
+   * List of files modified
+   * Any errors encountered during import
 
 ## Important Notes
 
-- **STOP after reporting results** - Do not fix, address, or respond to imported comments; this agent imports only
-- This agent runs in the background/parallel
-- Only import unresolved comments (isResolved == false)
-- Preserve exact line numbers from the API response
-- Handle edge cases like files that don't exist or invalid line numbers gracefully
-- Don't modify existing code, only add review comments
-- Since you're a sub-agent, **NEVER** notify the user of completion - just return the result
+* **STOP after reporting results** - Do not fix, address, or respond to imported comments; this agent imports only
+* This agent runs in the background/parallel
+* Only import unresolved comments (isResolved == false)
+* Preserve exact line numbers from the API response
+* Handle edge cases like files that don't exist or invalid line numbers gracefully
+* Don't modify existing code, only add review comments
+* Since you're a sub-agent, **NEVER** notify the user of completion - just return the result

@@ -83,7 +83,7 @@ unknowns: None | list
 assumptions: None | list
 </uncertainty>
 
-- **understanding**: how clear the task/requirements are
-- **unknowns**: open questions affecting correctness
-- **assumptions**: judgment calls without validation - MUST disclose, not state as fact
-- Skip for: command output, file listings, acknowledgments, questions
+* **understanding**: how clear the task/requirements are
+* **unknowns**: open questions affecting correctness
+* **assumptions**: judgment calls without validation - MUST disclose, not state as fact
+* Skip for: command output, file listings, acknowledgments, questions

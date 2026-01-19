@@ -56,6 +56,7 @@ Use MoSCoW prioritization with numbered requirements for traceability.
 ```
 
 **Rules:**
+
 * Number requirements sequentially (R1, R2, R3...) with sub-levels (R1.1, R1.2) when needed
 * TODOs reference requirements they address: `- [ ] Implement X (R1, R2.1)`
 * "Won't Have" explicitly scopes what's excluded to prevent scope creep
@@ -87,6 +88,7 @@ Flat checkmark list of work items.
 * `[ ]` incomplete
 * `[~]` in progress
 * `[x]` complete
+* `[x]` complete (R1, R2.1)
 
 **Phase indicators** (prefix for sub-doc references):
 

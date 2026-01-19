@@ -23,10 +23,10 @@ Current project files: !`ls "$PROJECT_ROOT/proj/" 2>/dev/null || echo "No projec
 3. Determine phase name: 2-3 words describing the phase (e.g., "auth-validation", "api-endpoints").
 
 4. Determine the next available number:
-   - List existing sub-docs: `01-*.md`, `02-*.md`, etc.
-   - If inserting between existing docs, **ask user** which approach:
-     - **Sub-numbering**: Use `01a-`, `01b-`, etc. (no renaming needed)
-     - **Resequence**: Rename existing docs to make room (updates all cross-references)
+   * List existing sub-docs: `01-*.md`, `02-*.md`, etc.
+   * If inserting between existing docs, **ask user** which approach:
+     * **Sub-numbering**: Use `01a-`, `01b-`, etc. (no renaming needed)
+     * **Resequence**: Rename existing docs to make room (updates all cross-references)
 
 5. Create the sub-doc with:
    * Context (brief, reference parent `00-<project-name>.md` via relative link)

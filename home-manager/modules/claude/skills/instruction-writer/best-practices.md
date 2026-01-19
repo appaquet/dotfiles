@@ -8,10 +8,10 @@ Comprehensive guidelines for writing effective instructions, skills, slash comma
 
 **Find the smallest set of high-signal tokens that maximize desired outcomes.** Every token depletes the model's attention budget.
 
-- Start with minimal prompt using best available model
-- Add clarity and examples based on observed failures
-- Don't anticipate every edge case upfront
-- Remove meta-commentary and verbose explanations
+* Start with minimal prompt using best available model
+* Add clarity and examples based on observed failures
+* Don't anticipate every edge case upfront
+* Remove meta-commentary and verbose explanations
 
 **Instruction Budget**: LLMs reliably follow only 150-200 instructions. Claude Code's system prompt uses ~50, so CLAUDE.md should stay well under 150 instructions.
 
@@ -29,9 +29,9 @@ Explain *why* instructions matter—helps Claude understand goals.
 
 CLAUDE.md loads in every conversation. Include only instructions that apply to most tasks.
 
-- Move task-specific guidance to separate files Claude reads on-demand
-- If instruction applies to <50% of sessions, it doesn't belong in CLAUDE.md
-- The more irrelevant content, the more Claude filters out everything uniformly
+* Move task-specific guidance to separate files Claude reads on-demand
+* If instruction applies to <50% of sessions, it doesn't belong in CLAUDE.md
+* The more irrelevant content, the more Claude filters out everything uniformly
 
 ## Structured Prompting
 
@@ -40,16 +40,16 @@ Claude 4.x was trained to understand XML tags as cognitive containers, not just 
 ### XML Tags vs Markdown Headers
 
 **Use XML tags when**:
-- Complex multi-part tasks requiring explicit boundaries
-- Constraints that must be enforced (validation rules)
-- Preventing context bleed between sections
-- Chain-of-thought reasoning needs exposure
+* Complex multi-part tasks requiring explicit boundaries
+* Constraints that must be enforced (validation rules)
+* Preventing context bleed between sections
+* Chain-of-thought reasoning needs exposure
 
 **Use Markdown headers when**:
-- Simple, linear structure
-- Human-readable documentation
-- Single-purpose files
-- Content flows naturally between sections
+* Simple, linear structure
+* Human-readable documentation
+* Single-purpose files
+* Content flows naturally between sections
 
 ### Tag Hierarchy and Priority
 
@@ -112,9 +112,9 @@ Canonical examples demonstrating expected behavior
 ```
 
 Benefits:
-- Helps model parse intent effectively
-- Separates concerns (context vs. instructions vs. examples)
-- Improves token efficiency through clear boundaries
+* Helps model parse intent effectively
+* Separates concerns (context vs. instructions vs. examples)
+* Improves token efficiency through clear boundaries
 
 ## Writing Style
 
@@ -130,9 +130,9 @@ Claude 4.x excels with clear, specific instructions.
 
 ### Action Language
 
-- Use "Change X" not "Can you suggest changes to X"
-- Default to imperative mood: "Do X" not "You should do X"
-- Avoid tentative phrasing: "Fix the bug" not "Maybe you could look at fixing the bug"
+* Use "Change X" not "Can you suggest changes to X"
+* Default to imperative mood: "Do X" not "You should do X"
+* Avoid tentative phrasing: "Fix the bug" not "Maybe you could look at fixing the bug"
 
 ### Reverse Negatives
 
@@ -144,17 +144,17 @@ Claude 4.x excels with clear, specific instructions.
 
 The formatting style of your prompt influences response formatting.
 
-- Remove markdown from prompts to reduce markdown in responses
-- Use prose in prompts to encourage prose in responses
-- "Write in prose rather than lists unless presenting truly discrete items where list format is best option"
+* Remove markdown from prompts to reduce markdown in responses
+* Use prose in prompts to encourage prose in responses
+* "Write in prose rather than lists unless presenting truly discrete items where list format is best option"
 
 ### Minimize Verbosity
 
 Claude 4.5 is naturally concise. Reinforce when needed:
 
-- "Provide fact-based progress reports without unnecessary verbosity"
-- "No superlatives or excessive praise"
-- "Never say 'You're absolutely right!' - just do the work"
+* "Provide fact-based progress reports without unnecessary verbosity"
+* "No superlatives or excessive praise"
+* "Never say 'You're absolutely right!' - just do the work"
 
 ## Examples
 
@@ -164,10 +164,10 @@ Provide diverse, representative examples rather than exhaustive exception lists.
 
 **Key Guidelines**:
 
-- Claude 4.x pays close attention to details in examples
-- Ensure examples align perfectly with desired behaviors
-- Models are highly sensitive to subtle patterns in examples
-- 1-2 well-chosen examples better than many redundant ones
+* Claude 4.x pays close attention to details in examples
+* Ensure examples align perfectly with desired behaviors
+* Models are highly sensitive to subtle patterns in examples
+* 1-2 well-chosen examples better than many redundant ones
 
 **Format**:
 
@@ -192,18 +192,18 @@ Verbose, vague instruction that leads to confusion
 
 ### Scrutinize Your Examples
 
-- Do they demonstrate the exact behavior you want?
-- Are there subtle patterns that could mislead?
-- Do they cover the most common use cases (not rare edge cases)?
+* Do they demonstrate the exact behavior you want?
+* Are there subtle patterns that could mislead?
+* Do they cover the most common use cases (not rare edge cases)?
 
 ## Instruction Types
 
 ### CLAUDE.md Structure
 
 **WHY, WHAT, HOW**:
-- **WHAT**: Tech stack, project structure, monorepo layout
-- **WHY**: Project purpose, component functions, design rationale
-- **HOW**: Build commands, test procedures, verification steps
+* **WHAT**: Tech stack, project structure, monorepo layout
+* **WHY**: Project purpose, component functions, design rationale
+* **HOW**: Build commands, test procedures, verification steps
 
 **Progressive Disclosure**:
 
@@ -221,8 +221,8 @@ CLAUDE.md points to these files; Claude reads relevant ones per-task.
 
 **What NOT to Include**:
 
-- Don't auto-generate via `/init`. Each line affects every interaction—manually craft content.
-- Don't embed code snippets. Prefer `file:line` references over code copies. Snippets become outdated; references stay accurate.
+* Don't auto-generate via `/init`. Each line affects every interaction—manually craft content.
+* Don't embed code snippets. Prefer `file:line` references over code copies. Snippets become outdated; references stay accurate.
 
 ### Skills (SKILL.md)
 
@@ -250,39 +250,39 @@ Clear steps for different scenarios.
 
 ## Supporting Files
 
-- @referenced-file.md: Purpose
+* @referenced-file.md: Purpose
 ```
 
 **Description Guidelines**:
 
-- Make specific and discoverable
-- Include file types/formats (PDF, .xlsx, etc.)
-- List concrete capabilities
-- Specify trigger phrases users would naturally say
-- Bad: "Helps with documents"
-- Good: "Extract text and tables from PDF files, fill forms, merge documents. Use when working with PDFs or mentioning document extraction."
+* Make specific and discoverable
+* Include file types/formats (PDF, .xlsx, etc.)
+* List concrete capabilities
+* Specify trigger phrases users would naturally say
+* Bad: "Helps with documents"
+* Good: "Extract text and tables from PDF files, fill forms, merge documents. Use when working with PDFs or mentioning document extraction."
 
 **SKILL.md vs Supporting Files**:
 
 Claude Code uses **progressive disclosure** - SKILL.md loads on activation, supporting files load only when referenced.
 
 **SKILL.md should contain**:
-- Quick-start guidance Claude needs immediately
-- Essential instructions and workflow steps
-- Concrete usage examples
-- References to supporting files with @filename.md
+* Quick-start guidance Claude needs immediately
+* Essential instructions and workflow steps
+* Concrete usage examples
+* References to supporting files with @filename.md
 
 **Supporting files handle**:
-- Extended documentation (best-practices.md, reference.md)
-- Additional examples (examples.md)
-- Detailed API specifications
-- Utility scripts and templates
+* Extended documentation (best-practices.md, reference.md)
+* Additional examples (examples.md)
+* Detailed API specifications
+* Utility scripts and templates
 
 **Avoiding Duplication**:
-- Keep detailed principles in supporting files
-- SKILL.md provides brief overview with cross-references
-- Example: "Apply principles from @best-practices.md" instead of repeating them
-- Pattern: "For detailed X, see @reference.md"
+* Keep detailed principles in supporting files
+* SKILL.md provides brief overview with cross-references
+* Example: "Apply principles from @best-practices.md" instead of repeating them
+* Pattern: "For detailed X, see @reference.md"
 
 ### Slash Commands
 
@@ -314,10 +314,10 @@ Target: $ARGUMENTS (if applicable)
 
 **Command Guidelines**:
 
-- Front-load critical rules (STOP points, approval gates)
-- Use phases for multi-step workflows
-- Single emphasis level (CRITICAL or Important, not both)
-- Imperative mood throughout
+* Front-load critical rules (STOP points, approval gates)
+* Use phases for multi-step workflows
+* Single emphasis level (CRITICAL or Important, not both)
+* Imperative mood throughout
 
 ### Memory Files (docs/*.md)
 
@@ -328,9 +328,9 @@ Brief context.
 
 ## Subsection
 
-- Concise bullet points
-- Avoid prose where lists suffice
-- One emphasis level (CRITICAL for critical items)
+* Concise bullet points
+* Avoid prose where lists suffice
+* One emphasis level (CRITICAL for critical items)
 
 ## Examples
 
@@ -341,8 +341,8 @@ Assistant: ideal response
 
 ## Important Notes
 
-- Front-load critical rules
-- Reference other docs: @docs/filename.md
+* Front-load critical rules
+* Reference other docs: @docs/filename.md
 ```
 
 ## Quality & Reliability
@@ -363,34 +363,34 @@ Assistant: ideal response
 
 For skills that use tools:
 
-- Tools should be self-contained and robust to error
-- Avoid overlapping tool functionality
-- Curated minimal viable set enables better maintenance
-- Use `allowed-tools` to restrict access when appropriate
+* Tools should be self-contained and robust to error
+* Avoid overlapping tool functionality
+* Curated minimal viable set enables better maintenance
+* Use `allowed-tools` to restrict access when appropriate
 
 ## Optimization Workflow
 
 When optimizing existing instructions:
 
 1. **Analysis Phase**
-   - Read target file and all linked files (@docs references)
-   - Identify issues: verbosity, unclear structure, weak examples, cross-file redundancy
-   - Compare against these best practices
-   - List specific issues with examples
-   - Show before/after for key changes
-   - Estimate token savings
+   * Read target file and all linked files (@docs references)
+   * Identify issues: verbosity, unclear structure, weak examples, cross-file redundancy
+   * Compare against these best practices
+   * List specific issues with examples
+   * Show before/after for key changes
+   * Estimate token savings
 
 2. **Wait for Approval**
 
 3. **Implementation Phase**
-   - Apply optimizations systematically
-   - Remove meta-commentary
-   - Consolidate redundant examples
-   - Convert prose to lists/tables where clearer
-   - Use imperative mood
-   - Front-load critical rules
-   - Single emphasis level
-   - **Preserve all salient information**
+   * Apply optimizations systematically
+   * Remove meta-commentary
+   * Consolidate redundant examples
+   * Convert prose to lists/tables where clearer
+   * Use imperative mood
+   * Front-load critical rules
+   * Single emphasis level
+   * **Preserve all salient information**
 
 ## Common Anti-Patterns
 
@@ -423,7 +423,7 @@ When optimizing existing instructions:
 
 ## References
 
-- [Claude 4.x Best Practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-4-best-practices)
-- [Effective Context Engineering for AI Agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
-- [Claude Code Skills Documentation](https://code.claude.com/docs/en/skills.md)
-- [Writing a Good CLAUDE.md](https://www.humanlayer.dev/blog/writing-a-good-claude-md)
+* [Claude 4.x Best Practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-4-best-practices)
+* [Effective Context Engineering for AI Agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
+* [Claude Code Skills Documentation](https://code.claude.com/docs/en/skills.md)
+* [Writing a Good CLAUDE.md](https://www.humanlayer.dev/blog/writing-a-good-claude-md)

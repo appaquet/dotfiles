@@ -17,9 +17,9 @@ Apply @instruction-writer best practices for all changes.
 1. If issue empty, use `AskUserQuestion` to get description
 
 2. Ultrathink: analyze conversation
-   - Specific error/behavior?
-   - Root cause (wrong assumption, missing context, unclear instruction)?
-   - Which instruction file(s) could prevent this?
+   * Specific error/behavior?
+   * Root cause (wrong assumption, missing context, unclear instruction)?
+   * Which instruction file(s) could prevent this?
 
 3. Summarize findings; use `AskUserQuestion` if unclear
 
@@ -32,5 +32,5 @@ Apply @instruction-writer best practices for all changes.
 **STOP** - Use `AskUserQuestion` to confirm changes.
 
 **If approved:**
-- Create jj change
-- Apply changes
+* Create jj change
+* Apply changes

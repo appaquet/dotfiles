@@ -51,8 +51,8 @@ gh api repos/OWNER/REPO/pulls/${PR_NUMBER}/comments/${DATABASE_ID}/replies \
 
 **Verify response includes:**
 
-- ✅ `"in_reply_to_id": 1234567890` (matches your DATABASE_ID)
-- ✅ Reply appears in PR conversation thread
+* ✅ `"in_reply_to_id": 1234567890` (matches your DATABASE_ID)
+* ✅ Reply appears in PR conversation thread
 
 **Remove inline comment** after successful reply:
 
@@ -66,6 +66,6 @@ gh api repos/OWNER/REPO/pulls/${PR_NUMBER}/comments/${DATABASE_ID}/replies \
 
 ## Troubleshooting
 
-- **404 Error**: Missing PR number in endpoint or wrong DATABASE_ID
-- **Not threaded**: Check `"in_reply_to_id"` field in response  
-- **New inline comment**: Used wrong endpoint format
+* **404 Error**: Missing PR number in endpoint or wrong DATABASE_ID
+* **Not threaded**: Check `"in_reply_to_id"` field in response
+* **New inline comment**: Used wrong endpoint format

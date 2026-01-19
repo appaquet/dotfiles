@@ -23,18 +23,18 @@ Comment out failing code/tests. Use `AskUserQuestion` for help.
 ## Before Completion
 
 Verify:
-- [ ] Initial plan/TODOs addressed
-- [ ] Diff reviewed (`jj-diff-working --git`)
-- [ ] Code style guidelines followed
-- [ ] Formatting, linting, tests pass (including affected modules)
-- [ ] Temporary debug files/code removed
-- [ ] Project doc updated (if exists)
+* [ ] Initial plan/TODOs addressed
+* [ ] Diff reviewed (`jj-diff-working --git`)
+* [ ] Code style guidelines followed
+* [ ] Formatting, linting, tests pass (including affected modules)
+* [ ] Temporary debug files/code removed
+* [ ] Project doc updated (if exists)
 
 ## When to Stop
 
 CRITICAL: For fundamental design problems, stop immediately:
-- Architectural mismatches (mutable vs immutable, incompatible structures)
-- API incompatibilities requiring redesign
-- Multiple failed workarounds
-- No workarounds/reverts/continued coding - ask for help
-- Never claim completion if incomplete
+* Architectural mismatches (mutable vs immutable, incompatible structures)
+* API incompatibilities requiring redesign
+* Multiple failed workarounds
+* No workarounds/reverts/continued coding - ask for help
+* Never claim completion if incomplete

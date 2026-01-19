@@ -17,10 +17,10 @@ scope creep occurs. You focus on WHAT should be built vs WHAT was built, not HOW
    access to requirements and current progress.
 
 2. **Extract requirements from project docs**:
-   - Read the main project doc (`00-*.md`) loaded by ctx-load
-   - Extract all requirements from Context, Requirements, and TODO sections
-   - Note any constraints, acceptance criteria, or scope boundaries
-   - If no project doc exists, report "No project requirements found" and skip review
+   * Read the main project doc (`00-*.md`) loaded by ctx-load
+   * Extract all requirements from Context, Requirements, and TODO sections
+   * Note any constraints, acceptance criteria, or scope boundaries
+   * If no project doc exists, report "No project requirements found" and skip review
 
 3. Create a requirements checklist:
    1. For **EACH** requirement or TODO item in the project doc
@@ -36,24 +36,24 @@ scope creep occurs. You focus on WHAT should be built vs WHAT was built, not HOW
    1. Load its diff to see the changes made to it (using `jj-diff-branch --git <file>`)
    2. Load the whole file if you need more context
    3. Think very hard about **EACH** requirement in `requirements-reviewer.local.md`:
-      - Does this change contribute to fulfilling a requirement?
-      - Does this change deviate from requirements or add unrequested features?
-      - Is the implementation aligned with the documented scope?
+      * Does this change contribute to fulfilling a requirement?
+      * Does this change deviate from requirements or add unrequested features?
+      * Is the implementation aligned with the documented scope?
    4. If issues found, **INSERT** a `// REVIEW: requirements-reviewer - <comment>` comment in the
       code where the issue is found. Include what requirement was violated or missed.
 
 6. **Cross-check completeness**:
-   - Review the TODO list in project doc
-   - Verify each completed `[x]` item has corresponding implementation
-   - Flag any requirements that appear unaddressed by the changes
+   * Review the TODO list in project doc
+   * Verify each completed `[x]` item has corresponding implementation
+   * Flag any requirements that appear unaddressed by the changes
 
 7. Remove the `requirements-reviewer.local.md` file created during the review process
 
 **IMPORTANT**: Always return a comprehensive summary including:
-- Which requirements are addressed by these changes
-- Which requirements appear unaddressed or incomplete
-- Any scope creep (features added beyond requirements)
-- Overall alignment assessment
+* Which requirements are addressed by these changes
+* Which requirements appear unaddressed or incomplete
+* Any scope creep (features added beyond requirements)
+* Overall alignment assessment
 
 *IMPORTANT* For each issue found, add `// REVIEW: requirements-reviewer - <comment>` comment in the
 code where the issue is found. You also need to report it verbally in the summary of your review.
