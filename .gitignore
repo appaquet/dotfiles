@@ -7,3 +7,7 @@ result
 .opencode
 docs/features
 *.local.*
+
+secrets/
+dotblip/
+humanfirst-dots/
