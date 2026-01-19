@@ -1,6 +1,6 @@
 [submodule "secrets"]
 	path = secrets
-	url = github:appaquet/dotfiles-secrets
+	url = git@github.com:appaquet/dotfiles-secrets.git
 	branch = main
 	update = rebase
 [submodule "shared-dotfiles"]
@@ -8,4 +8,4 @@
 	url = git@github.com:zia-ai/shared-dotfiles.git
 [submodule "dotblip"]
 	path = dotblip
-	url = github:appaquet/dotblip
+	url = git@github.com:appaquet/dotblip.git
