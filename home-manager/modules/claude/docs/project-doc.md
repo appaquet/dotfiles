@@ -124,6 +124,8 @@ Implement OAuth2 flow with JWT tokens. Adds login/logout endpoints and session m
 * Claude can mark tasks `[x]` after completing them
 * Claude NEVER marks phases ✅ → use `AskUserQuestion` to ask user
 * When resuming: if multiple items are `[~]` or 🔄, ask user which to focus on
+* Phase status is authoritative: report phases using their marker (⬜/🔄/✅), not inferred from tasks
+  - If all tasks `[x]` but phase still 🔄 → ask user if phase should be marked ✅
 
 **Management:**
 

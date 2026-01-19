@@ -21,8 +21,8 @@
 - Project/tasks management
   - `/proj-init`: Initialize project folder and main doc
   - `/proj-split`: Split a phase into a numbered sub-doc
-  - `/proj-desc`: Generate PR description for current branch
-  - `/proj-migrate`: Migrate existing PR.md project to new structure
+  - `/proj-tidy`: Validate and fix project doc consistency
+  - `/pr-desc`: Generate PR description for current branch
 
 - Reviewing
   - `/review-launch`: Launch review agents for code style, architecture and correctness
