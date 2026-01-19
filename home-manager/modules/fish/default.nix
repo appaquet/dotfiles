@@ -70,6 +70,7 @@
 
       l = "lsd";
       ll = "lsd -l";
+      llg = "lsd -lg"; # git status
     };
 
     shellAbbrs = {
