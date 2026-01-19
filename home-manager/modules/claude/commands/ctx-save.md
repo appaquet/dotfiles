@@ -23,7 +23,13 @@ Project files: !`ls "$PROJECT_ROOT/proj/" 2>/dev/null || echo "No project files"
    * Mark phases ✅ ONLY after `AskUserQuestion` confirms with user
    * Add any new tasks discovered during development
 
-4. Update context and requirements sections if needed based on new discoveries
+4. Update the "Last Session" section:
+   * Write 1-2 paragraph summary of work just completed
+   * Reference phase (if applicable) and specific tasks worked on
+   * Include next step if decided or obvious
+   * This helps resume work quickly in future sessions
+
+5. Update context and requirements sections if needed based on new discoveries
 
 If there are anything that you feel you should have known about the repository and the codebase, let
 me know what you propose as modifications to the rules and documentation to improve the process.

@@ -51,6 +51,10 @@ Modified or important context files. Update after modifications.
 * With sub-docs: use shorter descriptions, reference sub-doc for details
 * Never replace files list with redirects like "See [sub-doc] for details"
 
+### Last Session (optional)
+
+Brief 1-2 paragraph summary for resuming work. References phase (if applicable), tasks worked on, and next step if decided/obvious. Updated by `/ctx-save`, preserved until next save overwrites.
+
 ### TODO
 
 Flat checkmark list of work items.

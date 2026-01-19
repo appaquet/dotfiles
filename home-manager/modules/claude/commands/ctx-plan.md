@@ -40,4 +40,4 @@ Project files: !`ls "$PROJECT_ROOT/proj/" 2>/dev/null || echo "No project files"
    If still not 10/10, propose /ctx-improve to reach full understanding.
    Use `AskUserQuestion` to confirm any choices, uncertainties and assumptions made.
 
-8. **STOP** - Use `AskUserQuestion` to ask if user wants to proceed to implementation.
+8. **STOP** - The user will decide when to proceed to implementation.

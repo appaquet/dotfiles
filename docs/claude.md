@@ -16,6 +16,7 @@
   - `/ctx-save`: Save important context from conversation to project docs
   - `/ctx-plan`: Plan a high-level development plan for the task at hand
   - `/ctx-improve`: Improve context by asking clarifying questions to user
+  - `/ctx-check`: Check context understanding and output uncertainty disclosure
 
 - Project/tasks management
   - `/proj-init`: Initialize project folder and main doc
@@ -26,7 +27,7 @@
 - Reviewing
   - `/review-launch`: Launch review agents for code style, architecture and correctness
   - `/review-search`: Search for REVIEW comments in the codebase
-  - `/review-cat`: Categorize code review findings
+  - `/review-plan`: Create a review plan based on code changes
   - `/review-fix`: Fix code review findings
 
 - Instructions / Memory
@@ -43,3 +44,4 @@
 - `code-style-reviewer`: Reviews code for style, formatting, and syntax issues
 - `code-correctness-reviewer`: Reviews code for logic errors, bugs, and runtime issues
 - `architecture-reviewer`: Reviews code for architectural consistency and design patterns
+- `requirement-analyzer`: Analyzes project requirements and identifies potential gaps or ambiguities
