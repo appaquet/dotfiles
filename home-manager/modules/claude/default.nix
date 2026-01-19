@@ -24,7 +24,17 @@ let
   # ~/.claude.json so that we can keep all claude config in ~/.claude.
   claude-wrapped = pkgs.writeShellScriptBin "claude" ''
     export CLAUDE_CONFIG_DIR="${config.home.homeDirectory}/.claude"
+    export CLAUDE_ROOT="''${CLAUDE_PROJECT_DIR:-$(pwd)}"
     exec ${claude-code}/bin/claude "$@"
+  '';
+
+  # Utility to list project docs (avoids shell expansion issues in skill commands)
+  claude-proj-docs = pkgs.writeShellScriptBin "claude-proj-docs" ''
+    if [ -d "''${CLAUDE_ROOT:-$(pwd)}/proj" ]; then
+      ls "''${CLAUDE_ROOT:-$(pwd)}/proj/"
+    else
+      echo "No project files"
+    fi
   '';
 in
 {
@@ -40,6 +50,7 @@ in
 
   home.packages = [
     claude-wrapped
+    claude-proj-docs
     pkgs.socat # required for sandboxing
   ]
   ++ lib.optionals pkgs.stdenv.isLinux [

@@ -11,7 +11,7 @@ Load as much context as possible about the project and task at hand.
 
 * Current branch: !`jj-current-branch`
 * List of changes in current branch and stacked branches: !`jj-stacked-stats`
-* Project files: !`ls "$PROJECT_ROOT/proj/" 2>/dev/null || echo "No project files"`
+* Project files: !`claude-proj-docs`
 
 ## Instructions
 

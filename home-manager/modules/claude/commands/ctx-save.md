@@ -7,7 +7,7 @@ description: Update project doc with current state, files, and Tasks progress
 
 Save current project context into project docs while respecting established structure.
 
-Project files: !`ls "$PROJECT_ROOT/proj/" 2>/dev/null || echo "No project files"`
+Project files: !`claude-proj-docs`
 
 ## Instructions
 
