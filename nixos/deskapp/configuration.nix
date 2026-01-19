@@ -88,6 +88,16 @@
   services.printing.enable = false;
   services.openssh.enable = true;
 
+  programs.chromium = {
+    enable = true;
+    extensions = [
+      "fcoeoabgfeneiglbffodgkkbkcdhcgfn" # claude
+    ];
+  };
+  environment.systemPackages = with pkgs; [
+    chromium
+  ];
+
   sops.secrets.nasapp_cifs.sopsFile = config.sops.secretsFiles.home;
   nasapp = {
     enable = true;
