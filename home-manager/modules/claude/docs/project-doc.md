@@ -33,6 +33,10 @@ Keep sections in order described below.
 
 Purpose and scope of changes
 
+### Checkpoint (optional)
+
+Brief 1-2 paragraph summary for resuming work. References phase (if applicable), tasks worked on, and next step if decided/obvious. Updated by `/ctx-save`, preserved until next save overwrites.
+
 ### Requirements (optional)
 
 Use MoSCoW prioritization with numbered requirements for traceability.
@@ -41,25 +45,34 @@ Use MoSCoW prioritization with numbered requirements for traceability.
 
 ```markdown
 #### Must Have
-* R1: Core feature description
+* R1: ⬜ Core feature description (Phase 1)
   * R1.1: Sub-requirement if hierarchical
-* R2: Another essential feature
+* R2: 🔄 Another essential feature (Phase 2)
 
 #### Should Have
-* R3: Important but not blocking
+* R3: ✅ Important but not blocking (Phase 1)
 
 #### Could Have
-* R4: Nice to have
+* R4: ⬜ Nice to have
 
 #### Won't Have (this scope)
 * R5: Explicitly out of scope
 ```
 
+**Requirement status markers:**
+
+* `⬜` - Not started
+* `🔄` - In progress
+* `✅` - Complete
+
 **Rules:**
 
 * Number requirements sequentially (R1, R2, R3...) with sub-levels (R1.1, R1.2) when needed
-* TODOs reference requirements they address: `- [ ] Implement X (R1, R2.1)`
-* "Won't Have" explicitly scopes what's excluded to prevent scope creep
+* Status marker follows requirement number: `R1: ⬜ Description`
+* Phase annotation links requirement to task phase: `(Phase 1)` or `(Phase: Auth)`
+* Tasks reference requirements they address: `* [ ] Implement X (R1, R2.1)`
+* "Won't Have" items don't need status markers
+* When phase completes, update all linked requirements to ✅
 
 ### Questions (optional)
 
@@ -75,11 +88,7 @@ Modified or important context files. Update after modifications.
 * With sub-docs: use shorter descriptions, reference sub-doc for details
 * Never replace files list with redirects like "See [sub-doc] for details"
 
-### Last Session (optional)
-
-Brief 1-2 paragraph summary for resuming work. References phase (if applicable), tasks worked on, and next step if decided/obvious. Updated by `/ctx-save`, preserved until next save overwrites.
-
-### TODO
+### Tasks
 
 Flat checkmark list of work items.
 
@@ -121,7 +130,7 @@ Implement OAuth2 flow with JWT tokens. Adds login/logout endpoints and session m
 * Update after starting/completing; detail sufficient for pickup
 * If split into sub-doc, update both main and sub-doc
 * Each item = discrete, independent work unit
-* Never remove useful info from completed TODOs
+* Never remove useful info from completed tasks
 * Propose `/proj-split` at 15+ items or completed phase with 5+ items
 
 ### Pull Requests (optional)

@@ -18,12 +18,12 @@ scope creep occurs. You focus on WHAT should be built vs WHAT was built, not HOW
 
 2. **Extract requirements from project docs**:
    * Read the main project doc (`00-*.md`) loaded by ctx-load
-   * Extract all requirements from Context, Requirements, and TODO sections
+   * Extract all requirements from Context, Requirements, and Tasks sections
    * Note any constraints, acceptance criteria, or scope boundaries
    * If no project doc exists, report "No project requirements found" and skip review
 
 3. Create a requirements checklist:
-   1. For **EACH** requirement or TODO item in the project doc
+   1. For **EACH** requirement or task in the project doc
    2. For **EACH** constraint or scope boundary mentioned
    3. Write to `requirements-reviewer.local.md` in a TODO list format
 
@@ -43,9 +43,13 @@ scope creep occurs. You focus on WHAT should be built vs WHAT was built, not HOW
       code where the issue is found. Include what requirement was violated or missed.
 
 6. **Cross-check completeness**:
-   * Review the TODO list in project doc
+   * Review the Tasks list in project doc
    * Verify each completed `[x]` item has corresponding implementation
    * Flag any requirements that appear unaddressed by the changes
+   * Verify requirement status markers (⬜/🔄/✅) match phase status:
+     * Requirements linked to ✅ phases should be marked ✅
+     * Requirements linked to 🔄 phases should be marked 🔄
+   * Flag mismatched requirement/phase status as issues
 
 7. Remove the `requirements-reviewer.local.md` file created during the review process
 
@@ -70,9 +74,10 @@ Incorrect ❌
 ## Agent specific checklist
 
 * Implementation matches documented requirements
-* No missing requirements from the TODO list
+* No missing requirements from the Tasks list
 * No scope creep (unrequested features or changes)
 * Changes align with stated project context and goals
 * Constraints and boundaries are respected
 * Acceptance criteria (if documented) are met
-* Project doc TODO items marked complete have corresponding implementation
+* Project doc tasks marked complete have corresponding implementation
+* Requirement status markers (⬜/🔄/✅) match linked phase status

@@ -34,7 +34,7 @@ Project files: !`ls "$PROJECT_ROOT/proj/" 2>/dev/null || echo "No project files"
 6. Write plan to project doc (per @docs/project-doc.md structure):
    * Context section describing the task
    * Requirements section using MoSCoW format with numbered items (R1, R2, R1.1)
-   * TODO section with planned work items referencing requirements (e.g., "Implement X (R1, R2.1)")
+   * Tasks section with planned work items referencing requirements (e.g., "Implement X (R1, R2.1)")
    * Files section with relevant files
 
 7. Tell me your understanding of the task on a 10/10 scale.

@@ -18,14 +18,14 @@ We want to review and fix the REVIEW comments I've left in the code.
 3. **ALWAYS** create an action plan:
    * Build internal TODO list from review comments
    * Create a new empty jj change on which to make the fixes
-   * Update project doc TODO section with identified tasks
+   * Update project doc Tasks section with identified tasks
    * Prioritize tasks based on dependencies
 
 4. Execute tasks systematically:
    * Address each task one by one
    * Always make sure you fully understand the context before making changes
    * Remove associated review comments after completion
-   * Update project doc TODO section progress as you go
+   * Update project doc Tasks section progress as you go
 
 5. Final verification:
    * Search again for any remaining review comments

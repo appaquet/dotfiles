@@ -1,6 +1,6 @@
 ---
 name: ctx-save
-description: Update project doc with current state, files, and TODO progress
+description: Update project doc with current state, files, and Tasks progress
 ---
 
 # Save Context
@@ -18,12 +18,13 @@ Project files: !`ls "$PROJECT_ROOT/proj/" 2>/dev/null || echo "No project files"
    * Launch the `branch-diff-summarizer` agent to analyze changed files
    * Update project doc with agent's output (format per @docs/project-doc.md)
 
-3. Update the TODO section (format per @docs/project-doc.md):
+3. Update the Tasks section (format per @docs/project-doc.md):
    * Mark completed tasks as `[x]` (no approval needed)
    * Mark phases ✅ ONLY after `AskUserQuestion` confirms with user
    * Add any new tasks discovered during development
+   * When marking a phase complete, update all linked requirements to ✅
 
-4. Update the "Last Session" section:
+4. Update the "Checkpoint" section:
    * Write 1-2 paragraph summary of work just completed
    * Reference phase (if applicable) and specific tasks worked on
    * Include next step if decided or obvious

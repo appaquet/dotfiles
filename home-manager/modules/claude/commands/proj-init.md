@@ -34,7 +34,7 @@ Unless project instructions specify otherwise:
 
 4. Create `00-<project-name>.md` with appropriate sections:
    * Include Requirements section using MoSCoW format (Must/Should/Could/Won't Have)
-   * Number requirements (R1, R2, R1.1) for TODO traceability
+   * Number requirements (R1, R2, R1.1) for Tasks traceability
    * Do NOT create sub-docs unless explicitly requested via `/proj-split` or after asking user
 
 5. After each Q&A, update the project doc and think hard about next questions.

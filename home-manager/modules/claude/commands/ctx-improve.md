@@ -23,6 +23,6 @@ Use the full understanding checklist and verify our full (10/10) understanding o
 
 4. Update project doc with new context gathered (if working on a planned task).
    * Organize requirements into MoSCoW priorities (Must/Should/Could/Won't Have)
-   * Number requirements (R1, R2, R1.1) for TODO traceability
+   * Number requirements (R1, R2, R1.1) for Tasks traceability
 
 5. **STOP** - Use `AskUserQuestion` to ask if user wants to proceed to implementation.
