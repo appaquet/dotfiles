@@ -20,6 +20,7 @@
       "Bash(jj-diff-working:*)",
       "Bash(jj-diff-branch:*)",
       "Bash(jj-stacked-stats:*)",
+      "Bash(claude-proj-docs:*)",
       "Bash(nix eval:*)",
       "Bash(nix build:*)",
       "Bash(nix flake:*)",
