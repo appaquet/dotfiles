@@ -50,8 +50,8 @@ require("which-key").add({
 
 local function lsp_document_symbols()
 	fzf.lsp_document_symbols({
-		-- Hide filepath and line:col, show only symbol (last tab-delimited field)
-		fzf_opts = { ["--delimiter"] = "\\t", ["--with-nth"] = "-1" },
+		-- Hide filepath and line:col, show symbol fields (last 2 tab-delimited fields)
+		fzf_opts = { ["--delimiter"] = "\\t", ["--with-nth"] = "-2.." },
 	})
 end
 
