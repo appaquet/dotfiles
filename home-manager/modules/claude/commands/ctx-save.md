@@ -31,8 +31,10 @@ Project files: !`claude-proj-docs`
    * This helps resume work quickly in future sessions
 
 5. Update context and requirements sections if needed based on new discoveries
+   * **Before adding requirements**: Read ALL existing requirements first. If a new discovery
+     relates to an existing requirement, update that requirement rather than creating a new one.
    * Maintain MoSCoW structure and Rn numbering in requirements
-   * Add new requirements with next available number
+   * Add new requirements with next available number only if truly new scope
 
 If there are anything that you feel you should have known about the repository and the codebase, let
 me know what you propose as modifications to the rules and documentation to improve the process.

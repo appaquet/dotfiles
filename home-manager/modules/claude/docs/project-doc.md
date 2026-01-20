@@ -39,6 +39,10 @@ Brief 1-2 paragraph summary for resuming work. References phase (if applicable),
 
 ### Requirements (optional)
 
+**Source of Truth:** Before creating/modifying requirements:
+1. Read ALL existing requirements in main doc
+2. Update existing rather than create parallel ones
+
 Use MoSCoW prioritization with numbered requirements for traceability.
 
 **Format:**
@@ -69,10 +73,20 @@ Use MoSCoW prioritization with numbered requirements for traceability.
 
 * Number requirements sequentially (R1, R2, R3...) with sub-levels (R1.1, R1.2) when needed
 * Status marker follows requirement number: `R1: ⬜ Description`
-* Phase annotation links requirement to task phase: `(Phase 1)` or `(Phase: Auth)`
+* Phase annotation by name: `(Phase: Auth)`, not number (phases may reorder)
 * Tasks reference requirements they address: `* [ ] Implement X (R1, R2.1)`
 * "Won't Have" items don't need status markers
 * When phase completes, update all linked requirements to ✅
+
+**Sub-doc / phase requirements:**
+
+Sub-docs may expand requirements with phase-specific details:
+
+* **Numbering**: Derive from parent R-number: `R5.A`, `R5.B` (never new top-level `R1`, `R2`)
+* **Main doc reference**: `R5: ⬜ Feature X (Phase: Auth, see R5.A-C in sub-doc)`
+* **No Requirements section needed**: If only implementing main doc requirements, reference in tasks
+  directly (e.g., `[ ] Implement X (R5)`)
+* **Alternative**: Keep all R-numbers in main doc; sub-docs only for phase-specific tasks
 
 ### Questions (optional)
 

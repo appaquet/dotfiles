@@ -32,6 +32,9 @@ Current project files: !`claude-proj-docs`
    * Context (brief, reference parent `00-<project-name>.md` via relative link)
    * Files (relevant to this phase)
    * Tasks (moved from main doc - preserve all details including completed items)
+   * **Requirements**: Only if expanding on main doc requirements. Sub-docs NEVER introduce new
+     top-level requirements - reference existing ones via `(R5)` in tasks or detail them as `R5.A`.
+     If no expansion needed, omit Requirements section entirely.
 
 6. Update main project doc:
    * Replace phase tasks with header + link + summary blurb (2-3 sentences):

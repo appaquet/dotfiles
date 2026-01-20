@@ -17,6 +17,9 @@ We want to review and fix the REVIEW comments I've left in the code.
 
 3. **ALWAYS** create an action plan:
    * Build internal TODO list from review comments
+   * **Requirement check**: Read ALL requirements in main doc. Verify tasks don't contradict
+     existing requirements - if a fix requires changing a requirement, update the existing one
+     rather than creating a new one.
    * Create a new empty jj change on which to make the fixes
    * Update project doc Tasks section with identified tasks
    * Prioritize tasks based on dependencies

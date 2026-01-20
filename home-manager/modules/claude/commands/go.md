@@ -8,6 +8,9 @@ description: Proceed to implementation of the plan or task at hand
 1. Make sure you have a crystal clear understanding of the task at hand. If not, use the
    `/ctx-improve` command to ask clarifying questions until you do.
 
+   **Requirement check**: Read ALL requirements in main project doc. Verify the task aligns with
+   existing requirements - if it contradicts or overlaps with one, clarify before proceeding.
+
 2. Load your internal TODO list with all tasks to be done, including implementation, testing,
    validation (ask for next step). Include a task to update the project documentation after sizable
    amounts of work.
