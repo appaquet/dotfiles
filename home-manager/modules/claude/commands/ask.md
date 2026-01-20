@@ -15,6 +15,7 @@ Topic: $ARGUMENTS
 1. If topic empty or unclear, use `AskUserQuestion` to clarify.
 
 2. Ultrathink. Research (files, code, web) only if the question requires it.
+   Consider launching sub-agents to explore codebase, find patterns if needed.
 
 3. Provide analysis, opinions, alternatives. Challenge assumptions.
 

@@ -77,6 +77,10 @@ Use MoSCoW prioritization with numbered requirements for traceability.
 * Tasks reference requirements they address: `* [ ] Implement X (R1, R2.1)`
 * "Won't Have" items don't need status markers
 * When phase completes, update all linked requirements to ✅
+* When requirements have logical groupings (e.g., "API Operations", "Data Model"), add new
+  requirements to the appropriate group rather than creating standalone entries elsewhere
+* When promoting a Could Have item to active work, relocate it to the appropriate Must Have/Should
+  Have section based on its type (e.g., an API endpoint moves to "API Operations")
 
 **Sub-doc / phase requirements:**
 

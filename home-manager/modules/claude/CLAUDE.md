@@ -12,11 +12,14 @@
 * Call `/ctx-load` before work/commands to ensure all relevant context loaded
 * Plan and track work using project docs
 * Consider: edge cases, alternatives, reusability, existing patterns, bigger picture
-* After context compaction ("continued from previous conversation"): ALWAYS call `/ctx-load` first
-  and then continue with your work if that was the intended next step
 * Ambiguous references ("that/this/it"): STOP, ask which specific thing (IDE selection may be missing)
 * User answers with questions ("would this work?", "makes sense?"): investigate/analyze first, don't jump to implementation
-* When summarizing conversation for compaction, always include the reference to project doc and phase (`@proj/...`)
+* When summarizing conversation for compaction, **always** include the reference to project doc and
+  phase (@proj/..., where prefix path with `@` very important to make sure we automatically
+  reference the file)
+* After context compaction ("continued from previous conversation"): ALWAYS call `/ctx-load` as your
+  FIRST action before any other response, even if the user sends a greeting or simple message. Then
+  continue with your work if that was the intended next step.
 
 ## Instructions files
 

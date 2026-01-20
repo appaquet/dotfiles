@@ -45,6 +45,7 @@
       "Read(/tmp/**)",
       "Edit(/tmp/**)",
       "Read(/nix/**)",
+
       "WebSearch",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:api.github.com)",
@@ -56,16 +57,29 @@
       "WebFetch(domain:code.claude.com)",
       "WebFetch(domain:www.anthropic.com)",
       "WebFetch(domain:wiki.nixos.org)",
+
       "Skill(instruction-writer)",
+
       "SlashCommand(/ctx-load)",
       "Skill(ctx-load)",
+      "SlashCommand(/ctx-save)",
+      "Skill(ctx-save)",
       "SlashCommand(/review-search)",
-      "Skill(review-search)",
-      "SlashCommand(/review-cat)",
-      "Skill(review-cat)"
+      "Skill(review-search)"
     ]
   },
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"additionalContext\": \"COMPACTION JUST OCCURRED. You MUST run /ctx-load NOW before any other action to reload project context.\"}'"
+          }
+        ]
+      }
+    ],
     "Notification": [
       {
         "matcher": "",
