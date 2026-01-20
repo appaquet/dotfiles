@@ -130,6 +130,13 @@
       {
         name = "utm";
       }
+
+      {
+        name = "yubico-authenticator";
+      }
+      {
+        name = "claude";
+      }
     ];
   };
 }
