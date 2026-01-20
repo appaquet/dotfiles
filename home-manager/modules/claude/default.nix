@@ -43,6 +43,29 @@ let
     fi
   '';
 
+  # Toggle tmux window indicator when Claude is working (used by hooks)
+  claude-tmux-indicator = pkgs.writeShellScriptBin "claude-tmux-indicator" ''
+    [ -z "$TMUX" ] && exit 0
+
+    WORKING=" 🔄"
+    PERMISSION=" 🔐"
+    CURRENT=$(${pkgs.tmux}/bin/tmux display-message -p '#{window_name}')
+    BASE="''${CURRENT%$WORKING}"
+    BASE="''${BASE%$PERMISSION}"
+
+    case "$1" in
+      on)
+        [[ "$CURRENT" != *"$WORKING" ]] && ${pkgs.tmux}/bin/tmux rename-window "$BASE$WORKING"
+        ;;
+      permission)
+        ${pkgs.tmux}/bin/tmux rename-window "$BASE$PERMISSION"
+        ;;
+      off)
+        ${pkgs.tmux}/bin/tmux rename-window "$BASE"
+        ;;
+    esac
+  '';
+
   # Creates a sandboxed version of claude that we can use to skip permissions. This isn't protecting
   # it from the network, but we can at least be sure it doesn't wipe the system and home.
   sandboxed-version = "12";
@@ -174,6 +197,7 @@ in
     claude-sandboxed
     claude-wrapped
     claude-proj-docs
+    claude-tmux-indicator
     pkgs.socat # required for sandboxing
   ]
   ++ lib.optionals pkgs.stdenv.isLinux [
