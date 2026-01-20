@@ -9,6 +9,8 @@ argument-hint: [task-description]
 Create a project folder with `00-<project-name>.md` main doc by conversing with me. Use documented
 structure from @docs/project-doc.md.
 
+Current date: !`date +%Y/%m/%d`
+
 Task: $ARGUMENTS
 
 ## File Location
@@ -16,7 +18,7 @@ Task: $ARGUMENTS
 Unless project instructions specify otherwise:
 
 1. Derive project name from `jj-current-branch`, use `AskUserQuestion` to confirm/adjust
-2. Get current date via `date +%Y/%m/%d` and create directory: `docs/features/<date>-<project-name>/`
+2. Using current date, create directory: `docs/features/<year>/<month>/<day>-<project-name>/`
 3. Create `00-<project-name>.md` in that directory
 4. Commit docs in private change: `private: claude: docs - <project-name>`
 5. Create folder symlink at repo root: `ln -s docs/features/<date>-<project-name> proj`

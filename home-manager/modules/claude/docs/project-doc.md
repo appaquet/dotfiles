@@ -76,7 +76,6 @@ Use MoSCoW prioritization with numbered requirements for traceability.
 * Phase annotation by name: `(Phase: Auth)`, not number (phases may reorder)
 * Tasks reference requirements they address: `* [ ] Implement X (R1, R2.1)`
 * "Won't Have" items don't need status markers
-* When phase completes, update all linked requirements to ✅
 * When requirements have logical groupings (e.g., "API Operations", "Data Model"), add new
   requirements to the appropriate group rather than creating standalone entries elsewhere
 * When promoting a Could Have item to active work, relocate it to the appropriate Must Have/Should
@@ -127,13 +126,13 @@ Implement OAuth2 flow with JWT tokens. Adds login/logout endpoints and session m
 
 **Progress Tracking Rules:**
 
-* When starting work on a task → mark it `[~]` immediately
-* When starting work in a phase → mark it 🔄 immediately
 * Claude can mark tasks `[x]` after completing them
-* Claude NEVER marks phases ✅ → use `AskUserQuestion` to ask user
+* Claude NEVER marks phases or requirements ✅ → use `AskUserQuestion` (user decides acceptance)
+
+* When starting work on a task → mark it `[~]` immediately
+* When starting work on a phase/requirement → mark it 🔄 immediately
 * When resuming: if multiple items are `[~]` or 🔄, ask user which to focus on
-* Phase status is authoritative: report phases using their marker (⬜/🔄/✅), not inferred from tasks
-  - If all tasks `[x]` but phase still 🔄 → ask user if phase should be marked ✅
+* Phase/requirement status is authoritative - don't infer from task completion
 
 **Management:**
 

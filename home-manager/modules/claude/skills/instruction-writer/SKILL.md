@@ -1,46 +1,35 @@
 ---
 name: instruction-writer
-description: Write and optimize instructions for Claude Code (skills, slash commands, memory files, CLAUDE.md). **ALWAYS use before creating or modifying any CLAUDE.md file, SKILL.md file, command file, or instruction documentation.** Triggers when writing skill descriptions, optimizing prompts for clarity/token efficiency, or when user mentions "write a skill", "create a command", "optimize instructions", or "improve this prompt".
+description: Knowledge for writing effective Claude Code instructions. Auto-triggers for CLAUDE.md, SKILL.md, command files.
 ---
 
 # Instruction Writer Skill
 
-Expertise in writing effective instructions for Claude Code using latest prompt engineering best practices.
+Load this skill to enter instruction-writing mode. Provides knowledge and principles for writing
+effective Claude Code instructions.
 
-## When to Use This Skill
+## When Loaded
 
-**MANDATORY** - Automatically invoked when:
-
-* Creating or modifying ANY CLAUDE.md file (project, global, or package-level)
-* Creating or modifying SKILL.md files
-* Creating or modifying slash command files
-* Creating or modifying any instruction/documentation files meant for Claude
+**Auto-triggers when:**
+* Creating or modifying CLAUDE.md, SKILL.md, or command files
 * Optimizing prompts for clarity or token efficiency
-* User mentions "write instructions", "create a skill/command", or "optimize this prompt"
+* User mentions "write instructions", "create a skill/command", "optimize this prompt"
 
 ## Core Principles
 
-Apply all principles from @best-practices.md when writing or optimizing instructions. Key focus areas: clarity & specificity, token efficiency, canonical examples, and actionable steps.
+Apply all principles from @best-practices.md. Key focus areas:
+* Clarity & specificity over vagueness
+* Token efficiency - every token depletes attention budget
+* Canonical examples over exhaustive edge cases
+* Actionable steps in imperative mood
 
-## Workflow
+## What to Check
 
-### For New Instructions
-
-1. Understand the purpose and trigger conditions
-2. Draft clear, specific description (if skill) or title/purpose (if command)
-3. Structure content with headers/XML tags
-4. Add canonical examples
-5. Review for token efficiency
-
-### For Optimization
-
-1. Read target file first to identify all linked files (@ references)
-2. Read all linked files from target
-3. Read @best-practices.md for comparison
-4. Identify issues: verbosity, unclear structure, weak examples, cross-file redundancy
-5. Report findings with before/after examples
-6. Wait for approval before applying changes
-7. Apply optimizations preserving all salient information
+When reviewing instructions, look for:
+* Ambiguity - what could a fresh agent misinterpret?
+* Cross-file conflicts - do related files have contradicting rules?
+* Redundancy - is this duplicated elsewhere?
+* Missing context - does this assume knowledge not provided?
 
 ## Supporting Files
 

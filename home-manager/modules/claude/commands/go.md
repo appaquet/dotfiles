@@ -5,27 +5,23 @@ description: Proceed to implementation of the plan or task at hand
 
 # Go
 
-1. Make sure you have a crystal clear understanding of the task at hand. If not, use the
-   `/ctx-improve` command to ask clarifying questions until you do.
+1. Ensure crystal clear understanding of the task. If not, use `/ctx-improve` to clarify.
 
-   **Requirement check**: Read ALL requirements in main project doc. Verify the task aligns with
-   existing requirements - if it contradicts or overlaps with one, clarify before proceeding.
+   **Requirement check**: Read ALL requirements in project doc. Verify task aligns - clarify
+   if it contradicts or overlaps with existing requirements.
 
-2. Load your internal TODO list with all tasks to be done, including implementation, testing,
-   validation (ask for next step). Include a task to update the project documentation after sizable
-   amounts of work.
+2. Load internal TODO list with tasks: implementation, testing, validation.
 
-3. Make sure you are working on a new jj change for this implementation.
+3. Create new jj change for this implementation.
 
-4. Start implementing the tasks one by one, following best practices, coding standards, and
-   ensuring high code quality.
+4. Implement tasks one by one, following best practices and coding standards:
 
-   If you EVER find yourself deviating from the plan OR you're overcomplicating things, STOP
-   IMMEDIATELY and update me about the situation.
+   * Mark task `[~]` when starting, `[x]` when done
+   * When all tasks under a phase are `[x]` → ask user via `AskUserQuestion` if phase should be ✅
+   * When all tasks for a requirement are `[x]` → ask user via `AskUserQuestion` if requirement should be ✅
+   * Add new tasks discovered, update Files section as needed
+   * Create jj changes for significant milestones
 
-   Update the project documentation as you go along to reflect changes made during implementation.
+   If deviating from plan, overcomplicating or keep doing same mistake, STOP and update user.
 
-   Make sure to create appropriate jj changes as you go along.
-
-5. After completing, make sure the project doc reflects the current state.
-   Make sure to commit the jj change with a meaningful message summarizing the work done.
+5. After all implementation: commit jj change with meaningful message.

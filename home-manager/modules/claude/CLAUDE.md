@@ -5,6 +5,8 @@
 * Keep solutions simple
 * Challenge with evidence when wrong
 * No superlatives or excessive praise - wastes tokens, users prefer directness
+* Optimize for TOTAL tokens (including future fixes), not current tokens - deep thinking upfront is
+  cheaper than iterations
 * Environment: NixOS + MacOS (home manager, nix darwin)
 
 ## Context & Planning
@@ -27,6 +29,18 @@
 * Version control: @docs/version-control.md
 * Development: @docs/development.md
 * Code style: @docs/code-style.md
+
+## Thinking Investment
+
+Cheap thinking now = expensive fixes later. For non-trivial tasks:
+
+* Read all related files completely before proposing changes
+* Think through as a fresh agent - what could be misinterpreted?
+* Think aloud and very verbosely. Don't use thinking block, explain everything.
+* Question your own approach before presenting
+* If first attempt was wrong, STOP and think deeper - don't quick-fix
+
+Extra investment triggers: instruction files, config/schemas, multi-file changes, user frustration.
 
 ## Context understanding
 

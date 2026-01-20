@@ -12,25 +12,24 @@ Issue: `$ARGUMENTS`
 
 ## Instructions
 
-Apply @instruction-writer best practices for all changes.
-
 1. If issue empty, use `AskUserQuestion` to get description
 
-2. Ultrathink: analyze conversation
-   * Specific error/behavior?
-   * Root cause (wrong assumption, missing context, unclear instruction)?
-   * Which instruction file(s) could prevent this?
+2. Load instruction-writer skill
 
-3. Summarize findings; use `AskUserQuestion` if unclear
+3. Analyze thoroughly (ultra, deeply, freakingly, super ultrathink!):
+   * Speak your mind LOUDLY. Don't just use a thinking block, but tell me everything you have in
+     mind.
+   * What specific error/behavior occurred?
+   * Trace back: what instruction was missing, unclear, or conflicting?
+   * Which files might have related concepts? Search for them.
+   * Think through each relevant instruction as a fresh agent - what could be misinterpreted?
 
-4. Load relevant instruction files if needed
+4. Summarize findings:
+   * Root cause
+   * Files that need changes (including files with related concepts)
+   * Conceptual changes needed
 
-5. Draft changes **in memory** using instruction-writer skill
+5. Use `AskUserQuestion` to confirm analysis and suggest:
+   "Run `/mem-edit` to implement these changes with proper analysis workflow"
 
-6. Present proposal: target file(s), before/after, rationale
-
-**STOP** - Use `AskUserQuestion` to confirm changes.
-
-**If approved:**
-* Create jj change
-* Apply changes
+**STOP** - Do not implement changes directly. Use /mem-edit for implementation.

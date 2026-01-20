@@ -2,7 +2,7 @@
 
 ## TODO
 
-- [ ] Uncertainty disclosure
+- [x] Uncertainty disclosure
 
 ## Workflows
 
@@ -31,8 +31,11 @@
   - `/review-fix`: Fix code review findings
 
 - Instructions / Memory
-  - `/mem-optimize`: Optimize instructions and memory usage
-  - `/introspect`: Reflect on errors to propose instruction improvements
+  - `/mem-edit`: Entry point for instruction file changes (edits, fixes, optimization)
+  - `/introspect`: Reflect on errors to propose instruction improvements (suggests /mem-edit)
+
+- Thinking
+  - `/think`: Trigger deep thinking mode for complex problems
 
 - Pull requests
   - `/pr-import-comments`: Import PR comments into codebase as REVIEW comments
