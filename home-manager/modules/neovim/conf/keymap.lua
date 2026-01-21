@@ -166,14 +166,3 @@ end, { silent = true, desc = "Yank file path" })
 -- https://github.com/smoka7/multicursors.nvim
 require("multicursors").setup({})
 vim.keymap.set({ "n", "v" }, "<C-n>", "<cmd>MCstart<cr>", { silent = true })
-
--- Open project at proj/00-*.md
-vim.keymap.set("n", "<Leader>po", function()
-	local proj_dir = vim.fn.getcwd()
-	local target_file = vim.fn.glob(proj_dir .. "/proj/00-*.md", false, true)[1]
-	if target_file and target_file ~= "" then
-		vim.cmd("edit " .. target_file)
-	else
-		vim.notify("No file matching proj/00-*.md found in project root", vim.log.levels.WARN)
-	end
-end, { silent = true, desc = "Project: open project file" })

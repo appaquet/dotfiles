@@ -201,6 +201,7 @@ in
             (includeLuaFile "sessions.lua")
             (includeLuaFile "notify.lua")
             (includeLuaFile "fzf.lua")
+            (includeLuaFile "projects.lua")
 
             (includeLuaFile "treesitter.lua")
             (includeLuaFile "git.lua")
