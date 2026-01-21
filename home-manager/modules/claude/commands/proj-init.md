@@ -28,11 +28,16 @@ Unless project instructions specify otherwise:
 
 ## Instructions
 
+STOP rushing. Invest thinking tokens now to save iteration tokens later.
+
 1. If task empty, ask about the task to be worked on.
 
 2. Determine file location per above, create directory and symlink.
 
 3. Use `/ctx-improve` to clarify requirements until crystal clear understanding.
+   * Analyze thoroughly (ultra, deeply, freakingly, super ultrathink!)
+   * Speak your mind LOUDLY. Don't just use a thinking block, but tell me everything you have in
+     mind.
 
 4. Create `00-<project-name>.md` with appropriate sections:
    * Include Requirements section using MoSCoW format (Must/Should/Could/Won't Have)

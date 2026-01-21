@@ -14,9 +14,14 @@ Focus: $ARGUMENTS
 
 ## Instructions
 
+STOP rushing. Invest thinking tokens now to save iteration tokens later.
+
 1. Run `/ctx-load` to load project context (project doc, branch state, recent commits).
 
 2. Analyze branch changes:
+   * Analyze thoroughly (ultra, deeply, freakingly, super ultrathink!)
+   * Speak your mind LOUDLY. Don't just use a thinking block, but tell me everything you have in
+     mind.
    * Get changed files: `jj-diff-branch --stat`
    * Read diffs for understanding: `jj-diff-branch --git`
    * If user specified a focus area, prioritize those components

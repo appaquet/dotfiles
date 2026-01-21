@@ -13,6 +13,8 @@ Target: `$ARGUMENTS` (files or description of change)
 
 ## Instructions
 
+STOP rushing. Invest thinking tokens now to save iteration tokens later.
+
 ### Phase 1: Analysis (DO NOT MODIFY FILES)
 
 1. Identify scope:

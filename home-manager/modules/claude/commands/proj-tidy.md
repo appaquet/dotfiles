@@ -9,21 +9,20 @@ context: fork
 Validate current project doc against the standard structure defined in @docs/project-doc.md and
 propose fixes for any inconsistencies.
 
-Throughout this process:
-
-* Analyze thoroughly (ultra, deeply, freakingly, super ultrathink!)
-* Speak your mind LOUDLY. Don't just use a thinking block, but tell me everything you have in
-       mind.
-
 Current project files: !`claude-proj-docs`
 
 ## Instructions
+
+STOP rushing. Invest thinking tokens now to save iteration tokens later.
 
 1. Load the standard structure from @docs/project-doc.md.
 
 2. Read current project doc (main `00-*.md` and any sub-docs).
 
 3. Validate against standard structure:
+   * Analyze thoroughly (ultra, deeply, freakingly, super ultrathink!)
+   * Speak your mind LOUDLY. Don't just use a thinking block, but tell me everything you have in
+     mind.
    * Section names match expected names
    * Sections appear in correct order
    * Section content follows documented format (bullet style, checkbox format, emoji markers, etc.)

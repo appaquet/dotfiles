@@ -7,13 +7,21 @@ description: Fix REVIEW comments left in code or pull requests
 
 We want to review and fix the REVIEW comments I've left in the code.
 
+## Instructions
+
+STOP rushing. Invest thinking tokens now to save iteration tokens later.
+
 1. Unless we just searched or decided on review comments, call `/review-search` to find all REVIEW
    comments in the codebase. **DON'T** just use the find method, you need to use the command.
 
 2. For each comment found, **ALWAYS** look at the surrounding and/or related code to fully
-   understand the context. If you aren't sure about a comment, **ALWAYS** use `AskUserQuestion`
-   tool to clarify. You **MUST** fully understand the context before taking any action, using the
-   context understanding checklist.
+   understand the context.
+   * Analyze thoroughly (ultra, deeply, freakingly, super ultrathink!)
+   * Speak your mind LOUDLY. Don't just use a thinking block, but tell me everything you have in
+     mind.
+   * If you aren't sure about a comment, **ALWAYS** use `AskUserQuestion` tool to clarify.
+   * You **MUST** fully understand the context before taking any action, using the context
+     understanding checklist.
 
 3. **ALWAYS** create an action plan:
    * Build internal TODO list from review comments

@@ -15,6 +15,8 @@ Load as much context as possible about the project and task at hand.
 
 ## Instructions
 
+STOP rushing. Invest thinking tokens now to save iteration tokens later.
+
 1. Read project docs (use State above - don't re-discover):
    * If "No project files" shown, check if project instructions specify a different location
    * May not exist if no task started yet - that's fine for new features
@@ -28,6 +30,9 @@ Load as much context as possible about the project and task at hand.
    * Mark the chosen task/phase as in-progress per @docs/project-doc.md rules
 
 3. Synthesize and propose next steps:
+   * Analyze thoroughly (ultra, deeply, freakingly, super ultrathink!)
+   * Speak your mind LOUDLY. Don't just use a thinking block, but tell me everything you have in
+     mind.
    * If project doc exists, propose next tasks based on Tasks section
    * Propose project doc updates if missing information
    * If no clear direction, use `AskUserQuestion` tool for clarification on goals

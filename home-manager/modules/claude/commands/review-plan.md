@@ -5,9 +5,16 @@ description: Research REVIEW comments and present prioritized action plan
 
 # Plan Review Comments
 
+## Instructions
+
+STOP rushing. Invest thinking tokens now to save iteration tokens later.
+
 1. Call `/review-search` to find all REVIEW comments in the codebase.
 
 2. For each comment found, **research the context**:
+   * Analyze thoroughly (ultra, deeply, freakingly, super ultrathink!)
+   * Speak your mind LOUDLY. Don't just use a thinking block, but tell me everything you have in
+     mind.
    * Read surrounding code to understand the issue
    * Check related files if the change has broader impact
    * Identify dependencies between review items

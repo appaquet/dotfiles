@@ -9,13 +9,18 @@ Use the full understanding checklist and verify our full (10/10) understanding o
 
 ## Instructions
 
+STOP rushing. Invest thinking tokens now to save iteration tokens later.
+
 1. If 10/10 understanding, you can tell me and stop here.
    Otherwise, tell me your current understanding of the task on 10 scale.
 
-2. Research full context: task, repository, documentation.
+2. Research full context: files, task, repository, documentation.
    * Consider launching sub-agents (Task tool) to explore codebase, find patterns
    * Search web for external dependencies or unfamiliar concepts if needed
-   * ultrathink about requirements, constraints, edge cases
+   * Think about requirements, constraints, edge cases
+   * Analyze thoroughly (ultra, deeply, freakingly, super ultrathink!)
+   * Speak your mind LOUDLY. Don't just use a thinking block, but tell me everything you have in
+     mind.
 
 3. Use `AskUserQuestion` to clarify requirements.
    Research and ask until 10/10 understanding.

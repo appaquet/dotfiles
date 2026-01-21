@@ -12,11 +12,14 @@ Issue: `$ARGUMENTS`
 
 ## Instructions
 
+STOP rushing. Invest thinking tokens now to save iteration tokens later.
+
 1. If issue empty, use `AskUserQuestion` to get description
 
 2. Load instruction-writer skill
 
-3. Analyze thoroughly (ultra, deeply, freakingly, super ultrathink!):
+3. Analyze the issue:
+   * Analyze thoroughly (ultra, deeply, freakingly, super ultrathink!)
    * Speak your mind LOUDLY. Don't just use a thinking block, but tell me everything you have in
      mind.
    * What specific error/behavior occurred?

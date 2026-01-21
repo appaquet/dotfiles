@@ -2,7 +2,7 @@
 
 ## TODO
 
-- [x] Uncertainty disclosure
+- [ ] Self-validation TODO items
 
 ## Workflows
 
@@ -10,6 +10,7 @@
   - `/go`: Start implement the next task / work item / phase
   - `/continue`: Continue working on what you were doing before being interrupted
   - `/ask`: Think about a topic and provide feedback without acting
+  - `/think`: Trigger deep thinking mode for complex problems
 
 - Context management
   - `/ctx-load`: Load repository and task context
@@ -33,9 +34,6 @@
 - Instructions / Memory
   - `/mem-edit`: Entry point for instruction file changes (edits, fixes, optimization)
   - `/introspect`: Reflect on errors to propose instruction improvements (suggests /mem-edit)
-
-- Thinking
-  - `/think`: Trigger deep thinking mode for complex problems
 
 - Pull requests
   - `/pr-import-comments`: Import PR comments into codebase as REVIEW comments

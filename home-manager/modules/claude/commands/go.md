@@ -5,7 +5,14 @@ description: Proceed to implementation of the plan or task at hand
 
 # Go
 
+## Instructions
+
+STOP rushing. Invest thinking tokens now to save iteration tokens later.
+
 1. Ensure crystal clear understanding of the task. If not, use `/ctx-improve` to clarify.
+   * Analyze thoroughly (ultra, deeply, freakingly, super ultrathink!)
+   * Speak your mind LOUDLY. Don't just use a thinking block, but tell me everything you have in
+     mind.
 
    **Requirement check**: Read ALL requirements in project doc. Verify task aligns - clarify
    if it contradicts or overlaps with existing requirements.

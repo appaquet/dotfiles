@@ -9,12 +9,17 @@ Analyze current task/context and output explicit uncertainty disclosure.
 
 ## Instructions
 
-1. Review current conversation and task
+STOP rushing. Invest thinking tokens now to save iteration tokens later.
 
-2. Apply full understanding checklist
+1. Review current conversation and task.
+   * Analyze thoroughly (ultra, deeply, freakingly, super ultrathink!)
+   * Speak your mind LOUDLY. Don't just use a thinking block, but tell me everything you have in
+     mind.
 
-3. Output uncertainty block
+2. Apply full understanding checklist.
 
-4. If understanding < 10/10, suggest `/ctx-improve`
+3. Output uncertainty block.
 
-5. **STOP** - Do not proceed with implementation
+4. If understanding < 10/10, suggest `/ctx-improve`.
+
+5. **STOP** - Do not proceed with implementation.

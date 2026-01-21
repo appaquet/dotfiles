@@ -12,14 +12,19 @@ Project files: !`claude-proj-docs`
 
 ## Instructions
 
+STOP rushing. Invest thinking tokens now to save iteration tokens later.
+
 1. Run `/ctx-load` if context not sufficiently loaded.
 
 2. Clarify task if empty or unclear via `AskUserQuestion`.
 
-3. Research full context: task, repository, documentation.
+3. Research full context: files, task, repository, documentation.
    * Consider launching sub-agents (Task tool) to explore codebase, find patterns
    * Search web for external dependencies or unfamiliar concepts if needed
-   * ultrathink about requirements, constraints, edge cases
+   * Think about requirements, constraints, edge cases
+   * Analyze thoroughly (ultra, deeply, freakingly, super ultrathink!)
+   * Speak your mind LOUDLY. Don't just use a thinking block, but tell me everything you have in
+     mind.
 
 4. Use `AskUserQuestion` to clarify requirements.
    Research and ask until 10/10 understanding.
@@ -37,7 +42,7 @@ Project files: !`claude-proj-docs`
    * Tasks section with planned work items referencing requirements (e.g., "Implement X (R1, R2.1)")
    * Files section with relevant files
 
-7. Tell me your understanding of the task on a 10/10 scale.
+7. Think very hard about your plan and the tell me your understanding of the task on a 10/10 scale.
    If still not 10/10, propose /ctx-improve to reach full understanding.
    Use `AskUserQuestion` to confirm any choices, uncertainties and assumptions made.
 

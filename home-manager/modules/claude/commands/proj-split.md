@@ -15,12 +15,18 @@ Current project files: !`claude-proj-docs`
 
 ## Instructions
 
+STOP rushing. Invest thinking tokens now to save iteration tokens later.
+
 1. If project doc not loaded/clear from context, run `/ctx-load` first.
 
 2. If phase not specified and not clear from context, list phases from Tasks section and use
    `AskUserQuestion`.
 
 3. Determine phase name: 2-3 words describing the phase (e.g., "auth-validation", "api-endpoints").
+   * Analyze thoroughly (ultra, deeply, freakingly, super ultrathink!)
+   * Speak your mind LOUDLY. Don't just use a thinking block, but tell me everything you have in
+     mind.
+   * Think about what name captures the phase's purpose
 
 4. Determine the next available number:
    * List existing sub-docs: `01-*.md`, `02-*.md`, etc.
