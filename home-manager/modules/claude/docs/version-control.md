@@ -2,6 +2,20 @@
 
 Using `jj` (collocated with git). Always detached head state.
 
+## State Verification
+
+Before any jj operation, verify working copy state with `jj status`:
+
+* **Expected**: Clean working copy OR only changes you made in this session
+* **Unexpected**: Pre-existing changes, unknown modifications, conflicts
+
+**If state is unexpected: STOP immediately.**
+* Do NOT create new changes, commit, or continue working
+* Do NOT attempt to "clean up" or "fix" the state
+* Report what you found and ask for clarification
+
+This prevents accidentally orphaning user changes or reverting work.
+
 ## Creating Changes
 
 **jj commit vs jj new:**
@@ -57,4 +71,5 @@ jj commit -m "feat(workspace): add collections API"
 
 * Use `--git` flag for readable diff output
 * For `gh` commands: use `$(jj-current-branch)` since always detached
-* Never revert changes not made by you - ask for clarification
+* Never revert, restore, or abandon changes not made by you in this session - STOP and ask
+* If `jj status` shows unexpected state, do not proceed - report and ask for clarification
