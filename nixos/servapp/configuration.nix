@@ -71,9 +71,13 @@
       credentialsFile = config.sops.secrets.mqtt.path;
     };
     reporters = {
-      system = {
+      nix = {
         enable = true;
         interval = 3600;
+      };
+      system = {
+        enable = true;
+        interval = 60;
       };
       restic = {
         enable = true;
