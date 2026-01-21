@@ -36,7 +36,7 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
    * Consider dependencies and challenges
    * Insert validation tasks after each phase
 
-6. Write plan to project doc (per @docs/project-doc.md structure):
+6. Write plan to project doc (per @~/.claude/docs/project-doc.md structure):
    * Context section describing the task
    * Requirements section using MoSCoW format with numbered items (R1, R2, R1.1)
    * Tasks section with planned work items referencing requirements (e.g., "Implement X (R1, R2.1)")

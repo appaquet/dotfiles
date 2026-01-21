@@ -27,7 +27,9 @@ Unless project instructions specify otherwise:
 
 ## Sections
 
-Keep sections in order described below.
+Keep sections in order described below. Never reorder, rename or create more sections.
+Project document should always have context, checkpoint (if applicable), requirements (if any), tasks,
+and files sections. No more, and always in this order.
 
 ### Context
 
@@ -42,6 +44,7 @@ Brief 1-2 paragraph summary for resuming work. References phase (if applicable),
 **Source of Truth:** Before creating/modifying requirements:
 1. Read ALL existing requirements in main doc
 2. Update existing rather than create parallel ones
+3. All requirements go in ONE Requirements section (never create separate scope sections)
 
 Use MoSCoW prioritization with numbered requirements for traceability.
 

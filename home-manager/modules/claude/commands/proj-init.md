@@ -7,7 +7,7 @@ argument-hint: [task-description]
 # Project Initialization
 
 Create a project folder with `00-<project-name>.md` main doc by conversing with me. Use documented
-structure from @docs/project-doc.md.
+structure from @~/.claude/docs/project-doc.md.
 
 Current date: !`date +%Y/%m/%d`
 
@@ -39,9 +39,9 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
    * Speak your mind LOUDLY. Don't just use a thinking block, but tell me everything you have in
      mind.
 
-4. Create `00-<project-name>.md` with appropriate sections:
-   * Include Requirements section using MoSCoW format (Must/Should/Could/Won't Have)
-   * Number requirements (R1, R2, R1.1) for Tasks traceability
+4. Create `00-<project-name>.md`:
+   * Read @~/.claude/docs/project-doc.md "## Sections" completely first
+   * Match every format detail: status markers, emoji prefixes, bullet styles, R-numbers
    * Do NOT create sub-docs unless explicitly requested via `/proj-split` or after asking user
 
 5. After each Q&A, update the project doc and think hard about next questions.

@@ -342,7 +342,7 @@ Assistant: ideal response
 ## Important Notes
 
 * Front-load critical rules
-* Reference other docs: @docs/filename.md
+* Reference other docs: @~/.claude/docs/filename.md
 ```
 
 ## Quality & Reliability

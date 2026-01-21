@@ -6,7 +6,7 @@ context: fork
 
 # Project Tidy
 
-Validate current project doc against the standard structure defined in @docs/project-doc.md and
+Validate current project doc against the standard structure defined in @~/.claude/docs/project-doc.md and
 propose fixes for any inconsistencies.
 
 Current project files: !`claude-proj-docs`
@@ -15,7 +15,7 @@ Current project files: !`claude-proj-docs`
 
 STOP rushing. Invest thinking tokens now to save iteration tokens later.
 
-1. Load the standard structure from @docs/project-doc.md.
+1. Load the standard structure from @~/.claude/docs/project-doc.md.
 
 2. Read current project doc (main `00-*.md` and any sub-docs).
 
@@ -35,7 +35,7 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
      instead of `R5.A:`). Phase docs should never introduce new top-level requirements.
    * Verify main doc references sub-doc details when sub-doc expands requirements
 
-5. Check for completable items (per @docs/project-doc.md, user decides ✅):
+5. Check for completable items (per @~/.claude/docs/project-doc.md, user decides ✅):
    * Flag phases where all tasks are `[x]` but phase is still 🔄
    * Flag requirements where all linked work is done but requirement is still 🔄
    * These are candidates - use `AskUserQuestion` before marking ✅

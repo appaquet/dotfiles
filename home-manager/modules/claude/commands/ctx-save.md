@@ -15,7 +15,7 @@ Project files: !`claude-proj-docs`
 
 2. Update Files section:
    * Run `branch-diff-summarizer` agent for changed files
-   * Update with output (format per @docs/project-doc.md)
+   * Update with output (format per @~/.claude/docs/project-doc.md)
 
 3. Update Tasks section:
    * Mark completed tasks `[x]`

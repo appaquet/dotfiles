@@ -27,7 +27,7 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
 
 2. Resolve ambiguity if multiple items in-progress:
    * If multiple tasks `[~]` or phases 🔄, use `AskUserQuestion` to clarify which to focus on
-   * Mark the chosen task/phase as in-progress per @docs/project-doc.md rules
+   * Mark the chosen task/phase as in-progress per @~/.claude/docs/project-doc.md rules
 
 3. Synthesize and propose next steps:
    * Analyze thoroughly (ultra, deeply, freakingly, super ultrathink!)

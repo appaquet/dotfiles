@@ -7,7 +7,7 @@
 * Use project-specific TODO tags: `// TODO: PROJCODE - description`
 * Never start implementation until explicitly told (even after plan)
 * Verify understanding checklist before starting (see CLAUDE.md)
-* Create `private: claude:` jj change before code changes (@docs/version-control.md)
+* Create `private: claude:` jj change before code changes (@~/.claude/docs/version-control.md)
 
 ## Coding
 
