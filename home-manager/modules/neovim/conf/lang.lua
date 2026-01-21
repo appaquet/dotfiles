@@ -25,7 +25,7 @@ vim.lsp.config["nixd"] = {
 
 -- Protobuf
 vim.lsp.config["buf_ls"] = {
-	cmd = { "bufls", "serve" },
+	cmd = { "buf", "lsp", "serve" },
 	root_markers = { "buf.work.yaml", "buf.yaml", ".git" },
 	filetypes = { "proto" },
 }
