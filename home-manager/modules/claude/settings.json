@@ -91,6 +91,28 @@
         ]
       }
     ],
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "claude-tmux-indicator off"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "claude-tmux-indicator on"
+          }
+        ]
+      }
+    ],
     "PermissionRequest": [
       {
         "matcher": "",

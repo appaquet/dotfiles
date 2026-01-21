@@ -27,11 +27,15 @@ let
     if [ ! -d ".git" ]; then
       echo -e "\e[31mWARNING: No .git, are you at the root of a project?\e[0m" >&2
       sleep 5
-    fi  
+    fi
 
     export CLAUDE_CONFIG_DIR="${config.home.homeDirectory}/.claude"
     export CLAUDE_ROOT="''${CLAUDE_PROJECT_DIR:-$(pwd)}"
-    exec ${claude-code}/bin/claude "$@"
+
+    # Clear tmux indicator on start (in case previous session was killed) and exit
+    ${claude-tmux-indicator}/bin/claude-tmux-indicator off
+    trap '${claude-tmux-indicator}/bin/claude-tmux-indicator off' EXIT
+    ${claude-code}/bin/claude "$@"
   '';
 
   # Utility to list project docs (avoids shell expansion issues in skill commands)
