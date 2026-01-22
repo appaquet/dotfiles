@@ -47,3 +47,5 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
    Use `AskUserQuestion` to confirm any choices, uncertainties and assumptions made.
 
 8. **STOP** - The user will decide when to proceed to implementation.
+   * Do NOT use `EnterPlanMode` or `ExitPlanMode` tools - this skill writes to project docs directly
+   * Simply stop generating and wait for user to respond (e.g., with `/go`)
