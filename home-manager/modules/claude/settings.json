@@ -75,7 +75,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "claude-tmux-indicator on"
+            "command": "claude-tmux-indicator on UserPromptSubmit"
           }
         ]
       }
@@ -86,7 +86,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "claude-tmux-indicator off"
+            "command": "claude-tmux-indicator off Stop"
           }
         ]
       }
@@ -97,7 +97,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "claude-tmux-indicator off"
+            "command": "claude-tmux-indicator off SessionEnd"
           }
         ]
       }
@@ -108,7 +108,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "claude-tmux-indicator on"
+            "command": "claude-tmux-indicator on PostToolUse"
           }
         ]
       }
@@ -119,7 +119,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "claude-tmux-indicator permission"
+            "command": "claude-tmux-indicator permission PermissionRequest"
           }
         ]
       }

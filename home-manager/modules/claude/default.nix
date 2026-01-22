@@ -32,9 +32,14 @@ let
     export CLAUDE_CONFIG_DIR="${config.home.homeDirectory}/.claude"
     export CLAUDE_ROOT="''${CLAUDE_PROJECT_DIR:-$(pwd)}"
 
+    # Capture tmux window ID so indicator targets correct window even if user switches
+    if [ -n "$TMUX" ]; then
+      export CLAUDE_TMUX_WINDOW=$(${pkgs.tmux}/bin/tmux display-message -p '#{window_id}')
+    fi
+
     # Clear tmux indicator on start (in case previous session was killed) and exit
-    ${claude-tmux-indicator}/bin/claude-tmux-indicator off
-    trap '${claude-tmux-indicator}/bin/claude-tmux-indicator off' EXIT
+    ${claude-tmux-indicator}/bin/claude-tmux-indicator off wrapper-start
+    trap '${claude-tmux-indicator}/bin/claude-tmux-indicator off wrapper-exit-trap' EXIT
     ${claude-code}/bin/claude "$@"
   '';
 
@@ -49,23 +54,31 @@ let
 
   # Toggle tmux window indicator when Claude is working (used by hooks)
   claude-tmux-indicator = pkgs.writeShellScriptBin "claude-tmux-indicator" ''
+    LOG_FILE="''${CLAUDE_ROOT:-.}/tmux.local.log"
+    ACTION="$1"
+    HOOK_NAME="''${2:-unknown}"
+
+    # Log state change with timestamp
+    echo "$(date '+%Y-%m-%d %H:%M:%S.%3N') [$HOOK_NAME] $ACTION" >> "$LOG_FILE"
+
     [ -z "$TMUX" ] && exit 0
+    [ -z "$CLAUDE_TMUX_WINDOW" ] && exit 0
 
     WORKING=" 🔄"
     PERMISSION=" 🔐"
-    CURRENT=$(${pkgs.tmux}/bin/tmux display-message -p '#{window_name}')
+    CURRENT=$(${pkgs.tmux}/bin/tmux display-message -t "$CLAUDE_TMUX_WINDOW" -p '#{window_name}')
     BASE="''${CURRENT%$WORKING}"
     BASE="''${BASE%$PERMISSION}"
 
-    case "$1" in
+    case "$ACTION" in
       on)
-        [[ "$CURRENT" != *"$WORKING" ]] && ${pkgs.tmux}/bin/tmux rename-window "$BASE$WORKING"
+        [[ "$CURRENT" != *"$WORKING" ]] && ${pkgs.tmux}/bin/tmux rename-window -t "$CLAUDE_TMUX_WINDOW" "$BASE$WORKING"
         ;;
       permission)
-        ${pkgs.tmux}/bin/tmux rename-window "$BASE$PERMISSION"
+        ${pkgs.tmux}/bin/tmux rename-window -t "$CLAUDE_TMUX_WINDOW" "$BASE$PERMISSION"
         ;;
       off)
-        ${pkgs.tmux}/bin/tmux rename-window "$BASE"
+        ${pkgs.tmux}/bin/tmux rename-window -t "$CLAUDE_TMUX_WINDOW" "$BASE"
         ;;
     esac
   '';
