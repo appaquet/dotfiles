@@ -25,7 +25,6 @@ in
         nixosOverlaysModule
         inputs.secrets.nixos.common
         inputs.secrets.nixos.servapp
-        inputs.dotblip.nixosModules.default
         ./servapp/configuration.nix
       ];
     };
@@ -109,7 +108,6 @@ in
         inputs.secrets.nixos.common
         inputs.secrets.nixos.vps
         inputs.disko.nixosModules.disko
-        inputs.dotblip.nixosModules.default
         ./vps/configuration.nix
       ];
     };

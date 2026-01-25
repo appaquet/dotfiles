@@ -23,7 +23,7 @@ in
   ];
 
   # global tools (none anymore since we're using nixpkgs)
-  home.file.".tool-versions".text = '''';
+  home.file.".tool-versions".text = "";
 
   programs.fish.interactiveShellInit = ''
     ${pkgs.mise}/bin/mise activate fish | source

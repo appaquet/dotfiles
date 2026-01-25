@@ -8,12 +8,13 @@
     ../modules/common.nix
     ../modules/dev.nix
     ../modules/docker.nix
+    ../modules/dotblip.nix
     ../modules/nasapp.nix
     ../modules/network-bridge.nix
-    ../modules/ups/client.nix
     ../modules/restic/backup.nix
-    ./hardware-configuration.nix
+    ../modules/ups/client.nix
     ./adguardhome.nix
+    ./hardware-configuration.nix
   ];
 
   boot.loader.systemd-boot.enable = true;
@@ -61,24 +62,9 @@
     };
   };
 
-  sops.secrets.mqtt.sopsFile = config.sops.secretsFiles.dotblip;
   dotblip = {
     enable = true;
-    user = "appaquet";
-    mqtt = {
-      host = "haos.n3x.net";
-      port = 1883;
-      credentialsFile = config.sops.secrets.mqtt.path;
-    };
     reporters = {
-      nix = {
-        enable = true;
-        interval = 3600;
-      };
-      system = {
-        enable = true;
-        interval = 60;
-      };
       restic = {
         enable = true;
         localBackups = [ "home" ];

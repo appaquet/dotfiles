@@ -9,11 +9,12 @@
     ../modules/common.nix
     ../modules/dev.nix
     ../modules/docker.nix
+    ../modules/dotblip.nix
     ../modules/nasapp.nix
+    ../modules/netconsole/sender.nix
     ../modules/network-bridge.nix
     ../modules/restic/backup.nix
     ../modules/ups/client.nix
-    ../modules/netconsole/sender.nix
     ./gpu-switch.nix
     ./ha-ctrl.nix
     ./hardware-configuration.nix
@@ -122,6 +123,19 @@
       pruneOpts = [
         "--keep-weekly 4"
       ];
+    };
+  };
+
+  dotblip = {
+    reporters = {
+      restic = {
+        enable = true;
+        localBackups = [
+          "home"
+          "vms"
+        ];
+        interval = 3600;
+      };
     };
   };
 
