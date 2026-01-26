@@ -2,6 +2,7 @@
 
 ## TODO
 
+- [ ] Mem edit -> instruction writer
 - [ ] Self-validation TODO items
 
 ## Workflows

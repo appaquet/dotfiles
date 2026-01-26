@@ -1,40 +1,35 @@
 
 # Development Instructions
 
-## Implementation Approach
+## General principles
 
 * TODO-driven + TDD: Add TODOs → write tests (comment non-compiling) → implement
-* Use project-specific TODO tags: `// TODO: PROJCODE - description`
-* Never start implementation until explicitly told (even after plan)
+* Never start implementation until explicitly told
 * Verify understanding checklist before starting (see CLAUDE.md)
-* Create `private: claude:` jj change before code changes (@~/.claude/docs/version-control.md)
-
-## Coding
-
 * Iterate: add functions/structures/TODOs before implementation
 * Follow existing patterns, use existing libraries
 * Write simple, non-overlapping tests (test golden path, not exhaustively)
-* Comment out non-compiling code in compiled languages
 
-## When Stuck
+## Before marking as completed
 
-Comment out failing code/tests. Use `AskUserQuestion` for help.
-
-## Before Completion
-
-Verify:
-* [ ] Initial plan/TODOs addressed
+<development-completion-checklist>
+* [ ] Initial plan/requirements/TODOs addressed
 * [ ] Diff reviewed (`jj-diff-working --git`)
-* [ ] Code style guidelines followed
-* [ ] Formatting, linting, tests pass (including affected modules)
 * [ ] Temporary debug files/code removed
+* [ ] Code style guidelines followed
+* [ ] Formatting, linting, tests pass (only affected modules)
 * [ ] Project doc updated (if exists)
+</development-completion-checklist>
 
 ## When to Stop
 
-CRITICAL: For fundamental design problems, stop immediately:
+**CRITICAL**: Stop development as soon as any of these triggers occur:
+
+<development-stop-triggers>
 * Architectural mismatches (mutable vs immutable, incompatible structures)
 * API incompatibilities requiring redesign
 * Multiple failed workarounds
 * No workarounds/reverts/continued coding - ask for help
 * Never claim completion if incomplete
+* Keep executing a command which never succeeds
+</development-stop-triggers>
