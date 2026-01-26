@@ -4,6 +4,23 @@ Comprehensive guidelines for writing effective instructions, skills, slash comma
 
 ## Core Philosophy
 
+### Self-Verification (Highest Leverage)
+
+**Give Claude ways to verify its work.** This is the single highest-leverage technique for instruction quality.
+
+* Include tests, expected outputs, or success criteria in instructions
+* Add verification steps at the end of workflows ("Run X to confirm Y")
+* Provide screenshots or examples of correct output for UI work
+* Define what "done" looks like explicitly
+
+<good-example>
+After implementing, run `npm test` and verify all tests pass. The output should show "42 passing, 0 failing".
+</good-example>
+
+<bad-example>
+Implement the feature and make sure it works.
+</bad-example>
+
 ### Minimal, High-Signal Information
 
 **Find the smallest set of high-signal tokens that maximize desired outcomes.** Every token depletes the model's attention budget.
@@ -16,6 +33,14 @@ Comprehensive guidelines for writing effective instructions, skills, slash comma
 **Instruction Budget**: LLMs reliably follow only 150-200 instructions. Claude Code's system prompt uses ~50, so CLAUDE.md should stay well under 150 instructions.
 
 **Line Count**: Keep CLAUDE.md under 300 lines; under 60 lines is optimal. Put detailed docs in separate files.
+
+### Front-Load Critical Instructions
+
+Put the most important instruction at the very top. Claude processes instructions sequentially; early content gets more attention weight.
+
+* State the task clearly before providing context
+* Critical constraints go before background information
+* Structure: [Role/Task] → [Constraints] → [Context] → [Examples]
 
 ### Provide Context and Motivation
 
@@ -33,9 +58,36 @@ CLAUDE.md loads in every conversation. Include only instructions that apply to m
 * If instruction applies to <50% of sessions, it doesn't belong in CLAUDE.md
 * The more irrelevant content, the more Claude filters out everything uniformly
 
+### Hooks vs Instructions
+
+**Hooks** are shell commands that execute automatically on events (PreToolUse, PostToolUse, etc.). Use hooks instead of instructions when:
+
+* **Action must happen every time with zero exceptions** - hooks enforce mechanically, instructions can be ignored
+* **Claude already does it correctly without instruction** - delete the instruction, the behavior is trained-in
+* **Instruction is frequently ignored** - convert to hook for enforcement
+
+**Keep as instructions when:**
+* Behavior requires judgment or context-sensitivity
+* Action varies based on situation
+* Hook implementation would be complex or brittle
+
+**Pruning strategy:** If Claude consistently follows a rule without the instruction, remove it. Instructions that duplicate trained-in behavior waste attention budget.
+
 ## Structured Prompting
 
 Claude 4.x was trained to understand XML tags as cognitive containers, not just code. Proper structure significantly improves output quality.
+
+### Basic Prompt Structure
+
+For task-oriented prompts, use: **[Role] + [Task] + [Context]**
+
+```
+[Role]: You are a code reviewer specializing in security.
+[Task]: Review this authentication module for vulnerabilities.
+[Context]: This is a Node.js Express app using JWT tokens. Focus on token validation and session handling.
+```
+
+This structure front-loads the task (what to do) before context (background information).
 
 ### XML Tags vs Markdown Headers
 

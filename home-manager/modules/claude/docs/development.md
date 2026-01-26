@@ -3,12 +3,15 @@
 
 ## General principles
 
+* Never start implementation until explicitly told via the go command. If you ask a question and I
+  answer, you should not assume as approval to proceed unless I explicitly used the go command.
 * TODO-driven + TDD: Add TODOs → write tests (comment non-compiling) → implement
-* Never start implementation until explicitly told
 * Verify understanding checklist before starting (see CLAUDE.md)
 * Iterate: add functions/structures/TODOs before implementation
 * Follow existing patterns, use existing libraries
 * Write simple, non-overlapping tests (test golden path, not exhaustively)
+* Always leave existing TODO/FIXME/REVIEW comments intact, unless we implemented them or tracked
+  them in project doc.
 
 ## Before marking as completed
 

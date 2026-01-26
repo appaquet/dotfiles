@@ -40,7 +40,10 @@ Default to more changes - easier to squash than split.
 ## Commit Messages
 
 Prefix commits with `"private: claude: "` so they can be easily identified and squashed before PR.
-Always use `-m "message"` (never `jj commit` alone - opens editor)
+Always use `-m "message"` for commands that expect a message since they could open editor:
+  `jj commit -m ...
+  `jj new -m ...`
+  `jj squash -m ...`
 
 <good-example>
 jj commit -m "private: claude: fix validation bug"
@@ -58,6 +61,7 @@ jj commit -m "feat(workspace): add collections API"
 |---------|---------|
 | Commit current | `jj commit -m "private: claude: description"` |
 | New empty change | `jj new -m "private: claude: description"` |
+| Squash current into parent | `jj squash -m "private: claude: description"` |
 | Diff (git style) | `jj diff --git` |
 | Diff working | `jj-diff-working --git` (`--stat` for files) |
 | Diff branch | `jj-diff-branch --git` |

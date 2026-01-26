@@ -17,7 +17,9 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
    **Requirement check**: Read ALL requirements in project doc. Verify task aligns - clarify
    if it contradicts or overlaps with existing requirements.
 
-2. Load internal TODO list with tasks: implementation, testing, validation.
+2. Load internal TODO list with tasks
+   Always include testing task if not already present
+   Always include validation task that checks for the `development-completion-checklist`
 
 3. Create new jj change for this implementation.
 

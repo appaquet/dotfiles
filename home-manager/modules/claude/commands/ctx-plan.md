@@ -27,8 +27,7 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
      mind.
 
 4. Use `AskUserQuestion` to clarify requirements.
-   Research and ask until 10/10 understanding.
-   * Clarification ≠ approval—continue to steps 5-7 after answers
+   Research and ask until 10/10 on `full-understanding-checklist`.
 
 5. Create high-level development plan:
    * Break down into logical phases

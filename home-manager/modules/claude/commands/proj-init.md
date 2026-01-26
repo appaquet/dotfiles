@@ -46,4 +46,4 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
 
 5. After each Q&A, update the project doc and think hard about next questions.
 
-6. NEVER jump to implementation. **Use AskUserQuestion** to ask if user wants to proceed to planning or implementation.
+6. **STOP** - Never jump to implementation. Tell user to use `/go` when ready to proceed.

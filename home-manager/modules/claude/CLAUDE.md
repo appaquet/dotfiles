@@ -3,27 +3,22 @@
 * Name: AP
 * Research unknowns; never assume. Verify claims before stating - check docs/code first.
 * Keep solutions simple
-* Challenge with evidence when wrong
 * No superlatives or excessive praise - wastes tokens, users prefer directness
 * Optimize for TOTAL tokens (including future fixes), not current tokens - deep thinking upfront is
   cheaper than iterations
 * Environment: NixOS + MacOS (home manager, nix darwin)
 
-## Context & Planning
+## Top-level instructions
 
 * Call `/ctx-load` before work/commands to ensure all relevant context loaded
-* Plan and track work using project docs
-* Consider: edge cases, alternatives, reusability, existing patterns, bigger picture
-* Ambiguous references ("that/this/it"): STOP, ask which specific thing (IDE selection may be missing)
-* User answers with questions ("would this work?", "makes sense?"): investigate/analyze first, don't jump to implementation
-* When summarizing conversation for compaction, **always** include the reference to project doc and
-  phase (@proj/..., where prefix path with `@` very important to make sure we automatically
-  reference the file)
-* After context compaction ("continued from previous conversation"): ALWAYS call `/ctx-load` as your
-  FIRST action before any other response, even if the user sends a greeting or simple message. Then
-  continue with your work if that was the intended next step.
+* Plan and track work using @docs/project-doc.md
+* When summarizing, **always** include the reference to project doc and phase (@proj/..., where
+  prefix path with `@` very important to make sure we automatically reference the file)
+* An answer to `AskUserQuestion` should **never** be assumed as an approval to proceed with
+  implementation, unless the question was explicitly about proceeding. Only `/go` command indicates
+  that we can proceed.
 
-## Instructions files
+## Sub-instructions files
 
 * Project doc structure: @docs/project-doc.md
 * Version control: @docs/version-control.md
@@ -44,25 +39,19 @@ Extra investment triggers: instruction files, config/schemas, multi-file changes
 
 ## Context understanding
 
-If not 10/10 understanding, use `AskUserQuestion` (search code/web first):
+Always ensure 10/10 understanding checklist; use explore + web search + `AskUserQuestion`
+Always report on understanding at any decision point (ex: after thinking, answering ask, exploring, planning, etc.)
 
 <full-understanding-checklist>
 * [ ] Clear on goal/user need
-* [ ] Know which files to modify
 * [ ] Identified similar use cases to handle
 * [ ] Understand existing patterns
-* [ ] Have test strategy
-* [ ] Know success criteria
 * [ ] Re-read file structure (top-down, main-to-dependencies)
 * [ ] List existing functions/classes to understand organization
+* [ ] Have test strategy
+* [ ] Know which files to modify
+* [ ] Know success criteria
 </full-understanding-checklist>
-
-## TODO/Comment Preservation
-
-Never replace TODO/FIXME/REVIEW with explanatory notes. TODOs remain until:
-
-1. Implemented, OR
-2. Tracked in project doc AND you tell me to remove
 
 ## Destructive Operations
 

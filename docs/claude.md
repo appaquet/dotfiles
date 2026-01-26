@@ -4,6 +4,13 @@
 
 - [ ] Mem edit -> instruction writer
 - [ ] Self-validation TODO items
+- [ ] Generalize all commands to force creation of tasks to gate things
+      - Ex: /ctx-plan should load the clear list of things to do, and should have a clear task about
+        asking user to proceed with go. Same for review-fix, etc.
+- [ ] Generialize all commands that end up with an impletementation to use the same pattern
+  - Perhaps build a <..> tag and refer to it for clear instructions
+- [ ] `proj-split` -> should be `proj-edit` with crystal clear instructions on how project should be
+      edited.
 
 ## Workflows
 

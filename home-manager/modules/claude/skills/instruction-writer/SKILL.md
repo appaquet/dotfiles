@@ -1,6 +1,6 @@
 ---
 name: instruction-writer
-description: Knowledge for writing effective Claude Code instructions. Auto-triggers for CLAUDE.md, SKILL.md, command files.
+description: Write and optimize Claude Code instructions. Use when creating CLAUDE.md, SKILL.md, slash commands, agent definitions, or memory files. Triggers on "write instructions", "optimize prompt", "create skill/command", "improve CLAUDE.md".
 ---
 
 # Instruction Writer Skill
@@ -18,6 +18,7 @@ effective Claude Code instructions.
 ## Core Principles
 
 Apply all principles from @best-practices.md. Key focus areas:
+* **Self-verification** - include ways for Claude to check its work (tests, expected outputs, success criteria). Highest-leverage technique.
 * Clarity & specificity over vagueness
 * Token efficiency - every token depletes attention budget
 * Canonical examples over exhaustive edge cases

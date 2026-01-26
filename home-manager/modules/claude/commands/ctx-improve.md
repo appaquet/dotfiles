@@ -30,4 +30,4 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
    * Organize requirements into MoSCoW priorities (Must/Should/Could/Won't Have)
    * Number requirements (R1, R2, R1.1) for Tasks traceability
 
-5. **STOP** - Use `AskUserQuestion` to ask if user wants to proceed to implementation.
+5. **STOP** - Tell user to use `/go` when ready to proceed with implementation.
