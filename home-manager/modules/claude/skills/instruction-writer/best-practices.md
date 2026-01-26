@@ -351,18 +351,32 @@ Clear purpose statement.
 
 Target: $ARGUMENTS (if applicable)
 
+## Task Tracking
+
+**FIRST**: Create one `TaskCreate` per row below BEFORE any other work. Mark in-progress/completed as you proceed:
+
+| # | Subject | Description |
+| --- | --- | --- |
+| 1 | Ensure X loaded | Skip if already done, else do X |
+| 2 | Do main work | Details for agent |
+| 3 | Await /go to proceed | Work complete, await user confirmation |
+
 ## Instructions
 
-1. **Phase 1: Analysis (DO NOT MODIFY FILES)**
-   - Clear steps
-   - What to analyze
-   - **STOP HERE** - Wait for approval
-
-2. **Phase 2: Implementation (Only after approval)**
-   - Action steps
-   - What to modify
-   - Verification steps
+1. **Ensure X loaded** - Skip if already done.
+2. **Do main work** - Details...
+3. **Await /go to proceed** - Stop and wait for user.
 ```
+
+**Task Tracking Guidelines**:
+
+* **Create ALL tasks first** - One `TaskCreate` per table row BEFORE any other work
+* **Subject** = user-visible in task list UI (concise, actionable)
+* **Description** = agent context only (can be verbose)
+* Use **validation phrasing** for skippable tasks: "Ensure X" not "Do X"
+* Gate tasks use "Await /go to proceed" (not "STOP" - meaningless to user)
+* Dynamic tasks created at runtime: "For each X found, add sub-task 'Fix: [description]'"
+* Number steps match between table and instructions for clarity
 
 **Command Guidelines**:
 

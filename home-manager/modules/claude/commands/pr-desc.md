@@ -12,21 +12,31 @@ and branch diff to create multi-level breakdown.
 
 Focus: $ARGUMENTS
 
+## Task Tracking
+
+**FIRST**: Create one `TaskCreate` per row below BEFORE any other work. Mark in-progress/completed as you proceed:
+
+| # | Subject | Description |
+| --- | --- | --- |
+| 1 | Ensure context loaded | Skip if sufficient, else run /ctx-load |
+| 2 | Analyze changes | diff --stat, diff --git, understand scope |
+| 3 | Generate summary | Changelog-style, grouped by component |
+| 4 | Present to user | High-level + per-component breakdown |
+
 ## Instructions
 
 STOP rushing. Invest thinking tokens now to save iteration tokens later.
 
-1. Run `/ctx-load` to load project context (project doc, branch state, recent commits).
+1. **Ensure context loaded** - Run `/ctx-load` to load project context (project doc, branch state, recent commits).
 
-2. Analyze branch changes:
+2. **Analyze changes**:
    * Analyze thoroughly (ultra, deeply, freakingly, super ultrathink!)
-   * Speak your mind LOUDLY. Don't just use a thinking block, but tell me everything you have in
-     mind.
+   * Speak your mind LOUDLY. Don't just use a thinking block, but tell me everything you have in mind.
    * Get changed files: `jj-diff-branch --stat`
    * Read diffs for understanding: `jj-diff-branch --git`
    * If user specified a focus area, prioritize those components
 
-3. Generate changelog-style summary:
+3. **Generate summary**:
 
    **High-level summary** (2-3 sentences):
    * What was the main goal/accomplishment
@@ -41,4 +51,4 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
      * **Removed**: Deleted files, deprecated features
    * Skip empty categories
 
-4. Present summary to user - this is for reference, not copy-paste into PR.
+4. **Present to user** - This is for reference, not copy-paste into PR.

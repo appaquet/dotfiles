@@ -9,6 +9,9 @@ description: Proceed to implementation of the plan or task at hand
 
 STOP rushing. Invest thinking tokens now to save iteration tokens later.
 
+0. **Clear gate tasks** - Check `TaskList` for any "Await /go" tasks from previous command.
+   Mark them completed before proceeding.
+
 1. Ensure crystal clear understanding of the task. If not, use `/ctx-improve` to clarify.
    * Analyze thoroughly (ultra, deeply, freakingly, super ultrathink!)
    * Speak your mind LOUDLY. Don't just use a thinking block, but tell me everything you have in

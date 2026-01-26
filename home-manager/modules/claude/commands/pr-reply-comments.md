@@ -5,64 +5,77 @@ description: Reply to imported PR review comments and clean up inline comments
 
 # PR Reply Comments
 
+## Task Tracking
+
+**FIRST**: Create one `TaskCreate` per row below BEFORE any other work. Mark in-progress/completed as you proceed:
+
+| # | Subject | Description |
+| --- | --- | --- |
+| 1 | Find imported comments | Search for REVIEW: pr-import-comments pattern |
+| 2 | Reply to comments | For each imported comment found, add a sub-task "Reply: [DB_ID]" to craft reply, send via API, verify, and clean up |
+| 3 | Report | List all replies sent |
+
 ## Prerequisites
 
 Must have imported comments using `pr-import-comments` command first.
 
-## Step 1: Find Comments to Reply To
+## Instructions
 
-```bash
-# List all imported comments with metadata
-rg "REVIEW: pr-import-comments \(DB: (\d+), Node: ([^,]+), PR: (\d+)\)" -o --replace='DB: $1, Node: $2, PR: $3'
-```
+1. **Find imported comments**:
 
-## Step 2: Extract Comment Info and Craft Reply
+   ```bash
+   # List all imported comments with metadata
+   rg "REVIEW: pr-import-comments \(DB: (\d+), Node: ([^,]+), PR: (\d+)\)" -o --replace='DB: $1, Node: $2, PR: $3'
+   ```
 
-```bash
-# From imported comment, extract:
-DATABASE_ID=1234567890    # From "DB: 1234567890"  
-PR_NUMBER=1234           # From "PR: 1234"
+2. **Reply to comments** - For each imported comment:
+   * Add sub-task "Reply: [DB_ID]"
+   * Extract comment info:
 
-# Craft reply (must start with robot emoji)
-REPLY_BODY="🤖 Generated with Claude 🤖
+     ```bash
+     DATABASE_ID=1234567890    # From "DB: 1234567890"
+     PR_NUMBER=1234           # From "PR: 1234"
+     ```
 
-Here's a fix that addresses [specific issue]:
+   * Craft reply (must start with robot emoji):
 
-\`\`\`rust
-// Your code fix here
-\`\`\`
+     ```bash
+     REPLY_BODY="🤖 Generated with Claude 🤖
 
-This [explanation of why the fix works].
+     Here's a fix that addresses [specific issue]:
 
-Thanks for catching this!"
-```
+     \`\`\`rust
+     // Your code fix here
+     \`\`\`
 
-## Step 3: Send Reply
+     This [explanation of why the fix works].
 
-**CRITICAL**: Use correct endpoint with PR number:
+     Thanks for catching this!"
+     ```
 
-```bash
-gh api repos/OWNER/REPO/pulls/${PR_NUMBER}/comments/${DATABASE_ID}/replies \
-  -X POST \
-  -f body="${REPLY_BODY}"
-```
+   * Send reply - **CRITICAL**: Use correct endpoint with PR number:
 
-## Step 4: Verify Success and Clean Up
+     ```bash
+     gh api repos/OWNER/REPO/pulls/${PR_NUMBER}/comments/${DATABASE_ID}/replies \
+       -X POST \
+       -f body="${REPLY_BODY}"
+     ```
 
-**Verify response includes:**
+   * Verify response includes:
+     * ✅ `"in_reply_to_id": 1234567890` (matches your DATABASE_ID)
+     * ✅ Reply appears in PR conversation thread
 
-* ✅ `"in_reply_to_id": 1234567890` (matches your DATABASE_ID)
-* ✅ Reply appears in PR conversation thread
+   * Clean up - Remove inline comment after successful reply:
 
-**Remove inline comment** after successful reply:
+     ```bash
+     # Delete the entire comment block:
+     # // REVIEW: pr-import-comments (DB: 1234567890, Node: PRRC_kwABCDEF123456, PR: 1234) - username @ 2025-01-01T12:00:00Z
+     # // URL: https://github.com/OWNER/REPO/pull/1234#discussion_r1234567890
+     # // Location: src/main.rs:42
+     # // Comment content...
+     ```
 
-```bash
-# Delete the entire comment block:
-# // REVIEW: pr-import-comments (DB: 1234567890, Node: PRRC_kwABCDEF123456, PR: 1234) - username @ 2025-01-01T12:00:00Z
-# // URL: https://github.com/OWNER/REPO/pull/1234#discussion_r1234567890  
-# // Location: src/main.rs:42
-# // Comment content...
-```
+3. **Report** - List all replies sent.
 
 ## Troubleshooting
 
