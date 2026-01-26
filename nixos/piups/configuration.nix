@@ -7,6 +7,7 @@
   imports = [
     ../modules/common.nix
     ../modules/common-pi.nix
+    ../modules/dotblip.nix
     ./ups-server.nix
   ];
 

@@ -410,7 +410,7 @@ cmd_gc() {
 
   local ncg
   ncg=$(which nix-collect-garbage)
-  sudo "${ncg}" -d --delete-older-than "7d"
+  sudo "${ncg}" --delete-older-than "7d"
 }
 
 cmd_fmt() {
