@@ -62,8 +62,10 @@ let
     # Log state change with timestamp
     echo "$(date '+%Y-%m-%d %H:%M:%S.%3N') [$HOOK_NAME] $ACTION" >> "$LOG_FILE"
 
-    [ -z "$TMUX" ] && exit 0
-    [ -z "$CLAUDE_TMUX_WINDOW" ] && exit 0
+    if [ -z "$TMUX" ] || [ -z "$CLAUDE_TMUX_WINDOW" ]; then
+      echo '{"continue":true,"suppressOutput":true}'
+      exit 0
+    fi
 
     WORKING=" 🔄"
     PERMISSION=" 🔐"
@@ -82,6 +84,8 @@ let
         ${pkgs.tmux}/bin/tmux rename-window -t "$CLAUDE_TMUX_WINDOW" "$BASE"
         ;;
     esac
+
+    echo '{"continue":true,"suppressOutput":true}'
   '';
 
   # Creates a sandboxed version of claude that we can use to skip permissions. This isn't protecting
