@@ -21,7 +21,7 @@ Project files: !`claude-proj-docs`
 | 3 | Research and clarify | Explore files, ask questions. For each unknown, add sub-task to investigate. For each ambiguity, add sub-task to ask user. |
 | 4 | Report 10/10 understanding | If not 10/10, add more research/clarify sub-tasks and continue. Only proceed when fully understood. |
 | 5 | Create development plan | Break into phases, identify files, consider dependencies |
-| 6 | Write plan to project doc | Context, Requirements (MoSCoW), Tasks, Files sections |
+| 6 | Write plan to docs | Project doc: Context, Requirements, Phases. Phase doc: Tasks, Files. |
 | 7 | Confirm choices with user | Surface assumptions and uncertainties via AskUserQuestion |
 | 8 | Await /go to proceed | Plan complete, await user confirmation |
 
@@ -35,7 +35,7 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
 2. **Ensure task defined** - Clarify task if empty or unclear via `AskUserQuestion`.
 
 3. **Research and clarify** - Research full context: files, task, repository, documentation.
-   * Consider launching sub-agents (Task tool) to explore codebase, find patterns
+   * You need to use sub-agents (Task tool) to explore codebase, find patterns
    * Search web for external dependencies or unfamiliar concepts if needed
    * Think about requirements, constraints, edge cases
    * Analyze thoroughly (ultra, deeply, freakingly, super ultrathink!)
@@ -53,11 +53,18 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
    * Consider dependencies and challenges
    * Insert validation tasks after each phase
 
-6. **Write plan to project doc** (per @~/.claude/docs/project-doc.md structure):
+6. **Write plan to docs** (per @~/.claude/docs/project-doc.md structure):
+
+   **Project doc** (`00-*.md`):
    * Context section describing the task
    * Requirements section using MoSCoW format with numbered items (R1, R2, R1.1)
-   * Tasks section with planned work items referencing requirements (e.g., "Implement X (R1, R2.1)")
-   * Files section with relevant files
+   * Phases section with phase references (link + summary, NO task items)
+   * Files section with key files
+
+   **Phase doc** (`01-*.md`):
+   * Context referencing project doc
+   * Tasks with planned work items referencing requirements (e.g., "[ ] Implement X (R1, R2.1)")
+   * Files relevant to this phase
 
 7. **Confirm choices with user** - Think very hard about your plan and tell me your understanding
    of the task on a 10/10 scale. If still not 10/10, propose /ctx-improve to reach full understanding.
