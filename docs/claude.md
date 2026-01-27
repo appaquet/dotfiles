@@ -2,15 +2,13 @@
 
 ## TODO
 
-- [ ] Mem edit -> instruction writer
 - [ ] Self-validation TODO items
-- [ ] Generalize all commands to force creation of tasks to gate things
-      - Ex: /ctx-plan should load the clear list of things to do, and should have a clear task about
-        asking user to proceed with go. Same for review-fix, etc.
-- [ ] Generialize all commands that end up with an impletementation to use the same pattern
-  - Perhaps build a <..> tag and refer to it for clear instructions
 - [ ] `proj-split` -> should be `proj-edit` with crystal clear instructions on how project should be
       edited.
+- [x] Generalize all commands to force creation of tasks to gate things (Phase: Task Gating)
+- [x] Mem edit -> instruction writer (consolidated into /mem-edit skill)
+- [ ] Generialize all commands that end up with an impletementation to use the same pattern
+  - Perhaps build a <..> tag and refer to it for clear instructions
 
 ## Workflows
 
@@ -36,8 +34,7 @@
 - Reviewing
   - `/review-launch`: Launch review agents for code style, architecture and correctness
   - `/review-search`: Search for REVIEW comments in the codebase
-  - `/review-plan`: Create a review plan based on code changes
-  - `/review-fix`: Fix code review findings
+  - `/review-plan`: Research REVIEW comments, present plan, then fix after /go
 
 - Instructions / Memory
   - `/mem-edit`: Entry point for instruction file changes (edits, fixes, optimization)

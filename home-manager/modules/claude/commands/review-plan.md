@@ -21,7 +21,7 @@ Research REVIEW comments in the codebase, present prioritized plan, then execute
 | 6 | Present plan | Show prioritized list with research findings |
 | 7 | Await /go to proceed | Plan complete, await user confirmation |
 | 8 | Create jj change | New change for fixes |
-| 9 | Execute fixes | For each fix, add sub-task "Fix: [description]". Each fix must: implement change, remove REVIEW comment. Never skip without asking user, never replace REVIEW with "// Note:" |
+| 9 | Execute fixes | **FIRST**: Create one `TaskCreate` per REVIEW comment with subject "Fix: [file:line]" BEFORE implementing. **THEN**: For each Fix task, implement, remove REVIEW, mark complete. Never skip without asking user. |
 | 10 | Verify no orphaned removals | Search for removed REVIEW comments that weren't addressed |
 | 11 | Final verification | Search again for remaining comments, run tests |
 | 12 | Commit | Summarize fixes in message |
@@ -61,12 +61,14 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
 
 8. **Create jj change** - New change for fixes.
 
-9. **Execute fixes** - Address each task systematically:
-   * Add sub-task "Fix: [description]" for each fix
-   * Fully understand context before making changes
-   * Implement the change
-   * Remove associated REVIEW comment after completion
-   * Update project doc Tasks section progress
+9. **Execute fixes**:
+   * **FIRST**: Create one `TaskCreate` per REVIEW comment with subject "Fix: [file:line]" - do NOT implement anything until all Fix tasks exist
+   * **THEN**: For each Fix task:
+     * Mark task in-progress
+     * Implement the change
+     * Remove associated REVIEW comment
+     * Mark task complete
+     * Update project doc Tasks section
 
 10. **Verify no orphaned removals** - Search for any REVIEW comments that were removed without being addressed.
 

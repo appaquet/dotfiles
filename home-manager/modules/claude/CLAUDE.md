@@ -40,17 +40,17 @@ Extra investment triggers: instruction files, config/schemas, multi-file changes
 ## Context understanding
 
 Always ensure 10/10 understanding checklist; use explore + web search + `AskUserQuestion`
-Always report on understanding at any decision point (ex: after thinking, answering ask, exploring, planning, etc.)
+Always report on understanding at any decision point - verbalize WHAT you understand for each item, not just that you checked it. User validates your understanding.
 
 <full-understanding-checklist>
-* [ ] Clear on goal/user need
-* [ ] Identified similar use cases to handle
-* [ ] Understand existing patterns
-* [ ] Re-read file structure (top-down, main-to-dependencies)
-* [ ] List existing functions/classes to understand organization
-* [ ] Have test strategy
-* [ ] Know which files to modify
-* [ ] Know success criteria
+* [ ] Clear on goal/user need: [state the goal]
+* [ ] Identified similar use cases: [list them]
+* [ ] Understand existing patterns: [describe patterns]
+* [ ] Re-read file structure: [list key files]
+* [ ] List existing functions/classes: [name them]
+* [ ] Have test strategy: [describe approach]
+* [ ] Know which files to modify: [list files]
+* [ ] Know success criteria: [state criteria]
 </full-understanding-checklist>
 
 ## Destructive Operations

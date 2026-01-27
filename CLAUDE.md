@@ -32,7 +32,7 @@ Editing either location modifies the same files.
 
 ### Modifying Instructions
 
-Use the `instruction-writer` skill for any changes to commands, agents, skills, or instruction docs.
+Use the `mem-edit` skill for any changes to commands, agents, skills, or instruction docs.
 
 Commands and agents must be documented in `docs/claude.md` under Workflows or Agents sections.
 

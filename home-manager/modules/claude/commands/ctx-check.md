@@ -16,10 +16,8 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
    * Speak your mind LOUDLY. Don't just use a thinking block, but tell me everything you have in
      mind.
 
-2. Apply full understanding checklist.
+2. Report your understanding using `full-understanding-checklist`.
 
-3. Output uncertainty block.
+3. If understanding < 10/10, suggest `/ctx-improve`.
 
-4. If understanding < 10/10, suggest `/ctx-improve`.
-
-5. **STOP** - Do not proceed with implementation.
+4. **STOP** - Do not proceed with implementation.

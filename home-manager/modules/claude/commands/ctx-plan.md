@@ -19,7 +19,7 @@ Project files: !`claude-proj-docs`
 | 1 | Ensure context loaded | Skip if sufficient, else run /ctx-load |
 | 2 | Ensure task defined | Skip if $ARGUMENTS provided, else ask |
 | 3 | Research and clarify | Explore files, ask questions. For each unknown, add sub-task to investigate. For each ambiguity, add sub-task to ask user. |
-| 4 | Validate 10/10 understanding | If not 10/10, add more research/clarify sub-tasks and continue. Only proceed when fully understood. |
+| 4 | Report 10/10 understanding | If not 10/10, add more research/clarify sub-tasks and continue. Only proceed when fully understood. |
 | 5 | Create development plan | Break into phases, identify files, consider dependencies |
 | 6 | Write plan to project doc | Context, Requirements (MoSCoW), Tasks, Files sections |
 | 7 | Confirm choices with user | Surface assumptions and uncertainties via AskUserQuestion |
@@ -44,7 +44,7 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
    * For each unknown discovered, add sub-task to investigate
    * For each ambiguity, add sub-task to ask user
 
-4. **Validate 10/10 understanding** - Research and ask until 10/10 on `full-understanding-checklist`.
+4. **Report 10/10 understanding** - Research and ask until 10/10 on `full-understanding-checklist`.
    If not 10/10, add more research/clarify sub-tasks and continue. Only proceed when fully understood.
 
 5. **Create development plan**:

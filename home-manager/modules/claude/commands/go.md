@@ -22,7 +22,6 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
 
 2. Load internal TODO list with tasks
    Always include testing task if not already present
-   Always include validation task that checks for the `development-completion-checklist`
 
 3. Create new jj change for this implementation.
 
@@ -36,4 +35,7 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
 
    If deviating from plan, overcomplicating or keep doing same mistake, STOP and update user.
 
-5. After all implementation: commit jj change with meaningful message.
+5. **Validate completion checklist** - Before committing, verify each item in `development-completion-checklist`.
+   State each item aloud and confirm compliance. If any item fails, fix before proceeding.
+
+6. **Commit** - After validation passes, commit jj change with meaningful message.

@@ -58,7 +58,7 @@
       "WebFetch(domain:www.anthropic.com)",
       "WebFetch(domain:wiki.nixos.org)",
 
-      "Skill(instruction-writer)",
+      "Skill(mem-edit)",
 
       "SlashCommand(/ctx-load)",
       "Skill(ctx-load)",
