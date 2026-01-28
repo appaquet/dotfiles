@@ -9,8 +9,8 @@ let
     sha256 = "sha256-PuCYaNpKr9vk+AKfDg0YYQtepyjcHFvgwKLZMwTRb8c=";
   };
 
-  python = pkgs.python312;
-  pythonPackages = pkgs.python312Packages;
+  python = pkgs.python3;
+  pythonPackages = pkgs.python3Packages;
 
   # Patch iterfzf to use system fzf instead of bundled (which doesn't exist in nixpkgs)
   iterfzf = pythonPackages.iterfzf.overridePythonAttrs (old: {
