@@ -5,9 +5,9 @@ description: Proceed to implementation of the plan or task at hand
 
 # Go
 
-Proceed to implementation of the plan or task at hand.
+🚀 Engage thrusters
 
-Important: any modifications to project or phase docs need to be done via `proj-editing` skill.
+Proceed to implementation of the plan or task at hand.
 
 ## Task Tracking
 
@@ -23,9 +23,12 @@ Important: any modifications to project or phase docs need to be done via `proj-
 | 6 | Validate completion | State each item in development-completion-checklist aloud and confirm compliance |
 | 7 | Commit | Commit jj change with meaningful message |
 
+
 ## Instructions
 
 STOP rushing. Invest thinking tokens now to save iteration tokens later.
+
+🚀 Engage thrusters
 
 1. **Clear gate tasks** - Check `TaskList` for any "Await /go" tasks from previous command.
    Mark them completed before proceeding.

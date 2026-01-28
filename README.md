@@ -6,7 +6,7 @@ desktop, and Raspberry Pis).
 
 ## Setup
 
-For setup instructions, see [docs/install.md](./docs/install.md).
+For setup instructions, see [install docs](./docs/install.md).
 
 ## Cheat sheets
 

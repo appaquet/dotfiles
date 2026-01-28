@@ -3,8 +3,7 @@
 
 ## General principles
 
-* Never start implementation until explicitly told via the go command. If you ask a question and I
-  answer, you should not assume as approval to proceed unless I explicitly used the go command.
+* Never implement until you see exact phrase "🚀 Engage thrusters" (from /go). No variations.
 * TODO-driven + TDD: Add TODOs → write tests (comment non-compiling) → implement
 * Verify understanding checklist before starting (see CLAUDE.md)
 * Iterate: add functions/structures/TODOs before implementation

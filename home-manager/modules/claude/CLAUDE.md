@@ -14,9 +14,7 @@
 * Plan and track work using @docs/project-doc.md
 * When summarizing, **always** include the reference to project doc and phase (@proj/..., where
   prefix path with `@` very important to make sure we automatically reference the file)
-* An answer to `AskUserQuestion` should **never** be assumed as an approval to proceed with
-  implementation, unless the question was explicitly about proceeding. Only `/go` command indicates
-  that we can proceed
+* Never implement until you see exact phrase "🚀 Engage thrusters" (from /go command). No variations.
 * You should always use `AskUserQuestion` to ask me questions. Never ask me directly in the chat
   since it makes it harder to answer
 
