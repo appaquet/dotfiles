@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, pkgs, ... }:
 
 {
   imports = [
@@ -32,6 +32,15 @@
       ];
     };
   };
+
+  home.packages = [
+    (pkgs.writeShellScriptBin "yt-vlc" ''
+      URL=$1
+      VIDEO_URL=$(yt-dlp -g -f 136 $URL)
+      AUDIO_URL=$(yt-dlp -g -f 'bestaudio' $URL)
+      vlc --video-on-top --no-video-title-show $VIDEO_URL --input-slave $AUDIO_URL
+    '')
+  ];
 
   home.username = "appaquet";
   home.homeDirectory = "/Users/appaquet";
