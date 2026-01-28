@@ -9,6 +9,8 @@ Save project state for easy resumption by you or another agent.
 
 Project files: !`claude-proj-docs`
 
+Important: any modifications to project or phase docs need to be done via `proj-editing` skill.
+
 ## Instructions
 
 1. Find docs: `proj/` symlink → `00-*.md` (project doc), `01-*.md` etc. (phase docs)

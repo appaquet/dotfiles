@@ -7,6 +7,8 @@ description: Proceed to implementation of the plan or task at hand
 
 Proceed to implementation of the plan or task at hand.
 
+Important: any modifications to project or phase docs need to be done via `proj-editing` skill.
+
 ## Task Tracking
 
 **FIRST**: Create one `TaskCreate` per row below BEFORE any other work. Mark in-progress/completed as you proceed:

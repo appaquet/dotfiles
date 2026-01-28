@@ -7,6 +7,8 @@ description: Research REVIEW comments, present plan, then fix after /go
 
 Research REVIEW comments in the codebase, present prioritized plan, then execute fixes after /go.
 
+Important: any modifications to project or phase docs need to be done via `proj-editing` skill.
+
 ## Task Tracking
 
 **FIRST**: Create one `TaskCreate` per row below BEFORE any other work. Mark in-progress/completed as you proceed:

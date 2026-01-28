@@ -1,6 +1,6 @@
 ---
-name: mem-edit
-description: Entry point for instruction file changes - edits, fixes, optimization. Use when modifying CLAUDE.md, commands, skills, agents, or memory files.
+name: mem-editing
+description: Internal skill for instruction file changes. Called by /mem-edit command or other commands needing instruction edits. No gate - flows with caller.
 argument-hint: [files or description]
 ---
 
@@ -20,17 +20,14 @@ Target: `$ARGUMENTS` (files or description of change)
 | 1 | Ensure scope identified | Skip if $ARGUMENTS is file path, else ask |
 | 2 | Gather context | Read primary files, linked files, grep for related. For each related file, add sub-task "Read: [file]" |
 | 3 | Analyze and clarify | Check conflicts, redundancy. For each ambiguity about user intent, use AskUserQuestion to clarify. |
-| 4 | Report findings and confirm | Files affected, before/after, rationale. If multiple valid approaches, use AskUserQuestion to get direction. |
-| 5 | Await /go to proceed | Analysis complete, await user confirmation before modifying |
-| 6 | Create jj change | New change for edits |
-| 7 | Apply changes | Edit files, verify consistency across all affected |
-| 8 | Commit | Message describing changes |
+| 4 | Report findings | Files affected, before/after, rationale. If multiple valid approaches, use AskUserQuestion to get direction. |
+| 5 | Ensure jj change | Create new change if working copy clean, skip if already have uncommitted changes |
+| 6 | Apply changes | Edit files, verify consistency across all affected |
+| 7 | Commit | Message describing changes |
 
 ## Instructions
 
 STOP rushing. Invest thinking tokens now to save iteration tokens later.
-
-### Phase 1: Analysis (tasks 1-5, DO NOT MODIFY FILES)
 
 1. **Ensure scope identified**:
    * If target is a file path → that's the primary file
@@ -50,21 +47,16 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
    * Identify all changes needed (may span multiple files)
    * Apply best practices from supporting docs
 
-4. **Report findings and confirm**:
+4. **Report findings**:
    * Files affected
    * Before/after for each change
    * Rationale
-   * If multiple valid approaches exist, use `AskUserQuestion` to get direction
 
-5. **STOP** - Await /go confirmation before Phase 2.
+5. **Ensure jj change** - Check `jj status`. If working copy is clean, create new change. If already have uncommitted changes, use current change.
 
-### Phase 2: Implementation (tasks 6-8, only after /go)
+6. **Apply changes** - Preserve all salient information, verify consistency across all affected files.
 
-6. **Create jj change** - New change for edits.
-
-7. **Apply changes** - Preserve all salient information, verify consistency across all affected files.
-
-8. **Commit** - Commit changes with descriptive message.
+7. **Commit** - Commit changes with descriptive message.
 
 ## What to Check
 

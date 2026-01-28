@@ -16,7 +16,9 @@
   prefix path with `@` very important to make sure we automatically reference the file)
 * An answer to `AskUserQuestion` should **never** be assumed as an approval to proceed with
   implementation, unless the question was explicitly about proceeding. Only `/go` command indicates
-  that we can proceed.
+  that we can proceed
+* You should always use `AskUserQuestion` to ask me questions. Never ask me directly in the chat
+  since it makes it harder to answer
 
 ## Sub-instructions files
 

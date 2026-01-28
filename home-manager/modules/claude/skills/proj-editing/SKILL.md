@@ -1,6 +1,6 @@
 ---
-name: proj-edit
-description: Edit project and phase docs. Use when modifying project documentation structure, updating tasks, or validating doc consistency.
+name: proj-editing
+description: Internal skill for project/phase doc editing. Called by /proj-edit command or other commands needing doc edits. No gate - flows with caller.
 argument-hint: [operation or file]
 ---
 

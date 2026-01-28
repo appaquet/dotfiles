@@ -193,6 +193,7 @@ For skills that use tools:
 | Prose for discrete items | Lists for steps |
 | Vague descriptions: "Helps with files" | Specific: "Parse CSV files, convert to JSON" |
 | Split numbered lists across headers | Continuous list or separate lists per section |
+| Skill path reference: "Load skill `@~/.claude/skills/foo/SKILL.md`" | Just: "Load the `foo` skill" (already in context) |
 
 ## References
 
