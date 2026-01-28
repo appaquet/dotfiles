@@ -123,7 +123,7 @@ List of phase references. **No task items here** - all tasks live in phase docs.
 
 <phase-reference-format>
 ```
-### 🔄 Phase: Auth
+### 🔄 01 Phase: Auth
 [01-auth.md](01-auth.md)
 
 Implement OAuth2 flow with JWT tokens. Adds login/logout endpoints and session management.
@@ -132,9 +132,9 @@ Implement OAuth2 flow with JWT tokens. Adds login/logout endpoints and session m
 
 **Phase status indicators:**
 
-* `### ⬜ Phase: Name` - To Do
-* `### 🔄 Phase: Name` - In Progress
-* `### ✅ Phase: Name` - Done
+* `### ⬜ NN Phase: Name` - To Do (NN = file number like 01, 02)
+* `### 🔄 NN Phase: Name` - In Progress
+* `### ✅ NN Phase: Name` - Done
 
 **Rules:**
 

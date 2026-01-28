@@ -38,8 +38,8 @@ let
     fi
 
     # Clear tmux indicator on start (in case previous session was killed) and exit
-    ${claude-tmux-indicator}/bin/claude-tmux-indicator off wrapper-start
-    trap '${claude-tmux-indicator}/bin/claude-tmux-indicator off wrapper-exit-trap' EXIT
+    ${claude-tmux-indicator}/bin/claude-tmux-indicator off wrapper-start > /dev/null
+    trap '${claude-tmux-indicator}/bin/claude-tmux-indicator off wrapper-exit-trap > /dev/null' EXIT
     ${claude-code}/bin/claude "$@"
   '';
 
