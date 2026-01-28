@@ -229,7 +229,7 @@ in
         [
           nixd # nix lsp
 
-          marksman # markdown lsp
+          markdown-oxide # markdown lsp (rust, avoids dotnet/swift deps)
           markdownlint-cli # via nvim-lint
 
           nodejs # for copilot

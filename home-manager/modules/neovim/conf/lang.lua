@@ -10,9 +10,9 @@ vim.lsp.config["ts_ls"] = {
 }
 
 -- Markdown
-vim.lsp.config["marksman"] = {
-	cmd = { "marksman", "server" },
-	root_markers = { ".marksman.toml", ".git" },
+vim.lsp.config["markdown_oxide"] = {
+	cmd = { "markdown-oxide" },
+	root_markers = { ".moxide.toml", ".obsidian", ".git" },
 	filetypes = { "markdown", "markdown.mdx" },
 }
 
@@ -116,7 +116,7 @@ vim.lsp.config["lua_ls"] = {
 
 -- Enable all LSP servers
 vim.lsp.enable("ts_ls")
-vim.lsp.enable("marksman")
+vim.lsp.enable("markdown_oxide")
 vim.lsp.enable("nixd")
 vim.lsp.enable("buf_ls")
 vim.lsp.enable("bashls")
