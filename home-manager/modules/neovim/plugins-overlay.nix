@@ -23,12 +23,12 @@ final: prev: {
     # https://github.com/zbirenbaum/copilot.lua
     copilot-lua = prev.vimUtils.buildVimPlugin {
       pname = "copilot.lua";
-      version = "2025-11-04";
+      version = "2026-01-28";
       src = prev.fetchFromGitHub {
         owner = "zbirenbaum";
         repo = "copilot.lua";
-        rev = "508d8b00390ff3046323f61187a57069910c6e17";
-        sha256 = "sha256-tPCBAju6mWUNQxGiRcclWNhan3NkFWT7UlENVlGBcX0=";
+        rev = "9b8d77c6c847c83c784c05f5f86b4821ed90d3a1";
+        sha256 = "sha256-nvGt/u4K5iYi7AZegV/tpOjFNlye7+LYPMejuuIwJ0M=";
       };
       meta.homepage = "https://github.com/zbirenbaum/copilot.lua/";
       meta.hydraPlatforms = [ ];
@@ -55,12 +55,12 @@ final: prev: {
     # https://github.com/fredrikaverpil/neotest-golang
     neotest-golang = prev.vimUtils.buildVimPlugin {
       pname = "neotest-golang";
-      version = "2.5.1";
+      version = "2.7.2";
       src = prev.fetchFromGitHub {
         owner = "fredrikaverpil";
         repo = "neotest-golang";
-        rev = "v2.6.0";
-        sha256 = "sha256-aIiyJbJaB8YLfgt0S/MvP2AM32qE34WRfTa7249K5BQ=";
+        rev = "v2.7.2";
+        sha256 = "sha256-oZWb6GsZTgclKFyDgZWWANmfPRjg0LZgFymQs2SC8Rc=";
       };
       propagatedBuildInputs = [
         final.vimPlugins.neotest # Use our custom neotest from this overlay
