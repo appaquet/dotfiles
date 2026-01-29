@@ -13,51 +13,69 @@ focusing on the technical implementation rather than business value.
 
 Project files: !`claude-proj-docs`
 
+## Task Tracking
+
+**FIRST**: Create one `TaskCreate` per row below BEFORE any other work:
+
+| # | Subject | Description |
+| --- | --- | --- |
+| 1 | Check branch state | Get branch name and list of all changed files |
+| 2 | Read project doc | Check for existing Files section, note if update needed |
+| 3 | Create file tasks | **FIRST**: Get file list via jj-diff-branch --stat. **THEN**: For each code file (skip docs/generated), create `TaskCreate` with subject "Summarize: [filename]" |
+| 4 | Summarize files | For each Summarize task: read diff, understand changes, write technical summary, mark complete |
+| 5 | Format and return | Compile summaries into Files section format, return result |
+
 ## Instructions
 
-1. **Check current branch state**:
+1. Check current branch state:
    * Get current branch name: !`jj-current-branch`
    * Get list of all changed files: !`jj-stacked-stats`
 
-2. **Read existing project doc** (if it exists):
+2. Read existing project doc (if it exists):
    * Check for `proj/` symlink at repository root → find `00-*.md` main doc
    * Note if it already has a Files section with summaries
    * If Files section exists and seems complete, ask if you should update it
 
-3. **Analyze changed files**:
-   * Get overview of changes: !`jj-diff-branch --stat`
-   * For each changed file (excluding project docs and generated files):
-     1. Run !`jj-diff-branch --git <file>` to see the actual changes
-     2. If needed for context, read the full file or surrounding files
-     3. Understand both what the file does and what changes were made
-     4. Create a concise technical summary
+3. Create file tasks:
+   * **FIRST**: Get overview of changes via `jj-diff-branch --stat`
+   * **THEN**: For **EACH** code file (excluding project docs and generated files like *.pb.go):
+     * Create `TaskCreate` with subject "Summarize: [filename]"
+     * Description: "Read diff, understand purpose, write 1-2 sentence technical summary"
 
-4. **Format summaries** using this structure:
+4. Summarize files - For **EACH** Summarize task:
+   * Mark task in-progress
+   * Run `jj-diff-branch --git <file>` to see the actual changes
+   * If needed for context, read the full file or surrounding files
+   * Understand both what the file does and what changes were made
+   * Create a concise technical summary
+   * Mark task complete before moving to next file
+
+5. Format and return:
+   * Compile all summaries using this structure:
    ```markdown
    ## Files
-   
+
    - **path/to/file.ext**: Brief description of file purpose. Description of changes made.
    - **another/file.ext**: What this file is responsible for. Specific modifications implemented.
    ```
-   
-   Guidelines for summaries:
-   * First sentence: What the file is/does in the system
-   * Second sentence: What changes were made (if any)
-   * Focus on technical implementation, not business value
-   * Be specific but concise (1-2 sentences per file)
-   * Exclude generated files (*.pb.go, wire_gen.go, etc.)
-   * Exclude project docs (in `proj/` folder)
-   * Include important context files even if not modified
 
-5. **Return the summary**:
-   * If updating project doc directly was requested: update the Files section and confirm completion
-   * Otherwise: return the formatted Files section for the caller to use
-   * If project doc already has good summaries: report that no update is needed
+   * If updating project doc directly was requested: update the Files section
+   * Otherwise: return the formatted Files section for the caller
+
+## Summary Guidelines
+
+* First sentence: What the file is/does in the system
+* Second sentence: What changes were made (if any)
+* Focus on technical implementation, not business value
+* Be specific but concise (1-2 sentences per file)
+* Exclude generated files (*.pb.go, wire_gen.go, etc.)
+* Exclude project docs (in `proj/` folder)
+* Include important context files even if not modified
+* Group related files logically if there are many changes
 
 ## Important Notes
 
 * Focus on code files only, not documentation (except when specifically relevant)
-* Group related files logically if there are many changes
 * If encountering very large diffs, focus on the key changes rather than every detail
 * Always verify your understanding by checking the actual diff, not just filenames
 * Since you're a sub-agent, **NEVER** notify the user of the completion of your task. This will be

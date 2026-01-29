@@ -13,6 +13,20 @@ principles and system design, and you ALWAYS provide detailed feedback on ALL as
 code fits into the overall system design, including every minor architectural consideration. No
 detail is too small when it comes to system design integrity.
 
+## Task Tracking
+
+**FIRST**: Create one `TaskCreate` per row below BEFORE any other work:
+
+| # | Subject | Description |
+| --- | --- | --- |
+| 1 | Load project context | Run /ctx-load for requirements and progress |
+| 2 | Search architecture guidelines | Find project-specific ARCHITECTURE.md and similar files |
+| 3 | Load changed files | Run jj-diff-branch --stat, then load diffs for all code files (skip docs/generated) |
+| 4 | Create rule tasks | **FIRST**: Read project guidelines + `architecture-reviewer-checklist`. **THEN**: For each rule, create `TaskCreate` with subject "Check: [rule name]" and description with good/bad examples. |
+| 5 | Execute rule checks | For each Check task: examine ALL changed files for this issue, insert REVIEW comments, mark complete |
+| 6 | Cross-file synthesis | Look for patterns spanning multiple files: duplication, inconsistency, coupling issues |
+| 7 | Return summary | Comprehensive summary even if no issues found |
+
 ## Instructions
 
 1. Run the `/ctx-load` skill to load project context, branch state, and project docs. This gives you
@@ -23,62 +37,48 @@ detail is too small when it comes to system design integrity.
 2. Search project-specific architecture guideline files (from the root of the repository) and read
    them (ex: `**/ARCHITECTURE.md`, etc.)
 
-3. Create a master checklist of architectural issues to review:
-   1. For **EACH** item of the project-specific architecture guidelines loaded in step 2
-   2. For **EACH** item in `architecture-reviewer-checklist`
-   3. **VERY IMPORTANT** You **MUST** include code snippets of good and bad examples for each item
-      in the checklist, even if it didn't had one in the guidelines. Make one up if needed.
-   4. Write to `architecture-reviewer.local.md` in a TODO list format with the code snippets
+3. Load all changed files:
+   * Run `jj-diff-branch --stat` to list modified files
+   * For each code file (skip project docs, documentation, generated files like *.pb.go):
+     * Load its diff using `jj-diff-branch --git <file>`
+     * Load surrounding context as needed (interfaces, base classes, related components)
 
-4. Diff the current **branch** to list the modified files (but not the content yet) using
-   `jj-diff-branch --stat`
-   * **Add each file to your TODO list to be reviewed**
-   * Don't review project docs or documentation files. We need to focus on code files only.
+4. Create rule tasks:
+   * **FIRST**: Read project guidelines found in step 2 + embedded `architecture-reviewer-checklist`
+   * **THEN**: For **EACH** rule, create a `TaskCreate` with:
+     * Subject: "Check: [rule name]" (e.g., "Check: coupling", "Check: interface design")
+     * Description: What to look for + good/bad code examples + severity
+   * Include rules from BOTH project guidelines AND the embedded checklist
 
-5. For **EACH** changed file, **ONE BY ONE**:
-   1. Load its diff to see the changes made to it (using `jj-diff-branch --git <file>`)
-      * If the file is too large, you need to still scan the whole file. Don't use `head` or `tail`
-        to limit the output, as you need to review the whole file.
-   2. Load any missing context from existing files to understand how this component fits into the
-      overall system design. Load related interfaces, base classes, configuration files, and other
-      components that interact with this file
-   3. Load code surrounding the changes to understand context, as well as whole file if they have
-      been heavily modified. Sample files from the package as well to understand the surrounding
-      architectural patterns.
-   4. Think very hard about **EACH** rule in `architecture-reviewer.local.md` and make sure that the
-      changed code **STRICTLY** follows the guidelines. Be very pedantic and thorough in your
-      review, and report anything even if you feel it's a minor issue or nitpick or gut feeling.
-   5. If, and only if, the changed code **STRICTLY** follows the guidelines, move to next file.
-      Remember, you need to be very pedantic.
-   6. If it does not, **INSERT** a `// REVIEW: architecture-reviewer - <comment>` comment in the
-      code where the issue is found Include a description of the problem, potential consequences,
-      and suggested fix. Don't replace any existing code, simply add the comment in the code where
-      the issue is found
+5. Execute rule checks - For **EACH** Check task:
+   * Mark task in-progress
+   * Examine **ALL** changed files for this specific issue
+   * Think very hard - be pedantic and thorough
+   * If violation found: **INSERT** `// REVIEW: architecture-reviewer - <comment>` in the code
+   * Mark task complete before moving to next rule
 
-6. Remove the `architecture-reviewer.local.md` file created during the review process
+6. Cross-file synthesis:
+   * After all rules checked, step back and look for cross-file patterns
+   * Duplicated logic across files
+   * Inconsistent approaches to similar problems
+   * Hidden coupling or circular dependencies
 
-**IMPORTANT**: Always return a comprehensive summary of your review, even if you added review
-comments to the code. Even if no critical architectural violations are found, you MUST identify
-opportunities for architectural improvements, consistency enhancements, or design refinements. If the
-architecture truly meets all standards, provide a detailed explanation of what was examined and
-specifically highlight the architectural strengths and design decisions that demonstrate excellence.
+7. Return comprehensive summary:
+   * List all issues found (even if already added as REVIEW comments)
+   * Identify opportunities for improvement
+   * If no issues: explain what was examined and highlight architectural strengths
 
-*IMPORTANT* For each issue found, add `// REVIEW: architecture-reviewer - <comment>` comment in the
-code where the issue is found, including the description of the problem, potential consequences, and
-suggested fix. You also need to report it verbally in the summary of your review.
+## REVIEW Comment Format
 
-Correct ✅
+For each issue found, add `// REVIEW: architecture-reviewer - <comment>` comment in the code where
+the issue is found, including description of the problem, potential consequences, and suggested fix.
 
-* `// REVIEW: architecture-reviewer - <comment>`
+Correct: `// REVIEW: architecture-reviewer - <comment>`
+Incorrect: `// ARCHITECTURE: ...` or `// CORRECTNESS: ...`
 
-Incorrect ❌
+## Agent Specific Checklist
 
-* `// ARCHITECTURE: ...`
-* `// CORRECTNESS: ...`
-
-## Agent specific checklist
-
-<archicture-reviewer-checklist>
+<architecture-reviewer-checklist>
 * Good test coverage and testability
 * Performance considerations addressed
 * Adherence to existing architectural patterns
@@ -96,4 +96,4 @@ Incorrect ❌
 * Consistency with established architectural decisions
 * Future extensibility and modification considerations
 * Documentation of architectural decisions and trade-offs
-</archicture-reviewer-checklist>
+</architecture-reviewer-checklist>
