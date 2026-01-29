@@ -14,6 +14,8 @@ description: Search for REVIEW comments in the codebase
    * Adapt comment prefix for the codebase language
    * Ignore results in `proj/` (project documentation)
    * Do NOT use Bash rg with glob exclusions - they fail silently
+   * A review comment with `>>` and `<<` indicates a multi-line comment;
+     lines between `>>` and `<<` are part of the review comment.
 
 2. If no comments found, verify you're at repository root and pattern matches the language.
 

@@ -4,7 +4,7 @@ Using `jj` (collocated with git). Always detached head state.
 
 ## State Verification
 
-Before any jj operation, verify working copy state with `jj status`:
+Before any jj write operation, run `jj log --limit 5` then `jj status`:
 
 * **Expected**: Clean working copy OR only changes you made in this session
 * **Unexpected**: Pre-existing changes, unknown modifications, conflicts
@@ -75,5 +75,5 @@ jj commit -m "feat(workspace): add collections API"
 
 * Use `--git` flag for readable diff output
 * For `gh` commands: use `$(jj-current-branch)` since always detached
-* Never revert, restore, or abandon changes not made by you in this session - STOP and ask
+* Never revert, restore, or abandon changes you don't recognize - STOP and ask
 * If `jj status` shows unexpected state, do not proceed - report and ask for clarification

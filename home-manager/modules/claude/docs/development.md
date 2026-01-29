@@ -17,8 +17,10 @@
 Before adding/modifying code, ensure to follow this checklist:
 
 <code-insert-checklist>
-* [ ] Make sure that code is being inserted following the ordering of methods as per code style guidelines
+* [ ] Make sure that code is being inserted following the ordering of methods as per code style guidelines (ex: `file-organization-order`)
 * [ ] Make sure your comments/docs aren't excessive & describes why, not what
+* [ ] Make sure code strictly follows personal & project code style guidelines
+      (@~/.claude/docs/code-style.md)
 </code-insert-checklist>
 
 ## When to Stop

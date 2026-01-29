@@ -7,6 +7,8 @@
 * For complex logic blocks (7+ lines), use delimiter comments for "what"
 * Comments describe current state, not evolution - no "now uses", "changed to", "updated to" (that's git history's job)
 * Docstrings describe generic capability, not specific use cases - document WHAT it does, not WHY it was created for a particular feature
+* Error handling is descriptive and actionable
+  * In Go, no bare `return nil, err` - always wrap
 
 ## No Section Delimiters
 
@@ -16,6 +18,8 @@ Don't mark sections with comments ("// Test Helpers", "// Public Methods", ASCII
 
 STRICT ordering. Before modifying: check structure, list functions/structs.
 
+<file-organization-order>
 1. **Main/Primary** - Core purpose
 2. **Public before private** - APIs before implementation
 3. **Dependencies at bottom** - Helpers, utilities
+</file-organization-order>
