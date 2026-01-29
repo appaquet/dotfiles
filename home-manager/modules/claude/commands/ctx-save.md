@@ -23,8 +23,9 @@ Important: any modifications to project or phase docs need to be done via `proj-
    * If all tasks in phase are `[x]` → ask user if phase should be ✅ (in project doc)
 
 4. Update **phase doc** Files section:
-   * Run `branch-diff-summarizer` agent for changed files
-   * Update with output (format per @~/.claude/docs/project-doc.md)
+   * If you already have full context of changes (e.g., just completed implementation), update Files directly
+   * Otherwise, run `branch-diff-summarizer` agent for changed files
+   * Format per @~/.claude/docs/project-doc.md
 
 5. Update **project doc** if needed:
    * Update phase status (🔄 → ✅) after user confirmation

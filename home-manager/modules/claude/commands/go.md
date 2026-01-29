@@ -21,8 +21,8 @@ Proceed to implementation of the plan or task at hand.
 | 4 | Create jj change | New change for implementation |
 | 5 | Implement tasks | For each task: mark in-progress, implement following dev guidelines, mark complete, update project doc |
 | 6 | Validate completion | State each item in development-completion-checklist aloud and confirm compliance |
-| 7 | Commit | Commit jj change with meaningful message |
-
+| 7 | Save context | Run /ctx-save to update project and phase docs |
+| 8 | Commit | Commit jj change with meaningful message |
 
 ## Instructions
 
@@ -49,10 +49,12 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
 4. **Create jj change** - New change for this implementation.
 
 5. **Implement tasks** one by one, following best practices and coding standards:
+   * Make sure to follow the `code-insert-checklist` before adding/modifying code
    * Mark task in-progress when starting, completed when done
    * Mark **phase doc** task `[~]` when starting, `[x]` when done
    * When all tasks in phase are `[x]` → ask user via `AskUserQuestion` if phase should be ✅ (in project doc)
    * When all tasks for a requirement are `[x]` → ask user via `AskUserQuestion` if requirement should be ✅
+   * Make sure tests are added/updated and passing
    * Add new tasks discovered (to phase doc), update Files section as needed
    * Create jj changes for significant milestones
 
@@ -61,4 +63,6 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
 6. **Validate completion** - Before committing, verify each item in `development-completion-checklist`.
    State each item aloud and confirm compliance. If any item fails, fix before proceeding.
 
-7. **Commit** - After validation passes, commit jj change with meaningful message.
+7. **Save context** - Run `/ctx-save` to update project and phase docs.
+
+8. **Commit** - After validation passes, commit jj change with meaningful message.

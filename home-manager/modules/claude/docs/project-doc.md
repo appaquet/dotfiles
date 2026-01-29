@@ -122,12 +122,10 @@ Checklist of questions/answers to resolve
 List of phase references. **No task items here** - all tasks live in phase docs.
 
 <phase-reference-format>
-```
 ### 🔄 01 Phase: Auth
 [01-auth.md](01-auth.md)
 
 Implement OAuth2 flow with JWT tokens. Adds login/logout endpoints and session management.
-```
 </phase-reference-format>
 
 **Phase status indicators:**

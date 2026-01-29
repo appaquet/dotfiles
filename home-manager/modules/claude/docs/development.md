@@ -18,6 +18,7 @@ Before adding/modifying code, ensure to follow this checklist:
 
 <code-insert-checklist>
 * [ ] Make sure that code is being inserted following the ordering of methods as per code style guidelines
+* [ ] Make sure your comments/docs aren't excessive & describes why, not what
 </code-insert-checklist>
 
 ## When to Stop
@@ -39,10 +40,12 @@ Before marking the development as completed, ensure to follow this checklist:
 
 <development-completion-checklist>
 * [ ] Initial plan/requirements/TODOs addressed
+* [ ] Tests are added/updated and passing
 * [ ] Diff reviewed (`jj-diff-working --git`)
 * [ ] Temporary debug files/code removed
 * [ ] Code style guidelines followed
 * [ ] Strictly follow ordering of methods as stated in guidelines
 * [ ] Formatting, linting, tests pass (only affected modules)
+* [ ] Dependent code is still compiling & testing
 * [ ] Project doc updated (if exists)
 </development-completion-checklist>
