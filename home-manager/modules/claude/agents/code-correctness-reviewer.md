@@ -17,12 +17,14 @@ they seem. Every potential issue deserves attention - there is no such thing as 
 1. Run the `/ctx-load` skill to load project context, branch state, and project docs. This gives you
    access to requirements and current progress.
 
+🚀 Engage thrusters - As a sub-agent, proceed immediately after loading context.
+
 2. Search project-specific correctness guideline files (from the root of the
    repository) and read them (ex: `**/*security*.md`, `**/*testing*.md`, etc.)
 
 3. Create a master checklist of code correctness issues to review:
    1. For **EACH** item of the project-specific correctness guidelines loaded in step 2
-   2. For **EACH** item in agent specific check below
+   2. For **EACH** item in `code-correctness-reviewer-checklist`
    3. **VERY IMPORTANT** You **MUST** include code snippets of good and bad examples for each item
       in the checklist, even if it didn't had one in the guidelines. Make one up if needed.
    4. Write to `code-correctness-reviewer.local.md` in a TODO list format with the code snippets
@@ -75,6 +77,7 @@ Incorrect ❌
 
 ## Agent specific checklist
 
+<code-correctness-reviewer-checklist>
 * Proper error handling throughout the code
 * No exposed secrets or API keys
 * Input validation and sanitization implemented
@@ -92,3 +95,4 @@ Incorrect ❌
 * Defensive programming practices
 * Error message quality and usefulness
 * Logging and debugging considerations
+</code-correctness-reviewer-checklist>

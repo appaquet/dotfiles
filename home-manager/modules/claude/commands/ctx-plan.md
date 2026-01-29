@@ -8,6 +8,10 @@ argument-hint: [task-description]
 
 Build a full plan for the task at hand: $ARGUMENTS
 
+**NO QUICK FIXES**: There is no such thing as a "small change" that can skip planning. ALL
+implementations require completing this planning workflow and waiting for `/go` approval. No
+exceptions, no matter how trivial the task seems.
+
 Project files: !`claude-proj-docs`
 
 Important: any modifications to project or phase docs need to be done via `proj-editing` skill.

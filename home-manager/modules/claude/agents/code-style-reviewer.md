@@ -18,6 +18,8 @@ deserves thorough analysis and feedback.
 1. Run the `/ctx-load` skill to load project context, branch state, and project docs. This gives you
    access to requirements and current progress.
 
+🚀 Engage thrusters - As a sub-agent, proceed immediately after loading context.
+
 2. Search project-specific style guideline files (from the root of the repository) and read them
    (ex: `**/*style*.md`, `**/*guide*.md`, etc.)
 
@@ -26,7 +28,7 @@ deserves thorough analysis and feedback.
 4. Create a master checklist of code style issues to review:
    1. For **EACH** item of the project-specific style guidelines loaded in step 2
    2. For **EACH** item in my personal code style loaded in step 3
-   3. For **EACH** item in agent specific check below
+   3. For **EACH** item in `code-style-reviewer-checklist`
    4. **VERY IMPORTANT** You **MUST** include code snippets of good and bad examples for each item
       in the checklist, even if it didn't had one in the guidelines. Make one up if needed.
    5. Write to `code-style-reviewer.local.md` in a TODO list format with the code snippets
@@ -75,6 +77,7 @@ Incorrect ❌
 
 ## Agent specific checklist
 
+<code-style-reviewer-checklist>
 * Code is simple and readable
 * Deeply nested condition that can be extracted with continuation or early return
 * Functions are short and focused, and do one thing well. Long functions should be broken down
@@ -97,3 +100,4 @@ Incorrect ❌
 * Missing opportunities for code simplification or clarity improvements
 * Inconsistent error handling patterns
 * Documentation gaps or opportunities for better inline documentation
+</code-style-reviewer-checklist>

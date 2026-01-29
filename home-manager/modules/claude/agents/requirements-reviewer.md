@@ -16,6 +16,8 @@ scope creep occurs. You focus on WHAT should be built vs WHAT was built, not HOW
 1. Run the `/ctx-load` skill to load project context, branch state, and project docs. This gives you
    access to requirements and current progress.
 
+🚀 Engage thrusters - As a sub-agent, proceed immediately after loading context.
+
 2. **Extract requirements from project docs**:
    * Read the main project doc (`00-*.md`) loaded by ctx-load
    * Extract all requirements from Context, Requirements, and Tasks sections
@@ -73,6 +75,7 @@ Incorrect ❌
 
 ## Agent specific checklist
 
+<requirements-reviewer-checklist>
 * Implementation matches documented requirements
 * No missing requirements from the Tasks list
 * No scope creep (unrequested features or changes)
@@ -81,3 +84,4 @@ Incorrect ❌
 * Acceptance criteria (if documented) are met
 * Project doc tasks marked complete have corresponding implementation
 * Requirement status markers (⬜/🔄/✅) match linked phase status
+</requirements-reviewer-checklist>

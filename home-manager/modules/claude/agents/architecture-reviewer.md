@@ -18,12 +18,14 @@ detail is too small when it comes to system design integrity.
 1. Run the `/ctx-load` skill to load project context, branch state, and project docs. This gives you
    access to requirements and current progress.
 
+🚀 Engage thrusters - As a sub-agent, proceed immediately after loading context.
+
 2. Search project-specific architecture guideline files (from the root of the repository) and read
    them (ex: `**/ARCHITECTURE.md`, etc.)
 
 3. Create a master checklist of architectural issues to review:
    1. For **EACH** item of the project-specific architecture guidelines loaded in step 2
-   2. For **EACH** item in agent specific check below
+   2. For **EACH** item in `architecture-reviewer-checklist`
    3. **VERY IMPORTANT** You **MUST** include code snippets of good and bad examples for each item
       in the checklist, even if it didn't had one in the guidelines. Make one up if needed.
    4. Write to `architecture-reviewer.local.md` in a TODO list format with the code snippets
@@ -76,6 +78,7 @@ Incorrect ❌
 
 ## Agent specific checklist
 
+<archicture-reviewer-checklist>
 * Good test coverage and testability
 * Performance considerations addressed
 * Adherence to existing architectural patterns
@@ -93,3 +96,4 @@ Incorrect ❌
 * Consistency with established architectural decisions
 * Future extensibility and modification considerations
 * Documentation of architectural decisions and trade-offs
+</archicture-reviewer-checklist>
