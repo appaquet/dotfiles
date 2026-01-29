@@ -1,5 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "DISABLE_AUTOUPDATER": "1"
+  },
   "permissions": {
     "allow": [
       "Bash(notify:*)",
@@ -45,7 +48,6 @@
       "Read(/tmp/**)",
       "Edit(/tmp/**)",
       "Read(/nix/**)",
-
       "WebSearch",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:api.github.com)",
@@ -57,17 +59,17 @@
       "WebFetch(domain:code.claude.com)",
       "WebFetch(domain:www.anthropic.com)",
       "WebFetch(domain:wiki.nixos.org)",
-
       "Skill(mem-editing)",
       "Skill(proj-editing)",
-
       "SlashCommand(/ctx-load)",
       "Skill(ctx-load)",
       "SlashCommand(/ctx-save)",
       "Skill(ctx-save)",
       "SlashCommand(/review-search)",
-      "Skill(review-search)"
-    ]
+      "Skill(review-search)",
+      "Bash(grep:*)"
+    ],
+    "defaultMode": "default"
   },
   "hooks": {
     "UserPromptSubmit": [
@@ -152,6 +154,9 @@
     "type": "command",
     "command": "~/.claude/statusline.sh"
   },
+  "enabledPlugins": {
+    "plugin-dev@claude-plugins-official": true
+  },
   "sandbox": {
     "enabled": true,
     "autoAllowBashIfSandboxed": true,
@@ -162,11 +167,5 @@
       "allowLocalBinding": true
     }
   },
-  "alwaysThinkingEnabled": true,
-  "enabledPlugins": {
-    "plugin-dev@claude-plugins-official": true
-  },
-  "env": {
-    "DISABLE_AUTOUPDATER": "1"
-  }
+  "alwaysThinkingEnabled": true
 }

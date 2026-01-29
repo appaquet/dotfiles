@@ -10,7 +10,6 @@ Load as much context as possible about the project and task at hand.
 ## State
 
 * Current branch: !`jj-current-branch`
-* List of changes in current branch and stacked branches: !`jj-stacked-stats`
 * Project files: !`claude-proj-docs`
 
 ## Task Tracking
@@ -35,6 +34,7 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
    * May not exist if no task started yet - that's fine for new features
    * If files exist, read `00-*.md` project doc to understand context, requirements, progress
    * If "Checkpoint" section exists, present it to help resume where work left off
+   * If file list per commit is needed, run `jj-stacked-stats` manually
 
 2. **Load phase docs if needed**:
    * Load phase docs (`01-*.md`, `02-*.md`, ...) if referenced in checkpoint or planning to work on them
