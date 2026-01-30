@@ -113,6 +113,7 @@
 
     backups.home = {
       paths = [ "/home/appaquet" ];
+      schedule = "*:0/30";
     };
 
     backups.vms = {

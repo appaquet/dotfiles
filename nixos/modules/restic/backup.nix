@@ -85,7 +85,7 @@ in
 
     schedule = lib.mkOption {
       type = lib.types.str;
-      default = "hourly";
+      default = "daily";
       description = "Default backup schedule (systemd calendar format)";
     };
 
