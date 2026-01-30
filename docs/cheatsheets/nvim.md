@@ -106,24 +106,24 @@ keymaps, but also default/built-ins that I tend to forget.
 
 ## Nvim tree
 
-* `<leader>e` to toggle filetree 
+* `<leader>e` to toggle filetree
 * In tree
-  * `g?` to show help 
-  * `<ctrl>]` to CD into directory 
-  * `-` go up one directory 
-  * `<ctrl>v` Open in vertical split 
-  * `<ctrl>x` Open in horizontal split 
-  * `I` Toggle hidden files 
-  * `r` Rename file 
-  * `d` Delete file 
-  * `a` Add file or directory if it ends with `/` 
-  * `c`, `x`, `v` to copy, cut, paste files 
-  * `f` to find file, `F` to clear 
-  * `q` to close tree 
-  * `E` to expand all, `W` to collapse 
-  * `/` to fuzzy find file 
-  * `<leader>fS` fuzzy find content in selected directory 
-  * `<leader>ff` fuzzy find files in selected directory 
+  * `g?` to show help
+  * `<ctrl>]` to CD into directory
+  * `-` go up one directory
+  * `<ctrl>v` Open in vertical split
+  * `<ctrl>x` Open in horizontal split
+  * `I` Toggle hidden files
+  * `r` Rename file
+  * `d` Delete file
+  * `a` Add file or directory if it ends with `/`
+  * `c`, `x`, `v` to copy, cut, paste files
+  * `f` to find file, `F` to clear
+  * `q` to close tree
+  * `E` to expand all, `W` to collapse
+  * `/` to fuzzy find file
+  * `<leader>fS` fuzzy find content in selected directory
+  * `<leader>ff` fuzzy find files in selected directory
   * `<leader>gdf` show git file/directory history
   * `<leader>cs` add file to Claude context
 
@@ -155,11 +155,11 @@ keymaps, but also default/built-ins that I tend to forget.
 
 * `<leader>gs` to show git status
 * `:Git` or `:G` or `<leader>fgs` to show git status
-* `<leader>fgb` to list git branches 
-* `<leader>fgS` fuzzy find through git stash 
-* `<leader>fgf` fuzzy find through git files 
-* `<leader>fgB` fuzzy find through git blame 
-* `<leader>fgt` fuzzy find through git tags 
+* `<leader>fgb` to list git branches
+* `<leader>fgS` fuzzy find through git stash
+* `<leader>fgf` fuzzy find through git files
+* `<leader>fgB` fuzzy find through git blame
+* `<leader>fgt` fuzzy find through git tags
 * `:Gdiff` to see diff
 * `:Gwrite` to stage the current file
 * `:Gcommit` to commit changes
@@ -236,30 +236,30 @@ See [https://github.com/pwntester/octo.nvim/blob/03059cf4d694e2b3065136f074b42ee
 * `<leader>kc` to clear quickfix
 * `<leader>kn` or `]k` to go to next quickfix
 * `<leader>kp` or `[k` to go to prev quickfix
-* From any fzf, `<ctrl>k`, sends matches to the quickfix list 
+* From any fzf, `<ctrl>k`, sends matches to the quickfix list
 * Run replace in each quickfix match:
   * `:cdo %s/<pattern>/<replacement>/g` to replace in each quickfix match
   * `:cfdo %s/<pattern>/<replacement>/g` to replace in each quickfix match file
 
 ## Testing (t)
 
-* `<leader>tc` to run nearest / under cursor 
-* `<leader>tdc` to debug nearest 
-* `<leader>tf` to run file 
-* `<leader>tdf` to debug file 
-* `<leader>tp` to run package/directory 
-* `<leader>tdp` to debug package/directory 
-* `<leader>tl` to run last 
-* `<leader>tdl` to debug last 
-* `<leader>tu` to stop test 
-* `<leader>to` to output pane 
-* `<leader>tq` to close output & side panel 
+* `<leader>tc` to run nearest / under cursor
+* `<leader>tdc` to debug nearest
+* `<leader>tf` to run file
+* `<leader>tdf` to debug file
+* `<leader>tp` to run package/directory
+* `<leader>tdp` to debug package/directory
+* `<leader>tl` to run last
+* `<leader>tdl` to debug last
+* `<leader>tu` to stop test
+* `<leader>to` to output pane
+* `<leader>tq` to close output & side panel
 
-* `<leader>ts` to toggle side / summary panel, with keymaps: 
-  * `r` to run a test 
-  * `u` to stop a test 
-  * `i` to open a test source 
-  * `?` for help 
+* `<leader>ts` to toggle side / summary panel, with keymaps:
+  * `r` to run a test
+  * `u` to stop a test
+  * `i` to open a test source
+  * `?` for help
 
 ## Debugging (d)
 

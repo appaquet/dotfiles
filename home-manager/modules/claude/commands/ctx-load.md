@@ -19,8 +19,8 @@ Load as much context as possible about the project and task at hand.
 | # | Subject | Description |
 | --- | --- | --- |
 | 1 | Read project docs | Use State section. Read `00-*.md` project doc. Present Checkpoint if exists. |
-| 2 | Load phase docs if needed | Load phase docs (`01-*.md`, etc.) if referenced in checkpoint or planning to work on them |
-| 3 | Resolve ambiguity | If multiple tasks `[~]` or phases 🔄, use AskUserQuestion to clarify focus |
+| 2 | Resolve ambiguity | If multiple tasks `[~]` or phases 🔄, use AskUserQuestion to clarify focus |
+| 3 | Load phase docs if needed | Load phase docs (`01-*.md`, etc.) if referenced in checkpoint or planning to work on them |
 | 4 | Synthesize context | Analyze thoroughly. Summarize current project state. |
 | 5 | Propose next steps | Based on Tasks section or ask user via AskUserQuestion if unclear |
 | 6 | Await /go to proceed | Context loaded, await user confirmation |
@@ -36,16 +36,16 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
    * If "Checkpoint" section exists, present it to help resume where work left off
    * If file list per commit is needed, run `jj-stacked-stats` manually
 
-2. **Load phase docs if needed**:
-   * Load phase docs (`01-*.md`, `02-*.md`, ...) if referenced in checkpoint or planning to work on them
-
-3. **Resolve ambiguity** if multiple items in-progress:
+2. **Resolve ambiguity** if multiple items in-progress:
    * If multiple tasks `[~]` or phases 🔄, use `AskUserQuestion` to clarify which to focus on
    * Mark the chosen task/phase as in-progress per @~/.claude/docs/project-doc.md rules
 
+3. **Load phase docs if needed**:
+   * Load phase docs (`01-*.md`, `02-*.md`, ...) if referenced in checkpoint or planning to work on them
+
 4. **Synthesize context**:
-   * Analyze thoroughly (ultra, deeply, freakingly, super ultrathink!)
-   * Speak your mind LOUDLY. Don't just use a thinking block, but tell me everything you have in mind.
+   * Analyze thoroughly, speak your mind LOUDLY. Don't just use a thinking block, but tell me
+     everything you have in mind.
    * Provide summary of current project state and context
 
 5. **Propose next steps**:

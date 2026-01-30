@@ -1,16 +1,14 @@
 ---
 name: pr-desc
-description: Generate detailed changelog-style summary of branch changes
 context: fork
-argument-hint: [focus-area]
+description: Generate detailed changelog-style summary of branch changes
+model: haiku
 ---
 
 # PR Description
 
 Generate a detailed changelog-style summary of branch changes for reference. Uses project context
 and branch diff to create multi-level breakdown.
-
-Focus: $ARGUMENTS
 
 ## Task Tracking
 
@@ -20,8 +18,8 @@ Focus: $ARGUMENTS
 | --- | --- | --- |
 | 1 | Ensure context loaded | Skip if sufficient, else run /ctx-load |
 | 2 | Analyze changes | diff --stat, diff --git, understand scope |
-| 3 | Generate summary | Changelog-style, grouped by component |
-| 4 | Present to user | High-level + per-component breakdown |
+| 3 | Generate report | Changelog-style, grouped by component, with high level description |
+| 4 | Output report | Full report content to user |
 
 ## Instructions
 
@@ -36,7 +34,7 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
    * Read diffs for understanding: `jj-diff-branch --git`
    * If user specified a focus area, prioritize those components
 
-3. **Generate summary**:
+3. **Generate Report**:
 
    **High-level summary** (2-3 sentences):
    * What was the main goal/accomplishment
@@ -51,4 +49,8 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
      * **Removed**: Deleted files, deprecated features
    * Skip empty categories
 
-4. **Present to user** - This is for reference, not copy-paste into PR.
+4. **Output report**:
+   In **a single message**: output the complete report directly (high-level + per-component
+   breakdown). The user doesn't have access to all prior messages, you really need to verbatim
+   include everything here. Never describe what was generated - show the actual content. This is for
+   reference, not copy-paste.
