@@ -7,6 +7,10 @@ description: Research REVIEW comments, present plan, then fix after /go
 
 Research REVIEW comments in the codebase, present prioritized plan, then execute fixes after /go.
 
+Consider these REVIEW comments as created by me as a way to communicate potential issues,
+improvements, or questions in the code to act on right away. They aren't left for future
+consideration nor to be ignored.
+
 Important: any modifications to project or phase docs need to be done via `proj-editing` skill.
 
 ## Task Tracking
@@ -84,7 +88,8 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
 ## Important Rules
 
 * **NEVER** replace REVIEW comments with "// Note:" explanations or similar. Report to user if you
-  believe they are unnecessary, and keep the REVIEW comment in the code.
+  believe they are unnecessary, and keep the REVIEW comment in the code. Remember, these comments
+  are my way of communicating potential issues or improvements that I want you to act on right away.
 
 * **NEVER** skip a comment on the premise that it's not needed. If you want to pushback, communicate
   with the user. Fix other comments, then clearly state which you didn't address and why. User decides.

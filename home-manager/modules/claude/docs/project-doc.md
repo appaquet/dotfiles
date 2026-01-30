@@ -35,7 +35,7 @@ Keep sections in order described below. Never reorder, rename or create more sec
 <project-doc-sections>
 * Context - Purpose and scope
 * Checkpoint (optional) - Resume point, updated by /ctx-save
-* Requirements (optional) - MoSCoW prioritized, R-numbered
+* Requirements (optional) - MoSCoW prioritized, R-numbered, Hierarchical
 * Questions (optional) - Resolved Q&A
 * Phases - List of phase references (NOT task items)
 * Files - All modified files across all phases
@@ -43,7 +43,7 @@ Keep sections in order described below. Never reorder, rename or create more sec
 
 <phase-doc-sections>
 * Context - Brief, references project doc
-* Requirements (optional) - Only if expanding parent R-numbers (R5.A, R5.B)
+* Requirements (optional) - Only if expanding parent R-numbers (R5.A, R5.B), Hierarchical
 * Questions (optional) - Phase-specific Q&A
 * Tasks - All `[ ]`, `[~]`, `[x]` items live here
 * Files - Files relevant to this phase
@@ -64,8 +64,7 @@ Brief 1-2 paragraph summary for resuming work. References phase (if applicable),
 1. Read ALL existing requirements in main doc
 2. Update existing rather than create parallel ones
 3. All requirements go in ONE Requirements section (never create separate scope sections)
-
-Use MoSCoW prioritization with numbered requirements for traceability.
+   Use MoSCoW, R-numbering, hierarchical
 
 **Format:**
 
