@@ -37,6 +37,8 @@ in
 
       gnumake
       bintools # ld, objdump, etc.
+
+      opencode
     ])
     ++ lib.optionals pkgs.stdenv.isLinux [
       pkgs.mold
