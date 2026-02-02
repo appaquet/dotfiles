@@ -13,6 +13,13 @@ require("which-key").add({
 	{ "<C-e>h", group = "Heading", mode = { "n", "i" } },
 })
 
+local function insert_line(text)
+	local row = vim.api.nvim_win_get_cursor(0)[1]
+	vim.api.nvim_buf_set_lines(0, row, row, false, { text })
+	vim.api.nvim_win_set_cursor(0, { row + 1, #text })
+	vim.cmd("startinsert!")
+end
+
 local function comment_prefix()
 	local cs = vim.bo.commentstring
 	if cs == "" then
@@ -21,6 +28,10 @@ local function comment_prefix()
 	-- commentstring is like "// %s" or "# %s" or "-- %s"
 	local prefix = cs:gsub("%%s", ""):gsub("%s*$", "")
 	return prefix .. " "
+end
+
+local function insert_comment_tag(tag)
+	insert_line(comment_prefix() .. tag .. ": ")
 end
 
 local function todo_insert()
@@ -34,17 +45,6 @@ local function todo_set_state(state)
 	if new_line ~= line then
 		vim.api.nvim_buf_set_lines(0, row - 1, row, false, { new_line })
 	end
-end
-
-local function insert_line(text)
-	local row = vim.api.nvim_win_get_cursor(0)[1]
-	vim.api.nvim_buf_set_lines(0, row, row, false, { text })
-	vim.api.nvim_win_set_cursor(0, { row + 1, #text })
-	vim.cmd("startinsert!")
-end
-
-local function insert_comment_tag(tag)
-	insert_line(comment_prefix() .. tag .. ": ")
 end
 
 -- Todo
