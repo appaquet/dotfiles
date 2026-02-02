@@ -23,7 +23,6 @@ Load as much context as possible about the project and task at hand.
 | 3 | Load phase docs if needed | Load phase docs (`01-*.md`, etc.) if referenced in checkpoint or planning to work on them |
 | 4 | Synthesize context | Analyze thoroughly. Summarize current project state. |
 | 5 | Propose next steps | Based on Tasks section or ask user via AskUserQuestion if unclear |
-| 6 | Await /go to proceed | Context loaded, await user confirmation |
 
 ## Instructions
 
@@ -52,6 +51,4 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
    * If project doc exists, propose next tasks based on Tasks section in phase doc
    * Propose project doc updates if missing information
    * If no clear direction, use `AskUserQuestion` tool for clarification on goals
-
-6. **STOP** - Don't consider any answer on what to work next as an approval to start.
-   Await `/go` confirmation before proceeding with any work.
+   * Context is loaded - user decides next action (may run /go, /ctx-plan, or give direction)
