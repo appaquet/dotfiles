@@ -1,7 +1,7 @@
 require("which-key").add({
 	{ "<leader>r", group = "Execute" },
 	{ "<leader>T", group = "Toggle" },
-	{ "<leader>m", group = "Marks" },
+	{ "<leader>M", group = "Marks" },
 	{ "<leader>q", group = "Quit..." },
 	{ "<leader>y", group = "Clipboard" },
 })
@@ -11,7 +11,7 @@ vim.keymap.set("n", "<Leader>qa", ":qa!<CR>", { silent = true, desc = "Quit nvim
 vim.keymap.set("n", "<Leader>qs", ":SessionDelete<CR>:qa<CR>", { silent = true, desc = "Clear session & quit nvim" })
 
 -- Marks (m[a-z0-9A-Z], 'a-z0-9A-Z)
-vim.keymap.set("n", "<Leader>mk", ":delmarks a-z0-9A-Z<CR>", { silent = true, desc = "Marks: delete all" })
+vim.keymap.set("n", "<Leader>Mk", ":delmarks a-z0-9A-Z<CR>", { silent = true, desc = "Marks: delete all" })
 
 -- Command-line mappings for "sudo save" and quick quit commands
 vim.cmd([[

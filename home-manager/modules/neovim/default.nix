@@ -34,6 +34,10 @@ let
   '';
 in
 {
+  imports = [
+    ./pkms.nix
+  ];
+
   options.dotfiles.neovim = {
     enable = lib.mkOption {
       type = lib.types.bool;
@@ -220,6 +224,8 @@ in
             (includeLuaFile "testing.lua")
             (includeLuaFile "debugging.lua")
             (includeLuaFile "profiling.lua")
+
+            (includeLuaFile "pkms.lua")
           ])
         )
       );

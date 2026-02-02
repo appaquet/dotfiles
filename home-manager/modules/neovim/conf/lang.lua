@@ -14,6 +14,13 @@ vim.lsp.config["markdown_oxide"] = {
 	cmd = { "markdown-oxide" },
 	root_markers = { ".moxide.toml", ".obsidian", ".git" },
 	filetypes = { "markdown", "markdown.mdx" },
+	capabilities = {
+		workspace = {
+			didChangeWatchedFiles = {
+				dynamicRegistration = true,
+			},
+		},
+	},
 }
 
 -- Nix
