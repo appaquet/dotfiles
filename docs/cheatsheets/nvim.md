@@ -331,6 +331,19 @@ This uses code companion. Use `ga` and `gr` to accept/reject AI suggestions in v
 * `gs` use Code Companion to correct spelling and improve clarity of the current selection
 * `gC` generate comments or documentation for the current selection
 
+## PKMS (m)
+
+Personal Knowledge Management System keymaps. Works from any directory - opens floating window when
+not in PKMS, operates in-place when already in a PKMS buffer.
+
+* `<leader>md` toggle daily note (float if not in PKMS, in-place if in PKMS)
+* `<leader>mjd` open today's note
+* `<leader>mjy` open yesterday's note
+* `<leader>mjt` open tomorrow's note
+* `<leader>mf` find files in PKMS vault
+* `<leader>ms` search content in PKMS vault
+* `<leader>mS` search workspace symbols via LSP
+
 ## Object selection (in visual mode)
 
 * `aX`: Select around object X
