@@ -81,6 +81,10 @@ vim.keymap.set("v", "<Leader>rl", send_visual_to_sh, { silent = true, desc = "Ex
 vim.keymap.set("n", "<Leader>rb", send_block_to_sh, { silent = true, desc = "Execute code block" })
 vim.keymap.set("n", "<C-_>", ":nohlsearch<CR>", { silent = true, desc = "Clear search highlight" }) -- C-/
 
+-- Navigation
+vim.keymap.set("n", "<A-j>", "5j", { silent = true, desc = "Down 5 lines" })
+vim.keymap.set("n", "<A-k>", "5k", { silent = true, desc = "Up 5 lines" })
+
 -- Clipboard / yanking
 local function copy_selection_to_clipboard()
 	local selected = get_selected_visual()
