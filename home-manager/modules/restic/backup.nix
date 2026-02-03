@@ -13,7 +13,13 @@ let
   repoSecret = resticLib.repoSecret hostname;
 
   backupType = lib.types.submodule {
-    options = resticLib.backupTypeOptions;
+    options = resticLib.backupTypeOptions // {
+      pruneOpts = lib.mkOption {
+        type = lib.types.nullOr (lib.types.listOf lib.types.str);
+        default = null;
+        description = "Override default prune options";
+      };
+    };
   };
 
   mkSecrets = name: _backup: {
@@ -59,6 +65,18 @@ let
         "$@"
     '';
 
+  mkPruneScript =
+    name: backup:
+    let
+      pruneOpts = if backup.pruneOpts != null then backup.pruneOpts else cfg.pruneOpts;
+    in
+    pkgs.writeShellScriptBin "restic-${hostname}-${name}-prune" ''
+      set -euo pipefail
+      export RESTIC_REPOSITORY=$(cat ${config.sops.secrets.${repoSecret name}.path})
+      export RESTIC_PASSWORD_FILE=${config.sops.secrets.${resticLib.passwordSecret}.path}
+      exec ${pkgs.restic}/bin/restic forget ${lib.concatStringsSep " " pruneOpts} --prune "$@"
+    '';
+
   mkReduScript =
     name: _backup:
     pkgs.writeShellScriptBin "redu-${hostname}-${name}" ''
@@ -89,6 +107,12 @@ in
       description = "Sops file containing restic secrets";
     };
 
+    pruneOpts = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = resticLib.defaultPruneOpts;
+      description = "Default retention policy for restic forget";
+    };
+
     backups = lib.mkOption {
       type = lib.types.attrsOf backupType;
       default = { };
@@ -111,6 +135,7 @@ in
     home.packages =
       (lib.mapAttrsToList mkResticWrapper cfg.backups)
       ++ (lib.mapAttrsToList mkBackupScript cfg.backups)
+      ++ (lib.mapAttrsToList mkPruneScript cfg.backups)
       ++ (lib.mapAttrsToList mkReduScript cfg.backups);
   };
 }
