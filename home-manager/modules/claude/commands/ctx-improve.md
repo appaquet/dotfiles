@@ -19,7 +19,6 @@ Important: any modifications to project or phase docs need to be done via `proj-
 | 2 | Research context | Explore files, documentation, web. For each unknown, add sub-task to investigate. |
 | 3 | Ask clarifying questions | Use AskUserQuestion for each ambiguity. Continue until 10/10. |
 | 4 | Update project doc | Add new context to project doc if exists |
-| 5 | Await /go to proceed | Research complete, await user confirmation |
 
 ## Instructions
 
@@ -44,4 +43,4 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
    * Organize requirements into MoSCoW priorities (Must/Should/Could/Won't Have)
    * Number requirements (R1, R2, R1.1) for Tasks traceability
 
-5. **STOP** - Tell user to use `/go` when ready to proceed with implementation.
+5. Report 10/10 understanding achieved. User decides next action (may run /go, /ctx-plan, or give direction).

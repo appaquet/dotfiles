@@ -41,4 +41,5 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
 
 8. **Present with structure**: Show your reasoning. What did you consider? Why did you choose this approach?
 
-If at any point you feel uncertain, STOP and ask clarifying questions rather than guessing.
+**DO NOT**: Modify files, run side-effect commands, or start implementation. This command is for
+THINKING, not DOING. Present findings and await user direction.

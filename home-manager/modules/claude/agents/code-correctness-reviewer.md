@@ -75,7 +75,7 @@ where the issue is found, including description of the problem, potential conseq
 suggested fix.
 
 Correct: `// REVIEW: code-correctness-reviewer - <comment>`
-Incorrect: `// ARCHITECTURE: ...` or `// CORRECTNESS: ...`
+Incorrect: `// ARCHITECTURE: ...` or `// CORRECTNESS: ...` or `// REVIEW(code-correctness-reviewer): ...`
 
 ## Agent Specific Checklist
 

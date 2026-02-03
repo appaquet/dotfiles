@@ -5,7 +5,8 @@ description: Update project and phase docs with current state and progress
 
 # Save Context
 
-Save project state for easy resumption by you or another agent.
+Save project state for perfect resumption by you or someone else. The level of detail here is
+important so that anyone can pick up where you left off, including a junior developer.
 
 Project files: !`claude-proj-docs`
 
