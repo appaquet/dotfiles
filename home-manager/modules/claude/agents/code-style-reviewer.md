@@ -58,7 +58,7 @@ REVIEW comments where issues are found in the code.
 6. Execute rule checks - For **EACH** Check task:
    * Mark task in-progress
    * Examine **ALL** changed files for this specific issue
-   * Think very hard - be pedantic and thorough
+   * Apply <deep-thinking> procedure
    * If violation found: **INSERT** review comment using the <review-comment-format> in the code
    * Mark task complete before moving to next rule
 

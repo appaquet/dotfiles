@@ -64,3 +64,16 @@ For problems/issues/failing tests:
 
 When agreed plan fails: STOP, explain failure, ask before changing approach
 User-specified approaches are constraints - a working workaround is still a failure if it deviates
+
+## Deep Thinking
+
+When a command/skill/agent requires thorough analysis, apply these steps:
+
+<deep-thinking>
+1. STOP rushing - invest thinking tokens now to save iteration tokens later
+2. Re-read all relevant context - don't rely on memory
+3. Analyze thoroughly (ultra think, be pedantic)
+4. Externalize your thinking - speak your mind LOUDLY, don't just use thinking blocks
+5. Think as a fresh agent - what could be misinterpreted? What's ambiguous?
+6. Question assumptions - what haven't you verified?
+</deep-thinking>

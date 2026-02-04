@@ -17,9 +17,8 @@ Provide thoughtful analysis on a given question or topic without taking further 
 2. 🔳 Research (code, web search, web fetch) if question requires or context is missing
    * Consider launching sub-agents to explore codebase, find patterns if needed
    * Analyze thoroughly
-   * Speak your mind LOUDLY. Don't just use a thinking block, but tell me everything you have in
-     mind
+   * Apply <deep-thinking> procedure
 
-3. 🔳 Provide analysis, opinions, alternatives. Challenge assumptions. Spend as much time thinking
+3. 🔳 Provide analysis, opinions, alternatives. Challenge assumptions
 
 4. **STOP**: User will decide next steps

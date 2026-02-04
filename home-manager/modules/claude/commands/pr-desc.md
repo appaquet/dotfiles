@@ -12,15 +12,13 @@ and branch diff to create multi-level breakdown.
 
 ## Instructions
 
-STOP rushing. Invest thinking tokens now to save iteration tokens later.
-
 1. 🔳 Ensure context loaded
    - Run `/ctx-load` to load project context (project doc, branch state, recent commits)
 
 2. 🔳 Analyze changes
    - Get changed files: `jj-diff-branch --stat`
    - Read diffs for understanding: `jj-diff-branch --git`
-   - Analyze thoroughly
+   - Use the <deep-thinking> procedure
    - If user specified a focus area, prioritize those components
 
 3. 🔳 Generate report

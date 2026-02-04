@@ -12,9 +12,7 @@ Analyze current task/context and output explicit uncertainty disclosure
 ## Instructions
 
 1. 🔳 Review current conversation and task
-   * Analyze thoroughly, think step-by-step
-   * Speak your mind LOUDLY. Don't just use a thinking block, but tell me everything you have in
-     mind
+   - Use the <deep-thinking> procedure to analyze your understanding
 
 2. 🔳 Report your understanding using `full-understanding-checklist`
    If understanding < 10/10, suggest `/ctx-improve`

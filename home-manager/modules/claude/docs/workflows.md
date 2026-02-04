@@ -1,11 +1,5 @@
 # Workflows
 
-## Expectations
-
-- Plan before implementing (`/ctx-plan`)
-- Wait at STOP points - don't ask to continue
-- Track work in project docs
-
 ## Commands
 
 ### Actions

@@ -58,6 +58,7 @@ Your goal is to review the code correctness in the current branch, and insert
 5. Execute requirement checks - For **EACH** Verify/Check task:
    * Mark task in-progress
    * Examine **ALL** changed files for evidence this requirement is addressed
+   * Apply <deep-thinking> procedure
    * Ask: Does implementation match? Is anything missing? Is there scope creep?
    * If violation found: **INSERT** review comment using the <review-comment-format> in the code
    * Mark task complete before moving to next requirement

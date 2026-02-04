@@ -11,18 +11,14 @@ Important: any modifications to project or phase docs need to be done via `proj-
 
 ## Instructions
 
-STOP rushing. Invest thinking tokens now to save iteration tokens later.
-
 1. 🔳 Check current understanding
    - If 10/10 understanding, tell me and stop here
    - Otherwise, tell me your current understanding on a 10 scale
 
 2. 🔳 Research context
-   - Launch sub-agents (Task tool) to explore codebase, find patterns
+   - Launch sub-agents to explore codebase, find patterns
    - Search web for external dependencies or unfamiliar concepts
-   - Think about requirements, constraints, edge cases
-   - Analyze thoroughly (ultra, deeply, freakingly, super ultrathink!)
-   - Speak your mind LOUDLY - don't just use a thinking block, tell me everything you have in mind
+   - Use <deep-thinking> procedure
    - For each unknown discovered, add sub-task to investigate
 
 3. 🔳 Ask clarifying questions

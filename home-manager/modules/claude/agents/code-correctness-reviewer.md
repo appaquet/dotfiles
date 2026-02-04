@@ -56,7 +56,7 @@ Your goal is to review the code correctness in the current branch, and insert
 5. Execute rule checks - For **EACH** Check task:
    * Mark task in-progress
    * Examine **ALL** changed files for this specific issue
-   * Think very hard - be pedantic and thorough
+   * Apply <deep-thinking> procedure
    * If violation found: **INSERT** review comment using the <review-comment-format> in the code
    * Mark task complete before moving to next rule
 

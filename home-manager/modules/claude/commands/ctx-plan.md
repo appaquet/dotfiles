@@ -23,9 +23,9 @@ since I explicitly called this command.
 
 3. 🔳 Research and clarify
    - Use sub-agents to explore codebase, find patterns
+   - Using the <deep-thinking> procedure
    - Search web for unfamiliar concepts if needed
    - For each unknown, add sub-task to investigate
-   - For each ambiguity, add sub-task to ask user
    - Use `AskUserQuestion` to clarify as you discover uncertainties
 
 4. 🔳 Report 10/10 understanding via `full-understanding-checklist`

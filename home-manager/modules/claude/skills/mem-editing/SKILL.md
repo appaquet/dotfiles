@@ -23,9 +23,7 @@ Target: `$ARGUMENTS`
    - Check commands/skills/docs referencing same concepts
 
 3. 🔳 Analyze thoroughly
-   - STOP rushing - invest thinking tokens now to save iteration tokens later
-   - Speak your mind LOUDLY, verbalize thinking
-   - Think through each instruction as a fresh agent - what could be misinterpreted?
+   - Use the <deep-thinking> procedure
    - Check for redundancy and conflicts across files
    - Use `AskUserQuestion` for ambiguities
    - Apply principles from supporting docs
