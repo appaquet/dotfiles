@@ -91,7 +91,7 @@ For agents that process files individually (not checking rules):
 
 | Aspect | Command | Agent |
 |--------|---------|-------|
-| Gate tasks | "Await /go to proceed" | None (🚀 Engage thrusters) |
+| Gate tasks | "Await /proceed to proceed" | None (🚀 Engage thrusters) |
 | User interaction | AskUserQuestion | Return to caller |
 | Task purpose | User visibility + gating | Internal discipline |
 

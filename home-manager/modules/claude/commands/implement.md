@@ -1,13 +1,13 @@
 ---
-name: Go
-description: Proceed to implementation of the plan or task at hand
+name: Implement
+description: Proceed to implementation of the plan
 ---
 
-# Go
+# Implement
 
-🚀 Engage thrusters
+Goal is to proceed to implementation of the plan or task at hand.
 
-Proceed to implementation of the plan or task at hand.
+Once you are prepared (instructions clear, tasks created), 🚀 Engage thrusters!
 
 ## Task Tracking
 
@@ -15,7 +15,7 @@ Proceed to implementation of the plan or task at hand.
 
 | # | Subject | Description |
 | --- | --- | --- |
-| 1 | Clear gate tasks | Check TaskList for "Await /go" tasks from previous command, mark complete |
+| 1 | Clear gate tasks | Check TaskList for "Await /implement" tasks from previous command, mark complete |
 | 2 | Verify understanding | Ensure 10/10 understanding of task. If unclear, use /ctx-improve. Read ALL requirements in project doc. |
 | 3 | Load implementation tasks | **FIRST**: Read Tasks section from current phase doc (tasks live in phase docs, not project doc). For each `[ ]` item, create TaskCreate. **THEN**: List created tasks to verify before proceeding. |
 | 4 | Create jj change | New change for implementation |
@@ -30,7 +30,7 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
 
 🚀 Engage thrusters
 
-1. **Clear gate tasks** - Check `TaskList` for any "Await /go" tasks from previous command.
+1. **Clear gate tasks** - Check `TaskList` for any "Await /implement" tasks from previous command.
    Mark them completed before proceeding.
 
 2. **Verify understanding** - Ensure 10/10 understanding of the task. If not, use `/ctx-improve` to clarify.
@@ -66,3 +66,5 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
 7. **Save context** - Run `/ctx-save` to update project and phase docs.
 
 8. **Commit** - After validation passes, commit jj change with meaningful message.
+
+

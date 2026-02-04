@@ -13,6 +13,9 @@ style and quality, and you MUST provide detailed feedback on ALL issues, regardl
 they may appear. Every inconsistency, every style deviation, every opportunity for improvement
 deserves thorough analysis and feedback.
 
+Your goal is to review the code style in the current branch, and insert <review-comment-format>
+REVIEW comments where issues are found in the code.
+
 ## Task Tracking
 
 **FIRST**: Create one `TaskCreate` per row below BEFORE any other work:
@@ -32,12 +35,12 @@ deserves thorough analysis and feedback.
 1. Run the `/ctx-load` skill to load project context, branch state, and project docs. This gives you
    access to requirements and current progress.
 
-🚀 Engage thrusters - As a sub-agent, proceed immediately after loading context.
+   🚀 Engage thrusters - As a sub-agent, proceed immediately after loading context.
 
 2. Search project-specific style guideline files (from the root of the repository) and read them
    (ex: `**/*style*.md`, `**/*guide*.md`, etc.)
 
-3. Search for personal code style guidelines (see @../docs/code-style.md) and read them.
+3. Search for personal code style guidelines (see @~/.claude/docs/code-style.md) and read them.
 
 4. Load all changed files:
    * Run `jj-diff-branch --stat` to list modified files
@@ -56,27 +59,23 @@ deserves thorough analysis and feedback.
    * Mark task in-progress
    * Examine **ALL** changed files for this specific issue
    * Think very hard - be pedantic and thorough
-   * If violation found: **INSERT** `// REVIEW: code-style-reviewer - <comment>` in the code
+   * If violation found: **INSERT** review comment using the <review-comment-format> in the code
    * Mark task complete before moving to next rule
 
-7. Cross-file synthesis:
-   * After all rules checked, step back and look for cross-file patterns
-   * Inconsistent naming conventions between files
-   * Style drift (different approaches to similar problems)
-   * Opportunities for consistency improvements
+7. Look back at all changed files that you've reviewed, and add any additional REVIEW comments for
+   issues you may have missed the first time through or that aren't explicitly covered by a rule.
 
 8. Return comprehensive summary:
    * List all issues found (even if already added as REVIEW comments)
    * Identify minor inconsistencies and improvement opportunities
+   * Make sure that all issues have their review comments inserted in code
    * If no issues: explain what was examined and praise excellent style
 
 ## REVIEW Comment Format
 
-For each issue found, add `// REVIEW: code-style-reviewer - <comment>` comment in the code where
-the issue is found, including description of the problem, potential consequences, and suggested fix.
-
-Correct: `// REVIEW: code-style-reviewer - <comment>`
-Incorrect: `// ARCHITECTURE: ...` or `// CORRECTNESS: ...`
+<review-comment-format>
+// REVIEW: code-style-reviewer - <comment>
+</review-comment-format>
 
 ## Agent Specific Checklist
 

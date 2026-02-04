@@ -40,7 +40,7 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
    * Clarification ≠ approval—do not jump to implementation
 
 4. **Update project doc** - If working on a planned task, update with new context:
-   * Organize requirements into MoSCoW priorities (Must/Should/Could/Won't Have)
-   * Number requirements (R1, R2, R1.1) for Tasks traceability
+   * Add/update requirements as R-numbered items (R1, R2, R1.1) for task traceability
+   * Requirements describe behavior (WHAT), not implementation (HOW)
 
-5. Report 10/10 understanding achieved. User decides next action (may run /go, /ctx-plan, or give direction).
+5. Report 10/10 understanding achieved. User decides next action (may run /implement, /ctx-plan, or give direction).

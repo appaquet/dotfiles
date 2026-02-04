@@ -35,7 +35,7 @@ Keep sections in order described below. Never reorder, rename or create more sec
 <project-doc-sections>
 * Context - Purpose and scope
 * Checkpoint (optional) - Resume point, updated by /ctx-save
-* Requirements (optional) - MoSCoW prioritized, R-numbered, Hierarchical
+* Requirements (optional) - R-numbered, behavior-focused (WHAT not HOW)
 * Questions (optional) - Resolved Q&A
 * Phases - List of phase references (NOT task items)
 * Files - All modified files across all phases
@@ -59,48 +59,39 @@ Brief 1-2 paragraph summary for resuming work. References phase (if applicable),
 
 ### Requirements (optional)
 
-**Source of Truth:** Before creating/modifying requirements:
+**Content Quality:**
 
-1. Read ALL existing requirements in main doc
-2. Update existing rather than create parallel ones
-3. All requirements go in ONE Requirements section (never create separate scope sections)
-   Use MoSCoW, R-numbering, hierarchical
+Requirements describe WHAT (observable behavior), not HOW (implementation):
+
+* Good: "Tasks only run on workers with matching library versions"
+* Bad: "Workers report versions at registration time" (implementation detail)
+* Test: Can this be verified without reading the code?
 
 **Format:**
 
+* R-numbered with status markers: `R1: ⬜ Description`
+* Sub-levels when needed: R1.1, R1.2
+* Phase annotation: `(Phase: Auth)` - by name, not number
+* Tasks reference requirements: `[ ] Implement X (R1, R2.1)`
+
 ```markdown
-#### Must Have
-* R1: ⬜ Core feature description (Phase 1)
+* R1: ⬜ Core feature description (Phase: Setup)
   * R1.1: Sub-requirement if hierarchical
-* R2: 🔄 Another essential feature (Phase 2)
+* R2: 🔄 Another essential feature (Phase: Auth)
+* R3: ✅ Important supplementary feature (Phase: Setup)
 
-#### Should Have
-* R3: ✅ Important but not blocking (Phase 1)
-
-#### Could Have
-* R4: ⬜ Nice to have
-
-#### Won't Have (this scope)
-* R5: Explicitly out of scope
+#### Out of Scope (optional)
+* Explicitly out of scope items (no status needed)
 ```
 
-**Requirement status markers:**
-
-* `⬜` - Not started
-* `🔄` - In progress
-* `✅` - Complete
+**Status markers:** `⬜` Not started | `🔄` In progress | `✅` Complete
 
 **Rules:**
 
-* Number requirements sequentially (R1, R2, R3...) with sub-levels (R1.1, R1.2) when needed
-* Status marker follows requirement number: `R1: ⬜ Description`
-* Phase annotation by name: `(Phase: Auth)`, not number (phases may reorder)
-* Tasks reference requirements they address: `* [ ] Implement X (R1, R2.1)`
-* "Won't Have" items don't need status markers
-* When requirements have logical groupings (e.g., "API Operations", "Data Model"), add new
-  requirements to the appropriate group rather than creating standalone entries elsewhere
-* When promoting a Could Have item to active work, relocate it to the appropriate Must Have/Should
-  Have section based on its type (e.g., an API endpoint moves to "API Operations")
+* Read ALL existing requirements before creating/modifying
+* Update existing rather than create parallel ones
+* All requirements go in ONE section (never create separate scope sections)
+* Group related requirements logically when helpful (e.g., "API Operations", "Data Model")
 
 **Phase doc requirements:**
 
@@ -122,7 +113,7 @@ List of phase references. **No task items here** - all tasks live in phase docs.
 
 <phase-reference-format>
 ### 🔄 01 Phase: Auth
-[01-auth.md](01-auth.md)
+[01-auth](01-auth.md)
 
 Implement OAuth2 flow with JWT tokens. Adds login/logout endpoints and session management.
 </phase-reference-format>

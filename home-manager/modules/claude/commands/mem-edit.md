@@ -18,21 +18,20 @@ Target: `$ARGUMENTS`
 | --- | --- | --- |
 | 1 | Ensure scope identified | Skip if $ARGUMENTS is file path, else ask |
 | 2 | Analyze with mem-editing skill | Load `mem-editing` skill, run tasks 1-4 (scope, context, analyze, report) |
-| 3 | Await /go to proceed | Analysis complete, await user confirmation before modifying |
+| 3 | Await /proceed to proceed | Analysis complete, await user confirmation before modifying |
 | 4 | Apply with mem-editing skill | Run `mem-editing` skill tasks 5-7 (jj change, apply, commit) |
 
 ## Instructions
 
 STOP rushing. Invest thinking tokens now to save iteration tokens later.
 
-1. **Ensure scope identified** - If target unclear, use `AskUserQuestion` to clarify.
+1. **Ensure scope identified**
+   If target unclear, use `AskUserQuestion` to clarify.
 
-2. **Analyze with mem-editing skill**:
+2. **Analyze with mem-editing skill**
    * Load the `mem-editing` skill
-   * Execute tasks 1-4: scope, gather context, analyze, report findings
-   * Show before/after for proposed changes
+   * Using its instructions, analyse the requested instruction file(s)
 
-3. **STOP** - Await `/go` confirmation before applying changes.
+3. **STOP** - Await `/proceed` confirmation before applying changes.
 
-4. **Apply with mem-editing skill**:
-   * Execute tasks 5-7: ensure jj change, apply changes, commit
+4. **Apply with mem-editing skill**

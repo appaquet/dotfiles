@@ -1,6 +1,7 @@
 ---
 name: branch-diff-summarizer
 description: Analyzes branch diffs and provides detailed file-by-file summaries for PR documentation
+model: haiku
 ---
 
 # Branch Diff Summarizer
@@ -52,6 +53,7 @@ Project files: !`claude-proj-docs`
 
 5. Format and return:
    * Compile all summaries using this structure:
+
    ```markdown
    ## Files
 

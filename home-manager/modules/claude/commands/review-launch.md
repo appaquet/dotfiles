@@ -1,15 +1,14 @@
 ---
 name: review-launch
 description: Launch review agents for code style, architecture and correctness.
+model: haiku
 ---
 
 # Launch Review
 
-1. Ensure context is loaded. If not, run `/ctx-load` and `/ctx-improve`.
+1. Create a new jj change: `jj new -m "private: claude - agents review"`
 
-2. Create a new jj change for the review
-
-3. Launch 4 specialized agents in **parallel**:
+2. Launch 4 specialized agents in **parallel**:
     * Agent 1: launch the "code-style-reviewer" agent
     * Agent 2: launch the "code-correctness-reviewer" agent
     * Agent 3: launch the "architecture-reviewer" agent
@@ -18,6 +17,6 @@ description: Launch review agents for code style, architecture and correctness.
    Note: If an agent doesn't return any results but has finished, don't assume that it failed and
    just consider it as "no issues found". Don't restart the agents as they consume many tokens.
 
-4. Don't act on review comments. Agents should have added comments in the code where the issues are
+3. Don't act on review comments. Agents should have added comments in the code where the issues are
    found, so you can just read the code and see the comments. You can also read the summary of each
    agent to see what they found and make a summary.

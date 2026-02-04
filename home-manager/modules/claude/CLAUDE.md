@@ -14,9 +14,11 @@
 * Plan and track work using @docs/project-doc.md
 * When summarizing, **always** include the reference to project doc and phase (@proj/..., where
   prefix path with `@` very important to make sure we automatically reference the file)
-* Never implement until you see exact phrase "🚀 Engage thrusters" (from /go command). No variations.
+* Never implement until you see exact phrase "🚀 Engage thrusters" (from /proceed or /implement). No variations.
 * You should always use `AskUserQuestion` to ask me questions. Never ask me directly in the chat
   since it makes it harder to answer
+* When being instructed, create a `TaskCreate` for each instruction step that has 🔳 annotation
+  before proceeding with any of the requested work. Mark in-progress/completed as you proceed.
 
 ## Sub-instructions files
 

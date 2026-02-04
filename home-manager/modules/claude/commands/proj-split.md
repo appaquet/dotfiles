@@ -28,7 +28,7 @@ Important: any modifications to project or phase docs need to be done via `proj-
 | 5 | Create phase doc | Context, Tasks, Files sections per `<phase-doc-sections>` |
 | 6 | Update project doc | Add phase reference to Phases section with link + summary |
 | 7 | Resequence if needed | Ask user for approach if inserting |
-| 8 | Await /go to proceed | Phase doc created, await user confirmation |
+| 8 | Await /proceed to proceed | Phase doc created, await user confirmation |
 
 ## Instructions
 
@@ -62,7 +62,7 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
    * Add phase reference to Phases section with header + link + summary blurb (2-3 sentences):
      ```
      ### 🔄 Phase: Name
-     [02-phase-name.md](02-phase-name.md)
+     [02-phase-name](02-phase-name.md)
 
      Brief summary of what this phase accomplishes. Key deliverables or changes.
      ```
@@ -73,4 +73,4 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
    * Update all cross-references in all docs (project + phase docs)
    * Report all renamed docs to user
 
-8. **STOP** - Report changes and wait for instruction. Tell user to use `/go` when ready to proceed.
+8. **STOP** - Report changes and wait for instruction. Tell user to use `/proceed` when ready to proceed.

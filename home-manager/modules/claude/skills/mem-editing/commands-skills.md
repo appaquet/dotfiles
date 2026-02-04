@@ -85,13 +85,13 @@ Target: $ARGUMENTS (if applicable)
 | --- | --- | --- |
 | 1 | Ensure X loaded | Skip if already done, else do X |
 | 2 | Do main work | Details for agent |
-| 3 | Await /go to proceed | Work complete, await user confirmation |
+| 3 | Await /proceed to proceed | Work complete, await user confirmation |
 
 ## Instructions
 
 1. **Ensure X loaded** - Skip if already done.
 2. **Do main work** - Details...
-3. **Await /go to proceed** - Stop and wait for user.
+3. **Await /proceed to proceed** - Stop and wait for user.
 ```
 
 ### Task Tracking Guidelines
@@ -100,7 +100,7 @@ Target: $ARGUMENTS (if applicable)
 * **Subject** = user-visible in task list UI (concise, actionable)
 * **Description** = agent context only (can be verbose)
 * Use **validation phrasing** for skippable tasks: "Ensure X" not "Do X"
-* Gate tasks use "Await /go to proceed" (not "STOP" - meaningless to user)
+* Gate tasks use "Await /proceed to proceed" (not "STOP" - meaningless to user)
 * **Dynamic tasks** - When a step requires per-item work, use FIRST/THEN enforcement:
   * In Description: "**FIRST**: Create one `TaskCreate` per X with subject 'Type: [identifier]' BEFORE doing Y. **THEN**: For each task, do work and mark complete."
   * In Instructions: Same FIRST/THEN structure with explicit "do NOT implement until all tasks exist"

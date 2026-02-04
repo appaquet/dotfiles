@@ -90,7 +90,7 @@ let
 
   # Creates a sandboxed version of claude that we can use to skip permissions. This isn't protecting
   # it from the network, but we can at least be sure it doesn't wipe the system and home.
-  sandboxed-version = "12";
+  sandboxed-version = "13";
   claude-sandboxed = pkgs.writeShellApplication {
     name = "claude-sandboxed";
 
@@ -141,6 +141,16 @@ let
         ARGS=(--dangerously-skip-permissions --add-dir "${config.home.homeDirectory}" "$@")
       fi
 
+      # Mount tmux socket directory if available (for tmux indicator to work)
+      TMUX_MOUNT=""
+      if [ -n "''${TMUX:-}" ]; then
+        TMUX_SOCKET_PATH=$(echo "$TMUX" | cut -d, -f1)
+        TMUX_SOCKET_DIR=$(dirname "$TMUX_SOCKET_PATH")
+        if [ -d "$TMUX_SOCKET_DIR" ]; then
+          TMUX_MOUNT="--volume $TMUX_SOCKET_DIR:$TMUX_SOCKET_DIR"
+        fi
+      fi
+
       docker run --rm -it \
         --hostname "$(hostname)" \
         --user "$USER_UID:$USER_GID" \
@@ -157,6 +167,7 @@ let
         --volume "/etc/static/nix:/etc/static/nix:ro" \
         --volume "/nix:/nix:ro" \
         --volume "/run:/run:ro" \
+        $TMUX_MOUNT \
         --env "CLAUDE_CONFIG_DIR" \
         --network host \
         --pid host \
@@ -172,6 +183,8 @@ let
     "TERM"
     "COLORTERM"
     "SHELL"
+    "TMUX"
+    "CLAUDE_TMUX_WINDOW"
     "GOROOT"
     "GOBIN"
     "MISE_SHELL"

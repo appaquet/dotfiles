@@ -1,6 +1,7 @@
 ---
 name: ctx-load
 description: Load comprehensive project context including docs, project info, and branch status
+model: haiku
 ---
 
 # Load Context
@@ -14,7 +15,9 @@ Load as much context as possible about the project and task at hand.
 
 ## Task Tracking
 
-**FIRST**: Create one `TaskCreate` per row below BEFORE any other work. Mark in-progress/completed as you proceed:
+**IMPORTANT**: Before doing any of the instructions bellow, create one `TaskCreate` per row below
+BEFORE any other work. Mark in-progress/completed as you proceed:
+
 
 | # | Subject | Description |
 | --- | --- | --- |
@@ -23,6 +26,7 @@ Load as much context as possible about the project and task at hand.
 | 3 | Load phase docs if needed | Load phase docs (`01-*.md`, etc.) if referenced in checkpoint or planning to work on them |
 | 4 | Synthesize context | Analyze thoroughly. Summarize current project state. |
 | 5 | Propose next steps | Based on Tasks section or ask user via AskUserQuestion if unclear |
+
 
 ## Instructions
 
@@ -35,20 +39,18 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
    * If "Checkpoint" section exists, present it to help resume where work left off
    * If file list per commit is needed, run `jj-stacked-stats` manually
 
-2. **Resolve ambiguity** if multiple items in-progress:
-   * If multiple tasks `[~]` or phases 🔄, use `AskUserQuestion` to clarify which to focus on
-   * Mark the chosen task/phase as in-progress per @~/.claude/docs/project-doc.md rules
-
-3. **Load phase docs if needed**:
+2. **Load current phase docs**:
    * Load phase docs (`01-*.md`, `02-*.md`, ...) if referenced in checkpoint or planning to work on them
+   * Can be more than one phase if ambiguous or overlapping work
 
-4. **Synthesize context**:
+3. **Synthesize context**:
    * Analyze thoroughly, speak your mind LOUDLY. Don't just use a thinking block, but tell me
      everything you have in mind.
    * Provide summary of current project state and context
 
-5. **Propose next steps**:
+4. **Propose next steps**:
    * If project doc exists, propose next tasks based on Tasks section in phase doc
    * Propose project doc updates if missing information
-   * If no clear direction, use `AskUserQuestion` tool for clarification on goals
-   * Context is loaded - user decides next action (may run /go, /ctx-plan, or give direction)
+   * If no clear direction or ambiguities on next steps, use `AskUserQuestion` tool for
+     clarification on goals
+   * Context is loaded - user decides next action (may run /implement, /ctx-plan, or give direction)

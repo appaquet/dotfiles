@@ -43,7 +43,7 @@ Editing either location modifies the same files.
 - Agents (`agents/*.md`)
 - Supporting docs (`docs/*.md`)
 
-This applies even when running other commands like `/go`. If a task requires editing instructions, stop and run `/mem-edit` first.
+This applies even when running other commands like `/proceed` or `/implement`. If a task requires editing instructions, stop and run `/mem-edit` first.
 
-Commands and agents must be documented in `docs/claude.md` under Workflows or Agents sections.
+Commands and agents must be documented in @docs/claude.md under Workflows or Agents sections.
 

@@ -1,11 +1,11 @@
 ---
 name: review-plan
-description: Research REVIEW comments, present plan, then fix after /go
+description: Research REVIEW comments, present plan, then fix after /implement
 ---
 
 # Plan and Fix Review Comments
 
-Research REVIEW comments in the codebase, present prioritized plan, then execute fixes after /go.
+Research REVIEW comments in the codebase, present prioritized plan, then execute fixes after /implement.
 
 Consider these REVIEW comments as created by me as a way to communicate potential issues,
 improvements, or questions in the code to act on right away. They aren't left for future
@@ -25,7 +25,7 @@ Important: any modifications to project or phase docs need to be done via `proj-
 | 4 | Check requirements | Read ALL requirements in project doc. Verify fixes don't contradict - update existing requirement if needed |
 | 5 | Update project doc | Add identified fixes to Tasks section with priorities |
 | 6 | Present plan | Show prioritized list with research findings |
-| 7 | Await /go to proceed | Plan complete, await user confirmation |
+| 7 | Await /implement to proceed | Plan complete, await user confirmation |
 | 8 | Create jj change | New change for fixes |
 | 9 | Execute fixes | **FIRST**: Create one `TaskCreate` per REVIEW comment with subject "Fix: [file:line]" BEFORE implementing. **THEN**: For each Fix task, implement, remove REVIEW, mark complete. Never skip without asking user. |
 | 10 | Verify no orphaned removals | Search for removed REVIEW comments that weren't addressed |
@@ -61,13 +61,13 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
 
 6. **Present plan** - Show prioritized list with research findings.
 
-7. **STOP** - Wait for user to respond (e.g., with `/go`).
+7. **STOP** - Wait for user to respond (e.g., with `/implement`).
 
 ### Phase 2: Execute (tasks 8-12)
 
-8. **Create jj change** - New change for fixes.
+1. **Create jj change** - New change for fixes.
 
-9. **Execute fixes**:
+2. **Execute fixes**:
    * **FIRST**: Create one `TaskCreate` per REVIEW comment with subject "Fix: [file:line]" - do NOT implement anything until all Fix tasks exist
    * **THEN**: For each Fix task:
      * Mark task in-progress
@@ -76,14 +76,14 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
      * Mark task complete
      * Update project doc Tasks section
 
-10. **Verify no orphaned removals** - Search for any REVIEW comments that were removed without being addressed.
+3. **Verify no orphaned removals** - Search for any REVIEW comments that were removed without being addressed.
 
-11. **Final verification**:
+4. **Final verification**:
     * Search again for any remaining review comments
     * Run tests, formatting, and linting
     * Ensure project doc reflects all completed work
 
-12. **Commit** - Commit the jj change with a clear message summarizing the fixes.
+5. **Commit** - Commit the jj change with a clear message summarizing the fixes.
 
 ## Important Rules
 

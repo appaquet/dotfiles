@@ -26,7 +26,7 @@ Important: any modifications to project or phase docs need to be done via `proj-
 | 3 | Create project doc | Read project-doc.md structure. Create 00-\<name\>.md with Context, empty Requirements, Phases (link to first phase), Files |
 | 4 | Create first phase doc | Create 01-\<phase-name\>.md with Context, Tasks, Files. All task items go here. |
 | 5 | Clarify and update docs | Ask questions, update docs after each answer. For each gap, add sub-task "Clarify: [question]". Continue until 10/10. |
-| 6 | Await /go to proceed | Docs ready, await user confirmation |
+| 6 | Await /implement to proceed | Docs ready, await user confirmation |
 
 ## File Location
 
@@ -69,4 +69,4 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
    * For each gap discovered, add sub-task "Clarify: [question]"
    * Continue until 10/10 understanding on the `full-understanding-checklist`
 
-6. **STOP** - Never jump to implementation. Tell user to use `/go` when ready to proceed.
+6. **STOP** - Never jump to implementation. Tell user to use `/implement` when ready to proceed.

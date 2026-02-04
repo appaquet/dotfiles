@@ -14,7 +14,9 @@
 ## Workflows
 
 - Actions
-  - `/go`: Start implement the next task / work item / phase
+  - `/proceed`: Proceed with current workflow (universal gate)
+  - `/implement`: Start implementing tasks from phase doc (full development workflow)
+  - `/forked <skill>`: Fork a skill's work to sub-agents for parallel execution
   - `/continue`: Continue working on what you were doing before being interrupted
   - `/ask`: Think about a topic and provide feedback without acting
   - `/think`: Trigger deep thinking mode for complex problems
@@ -36,7 +38,7 @@
 - Reviewing
   - `/review-launch`: Launch review agents for code style, architecture and correctness
   - `/review-search`: Search for REVIEW comments in the codebase
-  - `/review-plan`: Research REVIEW comments, present plan, then fix after /go
+  - `/review-plan`: Research REVIEW comments, present plan, then fix after /implement
 
 - Instructions / Memory
   - `/mem-edit`: Edit instruction files with analysis and gate (user-facing)

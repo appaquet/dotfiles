@@ -20,7 +20,7 @@ Target: `$ARGUMENTS`
 | 2 | Load proj-editing skill | Load skill for structure rules |
 | 3 | Analyze current state | Read relevant docs, identify what needs to change |
 | 4 | Report proposed changes | Show before/after for each change |
-| 5 | Await /go to proceed | Analysis complete, await user confirmation |
+| 5 | Await /proceed to proceed | Analysis complete, await user confirmation |
 | 6 | Apply changes | Edit docs following proj-editing skill rules |
 
 ## Instructions
@@ -43,6 +43,6 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
 
 4. **Report proposed changes** - Show before/after for each change.
 
-5. **STOP** - Await `/go` confirmation before applying changes.
+5. **STOP** - Await `/proceed` confirmation before applying changes.
 
 6. **Apply changes** - Follow proj-editing skill operations, verify consistency.

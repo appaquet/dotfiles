@@ -9,7 +9,7 @@ argument-hint: [task-description]
 Build a full plan for the task at hand: $ARGUMENTS
 
 **NO QUICK FIXES**: There is no such thing as a "small change" that can skip planning. ALL
-implementations require completing this planning workflow and waiting for `/go` approval. No
+implementations require completing this planning workflow and waiting for `/implement` approval. No
 exceptions, no matter how trivial the task seems.
 
 Project files: !`claude-proj-docs`
@@ -29,7 +29,7 @@ Important: any modifications to project or phase docs need to be done via `proj-
 | 5 | Create development plan | Break into phases, identify files, consider dependencies |
 | 6 | Write plan to docs | Project doc: Context, Requirements, Phases. Phase doc: Tasks, Files. |
 | 7 | Confirm choices with user | Surface assumptions and uncertainties via AskUserQuestion |
-| 8 | Await /go to proceed | Plan complete, await user confirmation |
+| 8 | Await /implement to proceed | Plan complete, await user confirmation |
 
 
 ## Instructions
@@ -63,7 +63,7 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
 
    **Project doc** (`00-*.md`):
    * Context section describing the task
-   * Requirements section using MoSCoW format with numbered items (R1, R2, R1.1)
+   * Requirements section with R-numbered items (R1, R2, R1.1) - behavior-focused (WHAT not HOW)
    * Phases section with phase references (link + summary, NO task items)
    * Files section with key files
 
@@ -78,4 +78,4 @@ STOP rushing. Invest thinking tokens now to save iteration tokens later.
 
 8. **STOP** - The user will decide when to proceed to implementation.
    * Do NOT use `EnterPlanMode` or `ExitPlanMode` tools - this skill writes to project docs directly
-   * Simply stop generating and wait for user to respond (e.g., with `/go`)
+   * Simply stop generating and wait for user to respond (e.g., with `/implement`)

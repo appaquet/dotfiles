@@ -3,7 +3,7 @@
 
 ## General principles
 
-* Never implement until you see exact phrase "🚀 Engage thrusters" (from /go). No variations.
+* Never implement until you see exact phrase "🚀 Engage thrusters" (from /proceed or /implement). No variations.
 * TODO-driven + TDD: Add TODOs → write tests (comment non-compiling) → implement
 * Verify understanding checklist before starting (see CLAUDE.md)
 * Iterate: add functions/structures/TODOs before implementation
