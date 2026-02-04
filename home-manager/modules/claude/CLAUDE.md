@@ -12,13 +12,12 @@
 ## Top-level instructions
 
 * If `/ctx-load` has never been called, always call it first
-* Plan and track work using @docs/project-doc.md
+* Plan and track work using project & phase docs: @docs/project-doc.md
 * When summarizing, ALWAYS include the reference to project doc and phase (@proj/..., where
   prefix path with `@` very important to make sure we automatically reference the file)
 * Never implement until you see exact phrase "🚀 Engage thrusters". Never ask via `AskUserQuestion`
   if you can proceed - wait for signal
-* You should always use `AskUserQuestion` to ask me questions
-  Never ask me directly in response
+* You should always use `AskUserQuestion` to ask me questions. Never ask me directly in response
 * In any command/skill/agent, create a `TaskCreate` for each instruction step that has 🔳 annotation
   before proceeding with any of the requested work. Mark in-progress/completed as you proceed
 
@@ -49,9 +48,7 @@ Always report on understanding at any decision point - verbalize WHAT you unders
 ## Destructive Operations
 
 Before deleting files/content: confirm preserved elsewhere OR explicitly disposable
-
 Before rewriting/refactoring files: diff old vs new to verify no content lost
-
 Always assume you are not alone working on the same code. Multiple agents or myself may be working concurrently.
 
 ## Problem Solving
