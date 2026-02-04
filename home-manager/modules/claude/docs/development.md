@@ -25,7 +25,7 @@ Before adding/modifying code, ensure to follow this checklist:
 
 ## When to Stop
 
-**Stop development** as soon as any of these triggers occur:
+STEP IMPLEMENTATION as soon as any of these triggers occur:
 
 <development-stop-triggers>
 * Architectural mismatches (mutable vs immutable, incompatible structures)
@@ -46,7 +46,7 @@ Before marking the development as completed, ensure to follow this checklist:
 * [ ] Diff reviewed (`jj-diff-working --git`)
 * [ ] Temporary debug files/code removed
 * [ ] Code style guidelines followed
-* [ ] Strictly follow ordering of methods as stated in guidelines
+* [ ] Strictly follow ordering in `file-organization-order`
 * [ ] Formatting, linting, tests pass (only affected modules)
 * [ ] Dependent code is still compiling & testing
 * [ ] Project doc updated (if exists)

@@ -14,6 +14,7 @@ For quick iteration, use `check` first (fast eval) before `build`.
 ## Documentation
 
 `docs/features/` is a symlink to a **separate secrets repo**. This means:
+
 - Project docs (`proj/` → `docs/features/.../00-*.md`) are NOT in this repo
 - Changes to project docs are tracked in the secrets repo, not here
 - `jj status` in dotfiles will NOT show project doc changes
@@ -34,16 +35,11 @@ Editing either location modifies the same files.
 | Agents | `agents/<name>.md` |
 | Settings | `settings.json` |
 
-
 ### Modifying Instructions
 
-**ALWAYS use `/mem-edit`** for any changes to instruction files:
+ALWAYS use the `/mem-editting` skill for any changes to instruction files:
+
 - Commands (`commands/*.md`)
 - Skills (`skills/*/`)
 - Agents (`agents/*.md`)
 - Supporting docs (`docs/*.md`)
-
-This applies even when running other commands like `/proceed` or `/implement`. If a task requires editing instructions, stop and run `/mem-edit` first.
-
-Commands and agents must be documented in @docs/claude.md under Workflows or Agents sections.
-

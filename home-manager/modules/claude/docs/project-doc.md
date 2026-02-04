@@ -1,6 +1,6 @@
 # Project Doc Structure
 
-Project/feature documentation spanning multiple PRs. Docs kept throughout development.
+Project/feature documentation spanning potentially multiple PRs. Docs kept throughout development
 
 ## File Location
 
@@ -10,56 +10,50 @@ Unless project instructions specify otherwise:
 * **Main doc**: `00-<project-name>.md` inside the folder
 * **Phase docs**: `01-<phase-name>.md`, `02-<phase-name>.md`, etc. (numbered for ordering)
 * **Symlink**: `proj/` at repo root pointing to the project folder
-* **Private change**: Symlink in `private: proj - <project-name>` jj change - never committed
+* **Private change**: Symlink in `private: proj - <project-name>` jj change
+  * Never squash anything else into it
+  * Don't prefix with `claude:`
 
 ### Finding Project Docs
 
 1. Check if `proj/` symlink exists at repo root → follow it
 2. Look for `00-*.md` as project doc, `01-*.md`, `02-*.md`, etc. as phase docs
 3. If project instructions specify different location → use that
+4. Never start looking for project docs elsewhere, if symlink not found and docs needed → inform user
 
-## When to Create
+## When Created & Updated
 
 * **Create**: Only via `/proj-init`
 * **Update**: After file modifications if exists
-* **Phase docs**: Created with project doc (first phase) or via `/proj-split` (additional phases)
-* **Never**: Create phase docs proactively without asking
+* **Phase docs**:
+  * Created with project doc (first phase) or via `/proj-split` (additional phases)
+  * Propose creation via `AskUserQuestion` when phase scope justifies it
 
-## Sections
+## Project Doc (00-XYZ.md)
 
-Keep sections in order described below. Never reorder, rename or create more sections.
+Overview and navigation. Requirements live here. Tasks do NOT
 
-**Project doc** (`00-*.md`): Overview and navigation. Requirements live here. Tasks do NOT live here.
-**Phase doc** (`01-*.md`, `02-*.md`, ...): Where work happens. All tasks live here.
+### Sections
 
-<project-doc-sections>
+Keep in order. Never reorder, rename, or create more sections
+
 * Context - Purpose and scope
-* Checkpoint (optional) - Resume point, updated by /ctx-save
-* Requirements (optional) - R-numbered, behavior-focused (WHAT not HOW)
-* Questions (optional) - Resolved Q&A
+* Checkpoint - Resume point, updated by /ctx-save
+* Requirements - R-numbered, behavior-focused (WHAT not HOW)
+* Questions (optional) - Pending or resolved Q&A
 * Phases - List of phase references (NOT task items)
 * Files - All modified files across all phases
-</project-doc-sections>
-
-<phase-doc-sections>
-* Context - Brief, references project doc
-* Requirements (optional) - Only if expanding parent R-numbers (R5.A, R5.B), Hierarchical
-* Questions (optional) - Phase-specific Q&A
-* Tasks - All `[ ]`, `[~]`, `[x]` items live here
-* Files - Files relevant to this phase
-</phase-doc-sections>
 
 ### Context
 
 Purpose and scope of changes
 
-### Checkpoint (optional)
+### Checkpoint
 
-Brief 1-2 paragraph summary for resuming work. References phase (if applicable), tasks worked on, and next step if decided/obvious. Updated by `/ctx-save`, preserved until next save overwrites. Checkpoint should remain in the main doc only.
+Brief 1-2 paragraph summary for resuming work. References phase (if applicable), tasks worked on,
+and next step if decided/obvious. Updated by `/ctx-save`, preserved until next save overwrites
 
-### Requirements (optional)
-
-**Content Quality:**
+### Requirements
 
 Requirements describe WHAT (observable behavior), not HOW (implementation):
 
@@ -93,48 +87,86 @@ Requirements describe WHAT (observable behavior), not HOW (implementation):
 * All requirements go in ONE section (never create separate scope sections)
 * Group related requirements logically when helpful (e.g., "API Operations", "Data Model")
 
-**Phase doc requirements:**
-
-Phase docs may expand requirements with phase-specific details:
-
-* **Numbering**: Derive from parent R-number: `R5.A`, `R5.B` (never new top-level `R1`, `R2`)
-* **Project doc reference**: `R5: ⬜ Feature X (Phase: Auth, see R5.A-C in phase doc)`
-* **No Requirements section needed**: If only implementing project doc requirements, reference in tasks
-  directly (e.g., `[ ] Implement X (R5)`)
-* **Alternative**: Keep all R-numbers in project doc; phase docs only for phase-specific tasks
-
 ### Questions (optional)
 
-Checklist of questions/answers to resolve
+Checklist of questions/answers to resolve. Thorough coverage of uncertainties with answers
 
-### Phases (in project doc)
+### Phases
 
-List of phase references. **No task items here** - all tasks live in phase docs.
+List of phase references. No task items here
 
-<phase-reference-format>
-### 🔄 01 Phase: Auth
-[01-auth](01-auth.md)
+<phase-title-format>
 
-Implement OAuth2 flow with JWT tokens. Adds login/logout endpoints and session management.
-</phase-reference-format>
-
-**Phase status indicators:**
-
+```markdown
 * `### ⬜ NN Phase: Name` - To Do (NN = file number like 01, 02)
 * `### 🔄 NN Phase: Name` - In Progress
 * `### ✅ NN Phase: Name` - Done
+```
 
-**Rules:**
+</phase-title-format>
 
+<phase-format>
+
+```markdown
+### 🔄 01 Phase: Auth
+[01-auth](01-auth.md)
+
+Implement OAuth2 flow with JWT tokens. Adds login/logout endpoints and session management
+```
+
+</phase-format>
+
+<phase-progress-rules>
 * Every phase gets a phase doc - no exceptions
 * Always include 2-3 sentence summary after link
 * Update summary when scope changes significantly
 * Claude NEVER marks phases ✅ → use `AskUserQuestion` (user decides acceptance)
 * When resuming: if multiple phases 🔄, ask user which to focus on
+</phase-progress-rules>
 
-### Tasks (in phase doc)
+### Files
 
-Flat checkmark list of work items. **All tasks live in phase docs, never in project doc.**
+Modified or important context files. Update after modifications
+
+* Exclude: generated files (`*.pb.go`, `*_grpc.pb.go`, wire), project docs
+* Include: crucial files even if unmodified
+* Format: `- **path/file.ext**: Purpose. Changes (if any).`
+* Never replace files list with redirects like "See [phase doc] for details"
+
+## Phase Doc (01-XYZ.md, 02-XYZ.md, ...)
+
+Where work happens. All tasks live here
+
+### Sections
+
+Keep in order. Never reorder, rename, or create more sections
+
+* Context - Brief, references project doc
+* Requirements (optional) - Only if expanding parent R-numbers (R5.A, R5.B)
+* Questions (optional) - Phase-specific Q&A
+* Tasks - All `[ ]`, `[~]`, `[x]` items
+* Files - Files relevant to this phase
+
+### Context
+
+Brief context referencing parent project doc. Example: "See [00-project](00-project.md)."
+
+### Requirements (optional)
+
+Only needed when expanding project doc requirements with phase-specific details:
+
+* **Numbering**: Derive from parent R-number: `R5.A`, `R5.B` (never new top-level `R1`, `R2`)
+* **Project doc reference**: `R5: ⬜ Feature X (Phase: Auth, see R5.A-C in phase doc)`
+* **No section needed**: If only implementing project doc requirements, reference in tasks directly
+  (e.g., `[ ] Implement X (R5)`)
+
+### Questions (optional)
+
+Phase-specific Q&A checklist
+
+### Tasks
+
+Flat checkmark list of work items
 
 <task-format>
 * `[ ]` incomplete
@@ -143,21 +175,18 @@ Flat checkmark list of work items. **All tasks live in phase docs, never in proj
 * `[ ] Implement X (R1, R2.1)` - reference requirements
 </task-format>
 
-**Progress Tracking Rules:**
-
+<task-progress-rules>
 * When starting work on a task → mark it `[~]` immediately
 * When starting work on a phase → mark it 🔄 immediately (in project doc)
 * Claude can mark tasks `[x]` after completing them
 * Claude NEVER marks requirements ✅ → use `AskUserQuestion` (user decides acceptance)
 * Each item = discrete, independent work unit
 * Never remove useful info from completed tasks
+</task-progress-rules>
 
 ### Files
 
-Modified or important context files. Update after modifications.
+Files relevant to this phase. Update after modifications
 
-* Exclude: generated files (`*.pb.go`, `*_grpc.pb.go`, wire), project docs
-* Include: crucial files even if unmodified
 * Format: `- **path/file.ext**: Purpose. Changes (if any).`
-* With phase docs: use shorter descriptions, reference phase doc for details
-* Never replace files list with redirects like "See [phase doc] for details"
+* Use shorter descriptions, reference phase doc for details

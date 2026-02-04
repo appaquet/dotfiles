@@ -1,56 +1,32 @@
 ---
 name: ctx-load
 description: Load comprehensive project context including docs, project info, and branch status
-model: haiku
 ---
 
 # Load Context
 
-Load as much context as possible about the project and task at hand.
+Load context about the project and task at hand
 
 ## State
 
 * Current branch: !`jj-current-branch`
 * Project files: !`claude-proj-docs`
 
-## Task Tracking
-
-**IMPORTANT**: Before doing any of the instructions bellow, create one `TaskCreate` per row below
-BEFORE any other work. Mark in-progress/completed as you proceed:
-
-
-| # | Subject | Description |
-| --- | --- | --- |
-| 1 | Read project docs | Use State section. Read `00-*.md` project doc. Present Checkpoint if exists. |
-| 2 | Resolve ambiguity | If multiple tasks `[~]` or phases 🔄, use AskUserQuestion to clarify focus |
-| 3 | Load phase docs if needed | Load phase docs (`01-*.md`, etc.) if referenced in checkpoint or planning to work on them |
-| 4 | Synthesize context | Analyze thoroughly. Summarize current project state. |
-| 5 | Propose next steps | Based on Tasks section or ask user via AskUserQuestion if unclear |
-
-
 ## Instructions
 
-STOP rushing. Invest thinking tokens now to save iteration tokens later.
+1. 🔳 Read project docs (use State above - don't re-discover)
+   * If project files found:  
+     * Read main project doc for context, requirements, progress
+     * Read & summarize checkpoint section if exists
+   * If "No project files", may be uninitialized
+     * STOP, inform user about missing context
 
-1. **Read project docs** (use State above - don't re-discover):
-   * If "No project files" shown, check if project instructions specify a different location
-   * May not exist if no task started yet - that's fine for new features
-   * If files exist, read `00-*.md` project doc to understand context, requirements, progress
-   * If "Checkpoint" section exists, present it to help resume where work left off
-   * If file list per commit is needed, run `jj-stacked-stats` manually
+2. 🔳 Load current phase docs if referenced in checkpoint or you think relevant for current work
+      But be mindful of context length limits
 
-2. **Load current phase docs**:
-   * Load phase docs (`01-*.md`, `02-*.md`, ...) if referenced in checkpoint or planning to work on them
-   * Can be more than one phase if ambiguous or overlapping work
+3. 🔳 Resolve ambiguity
+   * If multiple phases or tasks in progress, use `AskUserQuestion` to clarify focus unless the
+     checkpoint is clear on next steps
 
-3. **Synthesize context**:
-   * Analyze thoroughly, speak your mind LOUDLY. Don't just use a thinking block, but tell me
-     everything you have in mind.
-   * Provide summary of current project state and context
-
-4. **Propose next steps**:
-   * If project doc exists, propose next tasks based on Tasks section in phase doc
-   * Propose project doc updates if missing information
-   * If no clear direction or ambiguities on next steps, use `AskUserQuestion` tool for
-     clarification on goals
-   * Context is loaded - user decides next action (may run /implement, /ctx-plan, or give direction)
+4. 🔳 Synthesize context
+   * Summarize current project state

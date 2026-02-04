@@ -42,6 +42,8 @@ operations as per skill requirements.
      - Changed files
      - Results (tests passing, etc.)
      - Next steps or blockers
+   - You should not attempt to validate their work by running tests, build, format, etc. Use
+     sub-agents to do any extra work, using same instructions as above.
 
 6. 🔳 Collect debriefs, analyse results, update project docs if applicable. Handle `jj` operations
    as per skill and development instructions requirements.

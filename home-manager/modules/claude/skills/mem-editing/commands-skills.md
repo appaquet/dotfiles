@@ -75,36 +75,20 @@ argument-hint: [optional-arg]
 
 Clear purpose statement.
 
-Target: $ARGUMENTS (if applicable)
-
-## Task Tracking
-
-**FIRST**: Create one `TaskCreate` per row below BEFORE any other work. Mark in-progress/completed as you proceed:
-
-| # | Subject | Description |
-| --- | --- | --- |
-| 1 | Ensure X loaded | Skip if already done, else do X |
-| 2 | Do main work | Details for agent |
-| 3 | Await /proceed to proceed | Work complete, await user confirmation |
+Target: `$ARGUMENTS`
 
 ## Instructions
 
-1. **Ensure X loaded** - Skip if already done.
-2. **Do main work** - Details...
-3. **Await /proceed to proceed** - Stop and wait for user.
+1. 🔳 Ensure X loaded
+   - Skip if already done
+
+2. 🔳 Do main work
+   - Details...
+
+3. **STOP AND WAIT** - Await `/proceed` confirmation
 ```
 
-### Task Tracking Guidelines
-
-* **Create ALL tasks first** - One `TaskCreate` per table row BEFORE any other work
-* **Subject** = user-visible in task list UI (concise, actionable)
-* **Description** = agent context only (can be verbose)
-* Use **validation phrasing** for skippable tasks: "Ensure X" not "Do X"
-* Gate tasks use "Await /proceed to proceed" (not "STOP" - meaningless to user)
-* **Dynamic tasks** - When a step requires per-item work, use FIRST/THEN enforcement:
-  * In Description: "**FIRST**: Create one `TaskCreate` per X with subject 'Type: [identifier]' BEFORE doing Y. **THEN**: For each task, do work and mark complete."
-  * In Instructions: Same FIRST/THEN structure with explicit "do NOT implement until all tasks exist"
-* Number steps match between table and instructions for clarity
+Note: Per CLAUDE.md, steps with 🔳 automatically become TaskCreate items.
 
 ### Command Guidelines
 

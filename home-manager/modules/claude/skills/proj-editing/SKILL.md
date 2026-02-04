@@ -23,7 +23,7 @@ Reference these XML blocks from @~/.claude/docs/project-doc.md:
 
 - `<project-doc-sections>` - Sections for project doc (Context, Checkpoint, Requirements, Questions, Phases, Files)
 - `<phase-doc-sections>` - Sections for phase docs (Context, Requirements, Questions, Tasks, Files)
-- `<phase-reference-format>` - How to reference phases in project doc
+- `<phase-format>` - How to reference phases in project doc
 - `<task-format>` - Task indicators `[ ]`, `[~]`, `[x]`
 
 ## Core Rules

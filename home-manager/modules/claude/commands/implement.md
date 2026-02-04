@@ -7,64 +7,37 @@ description: Proceed to implementation of the plan
 
 Goal is to proceed to implementation of the plan or task at hand.
 
-Once you are prepared (instructions clear, tasks created), 🚀 Engage thrusters!
-
-## Task Tracking
-
-**FIRST**: Create one `TaskCreate` per row below BEFORE any other work. Mark in-progress/completed as you proceed:
-
-| # | Subject | Description |
-| --- | --- | --- |
-| 1 | Clear gate tasks | Check TaskList for "Await /implement" tasks from previous command, mark complete |
-| 2 | Verify understanding | Ensure 10/10 understanding of task. If unclear, use /ctx-improve. Read ALL requirements in project doc. |
-| 3 | Load implementation tasks | **FIRST**: Read Tasks section from current phase doc (tasks live in phase docs, not project doc). For each `[ ]` item, create TaskCreate. **THEN**: List created tasks to verify before proceeding. |
-| 4 | Create jj change | New change for implementation |
-| 5 | Implement tasks | For each task: mark in-progress, implement following dev guidelines, mark complete, update project doc |
-| 6 | Validate completion | State each item in development-completion-checklist aloud and confirm compliance |
-| 7 | Save context | Run /ctx-save to update project and phase docs |
-| 8 | Commit | Commit jj change with meaningful message |
+After instructions & tasks loaded, you are free to 🚀 Engage thrusters
 
 ## Instructions
 
-STOP rushing. Invest thinking tokens now to save iteration tokens later.
+1. 🔳 Clear any "Await /implement" tasks from previous command
 
-🚀 Engage thrusters
+2. 🔳 Verify 10/10 understanding. If unclear, use `/ctx-improve`
+   - Read ALL requirements in project doc
+   - Clarify if task contradicts or overlaps
 
-1. **Clear gate tasks** - Check `TaskList` for any "Await /implement" tasks from previous command.
-   Mark them completed before proceeding.
+3. 🔳 Load tasks from project/phase doc/context
+   - For each task, create 1..n `TaskCreate`
+     - Segment for better tracking
+   - Create tasks for verification/testing
 
-2. **Verify understanding** - Ensure 10/10 understanding of the task. If not, use `/ctx-improve` to clarify.
-   * Analyze thoroughly (ultra, deeply, freakingly, super ultrathink!)
-   * Speak your mind LOUDLY. Don't just use a thinking block, but tell me everything you have in mind.
-   * **Requirement check**: Read ALL requirements in project doc. Verify task aligns - clarify if it contradicts or overlaps.
+4. Create `jj` change for this implementation
+   - Before proceeding: `jj new` at beginning
+   - After task complete: `jj status` and `jj commit`
 
-3. **Load implementation tasks**:
-   * Identify current phase from project doc Checkpoint or ask user
-   * **FIRST**: Read Tasks section from **phase doc** (tasks live in phase docs, NOT project doc).
-                For each `[ ]` item, create `TaskCreate` with subject matching the doc task.
-                You can create subtasks if needed for clarity.
-   * **THEN**: List created tasks to verify all items captured before proceeding
-   * Always include a verification/testing task if not already present
+5. 🔳 Implement tasks one by one:
+   - Follow `code-insert-checklist` before modifying code
+   - Update documentation if existing:
+     - Mark phase doc task `[~]` when starting, `[x]` when done
+       Like `task-format` dictates
+     - Add new tasks discovered to phase doc
+     - Note critical decisions
+   - If deviating or overcomplicating, STOP and update user
 
-4. **Create jj change** - New change for this implementation.
+6. 🔳 Validate via `development-completion-checklist`
+   - State each item aloud, confirm compliance
 
-5. **Implement tasks** one by one, following best practices and coding standards:
-   * Make sure to follow the `code-insert-checklist` before adding/modifying code
-   * Mark task in-progress when starting, completed when done
-   * Mark **phase doc** task `[~]` when starting, `[x]` when done
-   * When all tasks in phase are `[x]` → ask user via `AskUserQuestion` if phase should be ✅ (in project doc)
-   * When all tasks for a requirement are `[x]` → ask user via `AskUserQuestion` if requirement should be ✅
-   * Make sure tests are added/updated and passing
-   * Add new tasks discovered (to phase doc), update Files section as needed
-   * Create jj changes for significant milestones
+7. 🔳 Run `/ctx-save` to update project and phase docs
 
-   If deviating from plan, overcomplicating or keep doing same mistake, STOP and update user.
-
-6. **Validate completion** - Before committing, verify each item in `development-completion-checklist`.
-   State each item aloud and confirm compliance. If any item fails, fix before proceeding.
-
-7. **Save context** - Run `/ctx-save` to update project and phase docs.
-
-8. **Commit** - After validation passes, commit jj change with meaningful message.
-
-
+8. 🔳 Commit `jj` change with meaningful message if not already done

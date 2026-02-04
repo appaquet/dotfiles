@@ -5,36 +5,43 @@ description: Update project and phase docs with current state and progress
 
 # Save Context
 
-Save project state for perfect resumption by you or someone else. The level of detail here is
-important so that anyone can pick up where you left off, including a junior developer.
+Save project state for perfect resumption. Detail level should allow anyone, including a junior
+intern, to pick up where you left off
 
 Project files: !`claude-proj-docs`
 
-Important: any modifications to project or phase docs need to be done via `proj-editing` skill.
-
 ## Instructions
 
-1. Find docs: `proj/` symlink → `00-*.md` (project doc), `01-*.md` etc. (phase docs)
+1. 🔳 Load skills
+    * Load the `proj-editing` right away. This will be needed for updating project and phase docs
+    * Ensure you fully understand structure like `<project-doc-sections>` and `<phase-doc-sections>`
 
-2. Identify current phase from Checkpoint or ask user.
+2. 🔳 Find docs via `proj/` symlink. Identify current phase from Checkpoint or ask user
 
-3. Update **phase doc** Tasks section:
-   * Mark completed tasks `[x]`
-   * Add new tasks discovered during work
-   * If all tasks in phase are `[x]` → ask user if phase should be ✅ (in project doc)
+3. 🔳 Update phase doc using `proj-editing` skill:
+   * Tasks: mark completed `[x]`, add new tasks discovered
+     * If all done, confirmed via `AskUserQuestion`, update phase in next step
+   * Files: update with changes
+     * Use `branch-diff-summarizer` agent if needed not aware of files or may be missing some from
+       your context)
 
-4. Update **phase doc** Files section:
-   * If you already have full context of changes (e.g., just completed implementation), update Files directly
-   * Otherwise, run `branch-diff-summarizer` agent for changed files
-   * Format per @~/.claude/docs/project-doc.md
+4. 🔳 Update project doc using `proj-editing` skill:
+   * Checkpoint
+     * Update summary of work done
+     * Reference current phase and tasks
+     * Next step if decided/obvious
+   * Requirements
+     * Read current requirements carefully
+     * Update or add new ones if needed based on work done
+   * Questions
+     * Add resolved questions if any
+     * Add new questions if arose during work
+   * Phases
+     * Update status if all tasks completed + user confirmed done via `AskUserQuestion`
+   * Files
+     * Update with summary
 
-5. Update **project doc** if needed:
-   * Update phase status (🔄 → ✅) after user confirmation
-   * Update Requirements if new scope discovered (read ALL first, update existing)
-   * Update Files section with summary of phase doc files
-   * Update Context if scope or purpose changed
-
-6. Write **project doc** Checkpoint section:
+5. 🔳 Write project doc Checkpoint:
    * 1-2 paragraph summary of work completed
    * Reference current phase and tasks worked on
-   * Include next step if decided/obvious
+   * Next step if decided/obvious

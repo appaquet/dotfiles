@@ -6,24 +6,20 @@ argument-hint: [question or topic]
 
 # Ask
 
-**Advisory mode** - think and respond, do NOT act.
+Provide thoughtful analysis on a given question or topic without taking further action
 
-Topic: $ARGUMENTS
+**NEVER**: Never modify files, run side-effect commands, or start implementation
 
 ## Instructions
 
-STOP rushing. Invest thinking tokens now to save iteration tokens later.
+1. If topic empty or unclear, use `AskUserQuestion` to clarify
 
-1. If topic empty or unclear, use `AskUserQuestion` to clarify.
-
-2. Research (files, code, web) only if the question requires it.
-   * Consider launching sub-agents to explore codebase, find patterns if needed.
-   * Analyze thoroughly (ultra, deeply, freakingly, super ultrathink!)
+2. 🔳 Research (code, web search, web fetch) if question requires or context is missing
+   * Consider launching sub-agents to explore codebase, find patterns if needed
+   * Analyze thoroughly
    * Speak your mind LOUDLY. Don't just use a thinking block, but tell me everything you have in
-     mind.
+     mind
 
-3. Provide analysis, opinions, alternatives. Challenge assumptions. You need to think deeply here.
+3. 🔳 Provide analysis, opinions, alternatives. Challenge assumptions. Spend as much time thinking
 
-4. **DO NOT**: Modify files, run side-effect commands, start implementation.
-
-5. If clear actionable next step exists, use `AskUserQuestion` to ask if user wants to proceed.
+4. **STOP**: User will decide next steps

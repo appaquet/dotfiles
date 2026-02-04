@@ -18,13 +18,9 @@ Role definition with personality traits and standards. Agents often use emphatic
 to reinforce thoroughness ("uncompromising standards", "ruthlessly pedantic", "fanatically
 pedantic").
 
-## Task Tracking
-
-Task tracking table for complex agents (see below).
-
 ## Instructions
 
-Numbered steps the agent follows. Steps should be explicit about:
+Numbered steps with 🔳 notation. Steps should be explicit about:
 * What to load/search
 * How to process each item
 * What output to produce
@@ -44,54 +40,35 @@ Bullet list of domain-specific checks the agent performs, wrapped in XML tags fo
 
 ## Task Tracking for Agents
 
-Complex agents (especially reviewers) benefit from task tracking to ensure thoroughness.
-
-### When to Use Task Tracking
+Per CLAUDE.md, steps with 🔳 automatically become TaskCreate items. Agents use this for:
 
 * Multi-step workflows with distinct phases
 * Per-item processing (files, rules, requirements)
-* Agents where skipping steps is a risk
+* Steps where skipping is a risk
 
-### Rules-as-Tasks Pattern (Recommended for Reviewers)
+### Dynamic Task Creation
 
-Instead of file-by-file review, use rule-by-rule review with tasks:
-
-```markdown
-## Task Tracking
-
-**FIRST**: Create one `TaskCreate` per row below BEFORE any other work:
-
-| # | Subject | Description |
-| --- | --- | --- |
-| 1 | Load project context | Run /ctx-load for requirements and progress |
-| 2 | Search guidelines | Find project-specific guideline files |
-| 3 | Load changed files | Get file list, load all diffs upfront |
-| 4 | Create rule tasks | **FIRST**: Read guidelines + embedded checklist. **THEN**: For each rule, create `TaskCreate` with subject "Check: [rule]" and description with good/bad examples. |
-| 5 | Execute rule checks | For each Check task: examine ALL files for this issue, insert REVIEW comments, mark complete |
-| 6 | Cross-file synthesis | Look for patterns spanning multiple files |
-| 7 | Return summary | Comprehensive summary even if no issues |
-```
-
-**Benefits of rules-as-tasks:**
-* Each rule becomes a task that can't be skipped
-* Cross-file issues surface naturally (checking "coupling" across all files at once)
-* Prevents checklist fatigue (one rule at a time, thoroughly)
-* No intermediate .local.md file needed - tasks ARE the checklist
-
-### Files-as-Tasks Pattern (For Summarizers)
-
-For agents that process files individually (not checking rules):
+For per-item work (reviewing rules, processing files), create tasks dynamically:
 
 ```markdown
-| 3 | Create file tasks | **FIRST**: Get file list. **THEN**: For each file, create `TaskCreate` with subject "Summarize: [filename]" |
-| 4 | Process files | For each task: process file, mark complete |
+3. 🔳 Create rule/file tasks
+   - For each rule in checklist: `TaskCreate` with subject "Check: [rule]"
+   - For each file to process: `TaskCreate` with subject "Process: [filename]"
+
+4. 🔳 Execute tasks
+   - For each task: do work, mark complete
 ```
+
+**Benefits:**
+* Each item becomes a task that can't be skipped
+* Cross-file issues surface naturally (one rule across all files at once)
+* Prevents checklist fatigue
 
 ### Key Differences from Commands
 
 | Aspect | Command | Agent |
 |--------|---------|-------|
-| Gate tasks | "Await /proceed to proceed" | None (🚀 Engage thrusters) |
+| Gate | **STOP AND WAIT** - user confirms | None (🚀 Engage thrusters) |
 | User interaction | AskUserQuestion | Return to caller |
 | Task purpose | User visibility + gating | Internal discipline |
 
