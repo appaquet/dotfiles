@@ -9,10 +9,13 @@ let
       exo = final.callPackage ./exo { };
 
       fzf-nix = inputs.fzf-nix.packages.${system}.fzf-nix;
-      claude-code = inputs.nix-ai-tools.packages.${system}.claude-code;
-      codex = inputs.nix-ai-tools.packages.${system}.codex;
+
       opencode = inputs.nix-ai-tools.packages.${system}.opencode;
       gemini-cli = inputs.nix-ai-tools.packages.${system}.gemini-cli;
+      codex = inputs.nix-ai-tools.packages.${system}.codex;
+
+      #claude-code = final.callPackage ./claude-code/package.nix { };
+      claude-code = inputs.nix-ai-tools.packages.${system}.claude-code;
     };
 
   neovimPluginsOverlay = import ../home-manager/modules/neovim/plugins-overlay.nix;
