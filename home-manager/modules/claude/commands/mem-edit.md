@@ -14,7 +14,7 @@ Target: `$ARGUMENTS`
 
 1. 🔳 Load skills
     * Load the `mem-editing` right away. This will be needed for analysis and application
-    * Load the `ctx-plan` command to ensure proper planning steps
+    * Load the `ctx-plan` right away command to ensure proper planning steps
 
 1. 🔳 Ensure scope identified
    If target unclear, use `AskUserQuestion` to clarify

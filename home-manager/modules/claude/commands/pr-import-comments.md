@@ -9,29 +9,17 @@ model: haiku
 
 Fetch unresolved GitHub PR review comments and import them into the codebase as inline comments with metadata. This allows review comments to be addressed directly in the code and then replied to programmatically.
 
-## Task Tracking
-
-**FIRST**: Create one `TaskCreate` per row below BEFORE any other work. Mark in-progress/completed as you proceed:
-
-| # | Subject | Description |
-| --- | --- | --- |
-| 1 | Get PR info | Branch, PR number, repo owner/name |
-| 2 | Fetch comments | GraphQL query for unresolved review threads |
-| 3 | Import comments | For each comment fetched, add a sub-task "Import: [path:line]" to insert it into codebase |
-| 4 | Report results | Count imported, files modified, errors |
-| 5 | Import complete | Do not fix - review imported comments before proceeding |
-
 ## Instructions
 
-1. **Get PR info** - Get current branch and PR information:
-   * Current branch: !`jj-current-branch`
-   * Current PR number: !`gh pr view $(jj-current-branch) --json number --jq '.number'`
-   * Repo owner: !`gh repo view --json owner --jq '.owner.login'`
-   * Repo name: !`gh repo view --json name --jq '.name'`
+1. 🔳 Get PR info
+   - Current branch: !`jj-current-branch`
+   - Current PR number: !`gh pr view $(jj-current-branch) --json number --jq '.number'`
+   - Repo owner: !`gh repo view --json owner --jq '.owner.login'`
+   - Repo name: !`gh repo view --json name --jq '.name'`
 
-2. **Fetch comments** - Fetch unresolved PR review comments:
-   * Use GitHub GraphQL API to fetch all unresolved review threads
-   * Command:
+2. 🔳 Fetch comments
+   - Use GitHub GraphQL API to fetch all unresolved review threads
+   - Command:
 
      ```bash
      gh api graphql -f query="
@@ -60,11 +48,10 @@ Fetch unresolved GitHub PR review comments and import them into the codebase as 
      }" --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false) | .comments.nodes[0]'
      ```
 
-3. **Import comments** - For each unresolved comment:
-   * Add sub-task "Import: [path:line]"
-   * Read the file at the specified path
-   * Insert inline comment at the specified line number
-   * Use the following format:
+3. 🔳 Import comments
+   - For each unresolved comment, add sub-task "Import: [path:line]"
+   - Read the file at the specified path
+   - Insert inline comment at the specified line number using this format:
 
      ```
      // REVIEW: pr-import-comments (DB: <databaseId>, Node: <nodeId>, PR: <prNumber>) - <author> @ <createdAt>
@@ -75,19 +62,19 @@ Fetch unresolved GitHub PR review comments and import them into the codebase as 
      // ... (continue for all lines in the comment body)
      ```
 
-   * Handle multi-line comment bodies by prefixing each line with `//`
-   * Preserve proper indentation matching the surrounding code
+   - Handle multi-line comment bodies by prefixing each line with `//`
+   - Preserve proper indentation matching the surrounding code
 
-4. **Report results**:
-   * Count of comments imported
-   * List of files modified
-   * Any errors encountered during import
+4. 🔳 Report results
+   - Count of comments imported
+   - List of files modified
+   - Any errors encountered during import
 
 5. **STOP** - Do not fix, address, or respond to imported comments; this command imports only.
 
 ## Important Notes
 
-* Only import unresolved comments (isResolved == false)
-* Preserve exact line numbers from the API response
-* Handle edge cases like files that don't exist or invalid line numbers gracefully
-* Don't modify existing code, only add review comments
+- Only import unresolved comments (isResolved == false)
+- Preserve exact line numbers from the API response
+- Handle edge cases like files that don't exist or invalid line numbers gracefully
+- Don't modify existing code, only add review comments

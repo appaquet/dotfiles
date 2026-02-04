@@ -1,24 +1,22 @@
 ---
 name: Proceed
-description: Proceed with current workflow (universal gate)
+description: Proceed with current workflow
 ---
 
 # Proceed
 
-🚀 Engage thrusters
-
 Proceed with the current workflow. Clears any pending "Await /proceed" gate tasks and lets the
 calling command continue.
 
-For full implementation workflow (after `/ctx-plan`, `/proj-init`), use `/implement` instead.
-
-## Task Tracking
-
-| # | Subject | Description |
-| --- | --- | --- |
-| 1 | Clear gate tasks | Check TaskList for "Await /proceed" tasks, mark complete |
+After instructions & tasks loaded, you are free to 🚀 Engage thrusters
 
 ## Instructions
 
-1. **Clear gate tasks** - Check `TaskList` for any "Await /proceed" tasks. Mark them completed.
-   The calling workflow continues from where it left off.
+1. 🔳 Clear gate tasks
+   - Check `TaskList` for any "Await /proceed" tasks
+   - Mark them completed
+   - The calling workflow continues from where it left off
+
+2. 🔳 Breakdown and create tasks as needed using `TaskCreate`
+
+3. 🔳 Execute tasks one by one
