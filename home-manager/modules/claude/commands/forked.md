@@ -9,10 +9,20 @@ arguments:
 
 # Forked
 
-Goal is to load a given skill, extract its instructions and delegate work to sub-agents
+Fork a given skill, extract its instructions and delegate work to sub-agents
 
-Main agent will handle task decomposition, launching sub-agents, update project docs, and `jj`
-operations as per skill requirements
+Main agent's context is precious, we don't want to waste it with heavy tasks that can be done by
+sub-agents
+
+Main agent will still handle:
+
+- Task decomposition based on skill instructions and current context
+- Launching sub-agents
+- Updating project docs along the way
+- `jj` operations as per skill requirements
+
+But everything else will be done by sub-agents launched to handle specific tasks (e.g., research,
+implementation, reviews, etc.)
 
 ## Instructions
 
@@ -22,6 +32,7 @@ operations as per skill requirements
    - Extract its instructions and tasks
    - Think about how to best decompose the work into independent sub-tasks by agents
    - Should not be too granular to avoid overhead, but not too broad to cause conflicts
+   - If skill has multiple phases (e.g., plan + implement), consider launching sub-agents per phase
 
 3. 🔳 For each agent to be launched, create tasks:
    - Launch agent to do X
@@ -39,13 +50,13 @@ operations as per skill requirements
      exclude any of the parent agent's responsibilities (jj operations, project doc updates, etc.)
    - Instruct the sub-agent to a complete debrief in one single last message:
      - What was done
-     - Changed files
+     - Changed files (detailed to avoid having you to diff to understand)
      - Results (tests passing, etc.)
      - Next steps or blockers
    - Your context window is very precious
-     You should not attempt to validate their work by running tests, build, format, etc
-     You should not diff any code either, other than listing changed files
-     Use sub-agents to do any extra work, using same instructions as above
+     You should NOT attempt to validate their work by running tests, build, format, etc
+     You should NOT diff any code either, other than listing changed files to prevent context bloat
+     You should ALWAYS use sub-agents to do any extra work, using same instructions as above
 
 6. 🔳 Collect debriefs, analyse results and report on overall progress
       If requested by skill, update project docs using the `ctx-save` skill
