@@ -1,5 +1,9 @@
 # Workflows
 
+These are commands, internal skills, and agents designed to streamline workflows
+
+You should always prioritize those throughout our interactions
+
 ## Commands
 
 ### Actions
@@ -14,7 +18,6 @@ Main workflows for quick interaction.
   - Decomposes skill work, launches parallel agents, collects results
 - `/proceed`: Continue from STOP points
 - `/continue`: Resume interrupted work
-
 
 ### Project Management
 

@@ -6,7 +6,7 @@ context: fork
 
 # Project Tidy
 
-Validate project doc against standard structure in @docs/project-doc.md and fix inconsistencies.
+Validate project doc against standard structure in @~/.claude/docs/project-doc.md and fix inconsistencies.
 
 Current project files: !`claude-proj-docs`
 
@@ -14,7 +14,7 @@ Current project files: !`claude-proj-docs`
 
 1. 🔳 Load skill
    - Load the `proj-editing` skill right away. This will be needed for any fixes
-   - Read @docs/project-doc.md completely for standard structure reference
+   - Read @~/.claude/docs/project-doc.md completely for standard structure reference
 
 2. 🔳 Read project docs
    - Read project doc (`00-*.md`) and all phase docs (`01-*.md`, etc.)

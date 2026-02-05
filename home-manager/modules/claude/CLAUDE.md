@@ -1,33 +1,43 @@
 # General
 
 * Name: AP
-* Shell: fish
-* Research unknowns; never assume. Verify claims before stating - check docs/code first
-* Keep solutions simple
-* No superlatives or excessive praise - wastes tokens, users prefer directness
-* Optimize for TOTAL tokens (including future fixes), not current tokens - deep thinking upfront is
-  cheaper than iterations
-* Environment: NixOS + MacOS (home manager, nix darwin)
+* Environment:
+  * OS: NixOS + MacOS (home manager, nix darwin)
+  * Shell: fish
 
 ## Top-level instructions
 
-* If `/ctx-load` has never been called, always call it first
-* Plan and track work using project & phase docs: @docs/project-doc.md
-* When summarizing, ALWAYS include the reference to project doc and phase (@proj/..., where
-  prefix path with `@` very important to make sure we automatically reference the file)
-* Never implement until you see exact phrase "🚀 Engage thrusters". Never ask via `AskUserQuestion`
-  if you can proceed - wait for signal
-* You should always use `AskUserQuestion` to ask me questions. Never ask me directly in response
-* In any command/skill/agent, create a `TaskCreate` for each instruction step that has 🔳 annotation
-  before proceeding with any of the requested work. Mark in-progress/completed as you proceed
+* No superlatives, excessive praise, excessive verbosity - ALWAYS assume tokens are expensive
+
+* ALWAYS optimize for TOTAL present and future tokens
+  * Use the <deep-thinking> procedure to think through before acting
+
+* When starting a new conversation, ALWAYS make sure to load the relevant project context using `/ctx-load`
+
+* NEVER implement until you receive this exact signal: "🚀 Engage thrusters"
+  * NEVER ask via `AskUserQuestion` if you can proceed - wait for signal
+  * STOP and WAIT before proceeding after asking a question - wait for signal
+
+* ALWAYS use `AskUserQuestion` to ask questions. Never ask directly in response
+
+* ALWAYS create tasks using `TaskCreate` for each instruction step that has 🔳 annotation before
+  proceeding with any of the requested work. Mark in-progress/completed as you proceed
+
+* ALWAYS go for the simplest and most maintainable solution that meets the requirements
+  instead of over-engineering. KISS & Occam's razor principles
+
+* ALWAYS use project & phase docs to plan and track work @~/.claude/docs/project-doc.md using the
+  proper project editing skills
+
+* When agreed on a plan, ALWAYS follow it and ALWAYS stop & ask if you deviate or the plan fails
 
 ## Sub-instructions files
 
-* Workflows: @docs/workflows.md
-* Project doc structure: @docs/project-doc.md
-* Version control: @docs/version-control.md
-* Development: @docs/development.md
-* Code style: @docs/code-style.md
+* Workflows: @~/.claude/docs/workflows.md
+* Project doc structure: @~/.claude/docs/project-doc.md
+* Version control: @~/.claude/docs/version-control.md
+* Development: @~/.claude/docs/development.md
+* Code style: @~/.claude/docs/code-style.md
 
 ## Context understanding
 
@@ -47,13 +57,14 @@ Always report on understanding at any decision point - verbalize WHAT you unders
 
 ## Destructive Operations
 
-Before deleting files/content: confirm preserved elsewhere OR explicitly disposable
-Before rewriting/refactoring files: diff old vs new to verify no content lost
-Always assume you are not alone working on the same code. Multiple agents or myself may be working concurrently.
+Before deleting files/content: ALWAYS make sure we can restore by any means
+Always assume you are not alone working on the same code at same time
+
+* ALWAYS preserve unknown code and ask instead of deleting / restoring it
 
 ## Problem Solving
 
-For problems/issues/failing tests:
+ALWAYS use this methodology to solve problems, issues, and bugs:
 
 <problem-solving-checklist>
 1. Understand WHY (trace data flow, logging, changes)
@@ -61,9 +72,6 @@ For problems/issues/failing tests:
 3. Ask user before destructive changes
 4. Test bugs: verify new test catches issue or update existing test to catch it
 </problem-solving-checklist>
-
-When agreed plan fails: STOP, explain failure, ask before changing approach
-User-specified approaches are constraints - a working workaround is still a failure if it deviates
 
 ## Deep Thinking
 

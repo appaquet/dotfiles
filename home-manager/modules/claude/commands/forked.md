@@ -47,5 +47,6 @@ operations as per skill requirements
      You should not diff any code either, other than listing changed files
      Use sub-agents to do any extra work, using same instructions as above
 
-6. 🔳 Collect debriefs, analyse results, update project docs if applicable. Handle `jj` operations
-   as per skill and development instructions requirements
+6. 🔳 Collect debriefs, analyse results and report on overall progress
+      If requested by skill, update project docs using the `ctx-save` skill
+      Handle `jj` operations as per skill and development instructions requirements
