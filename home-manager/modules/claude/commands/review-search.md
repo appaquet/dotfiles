@@ -5,7 +5,10 @@ description: Search for REVIEW comments in the codebase
 
 # Search Review Comments
 
-1. Search for REVIEW comments using the `Grep` tool:
+1. STOP, follow pre-flight instructions
+   THEN, continue
+
+2. Search for REVIEW comments using the `Grep` tool:
 
    ```
    Grep(pattern="// REVIEW:", output_mode="content")
@@ -17,9 +20,9 @@ description: Search for REVIEW comments in the codebase
    * A review comment with `>>` and `<<` indicates a multi-line comment;
      lines between `>>` and `<<` are part of the review comment.
 
-2. If no comments found, verify you're at repository root and pattern matches the language.
+3. If no comments found, verify you're at repository root and pattern matches the language.
 
-3. If still no comments OR user explicitly requested, check PR comments:
+4. If still no comments OR user explicitly requested, check PR comments:
    * Get current branch: `jj-current-branch`
    * Check PR: `gh pr view $(jj-current-branch)`
 

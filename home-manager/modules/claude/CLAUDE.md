@@ -20,16 +20,23 @@
 
 * ALWAYS use `AskUserQuestion` to ask questions. Never ask directly in response
 
-* ALWAYS create tasks using `TaskCreate` for each instruction step that has 🔳 annotation before
-  proceeding with any of the requested work. Mark in-progress/completed as you proceed
-
 * ALWAYS go for the simplest and most maintainable solution that meets the requirements
   instead of over-engineering. KISS & Occam's razor principles
 
+* When agreed on a plan, ALWAYS follow it and ALWAYS stop & ask if you deviate or the plan fails
+
+## Pre-flight instructions
+
+Before executing instructions of any command/skill/agent instructions:
+
+* When you receive instructions, before executing anything ALWAYS create tasks using `TaskCreate`
+   for each instruction step that has 🔳 annotation BEFORE executing anything
+  * Create one or more tasks per 🔳 step, 1:n mapping using the `TaskCreate` tool
+  * No ad-hoc replacements or broader grouping
+  * THEN execute the instructions & tasks in order, marking in-progress/completed as you proceed
+
 * ALWAYS use project & phase docs to plan and track work @~/.claude/docs/project-doc.md using the
   proper project editing skills
-
-* When agreed on a plan, ALWAYS follow it and ALWAYS stop & ask if you deviate or the plan fails
 
 ## Sub-instructions files
 

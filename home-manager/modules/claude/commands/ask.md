@@ -12,13 +12,16 @@ Provide thoughtful analysis on a given question or topic without taking further 
 
 ## Instructions
 
-1. If topic empty or unclear, use `AskUserQuestion` to clarify
+1. STOP, follow pre-flight instructions
+   THEN, continue
 
-2. 🔳 Research (code, web search, web fetch) if question requires or context is missing
+2. If topic empty or unclear, use `AskUserQuestion` to clarify
+
+3. 🔳 Research (code, web search, web fetch) if question requires or context is missing
    * Consider launching sub-agents to explore codebase, find patterns if needed
    * Analyze thoroughly
    * Apply <deep-thinking> procedure
 
-3. 🔳 Provide analysis, opinions, alternatives. Challenge assumptions
+4. 🔳 Provide analysis, opinions, alternatives. Challenge assumptions
 
-4. **STOP**: User will decide next steps
+5. **STOP**: User will decide next steps

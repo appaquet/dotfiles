@@ -28,22 +28,25 @@ Project files: !`claude-proj-docs`
 
 ## Instructions
 
-1. Check current branch state:
+1. STOP, follow pre-flight instructions
+   THEN, continue
+
+2. Check current branch state:
    * Get current branch name: !`jj-current-branch`
    * Get list of all changed files: !`jj-stacked-stats`
 
-2. Read existing project doc (if it exists):
+3. Read existing project doc (if it exists):
    * Check for `proj/` symlink at repository root → find `00-*.md` main doc
    * Note if it already has a Files section with summaries
    * If Files section exists and seems complete, ask if you should update it
 
-3. Create file tasks:
+4. Create file tasks:
    * **FIRST**: Get overview of changes via `jj-diff-branch --stat`
    * **THEN**: For **EACH** code file (excluding project docs and generated files like *.pb.go):
      * Create `TaskCreate` with subject "Summarize: [filename]"
      * Description: "Read diff, understand purpose, write 1-2 sentence technical summary"
 
-4. Summarize files - For **EACH** Summarize task:
+5. Summarize files - For **EACH** Summarize task:
    * Mark task in-progress
    * Run `jj-diff-branch --git <file>` to see the actual changes
    * If needed for context, read the full file or surrounding files
@@ -51,7 +54,7 @@ Project files: !`claude-proj-docs`
    * Create a concise technical summary
    * Mark task complete before moving to next file
 
-5. Format and return:
+6. Format and return:
    * Compile all summaries using this structure:
 
    ```markdown

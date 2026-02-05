@@ -14,30 +14,33 @@ They aren't left for future consideration nor to be ignored.
 
 ### Phase 1: Plan
 
-1. 🔳 Ensure REVIEW comments found
+1. STOP, follow pre-flight instructions
+   THEN, continue
+
+2. 🔳 Ensure REVIEW comments found
    - Use `/review-search` unless we just searched
 
-2. 🔳 Research each comment
+3. 🔳 Research each comment
    - Read surrounding code to understand the issue
    - Check related files if change has broader impact
    - Identify dependencies between review items
 
-3. 🔳 Categorize and prioritize
+4. 🔳 Categorize and prioritize
    - **Priority**: High (critical/security), Medium (important), Low (minor/stylistic)
    - **Effort**: Quick Win, Moderate, Extensive
    - **Dependencies**: Note order requirements
 
-4. 🔳 Check requirements
+5. 🔳 Check requirements
    - Verify fixes don't contradict existing requirements
    - Update existing requirements if needed (don't create new ones)
 
-5. 🔳 Update project doc
+6. 🔳 Update project doc
    - Add fixes to Tasks section with priorities
 
-6. 🔳 Present plan
+7. 🔳 Present plan
    - Show prioritized list with research findings
 
-7. **STOP AND WAIT** - Wait for `/implement`
+8. **STOP AND WAIT** - Wait for `/implement`
 
 ### Phase 2: Execute
 

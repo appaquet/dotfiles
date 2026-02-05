@@ -11,13 +11,16 @@ Must have imported comments using `pr-import-comments` command first.
 
 ## Instructions
 
-1. 🔳 Find imported comments
+1. STOP, follow pre-flight instructions
+   THEN, continue
+
+2. 🔳 Find imported comments
    - Search for REVIEW: pr-import-comments pattern:
      ```bash
      rg "REVIEW: pr-import-comments \(DB: (\d+), Node: ([^,]+), PR: (\d+)\)" -o --replace='DB: $1, Node: $2, PR: $3'
      ```
 
-2. 🔳 Reply to comments
+3. 🔳 Reply to comments
    - For each imported comment, add sub-task "Reply: [DB_ID]"
    - Extract comment info:
      ```bash
@@ -49,7 +52,7 @@ Must have imported comments using `pr-import-comments` command first.
      - Reply appears in PR conversation thread
    - Clean up by removing inline comment after successful reply
 
-3. 🔳 Report
+4. 🔳 Report
    - List all replies sent
 
 ## Troubleshooting

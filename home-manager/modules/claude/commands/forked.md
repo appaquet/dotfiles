@@ -26,23 +26,26 @@ implementation, reviews, etc.)
 
 ## Instructions
 
-1. 🔳 Make sure the task at hand is clear. If not, use `AskUserQuestion` to clarify
+1. STOP, follow pre-flight instructions
+   THEN, continue
 
-2. 🔳 Load the skill `$0`
+2. 🔳 Make sure the task at hand is clear. If not, use `AskUserQuestion` to clarify
+
+3. 🔳 Load the skill `$0` from ~/.claude/commands/
    - Extract its instructions and tasks
    - Think about how to best decompose the work into independent sub-tasks by agents
    - Should not be too granular to avoid overhead, but not too broad to cause conflicts
    - If skill has multiple phases (e.g., plan + implement), consider launching sub-agents per phase
 
-3. 🔳 For each agent to be launched, create tasks:
+4. 🔳 For each agent to be launched, create tasks:
    - Launch agent to do X
    - Analyse results
    - Update project docs if applicable
 
-4. If the skill requires to create a `jj` change, make sure to create one before launching
+5. If the skill requires to create a `jj` change, make sure to create one before launching
    sub-agents
 
-5. 🔳 Launch sub-agents in sequence OR parallel, depending on task dependencies
+6. 🔳 Launch sub-agents in sequence OR parallel, depending on task dependencies
    - Give as much details as possible on the context, what needs to be implemented, which project
      docs to load, which section of the plan to follow, and any other relevant information
    - Very thoroughly instruct the sub-agent to create tasks from the skill $0 instructions using the
@@ -58,6 +61,6 @@ implementation, reviews, etc.)
      You should NOT diff any code either, other than listing changed files to prevent context bloat
      You should ALWAYS use sub-agents to do any extra work, using same instructions as above
 
-6. 🔳 Collect debriefs, analyse results and report on overall progress
+7. 🔳 Collect debriefs, analyse results and report on overall progress
       If requested by skill, update project docs using the `ctx-save` skill
       Handle `jj` operations as per skill and development instructions requirements

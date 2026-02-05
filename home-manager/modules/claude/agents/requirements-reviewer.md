@@ -25,15 +25,13 @@ If no project doc exists, report "No project requirements found" and skip review
 
 Follow workflow in @~/.claude/docs/reviewing-agent.md with these additions:
 
-**Step 4 - Create tasks:**
-- For EACH requirement (R1, R2, etc.), create `TaskCreate`:
-  - Subject: "Verify: R[N] [brief name]"
-  - Description: Full requirement text + what to look for
+- For EACH requirement (R1, R2, etc.), create a task with `TaskCreate`
+  - Make sure that each requirement is checked against guidelines
 
-**Step 6 - Cross-check completeness:**
-- Verify each `[x]` task has corresponding implementation
-- Verify requirement status markers (⬜/🔄/✅) match phase status
-- Flag scope creep (features added beyond requirements)
+- Cross-check completeness
+  - Verify each completed phase task (`[x]`) has corresponding implementation
+  - Verify requirement status markers (⬜/🔄/✅) match phase status
+  - Flag scope creep (features added beyond requirements)
 
 ## Comment Format
 

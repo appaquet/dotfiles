@@ -12,14 +12,17 @@ Target: `$ARGUMENTS`
 
 ## Instructions
 
-1. 🔳 Load skills
+1. STOP, follow pre-flight instructions
+   THEN, continue
+
+2. 🔳 Load skills
     * Load the `mem-editing` right away. This will be needed for analysis and application
     * Load the `ctx-plan` right away command to ensure proper planning steps
 
-1. 🔳 Ensure scope identified
+3. 🔳 Ensure scope identified
    If target unclear, use `AskUserQuestion` to clarify
 
-1. 🔳 Analyze with mem-editing skill
+4. 🔳 Analyze with mem-editing skill
    * Load the `mem-editing` skill
    * Load all of its files
    * Load some context around the target instruction file(s)
@@ -27,6 +30,6 @@ Target: `$ARGUMENTS`
    * Using its instructions, analyse the requested instruction file(s)
      * It's important to follower the `mem-editing` skill, but the surrounding style also has to be considered
 
-1. **STOP AND WAIT** - Await `/proceed` confirmation before applying changes
+5. **STOP AND WAIT** - Await `/proceed` confirmation before applying changes
 
-1. 🔳 Apply with mem-editing skill
+6. 🔳 Apply with mem-editing skill

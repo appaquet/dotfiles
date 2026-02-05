@@ -11,24 +11,27 @@ Important: any modifications to project or phase docs need to be done via `proj-
 
 ## Instructions
 
-1. 🔳 Check current understanding
+1. STOP, follow pre-flight instructions
+   THEN, continue
+
+2. 🔳 Check current understanding
    - If 10/10 understanding, tell me and stop here
    - Otherwise, tell me your current understanding on a 10 scale
 
-2. 🔳 Research context
+3. 🔳 Research context
    - Launch sub-agents to explore codebase, find patterns
    - Search web for external dependencies or unfamiliar concepts
    - Use <deep-thinking> procedure
    - For each unknown discovered, add sub-task to investigate
 
-3. 🔳 Ask clarifying questions
+4. 🔳 Ask clarifying questions
    - Use `AskUserQuestion` for each ambiguity
    - Research and ask until 10/10 understanding
    - Clarification is not approval - do not jump to implementation
 
-4. 🔳 Update project doc
+5. 🔳 Update project doc
    - If working on a planned task, update with new context
    - Add/update requirements as R-numbered items (R1, R2, R1.1) for task traceability
    - Requirements describe behavior (WHAT), not implementation (HOW)
 
-5. Report 10/10 understanding achieved. User decides next action (may run /implement, /ctx-plan, or give direction).
+6. Report 10/10 understanding achieved. User decides next action (may run /implement, /ctx-plan, or give direction).

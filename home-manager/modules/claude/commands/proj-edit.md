@@ -12,11 +12,14 @@ Target: `$ARGUMENTS`
 
 ## Instructions
 
-1. 🔳 Load skill
+1. STOP, follow pre-flight instructions
+   THEN, continue
+
+2. 🔳 Load skill
    - Load the `proj-editing` right away. This will be needed for analysis and application
    - Load the `ctx-plan` right away command to ensure proper planning steps
 
-2. 🔳 Ensure scope identified
+3. 🔳 Ensure scope identified
    - If target unclear, use `AskUserQuestion` to clarify what operation:
      - Create project doc
      - Create phase doc
@@ -24,13 +27,13 @@ Target: `$ARGUMENTS`
      - Update phase status
      - Validate structure
 
-3. 🔳 Analyze current state
+4. 🔳 Analyze current state
    - Read relevant project/phase docs
    - Identify changes needed
 
-4. 🔳 Report proposed changes
+5. 🔳 Report proposed changes
    - Show before/after for each change
 
-5. **STOP AND WAIT** - Await `/proceed` confirmation before applying changes
+6. **STOP AND WAIT** - Await `/proceed` confirmation before applying changes
 
-1. 🔳 Apply with proj-editing skill
+7. 🔳 Apply with proj-editing skill

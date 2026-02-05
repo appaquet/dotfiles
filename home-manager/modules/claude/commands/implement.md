@@ -11,22 +11,25 @@ After instructions & tasks loaded, you are free to 🚀 Engage thrusters
 
 ## Instructions
 
-1. 🔳 Clear any "Await /implement" tasks from previous command
+1. STOP, follow pre-flight instructions
+   THEN, continue
 
-2. 🔳 Verify 10/10 understanding. If unclear, use `/ctx-improve`
+2. 🔳 Clear any "Await /implement" tasks from previous command
+
+3. 🔳 Verify 10/10 understanding. If unclear, use `/ctx-improve`
    - Read ALL requirements in project doc
    - Clarify if task contradicts or overlaps
 
-3. 🔳 Load tasks from project/phase doc/context
+4. 🔳 Load tasks from project/phase doc/context
    - For each task, create 1..n `TaskCreate`
      - Segment for better tracking
    - Create tasks for verification/testing
 
-4. Create `jj` change for this implementation
+5. Create `jj` change for this implementation
    - Before proceeding: `jj new` at beginning
    - After task complete: `jj status` and `jj commit`
 
-5. 🔳 Implement tasks one by one:
+6. 🔳 Implement tasks one by one:
    - Follow `code-insert-checklist` before modifying code
    - Update documentation if existing:
      - Mark phase doc task `[~]` when starting, `[x]` when done
@@ -35,9 +38,9 @@ After instructions & tasks loaded, you are free to 🚀 Engage thrusters
      - Note critical decisions
    - If deviating or overcomplicating, STOP and update user
 
-6. 🔳 Validate via `development-completion-checklist`
+7. 🔳 Validate via `development-completion-checklist`
    - State each item aloud, confirm compliance
 
-7. 🔳 Run `/ctx-save` to update project and phase docs
+8. 🔳 Run `/ctx-save` to update project and phase docs
 
-8. 🔳 Commit `jj` change with meaningful message if not already done
+9. 🔳 Commit `jj` change with meaningful message if not already done

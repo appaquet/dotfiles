@@ -12,20 +12,23 @@ Project files: !`claude-proj-docs`
 
 ## Instructions
 
-1. 🔳 Load skills
+1. STOP, follow pre-flight instructions
+   THEN, continue
+
+2. 🔳 Load skills
     * Load the `proj-editing` right away. This will be needed for updating project and phase docs
     * Ensure you fully understand structure like `<project-doc-sections>` and `<phase-doc-sections>`
 
-2. 🔳 Find docs via `proj/` symlink. Identify current phase from Checkpoint or ask user
+3. 🔳 Find docs via `proj/` symlink. Identify current phase from Checkpoint or ask user
 
-3. 🔳 Update phase doc using `proj-editing` skill:
+4. 🔳 Update phase doc using `proj-editing` skill:
    * Tasks: mark completed `[x]`, add new tasks discovered
      * If all done, confirmed via `AskUserQuestion`, update phase in next step
    * Files: update with changes
      * Use `branch-diff-summarizer` agent if needed not aware of files or may be missing some from
        your context)
 
-4. 🔳 Update project doc using `proj-editing` skill:
+5. 🔳 Update project doc using `proj-editing` skill:
    * Checkpoint
      * Update summary of work done
      * Reference current phase and tasks
@@ -41,7 +44,7 @@ Project files: !`claude-proj-docs`
    * Files
      * Update with summary
 
-5. 🔳 Write project doc Checkpoint:
+6. 🔳 Write project doc Checkpoint:
    * 1-2 paragraph summary of work completed
    * Reference current phase and tasks worked on
    * Next step if decided/obvious

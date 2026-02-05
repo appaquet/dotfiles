@@ -79,16 +79,19 @@ Target: `$ARGUMENTS`
 
 ## Instructions
 
-1. 🔳 Ensure X loaded
+1. STOP, follow pre-flight instructions
+   THEN, continue
+
+2. 🔳 Ensure X loaded
    - Skip if already done
 
-2. 🔳 Do main work
+3. 🔳 Do main work
    - Details...
 
-3. **STOP AND WAIT** - Await `/proceed` confirmation
+4. **STOP AND WAIT** - Await `/proceed` confirmation
 ```
 
-Note: Per CLAUDE.md, steps with 🔳 automatically become TaskCreate items.
+Note: Per CLAUDE.md, steps with 🔳 automatically become TaskCreate items. All commands include pre-flight step 1 referencing CLAUDE.md pre-flight instructions.
 
 ### Command Guidelines
 

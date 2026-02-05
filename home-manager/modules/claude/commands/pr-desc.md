@@ -12,16 +12,19 @@ and branch diff to create multi-level breakdown.
 
 ## Instructions
 
-1. 🔳 Ensure context loaded
+1. STOP, follow pre-flight instructions
+   THEN, continue
+
+2. 🔳 Ensure context loaded
    - Run `/ctx-load` to load project context (project doc, branch state, recent commits)
 
-2. 🔳 Analyze changes
+3. 🔳 Analyze changes
    - Get changed files: `jj-diff-branch --stat`
    - Read diffs for understanding: `jj-diff-branch --git`
    - Use the <deep-thinking> procedure
    - If user specified a focus area, prioritize those components
 
-3. 🔳 Generate report
+4. 🔳 Generate report
    - **High-level summary** (2-3 sentences):
      - What was the main goal/accomplishment
      - Key technical approach taken
@@ -35,7 +38,7 @@ and branch diff to create multi-level breakdown.
        - **Removed**: Deleted files, deprecated features
      - Skip empty categories
 
-4. 🔳 Output report
+5. 🔳 Output report
    - In **a single message**: output the complete report directly (high-level + per-component breakdown)
    - The user doesn't have access to all prior messages, you really need to verbatim include everything here
    - Never describe what was generated - show the actual content

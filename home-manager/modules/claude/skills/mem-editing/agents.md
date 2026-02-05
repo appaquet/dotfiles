@@ -79,7 +79,10 @@ For per-item work (reviewing rules, processing files), create tasks dynamically:
 Agents typically start by loading project context:
 
 ```markdown
-1. Run the `/ctx-load` skill to load project context, branch state, and project docs. This gives you
+1. STOP, follow pre-flight instructions
+   THEN, continue
+
+2. Run the `/ctx-load` skill to load project context, branch state, and project docs. This gives you
    access to requirements and current progress.
 
 🚀 Engage thrusters - As a sub-agent, proceed immediately after loading context.

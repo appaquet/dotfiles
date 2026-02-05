@@ -12,11 +12,14 @@ After instructions & tasks loaded, you are free to 🚀 Engage thrusters
 
 ## Instructions
 
-1. 🔳 Clear gate tasks
+1. STOP, follow pre-flight instructions
+   THEN, continue
+
+2. 🔳 Clear gate tasks
    - Check `TaskList` for any "Await /proceed" tasks
    - Mark them completed
    - The calling workflow continues from where it left off
 
-2. 🔳 Breakdown and create tasks as needed using `TaskCreate`
+3. 🔳 Breakdown and create tasks as needed using `TaskCreate`
 
-3. 🔳 Execute tasks one by one
+4. 🔳 Execute tasks one by one
