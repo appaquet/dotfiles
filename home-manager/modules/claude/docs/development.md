@@ -34,6 +34,7 @@ STEP IMPLEMENTATION as soon as any of these triggers occur:
 * No workarounds/reverts/continued coding - ask for help
 * Never claim completion if incomplete
 * Keep executing a command which never succeeds
+* Version control state confusing or operations had unexpected effects
 </development-stop-triggers>
 
 ## Before marking as completed

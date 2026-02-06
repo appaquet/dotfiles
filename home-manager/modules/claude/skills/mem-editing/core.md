@@ -112,6 +112,7 @@ The formatting style of your prompt influences response formatting.
 * Remove markdown from prompts to reduce markdown in responses
 * Use prose in prompts to encourage prose in responses
 * "Write in prose rather than lists unless presenting truly discrete items where list format is best option"
+* Avoid bold (`**text**`) in instruction files -- it adds tokens without increasing salience for Claude. Use plain text, CAPS for emphasis, or XML tags for boundaries.
 
 ### Minimize Verbosity
 
