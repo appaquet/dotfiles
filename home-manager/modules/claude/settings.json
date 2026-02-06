@@ -55,6 +55,7 @@
       "Bash(go mod:*)",
       "Bash(go test:*)",
       "Bash(go doc:*)",
+      "Bash(go vet:*)",
 
       "Bash(npm run build:*)",
       "Bash(npm run lint:*)",
@@ -83,6 +84,7 @@
       "WebFetch(domain:sum.golang.org)",
       "WebFetch(domain:stackoverflow.com)",
 
+      "Read(~/.claude/**)",
       "Skill(ctx-load)",
       "Skill(ctx-save)",
       "Skill(review-search)",

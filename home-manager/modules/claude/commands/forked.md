@@ -31,7 +31,7 @@ implementation, reviews, etc.)
 
 2. 🔳 Make sure the task at hand is clear. If not, use `AskUserQuestion` to clarify
 
-3. 🔳 Load skill `$0` (from ~/.claude/commands/ or ~/.claude/skills/) if not already loaded
+3. 🔳 Load `$0` skill if not already loaded using the `Skill` tool
    - Extract its instructions and tasks
    - Think about how to best decompose the work into independent sub-tasks by agents
    - Should not be too granular to avoid overhead, but not too broad to cause conflicts

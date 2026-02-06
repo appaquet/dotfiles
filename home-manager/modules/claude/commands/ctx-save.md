@@ -15,9 +15,8 @@ Project files: !`claude-proj-docs`
 1. STOP, follow pre-flight instructions
    THEN, continue
 
-2. 🔳 Load skills (from ~/.claude/skills/)
-    * Load the `proj-editing` right away. This will be needed for updating project and phase docs
-    * Ensure you fully understand structure like `<project-doc-sections>` and `<phase-doc-sections>`
+2. 🔳 Load `proj-editing` skill using the `Skill` tool
+    * Understand structure like `<project-doc-sections>` and `<phase-doc-sections>`
 
 3. 🔳 Find docs via `proj/` symlink. Identify current phase from Checkpoint or ask user
 

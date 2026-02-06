@@ -16,10 +16,8 @@ Current date: !`date +%Y/%m/%d`
 1. STOP, follow pre-flight instructions
    THEN, continue
 
-2. 🔳 Load skill (from ~/.claude/skills/)
-   - Load the `proj-editing` skill right away. This will be needed for creating project and phase docs
-   - Read @/.claude/docs/project-doc.md completely to ensure full understanding of structure of
-     project and phase docs
+2. 🔳 Load `proj-editing` skill using the `Skill` tool
+   - Read @/.claude/docs/project-doc.md completely for full understanding of doc structure
 
 3. 🔳 Ensure task defined
    - If empty, use `AskUserQuestion` to clarify

@@ -15,9 +15,9 @@ Target: `$ARGUMENTS`
 1. STOP, follow pre-flight instructions
    THEN, continue
 
-2. 🔳 Load skills
-    * Load the `mem-editing` skill and all its supporting files
-    * Load the `ctx-plan` command
+2. 🔳 Load skills using the `Skill` tool
+    * `mem-editing` - editing guidelines and supporting files
+    * `ctx-plan` - planning steps
 
 3. 🔳 Ensure scope identified
    If target unclear, use `AskUserQuestion` to clarify

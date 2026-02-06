@@ -15,8 +15,7 @@ Current project files: !`claude-proj-docs`
 1. STOP, follow pre-flight instructions
    THEN, continue
 
-2. 🔳 Load skill (from ~/.claude/skills/)
-   - Load the `proj-editing` skill right away. This will be needed for any fixes
+2. 🔳 Load `proj-editing` skill using the `Skill` tool
    - Read @~/.claude/docs/project-doc.md completely for standard structure reference
 
 3. 🔳 Read project docs

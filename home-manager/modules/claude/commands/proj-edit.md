@@ -15,9 +15,9 @@ Target: `$ARGUMENTS`
 1. STOP, follow pre-flight instructions
    THEN, continue
 
-2. 🔳 Load skills (from ~/.claude/commands/ or ~/.claude/skills/)
-   - Load the `proj-editing` right away. This will be needed for analysis and application
-   - Load the `ctx-plan` right away command to ensure proper planning steps
+2. 🔳 Load skills using the `Skill` tool
+   - `proj-editing` - for doc structure and validation
+   - `ctx-plan` - for planning steps
 
 3. 🔳 Ensure scope identified
    - If target unclear, use `AskUserQuestion` to clarify what operation:
