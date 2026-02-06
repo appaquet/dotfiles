@@ -12,8 +12,9 @@ Project files: !`claude-proj-docs`
 
 ALL implementations require completing this planning workflow and waiting for `/implement`. No
 exceptions, no matter how trivial. There is no such thing as "quick fix not requiring planning"
-since I explicitly called this command.
+since I explicitly called this command
 
+NEVER engage the native plan mode `EnterPlanMode`
 
 ## Instructions
 

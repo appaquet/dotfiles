@@ -27,7 +27,9 @@
 * ALWAYS go for the simplest and most maintainable solution that meets the requirements
   instead of over-engineering. KISS & Occam's razor principles
 
-* When agreed on a plan, ALWAYS follow it and ALWAYS stop & ask if you deviate or the plan fails
+* Planning is mandatory for ALL implementations, no matter how trivial
+  * NEVER engage the native plan mode `EnterPlanMode`. Refer to workflows for planning instructions
+  * When agreed on a plan, ALWAYS follow it and ALWAYS stop & ask if you deviate or the plan fails
 
 ## Pre-flight instructions
 

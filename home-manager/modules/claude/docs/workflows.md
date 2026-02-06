@@ -31,7 +31,7 @@ Main workflows for quick interaction.
 - `/ctx-load`: Load project context
 - `/ctx-save`: Save progress to project docs
 - `/ctx-plan`: Create development plan
-  - Research → plan → write to docs → **STOP** waits for `/implement`
+  - Research → plan → write to docs → STOP waits for `/implement`
 - `/ctx-improve`: Clarify understanding via exploration, reasearch and questions
 - `/ctx-check`: Output uncertainty disclosure
 
@@ -41,7 +41,7 @@ Main workflows for quick interaction.
   - Spawns 4 agents in parallel (style, correctness, architecture, requirements)
 - `/review-search`: Find REVIEW comments
 - `/review-plan`: Plan fixes for REVIEW comments
-  - Phase 1: Research → prioritize → **STOP**
+  - Phase 1: Research → prioritize → STOP
   - Phase 2: After `/implement`, executes fixes
 
 ### Instructions
