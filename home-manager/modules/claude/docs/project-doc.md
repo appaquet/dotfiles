@@ -6,7 +6,7 @@ Project/feature documentation spanning potentially multiple PRs. Docs kept throu
 
 Unless project instructions specify otherwise:
 
-* **Default**: `docs/features/<date>-<project-name>/` (date via `date +%Y/%m/%d`)
+* **Default**: `docs/features/<date>-<project-name>/` (date YYYY-mm-dd; if unavailable, use `date +%Y/%m/%d`)
 * **Main doc**: `00-<project-name>.md` inside the folder
 * **Phase docs**: `01-<phase-name>.md`, `02-<phase-name>.md`, etc. (numbered for ordering)
 * **Symlink**: `proj/` at repo root pointing to the project folder

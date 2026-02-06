@@ -28,6 +28,8 @@ Important: any modifications to project or phase docs need to be done via `proj-
    - Use `AskUserQuestion` for each ambiguity
    - Research and ask until 10/10 understanding
    - Clarification is not approval - do not jump to implementation
+   - Go back to step 2 after each answers that require further analysis
+     Should add more tasks 🔳 to track progress
 
 5. 🔳 Update project doc
    - If working on a planned task, update with new context
