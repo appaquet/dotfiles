@@ -25,9 +25,9 @@ Load context about the project and task at hand
      * STOP, inform user about missing context
 
 3. 🔳 Load current phase docs if referenced in checkpoint or you think relevant for current work
-      But be mindful of context length limits
+      But be mindful of context window cost
 
-4. 🔳 Resolve ambiguity
+4. 🔳 Check & resolve ambiguity
    * If multiple phases or tasks in progress, use `AskUserQuestion` to clarify focus unless the
      checkpoint is clear on next steps
 

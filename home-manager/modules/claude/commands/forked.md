@@ -31,7 +31,7 @@ implementation, reviews, etc.)
 
 2. 🔳 Make sure the task at hand is clear. If not, use `AskUserQuestion` to clarify
 
-3. 🔳 Load the skill `$0` from ~/.claude/commands/
+3. 🔳 Load the skill `$0` from ~/.claude/commands/ if not already loaded
    - Extract its instructions and tasks
    - Think about how to best decompose the work into independent sub-tasks by agents
    - Should not be too granular to avoid overhead, but not too broad to cause conflicts
@@ -48,14 +48,17 @@ implementation, reviews, etc.)
 6. 🔳 Launch sub-agents in sequence OR parallel, depending on task dependencies
    - Give as much details as possible on the context, what needs to be implemented, which project
      docs to load, which section of the plan to follow, and any other relevant information
+
    - Very thoroughly instruct the sub-agent to create tasks from the skill $0 instructions using the
      🔳 notation and execute them in the exact same way as the original skill would. These should
      exclude any of the parent agent's responsibilities (jj operations, project doc updates, etc.)
+
    - Instruct the sub-agent to a complete debrief in one single last message:
      - What was done
      - Changed files (detailed to avoid having you to diff to understand)
      - Results (tests passing, etc.)
      - Next steps or blockers
+
    - Your context window is very precious
      You should NOT attempt to validate their work by running tests, build, format, etc
      You should NOT diff any code either, other than listing changed files to prevent context bloat
