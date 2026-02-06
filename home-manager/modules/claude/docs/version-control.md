@@ -38,6 +38,7 @@ When to create changes:
 * Skip for: read-only ops, iteration within same logical step
 
 Default to more changes - easier to squash than split
+Never clean up commit history (squash, abandon empty changes, reorder). User handles that
 
 ## Commit Messages
 
