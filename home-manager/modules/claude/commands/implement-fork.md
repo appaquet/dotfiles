@@ -29,3 +29,6 @@ After `/implement` completes, instruct the agent to debrief thoroughly:
 - Changed files
 - Results (tests passing, etc.)
 - Next steps or blockers
+
+NEVER call `TaskOutput` on background agents — it returns full transcripts, not summaries.
+Background agents deliver their summary automatically when done.

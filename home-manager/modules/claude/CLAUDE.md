@@ -12,6 +12,10 @@
 * ALWAYS optimize for TOTAL present and future tokens
   * Use the <deep-thinking> procedure to think through before acting
 
+* NEVER call `TaskOutput` on background agents — it returns the full execution transcript, not the
+  summary. Background agents automatically deliver their summary when they finish. Use foreground
+  agents when you need results inline. Only call `TaskOutput` if user explicitly asks for it
+
 * When starting a new conversation, ALWAYS make sure to load the relevant project context using `/ctx-load`
 
 * NEVER implement until you receive this exact signal: "🚀 Engage thrusters"

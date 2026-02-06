@@ -59,6 +59,8 @@ implementation, reviews, etc.)
    - Your context window is very precious
      You should NOT attempt to validate their work by running tests, build, format, etc
      You should NOT diff any code either, other than listing changed files to prevent context bloat
+     You should NEVER call `TaskOutput` on background agents — it returns full transcripts, not
+     summaries. Background agents deliver their summary automatically when done
      You should ALWAYS use sub-agents to do any extra work, using same instructions as above
 
 7. 🔳 Collect debriefs, analyse results and report on overall progress
