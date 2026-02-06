@@ -87,7 +87,7 @@
       "Skill(ctx-save)",
       "Skill(review-search)",
       "Skill(mem-editing)",
-      "Skill(proj-editing)",
+      "Skill(proj-editing)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

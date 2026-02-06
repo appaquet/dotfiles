@@ -37,7 +37,7 @@ Editing either location modifies the same files.
 
 ### Modifying Instructions
 
-ALWAYS use the `/mem-editting` skill for any changes to instruction files:
+ALWAYS use the `/mem-edit` command for any changes to instruction files:
 
 - Commands (`commands/*.md`)
 - Skills (`skills/*/`)

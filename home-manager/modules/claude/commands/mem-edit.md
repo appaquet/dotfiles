@@ -15,21 +15,21 @@ Target: `$ARGUMENTS`
 1. STOP, follow pre-flight instructions
    THEN, continue
 
-2. 🔳 Load skills (from ~/.claude/commands/ or ~/.claude/skills/)
-    * Load the `mem-editing` right away. This will be needed for analysis and application
-    * Load the `ctx-plan` right away command to ensure proper planning steps
+2. 🔳 Load skills
+    * Load the `mem-editing` skill and all its supporting files
+    * Load the `ctx-plan` command
 
 3. 🔳 Ensure scope identified
    If target unclear, use `AskUserQuestion` to clarify
 
-4. 🔳 Analyze with mem-editing skill
-   * Load the `mem-editing` skill
-   * Load all of its files
-   * Load some context around the target instruction file(s)
+4. 🔳 Analyze target files
+   * Load context around the target instruction file(s)
      * Load surrounding instructions/commands/skills/agents to understand the pattern and style
-   * Using its instructions, analyse the requested instruction file(s)
-     * It's important to follower the `mem-editing` skill, but the surrounding style also has to be considered
+   * Apply `mem-editing` guidelines: check for ambiguity, cross-file conflicts, redundancy
+   * Use the `<deep-thinking>` procedure
 
 5. **STOP AND WAIT** - Await `/proceed` confirmation before applying changes
 
-6. 🔳 Apply with mem-editing skill
+6. 🔳 Apply changes
+   * Follow `mem-editing` guidelines during edits
+   * Verify consistency across affected files

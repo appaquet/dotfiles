@@ -61,7 +61,7 @@ Main workflows for quick interaction.
 
 ## Internal Skills
 
-- `mem-editing`: Should be used for any edit to instruction / commands / agents files
+- `mem-editing`: Guidelines for editing instruction files (commands, skills, agents, docs)
 - `proj-editing`: Should be used for any edit to project or phase docs
 
 ## Agents
