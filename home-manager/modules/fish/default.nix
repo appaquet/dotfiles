@@ -21,10 +21,14 @@
         # vi mode
         fish_vi_key_bindings
 
-        # If colors are messed up, check:
-        # https://gist.github.com/andersevenrud/015e61af2fd264371032763d4ed965b6
-        # Don't set TERM here, it should be set via tmux (see tmux/default.nix)
+        # Make sure colors work in TUI apps 
+        # See https://gist.github.com/andersevenrud/015e61af2fd264371032763d4ed965b6
+        # Override the default TERM set by tmux and process-compose because they use older versions
+        # of tcell which had issue with tmux-256color. xterm-256color works better and also allow
+        # italics which screen-256color doesn't support
         export COLORTERM=truecolor
+        alias k9s="TERM=xterm-256color command k9s"
+        alias process-compose="TERM=xterm-256color command process-compose"
 
         # Since it doesn't seem to always work in neovim setup
         export EDITOR="nvim"

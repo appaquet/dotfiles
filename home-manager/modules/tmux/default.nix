@@ -70,9 +70,11 @@ in
       set -gu default-command
       set -g default-shell "${pkgs.fish}/bin/fish"
 
-      # Because `tmux-256color` is not supported correctly by all TUIs (Go)
-      # `COLORTERM=truecolor` is set in fish.nix
-      set -g default-terminal 'screen-256color'
+      # Make sure colors work in TUI apps
+      # Works in tandem with fish/default.nix
+      # See: https://gist.github.com/andersevenrud/015e61af2fd264371032763d4ed965b6
+      set -g default-terminal 'tmux-256color'
+      set -sg terminal-overrides ',*:RGB'
 
       # Force tmux to resize windows to the most recently active client
       set -g window-size latest
