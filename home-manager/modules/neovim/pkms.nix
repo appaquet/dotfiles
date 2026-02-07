@@ -4,8 +4,8 @@ let
 
   # https://oxide.md/Configuration
   moxideConfig = ''
-    # Daily notes date format (strftime). Creates daily/2026/02/01.md
-    dailynote = "%Y/%m/%d"
+    # Daily notes date format (strftime). Creates daily/2026/02/2026-02-01-daily.md
+    dailynote = "%Y/%m/%Y-%m-%d-daily"
 
     # Folder for daily notes (relative to vault root)
     daily_notes_folder = "${pkmsDir}/daily"
@@ -51,7 +51,7 @@ let
     block_transclusion_length = "Full"
 
     # Complete by heading but link to filename only (for Zettelkasten)
-    link_filenames_only = false
+    link_filenames_only = true
   '';
 in
 {
