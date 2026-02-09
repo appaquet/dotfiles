@@ -44,7 +44,4 @@ NEVER engage the native plan mode `EnterPlanMode`
 
 7. 🔳 Write plan to docs via `proj-editing` skill
 
-8. 🔳 Confirm choices with user via `AskUserQuestion`
-   - Surface assumptions and uncertainties
-
-9. **STOP**: User will decide next steps
+8. **STOP**: User will decide next steps
