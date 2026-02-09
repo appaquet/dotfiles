@@ -53,18 +53,25 @@ implementation, reviews, etc.)
      🔳 notation and execute them in the exact same way as the original skill would. These should
      exclude any of the parent agent's responsibilities (jj operations, project doc updates, etc.)
 
-   - Instruct the sub-agent to a complete debrief in one single last message:
-     - What was done
-     - Changed files (detailed to avoid having you to diff to understand)
-     - Results (tests passing, etc.)
-     - Next steps or blockers
+   - Optimize sub-agent prompts and output — enough for parent to understand and decide next steps,
+     not exhaustive dumps:
+     - State the specific question or deliverable, not open-ended exploration
+     - Specify expected output format (e.g., "2-3 sentences", "findings with
+       reasoning", "file list with one-line descriptions")
+     - Instruct sub-agent to debrief concisely in one final message
+       (target: ~500 tokens research, ~1000 implementation):
+       - Lead with actionable findings, not the process
+       - Changed files with one-line description each
+       - Results (pass/fail) and next steps or blockers
 
    - Your context window is very precious
-     You should NOT attempt to validate their work by running tests, build, format, etc
-     You should NOT diff any code either, other than listing changed files to prevent context bloat
-     You should NEVER call `TaskOutput` on background agents — it returns full transcripts, not
-     summaries. Background agents deliver their summary automatically when done
-     You should ALWAYS use sub-agents to do any extra work, using same instructions as above
+     - You should NOT attempt to validate their work by running tests, build, format, etc
+     - You should NOT diff any code either, other than listing changed files to prevent context bloat
+     - You should NEVER call `TaskOutput` on background agents — it returns full transcripts, not
+       summaries. Background agents deliver their summary automatically when done
+     - You should ALWAYS use sub-agents to do any extra work, using same instructions as above
+     - Think about that when instructing the agent: optimize their output for your context and
+       preventing you from having to do extra work to validate or understand it
 
 7. 🔳 Collect debriefs, analyse results and report on overall progress
       If requested by skill, update project docs using the `ctx-save` skill

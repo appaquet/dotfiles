@@ -39,7 +39,9 @@ Before executing instructions of any command/skill/agent instructions:
    for each instruction step that has 🔳 annotation BEFORE executing anything
   * Create one or more tasks per 🔳 step, 1:n mapping using the `TaskCreate` tool
   * No ad-hoc replacements or broader grouping
-  * THEN execute the instructions & tasks in order, marking in-progress/completed as you proceed
+  * THEN execute the instructions & tasks in order
+  * Marking in-progress/completed as you proceed, always make sure you do so and make as completed
+    previous tasks if you forgot to mark them on a later step
 
 * ALWAYS use project & phase docs to plan and track work @~/.claude/docs/project-doc.md using the
   proper project editing skills
