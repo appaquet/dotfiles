@@ -1,348 +1,357 @@
-# Neovim sheet cheat
+# Neovim Cheat Sheet
 
 This is a collection of keymaps and commands for my Neovim setup. It doesn't contain only personal
 keymaps, but also default/built-ins that I tend to forget.
 
-## General keymap
+## General Keymap
 
 * `<leader>` is space
-* `<leader>qq` to close current window/split
-* `<leader>qa` to quit neovim
-* `<leader>qs` to clear auto-session and quit neovim
-* `<leader>o` to open messages in floating window
-* `<leader>qn` to dismiss all notifications
+* `<leader>qq` Close current window/split
+* `<leader>qa` Quit neovim
+* `<leader>qs` Clear session and quit neovim
+* `<leader>qn` Dismiss all notifications
+* `<leader>o` Open messages in floating window
+* `<A-j>` Move down 5 lines
+* `<A-k>` Move up 5 lines
+* `<C-/>` Clear search highlights
 
 ## Buffers (b)
 
-* `]b` to switch to next buffer
-* `[b` to switch to previous buffer
-* `<leader>bc` to open a new empty buffer
-* `<leader>bu` to undo changes (reload from disk)
-* `<leader>bq` or `<leader>bqq` to close the current buffer by trying not to mess up the layout
-* `<leader>bqo` to close all buffers except the current one
-* `<leader>bqa` to close all buffers
-* `<leader>bm` to create buffer from messages
-* `<leader>w`, `<leader>ww` to save current buffer
-* `<leader>wa` to save all buffers
+* `<leader>bc` Open new empty buffer
+* `<leader>bu` Undo changes (reload from disk)
+* `<leader>bq` or `<leader>bqq` Close current buffer
+* `<leader>bqo` Close all buffers except current
+* `<leader>bqa` Close all buffers
+* `<leader>bm` Create buffer from messages
+* `<leader>w` or `<leader>ww` Save current buffer
+* `<leader>wa` Save all buffers
 
 ## Tabs (n)
 
-* `<leader>nc` to open a new tab
-* `]n` to switch to next tab
-* `[n` to switch to previous tab
-* `<leader>n1 through 6` to switch to tab 1 through 6
-* `<leader>nq` to close current tab
-* `<leader>n<tab>` to switch to last tab
+* `<leader>nc` Open new tab
+* `]n` Switch to next tab
+* `[n` Switch to previous tab
+* `<leader>n1` through `<leader>n6` Switch to tab 1-6
+* `<leader>nq` Close current tab
+* `<leader>n<Tab>` Switch to last tab
 
 ## Windows
 
-* `ctrl-w w` to swap left and right window buffers
-* `ctrl-w r` or `ctrl-w R` to rotate panes
-* `ctrl-w c` or `ctrl-w o` close current split OR others
-* `ctrl-w z` to toggle zen mode
-* `ctrl-w pl` to pop current buffer to right window and navigate back
-* `ctrl-w pf` to pop current buffer to a floating window and navigate back
-* `ctrl-w ]` to increase window width
-* `ctrl-w [` to decrease window width
-* `ctrl-w m` to set window width to 80% of screen
+* `<C-w>w` Swap left and right window buffers
+* `<C-w>r` or `<C-w>R` Rotate panes
+* `<C-w>c` or `<C-w>o` Close current split OR others
+* `<C-w>z` Toggle zen mode
+* `<C-w>pl` Pop current buffer to right window and navigate back
+* `<C-w>pf` Pop current buffer to a floating window and navigate back
+* `<C-w>]` Increase window width
+* `<C-w>[` Decrease window width
+* `<C-w>m` Set window width to 80% of screen
 
 ## Fzf (f)
 
-* `<ctrl-p>` or `<leader>ff` fuzzy finding file names (can also be used in tree)
-* `<ctrl-l>` or `<leader>fs` fuzzy find content in current file
-* `<ctrl-g>` or `<leader>fS` fuzzy find content in workspace (can also be used in tree)
-* `<ctrl-b>` or `<leader>fb` fuzzy find through buffers
-* `<ctrl-s>` or `<leader>fls` fuzzy find through document symbols
-* `<ctrl-n>` or `<leader>fn` fuzzy find through tabs
-* `<ctrl-h>` or `<leader>fo` fuzzy find through old files
-* `<leader>flS` fuzzy find through workspace symbols
-* `<leader>flr` fuzzy find through LSP references
-* `<leader>flc` fuzzy find through LSP incoming calls
-* `<leader>flC` fuzzy find through LSP outgoing calls
-* `<leader>fld` fuzzy find through LSP definitions
-* `<leader>flD` fuzzy find through LSP declarations
-* `<leader>flt` fuzzy find through LSP type definitions
-* `<leader>fli` fuzzy find through LSP implementations
-* `<leader>flm` fuzzy find through LSP document diagnostics
-* `<leader>flM` fuzzy find through LSP workspace diagnostics
-* `<leader>fdb` fuzzy find through DAP breakpoints
-* `<leader>fw` fuzzy find word under cursor in file
-* `<leader>fW` fuzzy find word under cursor in workspace
-* `<leader>fk` fuzzy find through keymaps
-* `<leader>fc` fuzzy find through neovim commands
-* `<leader>fr` to resume last search
-* `<leader>fh` fuzzy find through help tags
-* `<leader>fm` fuzzy find through marks
-* `<leader>fR` fuzzy find through registers
-* `<leader>fx` or `<leader>fxl` fuzzy find through quickfix list
-* `<leader>fxs` fuzzy find through quickfix stack
+* `<C-p>` or `<leader>ff` Fuzzy find file names (can also be used in tree)
+* `<C-l>` or `<leader>fs` Fuzzy find content in current file
+* `<C-g>` or `<leader>fS` Fuzzy find content in workspace (can also be used in tree)
+* `<C-b>` or `<leader>fb` Fuzzy find through buffers
+* `<C-s>` or `<leader>fls` Fuzzy find through document symbols
+* `<C-n>` or `<leader>fn` Fuzzy find through tabs
+* `<C-h>` or `<leader>fo` Fuzzy find through old files
+* `<leader>flS` Fuzzy find through workspace symbols
+* `<leader>flr` Fuzzy find through LSP references
+* `<leader>flc` Fuzzy find through LSP incoming calls
+* `<leader>flC` Fuzzy find through LSP outgoing calls
+* `<leader>fld` Fuzzy find through LSP definitions
+* `<leader>flD` Fuzzy find through LSP declarations
+* `<leader>flt` Fuzzy find through LSP type definitions
+* `<leader>fli` Fuzzy find through LSP implementations
+* `<leader>flm` Fuzzy find through LSP document diagnostics
+* `<leader>flM` Fuzzy find through LSP workspace diagnostics
+* `<leader>fdb` Fuzzy find through DAP breakpoints
+* `<leader>fw` Fuzzy find word under cursor in file
+* `<leader>fW` Fuzzy find word under cursor in workspace
+* `<leader>fk` Fuzzy find through keymaps
+* `<leader>fc` Fuzzy find through neovim commands
+* `<leader>fr` Resume last search
+* `<leader>fh` Fuzzy find through help tags
+* `<leader>fm` Fuzzy find through marks
+* `<leader>fR` Fuzzy find through registers
+* `<leader>fx` or `<leader>fxl` Fuzzy find through quickfix list
+* `<leader>fxs` Fuzzy find through quickfix stack
 
-### Git integration
+### Git Integration
 
-* `<leader>fgs` fuzzy find through git status
-* `<leader>fgb` fuzzy find through git branches
-* `<leader>fgS` fuzzy find through git stash
-* `<leader>fgf` fuzzy find through git files
-* `<leader>fgB` fuzzy find through git blame
-* `<leader>fgt` fuzzy find through git tags
+* `<leader>fgs` Fuzzy find through git status
+* `<leader>fgb` Fuzzy find through git branches
+* `<leader>fgS` Fuzzy find through git stash
+* `<leader>fgf` Fuzzy find through git files
+* `<leader>fgB` Fuzzy find through git blame
+* `<leader>fgt` Fuzzy find through git tags
 
-### Inside fzf window
+### Inside FZF Window
 
-* `<ctrl-d>` or `<ctrl-u>` to page through results
-* `<shift-up>` or `<shift-down>` to page through preview
-* `<ctrl-i>` to select matches
-* `<ctrl-k>` to select all + send matches to quickfix list
-* `<ctrl-v>` to open selection in vertical split
-* `<ctrl-s>` to open selection in horizontal split
-* `<ctrl-t>` to open selection in tabs
-* `<alt-i>` to toggle ignored files
-* `<alt-h>` to toggle hidden files
-* `<alt-f>` to toggle follow symlinks
+* `<C-d>` or `<C-u>` Page through results
+* `<S-Up>` or `<S-Down>` Page through preview
+* `<C-i>` Select matches
+* `<C-k>` Select all + send matches to quickfix list
+* `<C-v>` Open selection in vertical split
+* `<C-s>` or `<C-x>` Open selection in horizontal split
+* `<C-t>` Open selection in tabs
+* `<A-i>` Toggle ignored files
+* `<A-h>` Toggle hidden files
+* `<A-f>` Toggle follow symlinks
 
-### Insert-mode completions
+### Inside FZF Buffers Window
 
-* `<ctrl-x><ctrl-f>` to fuzzy complete files/paths
-* See [fzf.lua](/home-manager/modules/neovim/conf/fzf.lua) for all keymaps
+* `<C-d>` Force delete buffer
+* `<C-x>` Delete buffer
 
-## Nvim tree
+### Insert-Mode Completions
 
-* `<leader>e` to toggle filetree
+* `<C-x><C-f>` Fuzzy complete files/paths
+
+## Nvim Tree
+
+* `<leader>e` Toggle filetree
 * In tree
-  * `g?` to show help
-  * `<ctrl>]` to CD into directory
-  * `-` go up one directory
-  * `<ctrl>v` Open in vertical split
-  * `<ctrl>x` Open in horizontal split
+  * `g?` Show help
+  * `<C-]>` CD into directory
+  * `-` Go up one directory
+  * `<C-v>` Open in vertical split
+  * `<C-x>` Open in horizontal split
   * `I` Toggle hidden files
   * `r` Rename file
   * `d` Delete file
-  * `a` Add file or directory if it ends with `/`
-  * `c`, `x`, `v` to copy, cut, paste files
-  * `f` to find file, `F` to clear
-  * `q` to close tree
-  * `E` to expand all, `W` to collapse
-  * `/` to fuzzy find file
-  * `<leader>fS` fuzzy find content in selected directory
-  * `<leader>ff` fuzzy find files in selected directory
-  * `<leader>gdf` show git file/directory history
-  * `<leader>cs` add file to Claude context
+  * `a` Add file or directory (if ends with `/`)
+  * `c`, `x`, `v` Copy, cut, paste files
+  * `f` Find file, `F` to clear
+  * `q` Close tree
+  * `E` Expand all, `W` Collapse all
+  * `/` Fuzzy find file in tree
+  * `<leader>fS` Fuzzy find content in selected directory
+  * `<leader>ff` Fuzzy find files in selected directory
+  * `<leader>gdf` Show git file/directory history
+  * `<leader>cs` Add file to Claude context
 
-## LSP / lang
+## LSP (l)
 
-* `<leader>lgd` or `gd` LSP: Go to definition
-* `<leader>lgt` or `gt` LSP: Go to type definition
-* `<leader>lli` or `gri` LSP: List all implementations
-* `<leader>llr` or `grr` LSP: List references
-* `<leader>lii` LSP: Displays hover information about a symbol
-* `<leader>lis` LSP: Show signature help
-* `<leader>Ti` LSP: Toggle inlay line hints
-* `<leader>lr` or `grn` LSP: Rename
-* `<ctrl-l>r` LSP: Rename (insert|visual mode)
-* `<leader>lca` or `gra` LSP: Code action
-* `<ctrl-l>ca` LSP: Code action (insert|visual mode)
-* `<leader>lci` LSP: Fix imports (Go)
-* `<leader>lR` LSP: Restart LSP
-* `<leader>lwa` LSP: Add workspace folder
-* `<leader>lwr` LSP: Remove workspace folder
-* `<leader>lwl` LSP: List workspace folders
-* `<leader>lf` Format current buffer with conform
-* `gfd` LSP: Go to definition in floating window
-* `gft` LSP: Go to type definition in floating window
-* `gld` LSP: Go to definition in right split
-* `glt` LSP: Go to type definition in right split
+* `<leader>lgd` or `gd` Go to definition
+* `<leader>lgt` or `gt` Go to type definition
+* `<leader>lli` List all implementations
+* `<leader>llr` List references
+* `<leader>lii` Display hover information about symbol
+* `<leader>lis` Show signature help
+* `<leader>Ti` Toggle inlay hints
+* `<leader>lr` Rename
+* `<C-l>r` Rename (insert/visual mode)
+* `<leader>lca` Code action
+* `<C-l>ca` Code action (insert/visual mode)
+* `<leader>lci` Fix imports
+* `<leader>lR` Restart LSP
+* `<leader>lwa` Add workspace folder
+* `<leader>lwr` Remove workspace folder
+* `<leader>lwl` List workspace folders
+* `<leader>lf` Format current buffer
+* `<leader>lt` Run linting on demand
+* `<leader>lT` Fix linting issues
+* `gfd` Go to definition (floating window)
+* `gft` Go to type definition (floating window)
+* `gld` Go to definition (right split)
+* `glt` Go to type definition (right split)
 
 ## Git (g)
 
-* `<leader>gs` to show git status
-* `:Git` or `:G` or `<leader>fgs` to show git status
-* `<leader>fgb` to list git branches
-* `<leader>fgS` fuzzy find through git stash
-* `<leader>fgf` fuzzy find through git files
-* `<leader>fgB` fuzzy find through git blame
-* `<leader>fgt` fuzzy find through git tags
-* `:Gdiff` to see diff
-* `:Gwrite` to stage the current file
-* `:Gcommit` to commit changes
-* `:Glog` to show git log
-* `:Gblame` to show blame
-* `<leader>gm` to change main branch
-* `<leader>gy` to yank the current line GitHub URL
-* `<leader>gu` to revert hunk
-* `<leader>ga` to stage hunk
-* `<leader>gb` to show blame pane
-* `]g` to navigate to the next git hunk
-* `[g` to navigate to the previous git hunk
-* `<leader>ggm` to switch gutter base against main branch
-* `<leader>ggp` to switch gutter base against previous branch
-* `<leader>ggw` to switch gutter base to working set
+* `<leader>gs` Show git status
+* `<leader>gm` Change main branch
+* `<leader>gy` Yank current line GitHub URL
+* `<leader>gu` Revert hunk
+* `<leader>ga` Stage hunk
+* `<leader>gb` Show blame pane
+* `<leader>gdb` Open buffer diff
+* `]g` Navigate to next git hunk
+* `[g` Navigate to previous git hunk
+* `<leader>ggm` Switch gutter base to main branch
+* `<leader>ggp` Switch gutter base to previous branch
+* `<leader>ggw` Switch gutter base to working set
 
-### Diff view
+### Git Commands
 
-* `<leader>gdw` to open diff view against working set
-* `<leader>gdm` to open diff view against main branch
-* `<leader>gdp` to open diff view against previous branch
-* `<leader>gdc` to open diff view against given rev/commit
-* `<leader>gdq` to close diff view
-* `<leader>gdf` to open file history
-* `<leader>gdb` to open buffer diff
-* `<leader>Tdw` to toggle whitespace visibility
+* `:Git` or `:G` Show git status
+* `:Gdiff` Show diff
+* `:Gwrite` Stage current file
+* `:Gcommit` Commit changes
+* `:Glog` Show git log
+* `:Gblame` Show blame
+
+### Diff View
+
+* `<leader>gdw` Open diff view against working set
+* `<leader>gdm` Open diff view against main branch
+* `<leader>gdp` Open diff view against previous branch
+* `<leader>gdc` Open diff view against given rev/commit
+* `<leader>gdq` Close diff view
+* `<leader>gdf` Open file history
+* `<leader>Tdw` Toggle whitespace visibility
 
 ### PR review
 
-See [https://github.com/pwntester/octo.nvim/blob/03059cf4d694e2b3065136f074b42ee98ff8e4b2/lua/octo/config.lua#L238]
-
-* `<leader>gpo` to open PR review mode
-* `<leader>gpq` to close PR review mode
-* `<leader>gpl` to list PRs
-* Files
-  * `]q` and `[q` to navigate between files
-  * `]Q` and `[Q` to navigate first and last files
-  * `<leader>space` to toggle file as reviewed
-  * `gf` to open file (unfortunately not in new tab)
-* Comments
-  * `<leader>gpc` to review comments
-  * `<leader>ca` to add a comment (save + unfocus window to submit)
-  * `<leader>cd` to delete a comment (in comment window)
-  * `<leader>sa` to add line suggestion
-  * `<leader>r` to add reaction
-  * `]c` and `[c` to navigate between comments
-* Review
-  * `<leader>gps` to submit review
-  * `<C-m>` to submit with comment
-  * `<C-a>` to approve
-  * `<C-r>` to request change
+* `<leader>gpo` Open PR review mode
+* `<leader>gpq` Close PR review mode
+* `<leader>gpl` List PRs
+* `<leader>gpc` Review comments
+* `<leader>gps` Submit review
+* Files:
+  * `]q` and `[q` Navigate between files
+  * `]Q` and `[Q` Navigate to first/last files
+  * `<leader>space` Toggle file as reviewed
+  * `gf` Open file
+* Comments:
+  * `<leader>ca` Add comment
+  * `<leader>cd` Delete comment
+  * `<leader>sa` Add line suggestion
+  * `<leader>r` Add reaction
+  * `]c` and `[c` Navigate between comments
+* Review actions:
+  * `<C-m>` Submit with comment
+  * `<C-a>` Approve
+  * `<C-r>` Request changes
 
 ## Diagnostics (x)
 
-* `<leader>xs` or `<leader>xf` Open diagnostic float
-* `<leader>xr` Reset diagnostics
+* `<leader>xs` Open diagnostic float
+* `<leader>xf` Open or focus diagnostic panel
+* `<leader>xr` Close diagnostics
 * `<leader>xl` Set location list
 * `<leader>xo` Open diagnostic panel
-* `<leader>xf` Focus diagnostic panel
 * `<leader>xx` Toggle diagnostic panel
 * `<leader>xq` Close diagnostic panel
 * `]x` Go to next diagnostic (in file)
 * `[x` Go to previous diagnostic (in file)
-* `]X` Go to next diagnostic (global)
-* `[X` Go to previous diagnostic (global)
+* `]X` Go to next diagnostic (global, opens panel)
+* `[X` Go to previous diagnostic (global, opens panel)
 * In diagnostic panel
-  * `s` to toggle between severty levels
+  * `s` to toggle between severity levels
 
 ## Quickfix (k)
 
-* `<leader>ko` to open quickfix
-* `<leader>kq` to close quickfix
-* `<leader>kk` to toggle quickfix
-* `<leader>kc` to clear quickfix
-* `<leader>kn` or `]k` to go to next quickfix
-* `<leader>kp` or `[k` to go to prev quickfix
-* From any fzf, `<ctrl>k`, sends matches to the quickfix list
-* Run replace in each quickfix match:
-  * `:cdo %s/<pattern>/<replacement>/g` to replace in each quickfix match
-  * `:cfdo %s/<pattern>/<replacement>/g` to replace in each quickfix match file
+* `<leader>ko` Open quickfix
+* `<leader>kq` Close quickfix
+* `<leader>kk` Toggle quickfix
+* `<leader>kc` Clear quickfix
+* `<leader>kn` or `]k` Go to next item
+* `<leader>kp` or `[k` Go to previous item
+* From any fzf, `<C-k>` sends all matches to quickfix list
+
+### Replace in quickfix matches
+
+* `:cdo %s/<pattern>/<replacement>/g` Replace in each match
+* `:cfdo %s/<pattern>/<replacement>/g` Replace in each file
 
 ## Testing (t)
 
-* `<leader>tc` to run nearest / under cursor
-* `<leader>tdc` to debug nearest
-* `<leader>tf` to run file
-* `<leader>tdf` to debug file
-* `<leader>tp` to run package/directory
-* `<leader>tdp` to debug package/directory
-* `<leader>tl` to run last
-* `<leader>tdl` to debug last
-* `<leader>tu` to stop test
-* `<leader>to` to output pane
-* `<leader>tq` to close output & side panel
-
-* `<leader>ts` to toggle side / summary panel, with keymaps:
-  * `r` to run a test
-  * `u` to stop a test
-  * `i` to open a test source
-  * `?` for help
+* `<leader>tc` Run nearest test / under cursor
+* `<leader>tdc` Debug nearest test
+* `<leader>tf` Run file tests
+* `<leader>tdf` Debug file tests
+* `<leader>tp` Run package/directory tests
+* `<leader>tdp` Debug package/directory tests
+* `<leader>tl` Run last test
+* `<leader>tdl` Debug last test
+* `<leader>tu` Stop test
+* `<leader>to` Show output pane
+* `<leader>tq` Close output & side panel
+* `<leader>ts` Toggle side/summary panel with keymaps:
+  * `r` Run a test
+  * `u` Stop a test
+  * `i` Open test source
+  * `?` Show help
 
 ## Debugging (d)
 
-* `<leader>db` to toggle breakpoint
-* `<leader>dc` to start/continue debugging
-* `<leader>do` to step over
-* `<leader>dI` to step into
-* `<leader>dO` to step out
-* `<leader>dj` to move down in the stack trace
-* `<leader>dk` to move up in the stack trace
-* `<leader>dp` to pause execution
-* `<leader>dt` to terminate the debugging session
-* `<leader>dr` to restart the debugging session
-* `<leader>de` to toggle the REPL
-* `<leader>dl` to run last
-* `<leader>dC` to run to cursor
-* `<leader>du` to open the DAP UI
-* `<leader>dq` to terminate & quit the DAP UI
-* In stacks
-  * `o` to open the current stack frame
-  * `t` to toggle hidden stack frames
+* `<leader>db` Toggle breakpoint
+* `<leader>dc` Start/continue debugging
+* `<leader>do` Step over
+* `<leader>dI` Step into
+* `<leader>dO` Step out
+* `<leader>dj` Move down in stack trace
+* `<leader>dk` Move up in stack trace
+* `<leader>dp` Pause execution
+* `<leader>dt` Terminate debugging session
+* `<leader>dr` Restart debugging session
+* `<leader>de` Toggle REPL
+* `<leader>dl` Run last
+* `<leader>dC` Run to cursor
+* `<leader>du` Open DAP UI
+* `<leader>dq` Terminate & quit DAP UI
+* In stack frames:
+  * `o` Open current stack frame
+  * `t` Toggle hidden stack frames
 
-## Inline AI code completion (insert mode)
+## Inline AI Code Completion (Insert Mode)
 
-* `<Alt-l>`: Accept word suggestion
-* `<Alt-o>`: Accept line suggestion
-* `<Alt-j>`: Next suggestion
-* `<Alt-J>`: Show all suggestions in a panel
-* `<Alt-k>`: Previous suggestion
-* `<Alt-n>`: Accept NES suggestion and go to next edit
-* `<ctrl-]>`: Dismiss suggestion
-* `<Tab>`: Accept suggestion if visible, otherwise expand/jump snippet or insert tab
-* `<Shift-Tab>`: Force insert a tab instead of expanding a snippet
+* `<M-l>` Accept word suggestion
+* `<M-o>` Accept line suggestion
+* `<M-j>` Next suggestion
+* `<M-k>` Previous suggestion
+* `<M-n>` Accept suggestion and go to next edit
+* `<C-]>` Dismiss suggestion
+* `<M-J>` Show Copilot panel
+* `<Tab>` Accept suggestion if visible, apply next edit suggestion, expand snippet, or insert tab
+* `<S-Tab>` Insert tab (skip snippet expansion and suggestions)
 
 ## Toggle Options (T)
 
-* `<leader>Tm` to toggle mouse support (useful to allow select + copy)
-* `<leader>Tn` to toggle line numbers
-* `<leader>Tw` to toggle line wrap
-* `<leader>Ts` to toggle spell checking
-* `<leader>Ti` to toggle LSP inlay hints
-* `<leader>Tp` to toggle Copilot
-* `<leader>Tf` to toggle auto-formatting
-* `<leader>Tl` to toggle auto linting
-* `<leader>Tt` to toggle theme between light and dark
-* `<leader>Tdw` to toggle whitespace visibility
+* `<leader>Tm` Toggle mouse support
+* `<leader>Tn` Toggle line numbers
+* `<leader>Tw` Toggle line wrap
+* `<leader>Ts` Toggle spell checking
+* `<leader>Ti` Toggle LSP inlay hints
+* `<leader>Tp` Toggle Copilot
+* `<leader>Tf` Toggle auto-formatting
+* `<leader>Tl` Toggle auto linting
+* `<leader>Tt` Toggle theme (light/dark)
+* `<leader>Tdw` Toggle whitespace visibility
 
-## AI Tools
+## AI Tools (a)
 
-* `<leader>au` to open MCPHub
-* `<leader>aa` to show CodeCompanion actions
-* `<leader>ae` inline edit with prompt in visual mode
+* `<leader>aa` Show CodeCompanion actions
+* `<leader>ae` Inline edit with prompt (visual mode)
 
-### Claude Integration
+### Claude Integration (c)
 
-* `<leader>cc` to toggle Claude
-* `<leader>cf` to focus Claude
-* `<leader>cr` to resume Claude
-* `<leader>cC` to continue Claude
-* `<leader>cb` to add current buffer to Claude
-* `<leader>cs` to send selection to Claude (visual) / add file to Claude (in tree)
-* `<leader>ca` to accept diff
-* `<leader>cd` to deny diff
+* `<leader>cc` Toggle Claude
+* `<leader>cf` Focus Claude
+* `<leader>cr` Resume Claude
+* `<leader>cC` Continue Claude
+* `<leader>cb` Add current buffer to Claude
+* `<leader>cs` Send selection to Claude (visual) / add file (tree)
+* `<leader>ca` Accept diff
+* `<leader>cd` Deny diff
 
-## Visual AI actions
+### Visual AI actions
 
-This uses code companion. Use `ga` and `gr` to accept/reject AI suggestions in visual mode.
-
-* `gs` use Code Companion to correct spelling and improve clarity of the current selection
-* `gC` generate comments or documentation for the current selection
+* `gs` Fix spelling and improve clarity (visual mode)
+* `gC` Add or improve documentation/comments (visual mode)
 
 ## PKMS (m)
 
 Personal Knowledge Management System keymaps. Works from any directory - opens floating window when
 not in PKMS, operates in-place when already in a PKMS buffer.
 
-* `<leader>md` toggle daily note (float if not in PKMS, in-place if in PKMS)
-* `<leader>mjd` open today's note
-* `<leader>mjy` open yesterday's note
-* `<leader>mjt` open tomorrow's note
-* `<leader>mf` find files in PKMS vault
-* `<leader>ms` search content in PKMS vault
-* `<leader>mS` search workspace symbols via LSP
+* `<leader>md` Toggle daily note (float if not in PKMS, in-place if in PKMS)
+* `<leader>mjd` Open today's note
+* `<leader>mjy` Open yesterday's note
+* `<leader>mjt` Open tomorrow's note
+* `<leader>mf` Find files in PKMS vault
+* `<leader>ms` Search content in PKMS vault
+* `<leader>mS` Search workspace symbols via LSP
+* `<leader>mt` Insert template
+
+## Projects (p)
+
+* `<leader>po` Open main project doc (00-*.md)
+* `<leader>pf` Find files in proj/
+* `<leader>fp` Find files in proj/ (alias)
+* `<leader>ps` Search content in proj/
 
 ## Object selection (in visual mode)
 
@@ -355,7 +364,7 @@ not in PKMS, operates in-place when already in a PKMS buffer.
 * `]X`: Next start of X
 * `[X`: Previous start of X
 * `]X`, `[X`: With capital letters → go to end
-  *(X = (f)unction, (c)lass, con(d)itional)*
+  *(X = (f)unction, (c)lass)*
 * `]d`: Next conditional
 * `[d`: Previous conditional
 
@@ -366,88 +375,105 @@ not in PKMS, operates in-place when already in a PKMS buffer.
 * `<leader>SP`: Swap with previous parameter
 * `<leader>SF`: Swap with previous function
 
-## Text/code manipulation
+## Text/Code Manipulation
 
-* `gw` to format text (using vim, in visual)
-* `gc` to comment text (in visual)
-* `gu` to lowercase text (in visual)
-* `gU` to upercase text (in visual)
-* `g~` to toggle casing (in visual)
-* `g;` and `g,` to navigate through last edits
-* `<ctrl-n>` to start multicursor edit
+* `gw` Format text (in visual)
+* `gc` Comment text (in visual)
+* `gu` Lowercase text (in visual)
+* `gU` Uppercase text (in visual)
+* `g~` Toggle casing (in visual)
+* `g;` and `g,` Navigate through last edits
+* `<C-t>` Increase indent (insert mode)
+* `<C-d>` Decrease indent (insert mode)
+* `<C-n>` Start multicursor edit
   * A keymap helper will show up with the available keymaps
-  * `n`, `N` to go to next/prev match
-  * `q` to skip current match
-  * `c` to change matches
-  * `d` to delete matches
-  * `a` to append after matches
+  * `n`, `N` Go to next/previous match
+  * `q` Skip current match
+  * `c` Change matches
+  * `d` Delete matches
+  * `a` Append after matches
+
+## Templates (C-e)
+
+### Todo (C-e t)
+
+* `<C-e>ti` Insert new todo `- [ ] ` on next line
+* `<C-e>td` Mark todo as done `[x]`
+* `<C-e>tp` Mark todo as in progress `[~]`
+* `<C-e>tu` Mark todo as undone `[ ]`
+
+### Comment Tags (C-e c)
+
+* `<C-e>cr` Insert `REVIEW: ` comment (filetype-aware)
+* `<C-e>ct` Insert `TODO: ` comment (filetype-aware)
+* `<C-e>cf` Insert `FIXME: ` comment (filetype-aware)
+* `<C-e>cn` Insert `NOTE: ` comment (filetype-aware)
+
+### Markdown
+
+* `<C-e>b` Insert bullet `- `
+* `<C-e>h1` Insert heading `# `
+* `<C-e>h2` Insert heading `## `
+* `<C-e>h3` Insert heading `### `
+* `<C-e>h4` Insert heading `#### `
 
 ## Execute/Run Commands (r)
 
-* `<leader>rf` to execute current file in a shell
-* `<leader>rl` to execute current visual selection in a shell (visual mode)
-* `<leader>rb` to execute code block in a shell
+* `<leader>rf` Execute current file in a shell
+* `<leader>rl` Execute current visual selection in a shell (visual mode)
+* `<leader>rb` Execute code block in a shell
 
 ## Clipboard Operations (y)
 
-* `<leader>yy` to yank to clipboard using [bin/pbcopy](bin/pbcopy) util
-* `<leader>yp` to paste from clipboard using [bin/pbpaste](bin/pbpaste) util
-* `<leader>yc` to yank the current line and comment the previous one
-* `<leader>yf` to yank current file's absolute path
+* `<leader>yy` Yank selection to system clipboard (visual mode)
+* `<leader>yp` Paste from system clipboard
+* `<leader>yc` Copy line and comment previous one
+* `<leader>yf` Copy current file's absolute path
 
-## Marks (m)
+## Marks (M)
 
-* `<leader>mk` to delete all marks
+* `<leader>Mk` Delete all marks
 
 ## Folding
 
-* `zm` to fold more
-* `zM` to fold all
-* `zr` to unfold more
-* `zR` to unfold all
-* `za` to toggle fold under cursor
+* `zm` Fold more
+* `zM` Fold all
+* `zr` Unfold more
+* `zR` Unfold all
+* `za` Toggle fold under cursor
+* `zz` Center cursor in screen
 
-## Marks
+## Vim Marks
 
-* `m[a-z0-9A-Z]` to set mark
-* `'[a-z0-9A-Z]` to list (which-key) and go to mark
+* `m[a-z0-9A-Z]` Set mark
+* `'[a-z0-9A-Z]` List (which-key) and go to mark
 
-## Recording & registers
+## Recording & Registers
 
-* `q[a-z0-9A-Z]` to start recording
-* `q` to stop recording
-* `@[a-z0-9A-Z]` to play macro (can be prefixed with number)
-* `.` to replay last action (or macro)
-* `"[a-z0-9A-Z]` to yank to register
-* `"[a-z0-9A-Z]p` to list (which-key) and paste from register
-
-## Linting
-
-* `<leader>lt` to run linting on demand
-* `<leader>Tl` to toggle auto linting
+* `q[a-z0-9A-Z]` Start recording
+* `q` Stop recording
+* `@[a-z0-9A-Z]` Play macro (prefixed with number for repeats)
+* `.` Replay last action/macro
+* `"[a-z0-9A-Z]` Yank to register
+* `"[a-z0-9A-Z]p` Paste from register (which-key list available)
 
 ## Profiling (P)
 
-* `<leader>Pt` to toggle profiler
-* `<leader>Ph` to toggle profiler highlights
-
-## Misc
-
-* `zz` to center cursor in the middle of the screen
-* `<ctrl-/>` to clear search highlights
+* `<leader>Pt` Toggle profiler
+* `<leader>Ph` Toggle profiler highlights
 
 ## Spelling
 
-* `<leader>Ts` to toggle spell checking
-* `]s` or `[s` to go to next/prev spelling error
-* `z=` to see spelling suggestions for word under cursor
-* `zg` to add word under cursor to spelling dictionary
-  (`1zg`, `2zg`, if multiple dicts. Check `echo &spellfile` for order)
-* `zw` to remove word under cursor from spelling dictionary
-* `gs` use code companion to correct spelling & clarity of current selection
-  (use `ga` or `gr` to accept/reject)
+* `<leader>Ts` Toggle spell checking
+* `]s` or `[s` Navigate to next/previous spelling error
+* `z=` Show spelling suggestions for word under cursor
+* `zg` Add word to spelling dictionary
+  (Use `1zg`, `2zg` for multiple dictionaries)
+* `zw` Remove word from spelling dictionary
+* `gs` Fix spelling/clarity (visual mode)
 
-## Command-line shortcuts
+## Command-line Shortcuts
 
-* `w!!` to save file with sudo
-* Various typo protection: `Wq`, `WQ`, `wQ` all mapped to `wqa` (write all and quit)
+* `w!!` Save file with sudo
+* `wq`, `Wq`, `WQ`, `wQa`, `WQa`, `wqaa`, `WQaa` Mapped to `wqa`
+* `Qw`, `qw` Mapped to `wqq`

@@ -24,3 +24,4 @@ Update my neovim cheat sheet file to ensure all keybindings are documented and a
 - Maintain the existing section structure in the cheat sheet
 - Keep descriptions concise but informative
 - Ensure all leader key mappings are correctly documented
+

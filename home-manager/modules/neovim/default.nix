@@ -197,6 +197,7 @@ in
             (includeLuaFile "base.lua")
 
             (includeLuaFile "keymap.lua")
+            (includeLuaFile "template.lua")
             (includeLuaFile "theme.lua")
             (includeLuaFile "buffers.lua")
             (includeLuaFile "windows.lua")
