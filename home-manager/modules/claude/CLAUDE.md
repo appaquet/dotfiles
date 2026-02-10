@@ -12,9 +12,10 @@
 * ALWAYS optimize for TOTAL present and future tokens
   * Use the <deep-thinking> procedure to think through before acting
 
-* NEVER call `TaskOutput` on background agents - it returns the full execution transcript, not the
-  summary. Background agents automatically deliver their summary when they finish. Use foreground
-  agents when you need results inline. Only call `TaskOutput` if user explicitly asks for it
+* NEVER call `TaskOutput` or read agent output files — for both foreground and background agents,
+  these return raw execution transcripts, not summaries. Foreground agents return their summary
+  directly in the Task tool result. Background agents deliver their summary automatically when done.
+  Only call `TaskOutput` if user explicitly asks for it
 
 * When starting a new conversation, ALWAYS make sure to load the relevant project context using `/ctx-load`
 

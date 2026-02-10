@@ -38,6 +38,9 @@ Follow workflow in @~/.claude/docs/reviewing-agent.md
 * No duplicated code that could be extracted
 * Code organization matches project patterns
 * No typos or syntax errors
+* Inconsistent error handling patterns
+* Errors are properly wrapped and informative, not just re-thrown without extra context
+  * Ex: `errors.Wrap` info
 * No remaining debug code (dbg!, println, console.log, etc.)
 * Comments describe "why" not "what", not redundant
 * Import/export organization follows project patterns
@@ -46,5 +49,4 @@ Follow workflow in @~/.claude/docs/reviewing-agent.md
 * Naming could be more descriptive or consistent
 * Code works but could be more idiomatic
 * Missing opportunities for simplification
-* Inconsistent error handling patterns
 </code-style-reviewer-guidelines>

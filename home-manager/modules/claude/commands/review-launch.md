@@ -27,6 +27,6 @@ all the context loading capabilities
    just consider it as "no issues found". Don't restart the agents as they consume many tokens.
 
 4. Collect results from agent summaries (returned directly for foreground agents, or delivered
-   automatically for background agents). NEVER call `TaskOutput` on background agents.
+   automatically for background agents). NEVER call `TaskOutput` or read agent output files.
    Don't act on review comments — agents insert `// REVIEW:` comments in code directly.
    Summarize findings from agent summaries.
