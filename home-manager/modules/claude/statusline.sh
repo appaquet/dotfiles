@@ -9,7 +9,7 @@ cwd=$(echo "$input" | jq -r '.cwd // ""')
 project_dir=$(echo "$input" | jq -r '.workspace.project_dir // ""')
 if [[ -n "$project_dir" && "$cwd" == "$project_dir"* ]]; then
   dir="${cwd#"$project_dir"}"
-  dir=".${dir:-/}"  # prefix with ., default to / if empty
+  dir=".${dir:-/}" # prefix with ., default to / if empty
 else
   dir=$(basename "$cwd")
 fi
@@ -40,4 +40,6 @@ else
   ctx="0%"
 fi
 
-echo -e "📁 $dir  💭 $ctx  🤖 $model"
+branch=$(jj-current-branch 2>/dev/null || echo "?")
+
+echo -e "📁 $dir 🔀 $branch  💭 $ctx  🤖 $model"
