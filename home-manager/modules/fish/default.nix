@@ -187,6 +187,24 @@
       vagrant = {
         disabled = true;
       };
+
+      git_branch = {
+        disabled = true;
+      };
+      git_commit = {
+        disabled = true;
+      };
+      git_status = {
+        disabled = true;
+      };
+
+      custom.jj_branch = {
+        command = "jj-current-branch 2>/dev/null";
+        detect_folders = [".jj"];
+        symbol = "🔀 ";
+        style = "bold purple";
+        format = "on [$symbol$output]($style) ";
+      };
     };
   };
 }
