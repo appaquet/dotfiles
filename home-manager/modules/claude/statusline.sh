@@ -42,4 +42,4 @@ fi
 
 branch=$(jj-current-branch 2>/dev/null || echo "?")
 
-echo -e "📁 $dir 🔀 $branch  💭 $ctx  🤖 $model"
+echo -e "📁 $dir 💭 $ctx 🔀 $branch 🤖 $model"
