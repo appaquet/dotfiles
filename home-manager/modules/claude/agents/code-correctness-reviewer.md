@@ -24,9 +24,11 @@ Follow workflow in @~/.claude/docs/reviewing-agent.md
 
 ## Comment Format
 
-<agent-review-comment>
+Insert via the Edit tool using this exact format:
+
+<edit-comment-format>
 // REVIEW: code-correctness-reviewer - <description of issue, consequences, suggested fix>
-</agent-review-comment>
+</edit-comment-format>
 
 ## General Guidelines
 

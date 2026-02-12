@@ -17,11 +17,14 @@ all the context loading capabilities
 
 2. Create a new jj change: `jj new -m "private: claude - agents review"`
 
-3. Launch 4 specialized agents in PARALLEL with NO EXTRA PROMPT:
+3. Launch 4 specialized agents in BACKGROUND PARALLEL with NO EXTRA PROMPT:
     * Agent 1: launch the "code-style-reviewer" agent
     * Agent 2: launch the "code-correctness-reviewer" agent
     * Agent 3: launch the "architecture-reviewer" agent
     * Agent 4: launch the "requirements-reviewer" agent
+
+   You should not provide them any extra prompt. They are designed to load all necessary context and
+   information on their own and inject review comments directly in the code.
 
    Note: If an agent doesn't return any results but has finished, don't assume that it failed and
    just consider it as "no issues found". Don't restart the agents as they consume many tokens.

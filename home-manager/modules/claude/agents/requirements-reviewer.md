@@ -35,9 +35,11 @@ Follow workflow in @~/.claude/docs/reviewing-agent.md with these additions:
 
 ## Comment Format
 
-<agent-review-comment>
+Insert via the Edit tool using this exact format:
+
+<edit-comment-format>
 // REVIEW: requirements-reviewer - <description of issue, consequences, suggested fix>
-</agent-review-comment>
+</edit-comment-format>
 
 ## General Guidelines
 

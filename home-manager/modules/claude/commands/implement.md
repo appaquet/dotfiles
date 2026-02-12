@@ -33,7 +33,7 @@ After instructions & tasks loaded, you are free to 🚀 Engage thrusters
    - Follow `code-insert-checklist` before modifying code
    - Update documentation if existing:
      - Mark phase doc task `[~]` when starting, `[x]` when done
-       Like `task-format` dictates
+       Like `task-format` dictates. Done = tested working
      - Add new tasks discovered to phase doc
      - Note critical decisions
    - If deviating or overcomplicating, STOP and update user

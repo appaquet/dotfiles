@@ -56,6 +56,7 @@
       "Bash(go test:*)",
       "Bash(go doc:*)",
       "Bash(go vet:*)",
+      "Bash(staticcheck:*)",
 
       "Bash(npm run build:*)",
       "Bash(npm run lint:*)",
@@ -68,6 +69,8 @@
       "Edit(~/go/**)",
       "Edit(~/dotfiles/**)",
       "Edit(/tmp/**)",
+      "Edit(~/.config/jj/repos/)",
+      "Read(~/.claude/**)",
 
       "WebSearch",
       "WebFetch(domain:github.com)",
@@ -80,11 +83,14 @@
       "WebFetch(domain:code.claude.com)",
       "WebFetch(domain:www.anthropic.com)",
       "WebFetch(domain:wiki.nixos.org)",
+      "WebFetch(domain:search.nixos.org)",
       "WebFetch(domain:proxy.golang.org)",
       "WebFetch(domain:sum.golang.org)",
       "WebFetch(domain:stackoverflow.com)",
+      "WebFetch(domain:index.crates.io)",
+      "WebFetch(domain:static.crates.io)",
+      "WebFetch(domain:docs.rs)",
 
-      "Read(~/.claude/**)",
       "Skill(ctx-load)",
       "Skill(ctx-save)",
       "Skill(review-search)",

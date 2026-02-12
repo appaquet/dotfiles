@@ -34,31 +34,28 @@ Shared infrastructure for code review agents. All review agents follow this work
      - Mark task in-progress
      - Examine changed hunks for this issue
        - Apply `<deep-thinking>` procedure
-       - Don't report issues on unrelated changes, unless it's a blatant problem
-     - If violation(s) found
-       - INSERT IN THE CODE review comments using the format found in `<agent-review-comment>` block in agent file
-         - The format is CRUCIAL for automated extraction
-           - Don't include the actual XML block
-           - `// REVIEW: [agent-name] - <description of issue, consequences, suggested fix>`
-         - You should never just report an issue without inserting a comment in the code
-         - Use the `Edit` tool to write it, no other means
-         - If you can't edit, it may be that another agent inserted in parallel, and you NEED to
-           read it back to insert
-         - You should NEVER report on an issue without successfully inserting a comment
-     - Mark complete before next rule
+       - Focus on changed code, not unrelated areas (unless blatant problem)
+     - For EACH violation found, IMMEDIATELY call the `Edit` tool to insert a comment:
+       `// REVIEW: [agent-name] - <description of issue, consequences, suggested fix>`
+       - Place the comment on the line above or next to the issue
+       - Edit tool is the ONLY way to report issues — text in your response does not count
+       - If Edit fails (parallel agent modified file), re-read the file and retry Edit
+       - Insert ALL violations, minor or major
+     - Mark task complete before next rule
 
 7. 🔳 Cross-file synthesis
    - Look back at all files and rules, add comments for issues that span multiple files that may
      have been missed
 
-8. 🔳 Return summary, in one SINGLE LAST message
-   - Give overall summary to parent agent
-   - If issues found:
-     - List all issues found to parent agent
-     - Make sure you really inserted comments for each
-       This is CRUCIAL for automated extraction
-   - If no issues
-     - Explain what was examined
+8. 🔳 Verify insertions
+   - Search changed files for `// REVIEW:` using the Grep tool
+   - If you found issues but grep returns no matches, go back to step 6 and insert via Edit
+   - Every reported issue MUST have a corresponding comment in the code
+
+9. 🔳 Return summary in one SINGLE LAST message
+   - Overall assessment to parent agent
+   - If issues found: list each as `file:line - brief description` (comment text is in the code)
+   - If no issues: explain what was examined
 
 ## Sub-agent Rules
 
@@ -73,9 +70,8 @@ Shared infrastructure for code review agents. All review agents follow this work
 - NEVER create `jj` changes since multiple reviewers run in parallel
   - Parent agent manages `jj` operations after collecting all reviews
 
-- You should NOT use externals tools (bash, formatter, linters, etc.)
-  Your own is to solely rely on your training and guidelines provided and insert commentsw
-  accordingly
+- Do NOT use external tools (bash, formatter, linters, etc.)
+  Rely solely on your training and the guidelines provided
 
 - Other reviewer agents may run in parallel
   - It's normal for code to change, and you may have to-read for latest changes
