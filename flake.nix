@@ -53,9 +53,8 @@
     };
 
     nix-ai-tools = {
-      # url = "github:numtide/nix-ai-tools?rev=81029ab8342b927a453d888676dc53247affa2c2"; # 2.0.76
-      # url = "github:numtide/nix-ai-tools?rev=863c3ad8d0964b31df2aff07386b1b67f435e6d0"; # 2.1.2
-      url = "github:numtide/nix-ai-tools";
+      url = "github:numtide/nix-ai-tools?rev=c5ec3b8e6a4b659a990b823deab8704094e08dbf"; # 2.1.39, as 2.1.41 has the bwrap sandboxing issue back
+      #url = "github:numtide/nix-ai-tools";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
