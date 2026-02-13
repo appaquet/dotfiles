@@ -200,7 +200,7 @@
 
       custom.jj_branch = {
         command = "jj-current-branch 2>/dev/null";
-        detect_folders = [".jj"];
+        when = "jj root --ignore-working-copy 2>/dev/null";
         symbol = "🔀 ";
         style = "bold purple";
         format = "on [$symbol$output]($style) ";
