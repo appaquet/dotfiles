@@ -18,6 +18,9 @@
   when done. DON'T EVER EVER EVER call `TaskOutput` to get agent results. THIS IS WASTING TOKENS.
   Only call `TaskOutput` if user explicitly asks for it
 
+* When a skill or agent returns output, ALWAYS present it to the user. Never dismiss and redo
+  the work. If output needs reformatting, reformat — don't start from scratch
+
 * When starting a new conversation, ALWAYS make sure to load the relevant project context using `/ctx-load`
 
 * NEVER implement until you receive this exact signal: "🚀 Engage thrusters"
