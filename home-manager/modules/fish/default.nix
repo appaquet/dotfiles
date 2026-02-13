@@ -154,7 +154,7 @@
       };
 
       direnv = {
-        disabled = false;
+        disabled = true;
         format = "[$symbol$allowed]($style) ";
         symbol = "direnv ";
         allowed_msg = "✓";
@@ -197,14 +197,14 @@
       git_status = {
         disabled = true;
       };
-
-      custom.jj_branch = {
-        command = "jj-current-branch 2>/dev/null";
-        when = "jj root --ignore-working-copy 2>/dev/null";
-        symbol = "🔀 ";
-        style = "bold purple";
-        format = "on [$symbol$output]($style) ";
-      };
+      #
+      # custom.jj_branch = {
+      #   command = "jj-current-branch 2>/dev/null";
+      #   when = "jj root --ignore-working-copy 2>/dev/null";
+      #   symbol = "🔀 ";
+      #   style = "bold purple";
+      #   format = "on [$symbol$output]($style) ";
+      # };
     };
   };
 }
