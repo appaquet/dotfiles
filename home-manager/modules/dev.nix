@@ -25,6 +25,7 @@ in
 {
   imports = [
     inputs.secrets.homeManager.dev
+    inputs.secrets.homeManager.nixAuth
   ];
 
   home.packages =

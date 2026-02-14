@@ -21,18 +21,22 @@
 1. Start neovim & git shells
    `nix shell nixpkgs#neovim nixpkgs#git`
 
-1. Setup a GitHub personal access token in `~/.config/nix/nix.conf`
-   (see [doc](https://nix.dev/manual/nix/2.18/command-ref/conf-file#conf-access-tokens))
-
-   ```conf
-    access-tokens = github.com:<YOUR_TOKEN>
-   ```
-
 1. Setup SSH keys. Rekey sops secrets + commit + push.
 
 1. Clone repo: `git clone --recursive git@github.com:appaquet/dotfiles.git`
 
-1. Setup home-manager & activate it.
+1. Bootstrap with manually injected PAT (needed for the private secrets flake input).
+   After the first `home-manager switch`, sops manages the token automatically via `access-tokens.conf`.
+
+   ```bash
+   NIX_CONFIG="access-tokens = github.com=ghp_YOUR_TOKEN" ./x home build
+   ```
+
+1. Add the following to `~/.config/nix/nix.conf` so nix picks up the sops-managed token:
+
+   ```conf
+   !include ./access-tokens.conf
+   ```
 
 1. Copy `/etc/nixos/*.nix` to this repo to compare & adapt.
 
@@ -46,20 +50,24 @@
 1. Enable flakes:
    `mkdir -p ~/.config/nix/ && echo 'experimental-features = nix-command flakes fetch-closure' > ~/.config/nix/nix.conf`
 
-1. Setup a GitHub personal access token in `~/.config/nix/nix.conf`
-   (see [doc](https://nix.dev/manual/nix/2.18/command-ref/conf-file#conf-access-tokens))
-
-   ```conf
-    access-tokens = github.com:<YOUR_TOKEN>
-   ```
-
 1. Setup SSH keys. Rekey sops secrets + commit + push.
 
 1. Clone repo: `git clone --recursive git@github.com:appaquet/dotfiles.git`
 
 1. Install [HomeBrew](https://brew.sh/).
 
-1. Build & activate home.
+1. Bootstrap with manually injected PAT (needed for the private secrets flake input).
+   After the first `home-manager switch`, sops manages the token automatically via `access-tokens.conf`.
+
+   ```bash
+   NIX_CONFIG="access-tokens = github.com=ghp_YOUR_TOKEN" ./x home build
+   ```
+
+1. Add the following to `~/.config/nix/nix.conf` so nix picks up the sops-managed token:
+
+   ```conf
+   !include ./access-tokens.conf
+   ```
 
 1. Build & activate darwin.
 
@@ -73,13 +81,6 @@
 
 1. Enable flakes:
    `mkdir -p ~/.config/nix/ && echo 'experimental-features = nix-command flakes fetch-closure' > ~/.config/nix/nix.conf`
-
-1. Setup a GitHub personal access token in `~/.config/nix/nix.conf`
-   (see [doc](https://nix.dev/manual/nix/2.18/command-ref/conf-file#conf-access-tokens))
-
-   ```conf
-    access-tokens = github.com:<YOUR_TOKEN>
-   ```
 
 1. On Linux, configure nix by adding to `/etc/nix/nix.conf`.
    No need to do it on Darwin since we already do it nix-darwin
@@ -98,7 +99,18 @@
 
 1. Setup SSH keys. Rekey sops secrets + commit + push.
 
-1. Clone repo, configure home & activate it.
+1. Clone repo. Bootstrap with manually injected PAT (needed for the private secrets flake input).
+   After the first `home-manager switch`, sops manages the token automatically via `access-tokens.conf`.
+
+   ```bash
+   NIX_CONFIG="access-tokens = github.com=ghp_YOUR_TOKEN" ./x home build
+   ```
+
+1. Add the following to `~/.config/nix/nix.conf` so nix picks up the sops-managed token:
+
+   ```conf
+   !include ./access-tokens.conf
+   ```
 
 1. Switch shell by adding `/home/appaquet/.nix-profile/bin/fish` to `/etc/shells` and running
    `chsh -s /home/appaquet/.nix-profile/bin/fish`
