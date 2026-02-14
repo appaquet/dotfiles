@@ -130,29 +130,9 @@
 
 1. Change password from default `carpediem`.
    SSH may not work until a physical login is done.
-
-1. **NVMe Migration** (Optional): If using NVMe, copy system to NVMe and update boot:
-
-   ```bash
-   # Format NVMe drive
-   sudo fdisk /dev/nvme0n1  # Create partitions matching SD layout
-
-   # Copy system to NVMe
-   sudo dd if=/dev/mmcblk0 of=/dev/nvme0n1 bs=4M status=progress
-
-   # NVMe boot is handled automatically by nvmd/nixos-raspberrypi
-   ```
-
-1. Generate hardware configuration on the running system:
-
-   ```bash
-   sudo nixos-generate-config --show-hardware-config
-   ```
-
-   Copy the output to `nixos/piapp/hardware-configuration.nix` with `lib.mkDefault` for all filesystem options.
+   Wifi won't work until secrets configured (sops rekeyed).
 
 1. Follow normal procedure to setup home-manager & rebuild NixOS.
-   Note: WiFi will not work until home & ssh is setup for keys.
 
 1. Setup SSH keys, rekey sops secrets, commit & push.
 
