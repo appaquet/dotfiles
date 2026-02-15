@@ -3,9 +3,10 @@
 {
   imports = [
     ./modules/base.nix
+    ./modules/dev.nix
   ];
 
-  dotfiles.neovim.full = false;
+  dotfiles.neovim.full = true;
 
   home.username = "appaquet";
   home.homeDirectory = "/home/appaquet";
