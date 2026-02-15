@@ -47,6 +47,8 @@
       user_rules = [
         "@@||appsflyersdk.com^" # ws promos
         "@@||braze.com^" # ws promos
+        "@@||featureassets.org^" # ws promos
+        "@@||prodregistryv2.org^" # ws promos
         # Block: "||blocked-domain.com^"
         # Allow: "@@||allowed-domain.com^"
       ];
