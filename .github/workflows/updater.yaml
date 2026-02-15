@@ -2,7 +2,7 @@ name: "Flake updater"
 
 on:
   schedule:
-    - cron: "0 7 * * *" # UTC, 3AM EST
+    - cron: "45 5 * * *" # UTC, 12/1AM EST
   workflow_dispatch: # allow manual triggering
   # pull_request:
   # push:
