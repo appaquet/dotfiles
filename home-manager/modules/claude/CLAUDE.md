@@ -70,7 +70,7 @@ Always report on understanding at any decision point - verbalize WHAT you unders
 * [ ] Understand existing patterns: [describe patterns]
 * [ ] Re-read file structure: [list key files]
 * [ ] List existing functions/classes: [name them]
-* [ ] Have test strategy: [describe approach]
+* [ ] Have test strategy used to iterate: [describe approach]
 * [ ] Know which files to modify: [list files]
 * [ ] Know success criteria: [state criteria]
 </full-understanding-checklist>

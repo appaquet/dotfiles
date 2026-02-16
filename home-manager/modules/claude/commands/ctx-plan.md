@@ -30,6 +30,11 @@ NEVER engage the native plan mode `EnterPlanMode`
    - Using the <deep-thinking> procedure
    - Search web for unfamiliar concepts if needed
    - For each unknown, add sub-task to investigate
+   - Make sure to identity ways to test work as we go
+     - If it's non-code or infra, design a way to test (ex: separate harness)
+     - If not possible to test, involve user at clear stages to validate work
+     - Should be done iteratively, not just at the end as validation step
+     - Never run blindly, always inform user if need way to validate
    - Use `AskUserQuestion` to clarify as you discover uncertainties
 
 5. 🔳 Report 10/10 understanding via `full-understanding-checklist`
@@ -38,8 +43,8 @@ NEVER engage the native plan mode `EnterPlanMode`
 6. 🔳 Create development plan
    - Break into logical phases
    - Identify key files and components
-   - Develop one component at the time, writing its test right after and make sure to pass it before
-     moving on
+   - Develop one component at the time, writing its test before if possible, and make it passes before
+     moving on to next step. If user validation needed, add it as a step in the plan
    - Consider dependencies and challenges
 
 7. 🔳 Write plan to docs via `proj-editing` skill

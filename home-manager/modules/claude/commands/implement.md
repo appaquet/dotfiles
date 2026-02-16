@@ -23,7 +23,8 @@ After instructions & tasks loaded, you are free to 🚀 Engage thrusters
 4. 🔳 Load tasks from project/phase doc/context
    - For each task, create 1..n `TaskCreate`
      - Segment for better tracking
-   - Create tasks for verification/testing
+   - Create tasks for verification/testing each implementation step
+     If user validation needed, task description should be clear about waiting for user input
 
 5. Create `jj` change for this implementation
    - Before proceeding: `jj new` at beginning
