@@ -28,6 +28,7 @@
       };
 
       revset-aliases = {
+        "proj()" = "description(glob:'private: proj*')";
       };
 
       aliases = {
@@ -49,5 +50,16 @@
 
   home.packages = with pkgs; [
     jjui
+    (writeShellScriptBin "jj-proj-tug" ''
+      if [ "$(jj log --no-graph -r '@' -T 'empty')" = "false" ]; then
+        jj new
+      fi
+      PROJ=$(jj log --no-graph -r 'latest(proj())' -T 'change_id.shortest()')
+      if [ -z "$PROJ" ]; then
+        echo "No proj commit found"
+        exit 1
+      fi
+      jj rebase -r "$PROJ" -B @
+    '')
   ];
 }
