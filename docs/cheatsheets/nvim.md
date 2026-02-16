@@ -75,6 +75,7 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>fh` Fuzzy find through help tags
 * `<leader>fm` Fuzzy find through marks
 * `<leader>fR` Fuzzy find through registers
+* `<leader>fv` Search for REVIEW comments in workspace
 * `<leader>fx` or `<leader>fxl` Fuzzy find through quickfix list
 * `<leader>fxs` Fuzzy find through quickfix stack
 
