@@ -20,7 +20,7 @@ in
 
     receiverIp = lib.mkOption {
       type = lib.types.str;
-      default = "192.168.0.27"; # piapp
+      default = "192.168.0.28"; # piapp
       description = "IP address of the log receiver machine";
     };
 
