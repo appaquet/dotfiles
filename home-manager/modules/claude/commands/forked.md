@@ -36,6 +36,8 @@ implementation, reviews, etc.)
    - Think about how to best decompose the work into independent sub-tasks by agents
    - Should not be too granular to avoid overhead, but not too broad to cause conflicts
    - If skill has multiple phases (e.g., plan + implement), consider launching sub-agents per phase
+   - If an agent require user intervention (ex: manual test, validation), inform agent to stop its
+     work, parent agent handle communication and then relaunch agent with new information
 
 4. 🔳 For each agent to be launched, create tasks:
    - Launch agent to do X
