@@ -100,7 +100,7 @@
     "deny": [],
     "defaultMode": "acceptEdits",
     "additionalDirectories": [
-      "/home/appaquet/dotfiles"
+      "~/dotfiles"
     ]
   },
   "hooks": {

@@ -32,8 +32,8 @@ Main workflows for quick interaction.
 - `/ctx-save`: Save progress to project docs
 - `/ctx-plan`: Create development plan
   - Research → plan → write to docs → STOP waits for `/implement`
-- `/ctx-improve`: Clarify understanding via exploration, reasearch and questions
 - `/ctx-check`: Output uncertainty disclosure
+- `/ctx-improve`: Clarify understanding via exploration, reasearch and questions
 
 ### Reviewing
 

@@ -31,7 +31,8 @@ refactoring, new commands/skills/agents.
 
 ## Supporting Files
 
-* @core.md: Core principles (self-verification, minimal info, writing style)
-* @commands-skills.md: Slash command and skill structure
-* @instructions.md: CLAUDE.md, memory files, structured prompting
-* @agents.md: Agent structure and patterns
+* @references/core.md: Core principles (self-verification, minimal info, writing style)
+* @references/skills.md: Skill structure, naming, progressive disclosure, description guidelines
+* @references/commands.md: Slash command structure and optimization workflow
+* @references/instructions.md: CLAUDE.md, memory files, structured prompting
+* @references/agents.md: Agent structure and patterns
