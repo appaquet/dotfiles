@@ -19,6 +19,8 @@ They aren't left for future consideration nor to be ignored.
 
 2. 🔳 Ensure REVIEW comments found
    - Use `/review-search` unless we just searched
+   - If launching via forked, ask agents to use `/review-search`
+     Never roll your own search
 
 3. 🔳 Research each comment
    - Read surrounding code to understand the issue

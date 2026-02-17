@@ -132,6 +132,7 @@ Modified or important context files. Update after modifications
 * Include: crucial files even if unmodified
 * Format: `- **path/file.ext**: Purpose. Changes (if any).`
 * Never replace files list with redirects like "See [phase doc] for details"
+* Should mention phase in which got modified. Don't remove previous ones, always include all of them
 
 ## Phase Doc (01-XYZ.md, 02-XYZ.md, ...)
 

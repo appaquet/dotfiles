@@ -60,7 +60,7 @@ jj commit -m "feat(workspace): add collections API"
 
 ## State Verification
 
-Before any jj write operation, run `jj log --limit 5` then `jj status`:
+Before any jj write operation, run `jj log --limit 5` then `jj status` (as separate calls, no pipe):
 
 * Expected: Clean working copy OR only changes you made in this session
 * Unexpected: Pre-existing changes, unknown modifications, conflicts

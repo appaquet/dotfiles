@@ -42,7 +42,7 @@ implementation, reviews, etc.)
 4. 🔳 For each agent to be launched, create tasks:
    - Launch agent to do X
    - Analyse results
-   - Update project docs if applicable
+   - Update project docs if applicable using `/ctx-save` procedure (on main agent)
 
 5. If the skill requires to create a `jj` change, make sure to create one before launching
    sub-agents
@@ -72,10 +72,11 @@ implementation, reviews, etc.)
      - NEVER call `TaskOutput` or read agent output files — they contain raw transcripts, not
        summaries. Foreground agents return results in the tool response. Background agents deliver
        summaries automatically
-     - You should ALWAYS use sub-agents to do any extra work, using same instructions as above
+     - You should ALWAYS use sub-agents to do any extra work beyond main agent responsibilities
+       listed above
      - Think about that when instructing the agent: optimize their output for your context and
        preventing you from having to do extra work to validate or understand it
 
 7. 🔳 Collect debriefs, analyse results and report on overall progress
-      If requested by skill, update project docs using the `ctx-save` skill
+      Make sure progress reflected in project docs as per instructions in the skill using `/ctx-save` procedure
       Handle `jj` operations as per skill and development instructions requirements
