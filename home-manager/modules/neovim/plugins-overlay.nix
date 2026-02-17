@@ -13,8 +13,8 @@ final: prev: {
       src = prev.fetchFromGitHub {
         owner = "copilotlsp-nvim";
         repo = "copilot-lsp";
-        rev = "884034b23c3716d55b417984ad092dc2b011115b";
-        sha256 = "sha256-g9/yQ7wsyJQHCp+nKTy5WFGoHPtXEEIMwfyuCasmHTY=";
+        rev = "1b6d8273594643f51bb4c0c1d819bdb21b42159d";
+        sha256 = "sha256-wb6WpIMUggHjUKEI++pRgg53vyiuwEZQmYWEN7sev3M=";
       };
       meta.homepage = "https://github.com/copilotlsp-nvim/copilot-lsp/";
       meta.hydraPlatforms = [ ];
@@ -27,8 +27,8 @@ final: prev: {
       src = prev.fetchFromGitHub {
         owner = "zbirenbaum";
         repo = "copilot.lua";
-        rev = "9b8d77c6c847c83c784c05f5f86b4821ed90d3a1";
-        sha256 = "sha256-nvGt/u4K5iYi7AZegV/tpOjFNlye7+LYPMejuuIwJ0M=";
+        rev = "dd3e345d59051464573d821b042f0a0c82410b5d";
+        sha256 = "sha256-0aPy0GE51H3HzhlX5eT4y/0BaFVRPY6kk5qMh/yY0+E=";
       };
       meta.homepage = "https://github.com/zbirenbaum/copilot.lua/";
       meta.hydraPlatforms = [ ];
