@@ -18,6 +18,7 @@
       "Bash(jj status:*)",
       "Bash(jj commit:*)",
       "Bash(jj new:*)",
+      "Bash(jj squash:*)",
       "Bash(jj-main-branch:*)",
       "Bash(jj-current-branch:*)",
       "Bash(jj-prev-branch:*)",
@@ -98,6 +99,7 @@
       "~/dotfiles"
     ]
   },
+  "model": "sonnet",
   "hooks": {
     "UserPromptSubmit": [
       {

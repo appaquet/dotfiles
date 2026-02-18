@@ -8,7 +8,8 @@ Using `jj` (collocated with git). Always detached head state
 |---------|---------|
 | Commit current | `jj commit -m "private: claude: description"` |
 | New empty change | `jj new -m "private: claude: description"` |
-| Squash current into parent | `jj squash -m "private: claude: description"` |
+| Squash current into parent, changing parent message | `jj squash -m "private: claude: description"` |
+| Squash current into parent, keep parent message | `jj squash -u` |
 | Diff (git style) | `jj diff --git` |
 | Diff working | `jj-diff-working --git` (`--stat` for files) |
 | Diff branch | `jj-diff-branch --git` |
@@ -46,7 +47,7 @@ Prefix commits with `"private: claude: "` so they can be easily identified and s
 Always use `-m "message"` for commands that expect a message since they could open editor:
   `jj commit -m ...`
   `jj new -m ...`
-  `jj squash -m ...`
+  `jj squash -m ...` => will change destination message, use -u to keep destination
 
 <good-example>
 jj commit -m "private: claude: fix validation bug"

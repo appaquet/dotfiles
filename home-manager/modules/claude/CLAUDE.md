@@ -51,6 +51,11 @@ Before executing instructions of any command/skill/agent instructions:
 * ALWAYS use project & phase docs to plan and track work @~/.claude/docs/project-doc.md using the
   proper project editing skills
 
+## Bash instructions
+
+* Avoid operations that bypass my allow list uselessly:
+  * Avoid prefixing commands with env set (`VAR=value command`) unless necessary
+
 ## Sub-instructions files
 
 * Workflows: @~/.claude/docs/workflows.md

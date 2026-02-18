@@ -46,6 +46,7 @@ NEVER engage the native plan mode `EnterPlanMode`
    - Develop one component at the time, writing its test before if possible, and make it passes before
      moving on to next step. If user validation needed, add it as a step in the plan
    - Consider dependencies and challenges
+   - It is crucial to include testing strategy in plan so you are autonomous
 
 7. 🔳 Write plan to docs via `proj-editing` skill
 
