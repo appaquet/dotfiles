@@ -89,18 +89,20 @@ local function render_template(template_str, ctx)
 		end
 	end
 
-	return (template_str:gsub("{{(.-)}}", function(key)
-		local base, fmt = key:match("^(%w+):(.+)$")
-		if base and (base == "date" or base == "time") then
-			return os.date(fmt, base == "date" and date_ts or nil)
-		end
-		local trimmed = key:match("^%s*(.-)%s*$")
-		local val = ctx[trimmed] or defaults[trimmed]
-		if val == nil then
-			return nil
-		end
-		return type(val) == "function" and val() or tostring(val)
-	end))
+	return (
+		template_str:gsub("{{(.-)}}", function(key)
+			local base, fmt = key:match("^(%w+):(.+)$")
+			if base and (base == "date" or base == "time") then
+				return os.date(fmt, base == "date" and date_ts or nil)
+			end
+			local trimmed = key:match("^%s*(.-)%s*$")
+			local val = ctx[trimmed] or defaults[trimmed]
+			if val == nil then
+				return nil
+			end
+			return type(val) == "function" and val() or tostring(val)
+		end)
+	)
 end
 
 local function read_and_render_template(template_path, ctx)
@@ -202,28 +204,17 @@ local function open_daily_with_hydrate(day_arg)
 end
 
 -- Journal keymaps
-vim.keymap.set("n", "<leader>mjd", function()
+vim.keymap.set("n", "<leader>mjj", function()
 	open_daily_with_hydrate("today")
 end, { silent = true, desc = "PKMS: Today's note" })
 
-vim.keymap.set("n", "<leader>mjy", function()
+vim.keymap.set("n", "<leader>mjp", function()
 	open_daily_with_hydrate("yesterday")
 end, { silent = true, desc = "PKMS: Yesterday's note" })
 
-vim.keymap.set("n", "<leader>mjt", function()
+vim.keymap.set("n", "<leader>mjn", function()
 	open_daily_with_hydrate("tomorrow")
 end, { silent = true, desc = "PKMS: Tomorrow's note" })
-
--- Daily note with toggle behavior
-vim.keymap.set("n", "<leader>md", function()
-	if pkms_float_win and vim.api.nvim_win_is_valid(pkms_float_win) then
-		vim.api.nvim_win_close(pkms_float_win, true)
-		pkms_float_win = nil
-		return
-	end
-
-	open_daily_with_hydrate("today")
-end, { desc = "PKMS: Toggle daily note" })
 
 -- File search (no LSP needed)
 vim.keymap.set("n", "<leader>mf", function()

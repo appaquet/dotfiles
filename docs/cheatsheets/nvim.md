@@ -338,10 +338,9 @@ keymaps, but also default/built-ins that I tend to forget.
 Personal Knowledge Management System keymaps. Works from any directory - opens floating window when
 not in PKMS, operates in-place when already in a PKMS buffer.
 
-* `<leader>md` Toggle daily note (float if not in PKMS, in-place if in PKMS)
-* `<leader>mjd` Open today's note
-* `<leader>mjy` Open yesterday's note
-* `<leader>mjt` Open tomorrow's note
+* `<leader>mjj` Open today's note
+* `<leader>mjp` Open yesterday's note
+* `<leader>mjn` Open tomorrow's note
 * `<leader>mf` Find files in PKMS vault
 * `<leader>ms` Search content in PKMS vault
 * `<leader>mS` Search workspace symbols via LSP

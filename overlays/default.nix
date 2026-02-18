@@ -14,8 +14,8 @@ let
       gemini-cli = inputs.nix-ai-tools.packages.${system}.gemini-cli;
       codex = inputs.nix-ai-tools.packages.${system}.codex;
 
-      #claude-code = final.callPackage ./claude-code/package.nix { };
-      claude-code = inputs.nix-ai-tools.packages.${system}.claude-code;
+      claude-code = final.callPackage ./claude-code/package.nix { };
+      #claude-code = inputs.nix-ai-tools.packages.${system}.claude-code;
     };
 
   neovimPluginsOverlay = import ../home-manager/modules/neovim/plugins-overlay.nix;

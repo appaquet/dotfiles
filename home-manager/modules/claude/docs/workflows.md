@@ -34,6 +34,8 @@ Main workflows for quick interaction.
   - Research → plan → write to docs → STOP waits for `/implement`
 - `/ctx-check`: Output uncertainty disclosure
 - `/ctx-improve`: Clarify understanding via exploration, reasearch and questions
+- `/ctx-usage`: Break down Messages portion of context window (tool results by tool, largest items, hints)
+  - Run `/context` first for static overview, then `/ctx-usage` for message-level detail
 
 ### Reviewing
 
