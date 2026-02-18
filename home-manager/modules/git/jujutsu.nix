@@ -60,6 +60,14 @@
         exit 1
       fi
       jj rebase -r "$PROJ" -B @
+
+      jj tug
     '')
   ];
+
+  programs.fish = {
+    shellAbbrs = {
+      jjt = "jj-proj-tug";
+    };
+  };
 }
