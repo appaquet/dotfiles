@@ -68,11 +68,9 @@
         jj new
       fi
       PROJ=$(jj log --no-graph -r 'latest(proj())' -T 'change_id.shortest()')
-      if [ -z "$PROJ" ]; then
-        echo "No proj commit found"
-        exit 1
+      if [ -n "$PROJ" ]; then
+        jj rebase -r "$PROJ" -B @
       fi
-      jj rebase -r "$PROJ" -B @
 
       jj tug
     '')
