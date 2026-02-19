@@ -18,6 +18,8 @@
   summary automatically when done
   Only call `TaskOutput` or read transcript if user explicitly asks for it, and try to use a
   sub-agent to do it if possible
+  If an agent's summary is insufficient, use the `resume` parameter on the Task tool to re-engage
+  the agent and ask targeted follow-up questions — never use TaskOutput as a workaround
 
 * When a skill or agent returns output, ALWAYS present it to the user. Never dismiss and redo
   the work. If output needs reformatting, reformat — don't start from scratch

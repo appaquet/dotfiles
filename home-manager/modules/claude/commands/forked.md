@@ -81,11 +81,15 @@ When launching sub-agents, pick the right model for the task to optimize speed &
      - NEVER call `TaskOutput` or read agent output files — they contain raw transcripts, not
        summaries. Foreground agents return results in the tool response. Background agents deliver
        summaries automatically
+     - If an agent's debrief is insufficient, use the `resume` parameter (with the agent's ID from
+       the Task tool result) to re-engage it and ask targeted follow-up questions
      - You should ALWAYS use sub-agents to do any extra work beyond main agent responsibilities
        listed above
      - Think about that when instructing the agent: optimize their output for your context and
        preventing you from having to do extra work to validate or understand it
 
 7. 🔳 Collect debriefs, analyse results and report on overall progress
+      If a debrief lacks needed detail, resume the agent (Task tool `resume` parameter with agent ID)
+      to ask specific follow-up questions rather than reading raw transcripts
       Make sure progress reflected in project docs as per instructions in the skill using `/ctx-save` procedure
       Handle `jj` operations as per skill and development instructions requirements
