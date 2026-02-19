@@ -6,12 +6,17 @@
   "permissions": {
     "allow": [
       "mcp__ide__getDiagnostics",
+
       "Bash(notify:*)",
       "Bash(lsof:*)",
       "Bash(readlink:*)",
-      "Bash(echo $?)",
+      "Bash(echo:*)",
       "Bash(grep:*)",
       "Bash(rg:*)",
+      "Bash(sed:*)",
+      "Bash(cat:*)",
+      "Bash(ln -s * proj)",
+
       "Bash(jj log:*)",
       "Bash(jj show:*)",
       "Bash(jj diff:*)",
@@ -19,6 +24,8 @@
       "Bash(jj commit:*)",
       "Bash(jj new:*)",
       "Bash(jj squash:*)",
+      "Bash(jj ls)",
+      "Bash(jj describe:*)",
       "Bash(jj-main-branch:*)",
       "Bash(jj-current-branch:*)",
       "Bash(jj-prev-branch:*)",
@@ -26,12 +33,15 @@
       "Bash(jj-diff-working:*)",
       "Bash(jj-diff-branch:*)",
       "Bash(jj-stacked-stats:*)",
-      "Bash(claude-proj-docs:*)",
+
       "Bash(gh pr list:*)",
       "Bash(gh pr view:*)",
       "Bash(gh pr checks:*)",
       "Bash(gh pr diff:*)",
       "Bash(gh pr review:*)",
+
+      "Bash(claude-proj-docs:*)",
+
       "Bash(nix eval:*)",
       "Bash(nix build:*)",
       "Bash(nix flake:*)",
@@ -39,12 +49,14 @@
       "Bash(nix run:*)",
       "Bash(nix shell:*)",
       "Bash(nix repl:*)",
+
       "Bash(cargo test:*)",
       "Bash(cargo check:*)",
       "Bash(cargo clippy:*)",
       "Bash(cargo fmt:*)",
       "Bash(cargo build:*)",
       "Bash(cargo tree:*)",
+
       "Bash(go build:*)",
       "Bash(go fmt:*)",
       "Bash(go mod:*)",
@@ -52,18 +64,21 @@
       "Bash(go doc:*)",
       "Bash(go vet:*)",
       "Bash(staticcheck:*)",
+
       "Bash(npm run build:*)",
       "Bash(npm run lint:*)",
       "Bash(npm run test:*)",
+
       "Edit(~/Library/Caches/**)",
       "Edit(~/.cache/**)",
       "Edit(~/.cargo/**)",
       "Edit(~/.npm/**)",
       "Edit(~/go/**)",
       "Edit(~/dotfiles/**)",
-      "Edit(/tmp/**)",
+      "Edit(//tmp/**)",
       "Edit(~/.config/jj/repos/)",
       "Read(~/.claude/**)",
+
       "WebSearch",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:api.github.com)",
@@ -87,6 +102,7 @@
       "WebFetch(domain:docs.rs)",
       "WebFetch(domain:jj-vcs.github.io)",
       "WebFetch(domain:docs.jj-vcs.dev)",
+
       "Skill(ctx-load)",
       "Skill(ctx-save)",
       "Skill(review-search)",

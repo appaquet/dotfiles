@@ -27,8 +27,10 @@ After instructions & tasks loaded, you are free to 🚀 Engage thrusters
      If user validation needed, task description should be clear about waiting for user input
 
 5. Create `jj` change for this implementation
-   - Before proceeding: `jj new` at beginning
-   - After task complete: `jj status` and `jj commit`
+   - Run `jj ls` to check state
+   - If `@` is empty: `jj describe -m "private: claude: description"`
+   - If `@` has changes: `jj new -m "private: claude: description"`
+   - After task complete: `jj ls` then `jj commit -m "..."`
 
 6. 🔳 Implement tasks one by one:
    - Follow `code-insert-checklist` before modifying code

@@ -8,6 +8,7 @@ Using `jj` (collocated with git). Always detached head state
 |---------|---------|
 | Commit current | `jj commit -m "private: claude: description"` |
 | New empty change | `jj new -m "private: claude: description"` |
+| Rename current change | `jj describe -m "private: claude: description"` |
 | Squash current into parent, changing parent message | `jj squash -m "private: claude: description"` |
 | Squash current into parent, keep parent message | `jj squash -u` |
 | Diff (git style) | `jj diff --git` |
@@ -21,13 +22,18 @@ Using `jj` (collocated with git). Always detached head state
 
 ## Creating Changes
 
-jj commit vs jj new:
+Commands:
 
 * `jj commit -m "msg"` - Finalize CURRENT changes with message, create new empty change
 * `jj new -m "msg"` - Create NEW empty change with message (current changes stay in parent)
+* `jj describe -m "msg"` - Set message on current `@` without creating a new change
 
-Use `commit` after changes. Use `new` before changes
-Run `jj status` before committing to verify changes are in expected place
+Use `commit` after changes. Before starting new work, check if `@` is already empty:
+
+* `@` is empty → `jj describe -m "..."` (avoid `jj new` which creates an orphaned empty intermediate)
+* `@` has changes → `jj new -m "..."`
+
+Run `jj ls` before committing to verify changes are in expected place
 
 When to create changes:
 
@@ -61,12 +67,13 @@ jj commit -m "feat(workspace): add collections API"
 
 ## State Verification
 
-Before any jj write operation, run `jj log --limit 5` then `jj status` (as separate calls, no pipe):
+Before any jj write operation, run `jj ls`:
 
 * Expected: Clean working copy OR only changes you made in this session
 * Unexpected: Pre-existing changes, unknown modifications, conflicts
 
 If state is unexpected: STOP immediately
+
 * Do NOT attempt to fix — report what you found and ask for clarification
 
 ## Dangerous Operations

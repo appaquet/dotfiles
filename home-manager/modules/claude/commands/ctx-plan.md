@@ -9,6 +9,7 @@ argument-hint: [task-description]
 Build a full plan for the task at hand: $ARGUMENTS
 
 Project files: !`claude-proj-docs`
+If no project files, assume we are working in memory only and skip any steps related to project files
 
 ALL implementations require completing this planning workflow and waiting for `/implement`. No
 exceptions, no matter how trivial. There is no such thing as "quick fix not requiring planning"
@@ -48,6 +49,6 @@ NEVER engage the native plan mode `EnterPlanMode`
    - Consider dependencies and challenges
    - It is crucial to include testing strategy in plan so you are autonomous
 
-7. 🔳 Write plan to docs via `proj-editing` skill
+7. 🔳 Write plan to docs via `proj-editing` skill if we have doc files
 
 8. **STOP**: User will decide next steps

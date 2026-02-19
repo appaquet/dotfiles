@@ -12,11 +12,12 @@
 * ALWAYS optimize for TOTAL present and future tokens
   * Use the <deep-thinking> procedure to think through before acting
 
-* NEVER NEVER NEVER NEVER call `TaskOutput` or read agent output files — for both foreground and
-  background agents, these return raw execution transcripts, not summaries. Agents provide their
-  summary directly in the Task tool result. Background agents deliver their summary automatically
-  when done. DON'T EVER EVER EVER call `TaskOutput` to get agent results. THIS IS WASTING TOKENS.
-  Only call `TaskOutput` if user explicitly asks for it
+* NEVER NEVER NEVER NEVER call `TaskOutput` to get agent output or read agent transcript files — for
+  both foreground and background agents, these return raw execution transcripts, not summaries.
+  Agents provide their summary directly in the Task tool result. Background agents deliver their
+  summary automatically when done
+  Only call `TaskOutput` or read transcript if user explicitly asks for it, and try to use a
+  sub-agent to do it if possible
 
 * When a skill or agent returns output, ALWAYS present it to the user. Never dismiss and redo
   the work. If output needs reformatting, reformat — don't start from scratch

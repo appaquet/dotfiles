@@ -15,7 +15,7 @@ all the context loading capabilities
 1. STOP, follow pre-flight instructions
    THEN, continue
 
-2. Create a new jj change: `jj new -m "private: claude - agents review"`
+2. Create a new jj change: `jj new -m "private: claude: agents review"`
 
 3. Launch 4 specialized agents in BACKGROUND PARALLEL with NO EXTRA PROMPT:
     * Agent 1: launch the "code-style-reviewer" agent

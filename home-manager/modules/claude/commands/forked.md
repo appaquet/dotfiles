@@ -24,6 +24,9 @@ Main agent will still handle:
 But everything else will be done by sub-agents launched to handle specific tasks (e.g., research,
 implementation, reviews, etc.)
 
+This applies to ALL tasks: trivial, obvious or not. "I can see the fix" is not a reason
+to bypass the flow
+
 ## Instructions
 
 1. STOP, follow pre-flight instructions
@@ -67,7 +70,9 @@ implementation, reviews, etc.)
        - Results (pass/fail) and next steps or blockers
 
    - Your context window is very precious
-     - You should NOT attempt to validate their work by running tests, build, format, etc
+     - NEVER do any validation or verification yourself
+       No tests, builds, browser snapshots, code inspection or any other form of checking
+       Route ALL verification to a sub-agent
      - You should NOT diff any code either, other than listing changed files to prevent context bloat
      - NEVER call `TaskOutput` or read agent output files — they contain raw transcripts, not
        summaries. Foreground agents return results in the tool response. Background agents deliver
