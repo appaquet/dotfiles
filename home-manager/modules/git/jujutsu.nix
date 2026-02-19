@@ -44,6 +44,19 @@
         "e" = [
           "edit"
         ];
+        "ls" = [
+          "util"
+          "exec"
+          "--"
+          "bash"
+          "-c"
+          ''
+            jj log --limit 5
+            echo ""
+            jj status
+          ''
+          ""
+        ];
       };
     };
   };
