@@ -60,7 +60,7 @@ vim.keymap.set({ "n", "i" }, "<C-e>tu", function()
 end, { silent = true, desc = "Todo: Undo" })
 
 -- Comment tags
-vim.keymap.set({ "n", "i" }, "<C-e>cr", function()
+vim.keymap.set({ "n", "i" }, "<C-e>cv", function()
 	insert_comment_tag("REVIEW")
 end, { silent = true, desc = "Comment: REVIEW" })
 vim.keymap.set({ "n", "i" }, "<C-e>ct", function()

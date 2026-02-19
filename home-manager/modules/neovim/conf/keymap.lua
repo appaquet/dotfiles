@@ -82,8 +82,8 @@ vim.keymap.set("n", "<Leader>rb", send_block_to_sh, { silent = true, desc = "Exe
 vim.keymap.set("n", "<C-_>", ":nohlsearch<CR>", { silent = true, desc = "Clear search highlight" }) -- C-/
 
 -- Navigation
-vim.keymap.set("n", "<A-j>", "5j", { silent = true, desc = "Down 5 lines" })
-vim.keymap.set("n", "<A-k>", "5k", { silent = true, desc = "Up 5 lines" })
+vim.keymap.set({ "n", "v" }, "<A-j>", "5j", { silent = true, desc = "Down 5 lines" })
+vim.keymap.set({ "n", "v" }, "<A-k>", "5k", { silent = true, desc = "Up 5 lines" })
 
 -- Clipboard / yanking
 local function copy_selection_to_clipboard()
