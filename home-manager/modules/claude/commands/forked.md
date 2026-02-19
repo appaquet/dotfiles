@@ -14,7 +14,7 @@ Fork a given skill, extract its instructions and delegate work to sub-agents
 Main agent's context is precious, we don't want to waste it with heavy tasks that can be done by
 sub-agents
 
-Main agent will still handle:
+Main agent should ONLY be responsible for:
 
 - Task decomposition based on skill instructions and current context
 - Launching sub-agents
@@ -22,10 +22,14 @@ Main agent will still handle:
 - `jj` operations as per skill requirements
 
 But everything else will be done by sub-agents launched to handle specific tasks (e.g., research,
-implementation, reviews, etc.)
+implementation, reviews, etc.). This applies to ALL tasks: trivial, obvious or not. "I can see the
+fix" is not a reason to bypass the flow.
 
-This applies to ALL tasks: trivial, obvious or not. "I can see the fix" is not a reason
-to bypass the flow
+When launching sub-agents, pick the right model for the task to optimize speed & accuracy:
+
+- haiku: code exploration, straightforward code, etc.
+- opus: planning, complex code
+- sonnet: normal code, most tasks
 
 ## Instructions
 
