@@ -76,6 +76,7 @@
       "Edit(~/go/**)",
       "Edit(~/dotfiles/**)",
       "Edit(//tmp/**)",
+      "Edit(//nix/**)",
       "Edit(~/.config/jj/repos/)",
       "Read(~/.claude/**)",
 

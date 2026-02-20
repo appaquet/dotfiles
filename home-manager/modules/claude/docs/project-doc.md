@@ -10,9 +10,6 @@ Unless project instructions specify otherwise:
 * **Main doc**: `00-<project-name>.md` inside the folder
 * **Phase docs**: `01-<phase-name>.md`, `02-<phase-name>.md`, etc. (numbered for ordering)
 * **Symlink**: `proj/` at repo root pointing to the project folder
-* **Private change**: Symlink in `private: proj - <project-name>` jj change
-  * Never squash anything else into it
-  * Don't prefix with `claude:`
 
 ### Finding Project Docs
 
@@ -20,6 +17,17 @@ Unless project instructions specify otherwise:
 2. Look for `00-*.md` as project doc, `01-*.md`, `02-*.md`, etc. as phase docs
 3. If project instructions specify different location → use that
 4. Never start looking for project docs elsewhere, if symlink not found and docs needed → inform user
+
+### Version control (jj)
+
+* The symlink should be in a `private: proj - <project-name>` jj change
+  * Contains the symlink file and **nothing else** — never mix doc changes into it
+  * Don't prefix with `claude:`
+* Doc file changes (00-*.md, 01-*.md, etc.)
+  * Use `private: claude: docs -` like any other Claude commit
+  * Should only contain doc file changes, never mix code changes into it
+  * You can use jj fileset to only commit/squash the doc files if needed
+  * Use `readlink ./proj` to get the path of project docs to commit
 
 ## When Created & Updated
 

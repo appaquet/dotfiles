@@ -57,3 +57,6 @@ Project files: !`claude-proj-docs`
    * 1-2 paragraph summary of work completed
    * Reference current phase and tasks worked on
    * Next step if decided/obvious
+
+8. 🔳 Commit doc changes:
+   * Use the Version Control guidelines from the project doc instructions

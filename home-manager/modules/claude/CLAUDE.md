@@ -39,6 +39,14 @@
   * NEVER engage the native plan mode `EnterPlanMode`. Refer to workflows for planning instructions
   * When agreed on a plan, ALWAYS follow it and ALWAYS stop & ask if you deviate or the plan fails
 
+## Sub-instructions files
+
+* Workflows: @~/.claude/docs/workflows.md
+* Project doc structure: @~/.claude/docs/project-doc.md
+* Version control: @~/.claude/docs/version-control.md
+* Development: @~/.claude/docs/development.md
+* Code style: @~/.claude/docs/code-style.md
+
 ## Pre-flight instructions
 
 Before executing instructions of any command/skill/agent instructions:
@@ -58,14 +66,11 @@ Before executing instructions of any command/skill/agent instructions:
 
 * Avoid operations that bypass my allow list uselessly:
   * Avoid prefixing commands with env set (`VAR=value command`) unless necessary
+  * Avoid using the `find` command if you can use your internal find tool instead
+    Find is not on my allow list because it can be used to execute arbitrary commands
 
-## Sub-instructions files
-
-* Workflows: @~/.claude/docs/workflows.md
-* Project doc structure: @~/.claude/docs/project-doc.md
-* Version control: @~/.claude/docs/version-control.md
-* Development: @~/.claude/docs/development.md
-* Code style: @~/.claude/docs/code-style.md
+* Avoid writing random python/node/bash scripts to do file operations
+  I'll need to approve them which leads to unnecessary back and forth
 
 ## Context understanding
 

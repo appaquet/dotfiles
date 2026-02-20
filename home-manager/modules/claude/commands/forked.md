@@ -12,24 +12,24 @@ arguments:
 Fork a given skill, extract its instructions and delegate work to sub-agents
 
 Main agent's context is precious, we don't want to waste it with heavy tasks that can be done by
-sub-agents
-
-Main agent should ONLY be responsible for:
+sub-agents. Main agent should ONLY be responsible for:
 
 - Task decomposition based on skill instructions and current context
 - Launching sub-agents
 - Updating project docs along the way
 - `jj` operations as per skill requirements
 
-But everything else will be done by sub-agents launched to handle specific tasks (e.g., research,
-implementation, reviews, etc.). This applies to ALL tasks: trivial, obvious or not. "I can see the
-fix" is not a reason to bypass the flow.
+Everything else must be done by sub-agents launched to handle specific tasks (e.g., research,
+implementation, reviews, etc.). This applies to ALL tasks: trivial, obvious or not. NEVER make
+judgment calls on if something is simple enough to be done by main agent
+
+## Model selection
 
 When launching sub-agents, pick the right model for the task to optimize speed & accuracy:
 
-- haiku: code exploration, straightforward code, etc.
+- haiku: shallow code exploration, straightforward code
+- sonnet: normal code, complex code exploration, most tasks
 - opus: planning, complex code
-- sonnet: normal code, most tasks
 
 ## Instructions
 
@@ -42,9 +42,10 @@ When launching sub-agents, pick the right model for the task to optimize speed &
    - Extract its instructions and tasks
    - Think about how to best decompose the work into independent sub-tasks by agents
    - Should not be too granular to avoid overhead, but not too broad to cause conflicts
-   - If skill has multiple phases (e.g., plan + implement), consider launching sub-agents per phase
+   - If skill has multiple phases (ex: plan + implement), consider launching sub-agents per phase
    - If an agent require user intervention (ex: manual test, validation), inform agent to stop its
      work, parent agent handle communication and then relaunch agent with new information
+   - Agent can stop early and you can use resume if more complex interaction needed
 
 4. 🔳 For each agent to be launched, create tasks:
    - Launch agent to do X
