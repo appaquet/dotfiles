@@ -131,11 +131,11 @@
 
       diff.algorithm = "histogram"; # better diffing algorithm
 
-      core.excludeFiles = "${config.home.homeDirectory}/.gitignore"; # global git ignore
+      core.excludesFile = "${config.home.homeDirectory}/.gitignore"; # global git ignore
 
       # Early corruption detection
-      transfer.fsckobjects = true;
-      fetch.fsckobjects = true;
+      transfer.fsckObjects = true;
+      fetch.fsckObjects = true;
       receive.fsckObjects = true;
 
       include = {

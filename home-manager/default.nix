@@ -3,11 +3,11 @@ let
   mkHomeConfig =
     system: hostModule:
     withSystem system (
-      { pkgs, ... }:
+      { pkgs, inputs', ... }:
       inputs.home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
         modules = [ hostModule ];
-        extraSpecialArgs = { inherit inputs; };
+        extraSpecialArgs = { inherit inputs inputs'; };
       }
     );
 in
