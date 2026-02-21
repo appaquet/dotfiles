@@ -46,14 +46,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1771786296,
-        "narHash": "sha256-HhmBOzxntMQgjK+dvT6TjyFmEa+iate7SKZrfgyGkqw=",
-        "path": "/home/appaquet/Projects/ccmon",
-        "type": "path"
+        "lastModified": 1771787818,
+        "narHash": "sha256-6dI/feAvxuJHEU4UBja2o/L3c0UO6ARMiwB4EWCNwG4=",
+        "owner": "appaquet",
+        "repo": "ccmon",
+        "rev": "90cc4aef5e4a88fdb14d319fc09dac7e9d50d6c5",
+        "type": "github"
       },
       "original": {
-        "path": "/home/appaquet/Projects/ccmon",
-        "type": "path"
+        "owner": "appaquet",
+        "repo": "ccmon",
+        "type": "github"
       }
     },
     "darwin": {

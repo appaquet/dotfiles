@@ -59,8 +59,8 @@
     };
 
     ccmon = {
-      #url = "github:appaquet/ccmon";
-      url = "path:/home/appaquet/Projects/ccmon";
+      url = "github:appaquet/ccmon";
+      #url = "path:/home/appaquet/Projects/ccmon";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

@@ -2,6 +2,7 @@
   pkgs,
   config,
   lib,
+  inputs',
   ...
 }:
 
@@ -234,6 +235,7 @@ in
     claude-proj-docs
     claude-tmux-indicator
     pkgs.socat # required for sandboxing
+    inputs'.ccmon.packages.default
   ]
   ++ lib.optionals pkgs.stdenv.isLinux [
     pkgs.bubblewrap # required for sandboxing
