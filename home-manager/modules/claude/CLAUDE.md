@@ -66,8 +66,8 @@ Before executing instructions of any command/skill/agent instructions:
 
 * Avoid operations that bypass my allow list uselessly:
   * Avoid prefixing commands with env set (`VAR=value command`) unless necessary
-  * Avoid using the `find` command if you can use your internal find tool instead
-    Find is not on my allow list because it can be used to execute arbitrary commands
+  * NEVER use `find` in bash — use the Glob tool for file discovery and Grep tool for content search
+    `find` bypasses the allow list; Glob + Grep handle all common patterns including combined file matching and content search
 
 * Avoid writing random python/node/bash scripts to do file operations
   I'll need to approve them which leads to unnecessary back and forth

@@ -18,7 +18,8 @@ Provide thoughtful analysis on a given question or topic without taking further 
 2. If topic empty or unclear, use `AskUserQuestion` to clarify
 
 3. 🔳 Research (code, web search, web fetch) if question requires or context is missing
-   * Consider launching sub-agents to explore codebase, find patterns if needed
+   * You need to use sub-agents to explore or read codebase, do research, etc.
+     Your context is precious, don't waste it
    * Analyze thoroughly
    * Apply <deep-thinking> procedure
 

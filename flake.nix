@@ -53,8 +53,14 @@
     };
 
     nix-ai-tools = {
-      url = "github:numtide/nix-ai-tools?rev=c5ec3b8e6a4b659a990b823deab8704094e08dbf"; # 2.1.39, as 2.1.41 has the bwrap sandboxing issue back
-      #url = "github:numtide/nix-ai-tools";
+      #url = "github:numtide/nix-ai-tools?rev=c5ec3b8e6a4b659a990b823deab8704094e08dbf"; # 2.1.39, as 2.1.41 has the bwrap sandboxing issue back
+      url = "github:numtide/nix-ai-tools";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    ccmon = {
+      #url = "github:appaquet/ccmon";
+      url = "path:/home/appaquet/Projects/ccmon";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

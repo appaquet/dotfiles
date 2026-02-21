@@ -59,9 +59,10 @@ When launching sub-agents, pick the right model for the task to optimize speed &
    - Give as much details as possible on the context, what needs to be implemented, which project
      docs to load, which section of the plan to follow, and any other relevant information
 
-   - Very thoroughly instruct the sub-agent to create tasks from the skill $0 instructions using the
-     🔳 notation and execute them in the exact same way as the original skill would. These should
-     exclude any of the parent agent's responsibilities (jj operations, project doc updates, etc.)
+   - Instruct the sub-agent to load the forked skill (`$0`) via the `Skill` tool, create tasks from
+     its 🔳 steps, and follow its full process (checklists, validation). Tell the sub-agent that it
+     should NEVER do the steps that are parent-only responsibilities (listed above, jj/docs/etc.).
+     You need to explicitly tell the sub-agent to IGNORE instructions from the skill that are about
 
    - Optimize sub-agent prompts and output — enough for parent to understand and decide next steps,
      not exhaustive dumps:
@@ -84,8 +85,8 @@ When launching sub-agents, pick the right model for the task to optimize speed &
        summaries automatically
      - If an agent's debrief is insufficient, use the `resume` parameter (with the agent's ID from
        the Task tool result) to re-engage it and ask targeted follow-up questions
-     - You should ALWAYS use sub-agents to do any extra work beyond main agent responsibilities
-       listed above
+     - ALWAYS use sub-agents for any work beyond parent-only responsibilities (listed at the top
+       of this file)
      - Think about that when instructing the agent: optimize their output for your context and
        preventing you from having to do extra work to validate or understand it
 
