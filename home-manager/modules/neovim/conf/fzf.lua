@@ -80,7 +80,7 @@ vim.keymap.set("n", "<leader>fh", fzf.helptags, { desc = "FZF: Help tags" })
 vim.keymap.set("n", "<leader>fk", fzf.keymaps, { desc = "FZF: Keymaps" })
 vim.keymap.set("n", "<leader>fc", fzf.commands, { desc = "FZF: Commands" })
 vim.keymap.set("n", "<leader>fv", function()
-	fzf.grep({ search = "(//|#|--)\\s*REVIEW:", no_esc = true })
+	fzf.grep({ search = "(//|#|\\*|--)\\s*REVIEW:", no_esc = true })
 end, { desc = "FZF: Search REVIEW comments" })
 
 vim.keymap.set("n", "<leader>fx", fzf.quickfix, { desc = "FZF: Quickfix list" })
