@@ -38,9 +38,14 @@ Current project files: !`claude-proj-docs`
    - Flag requirements where linked work done but still 🔄
    - Use `AskUserQuestion` before marking ✅
 
-7. 🔳 Present findings
+7. 🔳 Triage Inbox items (if section exists)
+   - For each item, propose: convert to requirement, add as phase task, move to Questions, or discard
+   - Use `AskUserQuestion` to confirm triage decisions
+   - Clear triaged items from Inbox
+
+8. 🔳 Present findings
    - Group issues by category
    - Show current state and proposed fix for each
    - Use `AskUserQuestion` to confirm before applying
 
-8. 🔳 Apply fixes after user confirmation
+9. 🔳 Apply fixes after user confirmation

@@ -49,6 +49,7 @@ Keep in order. Never reorder, rename, or create more sections
 * Checkpoint - Resume point, updated by /ctx-save
 * Requirements - R-numbered, behavior-focused (WHAT not HOW)
 * Questions (optional) - Pending or resolved Q&A
+* Inbox (optional) - Unprocessed feedback, bugs, ideas
 * Phases - List of phase references (NOT task items)
 * Files - All modified files across all phases
 
@@ -98,6 +99,10 @@ Requirements describe WHAT (observable behavior), not HOW (implementation):
 ### Questions (optional)
 
 Checklist of questions/answers to resolve. Thorough coverage of uncertainties with answers
+
+### Inbox (optional)
+
+Unprocessed items: feedback, bugs, ideas
 
 ### Phases
 
