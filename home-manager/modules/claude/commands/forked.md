@@ -1,15 +1,12 @@
 ---
 name: Forked
 description: Fork a skill's work to sub-agents for parallel execution
-arguments:
-  - name: skill
-    description: The skill to fork (e.g., implement, review-plan)
-    required: true
+argument-hint: [/skill1 & /skill2 ...] [instructions]
 ---
 
 # Forked
 
-Fork a given skill, extract its instructions and delegate work to sub-agents
+Fork one or more skills, extract their instructions and delegate work to sub-agents
 
 Main agent's context is precious, we don't want to waste it with heavy tasks that can be done by
 sub-agents. Main agent should ONLY be responsible for:
@@ -38,8 +35,9 @@ When launching sub-agents, pick the right model for the task to optimize speed &
 
 2. 🔳 Make sure the task at hand is clear. If not, use `AskUserQuestion` to clarify
 
-3. 🔳 Load `$0` skill if not already loaded using the `Skill` tool
-   - Extract its instructions and tasks
+3. 🔳 Parse `$ARGUMENTS` to identify skills (tokens with `/` prefix) and additional context
+   - Load each skill using the `Skill` tool
+   - Extract instructions and tasks from all loaded skills
    - Think about how to best decompose the work into independent sub-tasks by agents
    - Should not be too granular to avoid overhead, but not too broad to cause conflicts
    - If skill has multiple phases (ex: plan + implement), consider launching sub-agents per phase
@@ -59,7 +57,7 @@ When launching sub-agents, pick the right model for the task to optimize speed &
    - Give as much details as possible on the context, what needs to be implemented, which project
      docs to load, which section of the plan to follow, and any other relevant information
 
-   - Instruct the sub-agent to load the forked skill (`$0`) via the `Skill` tool, create tasks from
+   - Instruct the sub-agent to load the relevant skill(s) via the `Skill` tool, create tasks from
      its 🔳 steps, and follow its full process (checklists, validation). Tell the sub-agent that it
      should NEVER do the steps that are parent-only responsibilities (listed above, jj/docs/etc.).
      You need to explicitly tell the sub-agent to IGNORE instructions from the skill that are about
