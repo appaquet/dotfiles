@@ -6,7 +6,6 @@
   "permissions": {
     "allow": [
       "mcp__ide__getDiagnostics",
-
       "Bash(notify:*)",
       "Bash(lsof:*)",
       "Bash(readlink:*)",
@@ -16,7 +15,6 @@
       "Bash(sed:*)",
       "Bash(cat:*)",
       "Bash(ln -s * proj)",
-
       "Bash(jj log:*)",
       "Bash(jj show:*)",
       "Bash(jj diff:*)",
@@ -33,15 +31,12 @@
       "Bash(jj-diff-working:*)",
       "Bash(jj-diff-branch:*)",
       "Bash(jj-stacked-stats:*)",
-
       "Bash(gh pr list:*)",
       "Bash(gh pr view:*)",
       "Bash(gh pr checks:*)",
       "Bash(gh pr diff:*)",
       "Bash(gh pr review:*)",
-
       "Bash(claude-proj-docs:*)",
-
       "Bash(nix eval:*)",
       "Bash(nix build:*)",
       "Bash(nix flake:*)",
@@ -49,14 +44,12 @@
       "Bash(nix run:*)",
       "Bash(nix shell:*)",
       "Bash(nix repl:*)",
-
       "Bash(cargo test:*)",
       "Bash(cargo check:*)",
       "Bash(cargo clippy:*)",
       "Bash(cargo fmt:*)",
       "Bash(cargo build:*)",
       "Bash(cargo tree:*)",
-
       "Bash(go build:*)",
       "Bash(go fmt:*)",
       "Bash(go mod:*)",
@@ -64,11 +57,9 @@
       "Bash(go doc:*)",
       "Bash(go vet:*)",
       "Bash(staticcheck:*)",
-
       "Bash(npm run build:*)",
       "Bash(npm run lint:*)",
       "Bash(npm run test:*)",
-
       "Edit(~/Library/Caches/**)",
       "Edit(~/.cache/**)",
       "Edit(~/.cargo/**)",
@@ -79,7 +70,6 @@
       "Edit(//nix/**)",
       "Edit(~/.config/jj/repos/)",
       "Read(~/.claude/**)",
-
       "WebSearch",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:api.github.com)",
@@ -103,7 +93,6 @@
       "WebFetch(domain:docs.rs)",
       "WebFetch(domain:jj-vcs.github.io)",
       "WebFetch(domain:docs.jj-vcs.dev)",
-
       "Skill(ctx-load)",
       "Skill(ctx-save)",
       "Skill(review-search)",
@@ -116,7 +105,6 @@
       "~/dotfiles"
     ]
   },
-  "model": "sonnet",
   "hooks": {
     "UserPromptSubmit": [
       {
@@ -137,7 +125,10 @@
             "type": "command",
             "command": "claude-tmux-indicator off Stop"
           },
-          { "type": "command", "command": "ccmon status" }
+          {
+            "type": "command",
+            "command": "ccmon status"
+          }
         ]
       }
     ],
@@ -149,7 +140,10 @@
             "type": "command",
             "command": "claude-tmux-indicator off SessionEnd"
           },
-          { "type": "command", "command": "ccmon status" }
+          {
+            "type": "command",
+            "command": "ccmon status"
+          }
         ]
       }
     ],
@@ -172,7 +166,10 @@
             "type": "command",
             "command": "claude-tmux-indicator permission PermissionRequest"
           },
-          { "type": "command", "command": "ccmon status" }
+          {
+            "type": "command",
+            "command": "ccmon status"
+          }
         ]
       }
     ],
@@ -184,7 +181,10 @@
             "type": "command",
             "command": "echo '{\"additionalContext\": \"COMPACTION JUST OCCURRED. You MUST run /ctx-load NOW before any other action to reload project context.\"}'"
           },
-          { "type": "command", "command": "ccmon status" }
+          {
+            "type": "command",
+            "command": "ccmon status"
+          }
         ]
       }
     ],
@@ -196,7 +196,10 @@
             "type": "command",
             "command": "jq -r '.message' | xargs -I _ notify \"_\""
           },
-          { "type": "command", "command": "ccmon status" }
+          {
+            "type": "command",
+            "command": "ccmon status"
+          }
         ]
       }
     ]
