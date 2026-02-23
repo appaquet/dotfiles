@@ -11,7 +11,7 @@ description: Search for REVIEW comments in the codebase
 2. Search for REVIEW comments using the `Grep` tool:
 
    ```
-   Grep(pattern="(//|#|--)\\s*REVIEW:", output_mode="content")
+   Grep(pattern="(//|#|--|/\\*|\\*)\\s*REVIEW:", output_mode="content")
    ```
 
    * Ignore results in `proj/` (project documentation)
