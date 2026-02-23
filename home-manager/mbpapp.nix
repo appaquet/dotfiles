@@ -8,7 +8,6 @@
     ./modules/docker.nix
     ./modules/ghostty.nix
     ./modules/media.nix
-    ./modules/mise.nix
     ./modules/restic/backup.nix
     ./modules/work
   ];

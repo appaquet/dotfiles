@@ -9,7 +9,6 @@
     ./modules/media.nix
     ./modules/vms.nix
     ./modules/vpn.nix
-    ./modules/mise.nix
     ./modules/work
   ];
 
