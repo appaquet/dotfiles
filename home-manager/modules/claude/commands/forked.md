@@ -6,7 +6,7 @@ argument-hint: [/skill1 & /skill2 ...] [instructions]
 
 # Forked
 
-Fork one or more skills, extract their instructions and delegate work to sub-agents
+Fork one or more skills, understand their instructions and orchestrate their execution across sub-agents
 
 Main agent's context is precious, we don't want to waste it with heavy tasks that can be done by
 sub-agents. Main agent should ONLY be responsible for:
@@ -26,7 +26,7 @@ When launching sub-agents, pick the right model for the task to optimize speed &
 
 - haiku: shallow code exploration, straightforward code
 - sonnet: normal code, complex code exploration, most tasks
-- opus: planning, complex code
+- opus: planning, review comments research/planning, complex code
 
 ## Instructions
 
@@ -42,8 +42,6 @@ When launching sub-agents, pick the right model for the task to optimize speed &
    - Make sure that if more than one skill is involved, dependencies between skills are managed
    - Should not be too granular to avoid overhead, but not too broad to cause conflicts
    - If skill has multiple phases (ex: plan + implement), consider launching sub-agents per phase
-   - If an agent require user intervention (ex: manual test, validation), inform agent to stop its
-     work, parent agent handle communication and then relaunch agent with new information
    - Agent can stop early and you can use resume if more complex interaction needed
 
 4. 🔳 For each agent to be launched, create tasks:
@@ -55,42 +53,43 @@ When launching sub-agents, pick the right model for the task to optimize speed &
    sub-agents
 
 6. 🔳 Launch sub-agents in sequence OR parallel, depending on task dependencies
-   - Give as much details as possible on the context, what needs to be implemented, which project
-     docs to load, which section of the plan to follow, and any other relevant information
+   - Sub-agent instruction prompt:
+     - Give as much details as possible on the context, what needs to be implemented, which project
+       docs to load, which section of the plan to follow, and any other relevant information
 
-   - Instruct the sub-agent to load the relevant skill(s) via the `Skill` tool, create tasks from
-     its 🔳 steps, and follow its full process (checklists, validation). Tell the sub-agent that it
-     should NEVER do the steps that are parent-only responsibilities (listed above, jj/docs/etc.).
-     You need to explicitly tell the sub-agent to IGNORE instructions from the skill that are about
+     - Instruct the sub-agent to load the relevant skill(s) via the `Skill` tool, create tasks from
+       its 🔳 steps, and follow its full process (checklists, validation). Tell the sub-agent that it
+       should NEVER do the steps that are parent-only responsibilities (listed above, jj/docs/etc.)
 
-   - Optimize sub-agent prompts and output — enough for parent to understand and decide next steps,
-     not exhaustive dumps:
-     - State the specific question or deliverable, not open-ended exploration
-     - Specify expected output format (e.g., "2-3 sentences", "findings with
-       reasoning", "file list with one-line descriptions")
+     - You need to make sure that across all sub-agents, ALL of the steps that were instructed in the
+       skills were covered and accomplished
+
+   - Sub-agent output otpimization:
      - Instruct sub-agent to debrief concisely in one final message
        (target: ~500 tokens research, ~1000 implementation):
        - Lead with actionable findings, not the process
        - Changed files with one-line description each
        - Results (pass/fail) and next steps or blockers
+     - We should have enough information in the debrief to orchestrate next steps and update
+       documentation, but should always aim for context window optimization
 
    - Your context window is very precious
      - NEVER do any validation or verification yourself
        No tests, builds, browser snapshots, code inspection or any other form of checking
+       Listing chaninged files is ok, but not diffing or reading their content
        Route ALL verification to a sub-agent
-     - You should NOT diff any code either, other than listing changed files to prevent context bloat
+
      - NEVER call `TaskOutput` or read agent output files — they contain raw transcripts, not
        summaries. Foreground agents return results in the tool response. Background agents deliver
        summaries automatically
+
      - If an agent's debrief is insufficient, use the `resume` parameter (with the agent's ID from
        the Task tool result) to re-engage it and ask targeted follow-up questions
-     - ALWAYS use sub-agents for any work beyond parent-only responsibilities (listed at the top
-       of this file)
-     - Think about that when instructing the agent: optimize their output for your context and
-       preventing you from having to do extra work to validate or understand it
 
 7. 🔳 Collect debriefs, analyse results and report on overall progress
       If a debrief lacks needed detail, resume the agent (Task tool `resume` parameter with agent ID)
       to ask specific follow-up questions rather than reading raw transcripts
+
       Make sure progress reflected in project docs as per instructions in the skill using `/ctx-save` procedure
+
       Handle `jj` operations as per skill and development instructions requirements

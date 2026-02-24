@@ -46,6 +46,7 @@ Insert via the Edit tool using this exact format:
 * Security architecture compliance
 * Integration patterns and API design
 * Code organization and file structure consistency
+* File size and cohesion (files exceeding ~500 lines likely need splitting)
 * Naming conventions align with domain concepts
 * Potential for code reuse and modularity improvements
 * Consistency with established decisions

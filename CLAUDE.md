@@ -1,3 +1,5 @@
+# dotfiles
+
 
 ## Building & Testing
 
@@ -8,6 +10,7 @@ Use `./x` script for building and evaluating nix configurations:
 - `./x home check` - Eval home-manager config
 - `./x home build` - Build home-manager config
 - `HOST=deskapp ./x nixos check` - Check specific host
+- `./x check` - Eval all nixos/home/darwin configs for all hosts
 
 For quick iteration, use `check` first (fast eval) before `build`.
 
@@ -34,6 +37,7 @@ Editing either location modifies the same files.
 | Commands | `commands/<name>.md` |
 | Agents | `agents/<name>.md` |
 | Settings | `settings.json` |
+
 
 ### Modifying Instructions
 
