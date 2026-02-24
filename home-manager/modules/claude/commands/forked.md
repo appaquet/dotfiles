@@ -39,6 +39,7 @@ When launching sub-agents, pick the right model for the task to optimize speed &
    - Load each skill using the `Skill` tool
    - Extract instructions and tasks from all loaded skills
    - Think about how to best decompose the work into independent sub-tasks by agents
+   - Make sure that if more than one skill is involved, dependencies between skills are managed
    - Should not be too granular to avoid overhead, but not too broad to cause conflicts
    - If skill has multiple phases (ex: plan + implement), consider launching sub-agents per phase
    - If an agent require user intervention (ex: manual test, validation), inform agent to stop its

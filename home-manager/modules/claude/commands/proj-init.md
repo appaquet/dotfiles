@@ -19,8 +19,9 @@ Current date: !`date +%Y/%m/%d`
 2. 🔳 Load `proj-editing` skill using the `Skill` tool
    - Read @/.claude/docs/project-doc.md completely for full understanding of doc structure
 
-3. 🔳 Ensure high level task description is clear so that we can name it properly
+3. 🔳 Ensure **high level** task description is clear so that we can name it properly
    - If empty, use `AskUserQuestion` to clarify
+   - Don't go into a full planning mode, that will be done in a next step after creating files
 
 4. 🔳 Set up project folder
    - Derive name from `jj-current-branch`, confirm with `AskUserQuestion`

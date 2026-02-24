@@ -24,7 +24,7 @@ and branch diff to create multi-level breakdown.
    - Use the <deep-thinking> procedure
    - If user specified a focus area, prioritize those components
 
-4. 🔳 Generate report
+4. 🔳 Generate report in one message, without any following messages:
    - **High-level summary** (2-3 sentences):
      - What was the main goal/accomplishment
      - Key technical approach taken
@@ -37,9 +37,3 @@ and branch diff to create multi-level breakdown.
        - **Fixed**: Bug fixes, corrections
        - **Removed**: Deleted files, deprecated features
      - Skip empty categories
-
-5. 🔳 Output report
-   - In **a single message**: output the complete report directly (high-level + per-component breakdown)
-   - The user doesn't have access to all prior messages, you really need to verbatim include everything here
-   - Never describe what was generated - show the actual content
-   - This is for reference, not copy-paste

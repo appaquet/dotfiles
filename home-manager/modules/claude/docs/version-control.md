@@ -1,16 +1,19 @@
 # Version Control (Jujutsu)
 
-Using `jj` (collocated with git). Always detached head state
+We are using `jj` (collocated with git), which is always detached head state
+Never use `git`, unless absolutely necessary
 
 ## Commands
 
 | Purpose | Command |
 |---------|---------|
 | Commit current | `jj commit -m "private: claude: description"` |
+| Commit specific files of current | `jj commit -m "private: claude: description" <files...>` |
 | New empty change | `jj new -m "private: claude: description"` |
 | Rename current change | `jj describe -m "private: claude: description"` |
 | Squash current into parent, changing parent message | `jj squash -m "private: claude: description"` |
 | Squash current into parent, keep parent message | `jj squash -u` |
+| Squash specific files to parent | `jj squash -u <files...>` |
 | Diff (git style) | `jj diff --git` |
 | Diff working | `jj-diff-working --git` (`--stat` for files) |
 | Diff branch | `jj-diff-branch --git` |

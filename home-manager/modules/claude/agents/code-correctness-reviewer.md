@@ -50,4 +50,5 @@ Insert via the Edit tool using this exact format:
 * Defensive programming practices
 * Error message quality and usefulness
 * Logging and debugging considerations
+* Updated code documentation for changes impacting correctness
 </code-correctness-reviewer-guidelines>
