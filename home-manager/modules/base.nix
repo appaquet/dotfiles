@@ -15,7 +15,6 @@
     ./git
     ./neovim
     ./utils
-    ./autojump.nix
     ./ssh.nix
     ./ssh-agent.nix
   ];
