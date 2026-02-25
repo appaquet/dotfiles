@@ -41,7 +41,8 @@ When launching sub-agents, pick the right model for the task to optimize speed &
    - Think about how to best decompose the work into independent sub-tasks by agents
    - Make sure that if more than one skill is involved, dependencies between skills are managed
    - Should not be too granular to avoid overhead, but not too broad to cause conflicts
-   - If skill has multiple phases (ex: plan + implement), consider launching sub-agents per phase
+   - If skill has multiple phases (ex: plan + implement) you MUST launch multiple sub agents to
+     properly separate their context
    - Agent can stop early and you can use resume if more complex interaction needed
 
 4. 🔳 For each agent to be launched, create tasks:
