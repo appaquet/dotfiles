@@ -89,6 +89,7 @@
       pkgs.dool # dstat alternative, only on linux
       pkgs.wol # wake on lan
       pkgs.iotop
+      pkgs.systemctl-tui
     ]
     ++ lib.optionals (pkgs.stdenv.isDarwin || pkgs.stdenv.isx86_64) [
       pkgs.fzf-nix # fzf-nix, somehow doesn't work on linux arm
