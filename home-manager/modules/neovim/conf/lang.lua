@@ -17,7 +17,12 @@ vim.lsp.config["markdown_oxide"] = {
 	capabilities = {
 		workspace = {
 			didChangeWatchedFiles = {
-				dynamicRegistration = true,
+				-- This cause performance issue since it forces to fswatch a ton of files and it doesn't
+				-- ignore .devenv and .jj (it has hard coded .git, node_modules, but not more)
+				-- See https://github.com/neovim/neovim/issues/23291
+				--
+				-- Can be enable by project with .nvim.lua
+				dynamicRegistration = false,
 			},
 		},
 	},
