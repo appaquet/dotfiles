@@ -47,12 +47,12 @@ stdenv.mkDerivation (finalAttrs: {
 
     installBin $src
 
+      # --set CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC 1 \
+      # --set DISABLE_NON_ESSENTIAL_MODEL_CALLS 1 \
+      # --set DISABLE_TELEMETRY 1 \
     wrapProgram $out/bin/claude \
       --set DISABLE_AUTOUPDATER 1 \
       --set USE_BUILTIN_RIPGREP 0 \
-      --set CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC 1 \
-      --set DISABLE_NON_ESSENTIAL_MODEL_CALLS 1 \
-      --set DISABLE_TELEMETRY 1 \
       --set DISABLE_INSTALLATION_CHECKS 1 \
       --prefix PATH : ${
         lib.makeBinPath (

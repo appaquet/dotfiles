@@ -72,6 +72,13 @@ Before executing instructions of any command/skill/agent instructions:
 * Avoid writing random python/node/bash scripts to do file operations
   I'll need to approve them which leads to unnecessary back and forth
 
+* Avoid using substitution since they will trigger a permission check
+  Ex: `jj commit -m "private: claude: docs - some description" "$(readlink ./proj)/"`
+  That `$(..)` will automatically trigger a permission check
+
+* Avoid quoted strings in commands (e.g., `echo "some text"`) — triggers
+  "quoted characters in flag names" permission prompt. Use tools (Write, Edit) instead of echo/printf
+
 ## Context understanding
 
 Always ensure 10/10 understanding checklist: explore code + web search + `AskUserQuestion`
