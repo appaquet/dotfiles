@@ -405,9 +405,9 @@ cmd_update() {
 cmd_gc() {
   if is_remote; then
     echo "Garbage collecting on ${SSH_HOST}..."
-    ssh -t "${SSH_HOST}" "home-manager expire-generations \"-7 days\""
-    ssh -t "${SSH_HOST}" "nix-collect-garbage --delete-older-than 7d"
-    ssh -t "${SSH_HOST}" "sudo nix-collect-garbage --delete-older-than 7d"
+    ssh -t "${SSH_HOST}" "home-manager expire-generations \"-14 days\""
+    ssh -t "${SSH_HOST}" "nix-collect-garbage --delete-older-than 14d"
+    ssh -t "${SSH_HOST}" "sudo nix-collect-garbage --delete-older-than 14d"
     return
   fi
 

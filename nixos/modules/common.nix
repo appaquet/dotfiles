@@ -23,6 +23,11 @@
       builders-use-substitutes = true; # allow use of cached builds, require fast internet
       trusted-users = [ "@wheel" ];
     };
+    gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 14d";
+    };
   };
 
   users.users.appaquet = {
