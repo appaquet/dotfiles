@@ -60,6 +60,10 @@
   * If a sub-agent output is insufficient, use the `resume` parameter on the Task tool to re-engage
     the agent and ask targeted follow-up questions — never use TaskOutput as a workaround
 
+  * When a sub-agent comes back with an output, be critical of it. If it doesn't sound right, you
+    can resume and ask for more details or clarifications. Don't even check that yourself though,
+    your context is precious
+
 ## Task management
 
 * ALWAYS use the Task tool to create tasks for any instruction step that has a 🔳 annotation, before executing any of the instructions
@@ -91,9 +95,20 @@ Before executing instructions of any command/skill/agent instructions:
 * Avoid writing random python/node/bash scripts to do file operations
   I'll need to approve them which leads to unnecessary back and forth
 
-* Avoid using substitution since they will trigger a permission check
-  Ex: `jj commit -m "private: claude: docs - some description" "$(readlink ./proj)/"`
+* Avoid using $() substitution since they will trigger a permission check
+  ```
+  <bad-example>
+  Bash(jj commit -m "private: claude: docs - some description" "$(readlink ./proj)/")
+  </bad-example>
+  ```
   That `$(..)` will automatically trigger a permission check
+
+  ```
+  <good-example>
+  Bash(readlink ./proj)
+  Bash(jj commit -m "private: claude: docs - some description" some/path)
+  </good-example>
+  ```
 
 * Avoid quoted strings in commands (e.g., `echo "some text"`) — triggers
   "quoted characters in flag names" permission prompt. Use tools (Write, Edit) instead of echo/printf

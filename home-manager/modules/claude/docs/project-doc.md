@@ -28,6 +28,7 @@ Unless project instructions specify otherwise:
   * Should only contain doc file changes, never mix code changes into it
   * You can use jj fileset to only commit/squash the doc files if needed
   * Use `readlink ./proj` to get the path of project docs to commit
+    Always execute as separate command to avoid permission issues with `$(readlink ./proj)`
 
 ## When Created & Updated
 
