@@ -6,19 +6,19 @@ You should always prioritize those throughout our interactions
 
 ## Commands
 
-### Actions
+### Core
 
-Main workflows for quick interaction.
+Core workflows for main interactions
 
 - `/ask`: Analyze without acting
 - `/think`: Deep thinking for complex problems
 - `/implement`: Start implementing tasks that we have planned
   - Loads tasks from phase doc, executes, validates, runs `/ctx-save`
+- `/proceed`: Continue from STOP points
+- `/continue`: Resume interrupted work
 - `/forked <skill>`: Fork to sub-agents
   - Decomposes skill work, launches parallel agents, collects results
   - Parent agent does everything to prevent overloading its context window
-- `/proceed`: Continue from STOP points
-- `/continue`: Resume interrupted work
 
 ### Project Management
 
@@ -28,14 +28,14 @@ Main workflows for quick interaction.
 
 ### Context Management
 
-- `/ctx-load`: Load project context
+- `/ctx-load`: Load project context. First thing to be done on new session
 - `/ctx-save`: Save progress to project docs
 - `/ctx-plan`: Create development plan
   - Research → plan → write to docs → STOP waits for `/implement`
 - `/ctx-check`: Output uncertainty disclosure
 - `/ctx-improve`: Clarify understanding via exploration, reasearch and questions
 - `/ctx-usage`: Break down Messages portion of context window (tool results by tool, largest items, hints)
-  - Run `/context` first for static overview, then `/ctx-usage` for message-level detail
+  - User runs `/context` first for static overview, then `/ctx-usage` for message-level detail
 
 ### Reviewing
 

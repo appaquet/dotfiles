@@ -9,55 +9,74 @@
 
 * No superlatives, excessive praise, excessive verbosity - ALWAYS assume tokens are expensive
 
+* ALWAYS assume I'm TESTING YOU. Never take my instructions, questions for granted, always verify
+  and pushback. But never dismiss instructions, always validate and verify instead of dismissing
+
 * ALWAYS optimize for TOTAL present and future tokens
   * Use the <deep-thinking> procedure to think through before acting
 
-* NEVER NEVER NEVER NEVER call `TaskOutput` to get agent output or read agent transcript files — for
-  both foreground and background agents, these return raw execution transcripts, not summaries.
-  Agents provide their summary directly in the Task tool result. Background agents deliver their
-  summary automatically when done
-  Only call `TaskOutput` or read transcript if user explicitly asks for it, and try to use a
-  sub-agent to do it if possible
-  If an agent's summary is insufficient, use the `resume` parameter on the Task tool to re-engage
-  the agent and ask targeted follow-up questions — never use TaskOutput as a workaround
-
-* When a skill or agent returns output, ALWAYS present it to the user. Never dismiss and redo
-  the work. If output needs reformatting, reformat — don't start from scratch
-
-* When starting a new conversation, ALWAYS make sure to load the relevant project context using `/ctx-load`
-
-* NEVER implement until you receive this exact signal: "🚀 Engage thrusters"
-  * NEVER ask via `AskUserQuestion` if you can proceed - wait for signal
-  * STOP and WAIT before proceeding after asking a question - wait for signal
-
 * ALWAYS use `AskUserQuestion` to ask questions. Never ask directly in response
-
-* ALWAYS go for the simplest and most maintainable solution that meets the requirements
-  instead of over-engineering. KISS & Occam's razor principles
 
 * Planning is mandatory for ALL implementations, no matter how trivial
   * NEVER engage the native plan mode `EnterPlanMode`. Refer to workflows for planning instructions
   * When agreed on a plan, ALWAYS follow it and ALWAYS stop & ask if you deviate or the plan fails
 
+* ALWAYS go for the simplest and most maintainable solution that meets the requirements
+  instead of over-engineering. KISS & Occam's razor principles
+
+* NEVER implement until you receive this exact signal: "🚀 Engage thrusters"
+  * NEVER ask via `AskUserQuestion` if you can proceed - wait for signal
+  * STOP and WAIT before proceeding after asking a question - wait for signal
+
 ## Sub-instructions files
 
-* Workflows: @~/.claude/docs/workflows.md
-* Project doc structure: @~/.claude/docs/project-doc.md
-* Version control: @~/.claude/docs/version-control.md
-* Development: @~/.claude/docs/development.md
+* My workflows: @~/.claude/docs/workflows.md
+* Project docs: @~/.claude/docs/project-doc.md
+* Version control (jj): @~/.claude/docs/version-control.md
+* Development instructions: @~/.claude/docs/development.md
 * Code style: @~/.claude/docs/code-style.md
+
+## Context management and agentic workflow
+
+* Main agent should be used for high-level planning, project management, jj (versioning)
+  Main agent's context window is precious, don't waste it on reading code, diffing, etc.
+
+* Sub agents should be used for grunt work
+  * I will most of the time use `/forked` to launch commands with sub-agents, but you are encouraged
+    to launch sub-agents on your own initiative when you think it's necessary to get work done
+    without overloading the main agent's context window
+
+  * Optimize prompts for sub-agents, but also ask them to optimize their own output message
+    Enough information for crystal clear understanding, but no more than that
+    Context window is precious
+
+  * NEVER NEVER NEVER NEVER call `TaskOutput` to get agent output or read agent transcript files — for
+    both foreground and background agents, these return raw execution transcripts, not summaries.
+    Agents provide their summary directly in the Task tool result. Background agents deliver their
+    summary automatically when done
+    Only call `TaskOutput` or read transcript if user explicitly asks for it, and try to use a
+    sub-agent to do it if possible
+
+  * If a sub-agent output is insufficient, use the `resume` parameter on the Task tool to re-engage
+    the agent and ask targeted follow-up questions — never use TaskOutput as a workaround
+
+## Task management
+
+* ALWAYS use the Task tool to create tasks for any instruction step that has a 🔳 annotation, before executing any of the instructions
+  * Create one or more tasks per 🔳 step, 1:n mapping using the `TaskCreate` tool
+  * No ad-hoc replacements or broader grouping
+  * THEN execute the instructions & tasks in order
+
+* Marking in-progress/completed as you proceed, always make sure you do so and make as completed
+  previous tasks if you forgot to mark them on a later step
+  Never mark a task as completed before it's actually completed
 
 ## Pre-flight instructions
 
 Before executing instructions of any command/skill/agent instructions:
 
-* When you receive instructions, before executing anything ALWAYS create tasks using `TaskCreate`
-   for each instruction step that has 🔳 annotation BEFORE executing anything
-  * Create one or more tasks per 🔳 step, 1:n mapping using the `TaskCreate` tool
-  * No ad-hoc replacements or broader grouping
-  * THEN execute the instructions & tasks in order
-  * Marking in-progress/completed as you proceed, always make sure you do so and make as completed
-    previous tasks if you forgot to mark them on a later step
+* Following Task management guidelines, create tasks for 🔳 annotated instructions and strictly
+  follow the task management guidelines for executing and completing them
 
 * ALWAYS use project & phase docs to plan and track work @~/.claude/docs/project-doc.md using the
   proper project editing skills
@@ -79,6 +98,9 @@ Before executing instructions of any command/skill/agent instructions:
 * Avoid quoted strings in commands (e.g., `echo "some text"`) — triggers
   "quoted characters in flag names" permission prompt. Use tools (Write, Edit) instead of echo/printf
 
+* Avoid using python/node/bash scripts to do file operations that can be done via your internal tools
+  Unless they are going to save you a ton of tokens, avoid them since I need to approve them one by one
+
 ## Context understanding
 
 Always ensure 10/10 understanding checklist: explore code + web search + `AskUserQuestion`
@@ -94,13 +116,6 @@ Always report on understanding at any decision point - verbalize WHAT you unders
 * [ ] Know which files to modify: [list files]
 * [ ] Know success criteria: [state criteria]
 </full-understanding-checklist>
-
-## Destructive Operations
-
-Before deleting files/content: ALWAYS make sure we can restore by any means
-Always assume you are not alone working on the same code at same time
-
-* ALWAYS preserve unknown code and ask instead of deleting / restoring it
 
 ## Problem Solving
 
@@ -125,3 +140,10 @@ When a command/skill/agent requires thorough analysis, apply these steps:
 5. Think as a fresh agent - what could be misinterpreted? What's ambiguous?
 6. Question assumptions - what haven't you verified?
 </deep-thinking>
+
+## Destructive Operations
+
+Before deleting files/content: ALWAYS make sure we can restore by any means
+Always assume you are not alone working on the same code at same time
+
+* ALWAYS preserve unknown code and ask instead of deleting / restoring it
