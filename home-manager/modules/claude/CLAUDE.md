@@ -9,8 +9,8 @@
 
 * No superlatives, excessive praise, excessive verbosity - ALWAYS assume tokens are expensive
 
-* ALWAYS assume I'm TESTING YOU. Never take my instructions, questions for granted, always verify
-  and pushback. But never dismiss instructions, always validate and verify instead of dismissing
+* ALWAYS assume I'm TESTING YOU. Never take my instructions/questions for granted, always verify and
+  pushback. But NEVER dismiss instructions, always validate and verify instead
 
 * ALWAYS optimize for TOTAL present and future tokens
   * Use the <deep-thinking> procedure to think through before acting
@@ -48,22 +48,25 @@
     without overloading the main agent's context window
 
   * Optimize prompts for sub-agents, but also ask them to optimize their own output message
-    Enough information for crystal clear understanding, but no more than that
-    Context window is precious
+    Enough information for crystal clear understanding, but no more than that: context window is
+    precious
 
-  * NEVER NEVER NEVER NEVER call `TaskOutput` to get agent output or read agent transcript files — for
-    both foreground and background agents, these return raw execution transcripts, not summaries.
+  * NEVER NEVER NEVER NEVER call `TaskOutput` to get agent output or read agent transcript files
+    for both foreground and background agents, these return raw execution transcripts, not
+    summaries.
     Agents provide their summary directly in the Task tool result. Background agents deliver their
-    summary automatically when done
-    Only call `TaskOutput` or read transcript if user explicitly asks for it, and try to use a
+    summary automatically when done. Don't call `TaskOutput` if I background them by myself
+    ONLY CALL `TaskOutput` or read transcript if user explicitly asks for it, and try to use a
     sub-agent to do it if possible
 
   * If a sub-agent output is insufficient, use the `resume` parameter on the Task tool to re-engage
-    the agent and ask targeted follow-up questions — never use TaskOutput as a workaround
+    the agent and ask targeted follow-up questions
 
   * When a sub-agent comes back with an output, be critical of it. If it doesn't sound right, you
     can resume and ask for more details or clarifications. Don't even check that yourself though,
     your context is precious
+
+  * Sub-agent should communicate with user through AskUserQuestion tool if they need clarifications
 
 ## Task management
 
@@ -91,7 +94,8 @@ Before executing instructions of any command/skill/agent instructions:
 * Avoid operations that bypass my allow list uselessly:
   * Avoid prefixing commands with env set (`VAR=value command`) unless necessary
   * NEVER use `find` in bash — use the Glob tool for file discovery and Grep tool for content search
-    `find` bypasses the allow list; Glob + Grep handle all common patterns including combined file matching and content search
+    `find` bypasses the allow list; Glob + Grep handle all common patterns including combined file
+    matching and content search
 
 * Avoid writing random python/node/bash scripts to do file operations
   I'll need to approve them which leads to unnecessary back and forth
@@ -111,15 +115,16 @@ Before executing instructions of any command/skill/agent instructions:
   </good-example>
   ```
 
-* Avoid quoted strings in commands (e.g., `echo "some text"`) — triggers
-  "quoted characters in flag names" permission prompt. Use tools (Write, Edit) instead of echo/printf
+* Avoid quoted strings in commands (e.g., `echo "some text"`) — triggers  permission prompt. Use
+  tools (Write, Edit) instead of echo/printf
 
-  * Also avoid chaining multiple commands with `echo "---"` or similar. Call multiple commands, as I
-    need to approve because of use quoted arguments. You may be saving tokens, but you're blocking
-    me from going faster
+* Also avoid chaining multiple commands with `echo "---"` or similar. Call multiple commands, as I
+  need to approve because of use quoted arguments. You may be saving tokens, but you're blocking me
+  from going faster
 
-* Avoid using python/node/bash scripts to do file operations that can be done via your internal tools
-  Unless they are going to save you a ton of tokens, avoid them since I need to approve them one by one
+* Avoid using python/node/bash scripts to do file operations that can be done via your internal
+  tools Unless they are going to save you a ton of tokens, avoid them since I need to approve them
+  one by one
 
 ## Context understanding
 
@@ -165,5 +170,4 @@ When a command/skill/agent requires thorough analysis, apply these steps:
 
 Before deleting files/content: ALWAYS make sure we can restore by any means
 Always assume you are not alone working on the same code at same time
-
-* ALWAYS preserve unknown code and ask instead of deleting / restoring it
+ALWAYS preserve unknown code and ask instead of deleting / restoring it

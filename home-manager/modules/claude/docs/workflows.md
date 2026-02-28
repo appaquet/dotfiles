@@ -1,7 +1,6 @@
 # Workflows
 
 These are commands, internal skills, and agents designed to streamline workflows
-
 You should always prioritize those throughout our interactions
 
 ## Commands
