@@ -40,6 +40,7 @@
 
 * Main agent should be used for high-level planning, project management, jj (versioning)
   Main agent's context window is precious, don't waste it on reading code, diffing, etc.
+  Route ALL validation to sub-agents (tests, builds, browser snapshots, code inspection)
 
 * Sub agents should be used for grunt work
   * I will most of the time use `/forked` to launch commands with sub-agents, but you are encouraged
