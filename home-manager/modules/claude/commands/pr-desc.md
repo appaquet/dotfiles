@@ -25,10 +25,6 @@ and branch diff to create multi-level breakdown.
    - If user specified a focus area, prioritize those components
 
 4. 🔳 Generate report in one message, without any following messages:
-   - **High-level summary** (2-3 sentences):
-     - What was the main goal/accomplishment
-     - Key technical approach taken
-
    - **Per-component breakdown**:
      - Group changes by logical component (directory, module, or feature area)
      - For each component, list changes by category:
@@ -37,3 +33,8 @@ and branch diff to create multi-level breakdown.
        - **Fixed**: Bug fixes, corrections
        - **Removed**: Deleted files, deprecated features
      - Skip empty categories
+    
+   - **High-level summary** (4-3 sentences):
+     - What was the main goal/accomplishment
+     - Key technical approach taken
+
