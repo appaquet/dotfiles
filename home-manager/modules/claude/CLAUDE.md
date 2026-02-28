@@ -113,6 +113,10 @@ Before executing instructions of any command/skill/agent instructions:
 * Avoid quoted strings in commands (e.g., `echo "some text"`) — triggers
   "quoted characters in flag names" permission prompt. Use tools (Write, Edit) instead of echo/printf
 
+  * Also avoid chaining multiple commands with `echo "---"` or similar. Call multiple commands, as I
+    need to approve because of use quoted arguments. You may be saving tokens, but you're blocking
+    me from going faster
+
 * Avoid using python/node/bash scripts to do file operations that can be done via your internal tools
   Unless they are going to save you a ton of tokens, avoid them since I need to approve them one by one
 
