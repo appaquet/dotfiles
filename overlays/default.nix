@@ -10,12 +10,12 @@ let
 
       fzf-nix = inputs.fzf-nix.packages.${system}.fzf-nix;
 
-      opencode = inputs.nix-ai-tools.packages.${system}.opencode;
-      gemini-cli = inputs.nix-ai-tools.packages.${system}.gemini-cli;
-      codex = inputs.nix-ai-tools.packages.${system}.codex;
+      opencode = inputs.llm-agents.packages.${system}.opencode;
+      gemini-cli = inputs.llm-agents.packages.${system}.gemini-cli;
+      codex = inputs.llm-agents.packages.${system}.codex;
 
-      claude-code = final.callPackage ./claude-code/package.nix { };
-      #claude-code = inputs.nix-ai-tools.packages.${system}.claude-code;
+      # claude-code = final.callPackage ./claude-code/package.nix { };
+      claude-code = inputs.llm-agents.packages.${system}.claude-code;
     };
 
   neovimPluginsOverlay = import ../home-manager/modules/neovim/plugins-overlay.nix;
