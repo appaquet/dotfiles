@@ -56,7 +56,8 @@ let
 
   # Toggle tmux window indicator when Claude is working (used by hooks)
   claude-tmux-indicator = pkgs.writeShellScriptBin "claude-tmux-indicator" ''
-    LOG_FILE="''${CLAUDE_ROOT:-.}/tmux.local.log"
+    CLAUDE_DIR="''${CLAUDE_ROOT:-.}"
+    LOG_FILE="/tmp/claude-tmux-''${CLAUDE_DIR//\//-}.log"
     ACTION="$1"
     HOOK_NAME="''${2:-unknown}"
 
