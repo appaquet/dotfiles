@@ -172,7 +172,8 @@ keymaps, but also default/built-ins that I tend to forget.
 * `[g` Navigate to previous git hunk
 * `<leader>ggm` Switch gutter base to main branch
 * `<leader>ggp` Switch gutter base to previous branch
-* `<leader>ggw` Switch gutter base to working set
+* `<leader>ggh` Switch gutter base to head (default)
+* `<leader>ggw` Switch gutter base to current bookmark (changes since last push)
 
 ### Git Commands
 
@@ -185,7 +186,8 @@ keymaps, but also default/built-ins that I tend to forget.
 
 ### Diff View
 
-* `<leader>gdw` Open diff view against working set
+* `<leader>gdh` Open diff view against head (uncommitted changes)
+* `<leader>gdw` Open diff view against current bookmark (changes since last push)
 * `<leader>gdm` Open diff view against main branch
 * `<leader>gdp` Open diff view against previous branch
 * `<leader>gdc` Open diff view against given rev/commit

@@ -7,6 +7,15 @@ require("which-key").add({
 -- `--imply-local` means it will use the local version of the file on the right side
 require("diffview").setup({})
 
+local diffview_lib = require("diffview.lib")
+
+-- Close all open diffview instances across all tabs
+local function close_all_diffviews()
+	for _, view in ipairs(diffview_lib.views) do
+		view:close()
+	end
+end
+
 vim.g.main_branch_override = ""
 local function git_main_branch()
 	if vim.g.main_branch_override ~= "" then
@@ -23,14 +32,14 @@ local function git_prev_branch()
 end
 
 local function open_diffview_main()
-	vim.api.nvim_command("DiffviewClose")
+	close_all_diffviews()
 	local main_branch = git_main_branch()
 	vim.api.nvim_command("DiffviewOpen " .. main_branch .. "... --imply-local")
 	vim.notify("Diffing against " .. main_branch)
 end
 
 local function open_diffview_prev()
-	vim.api.nvim_command("DiffviewClose")
+	close_all_diffviews()
 	local prev_branch = git_prev_branch()
 	vim.api.nvim_command("DiffviewOpen " .. prev_branch .. " --imply-local")
 	vim.notify("Diffing against " .. prev_branch)
@@ -43,29 +52,41 @@ local function open_diffview_rev()
 		return
 	end
 
-	vim.api.nvim_command("DiffviewClose")
+	close_all_diffviews()
 	vim.api.nvim_command("DiffviewOpen " .. rev .. " --imply-local")
 end
 
-local function open_diffview_working()
-	vim.api.nvim_command("DiffviewClose")
+local function open_diffview_head()
+	close_all_diffviews()
 	vim.api.nvim_command("DiffviewOpen")
 end
 
+local function git_current_branch()
+	return vim.fn.system("jj-current-branch"):gsub("%s+", "")
+end
+
+local function open_diffview_working()
+	close_all_diffviews()
+	local remote = git_current_branch()
+	vim.api.nvim_command("DiffviewOpen " .. remote .. " --imply-local")
+	vim.notify("Diffing against " .. remote)
+end
+
 local function open_diffview_file_history()
-	vim.api.nvim_command("DiffviewClose")
+	close_all_diffviews()
 	vim.api.nvim_command("DiffviewFileHistory %")
 end
 
 require("which-key").add({
 	{ "<leader>gd", group = "Diff view" },
 })
-vim.keymap.set("n", "<Leader>gdw", open_diffview_working, { desc = "Git: open diff view against working set" })
+vim.keymap.set("n", "<Leader>gdh", open_diffview_head, { desc = "Git: open diff view against head" })
+vim.keymap.set("n", "<Leader>gdw", open_diffview_working, { desc = "Git: open diff view against current bookmark" })
 vim.keymap.set("n", "<Leader>gdm", open_diffview_main, { desc = "Git: open diff view against main branch" })
 vim.keymap.set("n", "<Leader>gdp", open_diffview_prev, { desc = "Git: open diff view against previous branch" })
 vim.keymap.set("n", "<Leader>gdf", open_diffview_file_history, { desc = "Git: open file history" })
 vim.keymap.set("n", "<Leader>gdc", open_diffview_rev, { desc = "Git: open diff view against given rev/commit" })
-vim.keymap.set("n", "<Leader>gdq", ":DiffviewClose<CR>", { silent = true, desc = "Git: close diff view" })
+vim.keymap.set("n", "<Leader>gdq", close_all_diffviews, { silent = true, desc = "Git: close diff view" })
 
 -- Git signs
 -- https://github.com/lewis6991/gitsigns.nvim
@@ -103,14 +124,20 @@ local function switch_gutter_base_prev()
 	vim.api.nvim_command("Gitsigns change_base " .. prev_branch .. " true")
 	vim.notify("Switching git gutter against " .. prev_branch)
 end
-local function switch_gutter_base_default()
+local function switch_gutter_base_head()
 	vim.api.nvim_command("Gitsigns reset_base true")
-	vim.notify("Switching git gutter to default")
+	vim.notify("Switching git gutter to head")
+end
+local function switch_gutter_base_working()
+	local remote = git_current_branch()
+	vim.api.nvim_command("Gitsigns change_base " .. remote .. " true")
+	vim.notify("Switching git gutter against " .. remote)
 end
 
-vim.keymap.set("n", "<Leader>ggm", switch_gutter_base_main, { silent = true, desc = "Git: switch gutter base gainst main branch" })
+vim.keymap.set("n", "<Leader>ggm", switch_gutter_base_main, { silent = true, desc = "Git: switch gutter base against main branch" })
 vim.keymap.set("n", "<Leader>ggp", switch_gutter_base_prev, { silent = true, desc = "Git: switch gutter base against previous branch" })
-vim.keymap.set("n", "<Leader>ggw", switch_gutter_base_default, { silent = true, desc = "Git: switch gutter base to working set" })
+vim.keymap.set("n", "<Leader>ggh", switch_gutter_base_head, { silent = true, desc = "Git: switch gutter base to head" })
+vim.keymap.set("n", "<Leader>ggw", switch_gutter_base_working, { silent = true, desc = "Git: switch gutter base against current bookmark" })
 
 -- Octo.nvim
 -- https://github.com/pwntester/octo.nvim
