@@ -59,6 +59,7 @@
       "Bash(go test:*)",
       "Bash(go doc:*)",
       "Bash(go vet:*)",
+      "Bash(gofmt:*)",
       "Bash(goimports:*)",
       "Bash(staticcheck:*)",
       "Bash(npm run build:*)",
