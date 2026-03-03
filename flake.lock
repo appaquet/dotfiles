@@ -309,11 +309,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1772504662,
-        "narHash": "sha256-skonBr55UKa25ien3tO65upHZXZLIyV49Xw/5zW0YE8=",
+        "lastModified": 1772563979,
+        "narHash": "sha256-uD3qNlr/KsORx5kewGw0CnQM4u6om+NtATNUAaRrzTc=",
         "owner": "zia-ai",
         "repo": "shared-dotfiles",
-        "rev": "aa6c928e12f5fdd87f801cd8ad1656749f24d2f4",
+        "rev": "e1bed20e11d351595ab7cb812b90c5e0bf57b352",
         "type": "github"
       },
       "original": {
