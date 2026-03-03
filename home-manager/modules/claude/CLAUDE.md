@@ -93,29 +93,14 @@ Before executing instructions of any command/skill/agent instructions:
 
 * Avoid operations that bypass my allow list uselessly:
   * Avoid prefixing commands with env set (`VAR=value command`) unless necessary
-  * NEVER use `find` in bash — use the Glob tool for file discovery and Grep tool for content search
-    `find` bypasses the allow list; Glob + Grep handle all common patterns including combined file
-    matching and content search
+  * NEVER use `find` in bash — use the Glob tool for file discovery
+  * NEVER use `grep`/`rg` in bash — use the Grep tool for content search
+    Both bypass the allow list and trigger permission prompts. Grep tool supports regex patterns,
+    glob file filters, type filters, and context lines — covers all common `grep` use cases
 
-* Avoid writing random python/node/bash scripts to do file operations
-  I'll need to approve them which leads to unnecessary back and forth
+* Avoid using `$()` substitution since they will trigger a permission check
 
-* Avoid using $() substitution since they will trigger a permission check
-  ```
-  <bad-example>
-  Bash(jj commit -m "private: claude: docs - some description" "$(readlink ./proj)/")
-  </bad-example>
-  ```
-  That `$(..)` will automatically trigger a permission check
-
-  ```
-  <good-example>
-  Bash(readlink ./proj)
-  Bash(jj commit -m "private: claude: docs - some description" some/path)
-  </good-example>
-  ```
-
-* Avoid quoted strings in commands (e.g., `echo "some text"`) — triggers  permission prompt. Use
+* Avoid quoted strings in commands (e.g., `echo "some text"`) — triggers permission prompt. Use
   tools (Write, Edit) instead of echo/printf
 
 * Also avoid chaining multiple commands with `echo "---"` or similar. Call multiple commands, as I
@@ -124,6 +109,23 @@ Before executing instructions of any command/skill/agent instructions:
 
 * Avoid using python/node/bash scripts to do file operations that can be done via your internal
   tools as I need to approve them
+
+```
+<bad-examples>
+Bash(grep -rn "pattern" /path --include="*.go" | grep -v ".pb.go" | head -20)
+Bash(jj commit -m "msg" "$(readlink ./proj)/")
+Bash(echo "some text" > file.txt)
+</bad-examples>
+```
+
+```
+<good-examples>
+Grep(pattern="pattern", path="/path", glob="*.go", head_limit=20)
+Bash(readlink ./proj)  # then use result in next call
+Bash(jj commit -m "msg" some/path)
+Write(file_path="file.txt", content="some text")
+</good-examples>
+```
 
 ## Context understanding
 
