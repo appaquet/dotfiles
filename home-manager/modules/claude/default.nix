@@ -41,6 +41,13 @@ let
     # Clear tmux indicator on start (in case previous session was killed) and exit
     ${claude-tmux-indicator}/bin/claude-tmux-indicator off wrapper-start > /dev/null
     trap '${claude-tmux-indicator}/bin/claude-tmux-indicator off wrapper-exit-trap > /dev/null' EXIT
+
+    # Enable telemetry and non-essential traffic since some features aren't enabled without
+    # https://github.com/numtide/llm-agents.nix/issues/2811
+    export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=""
+    export DISABLE_NON_ESSENTIAL_MODEL_CALLS=""
+    export DISABLE_TELEMETRY=""
+
     ${claude-code}/bin/claude "$@"
   '';
 

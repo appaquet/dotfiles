@@ -55,7 +55,8 @@ For sub-agents, pick right model for task to optimize speed & accuracy:
 
      - Tell the sub-agent they NEED skill(s) via the `Skill` tool, create tasks from its 🔳 steps,
        and follow its full process (checklists, validation). Tell the sub-agent that it should NEVER
-       do the steps that are parent-only responsibilities (listed above, jj/docs/etc.)
+       do the steps that are parent-only responsibilities (listed above, jj/docs/etc.). Give the
+       exact step number as well to prevent confusion
 
      - Tell agent can stop early for clarifications from user, you can use resume after
 

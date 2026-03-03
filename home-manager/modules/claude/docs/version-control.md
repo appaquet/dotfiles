@@ -1,9 +1,12 @@
 # Version Control (Jujutsu)
 
 We are using `jj` (collocated with git), which is always detached head state
-Never use `git`, unless absolutely necessary
+Always call `jj ls` before any write operations to verify state is as expected
+Never use `git`, unless absolutely necessary, and should only be done for read-only
+Never use `git stash`
 
 ## Commands
+
 
 | Purpose | Command |
 |---------|---------|
@@ -56,7 +59,7 @@ Prefix commits with `"private: claude: "` so they can be easily identified and s
 Always use `-m "message"` for commands that expect a message since they could open editor:
   `jj commit -m ...`
   `jj new -m ...`
-  `jj squash -m ...` => will change destination message, use -u to keep destination
+  `jj squash -m ...` => will change destination message, use -u to keep destination (always `jj ls` before)
 
 <good-example>
 jj commit -m "private: claude: fix validation bug"

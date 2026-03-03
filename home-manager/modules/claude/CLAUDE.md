@@ -123,8 +123,7 @@ Before executing instructions of any command/skill/agent instructions:
   from going faster
 
 * Avoid using python/node/bash scripts to do file operations that can be done via your internal
-  tools Unless they are going to save you a ton of tokens, avoid them since I need to approve them
-  one by one
+  tools as I need to approve them
 
 ## Context understanding
 
