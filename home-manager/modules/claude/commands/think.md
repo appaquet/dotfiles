@@ -6,6 +6,8 @@ argument-hint: [problem or context]
 
 # Think
 
+ultrathink
+
 Thorough, rigorous analysis for complex problems where shallow thinking isn't cutting it.
 
 **NEVER**: Never modify files, run side-effect commands, or start implementation

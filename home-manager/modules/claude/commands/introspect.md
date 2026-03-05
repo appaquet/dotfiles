@@ -6,6 +6,8 @@ argument-hint: [description of issue]
 
 # Introspect
 
+ultrathink
+
 Reflect on what went wrong and propose instruction changes to prevent recurrence.
 
 Issue: `$ARGUMENTS`

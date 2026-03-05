@@ -5,6 +5,8 @@ description: Output uncertainty disclosure about current task understanding
 
 # Check Context Understanding
 
+ultrathink
+
 Analyze current task/context and output explicit uncertainty disclosure
 
 **NEVER**: Never modify files, run side-effect commands, or start implementation

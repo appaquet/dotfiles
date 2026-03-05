@@ -53,9 +53,11 @@ let
 
   # Utility to list project docs (avoids shell expansion issues in skill commands)
   claude-proj-docs = pkgs.writeShellScriptBin "claude-proj-docs" ''
-    if [ -d "''${CLAUDE_ROOT:-$(pwd)}/proj" ]; then
-      echo "proj/ files:"
-      ls "''${CLAUDE_ROOT:-$(pwd)}/proj/"
+    proj="''${CLAUDE_ROOT:-$(pwd)}/proj"
+    if [ -d "$proj" ]; then
+      abs=$(readlink -f "$proj")
+      echo "proj/ ($abs) files:"
+      ls "$proj/"
     else
       echo "No project files"
     fi

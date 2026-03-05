@@ -6,6 +6,8 @@ context: fork
 
 # Project Tidy
 
+ultrathink
+
 Validate project doc against standard structure in @~/.claude/docs/project-doc.md and fix inconsistencies.
 
 Current project files: !`claude-proj-docs`

@@ -6,6 +6,8 @@ argument-hint: [question or topic]
 
 # Ask
 
+ultrathink
+
 Provide thoughtful analysis on a given question or topic without taking further action
 
 **NEVER**: Never modify files, run side-effect commands, or start implementation

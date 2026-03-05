@@ -40,6 +40,7 @@ For sub-agents, pick right model for task to optimize speed & accuracy:
    - Should not be too granular to avoid overhead, but not too broad to cause conflicts
    - If skill has multiple phases (ex: plan+implement) you MUST launch multiple sub agents to
      properly separate their context
+   - If skill contains `ultrathink`, make sure to include that specific keyword in sub-agent instructions
 
 4. 🔳 For each agent to be launched, create tasks:
    - Launch agent to do X
@@ -57,6 +58,7 @@ For sub-agents, pick right model for task to optimize speed & accuracy:
        and follow its full process (checklists, validation). Tell the sub-agent that it should NEVER
        do the steps that are parent-only responsibilities (listed above, jj/docs/etc.). Give the
        exact step number as well to prevent confusion
+
 
      - Tell agent can stop early for clarifications from user, you can use resume after
 
