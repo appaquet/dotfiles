@@ -66,9 +66,10 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>fli` Fuzzy find through LSP implementations
 * `<leader>flm` Fuzzy find through LSP document diagnostics
 * `<leader>flM` Fuzzy find through LSP workspace diagnostics
+* `<leader>fi` Scope next picker to a folder (auto-clears after 5s or use)
 * `<leader>fdb` Fuzzy find through DAP breakpoints
-* `<leader>fw` Fuzzy find word under cursor in file
-* `<leader>fW` Fuzzy find word under cursor in workspace
+* `<leader>fw` Grep word under cursor in workspace
+* `<leader>fW` Grep WORD under cursor in workspace
 * `<leader>fk` Fuzzy find through keymaps
 * `<leader>fc` Fuzzy find through neovim commands
 * `<leader>fr` Resume last search
@@ -406,7 +407,7 @@ not in PKMS, operates in-place when already in a PKMS buffer.
 
 ### Comment Tags (C-e c)
 
-* `<C-e>cr` Insert `REVIEW: ` comment (filetype-aware)
+* `<C-e>cv` Insert `REVIEW: ` comment (filetype-aware)
 * `<C-e>ct` Insert `TODO: ` comment (filetype-aware)
 * `<C-e>cf` Insert `FIXME: ` comment (filetype-aware)
 * `<C-e>cn` Insert `NOTE: ` comment (filetype-aware)

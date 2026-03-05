@@ -2,6 +2,52 @@
 -- From https://github.com/jkearse3/dotfiles/blob/e3e53bb0c11daeb33dc5b44609ff46da9dd05b1c/nvim/lua/lazy_plugins/search.lua#L2
 local fzf = require("fzf-lua")
 local actions = require("fzf-lua.actions")
+
+-- Scoped folder filtering: <leader>fi picks a folder, next scoped picker uses it as cwd
+local scoped_cwd = nil
+local scope_timer = nil
+
+local function clear_scope_timer()
+	if scope_timer then
+		scope_timer:stop()
+		if not scope_timer:is_closing() then
+			scope_timer:close()
+		end
+		scope_timer = nil
+	end
+end
+
+local function set_scope(dir)
+	scoped_cwd = dir
+	clear_scope_timer()
+	scope_timer = vim.uv.new_timer()
+	local expected = dir
+	scope_timer:start(5000, 0, vim.schedule_wrap(function()
+		if scoped_cwd == expected then
+			scoped_cwd = nil
+			vim.notify("FZF scope cleared (timeout)", vim.log.levels.INFO)
+		end
+		clear_scope_timer()
+	end))
+	vim.notify("FZF scope: " .. dir, vim.log.levels.INFO)
+end
+
+local function consume_scope()
+	if not scoped_cwd then
+		return {}
+	end
+	local cwd = scoped_cwd
+	scoped_cwd = nil
+	clear_scope_timer()
+	return { cwd = cwd }
+end
+
+local function scoped(fn)
+	return function()
+		fn(consume_scope())
+	end
+end
+
 fzf.setup({
 	winopts = {
 		preview = {
@@ -48,6 +94,17 @@ require("which-key").add({
 	{ "<leader>f", group = "FZF Search" },
 })
 
+vim.keymap.set("n", "<leader>fi", function()
+	fzf.fzf_exec("fd --type d", {
+		prompt = "Scope folder> ",
+		actions = {
+			["default"] = function(sel)
+				set_scope(sel[1])
+			end,
+		},
+	})
+end, { desc = "FZF: Scope to folder (for next picker)" })
+
 local function lsp_document_symbols()
 	fzf.lsp_document_symbols({
 		-- Hide filepath and line:col, show symbol fields (last 2 tab-delimited fields)
@@ -56,21 +113,21 @@ local function lsp_document_symbols()
 end
 
 -- Quick keybindings
-vim.keymap.set("n", "<C-p>", fzf.files, { desc = "FZF: Files" })
-vim.keymap.set("n", "<C-l>", fzf.lgrep_curbuf, { desc = "FZF: Live grep file" })
-vim.keymap.set("n", "<C-g>", fzf.live_grep, { desc = "FZF: Live grep workspace" })
+vim.keymap.set("n", "<C-p>", scoped(fzf.files), { desc = "FZF: Files" })
+vim.keymap.set("n", "<C-l>", scoped(fzf.lgrep_curbuf), { desc = "FZF: Live grep file" })
+vim.keymap.set("n", "<C-g>", scoped(fzf.live_grep), { desc = "FZF: Live grep workspace" })
 vim.keymap.set("n", "<C-b>", fzf.buffers, { desc = "FZF: Buffers" })
 vim.keymap.set("n", "<C-s>", lsp_document_symbols, { desc = "FZF: LSP document symbols" })
 vim.keymap.set("n", "<C-n>", fzf.tabs, { desc = "FZF: Tabs" })
-vim.keymap.set("n", "<C-h>", fzf.oldfiles, { desc = "FZF: Old files" })
+vim.keymap.set("n", "<C-h>", scoped(fzf.oldfiles), { desc = "FZF: Old files" })
 
 -- Long form keybindings
-vim.keymap.set("n", "<leader>ff", fzf.files, { desc = "FZF: Files" }) -- Can be used on nvim-tree folder node (see tree.lua)
-vim.keymap.set("n", "<leader>fo", fzf.oldfiles, { desc = "FZF: Old files" })
-vim.keymap.set("n", "<leader>fs", fzf.lgrep_curbuf, { desc = "FZF: Live grep file" })
-vim.keymap.set("n", "<leader>fS", fzf.live_grep, { desc = "FZF: Live grep workspace" }) -- Can be used on nvim-tree folder node (see tree.lua)
-vim.keymap.set("n", "<leader>fw", fzf.grep_cword, { desc = "FZF: Grep word" })
-vim.keymap.set("n", "<leader>fW", fzf.grep_cWORD, { desc = "FZF: Grep WORD" })
+vim.keymap.set("n", "<leader>ff", scoped(fzf.files), { desc = "FZF: Files" }) -- Can be used on nvim-tree folder node (see tree.lua)
+vim.keymap.set("n", "<leader>fo", scoped(fzf.oldfiles), { desc = "FZF: Old files" })
+vim.keymap.set("n", "<leader>fs", scoped(fzf.lgrep_curbuf), { desc = "FZF: Live grep file" })
+vim.keymap.set("n", "<leader>fS", scoped(fzf.live_grep), { desc = "FZF: Live grep workspace" }) -- Can be used on nvim-tree folder node (see tree.lua)
+vim.keymap.set("n", "<leader>fw", scoped(fzf.grep_cword), { desc = "FZF: Grep word" })
+vim.keymap.set("n", "<leader>fW", scoped(fzf.grep_cWORD), { desc = "FZF: Grep WORD" })
 vim.keymap.set("n", "<leader>fb", fzf.buffers, { desc = "FZF: Buffers" })
 vim.keymap.set("n", "<leader>fn", fzf.tabs, { desc = "FZF: Tabs" })
 vim.keymap.set("n", "<leader>fm", fzf.marks, { desc = "FZF: Marks" })
@@ -88,7 +145,7 @@ vim.keymap.set("n", "<leader>fxl", fzf.quickfix, { desc = "FZF: Quickfix list" }
 vim.keymap.set("n", "<leader>fxs", fzf.quickfix_stack, { desc = "FZF: Quickfix stack" })
 
 vim.keymap.set("n", "<leader>fls", lsp_document_symbols, { desc = "FZF: LSP document symbols" })
-vim.keymap.set("n", "<leader>flS", fzf.lsp_live_workspace_symbols, { desc = "FZF: LSP workspace symbols" })
+vim.keymap.set("n", "<leader>flS", scoped(fzf.lsp_live_workspace_symbols), { desc = "FZF: LSP workspace symbols" })
 vim.keymap.set("n", "<leader>flr", fzf.lsp_references, { desc = "FZF: LSP references" })
 vim.keymap.set("n", "<leader>flc", fzf.lsp_incoming_calls, { desc = "FZF: LSP incoming calls" })
 vim.keymap.set("n", "<leader>flC", fzf.lsp_outgoing_calls, { desc = "FZF: LSP outgoing calls" })
@@ -114,9 +171,9 @@ end, { silent = true, desc = "FZF: Fuzzy complete path" })
 -- 		previewer = "builtin",
 -- 	})
 -- end
-vim.keymap.set("n", "<leader>fgs", fzf.git_status, { desc = "FZF: Git status" })
+vim.keymap.set("n", "<leader>fgs", scoped(fzf.git_status), { desc = "FZF: Git status" })
 vim.keymap.set("n", "<leader>fgS", fzf.git_stash, { desc = "FZF: Git stash" })
-vim.keymap.set("n", "<leader>fgf", fzf.git_files, { desc = "FZF: Git files" })
+vim.keymap.set("n", "<leader>fgf", scoped(fzf.git_files), { desc = "FZF: Git files" })
 vim.keymap.set("n", "<leader>fgb", fzf.git_branches, { desc = "FZF: Git branches" })
 vim.keymap.set("n", "<leader>fgB", fzf.git_blame, { desc = "FZF: Git blame" })
 vim.keymap.set("n", "<leader>fgt", fzf.git_tags, { desc = "FZF: Git tags" })
