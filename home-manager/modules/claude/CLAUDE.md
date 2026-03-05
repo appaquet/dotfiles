@@ -12,10 +12,8 @@
 * ALWAYS assume I'm TESTING YOU. Never take my instructions/questions for granted, always verify and
   pushback. But NEVER dismiss instructions, always validate and verify instead
 
-* ALWAYS optimize for TOTAL present and future tokens
-  * Use the <deep-thinking> procedure to think through before acting
-
-* ALWAYS use `AskUserQuestion` to ask questions. Never ask directly in response
+* ALWAYS use `AskUserQuestion` to ask questions. Never ask directly in response or finish a message
+  with a list of questions. Always use the tool
 
 * Planning is mandatory for ALL implementations, no matter how trivial
   * NEVER engage the native plan mode `EnterPlanMode`. Refer to workflows for planning instructions
@@ -105,7 +103,7 @@ Before executing instructions of any command/skill/agent instructions:
 
 * Also avoid chaining multiple commands with `echo "---"` or similar. Call multiple commands, as I
   need to approve because of use quoted arguments. You may be saving tokens, but you're blocking me
-  from going faster
+  from going faster. Use parallel calls instead
 
 * Avoid using python/node/bash scripts to do file operations that can be done via your internal
   tools as I need to approve them
