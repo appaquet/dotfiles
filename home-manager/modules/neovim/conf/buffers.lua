@@ -8,16 +8,31 @@ require("which-key").add({
 local minibufremove = require("mini.bufremove")
 minibufremove.setup({})
 
+local function is_buf_in_floating_window(buf)
+	for _, win in ipairs(vim.api.nvim_list_wins()) do
+		local cfg = vim.api.nvim_win_get_config(win)
+		if cfg.relative and cfg.relative ~= "" and vim.api.nvim_win_get_buf(win) == buf then
+			return true
+		end
+	end
+	return false
+end
+
+local function bufdel(buf)
+	if not is_buf_in_floating_window(buf) then
+		minibufremove.delete(buf, true)
+	end
+end
+
 local function bufdelcurrent()
-	minibufremove.delete(nil, true)
+	bufdel(0)
 end
 
 local function bufdelothers()
 	local current = vim.api.nvim_get_current_buf()
-	local bufs = vim.api.nvim_list_bufs()
-	for _, buf in ipairs(bufs) do
+	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
 		if buf ~= current then
-			minibufremove.delete(buf, true)
+			bufdel(buf)
 		end
 	end
 end
@@ -25,9 +40,8 @@ end
 local function bufdelall()
 	WinCloseOthers()
 
-	local bufs = vim.api.nvim_list_bufs()
-	for _, buf in ipairs(bufs) do
-		minibufremove.delete(buf, true)
+	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+		bufdel(buf)
 	end
 end
 
