@@ -73,7 +73,7 @@ in
       # Make sure colors work in TUI apps
       # Works in tandem with fish/default.nix
       # See: https://gist.github.com/andersevenrud/015e61af2fd264371032763d4ed965b6
-      set -g default-terminal 'tmux-256color'
+      set -g default-terminal 'xterm-256color'
       set -sg terminal-overrides ',*:RGB'
 
       # Force tmux to resize windows to the most recently active client

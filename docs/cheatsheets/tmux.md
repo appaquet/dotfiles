@@ -25,4 +25,4 @@
 * Plugins (via integrated .tmux.conf's tpm)
 * [tmux-resurrect](https://github.com/tmux-plugins/tmux-resurrect)
   * `<prefix> <ctrl>s` to save current layout
-  * `<prefix> <ctrl>r` to ressurect last saved layout
+  * `<prefix> <ctrl>r` to resurrect last saved layout
