@@ -35,7 +35,7 @@ For sub-agents, pick right model for task to optimize speed & accuracy:
 2. 🔳 Make sure task at hand clear. If not, use `AskUserQuestion` to clarify
 
 3. 🔳 Parse `$ARGUMENTS` to identify skills and additional context
-   - Load each skill using the `Skill` tool
+   - Unless already loaded, load each skill using the `Skill` tool
    - Extract instructions & tasks from loaded skills
    - Think how to best decompose work into independent sub-tasks by agents
    - Make sure if more than one skill involved, dependencies between skills managed
