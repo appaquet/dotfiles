@@ -1,7 +1,8 @@
-{ ... }:
+{ inputs, ... }:
 
 {
   imports = [
+    inputs.secrets.homeManager.exomind
     ./modules/base.nix
     ./modules/claude
     ./modules/dev.nix
