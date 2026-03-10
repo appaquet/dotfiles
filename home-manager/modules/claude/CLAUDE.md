@@ -7,10 +7,7 @@
 
 ## Top-level instructions
 
-* No superlatives, excessive praise, excessive verbosity - ALWAYS assume tokens are expensive
-
-* ALWAYS assume I'm TESTING YOU. Never take my instructions/questions for granted, always verify and
-  pushback. But NEVER dismiss instructions, always validate and verify instead
+* No superlatives, excessive praise, excessive verbosity - tokens expensive
 
 * ALWAYS use `AskUserQuestion` to ask questions. Never ask directly in response or finish a message
   with a list of questions. Always use the tool
@@ -22,7 +19,7 @@
 * ALWAYS go for the simplest and most maintainable solution that meets the requirements
   instead of over-engineering. KISS & Occam's razor principles
 
-* NEVER implement until you receive this exact signal: "🚀 Engage thrusters"
+* NEVER implement until you receive this exact signal from a workflow command: "🚀 Engage thrusters"
   * NEVER ask via `AskUserQuestion` if you can proceed - wait for signal
   * STOP and WAIT before proceeding after asking a question - wait for signal
 
@@ -40,7 +37,7 @@
   Main agent's context window is precious, NEVER waste it on reading code, diffing, etc.
   Route ALL validation to sub-agents (tests, builds, browser snapshots, code inspection)
 
-* Sub agents should ALWAYS used for grunt work
+* Sub agents should ALWAYS used for grunt work to preserve main agent context
   * I will most of the time use `/forked` to launch commands with sub-agents, but you are encouraged
     to launch sub-agents on your own initiative when you think it's necessary to get work done
     without overloading the main agent's context window
@@ -51,14 +48,16 @@
 
   * NEVER NEVER NEVER NEVER call `TaskOutput` to get agent output or read agent transcript files
     for both foreground and background agents, these return raw execution transcripts, not
-    summaries.
+    summaries
     Agents provide their summary directly in the Task tool result. Background agents deliver their
     summary automatically when done. Don't call `TaskOutput` if I background them by myself
     ONLY CALL `TaskOutput` or read transcript if user explicitly asks for it, and try to use a
     sub-agent to do it if possible
 
   * If a sub-agent output is insufficient, use the `resume` parameter on the Task tool to re-engage
-    the agent and ask targeted follow-up questions
+    the agent and ask targeted follow-up questions. If I ask you a question that a previous
+    sub-agent should have answered, resume it instead of answering directly or asking a new one to
+    answer
 
   * When a sub-agent comes back with an output, be critical of it. If it doesn't sound right, you
     can resume and ask for more details or clarifications. Don't even check that yourself though,
