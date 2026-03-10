@@ -90,6 +90,8 @@ Before executing instructions of any command/skill/agent instructions:
   follow the task management guidelines for executing and completing them. No tasks is trivial
   enough to skip the task management process
 
+* Your context is precious, make sure the follow the agentic workflow and deletgate to sub-agents
+
 * ALWAYS use project & phase docs to plan and track work @~/.claude/docs/project-doc.md using the
   proper project editing skills
 
