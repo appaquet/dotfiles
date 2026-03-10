@@ -17,7 +17,6 @@
       "Bash(ls:*)",
       "Bash(tail:*)",
       "Bash(ln -s * proj)",
-       
       "Bash(jj log:*)",
       "Bash(jj show:*)",
       "Bash(jj diff:*)",
@@ -41,7 +40,6 @@
       "Bash(gh pr diff:*)",
       "Bash(gh pr review:*)",
       "Bash(claude-proj-docs:*)",
-
       "Bash(nix eval:*)",
       "Bash(nix build:*)",
       "Bash(nix flake:*)",
@@ -49,14 +47,12 @@
       "Bash(nix run:*)",
       "Bash(nix shell:*)",
       "Bash(nix repl:*)",
-
       "Bash(cargo test:*)",
       "Bash(cargo check:*)",
       "Bash(cargo clippy:*)",
       "Bash(cargo fmt:*)",
       "Bash(cargo build:*)",
       "Bash(cargo tree:*)",
-
       "Bash(go build:*)",
       "Bash(go fmt:*)",
       "Bash(go mod:*)",
@@ -66,12 +62,10 @@
       "Bash(gofmt:*)",
       "Bash(goimports:*)",
       "Bash(staticcheck:*)",
-
       "Bash(npm run build:*)",
       "Bash(npm run lint:*)",
       "Bash(npm run test:*)",
       "Bash(npm run fmt:*)",
-
       "Edit(~/Library/Caches/**)",
       "Edit(~/.cache/**)",
       "Edit(~/.cargo/**)",
@@ -82,7 +76,6 @@
       "Edit(~/.config/jj/repos/)",
       "Read(~/.claude/**)",
       "Read(//nix/**)",
-
       "WebSearch",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:api.github.com)",
@@ -106,7 +99,6 @@
       "WebFetch(domain:docs.rs)",
       "WebFetch(domain:jj-vcs.github.io)",
       "WebFetch(domain:docs.jj-vcs.dev)",
-
       "Skill(ctx-load)",
       "Skill(ctx-save)",
       "Skill(review-search)",
@@ -255,6 +247,6 @@
     }
   },
   "alwaysThinkingEnabled": true,
-  "skipDangerousModePermissionPrompt": true,
-  "promptSuggestionEnabled": false
+  "promptSuggestionEnabled": false,
+  "skipDangerousModePermissionPrompt": true
 }

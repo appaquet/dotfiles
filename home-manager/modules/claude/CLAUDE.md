@@ -37,10 +37,10 @@
 ## Context management and agentic workflow
 
 * Main agent should be used for high-level planning, project management, jj (versioning)
-  Main agent's context window is precious, don't waste it on reading code, diffing, etc.
+  Main agent's context window is precious, NEVER waste it on reading code, diffing, etc.
   Route ALL validation to sub-agents (tests, builds, browser snapshots, code inspection)
 
-* Sub agents should be used for grunt work
+* Sub agents should ALWAYS used for grunt work
   * I will most of the time use `/forked` to launch commands with sub-agents, but you are encouraged
     to launch sub-agents on your own initiative when you think it's necessary to get work done
     without overloading the main agent's context window
@@ -66,6 +66,11 @@
 
   * Sub-agent should communicate with user through AskUserQuestion tool if they need clarifications
 
+* For sub-agents, pick right model for task to optimize speed & accuracy:
+  * haiku: shallow code exploration, straightforward code
+  * sonnet: normal code, complex code exploration, most tasks
+  * opus: planning, review comments research/planning, complex code
+
 ## Task management
 
 * ALWAYS use the Task tool to create tasks for any instruction step that has a 🔳 annotation, before executing any of the instructions
@@ -82,7 +87,8 @@
 Before executing instructions of any command/skill/agent instructions:
 
 * Following Task management guidelines, create tasks for 🔳 annotated instructions and strictly
-  follow the task management guidelines for executing and completing them
+  follow the task management guidelines for executing and completing them. No tasks is trivial
+  enough to skip the task management process
 
 * ALWAYS use project & phase docs to plan and track work @~/.claude/docs/project-doc.md using the
   proper project editing skills

@@ -22,11 +22,6 @@ implementation, reviews, etc.). This applies to ALL tasks: trivial, obvious or n
 
 NEVER make judgment calls on if something is simple enough to be done by main agent
 
-For sub-agents, pick right model for task to optimize speed & accuracy:
-- haiku: shallow code exploration, straightforward code
-- sonnet: normal code, complex code exploration, most tasks
-- opus: planning, review comments research/planning, complex code
-
 ## Instructions
 
 1. STOP, follow pre-flight instructions
@@ -35,7 +30,8 @@ For sub-agents, pick right model for task to optimize speed & accuracy:
 2. 🔳 Make sure task at hand clear. If not, use `AskUserQuestion` to clarify
 
 3. 🔳 Parse `$ARGUMENTS` to identify skills and additional context
-   - Unless already loaded, load each skill using the `Skill` tool
+   - Unless already loaded in your context, load each skill from ~/.claude/skills or
+     ~/.claude/commands
    - Extract instructions & tasks from loaded skills
    - Think how to best decompose work into independent sub-tasks by agents
    - Make sure if more than one skill involved, dependencies between skills managed
@@ -44,7 +40,7 @@ For sub-agents, pick right model for task to optimize speed & accuracy:
      properly separate their context
    - If skill contains `ultrathink`, make sure to include that specific keyword in sub-agent instructions
 
-4. 🔳 For each agent to be launched, create tasks:
+4. For each agent to be launched, create tasks:
    - Launch agent to do X
    - Analyse results
    - Update project docs if applicable using `/ctx-save` procedure (on main agent)
