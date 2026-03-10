@@ -43,6 +43,10 @@
 
       tealdeer # rust version of tldr
 
+      killall
+      watch
+      bc
+
       bat # cat replacement
       lsd # ls replacement
       hexyl
@@ -74,8 +78,6 @@
       gzip
       bzip2
       gnutar
-      bc
-      killall
 
       curl
       wget
