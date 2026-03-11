@@ -166,7 +166,3 @@ vim.keymap.set("n", "<Leader>yf", function()
 	vim.notify(path)
 end, { silent = true, desc = "Yank file path" })
 
--- Multicursors
--- https://github.com/smoka7/multicursors.nvim
-require("multicursors").setup({})
-vim.keymap.set({ "n", "v" }, "<C-n>", "<cmd>MCstart<cr>", { silent = true })

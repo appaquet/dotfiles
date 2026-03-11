@@ -388,14 +388,6 @@ not in PKMS, operates in-place when already in a PKMS buffer.
 * `g;` and `g,` Navigate through last edits
 * `<C-t>` Increase indent (insert mode)
 * `<C-d>` Decrease indent (insert mode)
-* `<C-n>` Start multicursor edit
-  * A keymap helper will show up with the available keymaps
-  * `n`, `N` Go to next/previous match
-  * `q` Skip current match
-  * `c` Change matches
-  * `d` Delete matches
-  * `a` Append after matches
-
 ## Templates (C-e)
 
 ### Todo (C-e t)

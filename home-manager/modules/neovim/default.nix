@@ -91,7 +91,6 @@ in
           delimitMate # auto close quotes, parens, etc
           which-key-nvim # show keymap hints
           todo-comments-nvim # highlight TODO, FIXME, etc
-          multicursors-nvim
           auto-session # automatically restore last session
 
           # Notifications
