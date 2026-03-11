@@ -34,8 +34,9 @@
 ## Context management and agentic workflow
 
 * Main agent should be used for high-level planning, project management, jj (versioning)
-  Main agent's context window is precious, NEVER waste it on reading code, diffing, etc.
-  Route ALL validation to sub-agents (tests, builds, browser snapshots, code inspection)
+  Main agent's context window is precious, NEVER waste it on reading code, diffing, browser testing, etc.
+  Reading a file seems trivial, but it may load up your context in no time
+  Route ALL validation to sub-agents (tests, builds, browser testing, code inspection)
 
 * Sub agents should ALWAYS used for grunt work to preserve main agent context
   * I will most of the time use `/forked` to launch commands with sub-agents, but you are encouraged

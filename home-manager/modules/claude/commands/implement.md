@@ -44,6 +44,8 @@ After instructions & tasks loaded, you are free to 🚀 Engage thrusters
 7. 🔳 Validate via `development-completion-checklist`
    - State each item aloud, confirm compliance
 
-8. 🔳 Run `/ctx-save` to update project and phase docs
+8. 🔳 Validate formatting, linting and tests
 
-9. 🔳 Commit `jj` change with meaningful message if not already done
+9. 🔳 Run `/ctx-save` to update project and phase docs
+
+10. 🔳 Commit `jj` change with meaningful message if not already done

@@ -3,13 +3,15 @@
 
 ## Comments
 
-* Explain "why" not "what" - avoid obvious/redundant
+* Explain "why" not "what" - avoid obvious/redundant. When in doubt, omit
+* If code structure (names, control flow) communicates intent, no comment needed
 * Comments describe current state, not evolution
   * no "now uses", "changed to", "updated to" (that's git history's job)
-  * no references to specific bugs or investigations that motivated the code — describe the
-    general design intent (specific fix context belongs in git history)
-* Docstrings describe generic capability, not specific use cases - document WHAT it does, not WHY it was created for a particular feature
-* Don't mark sections with comments ("// Test Helpers", "// Public Methods", ASCII art). File structure should be self-evident. If markers seem needed, split the file.
+  * no references to specific bugs, investigations, function names, types, or error messages —
+    describe design intent generically (specifics belong in git history or go stale)
+* Docstrings describe generic capability, not specific use cases
+* Don't mark sections with comments. If markers seem needed, split the file
+* Test comments: brief behavior labels, not internal mechanics walkthroughs
 
 ## Errors
 

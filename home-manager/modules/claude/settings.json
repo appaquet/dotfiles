@@ -239,6 +239,9 @@
   "sandbox": {
     "enabled": true,
     "autoAllowBashIfSandboxed": true,
+    "excludedCommands": [
+      "nix"
+    ],
     "network": {
       "allowUnixSockets": [
         "/nix/var/nix/daemon-socket/socket"
