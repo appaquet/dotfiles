@@ -23,12 +23,12 @@ final: prev: {
     # https://github.com/zbirenbaum/copilot.lua
     copilot-lua = prev.vimUtils.buildVimPlugin {
       pname = "copilot.lua";
-      version = "2026-02-28";
+      version = "2026-03-11";
       src = prev.fetchFromGitHub {
         owner = "zbirenbaum";
         repo = "copilot.lua";
-        rev = "00446a63cba4cc59bb24fc1e210a555a3e4acdfb";
-        sha256 = "sha256-FL6OSeOtTTpswVBkMIun8tyoXchBQIOgofUBonlSVzQ=";
+        rev = "575646d22e4a80758935e92f7be7e210c1ceb5bc";
+        sha256 = "sha256-1NEzJ/HRLgDwjf8ZvFqOmcnwK36zOS18+ZutWeUtI3s=";
       };
       meta.homepage = "https://github.com/zbirenbaum/copilot.lua/";
       meta.hydraPlatforms = [ ];
@@ -86,5 +86,19 @@ final: prev: {
       meta.homepage = "https://github.com/nvim-neotest/neotest-python/";
       meta.hydraPlatforms = [ ];
     };
+
+    # https://github.com/coder/claudecode.nvim
+    # claudecode-nvim = prev.vimUtils.buildVimPlugin {
+    #   pname = "claudecode.nvim";
+    #   version = "0.3.0-unstable-2026-03-11";
+    #   src = prev.fetchFromGitHub {
+    #     owner = "coder";
+    #     repo = "claudecode.nvim";
+    #     rev = "432121f0f5b9bda041030d1e9e83b7ba3a93dd8f";
+    #     hash = "sha256-r8hAUpSsr8zNm+av8Mu5oILaTfEsXEnJmkzRmvi9pF8=";
+    #   };
+    #   meta.homepage = "https://github.com/coder/claudecode.nvim/";
+    #   meta.hydraPlatforms = [ ];
+    # };
   };
 }

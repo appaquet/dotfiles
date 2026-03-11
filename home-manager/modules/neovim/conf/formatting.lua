@@ -12,7 +12,7 @@ require("conform").setup({
 		typescriptreact = { "prettier" },
 		rust = { "rustfmt", lsp_format = "fallback" },
 		sh = { "treefmt_nix", "shfmt", stop_after_first = true },
-		go = { "treefmt_nix", "hfgofmt", "gofmt", "goimports", stop_after_first = true },
+		go = { "hfgofmt", "treefmt_nix", "gofmt", "goimports", stop_after_first = true },
 		nix = { "treefmt_nix", "nixfmt" },
 	},
 	formatters = {
