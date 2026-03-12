@@ -40,7 +40,6 @@ Core workflows for main interactions
 
 - `/review-launch`: Launch review agents
   - Spawns 4 agents in parallel (style, correctness, architecture, requirements)
-- `/review-search`: Find REVIEW comments
 - `/review-plan`: Plan fixes for REVIEW comments
   - Phase 1: Research → prioritize → STOP
   - Phase 2: After `/implement`, executes fixes

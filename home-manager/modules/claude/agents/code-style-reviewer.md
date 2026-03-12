@@ -45,6 +45,8 @@ Insert via the Edit tool using this exact format:
   * Ex: `errors.Wrap` info
 * No remaining debug code (dbg!, println, console.log, etc.)
 * Comments describe "why" not "what", not redundant
+* Comments are not describing changes, but what the code is doing
+* Comments are not linking to AC# or Req# as we don't have global tracking of those
 * Import/export organization follows project patterns
 * Tests cover golden path without excessive overlap
 * No dead code or unused variables

@@ -16,33 +16,23 @@
   * NEVER engage the native plan mode `EnterPlanMode`. Refer to workflows for planning instructions
   * When agreed on a plan, ALWAYS follow it and ALWAYS stop & ask if you deviate or the plan fails
 
-* ALWAYS go for the simplest and most maintainable solution that meets the requirements
-  instead of over-engineering. KISS & Occam's razor principles
+* Optimize your work with a maintability & future proofing mindset. Don't just write code that
+  minimize diff, but write code that will optimize the future diff
 
 * NEVER implement until you receive this exact signal from a workflow command: "🚀 Engage thrusters"
   * NEVER ask via `AskUserQuestion` if you can proceed - wait for signal
   * STOP and WAIT before proceeding after asking a question - wait for signal
 
-## Sub-instructions files
-
-* My workflows: @~/.claude/docs/workflows.md
-* Project docs: @~/.claude/docs/project-doc.md
-* Version control (jj): @~/.claude/docs/version-control.md
-* Development instructions: @~/.claude/docs/development.md
-* Code style: @~/.claude/docs/code-style.md
-
 ## Context management and agentic workflow
 
-* Main agent should be used for high-level planning, project management, jj (versioning)
-  Main agent's context window is precious, NEVER waste it on reading code, diffing, browser testing, etc.
-  Reading a file seems trivial, but it may load up your context in no time
-  Route ALL validation to sub-agents (tests, builds, browser testing, code inspection)
+* Main agent should ONLY be used for high-level planning, project management, jj (code versioning)
+  Main agent context window is VERY VERY precious
+  NEVER waste reading/validating/diffing code/files, testing, browser, running commands, etc.
+  => Always route to sub-agents
+  Reading files seem trivial, but may load your context quickly and bias you to not delegate
+  NEVER validate sub-agents work by reading their verbose output yourself
 
-* Sub agents should ALWAYS used for grunt work to preserve main agent context
-  * I will most of the time use `/forked` to launch commands with sub-agents, but you are encouraged
-    to launch sub-agents on your own initiative when you think it's necessary to get work done
-    without overloading the main agent's context window
-
+* Sub agents should ALWAYS used for grunt work to preserve main agent context, no matter the task complexity
   * Optimize prompts for sub-agents, but also ask them to optimize their own output message
     Enough information for crystal clear understanding, but no more than that: context window is
     precious
@@ -60,11 +50,14 @@
     sub-agent should have answered, resume it instead of answering directly or asking a new one to
     answer
 
-  * When a sub-agent comes back with an output, be critical of it. If it doesn't sound right, you
-    can resume and ask for more details or clarifications. Don't even check that yourself though,
-    your context is precious
+  * When a sub-agent comes back with an output, YOU HAVE TO BE CRITICAL. If it doesn't sound right,
+    you can resume and ask for more details or clarifications. Don't even check that yourself
+    though, your context is precious
 
   * Sub-agent should communicate with user through AskUserQuestion tool if they need clarifications
+
+  * Resuming an agent for a follow-up work should be prioritized over creating a new agent since it
+    has the context of the previous work
 
 * For sub-agents, pick right model for task to optimize speed & accuracy:
   * haiku: shallow code exploration, straightforward code
@@ -132,6 +125,15 @@ Bash(jj commit -m "msg" some/path)
 Write(file_path="file.txt", content="some text")
 </good-examples>
 ```
+
+## Sub-instructions files
+
+* My workflows: @~/.claude/docs/workflows.md
+* Project docs: @~/.claude/docs/project-doc.md
+* Version control (jj): @~/.claude/docs/version-control.md
+* Development instructions: @~/.claude/docs/development.md
+* Code style: @~/.claude/docs/code-style.md
+* Reviewing: @~/.claude/docs/review.md
 
 ## Context understanding
 

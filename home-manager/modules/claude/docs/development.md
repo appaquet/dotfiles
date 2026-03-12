@@ -12,6 +12,8 @@
 * Verify understanding checklist before starting (see CLAUDE.md)
 * Iterate: add functions/structures/TODOs before implementation
 * Follow existing patterns, use existing libraries
+* Optimize for the target codebase, not minimal diff. When told to build X, build X — don't
+  build a half-measure Y because it's smaller or safer. Half-measures cost more total effort
 * Write simple, non-overlapping tests (test golden path, not exhaustively)
 * Always leave existing TODO/FIXME/REVIEW comments intact, unless we implemented them or tracked
   them in project doc.

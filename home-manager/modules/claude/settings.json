@@ -101,7 +101,6 @@
       "WebFetch(domain:docs.jj-vcs.dev)",
       "Skill(ctx-load)",
       "Skill(ctx-save)",
-      "Skill(review-search)",
       "Skill(mem-editing)",
       "Skill(proj-editing)"
     ],
@@ -239,18 +238,19 @@
   "sandbox": {
     "enabled": true,
     "autoAllowBashIfSandboxed": true,
-    "excludedCommands": [
-      "nix"
-    ],
     "network": {
       "allowUnixSockets": [
         "/nix/var/nix/daemon-socket/socket"
       ],
       "allowLocalBinding": true
-    }
+    },
+    "excludedCommands": [
+      "nix"
+    ]
   },
   "alwaysThinkingEnabled": true,
+  "effortLevel": "high",
   "promptSuggestionEnabled": false,
   "skipDangerousModePermissionPrompt": true,
-  "effortLevel": "high"
+  "autoMemoryEnabled": false
 }

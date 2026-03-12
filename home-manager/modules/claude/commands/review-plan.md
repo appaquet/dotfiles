@@ -18,8 +18,8 @@ They aren't left for future consideration nor to be ignored.
    THEN, continue
 
 2. 🔳 Ensure REVIEW comments found
-   - Use `/review-search` unless we just searched
-   - If launching via forked, ask agents to use `/review-search`
+   - Follow the searching procedure from the reviewing doc unless we just searched
+   - If launching via forked, ask agents to follow the same procedure
      Never roll your own search
 
 3. 🔳 Research each comment
