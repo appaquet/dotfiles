@@ -40,6 +40,7 @@
       nvd # nix package diff tool
       nix-tree # explore nix derivations dependencies (https://github.com/utdemir/nix-tree)
       cachix
+      nix-diff # diff nix derivations
 
       tealdeer # rust version of tldr
 
