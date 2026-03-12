@@ -448,7 +448,7 @@ not in PKMS, operates in-place when already in a PKMS buffer.
 * `q[a-z0-9A-Z]` Start recording
 * `q` Stop recording
 * `@[a-z0-9A-Z]` Play macro (prefixed with number for repeats)
-* `.` Replay last action/macro
+* `.` Replay last action (macro if it got applied once)
 * `"[a-z0-9A-Z]` Yank to register
 * `"[a-z0-9A-Z]p` Paste from register (which-key list available)
 
