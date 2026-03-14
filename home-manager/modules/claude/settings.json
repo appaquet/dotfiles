@@ -251,6 +251,6 @@
   "alwaysThinkingEnabled": true,
   "effortLevel": "high",
   "promptSuggestionEnabled": false,
-  "skipDangerousModePermissionPrompt": true,
-  "autoMemoryEnabled": false
+  "autoMemoryEnabled": false,
+  "skipDangerousModePermissionPrompt": true
 }

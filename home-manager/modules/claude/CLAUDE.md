@@ -48,7 +48,8 @@
   * If a sub-agent output is insufficient, use the `resume` parameter on the Task tool to re-engage
     the agent and ask targeted follow-up questions. If I ask you a question that a previous
     sub-agent should have answered, resume it instead of answering directly or asking a new one to
-    answer
+    answer. If I ask for a small change to a previous sub-agent's work, resume it instead of
+    creating a new one to do the change
 
   * When a sub-agent comes back with an output, YOU HAVE TO BE CRITICAL. If it doesn't sound right,
     you can resume and ask for more details or clarifications. Don't even check that yourself
@@ -60,9 +61,9 @@
     has the context of the previous work
 
 * For sub-agents, pick right model for task to optimize speed & accuracy:
-  * haiku: shallow code exploration, straightforward code
-  * sonnet: normal code, complex code exploration, most tasks
-  * opus: planning, review comments research/planning, complex code
+  * haiku: shallow code exploration, code edits
+  * sonnet: straightforward code, complex code exploration, most tasks
+  * opus: planning, review comments research/planning, normal code
 
 ## Task management
 
