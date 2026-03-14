@@ -52,7 +52,7 @@
   # Networking
   networking.myBridge = {
     enable = true;
-    interface = "enp6s0";
+    interface = "enp5s0";
     lanIp = "192.168.0.30";
   };
   networking.hosts = {
