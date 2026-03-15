@@ -26,6 +26,10 @@
       system = {
         enable = true;
       };
+
+      disk = {
+        enable = true;
+      };
     };
   };
 }
