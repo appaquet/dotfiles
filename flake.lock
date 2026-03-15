@@ -145,17 +145,14 @@
         ]
       },
       "locked": {
-        "lastModified": 1773540190,
-        "narHash": "sha256-9zBPv0tfej2a8/88tboRZjDccI1D7CwRHuNwK0b/R8E=",
-        "owner": "appaquet",
-        "repo": "dotblip",
-        "rev": "6be5e8e9b5f81c9f0ad926c480fd6f73f52b7854",
-        "type": "github"
+        "lastModified": 1773540209,
+        "narHash": "sha256-3EgM2TKQBt7mmTNnwEPwwoKWoYKX8NH5XCGlYsOZ34s=",
+        "path": "/home/appaquet/dotfiles/dotblip",
+        "type": "path"
       },
       "original": {
-        "owner": "appaquet",
-        "repo": "dotblip",
-        "type": "github"
+        "path": "/home/appaquet/dotfiles/dotblip",
+        "type": "path"
       }
     },
     "flake-compat": {
