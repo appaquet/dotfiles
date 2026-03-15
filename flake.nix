@@ -24,8 +24,8 @@
     };
 
     dotblip = {
-      #url = "github:appaquet/dotblip";
-      url = "path:/home/appaquet/dotfiles/dotblip";
+      url = "github:appaquet/dotblip";
+      #url = "path:/home/appaquet/dotfiles/dotblip";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
