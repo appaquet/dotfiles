@@ -58,9 +58,6 @@
         name = "bartender";
       }
       {
-        name = "bettertouchtool";
-      }
-      {
         name = "steermouse";
       }
       {
