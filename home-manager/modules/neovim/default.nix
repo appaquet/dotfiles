@@ -77,7 +77,6 @@ in
           # Theme
           catppuccin-nvim
           nvim-web-devicons
-          nvim-colorizer-lua # colorize hex codes, etc.
 
           # Layout
           nvim-tree-lua
