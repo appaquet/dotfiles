@@ -53,11 +53,13 @@ Core workflows for main interactions
 - `/introspect`: Reflect on errors
   - Analyzes issue → proposes changes → suggests `/mem-edit`
 
-### Pull Requests
+### Pull Requests / version control
 
 - `/pr-desc`: Generate PR description
 - `/pr-import-comments`: Import PR comments
 - `/pr-reply-comments`: Reply to PR comments
+- `/jj-resolve-conflicts`: Resolve conflicting jj changes
+- `/jj-absorb`: Distribute files from current change into matching ancestor changes
 
 ## Internal Skills
 
