@@ -11,7 +11,7 @@ let
     font-thicken = false
 
     # Scroll on macos with external mouse is way too fast
-    mouse-scroll-multiplier = 0.25
+    mouse-scroll-multiplier = 0.33
 
     # Parses URLs to allow click
     # Doesn't work at the moment: https://github.com/ghostty-org/ghostty/issues/1972#issuecomment-2240048536
@@ -28,6 +28,7 @@ let
     confirm-close-surface = false
 
     # Because ghostty isn't well known and causes color issues
+    # Also trips tmux when connecting via ssh
     term = xterm-256color
   '';
 in
