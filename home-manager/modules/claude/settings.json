@@ -252,5 +252,6 @@
   "effortLevel": "high",
   "promptSuggestionEnabled": false,
   "autoMemoryEnabled": false,
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "includeGitInstructions": false
 }
