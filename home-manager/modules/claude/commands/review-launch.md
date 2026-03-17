@@ -31,7 +31,6 @@ all the context loading capabilities
 
 4. Collect results from agent summaries (returned directly for foreground agents, or delivered
    automatically for background agents). NEVER call `TaskOutput` or read agent output files.
-   If an agent's summary lacks detail, resume it (Task tool `resume` parameter with agent ID) to
-   ask specific follow-up questions.
+   If an agent's summary lacks detail, send it a follow-up message to ask specific questions.
    Don't act on review comments — agents insert `// REVIEW:` comments in code directly.
    Summarize findings from agent summaries.

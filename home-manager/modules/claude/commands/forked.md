@@ -58,7 +58,7 @@ NEVER make judgment calls on if something is simple enough to be done by main ag
        exact step number as well to prevent confusion
 
 
-     - Tell agent can stop early for clarifications from user, you can use resume after
+     - Tell agent can stop early for clarifications from user, you can send a follow-up message after
 
      - You need to make sure that across all sub-agents, ALL of the steps that were instructed in the
        skills were covered and accomplished
@@ -82,13 +82,13 @@ NEVER make judgment calls on if something is simple enough to be done by main ag
      - NEVER call `TaskOutput` or read agent output files. Foreground agents return results in the
        tool response. Background agents deliver summaries automatically
 
-     - If an agent's debrief is insufficient, use the `resume` param to re-engage it and ask
+     - If an agent's debrief is insufficient, send it a follow-up message to re-engage and ask
        targeted follow-up questions
 
 7. 🔳 Collect debriefs, analyse results and report on overall progress
 
-      If a debrief lacks needed detail, resume the agent to ask specific follow-up questions rather
-      than reading raw transcripts
+      If a debrief lacks needed detail, send the agent a follow-up message rather than reading raw
+      transcripts
 
       Make sure progress reflected in project docs as per instructions in the skill using `/ctx-save` procedure
 

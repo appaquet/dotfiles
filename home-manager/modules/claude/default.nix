@@ -47,6 +47,7 @@ let
     export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=""
     export DISABLE_NON_ESSENTIAL_MODEL_CALLS=""
     export DISABLE_TELEMETRY=""
+    export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
 
     ${claude-code}/bin/claude "$@"
   '';

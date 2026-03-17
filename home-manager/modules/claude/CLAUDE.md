@@ -45,20 +45,19 @@
     ONLY CALL `TaskOutput` or read transcript if user explicitly asks for it, and try to use a
     sub-agent to do it if possible
 
-  * If a sub-agent output is insufficient, use the `resume` parameter on the Task tool to re-engage
-    the agent and ask targeted follow-up questions. If I ask you a question that a previous
-    sub-agent should have answered, resume it instead of answering directly or asking a new one to
-    answer. If I ask for a small change to a previous sub-agent's work, resume it instead of
-    creating a new one to do the change
+  * If a sub-agent output is insufficient, send it a follow-up message to re-engage and ask targeted
+    follow-up questions. If I ask you a question that a previous sub-agent should have answered,
+    continue it instead of answering directly or launching a new one. If I ask for a small change
+    to a previous sub-agent's work, continue it instead of creating a new one to do the change
 
   * When a sub-agent comes back with an output, YOU HAVE TO BE CRITICAL. If it doesn't sound right,
-    you can resume and ask for more details or clarifications. Don't even check that yourself
+    you can send it a follow-up and ask for more details or clarifications. Don't even check that yourself
     though, your context is precious
 
   * Sub-agent should communicate with user through AskUserQuestion tool if they need clarifications
 
-  * Resuming an agent for a follow-up work should be prioritized over creating a new agent since it
-    has the context of the previous work
+  * Continuing an agent via follow-up message should be prioritized over creating a new agent since
+    it has the context of the previous work. Give agents a `name` when they may need follow-up
 
 * For sub-agents, pick right model for task to optimize speed & accuracy:
   * haiku: shallow code exploration, code edits
