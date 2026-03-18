@@ -141,6 +141,21 @@
         ]
       }
     ],
+    "StopFailure": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "claude-tmux-indicator off StopFailure"
+          },
+          {
+            "type": "command",
+            "command": "ccmon status"
+          }
+        ]
+      }
+    ],
     "SessionEnd": [
       {
         "matcher": "",

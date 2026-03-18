@@ -55,7 +55,7 @@ Before marking the development as completed, ensure to follow this checklist:
 * [ ] Temporary debug files/code removed
 * [ ] Code style guidelines followed
 * [ ] Strictly follow ordering in `file-organization-order`
-* [ ] Formatting, linting, tests pass (only affected modules)
+* [ ] Formatting, linting (including type checking if applicable), tests pass (only affected modules)
 * [ ] Dependent code is still compiling & testing
 * [ ] Project doc updated (if exists)
 </development-completion-checklist>
