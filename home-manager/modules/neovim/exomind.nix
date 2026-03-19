@@ -1,6 +1,6 @@
 { config, ... }:
 let
-  pkmsDir = "${config.home.homeDirectory}/pkms";
+  exomindDir = "${config.home.homeDirectory}/exomind";
 
   # https://oxide.md/Configuration
   moxideConfig = ''
@@ -8,10 +8,10 @@ let
     dailynote = "%Y/%m/%Y-%m-%d-daily"
 
     # Folder for daily notes (relative to vault root)
-    daily_notes_folder = "${pkmsDir}/daily"
+    daily_notes_folder = "${exomindDir}/daily"
 
     # Default folder for new files created via code actions
-    new_file_folder_path = "${pkmsDir}"
+    new_file_folder_path = "${exomindDir}"
 
     # Fuzzy match file headings in completions
     heading_completions = true

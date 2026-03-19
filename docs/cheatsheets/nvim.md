@@ -336,16 +336,16 @@ keymaps, but also default/built-ins that I tend to forget.
 * `gs` Fix spelling and improve clarity (visual mode)
 * `gC` Add or improve documentation/comments (visual mode)
 
-## PKMS (m)
+## Exomind (m)
 
 Personal Knowledge Management System keymaps. Works from any directory - opens floating window when
-not in PKMS, operates in-place when already in a PKMS buffer.
+not in Exomind, operates in-place when already in an Exomind buffer.
 
 * `<leader>mjj` Open today's note
 * `<leader>mjp` Open yesterday's note
 * `<leader>mjn` Open tomorrow's note
-* `<leader>mf` Find files in PKMS vault
-* `<leader>ms` Search content in PKMS vault
+* `<leader>mf` Find files in Exomind vault
+* `<leader>ms` Search content in Exomind vault
 * `<leader>mS` Search workspace symbols via LSP
 * `<leader>mt` Insert template
 

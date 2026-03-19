@@ -35,7 +35,7 @@ let
 in
 {
   imports = [
-    ./pkms.nix
+    ./exomind.nix
   ];
 
   options.dotfiles.neovim = {
@@ -224,7 +224,7 @@ in
             (includeLuaFile "debugging.lua")
             (includeLuaFile "profiling.lua")
 
-            (includeLuaFile "pkms.lua")
+            (includeLuaFile "exomind.lua")
           ])
         )
       );

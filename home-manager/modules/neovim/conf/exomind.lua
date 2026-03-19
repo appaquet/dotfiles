@@ -1,31 +1,31 @@
-local pkms_dir = vim.fn.expand("~/pkms")
-local pkms_float_win = nil
+local exomind_dir = vim.fn.expand("~/exomind")
+local exomind_float_win = nil
 local fzf = require("fzf-lua")
 
 require("which-key").add({
-	{ "<leader>m", group = "PKMS" },
+	{ "<leader>m", group = "Exomind" },
 	{ "<leader>mj", group = "Journal" },
 	{ "<leader>mt", group = "Templates" },
 })
 
-local function is_pkms_buffer(bufnr)
+local function is_exomind_buffer(bufnr)
 	bufnr = bufnr or vim.api.nvim_get_current_buf()
 	local path = vim.api.nvim_buf_get_name(bufnr)
-	return path:find(pkms_dir, 1, true) ~= nil
+	return path:find(exomind_dir, 1, true) ~= nil
 end
 
--- Opens PKMS float if not already in PKMS. Optionally waits for LSP.
-local function ensure_pkms_context(wait_for_lsp)
-	if is_pkms_buffer() then
+-- Opens Exomind float if not already in Exomind. Optionally waits for LSP.
+local function ensure_exomind_context(wait_for_lsp)
+	if is_exomind_buffer() then
 		return
 	end
 
-	if pkms_float_win and vim.api.nvim_win_is_valid(pkms_float_win) then
-		vim.api.nvim_set_current_win(pkms_float_win)
+	if exomind_float_win and vim.api.nvim_win_is_valid(exomind_float_win) then
+		vim.api.nvim_set_current_win(exomind_float_win)
 	else
 		local _, win = FloatingWindow()
-		pkms_float_win = win
-		vim.cmd("edit " .. pkms_dir .. "/index.md")
+		exomind_float_win = win
+		vim.cmd("edit " .. exomind_dir .. "/index.md")
 	end
 
 	if wait_for_lsp then
@@ -35,16 +35,16 @@ local function ensure_pkms_context(wait_for_lsp)
 	end
 end
 
--- fzf action that opens file in PKMS float
-local function pkms_fzf_open(selected, opts)
-	if pkms_float_win and vim.api.nvim_win_is_valid(pkms_float_win) then
-		vim.api.nvim_set_current_win(pkms_float_win)
+-- fzf action that opens file in Exomind float
+local function exomind_fzf_open(selected, opts)
+	if exomind_float_win and vim.api.nvim_win_is_valid(exomind_float_win) then
+		vim.api.nvim_set_current_win(exomind_float_win)
 	end
 	require("fzf-lua.actions").file_edit(selected, opts)
 end
 
 -- Template engine: replaces {{variable}} and {{variable:format}} placeholders
-local templates_dir = pkms_dir .. "/templates"
+local templates_dir = exomind_dir .. "/templates"
 
 local function title_from_filename(path)
 	local name = vim.fn.fnamemodify(path, ":t:r")
@@ -187,10 +187,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 
 local function open_daily_with_hydrate(day_arg)
-	ensure_pkms_context(true)
+	ensure_exomind_context(true)
 
 	-- One-shot autocmd to hydrate after the daily note buffer loads
-	local group = vim.api.nvim_create_augroup("PkmsDailyHydrate", { clear = true })
+	local group = vim.api.nvim_create_augroup("ExomindDailyHydrate", { clear = true })
 	vim.api.nvim_create_autocmd("BufEnter", {
 		group = group,
 		pattern = "*/daily/*.md",
@@ -206,42 +206,42 @@ end
 -- Journal keymaps
 vim.keymap.set("n", "<leader>mjj", function()
 	open_daily_with_hydrate("today")
-end, { silent = true, desc = "PKMS: Today's note" })
+end, { silent = true, desc = "Exomind: Today's note" })
 
 vim.keymap.set("n", "<leader>mjp", function()
 	open_daily_with_hydrate("yesterday")
-end, { silent = true, desc = "PKMS: Yesterday's note" })
+end, { silent = true, desc = "Exomind: Yesterday's note" })
 
 vim.keymap.set("n", "<leader>mjn", function()
 	open_daily_with_hydrate("tomorrow")
-end, { silent = true, desc = "PKMS: Tomorrow's note" })
+end, { silent = true, desc = "Exomind: Tomorrow's note" })
 
 -- File search (no LSP needed)
 vim.keymap.set("n", "<leader>mf", function()
-	ensure_pkms_context(false)
+	ensure_exomind_context(false)
 	fzf.files({
-		cwd = pkms_dir,
-		actions = { ["default"] = pkms_fzf_open },
+		cwd = exomind_dir,
+		actions = { ["default"] = exomind_fzf_open },
 	})
-end, { desc = "PKMS: Find files" })
+end, { desc = "Exomind: Find files" })
 
 -- Content search (no LSP needed)
 vim.keymap.set("n", "<leader>ms", function()
-	ensure_pkms_context(false)
+	ensure_exomind_context(false)
 	fzf.live_grep({
-		cwd = pkms_dir,
-		actions = { ["default"] = pkms_fzf_open },
+		cwd = exomind_dir,
+		actions = { ["default"] = exomind_fzf_open },
 	})
-end, { desc = "PKMS: Search content" })
+end, { desc = "Exomind: Search content" })
 
 -- Workspace symbols (needs LSP)
 vim.keymap.set("n", "<leader>mS", function()
-	ensure_pkms_context(true)
+	ensure_exomind_context(true)
 	fzf.lsp_live_workspace_symbols({
-		winopts = { title = " PKMS Symbols " },
-		actions = { ["default"] = pkms_fzf_open },
+		winopts = { title = " Exomind Symbols " },
+		actions = { ["default"] = exomind_fzf_open },
 	})
-end, { desc = "PKMS: Workspace symbols" })
+end, { desc = "Exomind: Workspace symbols" })
 
 -- Template picker
 vim.keymap.set("n", "<leader>mt", function()
@@ -262,4 +262,4 @@ vim.keymap.set("n", "<leader>mt", function()
 			end,
 		},
 	})
-end, { desc = "PKMS: Insert template" })
+end, { desc = "Exomind: Insert template" })
