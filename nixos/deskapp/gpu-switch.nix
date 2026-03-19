@@ -28,6 +28,11 @@ let
         echo "0000:$1"
     }
 
+    function write_sysfs() {
+        # Write to sysfs/procfs without clobbering stdout
+        echo "$1" | tee "$2" > /dev/null
+    }
+
     function get_bus_driver() {
         # takes a bus address (ex: 0000:01:00.0) and returns the driver in use (ex: nvidia, vfio-pci)
         echo $(lspci -nn -s $1 -k | grep "Kernel driver in use" | awk '{print $5}')
@@ -49,15 +54,15 @@ let
 
         if [ "$gpu_driver" != "" ]; then
             echo "Unbinding GPU from $gpu_driver"
-            echo $gpu_bus >/sys/bus/pci/drivers/$gpu_driver/unbind
-            echo $audio_bus >/sys/bus/pci/drivers/$gpu_driver/unbind || true
+            write_sysfs "$gpu_bus" "/sys/bus/pci/drivers/$gpu_driver/unbind"
+            write_sysfs "$audio_bus" "/sys/bus/pci/drivers/$gpu_driver/unbind" || true
             sleep 5
         fi
 
         # Force removal, otherwise drivers may not recognize the device (especially if it comes back from windows)
         echo "Removing GPU and audio devices"
-        echo "1" > /sys/bus/pci/devices/$gpu_bus/remove || true
-        echo "1" > /sys/bus/pci/devices/$audio_bus/remove || true
+        write_sysfs "1" "/sys/bus/pci/devices/$gpu_bus/remove" || true
+        write_sysfs "1" "/sys/bus/pci/devices/$audio_bus/remove" || true
         sleep 5
 
         if [ "$to_driver" == "nvidia" ]; then
@@ -82,13 +87,13 @@ let
         fi
 
         echo "Rescanning PCI bus"
-        echo "1" > /sys/bus/pci/rescan
+        write_sysfs "1" "/sys/bus/pci/rescan"
 
         sleep 5
 
         echo "Binding GPU to $to_driver"
-        echo $gpu_bus >/sys/bus/pci/drivers/$to_driver/bind || true
-        echo $audio_bus >/sys/bus/pci/drivers/$to_driver/bind || true
+        write_sysfs "$gpu_bus" "/sys/bus/pci/drivers/$to_driver/bind" || true
+        write_sysfs "$audio_bus" "/sys/bus/pci/drivers/$to_driver/bind" || true
 
         sleep 5
     }
