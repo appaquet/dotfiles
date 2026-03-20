@@ -14,6 +14,10 @@ local function is_exomind_buffer(bufnr)
 	return path:find(exomind_dir, 1, true) ~= nil
 end
 
+local function in_exomind_repo()
+	return vim.fn.getcwd():find(exomind_dir, 1, true) ~= nil
+end
+
 -- Opens Exomind float if not already in Exomind. Optionally waits for LSP.
 local function ensure_exomind_context(wait_for_lsp)
 	if is_exomind_buffer() then
@@ -29,7 +33,7 @@ local function ensure_exomind_context(wait_for_lsp)
 	end
 
 	if wait_for_lsp then
-		vim.wait(2000, function()
+		vim.wait(5000, function()
 			return #vim.lsp.get_clients({ bufnr = 0, name = "markdown_oxide" }) > 0
 		end, 50)
 	end
@@ -187,7 +191,13 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 
 local function open_daily_with_hydrate(day_arg)
-	ensure_exomind_context(true)
+	if not in_exomind_repo() then
+		ensure_exomind_context(true)
+	else
+		vim.wait(5000, function()
+			return #vim.lsp.get_clients({ name = "markdown_oxide" }) > 0
+		end, 50)
+	end
 
 	-- One-shot autocmd to hydrate after the daily note buffer loads
 	local group = vim.api.nvim_create_augroup("ExomindDailyHydrate", { clear = true })
@@ -200,7 +210,14 @@ local function open_daily_with_hydrate(day_arg)
 		end,
 	})
 
-	vim.cmd("Daily " .. day_arg)
+	local clients = vim.lsp.get_clients({ name = "markdown_oxide" })
+	if #clients == 0 then
+		vim.notify("markdown_oxide LSP not ready - try again", vim.log.levels.WARN)
+		return
+	end
+	clients[1]:request("workspace/executeCommand",
+		{ command = "jump", arguments = { day_arg } },
+		nil, vim.api.nvim_get_current_buf())
 end
 
 -- Journal keymaps
