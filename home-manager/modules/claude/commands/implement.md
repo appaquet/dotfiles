@@ -48,4 +48,5 @@ After instructions & tasks loaded, you are free to 🚀 Engage thrusters
 
 9. 🔳 Run `/ctx-save` to update project and phase docs
 
-10. 🔳 Commit `jj` change with meaningful message if not already done
+10. 🔳 Commit / squash `jj` change with meaningful message if not already done
+       After checking state with `jj ls`

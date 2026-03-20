@@ -57,12 +57,15 @@
   * Sub-agent should communicate with user through AskUserQuestion tool if they need clarifications
 
   * Continuing an agent via follow-up message should be prioritized over creating a new agent since
-    it has the context of the previous work. Give agents a `name` when they may need follow-up
+    it has the context of the previous work. Give agents a `name` for readability, but use the
+    agent ID (not name) in `SendMessage({to: agentId})` to continue them
 
 * For sub-agents, pick right model for task to optimize speed & accuracy:
-  * haiku: shallow code exploration, code edits
-  * sonnet: straightforward code, complex code exploration, most tasks
-  * opus: planning, review comments research/planning, normal code
+  * haiku: shallow code exploration and reconnaissance, code edits
+  * sonnet: very straightforward code, simple code exploration, most tasks
+  * opus: planning, review comments research/planning, detailed code exploration, most code
+
+* Don't launch agent of teams unless I explicitly ask you to
 
 ## Task management
 

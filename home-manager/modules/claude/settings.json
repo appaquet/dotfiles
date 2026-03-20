@@ -268,5 +268,6 @@
   "promptSuggestionEnabled": false,
   "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": true,
-  "includeGitInstructions": false
+  "includeGitInstructions": false,
+  "teammateMode": "in-process"
 }
