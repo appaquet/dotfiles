@@ -24,7 +24,6 @@ in
       modules = [
         nixosOverlaysModule
         inputs.secrets.nixos.common
-        inputs.secrets.nixos.servapp
         ./servapp/configuration.nix
       ];
     };
