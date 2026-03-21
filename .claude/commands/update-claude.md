@@ -18,7 +18,7 @@ All of these steps must be done inside `overlays/claude-code` directory, except 
 
 2. Read `package-lock.json` around line 12 to find the new version number
 
-3. Update the `default.nix` file:
+3. Update the `default.nix` filem
    * Update the `version` field to the new version from step 2
    * Set `hash = "";` (empty string)
    * Set `npmDepsHash = "";` (empty string)
