@@ -13,7 +13,6 @@
     ../modules/network-bridge.nix
     ../modules/restic/backup.nix
     ../modules/ups/client.nix
-    ./adguardhome.nix
     ./hardware-configuration.nix
   ];
 

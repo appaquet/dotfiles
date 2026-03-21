@@ -56,6 +56,7 @@ in
           ];
         }
         inputs.secrets.nixos.common
+        inputs.secrets.nixos.piapp
         ./piapp/configuration.nix
       ];
     };

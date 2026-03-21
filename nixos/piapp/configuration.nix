@@ -8,6 +8,7 @@
     ../modules/common.nix
     ../modules/common-pi.nix
     ../modules/netconsole/receiver.nix
+    ./adguardhome.nix
   ];
 
   services.openssh.enable = true;
