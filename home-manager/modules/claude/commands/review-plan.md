@@ -31,6 +31,7 @@ They aren't left for future consideration nor to be ignored.
    - **Priority**: High (critical/security), Medium (important), Low (minor/stylistic)
    - **Effort**: Quick Win, Moderate, Extensive
    - **Dependencies**: Note order requirements
+   - **Validity**: If you believe a comment is invalid or debatable, explain why and let user decide
 
 5. 🔳 Check requirements
    - Verify fixes don't contradict existing requirements

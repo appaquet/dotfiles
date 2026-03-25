@@ -66,6 +66,8 @@
   * opus: planning, review comments research/planning, detailed code exploration, most code
 
 * Don't launch agent of teams unless I explicitly ask you to
+  When using teams, don't kill agents until we're certain that we're done with them and have
+  validated their work. We will resume them if we need to go back to them
 
 ## Task management
 
