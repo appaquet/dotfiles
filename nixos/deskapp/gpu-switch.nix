@@ -29,8 +29,25 @@ let
     }
 
     function write_sysfs() {
-        # Write to sysfs/procfs without clobbering stdout
-        echo "$1" | tee "$2" > /dev/null
+        # Subshell contains any fd clobbering; timeout prevents infinite spin
+        timeout 30 bash -c 'echo "$1" > "$2"' _ "$1" "$2"
+    }
+
+    function kill_nvidia_users() {
+        # Kill all processes using /dev/nvidia* (e.g. chromium on igpu still opens nvidiactl)
+        if ls /dev/nvidia* &>/dev/null; then
+            echo "Killing processes using /dev/nvidia*..."
+            ${pkgs.psmisc}/bin/fuser -k /dev/nvidia* 2>/dev/null || true
+            sleep 2
+            ${pkgs.psmisc}/bin/fuser -k -9 /dev/nvidia* 2>/dev/null || true
+            sleep 2
+
+            local remaining
+            remaining=$(${pkgs.psmisc}/bin/fuser /dev/nvidia* 2>/dev/null) || true
+            if [ -n "$remaining" ]; then
+                echo "WARNING: processes still using nvidia devices: $remaining"
+            fi
+        fi
     }
 
     function get_bus_driver() {
@@ -72,6 +89,7 @@ let
             sleep 5
         elif [ "$to_driver" == "vfio-pci" ]; then
             echo "Loading vfio drivers..."
+            kill_nvidia_users
             rmmod nvidia_drm # modprobe -r doesn't seem to always work... order is important
             rmmod nvidia_uvm
             rmmod nvidia_modeset
@@ -135,6 +153,8 @@ let
         # Leading to spammy errors in the logs. We don't need it while we're gaming anyway.
         systemctl stop nvidia-container-toolkit-cdi-generator.service
         systemctl stop docker.service
+
+        kill_nvidia_users
 
         switch_driver "vfio-pci"
     }
