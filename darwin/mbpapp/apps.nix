@@ -99,10 +99,10 @@
       }
 
       {
-        name = "synology-drive";
+        name = "moonlight";
       }
       {
-        name = "moonlight";
+        name = "syncthing-app";
       }
 
       {
