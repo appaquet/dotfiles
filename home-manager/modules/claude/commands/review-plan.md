@@ -26,6 +26,7 @@ They aren't left for future consideration nor to be ignored.
    - Read surrounding code to understand the issue
    - Check related files if change has broader impact
    - Identify dependencies between review items
+   - Identify if any comment is invalid or debatable
 
 4. 🔳 Categorize and prioritize
    - **Priority**: High (critical/security), Medium (important), Low (minor/stylistic)

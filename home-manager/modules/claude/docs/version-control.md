@@ -1,7 +1,7 @@
 # Version Control (Jujutsu)
 
 We are using `jj` (collocated with git), which is always detached head state
-Always call `jj ls` before any write operations to verify state is as expected
+HARD GATE: `jj ls` before ANY write operation (see State Verification)
 Never use `git`, unless absolutely necessary, and should only be done for read-only
 Never use `git stash`
 
@@ -39,8 +39,6 @@ Use `commit` after changes. Before starting new work, check if `@` is already em
 * `@` is empty → `jj describe -m "..."` (avoid `jj new` which creates an orphaned empty intermediate)
 * `@` has changes → `jj new -m "..."`
 
-Run `jj ls` before committing to verify changes are in expected place
-
 When to create changes:
 
 * Before starting implementation (after planning)
@@ -73,14 +71,17 @@ jj commit -m "feat(workspace): add collections API"
 
 ## State Verification
 
-Before any jj write operation, run `jj ls`:
+HARD GATE: Verify graph state with `jj ls` before ANY write command (`commit`, `new`,
+`describe`, `squash`, `abandon`, `restore`, `rebase`). Read the output — confirm `@`
+parent and working copy match expectations. State changes from your operations, user
+actions, or external tools at any time.
 
 * Expected: Clean working copy OR only changes you made in this session
-* Unexpected: Pre-existing changes, unknown modifications, conflicts
+* Shifted: Graph moved from previous operations or user actions — understand the new
+  state and adjust your command target accordingly
+* Unexpected: Unknown modifications, conflicts, unrecognized content
 
-If state is unexpected: STOP immediately
-
-* Do NOT attempt to fix — report what you found and ask for clarification
+If state is unexpected: STOP — do NOT attempt to fix, report and ask
 
 ## Dangerous Operations
 

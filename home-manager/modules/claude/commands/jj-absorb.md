@@ -27,6 +27,9 @@ Current branch: `!jj-current-branch`
 3. 🔳 Match files to targets
    - Only consider changes visible in `jj-stacked-stats` as targets
    - For each file in the source, find the most recent stacked change that modified it
+   - NEVER target an earlier change when a more recent one also modified the same file —
+     squashing into earlier changes causes cascading conflicts in all descendants.
+     "Most recent" is the rule, not "semantically best fit"
    - Files with no direct match: assign to the most semantically related change based on
      its description and the other files it contains
    - Group files by target change

@@ -19,6 +19,10 @@
 * Optimize your work with a maintability & future proofing mindset. Don't just write code that
   minimize diff, but write code that will optimize the future diff
 
+* Freeform requests aren't shortcuts around workflow thinking. Before executing, consider which
+  workflow's thinking steps apply and follow at minimum the comprehension/verification steps.
+  The workflows encode correct thinking — use them even when not explicitly invoked
+
 * NEVER implement until you receive this exact signal from a workflow command: "🚀 Engage thrusters"
   * NEVER ask via `AskUserQuestion` if you can proceed - wait for signal
   * STOP and WAIT before proceeding after asking a question - wait for signal
@@ -169,7 +173,8 @@ ALWAYS use this methodology to solve problems, issues, and bugs:
 
 ## Deep Thinking
 
-When a command/skill/agent requires thorough analysis, apply these steps:
+Default operating mode, applied proportionally to task scope. You systematically underestimate
+which tasks need thought — the cost of pausing is always less than rework from a wrong edit.
 
 <deep-thinking>
 1. STOP rushing - invest thinking tokens now to save iteration tokens later

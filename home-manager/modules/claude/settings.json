@@ -1,9 +1,163 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "alwaysThinkingEnabled": true,
+  "autoMemoryEnabled": false,
+  "effortLevel": "high",
+  "enabledPlugins": {
+    "plugin-dev@claude-plugins-official": true
+  },
   "env": {
     "DISABLE_AUTOUPDATER": "1"
   },
+  "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "command": "jq -r '.message' | xargs -I _ notify \"_\"",
+            "type": "command"
+          },
+          {
+            "command": "ccmon status",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "command": "claude-tmux-indicator permission PermissionRequest",
+            "type": "command"
+          },
+          {
+            "command": "ccmon status",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "claude-tmux-indicator on PostToolUse",
+            "type": "command"
+          },
+          {
+            "command": "ccmon status",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "hooks": [
+          {
+            "command": "$HOME/.claude/hooks/nono-hook.sh",
+            "type": "command"
+          }
+        ],
+        "matcher": "Read|Write|Edit|Bash"
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "command": "claude-tmux-indicator off SessionEnd",
+            "type": "command"
+          },
+          {
+            "command": "ccmon status",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "echo '{\"additionalContext\": \"COMPACTION JUST OCCURRED. You MUST run /ctx-load NOW before any other action to reload project context.\"}'",
+            "type": "command"
+          },
+          {
+            "command": "ccmon status",
+            "type": "command"
+          }
+        ],
+        "matcher": "compact"
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "command": "claude-tmux-indicator off Stop",
+            "type": "command"
+          },
+          {
+            "command": "ccmon status",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "StopFailure": [
+      {
+        "hooks": [
+          {
+            "command": "claude-tmux-indicator off StopFailure",
+            "type": "command"
+          },
+          {
+            "command": "ccmon status",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "command": "ccmon status",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "command": "claude-tmux-indicator on UserPromptSubmit",
+            "type": "command"
+          },
+          {
+            "command": "ccmon status",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ]
+  },
+  "includeGitInstructions": false,
   "permissions": {
+    "additionalDirectories": [
+      "~/dotfiles"
+    ],
     "allow": [
       "mcp__ide__getDiagnostics",
       "Bash(notify:*)",
@@ -104,170 +258,27 @@
       "Skill(mem-editing)",
       "Skill(proj-editing)"
     ],
-    "deny": [],
     "defaultMode": "acceptEdits",
-    "additionalDirectories": [
-      "~/dotfiles"
-    ]
+    "deny": []
   },
-  "hooks": {
-    "UserPromptSubmit": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "claude-tmux-indicator on UserPromptSubmit"
-          },
-          {
-            "type": "command",
-            "command": "ccmon status"
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "claude-tmux-indicator off Stop"
-          },
-          {
-            "type": "command",
-            "command": "ccmon status"
-          }
-        ]
-      }
-    ],
-    "StopFailure": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "claude-tmux-indicator off StopFailure"
-          },
-          {
-            "type": "command",
-            "command": "ccmon status"
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "claude-tmux-indicator off SessionEnd"
-          },
-          {
-            "type": "command",
-            "command": "ccmon status"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "claude-tmux-indicator on PostToolUse"
-          },
-          {
-            "type": "command",
-            "command": "ccmon status"
-          }
-        ]
-      }
-    ],
-    "PermissionRequest": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "claude-tmux-indicator permission PermissionRequest"
-          },
-          {
-            "type": "command",
-            "command": "ccmon status"
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "matcher": "compact",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo '{\"additionalContext\": \"COMPACTION JUST OCCURRED. You MUST run /ctx-load NOW before any other action to reload project context.\"}'"
-          },
-          {
-            "type": "command",
-            "command": "ccmon status"
-          }
-        ]
-      }
-    ],
-    "Notification": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "jq -r '.message' | xargs -I _ notify \"_\""
-          },
-          {
-            "type": "command",
-            "command": "ccmon status"
-          }
-        ]
-      }
-    ],
-    "SubagentStop": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "ccmon status"
-          }
-        ]
-      }
-    ]
-  },
-  "statusLine": {
-    "type": "command",
-    "command": "~/.claude/statusline.sh"
-  },
-  "enabledPlugins": {
-    "plugin-dev@claude-plugins-official": true
-  },
+  "promptSuggestionEnabled": false,
   "sandbox": {
-    "enabled": true,
     "autoAllowBashIfSandboxed": true,
-    "network": {
-      "allowUnixSockets": [
-        "/nix/var/nix/daemon-socket/socket"
-      ],
-      "allowLocalBinding": true
-    },
+    "enabled": true,
     "excludedCommands": [
       "nix"
-    ]
+    ],
+    "network": {
+      "allowLocalBinding": true,
+      "allowUnixSockets": [
+        "/nix/var/nix/daemon-socket/socket"
+      ]
+    }
   },
-  "alwaysThinkingEnabled": true,
-  "effortLevel": "high",
-  "promptSuggestionEnabled": false,
-  "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": true,
-  "includeGitInstructions": false,
+  "statusLine": {
+    "command": "~/.claude/statusline.sh",
+    "type": "command"
+  },
   "teammateMode": "in-process"
 }

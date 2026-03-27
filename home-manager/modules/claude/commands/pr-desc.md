@@ -1,8 +1,7 @@
 ---
 name: pr-desc
-context: fork
 description: Generate detailed changelog-style summary of branch changes
-model: haiku
+model: sonnet
 ---
 
 # PR Description
@@ -34,7 +33,10 @@ and branch diff to create multi-level breakdown.
        - **Removed**: Deleted files, deprecated features
      - Skip empty categories
     
-   - **High-level summary** (4-3 sentences):
-     - What was the main goal/accomplishment
-     - Key technical approach taken
+   - **Summary** (after per-component breakdown):
+     - 2-3 sentence paragraph: what the PR accomplishes, why, and any notable cross-cutting
+       technical detail (e.g., engine fixes that enable the feature)
+     - Followed by 3-5 thematic bullet lines: group by what was done (not by directory),
+       each 1-2 lines describing a logical change spanning multiple layers
+     - Use `human-writer` skill tone — no AI filler or superlatives
 
