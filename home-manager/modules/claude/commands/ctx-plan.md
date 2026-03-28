@@ -39,6 +39,7 @@ NEVER engage the native plan mode `EnterPlanMode`
      - If not possible to test, involve user at clear stages to validate work
      - Should be done iteratively, not just at the end as validation step
      - Never run blindly, always inform user if need way to validate
+   - Make sure you list/understand/ask for requirements and acceptance criterion
    - Use `AskUserQuestion` to clarify as you discover uncertainties
 
 5. 🔳 Report 10/10 understanding via `full-understanding-checklist`
