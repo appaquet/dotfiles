@@ -10,7 +10,6 @@
     ../modules/dev.nix
     ../modules/docker.nix
     ../modules/dotblip.nix
-    ../modules/nasapp.nix
     ../modules/netconsole/sender.nix
     ../modules/network-bridge.nix
     ../modules/restic/backup.nix
@@ -98,14 +97,6 @@
   environment.systemPackages = with pkgs; [
     chromium
   ];
-
-  sops.secrets.nasapp_cifs.sopsFile = config.sops.secretsFiles.home;
-  nasapp = {
-    enable = true;
-    credentials = config.sops.secrets.nasapp_cifs.path;
-    uid = "appaquet";
-    gid = "users";
-  };
 
   restic-backup = {
     enable = true;
