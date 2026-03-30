@@ -1,4 +1,9 @@
-{ config, pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
 {
   imports = [
@@ -26,7 +31,7 @@
       exclude = [
         "Applications"
         "Library"
-        "DocumentsApp"
+        "documents_app" # Syncthing
         "Documents" # On iCloud, nothing important
         "Desktop" # On iCloud, nothing important
       ];

@@ -50,7 +50,7 @@
       };
 
       screencapture = {
-        location = "~/DocumentsApp/Screenshots/";
+        location = "~/documents_app/Screenshots/";
         type = "png";
       };
 
