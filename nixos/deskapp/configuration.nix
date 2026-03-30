@@ -106,16 +106,6 @@
       paths = [ "/home/appaquet" ];
       schedule = "*:0/30";
     };
-
-    backups.vms = {
-      paths = [
-        "/mnt/secondary/vms"
-      ];
-      schedule = "weekly";
-      pruneOpts = [
-        "--keep-weekly 4"
-      ];
-    };
   };
 
   dotblip = {
@@ -124,7 +114,6 @@
         enable = true;
         localBackups = [
           "home"
-          "vms"
         ];
         interval = 3600;
       };
