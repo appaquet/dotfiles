@@ -4,6 +4,7 @@
   imports = [
     ./modules/base.nix
     ./modules/dev.nix
+    ./modules/claude
   ];
 
   dotfiles.neovim.full = true;
