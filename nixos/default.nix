@@ -25,6 +25,7 @@ in
         nixosOverlaysModule
         inputs.secrets.nixos.common
         inputs.secrets.nixos.servapp
+        inputs.disko.nixosModules.disko
         ./servapp/configuration.nix
       ];
     };

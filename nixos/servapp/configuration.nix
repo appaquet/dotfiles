@@ -5,21 +5,24 @@
 
 {
   imports = [
+    ./backups.nix
+    ./media.nix
+    ./hardware-configuration.nix
     ../modules/common.nix
     ../modules/dev.nix
     ../modules/docker.nix
     ../modules/dotblip.nix
-    ../modules/nasapp.nix
     ../modules/network-bridge.nix
     ../modules/restic/backup.nix
+    ../modules/restic/server.nix
     ../modules/ups/client.nix
-    ./hardware-configuration.nix
   ];
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "servapp";
+  networking.hostId = "93ce7521";
 
   # Networking
   networking.myBridge = {
@@ -35,29 +38,59 @@
     extraUpFlags = [ "--advertise-exit-node" ];
   };
 
-  sops.secrets.nasapp_cifs.sopsFile = config.sops.secretsFiles.home;
+  users = {
+    users = {
+      chloe = {
+        isSystemUser = true;
+        group = "users";
+      };
 
-  # NasAPP mounts
-  nasapp = {
-    enable = true;
-    credentials = config.sops.secrets.nasapp_cifs.path;
-    uid = "appaquet";
-    gid = "users";
-    shares = [
-      {
-        share = "video";
-        mount = "/mnt/video";
-      }
-    ];
+      homeassistant = {
+        isSystemUser = true;
+        group = "users";
+      };
+
+      andre = {
+        isSystemUser = true;
+        group = "users";
+      };
+    };
+
+    groups = {
+      media.members = [
+        "appaquet"
+        "chloe"
+      ];
+
+      photos.members = [
+        "appaquet"
+        "immich"
+        "chloe"
+      ];
+
+      videos.members = [
+        "appaquet"
+        "chloe"
+      ];
+    };
   };
 
-  restic-backup = {
+  services.syncthing = {
     enable = true;
-    sopsFile = config.sops.secretsFiles.home;
+    user = "appaquet";
+    group = "users";
+    dataDir = "/home/appaquet";
+    guiAddress = "100.100.243.45:8384";
 
-    backups.home = {
-      paths = [ "/home/appaquet" ];
-      schedule = "daily";
+    overrideDevices = false;
+    overrideFolders = false;
+
+    # tailscale-only, no global/local announce
+    settings.options = {
+      globalAnnounceEnabled = false;
+      localAnnounceEnabled = false;
+      relaysEnabled = false;
+      natEnabled = false;
     };
   };
 

@@ -34,7 +34,7 @@
     isNormalUser = true;
     shell = pkgs.fish;
     description = "appaquet";
-    initialPassword = "carpediem";
+    initialHashedPassword = "$6$uSbRbP1Opxd.KZpA$X1E0fu4Jz7wTdIKgie4XvoeavFRSShUT6qCmlPJt02nxDdmLlc2BPGetuPwxmRWxzq1u5UkLde6A99eQQ00Gu1";
 
     homeMode = "0755"; # virt access to var files
 
@@ -83,6 +83,7 @@
     curl
     git
     neovim
+    disko
   ];
 
   # Some programs (ex: Go) expects /etc/mime.types

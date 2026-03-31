@@ -61,6 +61,7 @@ let
           -v ${config.home.homeDirectory}:${config.home.homeDirectory} \
           -v /nix:/nix \
           -v /mnt:/mnt \
+          -v /data:/data \
           -v /run:/run \
           -e OPENVPN_PROVIDER=NORDVPN \
           -e OPENVPN_USERNAME="$OPENVPN_USERNAME" \
