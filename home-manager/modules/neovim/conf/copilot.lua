@@ -25,7 +25,7 @@ require("copilot").setup({
 	copilot_model = "",
 
 	nes = {
-		enabled = true,
+		enabled = false,
 		keymap = {
 			accept_and_goto = "<M-n>",
 			accept = false,
