@@ -101,6 +101,8 @@ Requirements define WHAT to build. Acceptance criteria (ACs) on tasks define DON
 * Update existing rather than create parallel ones
 * All requirements go in ONE section (never create separate scope sections)
 * Group related requirements logically when helpful (e.g., "API Operations", "Data Model")
+* For multi-input or multi-platform features, consider a coverage matrix (feature x input/platform
+  table). Empty cells are untested assumptions
 
 ### Questions & Investigations (optional)
 
@@ -204,6 +206,8 @@ Flat checkmark list of work items
 * `[ ] Implement X (R1, R2.1)` - reference requirements
   - `AC: specific verifiable condition` - acceptance criteria sub-items
   - Each AC maps to a test assertion. Task done = all ACs pass
+  - Write ACs so someone unfamiliar with the implementation could verify them.
+    If verification requires reading the code, the AC is too implementation-specific
 </task-format>
 
 <task-progress-rules>

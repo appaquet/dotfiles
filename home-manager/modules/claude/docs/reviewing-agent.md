@@ -25,6 +25,8 @@ Shared infrastructure for code review agents. All review agents follow this work
 5. 🔳 Load changed files
    - Run `jj-diff-branch --stat` to list modified files
      - Exclude reviewing docs themselves and generated files (e.g., *.pb.go)
+   - For safety-critical patterns (exposed secrets, hardcoded credentials, debug statements),
+     supplement LLM judgment with deterministic Grep-based checks across changed files
    - For each file to be reviewed:
      - Load diff: `jj-diff-branch --git <file>`
      - Load surrounding context if needed to understand changes
@@ -53,6 +55,8 @@ Shared infrastructure for code review agents. All review agents follow this work
    - Every reported issue MUST have a corresponding comment in the code
 
 9. 🔳 Return summary in one SINGLE LAST message
+   - Review independently — do not soften findings. If you find no issues in your domain,
+     state what you examined rather than defaulting to praise
    - Overall assessment to parent agent
    - If issues found: list each as `file:line - brief description` (comment text is in the code)
    - If no issues: explain what was examined
