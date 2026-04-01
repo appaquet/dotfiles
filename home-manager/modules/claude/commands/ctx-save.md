@@ -24,6 +24,7 @@ Project files: !`claude-proj-docs`
 4. 🔳 Update current phase doc(s):
    * Tasks: mark completed `[x]`, add new tasks discovered
      * If all done, confirmed via `AskUserQuestion`, update phase in next step
+   * Capture unresolved uncertainties and completed investigations in Questions & Investigations section
    * Files: update with changes
      * Use `branch-diff-summarizer` agent if needed not aware of files or may be missing some from
        your context)
@@ -36,7 +37,7 @@ Project files: !`claude-proj-docs`
    * Requirements
      * Read current requirements carefully
      * Update or add new ones if needed based on work done
-   * Questions
+   * Questions & Investigations
      * Add resolved questions if any
      * Add new questions if arose during work
    * Phases

@@ -39,8 +39,10 @@ NEVER engage the native plan mode `EnterPlanMode`
      - If not possible to test, involve user at clear stages to validate work
      - Should be done iteratively, not just at the end as validation step
      - Never run blindly, always inform user if need way to validate
-   - Make sure you list/understand/ask for requirements and acceptance criterion
+   - List/understand/ask for requirements and acceptance criteria
+   - Define ACs per task during planning — each AC is a specific verifiable condition that maps to a test assertion
    - Use `AskUserQuestion` to clarify as you discover uncertainties
+   - Persist all planning decisions and investigation outcomes to project/phase doc Questions & Investigations — conversation context is ephemeral
 
 5. 🔳 Report 10/10 understanding via `full-understanding-checklist`
    - If not 10/10, suggest `/ctx-improve` to improve further more

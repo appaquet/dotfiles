@@ -49,7 +49,9 @@ Insert via the Edit tool using this exact format:
 * No scope creep (unrequested features)
 * Changes align with project context and goals
 * Constraints and boundaries respected
-* Acceptance criteria (if documented) met
+* ACs (if documented) met
+* Verify tasks have AC sub-items that define done — flag tasks missing ACs
+* Each AC should be a specific verifiable condition, not a vague description
 * Completed tasks have corresponding implementation
 * Requirement status markers match linked phase status
 </requirements-reviewer-guidelines>

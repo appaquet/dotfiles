@@ -33,6 +33,7 @@ Current project files: !`claude-proj-docs`
    - Flag overlapping requirements as potential conflicts
    - Phase doc requirements must derive from parent R-numbers (e.g., `R5.A:` not `R1:`)
    - Project doc references phase doc when phase expands requirements
+   - Tasks without AC sub-items: warn if tasks lack acceptance criteria
 
 6. 🔳 Check completable items
    - Flag phases where all tasks `[x]` but phase still 🔄

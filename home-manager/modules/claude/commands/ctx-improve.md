@@ -36,6 +36,7 @@ Important: any modifications to project or phase docs need to be done via `proj-
 5. 🔳 Update project doc
    - If working on a planned task, update with new context
    - Add/update requirements as R-numbered items (R1, R2, R1.1) for task traceability
+   - Add ACs to tasks: specific verifiable conditions that define done per task
    - Requirements describe behavior (WHAT), not implementation (HOW)
 
 6. Report 10/10 understanding achieved. User decides next action (may run /implement, /ctx-plan, or give direction).

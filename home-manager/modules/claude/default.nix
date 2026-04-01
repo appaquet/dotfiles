@@ -48,6 +48,7 @@ let
     export DISABLE_NON_ESSENTIAL_MODEL_CALLS=""
     export DISABLE_TELEMETRY=""
     export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+    export CLAUDE_CODE_NO_FLICKER=1
 
     ${claude-code}/bin/claude "$@"
   '';

@@ -38,6 +38,9 @@ Unless project instructions specify otherwise:
   * Created with project doc (first phase) or via `/proj-split` (additional phases)
   * Propose creation via `AskUserQuestion` when phase scope justifies it
 
+* Persist decisions immediately: any decision, insight, or user clarification captured in docs on
+  discovery — never rely on conversation as durable storage. Follow a SR&ED style of documentation
+
 ## Project Doc (00-XYZ.md)
 
 Overview and navigation. Requirements live here. Tasks do NOT
@@ -49,7 +52,7 @@ Keep in order. Never reorder, rename, or create more sections
 * Context - Purpose and scope
 * Checkpoint - Resume point, updated by /ctx-save
 * Requirements - R-numbered, behavior-focused (WHAT not HOW)
-* Questions (optional) - Pending or resolved Q&A
+* Questions & Investigations (optional) - Decisions, uncertainties, investigation records
 * Inbox (optional) - Unprocessed feedback, bugs, ideas
 * Phases - List of phase references (NOT task items)
 * Files - All modified files across all phases
@@ -70,6 +73,8 @@ Requirements describe WHAT (observable behavior), not HOW (implementation):
 * Good: "Tasks only run on workers with matching library versions"
 * Bad: "Workers report versions at registration time" (implementation detail)
 * Test: Can this be verified without reading the code?
+
+Requirements define WHAT to build. Acceptance criteria (ACs) on tasks define DONE — specific verifiable conditions per task
 
 **Format:**
 
@@ -97,9 +102,18 @@ Requirements describe WHAT (observable behavior), not HOW (implementation):
 * All requirements go in ONE section (never create separate scope sections)
 * Group related requirements logically when helpful (e.g., "API Operations", "Data Model")
 
-### Questions (optional)
+### Questions & Investigations (optional)
 
-Checklist of questions/answers to resolve. Thorough coverage of uncertainties with answers
+Checklist of questions, decisions, and investigation records. Capture uncertainties when encountered, outcomes when discovered. Update continuously — conversation context is ephemeral, docs are durable
+
+Format:
+```markdown
+* [x] Q: Can we use X for Y?
+  * Uncertainty: Unknown if X supports concurrent Z
+  * Tried: Prototype with X — hit limitation W
+  * Result: Switched to V, handles concurrency natively
+* [ ] Q: Will approach A scale to N?
+```
 
 ### Inbox (optional)
 
@@ -158,7 +172,7 @@ Keep in order. Never reorder, rename, or create more sections
 
 * Context - Brief, references project doc
 * Requirements (optional) - Only if expanding parent R-numbers (R5.A, R5.B)
-* Questions (optional) - Phase-specific Q&A
+* Questions & Investigations (optional) - Phase-specific questions, decisions, investigations
 * Tasks - All `[ ]`, `[~]`, `[x]` items
 * Files - Files relevant to this phase
 
@@ -175,9 +189,9 @@ Only needed when expanding project doc requirements with phase-specific details:
 * **No section needed**: If only implementing project doc requirements, reference in tasks directly
   (e.g., `[ ] Implement X (R5)`)
 
-### Questions (optional)
+### Questions & Investigations (optional)
 
-Phase-specific Q&A checklist
+Phase-specific questions, decisions, and investigation records. Same format as project doc Questions & Investigations
 
 ### Tasks
 
@@ -188,6 +202,8 @@ Flat checkmark list of work items
 * `[~]` in progress
 * `[x]` complete
 * `[ ] Implement X (R1, R2.1)` - reference requirements
+  - `AC: specific verifiable condition` - acceptance criteria sub-items
+  - Each AC maps to a test assertion. Task done = all ACs pass
 </task-format>
 
 <task-progress-rules>
@@ -197,6 +213,7 @@ Flat checkmark list of work items
 * Claude NEVER marks requirements ✅ → use `AskUserQuestion` (user decides acceptance)
 * Each item = discrete, independent work unit
 * Never remove useful info from completed tasks
+* A task without ACs is a task without a definition of done — add ACs during planning
 </task-progress-rules>
 
 ### Files

@@ -64,6 +64,10 @@
     it has the context of the previous work. Give agents a `name` for readability, but use the
     agent ID (not name) in `SendMessage({to: agentId})` to continue them
 
+  * Sub-agents read project/phase docs before starting work if they exist
+    When user provides a decision or insight mid-work: persist to docs first, then continue
+    Conversation context is ephemeral, docs are source of truth
+
 * For sub-agents, pick right model for task to optimize speed & accuracy:
   * haiku: shallow code exploration and reconnaissance, code edits
   * sonnet: very straightforward code, simple code exploration, most tasks
@@ -157,7 +161,7 @@ Always report on understanding at any decision point - verbalize WHAT you unders
 * [ ] List existing functions/classes: [name them]
 * [ ] Have test strategy used to iterate: [describe approach]
 * [ ] Know which files to modify: [list files]
-* [ ] Know success criteria: [state criteria]
+* [ ] Know success criteria / ACs: [state acceptance criteria per task]
 </full-understanding-checklist>
 
 ## Problem Solving
@@ -169,6 +173,7 @@ ALWAYS use this methodology to solve problems, issues, and bugs:
 2. Fix root cause, not symptom. Generic solution over specific case and bespoke fixes
 3. Ask user before destructive changes
 4. Test bugs: verify new test catches issue or update existing test to catch it
+5. Document investigation: capture uncertainty, what was tried, what was learned in phase doc Questions & Investigations
 </problem-solving-checklist>
 
 ## Deep Thinking

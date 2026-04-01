@@ -36,10 +36,12 @@ After instructions & tasks loaded, you are free to 🚀 Engage thrusters
    - Follow `code-insert-checklist` before modifying code
    - Update documentation if existing:
      - Mark phase doc task `[~]` when starting, `[x]` when done
-       Like `task-format` dictates. Done = tested working
+       Like `task-format` dictates. Done = all ACs pass and tested working
      - Add new tasks discovered to phase doc
      - Note critical decisions
+     - Before marking task done: verify each AC sub-item passes
    - If deviating or overcomplicating, STOP and update user
+   - If any decisions or discoveries, update project/phase doc
 
 7. 🔳 Validate via `development-completion-checklist`
    - State each item aloud, confirm compliance

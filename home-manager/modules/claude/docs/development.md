@@ -12,6 +12,9 @@
 * Verify understanding checklist before starting (see CLAUDE.md)
 * Iterate: add functions/structures/TODOs before implementation
 * Follow existing patterns, use existing libraries
+* Follow a SR&ED documentation style. Persist new uncertainties, hypothesis, decisions, insights,
+  failed approaches to phase doc Questions & Investigations immediately — docs are the single source
+  of truth, not conversation context
 * Optimize for the target codebase, not minimal diff. When told to build X, build X — don't
   build a half-measure Y because it's smaller or safer. Half-measures cost more total effort
 * Write simple, non-overlapping tests (test golden path, not exhaustively)
@@ -49,8 +52,9 @@ STEP IMPLEMENTATION as soon as any of these triggers occur:
 Before marking the development as completed, ensure to follow this checklist:
 
 <development-completion-checklist>
-* [ ] Initial plan/requirements/TODOs addressed
+* [ ] Initial plan/requirements/ACs/TODOs addressed
 * [ ] Tests are added/updated and passing
+* [ ] All task ACs verified passing
 * [ ] Diff reviewed (`jj-diff-working --git`)
 * [ ] Temporary debug files/code removed
 * [ ] Code style guidelines followed
