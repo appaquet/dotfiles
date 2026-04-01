@@ -15,7 +15,11 @@ let
         ''
           [target.x86_64-unknown-linux-gnu]
           linker = "clang"
-          rustflags = ["-Clink-arg=-fuse-ld=${pkgs.mold}/bin/mold", "-Clink-arg=-Wl,--no-rosegment"]
+          rustflags = [
+            "-Clink-arg=-fuse-ld=${pkgs.mold}/bin/mold", 
+            "-Clink-arg=-Wl,--no-rosegment",
+            "-Clink-arg=-flto"
+          ]
         ''
       else
         ""
