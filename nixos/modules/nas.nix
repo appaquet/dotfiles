@@ -6,14 +6,17 @@
 }:
 
 let
-  nasappIp = "192.168.0.20";
-
   modOptions = {
-    nasapp = {
+    nas = {
       enable = lib.mkOption {
         type = lib.types.bool;
         default = false;
-        description = "Enable NasAPP mounts";
+        description = "Enable NAS CIFS mounts";
+      };
+
+      ip = lib.mkOption {
+        type = lib.types.str;
+        description = "NAS IP address";
       };
 
       shares = lib.mkOption {
@@ -82,7 +85,7 @@ let
       gid,
     }:
     {
-      device = "//${nasappIp}/${share}";
+      device = "//${config.nas.ip}/${share}";
       fsType = "cifs";
       options =
         let
@@ -111,7 +114,7 @@ in
 {
   options = modOptions;
 
-  config = lib.mkIf config.nasapp.enable {
+  config = lib.mkIf config.nas.enable {
     environment.systemPackages = [
       pkgs.cifs-utils
     ];
@@ -120,11 +123,11 @@ in
       map (shareOpt: {
         "${shareOpt.mount}" = mkMount {
           share = shareOpt.share;
-          credentials = orDefault shareOpt.credentials config.nasapp.credentials;
-          uid = orDefault shareOpt.uid config.nasapp.uid;
-          gid = orDefault shareOpt.gid config.nasapp.gid;
+          credentials = orDefault shareOpt.credentials config.nas.credentials;
+          uid = orDefault shareOpt.uid config.nas.uid;
+          gid = orDefault shareOpt.gid config.nas.gid;
         };
-      }) config.nasapp.shares
+      }) config.nas.shares
     );
   };
 }
