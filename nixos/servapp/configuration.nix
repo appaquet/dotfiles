@@ -6,6 +6,8 @@
   imports = [
     ./backups.nix
     ./media.nix
+    ./datasets.nix
+    ./samba.nix
     ./hardware-configuration.nix
     ../modules/common.nix
     ../modules/dev.nix

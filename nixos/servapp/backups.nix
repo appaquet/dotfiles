@@ -1,7 +1,12 @@
 {
   config,
+  lib,
   ...
 }:
+
+let
+  syncoidDatasets = lib.attrNames (lib.filterAttrs (_: ds: ds.vps_backup) config.nas.datasets);
+in
 
 {
   services.sanoid = {
@@ -16,6 +21,30 @@
       yearly = 0;
       recursive = true;
     };
+  };
+
+  sops.secrets."syncoid/ssh_key" = {
+    sopsFile = config.sops.secretsFiles.servapp;
+    owner = "root";
+    mode = "0400";
+  };
+
+  services.syncoid = {
+    enable = true;
+    user = "root";
+    interval = "*-*-* 03:00:00";
+    sshKey = config.sops.secrets."syncoid/ssh_key".path;
+    commonArgs = [ "--no-sync-snap" ];
+    commands = lib.genAttrs syncoidDatasets (ds: {
+      source = "tank1/${ds}";
+      target = "root@vps.n3x.net:datapool/backup-servapp/${ds}";
+      sendOptions = "w";
+      extraArgs = [
+        "--sshport=22222"
+        "--sshoption=StrictHostKeyChecking=off"
+        "--sshoption=UserKnownHostsFile=/dev/null"
+      ];
+    });
   };
 
   restic-backup = {

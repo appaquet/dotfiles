@@ -6,7 +6,6 @@
   imports = [
     ../modules/common.nix
     ../modules/dotblip.nix
-    ../modules/restic/server.nix
     ./disk-config.nix
     ./hardware-configuration.nix
   ];
@@ -58,25 +57,22 @@
       yearly = 0;
       recursive = true;
     };
-  };
 
-  restic-server = {
-    enable = true;
-    dataDir = "/data/restic";
-    sopsFile = config.sops.secretsFiles.vps;
-  };
-
-  dotblip = {
-    reporters = {
-      restic = {
-        enable = true;
-        directoryBackups = [
-          { root = "/data/restic/nasapp"; }
-        ];
-        interval = 3600;
-      };
+    # zfs sent snapshots from servapp
+    datasets."datapool/backup-servapp" = {
+      autosnap = false;
+      autoprune = true;
+      daily = 30;
+      monthly = 3;
+      yearly = 0;
+      hourly = 0;
+      recursive = true;
     };
   };
+
+  users.users.root.openssh.authorizedKeys.keys = [
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICAnTd9pnNTuLtfjQyQ1mRNEjH5e7zoMceHlAx19I9Zu syncoid@servapp"
+  ];
 
   system.stateVersion = "25.11";
 }
