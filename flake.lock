@@ -83,11 +83,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1773841206,
-        "narHash": "sha256-loQbz1NXqn8V3Njk+u8gASiJLqNLCB4Rqsv2g3W8Vzo=",
+        "lastModified": 1775151875,
+        "narHash": "sha256-g4gojdnrOJoeFkzD+P56BIejqro9wFSmXjwvfTTgwhg=",
         "owner": "appaquet",
         "repo": "ccmon",
-        "rev": "317bd6d88cff9d2a98185d94917512821db43780",
+        "rev": "607b00930fe6b0c5392489e9e9c23f41f5a3dbba",
         "type": "github"
       },
       "original": {

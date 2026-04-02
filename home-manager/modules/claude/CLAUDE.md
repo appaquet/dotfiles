@@ -73,7 +73,8 @@
   * sonnet: very straightforward code, simple code exploration, most tasks
   * opus: planning, review comments research/planning, detailed code exploration, most code
 
-* Don't launch agent of teams unless I explicitly ask you to
+* For any workflow that requires multiple steps, synchronization or communication between agents,
+  use a team of agent (`TeamCreate`) instead of individual agents
   When using teams, don't kill agents until we're certain that we're done with them and have
   validated their work. We will resume them if we need to go back to them
 

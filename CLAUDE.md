@@ -27,6 +27,7 @@ For quick iteration, use `check` first (fast eval) before `build`.
 
 Source: `home-manager/modules/claude/{..}` (symlinked to `~/.claude/{...}`).
 Editing either location modifies the same files.
+Prioritize editing in this repo since I may need to approve changes in `~/.claude/`
 
 ### Components
 
