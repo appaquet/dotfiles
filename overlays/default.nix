@@ -7,6 +7,7 @@ let
     in
     {
       exo = final.callPackage ./exo { };
+      macpow = final.callPackage ./macpow { };
 
       fzf-nix = inputs.fzf-nix.packages.${system}.fzf-nix;
 
