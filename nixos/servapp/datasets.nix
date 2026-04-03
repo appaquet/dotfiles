@@ -9,6 +9,11 @@
             default = false;
           };
 
+          offline_backup = lib.mkOption {
+            type = lib.types.bool;
+            default = false;
+          };
+
           samba = {
             enable = lib.mkOption {
               type = lib.types.bool;

@@ -29,10 +29,10 @@
 
   services.openssh = {
     enable = true;
+    openFirewall = false;
     ports = [ 22222 ];
     settings.PasswordAuthentication = false;
   };
-  networking.firewall.allowedTCPPorts = [ 22222 ];
 
   boot.supportedFilesystems = [ "zfs" ];
   boot.zfs.extraPools = [ "datapool" ];

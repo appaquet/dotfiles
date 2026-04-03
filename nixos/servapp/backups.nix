@@ -1,11 +1,13 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 
 let
   syncoidDatasets = lib.attrNames (lib.filterAttrs (_: ds: ds.vps_backup) config.nas.datasets);
+  offlineDatasets = lib.attrNames (lib.filterAttrs (_: ds: ds.offline_backup) config.nas.datasets);
 in
 
 {
@@ -45,6 +47,15 @@ in
         "--sshoption=UserKnownHostsFile=/dev/null"
       ];
     });
+  };
+
+  systemd.services.offline-backup = {
+    description = "Sync ZFS datasets to offline backup pool";
+    path = [ pkgs.sanoid pkgs.zfs ];
+    serviceConfig = {
+      Type = "oneshot";
+    };
+    script = lib.concatMapStringsSep "\n" (ds: "syncoid --no-sync-snap tank1/${ds} offline/${ds}") offlineDatasets;
   };
 
   restic-backup = {
