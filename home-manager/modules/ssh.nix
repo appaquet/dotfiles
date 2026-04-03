@@ -43,6 +43,14 @@
         ];
       };
 
+      "exapp.n3x.net" = {
+        forwardAgent = true;
+        identityFile = [
+          "~/.ssh/ssh_1pw.pub"
+          config.sops.secrets."ssh/ssh_breakglass".path
+        ];
+      };
+
       "piapp.n3x.net" = {
         forwardAgent = true;
         identityFile = [

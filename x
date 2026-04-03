@@ -53,7 +53,12 @@ host_config_mbpapp() {
   OS_TYPE="darwin"
 }
 
-ALL_HOSTS=(deskapp servapp utm piapp piprint piups vps mbpapp)
+host_config_exapp() {
+  HOME_CONFIG="appaquet@exapp"
+  OS_TYPE="darwin"
+}
+
+ALL_HOSTS=(deskapp servapp utm piapp piprint piups vps mbpapp exapp)
 
 # Core helper functions
 resolve_host() {

@@ -16,6 +16,7 @@ in
     "appaquet@deskapp" = mkHomeConfig "x86_64-linux" ./deskapp.nix;
     "appaquet@servapp" = mkHomeConfig "x86_64-linux" ./servapp.nix;
     "appaquet@mbpapp" = mkHomeConfig "aarch64-darwin" ./mbpapp.nix;
+    "appaquet@exapp" = mkHomeConfig "aarch64-darwin" ./exapp.nix;
     "appaquet@utm" = mkHomeConfig "aarch64-linux" ./utm.nix;
     "appaquet@piapp" = mkHomeConfig "aarch64-linux" ./piapp.nix;
     "appaquet@piprint" = mkHomeConfig "aarch64-linux" ./piprint.nix;

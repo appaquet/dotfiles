@@ -39,19 +39,17 @@
       finder = {
         AppleShowAllExtensions = true; # show all file extensions
         FXEnableExtensionChangeWarning = false; # disable warning when changing file extension
+        FXPreferredViewStyle = "clmv"; # use column view by default
+        FXDefaultSearchScope = "SCcf"; # search the current folder by default
         QuitMenuItem = true; # enable quit menu item
         ShowPathbar = true; # show path bar
         ShowStatusBar = true; # show status bar
+        FXRemoveOldTrashItems = true; # clear trash after 30 days
       };
 
       trackpad = {
         Clicking = true; # enable tap to click
         TrackpadRightClick = true; # enable two finger right click
-      };
-
-      screencapture = {
-        location = "~/documents_app/Screenshots/";
-        type = "png";
       };
 
       # Customize settings that not supported by nix-darwin directly
@@ -61,6 +59,10 @@
       NSGlobalDomain = {
         AppleInterfaceStyle = "Dark";
         AppleInterfaceStyleSwitchesAutomatically = false; # don't switch automatically
+
+        # Reduce menu bar items spacing & padding
+        NSStatusItemSpacing = 2;
+        NSStatusItemSelectionPadding = 2;
 
         # Finder
         AppleShowAllExtensions = true; # show all file extensions
