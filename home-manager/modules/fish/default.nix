@@ -147,6 +147,10 @@
         format = "[$user]($styte)[@](fg:#808080)";
       };
 
+      battery = {
+        disabled = true;
+      };
+
       hostname = {
         ssh_only = false;
         style = "white";
