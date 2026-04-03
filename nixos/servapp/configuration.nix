@@ -7,6 +7,7 @@
     ./backups.nix
     ./media.nix
     ./datasets.nix
+    ./monitoring.nix
     ./samba.nix
     ./hardware-configuration.nix
     ../modules/common.nix
@@ -61,6 +62,7 @@
       media.members = [
         "appaquet"
         "chloe"
+        "andre"
       ];
 
       photos.members = [
@@ -72,6 +74,7 @@
       videos.members = [
         "appaquet"
         "chloe"
+        "andre"
       ];
     };
   };
