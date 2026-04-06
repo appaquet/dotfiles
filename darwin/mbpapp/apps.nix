@@ -17,6 +17,8 @@
       "rtl-sdr"
       "libbladerf"
       "codec2"
+
+      "xcodegen"
     ];
 
     casks = [
