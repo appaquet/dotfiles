@@ -46,6 +46,13 @@
     };
   };
 
+  dotblip = {
+    reporters.zfs = {
+      enable = true;
+      pools = [ "datapool" ];
+    };
+  };
+
   services.sanoid = {
     enable = true;
     datasets."datapool" = {

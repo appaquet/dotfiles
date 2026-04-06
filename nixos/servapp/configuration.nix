@@ -106,6 +106,10 @@
         localBackups = [ "home" ];
         interval = 3600;
       };
+      zfs = {
+        enable = true;
+        pools = [ "tank1" ];
+      };
     };
   };
 
