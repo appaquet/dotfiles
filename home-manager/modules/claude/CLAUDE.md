@@ -70,6 +70,10 @@
     When user provides a decision or insight mid-work: persist to docs first, then continue
     Conversation context is ephemeral, docs are source of truth
 
+  * If you're having a sub-agent do project documentation work, have it write to the file directly
+    instead of returning the content to you to write to prevent unnecessary back-and-forth and
+    preserve context. Have it return the modified file list so you can read them for validation
+
 * For sub-agents, pick right model for task to optimize speed & accuracy:
   * haiku: shallow code exploration and reconnaissance, code edits
   * sonnet: very straightforward code, simple code exploration, most tasks
