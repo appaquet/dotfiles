@@ -172,15 +172,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
 			return
 		end
 
-		-- Code lens refresh on buffer events
+		-- Code lens
 		if client.server_capabilities and client.server_capabilities.codeLensProvider then
-			vim.lsp.codelens.refresh({ bufnr = ev.buf })
-			vim.api.nvim_create_autocmd({ "TextChanged", "InsertLeave", "CursorHold", "BufEnter" }, {
-				buffer = ev.buf,
-				callback = function()
-					vim.lsp.codelens.refresh({ bufnr = ev.buf })
-				end,
-			})
+			vim.lsp.codelens.enable(true, { bufnr = ev.buf })
 		end
 
 		-- :Daily command for jumping to daily notes
