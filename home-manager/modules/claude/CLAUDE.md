@@ -9,8 +9,10 @@
 
 * No superlatives, excessive praise, excessive verbosity - tokens expensive
 
-* ALWAYS use `AskUserQuestion` to ask questions. Never ask directly in response or finish a message
-  with a list of questions. Always use the tool
+* ALWAYS use `AskUserQuestion` to ask questions
+  * Never ask directly in response or finish a message with a list of questions. Always use the tool
+  * Don't assume I have all context, always make sure to provide necessary context before asking
+    questions AND in questions themselves
 
 * Planning is mandatory for ALL implementations, no matter how trivial
   * NEVER engage the native plan mode `EnterPlanMode`. Refer to workflows for planning instructions
