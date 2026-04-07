@@ -3,6 +3,7 @@
   "alwaysThinkingEnabled": true,
   "autoMemoryEnabled": false,
   "effortLevel": "high",
+  "showThinkingSummaries": true,
   "enabledPlugins": {
     "plugin-dev@claude-plugins-official": true
   },
