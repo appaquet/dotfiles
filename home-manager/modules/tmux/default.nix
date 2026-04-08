@@ -1,91 +1,124 @@
-{ pkgs, config, ... }:
-
-let
-  # See https://stackoverflow.com/questions/53658303/fetchfromgithub-filter-down-and-use-as-environment-etc-file-source
-  dotTmuxRepo = pkgs.fetchFromGitHub {
-    owner = "gpakosz"; # https://github.com/gpakosz/.tmux
-    repo = ".tmux";
-    rev = "af33f07134b76134acca9d01eacbdecca9c9cda6";
-    sha256 = "sha256-zXI1c9Mj8AJCAquOP4W1MCH7nIzisYjMcW7WuSZ+/yI=";
-    stripRoot = false;
-  };
-
-  dotTmuxConfFile = "${dotTmuxRepo}/.tmux-af33f07134b76134acca9d01eacbdecca9c9cda6/.tmux.conf";
-in
+{ pkgs, ... }:
 {
-  # gpakosz/.tmux expect its files to be at specific locations
-  home.file.".tmux.conf".source = dotTmuxConfFile;
-  home.file.".tmux.conf.local".source = ./tmux.conf.local;
-
-  home.packages = with pkgs; [
-    tmux
-  ];
-
   programs.tmux = {
     enable = true;
     package = pkgs.tmux;
+    prefix = "C-a";
+    mouse = true;
+    keyMode = "vi";
+    historyLimit = 100000;
+    baseIndex = 1;
+    escapeTime = 10;
+    terminal = "xterm-256color";
+    aggressiveResize = true;
+
+    plugins = with pkgs.tmuxPlugins; [
+      sensible
+      resurrect
+      {
+        plugin = catppuccin;
+        extraConfig = ''
+          set -g @catppuccin_flavor 'mocha'
+          set -g @catppuccin_window_status_style 'rounded'
+          set -g @catppuccin_window_text ' #W'
+          set -g @catppuccin_window_current_text ' #W'
+        '';
+      }
+      {
+        plugin = tmux-fzf;
+        extraConfig = ''
+          set-environment -g TMUX_FZF_LAUNCH_KEY "W"
+          set-environment -g TMUX_FZF_OPTIONS "-p -w 62% -h 38% -m"
+          set-environment -g TMUX_FZF_PREVIEW "0"
+          set-environment -g TMUX_FZF_ORDER "session|window|pane|command|keybinding|clipboard|process"
+
+          # Flat fuzzy list of all windows across all sessions.
+          # "switch" arg skips the action picker and jumps straight to the list.
+          bind w run-shell -b "${pkgs.tmuxPlugins.tmux-fzf}/share/tmux-plugins/tmux-fzf/scripts/window.sh switch"
+        '';
+      }
+    ];
 
     extraConfig = ''
-      # Specify plugins here since tpm looks for plugins in xdg config
-      set -g @plugin 'tmux-plugins/tmux-resurrect'
+      # Renumber windows when one is closed
+      set -g renumber-windows on
 
-      # Loads gpakosz/.tmux configuration & .tmux.conf.local
-      source-file ~/.tmux.conf
+      # Report session/window to outer terminal title
+      set -g set-titles on
+      set -g set-titles-string "#S: #W"
 
-      # Synchronized panes
-      bind S setw synchronize-panes\; display-message "Synchronized pane is now #{?synchronize-panes,on,off}"
+      # Truecolor passthrough
+      set -sg terminal-overrides ',*:RGB'
 
-      # Clear the screen
-      bind C-k setw synchronize-panes\; send-keys C-l \; setw synchronize-panes
+      # Resize to most recent client
+      set -g window-size latest
 
-      # Move windows right/left
-      bind -r C-y swap-window -t -1 \; select-window -t -1  # swap current window with the previous one
-      bind -r C-u swap-window -t +1 \; select-window -t +1  # swap current window with the next one
-
-      # Space to toggle terminal in 2 split panes with editor on top
-      unbind Space
-      bind-key Space run-shell ' \
-        pane_title=$(tmux display-message -p "#{pane_title}"); \
-        in_vim=$(echo $pane_title | grep -c "vim"); \
-        is_zoomed=$(tmux display-message -p "#{window_zoomed_flag}"); \
-        if [ "$in_vim" == "1" ]; then \
-          if [ "$is_zoomed" == "1" ]; then \
-            tmux resize-pane -Z; \
-            tmux select-pane -D; \
-          else \
-            tmux select-pane -D; \
-          fi; \
-        else \
-          if [ "$is_zoomed" == "1" ]; then \
-            tmux select-pane -U; \
-          else \
-            tmux select-pane -U; \
-            tmux resize-pane -Z; \
-          fi; \
-        fi
-      '
-
-      # Fixes issue on macOS where shell in tmux is not right
+      # macOS: keep login shell behavior working inside tmux
       # See https://github.com/tmux/tmux/issues/4162
       set -gu default-command
       set -g default-shell "${pkgs.fish}/bin/fish"
 
-      # Make sure colors work in TUI apps
-      # Works in tandem with fish/default.nix
-      # See: https://gist.github.com/andersevenrud/015e61af2fd264371032763d4ed965b6
-      set -g default-terminal 'xterm-256color'
-      set -sg terminal-overrides ',*:RGB'
+      # Shorter repeat window than default 500ms
+      set -sg repeat-time 300
 
-      # Force tmux to resize windows to the most recently active client
-      set -g window-size latest
-      setw -g aggressive-resize on
+      # Inherit cwd on split / new window
+      bind '"' split-window -c "#{pane_current_path}"
+      bind % split-window -h -c "#{pane_current_path}"
+      bind c new-window -c "#{pane_current_path}"
 
-      # Unbind config edit since it's read-only anyway, and it messes up with overriden configs here
-      unbind e
+      # Vim-style pane navigation
+      bind h select-pane -L
+      bind j select-pane -D
+      bind k select-pane -U
+      bind l select-pane -R
 
-      # Rebind r to reload config
+      # Vim-style pane resize (repeatable)
+      bind -r H resize-pane -L 5
+      bind -r J resize-pane -D 5
+      bind -r K resize-pane -U 5
+      bind -r L resize-pane -R 5
+
+      # Navigate windows left / right
+      bind -r C-h previous-window
+      bind -r C-l next-window
+
+      # Swap current window left / right
+      bind -r C-y swap-window -t -1 \; select-window -t -1
+      bind -r C-u swap-window -t +1 \; select-window -t +1
+
+      # Toggle synchronized panes
+      bind S setw synchronize-panes\; display-message "Synchronized pane is now #{?synchronize-panes,on,off}"
+
+      # Clear screen across synced panes
+      bind C-k setw synchronize-panes\; send-keys C-l \; setw synchronize-panes
+
+      bind C-c command-prompt -p "New session name:" "new-session -s '%%'"
+
+      # Reload config
       unbind r
-      bind r source-file ${config.home.homeDirectory}"/.config/tmux/tmux.conf"
+      bind r source-file ~/.config/tmux/tmux.conf \; display-message "Config reloaded"
+
+      # Kill without confirmation
+      bind x kill-pane
+      bind "&" kill-window
+      bind X kill-session
+
+      # Catppuccin status line configuration
+      set -g status-position top
+      set -g status-left-length 100
+      set -g status-right-length 100
+      set -g status-left "#{E:@catppuccin_status_host}"
+      set -ag status-left "#{E:@catppuccin_status_session}"
+      set -ag status-left "#[default] "
+      set -g status-right "#{E:@catppuccin_status_application}"
+      set -agF status-right "#{E:@catppuccin_status_cpu}"
+      set -ag status-right "#{E:@catppuccin_status_uptime}"
+      set -agF status-right "#{E:@catppuccin_status_battery}"
+
+      run-shell ${pkgs.tmuxPlugins.cpu}/share/tmux-plugins/cpu/cpu.tmux
+      run-shell ${pkgs.tmuxPlugins.battery}/share/tmux-plugins/battery/battery.tmux
     '';
   };
+
+  home.packages = [ pkgs.tmux ];
 }
