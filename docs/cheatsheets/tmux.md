@@ -1,7 +1,7 @@
 # Tmux sheet cheat
 
 * See <https://github.com/gpakosz/.tmux> for all shortcuts
-* My prefixes are `ctrl-a` and `ctrl-space`
+* My prefix is `ctrl-a`
 * `<prefix> <ctrl>l / h` to navigate to next / prev window
 * `<prefix> L / H / J / K` to resize pane
 * `<prefix> l / h / j / k` to navigate between panes
