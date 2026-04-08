@@ -50,6 +50,34 @@ local function passthrough_keymap(keymap)
 	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(keymap, true, false, true), "n", true)
 end
 
+-- TODO: to revisit... May not be needed since it's not that intrusive
+-- Hide Copilot ghost text while the blink.cmp menu is open so the two
+-- suggestion sources don't overlap on screen. blink renders its own floating
+-- window (not Vim's pum), so we listen to its User events instead of
+-- CompleteChanged / CompleteDone. The Tab chain below still short-circuits on
+-- cpsug.is_visible(), which returns false while hidden.
+-- local copilot_pum_coex = vim.api.nvim_create_augroup("CopilotPumCoex", { clear = true })
+-- vim.api.nvim_create_autocmd("User", {
+-- 	group = copilot_pum_coex,
+-- 	pattern = "BlinkCmpMenuOpen",
+-- 	callback = function()
+-- 		vim.b.copilot_suggestion_hidden = true
+-- 	end,
+-- })
+-- vim.api.nvim_create_autocmd("User", {
+-- 	group = copilot_pum_coex,
+-- 	pattern = "BlinkCmpMenuClose",
+-- 	callback = function()
+-- 		vim.b.copilot_suggestion_hidden = false
+-- 	end,
+-- })
+-- vim.api.nvim_create_autocmd("InsertLeave", {
+-- 	group = copilot_pum_coex,
+-- 	callback = function()
+-- 		vim.b.copilot_suggestion_hidden = false
+-- 	end,
+-- })
+
 -- Add completion on tab (if visible), but real tab via shift-tab
 local cpsug = require("copilot.suggestion")
 local cpnes = require("copilot.nes.api")

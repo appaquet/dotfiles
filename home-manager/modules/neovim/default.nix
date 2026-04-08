@@ -70,6 +70,7 @@ in
       # We only have lua and vimscript configs
       withRuby = false;
       withNodeJs = false;
+      withPython3 = false;
 
       plugins =
         # Base plugins
@@ -157,19 +158,13 @@ in
             nvim-lint # linting
             nvim-lsp-notify # lsp notifications
 
-            # Autocomplete
-            nvim-cmp # https://github.com/hrsh7th/nvim-cmp
-            cmp-cmdline
-            cmp-nvim-lsp
-            cmp-nvim-lsp-signature-help
-            cmp-nvim-lsp-document-symbol
-            cmp-cmdline
+            # Completion popup
+            blink-cmp
             copilot-lua # use `Copilot auth` to login
             copilot-lsp # needed for NES on copilot-lua
 
             # Snippets
             luasnip
-            cmp_luasnip
             friendly-snippets # easy load from vscode, languages, etc.
 
             # AI assistants

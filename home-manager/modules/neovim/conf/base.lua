@@ -21,6 +21,11 @@ vim.opt.undofile = true -- Persists the undo across sessions
 -- Should not be too low since it writes to swap with this delay as well
 vim.opt.updatetime = 500 -- time to wait for a write to disk
 
+-- Insert-mode completion popup (driven by built-in vim.lsp.completion in lang.lua)
+vim.opt.completeopt = { "menuone", "noselect", "popup" }
+vim.opt.pumborder = "rounded"
+vim.opt.pummaxwidth = 60
+
 -- Line numbers (see keymap.lua for toggling)
 vim.opt.relativenumber = true -- relative line numbers
 vim.opt.number = true -- show current absolute number instead of 0

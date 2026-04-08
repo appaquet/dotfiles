@@ -228,49 +228,34 @@ vim.keymap.set("n", "<Leader>Ti", function()
 	vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
 end, { desc = "LSP: Toggle inlay hints" })
 
--- Autocomplete
--- nvim-cmp
--- https://github.com/hrsh7th/nvim-cmp
-local cmp = require("cmp")
-local luasnip = require("luasnip")
-cmp.setup({
-	-- luasnip
-	-- https://github.com/L3MON4D3/LuaSnip
-	snippet = {
-		expand = function(args)
-			luasnip.lsp_expand(args.body)
-		end,
+-- Completion popup via blink.cmp
+require("blink.cmp").setup({
+	keymap = {
+		preset = "none",
+		["<CR>"] = { "accept", "fallback" },
+		["<C-Space>"] = { "show", "show_documentation", "hide_documentation" },
+		["<Up>"] = { "select_prev", "fallback" },
+		["<Down>"] = { "select_next", "fallback" },
+		["<C-p>"] = { "select_prev", "fallback" },
+		["<C-n>"] = { "select_next", "fallback" },
 	},
-
-	preselect = cmp.PreselectMode.None, -- Don't preselect items
-
-	mapping = cmp.mapping.preset.insert({
-		-- Accept selected
-		["<CR>"] = cmp.mapping.confirm({
-			behavior = cmp.ConfirmBehavior.Insert,
-			select = false, -- don't select unless selected
-		}),
-		["<S-CR>"] = cmp.mapping.confirm({
-			behavior = cmp.ConfirmBehavior.Replace,
-			select = false, -- don't select unless selected
-		}),
-
-		-- Documentation pane navigation
-		["<C-u>"] = cmp.mapping.scroll_docs(-4), -- Up
-		["<C-d>"] = cmp.mapping.scroll_docs(4), -- Down
-	}),
-
-	window = {
-		completion = cmp.config.window.bordered(),
-		documentation = cmp.config.window.bordered(),
+	snippets = { preset = "luasnip" },
+	completion = {
+		trigger = {
+			show_on_keyword = true,
+			show_on_trigger_character = true,
+		},
+		menu = {
+			border = "rounded",
+			auto_show_delay_ms = 200,
+		},
+		documentation = { auto_show = true },
 	},
-
+	signature = { enabled = true },
 	sources = {
-		{ name = "nvim_lsp" },
-		{ name = "nvim_lsp_signature_help" },
-		{ name = "luasnip" },
-		{ name = "buffer" },
+		default = { "lsp", "buffer", "snippets", "path" },
 	},
+	fuzzy = { implementation = "prefer_rust" },
 })
 
 -- Load default snippets
