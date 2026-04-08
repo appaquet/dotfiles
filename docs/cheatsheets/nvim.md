@@ -221,8 +221,8 @@ keymaps, but also default/built-ins that I tend to forget.
 
 ## Diagnostics (x)
 
-* `<leader>xs` Open diagnostic float
-* `<leader>xf` Open or focus diagnostic panel
+* `<leader>xs` Open diagnostic float (inline)
+* `<leader>xf` Open or focus diagnostic panel (trouble)
 * `<leader>xr` Close diagnostics
 * `<leader>xl` Set location list
 * `<leader>xo` Open diagnostic panel
@@ -240,7 +240,7 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>ko` Open quickfix
 * `<leader>kq` Close quickfix
 * `<leader>kk` Toggle quickfix
-* `<leader>kc` Clear quickfix
+* `<leader>kc` Clear quickfix list
 * `<leader>kn` or `]k` Go to next item
 * `<leader>kp` or `[k` Go to previous item
 * From any fzf, `<C-k>` sends all matches to quickfix list
@@ -290,6 +290,13 @@ keymaps, but also default/built-ins that I tend to forget.
   * `o` Open current stack frame
   * `t` Toggle hidden stack frames
 
+## LSP Completion (Insert Mode)
+
+* `<C-Space>` Trigger completion (or toggle documentation)
+* `<CR>` Accept selected completion item
+* `<Up>` or `<C-p>` Select previous item
+* `<Down>` or `<C-n>` Select next item
+
 ## Inline AI Code Completion (Insert Mode)
 
 * `<M-l>` Accept word suggestion
@@ -299,7 +306,7 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<M-n>` Accept suggestion and go to next edit
 * `<C-]>` Dismiss suggestion
 * `<M-J>` Show Copilot panel
-* `<Tab>` Accept suggestion if visible, apply next edit suggestion, expand snippet, or insert tab
+* `<Tab>` Accept inline suggestion if visible, apply next edit suggestion (NES), expand/jump snippet, or insert tab
 * `<S-Tab>` Insert tab (skip snippet expansion and suggestions)
 
 ## Toggle Options (T)
