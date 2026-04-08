@@ -27,6 +27,8 @@
       "Bash(jj squash:*)",
       "Bash(jj ls)",
       "Bash(jj st)",
+      "Bash(jj file show:*)",
+      "Bash(jj op log:*)",
       "Bash(jj describe:*)",
       "Bash(jj-main-branch:*)",
       "Bash(jj-current-branch:*)",

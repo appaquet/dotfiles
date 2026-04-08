@@ -48,9 +48,7 @@ After instructions & tasks loaded, you are free to 🚀 Engage thrusters
 
 8. 🔳 Validate formatting, linting and tests
 
-9. 🔳 List all completed tasks and requirements/ACs and ask user which one to mark as completed
+9. 🔳 Run `/ctx-save` to update project and phase docs
 
-10. 🔳 Run `/ctx-save` to update project and phase docs
-
-11. 🔳 Commit / squash `jj` change with meaningful message if not already done
+10. 🔳 Commit / squash `jj` change with meaningful message if not already done
        After checking state with `jj ls`
