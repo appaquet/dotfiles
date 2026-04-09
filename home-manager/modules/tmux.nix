@@ -125,8 +125,7 @@
         set -ag status-left "#[default] "
 
         set -g status-right-length 100
-        set -g status-right "#{E:@catppuccin_status_application}"
-        set -agF status-right "#{E:@catppuccin_status_cpu}"
+        set -gF status-right "#{E:@catppuccin_status_cpu}"
         set -ag status-right "#{E:@catppuccin_status_uptime}"
         set -agF status-right "#{E:@catppuccin_status_battery}"
 
