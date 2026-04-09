@@ -8,6 +8,7 @@ Prefix is `C-a`. Mouse is enabled by default.
 * `<prefix> %` Split vertically (inherits cwd)
 * `<prefix> h/j/k/l` Navigate panes (vim-style)
 * `<prefix> H/J/K/L` Resize pane (repeatable)
+* `<prefix> =` Equalize pane layout
 * `<prefix> x` Kill pane (no confirmation)
 * `<prefix> q` Show pane numbers (then `:swap-pane -s X -t Y` to swap)
 * `<prefix> S` Toggle synchronized panes
