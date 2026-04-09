@@ -11,7 +11,7 @@
     inputs.secrets.homeManager.common
     inputs.nix-index-database.homeModules.default
     ./fish
-    ./tmux
+    ./tmux.nix
     ./git
     ./neovim
     ./utils

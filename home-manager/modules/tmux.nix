@@ -45,7 +45,7 @@
 
       # Report session/window to outer terminal title
       set -g set-titles on
-      set -g set-titles-string "#H: #S: #W"
+      set -g set-titles-string "#H · #S · #W"
 
       # Truecolor passthrough
       set -sg terminal-overrides ',*:RGB'
@@ -100,6 +100,9 @@
       # Reload config
       unbind r
       bind r source-file ~/.config/tmux/tmux.conf \; display-message "Config reloaded"
+
+      # Vi copy mode: block selection toggle
+      bind -T copy-mode-vi C-v send-keys -X rectangle-toggle
 
       # Kill without confirmation
       bind x kill-pane
