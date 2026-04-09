@@ -45,7 +45,7 @@
 
       # Report session/window to outer terminal title
       set -g set-titles on
-      set -g set-titles-string "#S: #W"
+      set -g set-titles-string "#H: #S: #W"
 
       # Truecolor passthrough
       set -sg terminal-overrides ',*:RGB'
@@ -85,6 +85,9 @@
       # Swap current window left / right
       bind -r C-y swap-window -t -1 \; select-window -t -1
       bind -r C-u swap-window -t +1 \; select-window -t +1
+
+      # Toggle mouse mode
+      bind M set -g mouse\; display-message "Mouse is now #{?mouse,on,off}"
 
       # Toggle synchronized panes
       bind S setw synchronize-panes\; display-message "Synchronized pane is now #{?synchronize-panes,on,off}"

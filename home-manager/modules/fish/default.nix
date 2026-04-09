@@ -33,6 +33,10 @@
         # Since it doesn't seem to always work in neovim setup
         export EDITOR="nvim"
 
+        # Because we live in the present
+        export LANG=en_US.UTF-8
+        export LC_ALL=en_US.UTF-8
+
         # Add support for nix run and nix-shell in fish
         ${pkgs.any-nix-shell}/bin/any-nix-shell fish --info-right | source
 
