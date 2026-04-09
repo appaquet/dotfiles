@@ -368,6 +368,8 @@ not in Exomind, operates in-place when already in an Exomind buffer.
 * `aX`: Select around object X
 * `iX`: Select inside object X
   *(X = (p)arameter, (f)unction, (c)lass, (b)lock)*
+* `an`: Select parent (outer) treesitter node (also operator-pending)
+* `in`: Select child (inner) treesitter node (also operator-pending)
 
 ## Object movements
 
@@ -377,6 +379,7 @@ not in Exomind, operates in-place when already in an Exomind buffer.
   *(X = (f)unction, (c)lass)*
 * `]d`: Next conditional
 * `[d`: Previous conditional
+* `]n`, `[n`: Next/previous treesitter node (visual mode)
 
 ## Object manipulations
 
