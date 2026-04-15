@@ -91,7 +91,7 @@ in
           delimitMate # auto close quotes, parens, etc
           which-key-nvim # show keymap hints
           todo-comments-nvim # highlight TODO, FIXME, etc
-          auto-session # automatically restore last session
+          auto-session # session management
 
           # Notifications
           (nvim-notify.overrideAttrs (_: {
@@ -106,7 +106,7 @@ in
           gitsigns-nvim # Show git signs in gutter
           diffview-nvim # :DiffviewOpen, :DiffviewClose
           octo-nvim
-          gitlinker-nvim
+          gitlinker-nvim # generate github/gitlab/bitbucket url for the current line/file/selection
 
           # Treesitter
           (nvim-treesitter.withPlugins (p: [

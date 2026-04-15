@@ -8,7 +8,6 @@ require("which-key").add({
 
 vim.keymap.set("n", "<Leader>qq", ":q<CR>", { silent = true, desc = "Quit current split/window" })
 vim.keymap.set("n", "<Leader>qa", ":qa!<CR>", { silent = true, desc = "Quit nvim" })
-vim.keymap.set("n", "<Leader>qs", ":SessionDelete<CR>:qa<CR>", { silent = true, desc = "Clear session & quit nvim" })
 
 -- Marks (m[a-z0-9A-Z], 'a-z0-9A-Z)
 vim.keymap.set("n", "<Leader>Mk", ":delmarks a-z0-9A-Z<CR>", { silent = true, desc = "Marks: delete all" })
@@ -165,4 +164,3 @@ vim.keymap.set("n", "<Leader>yf", function()
 	vim.fn.system("echo -n " .. vim.fn.shellescape(path) .. " | pbcopy")
 	vim.notify(path)
 end, { silent = true, desc = "Yank file path" })
-
