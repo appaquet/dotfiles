@@ -22,6 +22,7 @@
           ''
             set -g @catppuccin_flavor 'mocha'
             set -g @catppuccin_window_status_style 'rounded'
+            set -g @catppuccin_window_status_current_style 'rounded'
             set -g @catppuccin_window_text ' #W'
             set -g @catppuccin_window_current_text ' #W'
           '';
@@ -120,13 +121,13 @@
         set -g status-position bottom
 
         set -g status-left-length 100
-        set -g status-left "#{E:@catppuccin_status_host}"
-        set -ag status-left "#{E:@catppuccin_status_session}"
+        set -gF status-left "#{E:@catppuccin_status_host}"
+        set -agF status-left "#{E:@catppuccin_status_session}"
         set -ag status-left "#[default] "
 
         set -g status-right-length 100
         set -gF status-right "#{E:@catppuccin_status_cpu}"
-        set -ag status-right "#{E:@catppuccin_status_uptime}"
+        set -agF status-right "#{E:@catppuccin_status_uptime}"
         set -agF status-right "#{E:@catppuccin_status_battery}"
 
         run-shell ${pkgs.tmuxPlugins.cpu}/share/tmux-plugins/cpu/cpu.tmux
