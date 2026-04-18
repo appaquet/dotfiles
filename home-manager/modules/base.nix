@@ -7,7 +7,6 @@
 
 {
   imports = [
-    inputs.humanfirst-dots.homeManagerModule
     inputs.secrets.homeManager.common
     inputs.nix-index-database.homeModules.default
     ./fish

@@ -427,7 +427,7 @@ cmd_gc() {
 }
 
 cmd_fmt() {
-  find . -name "*.nix" -not -path "./humanfirst-dots/*" -exec nixfmt "$@" {} \;
+  find . -name "*.nix" -exec nixfmt "$@" {} \;
 }
 
 cmd_optimize() {

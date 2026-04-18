@@ -11,12 +11,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    humanfirst-dots = {
-      url = "github:zia-ai/shared-dotfiles";
-      #url = "path:/home/appaquet/dotfiles/humanfirst-dots";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     secrets = {
       url = "github:appaquet/dotfiles-secrets";
       #url = "path:/home/appaquet/dotfiles/secrets";

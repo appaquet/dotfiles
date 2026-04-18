@@ -16,8 +16,6 @@
     fzf
   ];
 
-  humanfirst.git.enable = true; # gcmp, gb, gh-pr-select, git-tag-select
-
   programs.fish = {
     shellAbbrs = {
       gs = "git status";
@@ -65,36 +63,77 @@
     };
 
     functions = {
-      git-current-branch = ''
-        git symbolic-ref --short HEAD
-      '';
+      git-current-branch = # fish
+        ''
+          git symbolic-ref --short HEAD
+        '';
 
       # if this fails, run `git remote set-head origin -a`
-      git-main-branch = ''
-        git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@' | tr -d '\n'
-      '';
+      git-main-branch = # fish
+        ''
+          git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@' | tr -d '\n'
+        '';
 
-      git-stacked-branches = ''
-        git log --pretty='%D' origin/(git-main-branch)... |
-              grep -oE '\b[^, ]+\b' |
-              grep -vE '^(HEAD|origin/)' |
-              sort | uniq
-      '';
+      git-stacked-branches = # fish
+        ''
+          git log --pretty='%D' origin/(git-main-branch)... |
+                grep -oE '\b[^, ]+\b' |
+                grep -vE '^(HEAD|origin/)' |
+                sort | uniq
+        '';
 
-      git-prev-branch = ''
-        git-stacked-branches | head -n 2 | tail -n 1
-      '';
+      git-prev-branch = # fish
+        ''
+          git-stacked-branches | head -n 2 | tail -n 1
+        '';
 
-      git-next-branch = ''
-        set current_branch (git symbolic-ref --short HEAD)
-        for branch in (git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/)
-            if test $branch != $current_branch
-                git merge-base --is-ancestor $current_branch $branch
-                echo $branch
-                break
-            end
-        end
-      '';
+      git-next-branch = # fish
+        ''
+          set current_branch (git symbolic-ref --short HEAD)
+          for branch in (git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/)
+              if test $branch != $current_branch
+                  git merge-base --is-ancestor $current_branch $branch
+                  echo $branch
+                  break
+              end
+          end
+        '';
+
+      gb = # fish
+        ''
+          set COMMAND 'git for-each-ref --sort=-committerdate refs/heads/ --format="%(color: red)%(committerdate:short)%(color: 244)|%(color: cyan)%(refname:short)%(color: 244)|%(color: green)%(subject)" --color=always | column -ts"|"'
+          FZF_DEFAULT_COMMAND=$COMMAND fzf \
+            --ansi \
+            --header "enter to checkout, ctrl-d to delete" \
+            --bind "ctrl-d:execute(echo {+} | awk '{print \$2}' | xargs git branch -D)+reload:$COMMAND" \
+            | awk '{print $2}' | xargs git checkout
+        '';
+
+      gcpm = # fish
+        ''
+          MSG=(git log --first-parent --pretty=format:%s | head -n 100 | uniq | head -n 10 | fzf) git commit -m "$MSG"
+        '';
+
+      gh-pr-select = # fish
+        ''
+          set COMMAND 'gh pr list --json number,title,author,headRefName,updatedAt \
+          --template "{{tablerow \"Ref\" \"PR\" \"Title\" \"Author\" \"Date\"}}{{range .}}{{tablerow (.headRefName | color \"blue\") (printf \"#%v\" .number | color \"yellow\") (.title | color \"green\") (.author.name | color \"cyan\") (timeago .updatedAt)}}{{end}}"'
+          GH_FORCE_TTY=100% FZF_DEFAULT_COMMAND=$COMMAND fzf \
+                    --ansi \
+                    --header-lines=1 \
+                    --no-multi \
+                    --prompt 'Search Open PRs > ' \
+                    | awk '{print $1}'
+        '';
+
+      git-tag-select = # fish
+        ''
+          set COMMAND "git tag -l --sort=-version:refname --color=always --format='%(color:red)%(refname:short) %(color: cyan) - %(color: green)%(creatordate:short)'"
+          FZF_DEFAULT_COMMAND=$COMMAND fzf \
+                  --ansi \
+                  --prompt 'Search tags > ' \
+                  | awk '{print $1}'
+        '';
     };
   };
 
