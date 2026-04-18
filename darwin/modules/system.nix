@@ -41,10 +41,12 @@
         FXEnableExtensionChangeWarning = false; # disable warning when changing file extension
         FXPreferredViewStyle = "clmv"; # use column view by default
         FXDefaultSearchScope = "SCcf"; # search the current folder by default
+        _FXEnableColumnAutoSizing = true; # auto size column view
         QuitMenuItem = true; # enable quit menu item
         ShowPathbar = true; # show path bar
         ShowStatusBar = true; # show status bar
         FXRemoveOldTrashItems = true; # clear trash after 30 days
+        NewWindowTarget = "Home"; # new finder windows open in home directory
       };
 
       trackpad = {
@@ -63,9 +65,6 @@
         # Reduce menu bar items spacing & padding
         NSStatusItemSpacing = 2;
         NSStatusItemSelectionPadding = 2;
-
-        # Finder
-        AppleShowAllExtensions = true; # show all file extensions
 
         # Keyboard
         InitialKeyRepeat = 15; # normal minimum is 15 (225 ms), maximum is 120 (1800 ms)
