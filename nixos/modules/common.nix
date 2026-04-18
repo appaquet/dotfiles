@@ -58,6 +58,19 @@
     authorizedKeysFiles = [ "/etc/ssh/authorized_keys.d/%u" ];
   };
 
+  services.openssh = {
+    enable = true;
+    settings = {
+      Macs = [
+        "hmac-sha2-512-etm@openssh.com" # default
+        "hmac-sha2-256-etm@openssh.com" # default
+        "umac-128-etm@openssh.com" # default
+        "hmac-sha2-512" # echo compatibility
+        "hmac-sha2-256" # echo compatibility
+      ];
+    };
+  };
+
   # Enable linger
   # See https://discourse.nixos.org/t/adding-nixos-option-for-systemd-user-lingering/28762/3
   systemd.tmpfiles.rules = [
