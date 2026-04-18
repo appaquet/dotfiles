@@ -51,7 +51,7 @@ let
     export CLAUDE_CODE_NO_FLICKER=1 # alt-mode
     #export CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1
 
-    ${claude-code}/bin/claude "$@"
+    ${claude-code}/bin/claude --verbose "$@"
   '';
 
   # Utility to list project docs (avoids shell expansion issues in skill commands)

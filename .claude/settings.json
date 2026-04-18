@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./x home check:*)",
+      "Bash(./x home build:*)",
+      "Bash(./x nixos check:*)",
+      "Bash(./x nixos build:*)",
+      "Bash(./x darwin check:*)",
+      "Bash(./x darwin build:*)",
+      "Bash(./x check:*)",
+      "Bash(HOST=* ./x home build)",
+      "Bash(HOST=* ./x home check)"
+    ],
+    "deny": []
+  },
+  "sandbox": {
+    "enabled": false,
+    "autoAllowBashIfSandboxed": false
+  }
+}
