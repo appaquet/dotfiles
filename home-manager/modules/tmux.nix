@@ -122,7 +122,7 @@
 
         set -g status-left-length 100
         set -gF status-left "#{E:@catppuccin_status_host}"
-        set -agF status-left "#{E:@catppuccin_status_session}"
+        set -ag status-left "#{E:@catppuccin_status_session}"
         set -ag status-left "#[default] "
 
         set -g status-right-length 100
