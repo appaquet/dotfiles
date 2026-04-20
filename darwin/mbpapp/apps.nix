@@ -81,6 +81,10 @@
       }
 
       {
+        name = "google-gemini";
+      }
+
+      {
         name = "docker-desktop";
       }
       {
