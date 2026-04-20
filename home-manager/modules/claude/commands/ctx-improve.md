@@ -1,6 +1,7 @@
 ---
 name: ctx-improve
 description: Improve context by asking clarifying questions
+effort: xhigh
 ---
 
 # Improve Context

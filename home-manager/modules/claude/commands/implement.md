@@ -1,6 +1,7 @@
 ---
 name: Implement
 description: Proceed to implementation of the plan
+effort: xhigh
 ---
 
 # Implement

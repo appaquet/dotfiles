@@ -2,6 +2,7 @@
 name: think
 description: Trigger deep thinking mode for complex problems
 argument-hint: [problem or context]
+effort: xhigh
 ---
 
 # Think

@@ -2,6 +2,7 @@
 name: introspect
 description: Reflect on an error or undesired behavior to propose instruction improvements
 argument-hint: [description of issue]
+effort: xhigh
 ---
 
 # Introspect

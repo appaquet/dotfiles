@@ -1,6 +1,7 @@
 ---
 name: review-plan
 description: Research REVIEW comments, present plan, then fix after /implement
+effort: xhigh
 ---
 
 # Plan and Fix Review Comments

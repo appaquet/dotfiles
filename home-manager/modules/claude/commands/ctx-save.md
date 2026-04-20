@@ -1,6 +1,7 @@
 ---
 name: ctx-save
 description: Update project and phase docs with current state and progress
+effort: medium
 ---
 
 # Save Context

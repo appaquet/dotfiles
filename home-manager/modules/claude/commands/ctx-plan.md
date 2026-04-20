@@ -2,7 +2,7 @@
 name: ctx-plan
 description: Load repository context and create high-level development plans
 argument-hint: [task-description]
-model: opus
+effort: xhigh
 ---
 
 # Plan

@@ -278,7 +278,7 @@
     ]
   },
   "alwaysThinkingEnabled": true,
-  "effortLevel": "xhigh",
+  "effortLevel": "medium",
   "promptSuggestionEnabled": false,
   "autoMemoryEnabled": false,
   "showThinkingSummaries": true,

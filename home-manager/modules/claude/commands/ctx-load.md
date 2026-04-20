@@ -1,6 +1,7 @@
 ---
 name: ctx-load
 description: Load comprehensive project context including docs, project info, and branch status
+effort: medium
 ---
 
 # Load Context

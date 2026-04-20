@@ -1,6 +1,7 @@
 ---
 name: jj-resolve-conflicts
 description: Resolve jj conflicts in the current change stack, oldest to newest
+effort: xhigh
 ---
 
 # Resolve jj Conflicts

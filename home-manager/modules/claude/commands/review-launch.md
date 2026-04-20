@@ -1,6 +1,7 @@
 ---
 name: review-launch
 description: Launch review agents for code style, architecture and correctness.
+effort: high
 ---
 
 # Launch Review

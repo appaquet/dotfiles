@@ -1,6 +1,7 @@
 ---
 name: ctx-check
 description: Output uncertainty disclosure about current task understanding
+effort: xhigh
 ---
 
 # Check Context Understanding
