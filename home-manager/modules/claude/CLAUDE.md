@@ -7,8 +7,6 @@
 
 ## Top-level instructions
 
-* No superlatives, excessive praise, excessive verbosity - tokens expensive
-
 * ALWAYS use `AskUserQuestion` to ask questions
   * Never ask directly in response or finish a message with a list of questions. Always use the tool
   * Don't assume I have all context, always make sure to provide necessary context before asking
@@ -29,36 +27,41 @@
   * NEVER ask via `AskUserQuestion` if you can proceed - wait for signal
   * STOP and WAIT before proceeding after asking a question - wait for signal
 
+## Sub-instructions files
+
+* My workflows: @~/.claude/docs/workflows.md
+* Project docs: @~/.claude/docs/project-doc.md
+* Version control (jj): @~/.claude/docs/version-control.md
+* Development instructions: @~/.claude/docs/development.md
+* Code style: @~/.claude/docs/code-style.md
+* Reviewing: @~/.claude/docs/review.md
+
 ## Context management and agentic workflow
 
-* Main agent should ONLY be used for high-level planning, project management, jj (code versioning)
+* Main agent should primarily be used for high-level planning, project management, jj (code
+  versioning) and trivial code edits that you know the location for. Anything requiring reading,
+  understanding and exploring code should be delegated to sub-agents
   Main agent context window is VERY VERY precious
   NEVER waste reading/validating/diffing code/files, testing, browser, running commands, etc.
   => Always route to sub-agents
-  Reading files seem trivial, but may load your context quickly and bias you to not delegate
-  NEVER validate sub-agents work by reading their verbose output yourself
 
 * Sub agents should ALWAYS used for grunt work to preserve main agent context, no matter the task complexity
   * Optimize prompts for sub-agents, but also ask them to optimize their own output message
     Enough information for crystal clear understanding, but no more than that: context window is
     precious
 
-  * NEVER NEVER NEVER NEVER call `TaskOutput` to get agent output or read agent transcript files
-    for both foreground and background agents, these return raw execution transcripts, not
-    summaries
-    Agents provide their summary directly in the Task tool result. Background agents deliver their
-    summary automatically when done. Don't call `TaskOutput` if I background them by myself
-    ONLY CALL `TaskOutput` or read transcript if user explicitly asks for it, and try to use a
-    sub-agent to do it if possible
-
   * If a sub-agent output is insufficient, send it a follow-up message to re-engage and ask targeted
     follow-up questions. If I ask you a question that a previous sub-agent should have answered,
-    continue it instead of answering directly or launching a new one. If I ask for a small change
-    to a previous sub-agent's work, continue it instead of creating a new one to do the change
+    resume it instead of answering directly or launching a new one. If I ask for a small change to a
+    previous sub-agent's work, continue it instead of creating a new one to do the change
 
   * When a sub-agent comes back with an output, YOU HAVE TO BE CRITICAL. If it doesn't sound right,
-    you can send it a follow-up and ask for more details or clarifications. Don't even check that yourself
-    though, your context is precious
+    you can send it a follow-up and ask for more details or clarifications. Avoid checking their
+    output code yourself, unless very trivial/small
+
+  * Assume that I don't have any context about what a sub-agent did and outputted. I don't see that
+    output, and you have to give me some context if I need to answer questions about it or make
+    decisions
 
   * Sub-agent should communicate with user through AskUserQuestion tool if they need clarifications
 
@@ -66,17 +69,17 @@
     it has the context of the previous work. Give agents a `name` for readability, but use the
     agent ID (not name) in `SendMessage({to: agentId})` to continue them
 
-  * Sub-agents read project/phase docs before starting work if they exist
-    When user provides a decision or insight mid-work: persist to docs first, then continue
-    Conversation context is ephemeral, docs are source of truth
+  * Instruction sub-agent to read project/phase docs explicitly to make sure they get the context
+    and understanding. When user provides a decision or insight mid-work: persist to docs first,
+    then continue Conversation context is ephemeral, docs are source of truth
 
   * If you're having a sub-agent do project documentation work, have it write to the file directly
     instead of returning the content to you to write to prevent unnecessary back-and-forth and
     preserve context. Have it return the modified file list so you can read them for validation
 
 * For sub-agents, pick right model for task to optimize speed & accuracy:
-  * haiku: shallow code exploration and reconnaissance, code edits
-  * sonnet: very straightforward code, simple code exploration, most tasks
+  * haiku: shallow code exploration and reconnaissance
+  * sonnet: very straightforward code, simple code exploration
   * opus: planning, review comments research/planning, detailed code exploration, most code
 
 * For any workflow that requires multiple steps, synchronization or communication between agents,
@@ -86,7 +89,8 @@
 
 ## Task management
 
-* ALWAYS use the Task tool to create tasks for any instruction step that has a 🔳 annotation, before executing any of the instructions
+* ALWAYS use the Task tool to create tasks for any instruction step that has a 🔳 annotation, before
+  executing any of the instructions
   * Create one or more tasks per 🔳 step, 1:n mapping using the `TaskCreate` tool
   * No ad-hoc replacements or broader grouping
   * THEN execute the instructions & tasks in order
@@ -103,7 +107,7 @@ Before executing instructions of any command/skill/agent instructions:
   follow the task management guidelines for executing and completing them. No tasks is trivial
   enough to skip the task management process
 
-* Your context is precious, make sure the follow the agentic workflow and deletgate to sub-agents
+* Your context is precious, make sure the follow the agentic workflow instructions
 
 * ALWAYS use project & phase docs to plan and track work @~/.claude/docs/project-doc.md using the
   proper project editing skills
@@ -146,15 +150,6 @@ Write(file_path="file.txt", content="some text")
 </good-examples>
 ```
 
-## Sub-instructions files
-
-* My workflows: @~/.claude/docs/workflows.md
-* Project docs: @~/.claude/docs/project-doc.md
-* Version control (jj): @~/.claude/docs/version-control.md
-* Development instructions: @~/.claude/docs/development.md
-* Code style: @~/.claude/docs/code-style.md
-* Reviewing: @~/.claude/docs/review.md
-
 ## Context understanding
 
 Always ensure 10/10 understanding checklist: explore code + web search + `AskUserQuestion`
@@ -181,6 +176,7 @@ ALWAYS use this methodology to solve problems, issues, and bugs:
 3. Ask user before destructive changes
 4. Test bugs: verify new test catches issue or update existing test to catch it
 5. Document investigation: capture uncertainty, what was tried, what was learned in phase doc Questions & Investigations
+   Use a SR&ED documentation style to capture learnings and prevent going in circles
 </problem-solving-checklist>
 
 ## Deep Thinking

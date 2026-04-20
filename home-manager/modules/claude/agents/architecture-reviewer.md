@@ -18,6 +18,8 @@ Search for project guidelines:
 Merge with General Guidelines below.
 Load surrounding context (interfaces, base classes, related components) as needed.
 
+If no scopes provided, assume full branch review as per the workflow.
+
 ## Instructions
 
 Follow workflow in @~/.claude/docs/reviewing-agent.md

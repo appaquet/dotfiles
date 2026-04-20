@@ -72,4 +72,4 @@ Core workflows for main interactions
 - `code-style-reviewer`: Style, formatting, syntax
 - `code-correctness-reviewer`: Logic, bugs, runtime issues
 - `architecture-reviewer`: Architecture, patterns
-- `requirement-analyzer`: Requirement gaps
+- `requirements-reviewer`: Requirement gaps

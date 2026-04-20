@@ -20,10 +20,13 @@ Extract project guidelines from project docs:
 
 Merge with General Guidelines below.
 If no project doc exists, report "No project requirements found" and skip review.
+If no scopes provided, assume full branch review as per the workflow.
 
 ## Instructions
 
-Follow workflow in @~/.claude/docs/reviewing-agent.md with these additions:
+Follow workflow in @~/.claude/docs/reviewing-agent.md.
+
+With these additions:
 
 - For EACH requirement (R1, R2, etc.), create a task with `TaskCreate`
   - Make sure that each requirement is checked against guidelines

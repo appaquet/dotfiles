@@ -18,6 +18,8 @@ Search for project guidelines:
 Merge with General Guidelines below.
 Load full files and called functions/classes when needed to validate correctness.
 
+If no scopes provided, assume full branch review as per the workflow.
+
 ## Instructions
 
 Follow workflow in @~/.claude/docs/reviewing-agent.md

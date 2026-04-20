@@ -17,6 +17,8 @@ Search for project guidelines:
 
 Merge with user guidelines (@~/.claude/docs/code-style.md) and General Guidelines below.
 
+If no scopes provided, assume full branch review as per the workflow.
+
 ## Instructions
 
 Follow workflow in @~/.claude/docs/reviewing-agent.md
