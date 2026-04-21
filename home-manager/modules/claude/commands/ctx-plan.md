@@ -7,8 +7,6 @@ effort: xhigh
 
 # Plan
 
-ultrathink
-
 Build a full plan for the task at hand: $ARGUMENTS
 
 Project files: !`claude-proj-docs`

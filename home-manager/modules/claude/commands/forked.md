@@ -6,8 +6,6 @@ argument-hint: [/skill1 & /skill2 ...] [instructions]
 
 # Forked
 
-ultrathink
-
 Fork one or more skills, understand their instructions and orchestrate their execution across sub-agents
 
 Main agent should ONLY be responsible for:

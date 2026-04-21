@@ -2,11 +2,10 @@
 name: ask
 description: Think about a topic and provide feedback without acting
 argument-hint: [question or topic]
+effort: high
 ---
 
 # Ask
-
-ultrathink
 
 Provide thoughtful analysis on a given question or topic without taking further action
 

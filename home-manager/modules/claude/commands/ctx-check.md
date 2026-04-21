@@ -6,8 +6,6 @@ effort: xhigh
 
 # Check Context Understanding
 
-ultrathink
-
 Analyze current task/context and output explicit uncertainty disclosure
 
 **NEVER**: Never modify files, run side-effect commands, or start implementation

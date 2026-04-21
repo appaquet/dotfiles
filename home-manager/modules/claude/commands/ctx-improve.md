@@ -6,8 +6,6 @@ effort: xhigh
 
 # Improve Context
 
-ultrathink
-
 Use the full understanding checklist and verify our full (10/10) understanding of the task at hand.
 
 Important: any modifications to project or phase docs need to be done via `proj-editing` skill.

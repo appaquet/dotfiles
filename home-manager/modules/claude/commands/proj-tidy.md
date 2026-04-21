@@ -1,11 +1,10 @@
 ---
 name: proj-tidy
 description: Validate and fix project doc consistency against standard structure
+effort: xhigh
 ---
 
 # Project Tidy
-
-ultrathink
 
 Validate project doc against standard structure in @~/.claude/docs/project-doc.md and fix inconsistencies.
 
