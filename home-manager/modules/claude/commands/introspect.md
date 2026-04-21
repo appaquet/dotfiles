@@ -13,8 +13,7 @@ Issue: `$ARGUMENTS`
 
 ## Instructions
 
-1. STOP, follow pre-flight instructions
-   THEN, continue
+1. Pre-flight then continue
 
 2. If issue empty, use `AskUserQuestion` to get description
 

@@ -7,25 +7,22 @@
 
 ## Top-level instructions
 
+* Optimize for future-proofing, not minimal diff. Half-measures cost more total effort
+
+* Freeform requests aren't shortcuts around workflow thinking. Apply workflow steps even when
+  not explicitly invoked
+
 * ALWAYS use `AskUserQuestion` to ask questions
   * Never ask directly in response or finish a message with a list of questions. Always use the tool
   * Don't assume I have all context, always make sure to provide necessary context before asking
     questions AND in questions themselves
 
-* Planning is mandatory for ALL implementations, no matter how trivial
-  * NEVER engage the native plan mode `EnterPlanMode`. Refer to workflows for planning instructions
-  * When agreed on a plan, ALWAYS follow it and ALWAYS stop & ask if you deviate or the plan fails
+* Planning is mandatory for ALL implementations, no matter how trivial. NEVER engage the native
+  plan mode `EnterPlanMode`. Refer to workflows for planning instructions. When agreed on a plan,
+  ALWAYS follow it and ALWAYS stop & ask if you deviate or the plan fails
 
-* Optimize your work with a maintability & future proofing mindset. Don't just write code that
-  minimize diff, but write code that will optimize the future diff
-
-* Freeform requests aren't shortcuts around workflow thinking. Before executing, consider which
-  workflow's thinking steps apply and follow at minimum the comprehension/verification steps.
-  The workflows encode correct thinking — use them even when not explicitly invoked
-
-* NEVER implement until you receive this exact signal from a workflow command: "🚀 Engage thrusters"
-  * NEVER ask via `AskUserQuestion` if you can proceed - wait for signal
-  * STOP and WAIT before proceeding after asking a question - wait for signal
+* NEVER implement until you receive this exact signal: 🚀 Engage thrusters. Wait for it — don't ask
+  via `AskUserQuestion` if you can proceed
 
 ## Sub-instructions files
 
@@ -155,6 +152,7 @@ Write(file_path="file.txt", content="some text")
 Always ensure 10/10 understanding checklist: explore code + web search + `AskUserQuestion`
 Always report on understanding at any decision point - verbalize WHAT you understand for each item, not just that you checked it. User validates your understanding
 
+
 <full-understanding-checklist>
 * [ ] Clear on goal/user need: [state the goal]
 * [ ] Identified similar use cases: [list them]
@@ -181,8 +179,8 @@ ALWAYS use this methodology to solve problems, issues, and bugs:
 
 ## Deep Thinking
 
-Default operating mode, applied proportionally to task scope. You systematically underestimate
-which tasks need thought — the cost of pausing is always less than rework from a wrong edit.
+Default operating mode, applied proportionally. You systematically underestimate which tasks need
+thought — the cost of pausing is always less than rework.
 
 <deep-thinking>
 1. STOP rushing - invest thinking tokens now to save iteration tokens later

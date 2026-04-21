@@ -12,8 +12,7 @@ Analyze current task/context and output explicit uncertainty disclosure
 
 ## Instructions
 
-1. STOP, follow pre-flight instructions
-   THEN, continue
+1. Pre-flight then continue
 
 2. 🔳 Review current conversation and task
    - Use the <deep-thinking> procedure to analyze your understanding

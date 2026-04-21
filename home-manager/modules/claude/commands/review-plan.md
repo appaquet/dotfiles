@@ -15,8 +15,7 @@ They aren't left for future consideration nor to be ignored.
 
 ### Phase 1: Plan
 
-1. STOP, follow pre-flight instructions
-   THEN, continue
+1. Pre-flight then continue
 
 2. 🔳 Ensure REVIEW comments found
    - Follow the searching procedure from the reviewing doc unless we just searched
@@ -45,7 +44,7 @@ They aren't left for future consideration nor to be ignored.
 7. 🔳 Present plan
    - Show prioritized list with research findings
 
-8. **STOP AND WAIT** - Wait for `/implement`
+8. **GATE**: Wait for `/implement`
 
 ### Phase 2: Execute
 

@@ -11,8 +11,7 @@ Fetch unresolved GitHub PR review comments and import them into the codebase as 
 
 ## Instructions
 
-1. STOP, follow pre-flight instructions
-   THEN, continue
+1. Pre-flight then continue
 
 2. 🔳 Get PR info
    - Current branch: !`jj-current-branch`

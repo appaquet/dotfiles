@@ -13,8 +13,7 @@ already a forked context.
 
 ## Instructions
 
-1. STOP, follow pre-flight instructions
-   THEN, continue
+1. Pre-flight then continue
 
 2. 🔳 Ensure context loaded
    - Run `/ctx-load` to load project context (project doc, branch state, recent commits)

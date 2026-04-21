@@ -12,8 +12,7 @@ Important: any modifications to project or phase docs need to be done via `proj-
 
 ## Instructions
 
-1. STOP, follow pre-flight instructions
-   THEN, continue
+1. Pre-flight then continue
 
 2. 🔳 Check current understanding
    - If 10/10 understanding, tell me and stop here

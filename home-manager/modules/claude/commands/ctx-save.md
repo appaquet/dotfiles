@@ -13,8 +13,7 @@ Project files: !`claude-proj-docs`
 
 ## Instructions
 
-1. STOP, follow pre-flight instructions
-   THEN, continue
+1. Pre-flight then continue
 
 2. 🔳 Load `proj-editing` skill using the `Skill` tool
       It's is crucial to use this skill to edit project and phase docs and strictly follow the

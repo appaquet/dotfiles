@@ -15,8 +15,7 @@ Load context about the project and task at hand
 
 ## Instructions
 
-1. STOP, follow pre-flight instructions
-   THEN, continue
+1. Pre-flight then continue
 
 2. 🔳 Read project docs (use State above - don't re-discover)
    * If project files found:  

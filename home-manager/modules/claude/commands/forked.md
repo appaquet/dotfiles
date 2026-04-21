@@ -22,8 +22,7 @@ NEVER make judgment calls on if something is simple enough to be done by main ag
 
 ## Instructions
 
-1. STOP, follow pre-flight instructions
-   THEN, continue
+1. Pre-flight then continue
 
 2. 🔳 Make sure task at hand clear. If not, use `AskUserQuestion` to clarify
 

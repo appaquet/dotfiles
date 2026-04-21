@@ -10,8 +10,7 @@ Resolve conflicts across stacked changes, processing oldest first so fixes casca
 
 ## Instructions
 
-1. STOP, follow pre-flight instructions
-   THEN, continue
+1. Pre-flight then continue
 
 2. 🔳 Survey conflicts
    - Run `jj log` to see the full stack

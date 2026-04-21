@@ -13,8 +13,7 @@ Current date: !`date +%Y/%m/%d`
 
 ## Instructions
 
-1. STOP, follow pre-flight instructions
-   THEN, continue
+1. Pre-flight then continue
 
 2. 🔳 Load `proj-editing` skill using the `Skill` tool
    - Read @/.claude/docs/project-doc.md completely for full understanding of doc structure
@@ -44,4 +43,4 @@ Current date: !`date +%Y/%m/%d`
    - Confirm phase name(s) with `AskUserQuestion`
    - Commit docs: `jj commit -m "private: claude: docs - <project-name>"`
 
-8. **STOP AND WAIT** - User decides when to `/implement`
+8. **GATE**: User decides when to `/implement`

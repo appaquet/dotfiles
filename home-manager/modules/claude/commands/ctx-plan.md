@@ -20,8 +20,7 @@ NEVER engage the native plan mode `EnterPlanMode`
 
 ## Instructions
 
-1. STOP, follow pre-flight instructions
-   THEN, continue
+1. Pre-flight then continue
 
 2. 🔳 Ensure context loaded - run `/ctx-load` if not sufficient
 

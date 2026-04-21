@@ -13,8 +13,7 @@ all the context loading capabilities
 
 ## Instructions
 
-1. STOP, follow pre-flight instructions
-   THEN, continue
+1. Pre-flight then continue
 
 2. Create a new jj change: `jj new -m "private: claude: agents review"`
 

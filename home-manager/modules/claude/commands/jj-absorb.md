@@ -16,8 +16,7 @@ Current branch: `!jj-current-branch`
 
 ## Instructions
 
-1. STOP, follow pre-flight instructions
-   THEN, continue
+1. Pre-flight then continue
 
 2. 🔳 Survey the stack
    - Run `jj-stacked-stats` to see all stacked branch changes and their files
