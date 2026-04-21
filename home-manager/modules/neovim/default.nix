@@ -94,9 +94,7 @@ in
           auto-session # session management
 
           # Notifications
-          (nvim-notify.overrideAttrs (_: {
-            doCheck = false; # flaky on ci
-          }))
+          mini-notify
 
           # Diagnostics
           trouble-nvim
@@ -157,7 +155,6 @@ in
             conform-nvim # formatting
             render-markdown-nvim
             nvim-lint # linting
-            nvim-lsp-notify # lsp notifications
 
             # Completion popup
             blink-cmp
