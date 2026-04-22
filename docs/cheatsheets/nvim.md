@@ -8,9 +8,9 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>` is space
 * `<leader>qq` Close current window/split
 * `<leader>qa` Quit neovim
+* `<leader>qr` Restart neovim
 * `<leader>ql` Restore last session
 * `<leader>qL` Search / pick a session to restore
-* `<leader>qn` Dismiss all notifications
 * `<leader>o` Open messages in floating window
 * `<A-j>` Move down 5 lines
 * `<A-k>` Move up 5 lines
