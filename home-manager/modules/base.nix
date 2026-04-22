@@ -95,8 +95,5 @@
     ]
     ++ lib.optionals pkgs.stdenv.isDarwin [
       pkgs.macpow
-    ]
-    ++ lib.optionals (pkgs.stdenv.isDarwin || pkgs.stdenv.isx86_64) [
-      pkgs.fzf-nix # fzf-nix, somehow doesn't work on linux arm
     ];
 }

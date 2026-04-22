@@ -155,6 +155,8 @@
 
     shellAbbrs = {
       jjt = "jj-proj-tug";
+      jjg = "jj pull";
+      jjp = "jj push";
       jjpr = {
         expansion = "gh pr create --head (jj-current-branch) --draft --body \"\" --title \"%\"";
         setCursor = true;

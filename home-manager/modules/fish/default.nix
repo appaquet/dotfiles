@@ -50,7 +50,6 @@
         fzf_configure_bindings
 
         # Some shortcuts (ctrl-alt-c, in iTerm2, need to rebind alt to Esc+)
-        bind -M insert ctrl-alt-n 'fzf-nix'
         bind -M insert ctrl-alt-g 'fzf-ripgrep'
       '';
 
@@ -107,11 +106,6 @@
         expansion = "nix shell github:NixOS/nixpkgs/nixpkgs-unstable#%";
         setCursor = true;
       };
-      nrf = "nix run nixpkgs#(fzf-nix)";
-      nrfu = "nix run github:NixOS/nixpkgs/nixpkgs-unstable#(fzf-nix)";
-      nsf = "nix shell nixpkgs#(fzf-nix)";
-      nsfu = "nix shell github:NixOS/nixpkgs/nixpkgs-unstable#(fzf-nix)";
-      fn = "fzf-nix";
 
       nv = "nvim";
     };

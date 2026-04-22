@@ -9,8 +9,6 @@ let
       exo = final.callPackage ./exo { };
       macpow = final.callPackage ./macpow { };
 
-      fzf-nix = inputs.fzf-nix.packages.${system}.fzf-nix;
-
       opencode = inputs.llm-agents.packages.${system}.opencode;
       gemini-cli = inputs.llm-agents.packages.${system}.gemini-cli;
       codex = inputs.llm-agents.packages.${system}.codex;

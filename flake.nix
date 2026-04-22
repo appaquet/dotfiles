@@ -23,14 +23,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    fzf-nix = {
-      url = "github:mrene/fzf-nix";
-
-      # use slower channel, but more stable and prevent rebuilding often
-      # since it needs to reindex nix packages on each update
-      inputs.nixpkgs.follows = "nixos";
-    };
-
     nix-index-database = {
       url = "github:nix-community/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
