@@ -5,6 +5,7 @@
     inputs.secrets.homeManager.exomind
     ./modules/base.nix
     ./modules/claude
+    ./modules/opencode
     ./modules/dev.nix
     ./modules/docker.nix
     ./modules/media.nix

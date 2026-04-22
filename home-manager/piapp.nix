@@ -5,6 +5,7 @@
     ./modules/base.nix
     ./modules/dev.nix
     ./modules/claude
+    ./modules/opencode
   ];
 
   dotfiles.neovim.full = true;
