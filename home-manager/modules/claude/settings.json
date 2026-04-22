@@ -108,7 +108,7 @@
       "Skill(proj-editing)"
     ],
     "deny": [],
-    "defaultMode": "acceptEdits",
+    "defaultMode": "auto",
     "additionalDirectories": [
       "~/dotfiles"
     ]
@@ -283,5 +283,6 @@
   "autoMemoryEnabled": false,
   "showThinkingSummaries": true,
   "skipDangerousModePermissionPrompt": true,
-  "teammateMode": "in-process"
+  "teammateMode": "in-process",
+  "skipAutoPermissionPrompt": true
 }
