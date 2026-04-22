@@ -1,12 +1,22 @@
 #!/usr/bin/env bash
 
+function remote_copy() {
+  ssh -o ConnectTimeout=5 -o PasswordAuthentication=no -o KbdInteractiveAuthentication=no mbpapp.n3x.net /usr/bin/pbcopy
+}
+
 os=$(uname)
 if [[ "$os" == "Linux" ]]; then
   if [[ "$DISPLAY" != "" ]]; then
     xclip -selection clipboard
   else
-    ssh -o ConnectTimeout=5 -o PasswordAuthentication=no -o KbdInteractiveAuthentication=no mbpapp.n3x.net /usr/bin/pbcopy
+    remote_copy
   fi
+
 elif [[ "$os" == "Darwin" ]]; then
-  reattach-to-user-namespace /usr/bin/pbcopy
+  hostname=$(hostname)
+  if [[ "$hostname" == "mbpapp" ]]; then
+    reattach-to-user-namespace /usr/bin/pbcopy
+  else
+    remote_copy
+  fi
 fi
