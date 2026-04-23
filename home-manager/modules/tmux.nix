@@ -127,7 +127,7 @@
 
         set -g status-right-length 100
         set -gF status-right "#{E:@catppuccin_status_cpu}"
-        set -agF status-right "#{E:@catppuccin_status_uptime}"
+        set -ag status-right "#{E:@catppuccin_status_uptime}"
         set -agF status-right "#{E:@catppuccin_status_battery}"
 
         run-shell ${pkgs.tmuxPlugins.cpu}/share/tmux-plugins/cpu/cpu.tmux
