@@ -327,6 +327,7 @@ keymaps, but also default/built-ins that I tend to forget.
 
 * `<leader>aa` Show CodeCompanion actions
 * `<leader>ae` Inline edit with prompt (visual mode)
+* `gA` Inline prose completion at cursor with prompt (normal mode)
 
 ### Claude Integration (c)
 
