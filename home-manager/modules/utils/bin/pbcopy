@@ -14,7 +14,7 @@ if [[ "$os" == "Linux" ]]; then
 
 elif [[ "$os" == "Darwin" ]]; then
   hostname=$(hostname)
-  if [[ "$hostname" == "mbpapp" ]]; then
+  if [[ "$hostname" == "mbpapp" || "$hostname" == "mbpapp".* ]]; then
     reattach-to-user-namespace /usr/bin/pbcopy
   else
     remote_copy
