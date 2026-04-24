@@ -44,6 +44,7 @@ Prefix is `C-a`. Mouse is enabled by default.
 
 * `<prefix> M` Toggle mouse on/off (disable for terminal text selection + copy)
 * `<prefix> r` Reload config
+* `<prefix> b` Floating btop popup (`q` to exit)
 
 ## Plugins
 

@@ -117,6 +117,9 @@
         bind "&" kill-window
         bind X kill-session
 
+        # Floating btop popup (q to exit)
+        bind b display-popup -E -w 90% -h 90% -T " btop " "btop"
+
         # Catppuccin status line configuration
         set -g status-position bottom
 
