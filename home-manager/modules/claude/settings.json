@@ -277,5 +277,6 @@
   "preferredNotifChannel": "ghostty",
   "fileCheckpointingEnabled": false,
   "remoteControlAtStartup": false,
-  "agentPushNotifEnabled": false
+  "agentPushNotifEnabled": false,
+  "verbose": true
 }
