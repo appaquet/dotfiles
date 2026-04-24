@@ -159,17 +159,6 @@
         ]
       }
     ],
-    "PostToolUseFailure": [
-      {
-        "matcher": "Read|Write|Edit|Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$HOME/.claude/hooks/nono-hook.sh"
-          }
-        ]
-      }
-    ],
     "SessionEnd": [
       {
         "matcher": "",
@@ -283,5 +272,10 @@
   "showThinkingSummaries": true,
   "skipDangerousModePermissionPrompt": true,
   "teammateMode": "in-process",
-  "skipAutoPermissionPrompt": true
+  "skipAutoPermissionPrompt": true,
+  "editorMode": "vim",
+  "preferredNotifChannel": "ghostty",
+  "fileCheckpointingEnabled": false,
+  "remoteControlAtStartup": false,
+  "agentPushNotifEnabled": false
 }
