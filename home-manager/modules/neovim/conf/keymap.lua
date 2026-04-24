@@ -80,6 +80,7 @@ vim.keymap.set("n", "<Leader>rf", send_file_to_sh, { silent = true, desc = "Exec
 vim.keymap.set("v", "<Leader>rl", send_visual_to_sh, { silent = true, desc = "Execute selected lines" })
 vim.keymap.set("n", "<Leader>rb", send_block_to_sh, { silent = true, desc = "Execute code block" })
 vim.keymap.set("n", "<C-/>", ":nohlsearch<CR>", { silent = true, desc = "Clear search highlight" })
+vim.keymap.set("n", "<C-_>", ":nohlsearch<CR>", { silent = true, desc = "Clear search highlight" })
 
 -- Navigation
 vim.keymap.set({ "n", "v" }, "<A-j>", "5j", { silent = true, desc = "Down 5 lines" })
