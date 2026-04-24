@@ -36,11 +36,9 @@
 ## Context management and agentic workflow
 
 * Main agent should primarily be used for high-level planning, project management, jj (code
-  versioning) and trivial code edits that you know the location for. Anything requiring reading,
-  understanding and exploring code should be delegated to sub-agents
-  Main agent context window is VERY VERY precious
-  NEVER waste reading/validating/diffing code/files, testing, browser, running commands, etc.
-  => Always route to sub-agents
+  versioning) and trivial code edits that you know the location for. 
+  Main agent context window is VERY VERY precious; Anything requiring reading, understanding and
+  exploring code should be delegated to sub-agents
 
 * Sub agents should ALWAYS used for grunt work to preserve main agent context, no matter the task complexity
   * Optimize prompts for sub-agents, but also ask them to optimize their own output message
@@ -109,49 +107,10 @@ Before executing instructions of any command/skill/agent instructions:
 * ALWAYS use project & phase docs to plan and track work @~/.claude/docs/project-doc.md using the
   proper project editing skills
 
-## Bash instructions
-
-* Avoid operations that bypass my allow list uselessly:
-  * Avoid prefixing commands with env set (`VAR=value command`) unless necessary
-  * NEVER use `find` in bash — use the Glob tool for file discovery
-  * NEVER use `grep`/`rg` in bash — use the Grep tool for content search
-    Both bypass the allow list and trigger permission prompts. Grep tool supports regex patterns,
-    glob file filters, type filters, and context lines — covers all common `grep` use cases
-
-* Avoid using `$()` substitution since they will trigger a permission check
-
-* Avoid quoted strings in commands (e.g., `echo "some text"`) — triggers permission prompt. Use
-  tools (Write, Edit) instead of echo/printf
-
-* Also avoid chaining multiple commands with `echo "---"` or similar. Call multiple commands, as I
-  need to approve because of use quoted arguments. You may be saving tokens, but you're blocking me
-  from going faster. Use parallel calls instead
-
-* Avoid using python/node/bash scripts to do file operations that can be done via your internal
-  tools as I need to approve them
-
-```
-<bad-examples>
-Bash(grep -rn "pattern" /path --include="*.go" | grep -v ".pb.go" | head -20)
-Bash(jj commit -m "msg" "$(readlink ./proj)/")
-Bash(echo "some text" > file.txt)
-</bad-examples>
-```
-
-```
-<good-examples>
-Grep(pattern="pattern", path="/path", glob="*.go", head_limit=20)
-Bash(readlink ./proj)  # then use result in next call
-Bash(jj commit -m "msg" some/path)
-Write(file_path="file.txt", content="some text")
-</good-examples>
-```
-
 ## Context understanding
 
 Always ensure 10/10 understanding checklist: explore code + web search + `AskUserQuestion`
 Always report on understanding at any decision point - verbalize WHAT you understand for each item, not just that you checked it. User validates your understanding
-
 
 <full-understanding-checklist>
 * [ ] Clear on goal/user need: [state the goal]
