@@ -74,8 +74,13 @@
 
 * For sub-agents, pick right model for task to optimize speed & accuracy:
   * haiku: shallow code exploration and reconnaissance
-  * sonnet: very straightforward code, simple code exploration
-  * opus: planning, review comments research/planning, detailed code exploration, most code
+  * sonnet: straightforward code, code exploration
+  * opus: planning, review comments research/planning, complex code exploration or debugging,
+          complex code
+
+* If you are a sub-agent, and running into issues and unforeseen complications, while running sonnet
+  or haiku, STOP and tell the main agent. The main agent should be able to restart work with the
+  more capable opus model.
 
 * For any workflow that requires multiple steps, synchronization or communication between agents,
   use a team of agent (`TeamCreate`) instead of individual agents
