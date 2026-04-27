@@ -124,4 +124,8 @@ in
   ++ lib.optionals pkgs.stdenv.isLinux [
     pkgs.bubblewrap # required for sandboxing
   ];
+
+  programs.fish.shellAbbrs = {
+    cc = "claude";
+  };
 }
