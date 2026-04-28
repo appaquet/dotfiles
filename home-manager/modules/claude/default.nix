@@ -118,6 +118,7 @@ in
     claude-proj-docs
     claude-tmux-indicator
     pkgs.socat # required for sandboxing
+    pkgs.nono
     inputs'.ccmon.packages.default
   ]
   ++ lib.optionals pkgs.stdenv.isLinux [
