@@ -8,7 +8,7 @@ let
     {
       exo = final.callPackage ./exo { };
       macpow = final.callPackage ./macpow { };
-      nono = final.callPackage ./nono { };
+      # nono = final.callPackage ./nono { };
 
       opencode = inputs.llm-agents.packages.${system}.opencode;
       gemini-cli = inputs.llm-agents.packages.${system}.gemini-cli;

@@ -11,16 +11,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "nono";
-  version = "0.24.0";
+  version = "0.43.0";
 
   src = fetchFromGitHub {
     owner = "always-further";
     repo = "nono";
     rev = "v${version}";
-    hash = "sha256-LhI5O85lwnSmMCoy5lbC9UCAKdMvRdtU2nt4WXyMPSk=";
+    hash = "sha256-V0QdcaNxn0bVOK5YZdN/bA//WBJXesDw7P9AzGbRQdk=";
   };
 
-  cargoHash = "sha256-5H9TgMh4MhSvz7szbFPHdIkHk8RbpqSEw86ltn4Rr0E=";
+  cargoHash = "sha256-qLL6tq2Q6smB8eb4lsN3VlEStn/7RoXPg23W/yONrog=";
 
   preCheck = ''
     mkdir -p /tmp/a /tmp/b

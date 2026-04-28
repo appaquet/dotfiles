@@ -16,6 +16,12 @@ let
         };
       }) paths
     );
+
+  nono-opencode = pkgs.writeShellScriptBin "nono-opencode" ''
+    export OPENCODE_CONFIG=${./opencode-nono.json}
+    nono run --profile ${./nono-profile.json} --allow-cwd -- opencode
+  '';
+
 in
 {
   home.file = (
@@ -28,5 +34,7 @@ in
 
   home.packages = [
     pkgs.opencode
+    pkgs.nono
+    nono-opencode
   ];
 }

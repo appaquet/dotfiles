@@ -1,0 +1,24 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "autoupdate": false,
+  "instructions": [
+    "~/.claude/docs/workflows.md",
+    "~/.claude/docs/project-doc.md",
+    "~/.claude/docs/version-control.md",
+    "~/.claude/docs/development.md",
+    "~/.claude/docs/code-style.md",
+    "~/.claude/docs/review.md",
+  ],
+  "permission": {
+    "*": "allow",
+    "webfetch": "allow",
+    "websearch": "allow",
+    "skill": {
+      "*": "allow"
+    },
+    "external_directory": {
+      "~/.claude/**": "allow"
+    }
+  }
+}
+
