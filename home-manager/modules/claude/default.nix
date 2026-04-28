@@ -7,7 +7,6 @@
 }:
 
 let
-  # We symlink here since it may be change by claude and I want to iterate
   mkClaudeConfSymlinks =
     paths:
     lib.listToAttrs (
