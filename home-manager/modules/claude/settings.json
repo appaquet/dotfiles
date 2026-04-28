@@ -271,12 +271,12 @@
   "autoMemoryEnabled": false,
   "showThinkingSummaries": true,
   "skipDangerousModePermissionPrompt": true,
-  "teammateMode": "in-process",
-  "skipAutoPermissionPrompt": true,
   "editorMode": "vim",
+  "verbose": true,
   "preferredNotifChannel": "ghostty",
   "fileCheckpointingEnabled": false,
+  "teammateMode": "in-process",
   "remoteControlAtStartup": false,
   "agentPushNotifEnabled": false,
-  "verbose": true
+  "skipAutoPermissionPrompt": true
 }
