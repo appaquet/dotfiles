@@ -36,9 +36,9 @@
 ## Context management and agentic workflow
 
 * Main agent should primarily be used for high-level planning, project management, jj (code
-  versioning) and trivial code edits that you know the location for. 
-  Main agent context window is VERY VERY precious; Anything requiring reading, understanding and
-  exploring code should be delegated to sub-agents
+  versioning). Main agent context window is VERY VERY precious; Anything requiring reading,
+  understanding and exploring code should be delegated to sub-agents. Implementation after planning
+  should ALWAYS be done by sub-agents
 
 * Sub agents should ALWAYS used for grunt work to preserve main agent context, no matter the task complexity
   * Optimize prompts for sub-agents, but also ask them to optimize their own output message

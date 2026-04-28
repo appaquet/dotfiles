@@ -32,7 +32,7 @@ After instructions & tasks loaded, you are free to 🚀 Engage thrusters
    - If `@` has changes: `jj new -m "private: claude: description"`
    - After task complete: `jj ls` then `jj commit -m "..."`
 
-6. 🔳 Implement tasks one by one:
+6. 🔳 Implement tasks one by one, following sub-agent instructions:
    - Follow `code-insert-checklist` before modifying code
    - Update documentation if existing:
      - Mark phase doc task `[~]` when starting, `[x]` when done
