@@ -24,7 +24,12 @@ let
 
   nono-opencode = pkgs.writeShellScriptBin "nono-opencode" ''
     export OPENCODE_CONFIG=${./opencode-nono.json}
-    nono run --profile ${./nono-profile.json} --allow-cwd -- opencode
+    nono run --profile ${./nono-profile.json} --allow-cwd -- ${opencode-wrapped}/bin/opencode "$@"
+  '';
+
+  opencode = pkgs.writeShellScriptBin "opencode" ''
+    export OPENCODE_CONFIG=${./opencode.json}
+    ${opencode-wrapped}/bin/opencode "$@"
   '';
 
 in
@@ -33,12 +38,11 @@ in
     mkOpencodeConfSymlinks ".config/opencode" "opencode" [
       "commands"
       "agents"
-      "opencode.json"
     ]
   );
 
   home.packages = [
-    opencode-wrapped
     nono-opencode
+    opencode
   ];
 }
