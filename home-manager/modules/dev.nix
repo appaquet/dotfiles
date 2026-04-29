@@ -42,6 +42,8 @@ in
 
       gnumake
       bintools # ld, objdump, etc.
+
+      nono
     ])
     ++ lib.optionals pkgs.stdenv.isLinux [
       pkgs.mold

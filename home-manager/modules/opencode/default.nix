@@ -17,6 +17,11 @@ let
       }) paths
     );
 
+  opencode-wrapped = pkgs.writeShellScriptBin "opencode" ''
+    export OPENCODE_ENABLE_EXA=1
+    ${pkgs.opencode}/bin/opencode "$@"
+  '';
+
   nono-opencode = pkgs.writeShellScriptBin "nono-opencode" ''
     export OPENCODE_CONFIG=${./opencode-nono.json}
     nono run --profile ${./nono-profile.json} --allow-cwd -- opencode
@@ -33,8 +38,7 @@ in
   );
 
   home.packages = [
-    pkgs.opencode
-    pkgs.nono
+    opencode-wrapped
     nono-opencode
   ];
 }
