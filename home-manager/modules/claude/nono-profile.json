@@ -3,11 +3,12 @@
     "name": "claude",
     "version": "1.0.0"
   },
+  "extends": "my-default",
   "filesystem": {
     "read": [
     ],
     "allow": [
-      "$HOME/.claude",
+      "$HOME/.claude"
     ],
     "read_file": [
     ],
