@@ -6,16 +6,7 @@
   "extends": "my-default",
   "filesystem": {
     "read": [
-      "/proc",
-      "/nix",
-      "$HOME/dotfiles",
-      "$HOME/.claude",
-
-      "$HOME/.config/jj",
-      "$HOME/.config/git",
-
-      "$HOME/.nix-profile/bin",
-      "$HOME/.local/state/nix"
+      "$HOME/.claude"
     ],
     "allow": [
       "$HOME/.config/opencode",
@@ -29,7 +20,6 @@
       "/tmp"
     ],
     "read_file": [
-      "$HOME/.profile"
     ],
     "write_file": []
   },
