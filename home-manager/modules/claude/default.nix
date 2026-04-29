@@ -53,6 +53,10 @@ let
     ${claude-code}/bin/claude --verbose "$@"
   '';
 
+  nono-claude = pkgs.writeShellScriptBin "nono-claude" ''
+    nono run --profile ${./nono-profile.json} --allow-cwd -- claude "$@"
+  '';
+
   # Utility to list project docs (avoids shell expansion issues in skill commands)
   claude-proj-docs = pkgs.writeShellScriptBin "claude-proj-docs" ''
     proj="''${CLAUDE_ROOT:-$(pwd)}/proj"
@@ -115,8 +119,11 @@ in
 
   home.packages = [
     claude-wrapped
+    nono-claude
+
     claude-proj-docs
     claude-tmux-indicator
+
     pkgs.socat # required for sandboxing
     pkgs.nono
     inputs'.ccmon.packages.default

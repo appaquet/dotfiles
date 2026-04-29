@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "name": "claude",
+    "version": "1.0.0"
+  },
+  "filesystem": {
+    "read": [
+      "/proc",
+      "/nix",
+      "$HOME/dotfiles",
+
+      "$HOME/.config/jj",
+      "$HOME/.config/git",
+
+      "$HOME/.nix-profile/bin",
+      "$HOME/.local/state/nix"
+    ],
+    "allow": [
+      "$HOME/.claude",
+
+      "$HOME/.config/fish",
+      "$HOME/.local/share/fish",
+
+      "/tmp"
+    ],
+    "read_file": [
+      "$HOME/.profile"
+    ],
+    "write_file": []
+  },
+  "network": {
+    "block": false
+  },
+  "workdir": {
+    "access": "readwrite"
+  }
+}
