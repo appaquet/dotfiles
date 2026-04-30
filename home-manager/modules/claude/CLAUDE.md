@@ -24,6 +24,9 @@
 * NEVER implement until you receive this exact signal: 🚀 Engage thrusters. Wait for it — don't ask
   via `AskUserQuestion` if you can proceed
 
+* If instructions contains a `@some-file` annotation, make sure you have the file in context, or
+  read it if you don't
+
 ## Context management and agentic workflow
 
 * Main agent should primarily be used for high-level planning, project management, jj (code
