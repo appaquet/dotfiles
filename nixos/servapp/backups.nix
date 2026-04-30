@@ -23,6 +23,16 @@ in
       yearly = 0;
       recursive = true;
     };
+
+    datasets."offline" = {
+      autosnap = false;
+      autoprune = true;
+      daily = 30;
+      hourly = 0;
+      monthly = 24;
+      yearly = 0;
+      recursive = true;
+    };
   };
 
   sops.secrets."syncoid/ssh_key" = {
@@ -51,11 +61,20 @@ in
 
   systemd.services.offline-backup = {
     description = "Sync ZFS datasets to offline backup pool";
-    path = [ pkgs.sanoid pkgs.zfs ];
+    path = [
+      pkgs.sanoid
+      pkgs.zfs
+      config.systemd.package
+    ];
     serviceConfig = {
       Type = "oneshot";
     };
-    script = lib.concatMapStringsSep "\n" (ds: "syncoid --no-sync-snap tank1/${ds} offline/${ds}") offlineDatasets;
+    script = ''
+      ${lib.concatMapStringsSep "\n" (
+        ds: "syncoid --no-sync-snap tank1/${ds} offline/${ds}"
+      ) offlineDatasets}
+      systemctl start sanoid.service
+    '';
   };
 
   restic-backup = {
