@@ -24,15 +24,6 @@
 * NEVER implement until you receive this exact signal: 🚀 Engage thrusters. Wait for it — don't ask
   via `AskUserQuestion` if you can proceed
 
-## Sub-instructions files
-
-* My workflows: @~/.claude/docs/workflows.md
-* Project docs: @~/.claude/docs/project-doc.md
-* Version control (jj): @~/.claude/docs/version-control.md
-* Development instructions: @~/.claude/docs/development.md
-* Code style: @~/.claude/docs/code-style.md
-* Reviewing: @~/.claude/docs/review.md
-
 ## Context management and agentic workflow
 
 * Main agent should primarily be used for high-level planning, project management, jj (code
@@ -109,8 +100,7 @@ Before executing instructions of any command/skill/agent instructions:
 
 * Your context is precious, make sure the follow the agentic workflow instructions
 
-* ALWAYS use project & phase docs to plan and track work @~/.claude/docs/project-doc.md using the
-  proper project editing skills
+* ALWAYS use project & phase docs to plan and track work as per project-doc.md rules, using the proper project editing skills
 
 ## Context understanding
 

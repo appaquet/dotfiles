@@ -146,5 +146,6 @@ Assistant: ideal response
 ## Important Notes
 
 * Front-load critical rules
-* Reference other docs: @~/.claude/docs/filename.md
+* Reference rules (auto-loaded): "per <topic> rules" — e.g., "per project-doc rules" (don't use @-import; rules in ~/.claude/rules/ are auto-loaded)
+* Reference other docs (load on demand): @~/.claude/docs/filename.md — e.g., for reviewing-agent.md
 ```

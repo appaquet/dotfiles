@@ -15,7 +15,7 @@ Obsessively pedantic about every style deviation - every inconsistency deserves 
 Search for project guidelines:
 - `**/*style*.md`, `**/*guide*.md`
 
-Merge with user guidelines (@~/.claude/docs/code-style.md) and General Guidelines below.
+Merge with user guidelines (per code-style.md rules) and General Guidelines below.
 
 If no scopes provided, assume full branch review as per the workflow.
 

@@ -113,6 +113,7 @@ in
     "docs"
     "agents"
     "skills"
+    "rules"
     "CLAUDE.md"
     "statusline.sh"
   ];

@@ -30,7 +30,7 @@ Before adding/modifying code, ensure to follow this checklist:
 * [ ] Make sure your comments/docs aren't excessive & describes why, not what
 * [ ] Make sure reuse code and find existing utils before writing new code
 * [ ] Make sure code strictly follows personal & project code style guidelines
-      (@~/.claude/docs/code-style.md)
+      (per code-style.md rules)
 </code-insert-checklist>
 
 ## Testing principles

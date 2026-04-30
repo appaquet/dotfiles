@@ -5,7 +5,7 @@
 
 {
   home.file = {
-    ".config/nono/profiles/my-default.json".source = ./my-default.json;
+    ".config/nono/profiles/coding-agent.json".source = ./coding-agent.json;
   };
 
   home.packages = [

@@ -6,7 +6,7 @@ effort: xhigh
 
 # Project Tidy
 
-Validate project doc against standard structure in @~/.claude/docs/project-doc.md and fix inconsistencies.
+Validate project doc against the standard structure (per project-doc rules) and fix inconsistencies.
 
 Current project files: !`claude-proj-docs`
 
@@ -15,7 +15,7 @@ Current project files: !`claude-proj-docs`
 1. Pre-flight then continue
 
 2. 🔳 Load `proj-editing` skill using the `Skill` tool
-   - Read @~/.claude/docs/project-doc.md completely for standard structure reference
+   - Reference the project-doc.md rules for the standard structure
 
 3. 🔳 Read project docs
    - Read project doc (`00-*.md`) and all phase docs (`01-*.md`, etc.)

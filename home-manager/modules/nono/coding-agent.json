@@ -1,6 +1,6 @@
 {
   "meta": {
-    "name": "my-default",
+    "name": "coding-agent",
     "version": "1.0.0"
   },
   "filesystem": {
@@ -18,6 +18,8 @@
     "allow": [
       "$HOME/.config/fish",
       "$HOME/.local/share/fish",
+
+      "$HOME/.cache/nix",
 
       "/tmp"
     ],

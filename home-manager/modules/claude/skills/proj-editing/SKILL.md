@@ -6,7 +6,7 @@ argument-hint: [operation or file]
 
 # Project Doc Editing
 
-Edit project documentation following the structure in @~/.claude/docs/project-doc.md.
+Edit project documentation following the project-doc.md rules.
 
 Target: `$ARGUMENTS`
 
@@ -19,7 +19,7 @@ Target: `$ARGUMENTS`
 
 ## Key Structures
 
-Reference these XML blocks from @~/.claude/docs/project-doc.md:
+Reference these XML blocks from the project-doc.md rules:
 
 - `<project-doc-sections>` - Sections for project doc (Context, Checkpoint, Requirements, Questions, Phases, Files)
 - `<phase-doc-sections>` - Sections for phase docs (Context, Requirements, Questions, Tasks, Files)
