@@ -30,7 +30,7 @@ require("lualine").setup({
 		ignore_focus = {},
 		always_divide_middle = true,
 		always_divide_tabline = true,
-		globalstatus = false,
+		globalstatus = true,
 		refresh = {
 			statusline = 100,
 			tabline = 100,
