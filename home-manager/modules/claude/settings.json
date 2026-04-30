@@ -120,10 +120,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '.message' | xargs -I _ notify \"_\""
-          },
-          {
-            "type": "command",
             "command": "ccmon status"
           }
         ]
