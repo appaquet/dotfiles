@@ -13,6 +13,7 @@ Use `./x` script for building and evaluating nix configurations:
 - `./x check` - Eval all nixos/home/darwin configs for all hosts
 
 For quick iteration, use `check` first (fast eval) before `build`.
+To find a missing hash, use build functions instead of trying to eval.
 
 ## Documentation
 

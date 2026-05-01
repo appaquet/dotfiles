@@ -19,6 +19,8 @@ let
     };
 
   neovimPluginsOverlay = import ../home-manager/modules/neovim/plugins-overlay.nix;
+
+  markdownOxideOverlay = import ./markdown-oxide;
 in
 {
   # Export overlays as flake outputs (single source of truth)
@@ -26,6 +28,7 @@ in
   flake.overlays = {
     packages = packagesOverlay;
     neovimPlugins = neovimPluginsOverlay;
+    markdown-oxide = markdownOxideOverlay;
   };
 
   perSystem =
@@ -40,6 +43,7 @@ in
         overlays = [
           packagesOverlay
           neovimPluginsOverlay
+          markdownOxideOverlay
         ];
       };
     };

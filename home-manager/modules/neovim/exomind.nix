@@ -52,6 +52,8 @@ let
 
     # Complete by heading but link to filename only (for Zettelkasten)
     link_filenames_only = true
+
+    excluded_folders = ["node_modules", "dist", "build"]
   '';
 in
 {
