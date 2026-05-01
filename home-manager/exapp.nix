@@ -9,6 +9,7 @@
     ./modules/base.nix
     ./modules/claude
     ./modules/opencode
+    ./modules/nono
     ./modules/dev.nix
     ./modules/ghostty.nix
   ];

@@ -24,7 +24,7 @@ let
 
   nono-opencode = pkgs.writeShellScriptBin "nono-opencode" ''
     export OPENCODE_CONFIG=${./opencode-nono.json}
-    nono run --profile ${./nono-profile.json} --allow-cwd -- ${opencode-wrapped}/bin/opencode "$@"
+    nono run --profile opencode --allow-cwd -- ${opencode-wrapped}/bin/opencode "$@"
   '';
 
   opencode = pkgs.writeShellScriptBin "opencode" ''
@@ -45,4 +45,25 @@ in
     nono-opencode
     opencode
   ];
+
+  dotfiles.nono.profiles.opencode = {
+    meta.version = "1.0.0";
+    extends = "coding-agent";
+    filesystem = {
+      read = [ "$HOME/.claude" ];
+      allow = [
+        "$HOME/.config/opencode"
+        "$HOME/.local/share/opencode"
+        "$HOME/.cache/opencode"
+        "$HOME/.local/state/opencode"
+        "$HOME/.config/fish"
+        "$HOME/.local/share/fish"
+        "/tmp"
+      ];
+      read_file = [ ];
+      write_file = [ ];
+    };
+    network.block = false;
+    workdir.access = "readwrite";
+  };
 }

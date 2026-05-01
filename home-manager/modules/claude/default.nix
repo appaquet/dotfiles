@@ -54,7 +54,7 @@ let
   '';
 
   nono-claude = pkgs.writeShellScriptBin "nono-claude" ''
-    nono run --profile ${./nono-profile.json} --allow-cwd -- claude "$@"
+    nono run --profile claude --allow-cwd -- claude "$@"
   '';
 
   # Utility to list project docs (avoids shell expansion issues in skill commands)
@@ -126,12 +126,24 @@ in
     claude-tmux-indicator
 
     pkgs.socat # required for sandboxing
-    pkgs.nono
     inputs'.ccmon.packages.default
   ]
   ++ lib.optionals pkgs.stdenv.isLinux [
     pkgs.bubblewrap # required for sandboxing
   ];
+
+  dotfiles.nono.profiles.claude = {
+    meta.version = "1.0.0";
+    extends = "coding-agent";
+    filesystem = {
+      read = [ ];
+      allow = [ "$HOME/.claude" ];
+      read_file = [ ];
+      write_file = [ ];
+    };
+    network.block = false;
+    workdir.access = "readwrite";
+  };
 
   programs.fish.shellAbbrs = {
     cc = "claude";
