@@ -22,7 +22,12 @@ in
       name: profile:
       lib.nameValuePair ".config/nono/profiles/${name}.json" {
         source = pkgs.writers.writeJSON "nono-profile-${name}.json" (
-          profile // { meta = (profile.meta or { }) // { name = name; }; }
+          profile
+          // {
+            meta = (profile.meta or { }) // {
+              name = name;
+            };
+          }
         );
       }
     ) cfg.profiles;
@@ -40,8 +45,10 @@ in
           "$HOME/dotfiles"
           "$HOME/.config/jj"
           "$HOME/.config/git"
+
           "$HOME/.nix-profile/bin"
           "$HOME/.local/state/nix"
+          "$HOME/.nix-defexpr"
         ];
         allow = [
           "$HOME/.config/fish"
