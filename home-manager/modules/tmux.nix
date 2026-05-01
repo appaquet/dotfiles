@@ -109,8 +109,12 @@
         unbind r
         bind r source-file ~/.config/tmux/tmux.conf \; display-message "Config reloaded"
 
-        # Vi copy mode: block selection toggle
-        bind -T copy-mode-vi C-v send-keys -X rectangle-toggle
+        # Copy mode
+        bind -T copy-mode-vi C-v {
+          send-keys -X begin-selection
+          send-keys -X rectangle-toggle
+        }
+        bind -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "pbcopy"
 
         # Kill without confirmation
         bind x kill-pane
