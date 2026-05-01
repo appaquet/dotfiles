@@ -24,7 +24,8 @@ If no scopes provided, assume full branch review as per the workflow.
 
 ## Instructions
 
-Follow workflow in @~/.claude/docs/reviewing-agent.md.
+Make sure you have instructions from @~/.claude/docs/reviewing-agent.md loaded AND follow them to
+the letter.
 
 With these additions:
 

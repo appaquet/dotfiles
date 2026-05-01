@@ -48,12 +48,16 @@ in
 
           "$HOME/.nix-profile/bin"
           "$HOME/.local/state/nix"
+          "$HOME/.local/share/nix"
           "$HOME/.nix-defexpr"
         ];
         allow = [
           "$HOME/.config/fish"
           "$HOME/.local/share/fish"
+
           "$HOME/.cache/nix"
+          "$HOME/.cache/go-build"
+
           "/tmp"
         ];
         read_file = [ "$HOME/.profile" ];
