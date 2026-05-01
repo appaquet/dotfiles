@@ -3,16 +3,19 @@
 let
   sambaDatasets = lib.filterAttrs (_: ds: ds.samba.enable) config.nas.datasets;
 
-  mkShare = name: ds: {
-    path = "/data/${name}";
-    browseable = if ds.samba.browseable then "yes" else "no";
-    "read only" = if ds.samba.read_only then "yes" else "no";
-    "valid users" = builtins.concatStringsSep " " ds.samba.valid_users;
-    "create mask" = ds.samba.create_mask;
-    "directory mask" = ds.samba.directory_mask;
-  } // lib.optionalAttrs (ds.samba.force_group != null) {
-    "force group" = ds.samba.force_group;
-  };
+  mkShare =
+    name: ds:
+    {
+      path = "/data/${name}";
+      browseable = if ds.samba.browseable then "yes" else "no";
+      "read only" = if ds.samba.read_only then "yes" else "no";
+      "valid users" = builtins.concatStringsSep " " ds.samba.valid_users;
+      "create mask" = ds.samba.create_mask;
+      "directory mask" = ds.samba.directory_mask;
+    }
+    // lib.optionalAttrs (ds.samba.force_group != null) {
+      "force group" = ds.samba.force_group;
+    };
 in
 {
   services.samba = {
@@ -34,6 +37,7 @@ in
         "vfs objects" = "catia fruit streams_xattr";
         "fruit:metadata" = "stream";
       };
-    } // lib.mapAttrs mkShare sambaDatasets;
+    }
+    // lib.mapAttrs mkShare sambaDatasets;
   };
 }
