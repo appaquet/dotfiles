@@ -241,6 +241,9 @@ require("blink.cmp").setup({
 	},
 	snippets = { preset = "luasnip" },
 	completion = {
+		list = {
+			selection = { preselect = false, auto_insert = false },
+		},
 		trigger = {
 			show_on_keyword = true,
 			show_on_trigger_character = true,
