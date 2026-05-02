@@ -63,8 +63,8 @@
         AppleInterfaceStyleSwitchesAutomatically = false; # don't switch automatically
 
         # Reduce menu bar items spacing & padding
-        NSStatusItemSpacing = 2;
-        NSStatusItemSelectionPadding = 2;
+        NSStatusItemSpacing = 12;
+        NSStatusItemSelectionPadding = 6;
 
         # Keyboard
         InitialKeyRepeat = 15; # normal minimum is 15 (225 ms), maximum is 120 (1800 ms)
