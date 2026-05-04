@@ -38,6 +38,7 @@ in
     mkOpencodeConfSymlinks ".config/opencode" "opencode" [
       "commands"
       "agents"
+      "tui.json"
     ]
   );
 
@@ -56,12 +57,7 @@ in
         "$HOME/.local/share/opencode"
         "$HOME/.cache/opencode"
         "$HOME/.local/state/opencode"
-        "$HOME/.config/fish"
-        "$HOME/.local/share/fish"
-        "/tmp"
       ];
-      read_file = [ ];
-      write_file = [ ];
     };
     network.block = false;
     workdir.access = "readwrite";

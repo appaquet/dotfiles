@@ -142,7 +142,6 @@ in
       write_file = [ ];
     };
     network.block = false;
-    workdir.access = "readwrite";
   };
 
   programs.fish.shellAbbrs = {
