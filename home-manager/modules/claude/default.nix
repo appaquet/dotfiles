@@ -54,7 +54,7 @@ let
   '';
 
   nono-claude = pkgs.writeShellScriptBin "nono-claude" ''
-    nono run --profile claude --allow-cwd -- claude "$@"
+    nono run --profile claude --allow-cwd -- claude --allow-dangerously-skip-permissions "$@"
   '';
 
   # Utility to list project docs (avoids shell expansion issues in skill commands)

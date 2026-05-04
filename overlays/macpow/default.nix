@@ -9,6 +9,7 @@ rustPlatform.buildRustPackage {
   pname = "macpow";
   version = "0.1.14";
 
+  # https://github.com/k06a/macpow
   src = fetchFromGitHub {
     owner = "k06a";
     repo = "macpow";

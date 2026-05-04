@@ -1,13 +1,13 @@
 { pkgs, ... }:
 let
-  version = "2.7.2";
+  version = "2.11.1";
 
   # https://github.com/Realiserad/fish-ai
   src = pkgs.fetchFromGitHub {
     owner = "Realiserad";
     repo = "fish-ai";
     rev = "v${version}";
-    sha256 = "sha256-AQ5RbpnnSuX7z8kMrrjgHhS4StARu2BJVWz3V+RvQvo=";
+    sha256 = "sha256-4jCOCx6bLrugIrTRz/Ut/SIMknMTXgyJJINxA9SljCA=";
   };
 
   python = pkgs.python3;

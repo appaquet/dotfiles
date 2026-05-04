@@ -3,6 +3,7 @@ final: prev: {
     pname = "markdown-oxide";
     version = "unstable-2026-03-10";
 
+    # https://github.com/Feel-ix-343/markdown-oxide
     src = final.fetchFromGitHub {
       owner = "Feel-ix-343";
       repo = "markdown-oxide";
