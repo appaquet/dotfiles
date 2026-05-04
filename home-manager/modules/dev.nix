@@ -43,8 +43,6 @@ in
       gnumake
       bintools # ld, objdump, etc.
 
-      nono
-      codeburn
     ])
     ++ lib.optionals pkgs.stdenv.isLinux [
       pkgs.mold

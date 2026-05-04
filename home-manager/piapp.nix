@@ -3,10 +3,8 @@
 {
   imports = [
     ./modules/base.nix
+    ./modules/agentic.nix
     ./modules/dev.nix
-    ./modules/claude
-    ./modules/opencode
-    ./modules/nono.nix
   ];
 
   dotfiles.neovim.full = true;
