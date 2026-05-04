@@ -57,7 +57,9 @@ in
           "$HOME/.local/share/fish"
 
           "$HOME/.cache/nix"
+
           "$HOME/.cache/go-build"
+          "$HOME/.cache/golangci-lint"
 
           "/tmp"
         ];

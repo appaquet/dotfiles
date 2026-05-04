@@ -1,0 +1,29 @@
+--- a/scripts/bundle-litellm.mjs
++++ b/scripts/bundle-litellm.mjs
+@@ -1,8 +1,9 @@
+-import { writeFileSync, mkdirSync } from 'fs'
++import { writeFileSync, mkdirSync, readFileSync } from 'fs'
+ import { dirname, join } from 'path'
+ import { fileURLToPath } from 'url'
+ 
+-const LITELLM_URL = 'https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json'
++const LITELLM_URL = process.env.LITELLM_PRICES_PATH
++  || 'https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json'
+ const __dirname = dirname(fileURLToPath(import.meta.url))
+ const outPath = join(__dirname, '..', 'src', 'data', 'litellm-snapshot.json')
+ 
+@@ -12,7 +13,12 @@
+   'MiniMax-M2.7-highspeed': [0.6e-6, 2.4e-6, 0.375e-6, 0.06e-6],
+ }
+ 
+-const res = await fetch(LITELLM_URL)
+-if (!res.ok) throw new Error(`HTTP ${res.status}`)
+-const data = await res.json()
++let data
++if (process.env.LITELLM_PRICES_PATH) {
++  data = JSON.parse(readFileSync(process.env.LITELLM_PRICES_PATH, 'utf-8'))
++} else {
++  const res = await fetch(LITELLM_URL)
++  if (!res.ok) throw new Error(`HTTP ${res.status}`)
++  data = await res.json()
++}

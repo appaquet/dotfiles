@@ -8,6 +8,10 @@ let
     {
       macpow = final.callPackage ./macpow { };
 
+      markdown-oxide = final.callPackage ./markdown-oxide { };
+
+      codeburn = final.callPackage ./codeburn { };
+
       opencode = inputs.llm-agents.packages.${system}.opencode;
       gemini-cli = inputs.llm-agents.packages.${system}.gemini-cli;
       codex = inputs.llm-agents.packages.${system}.codex;
@@ -17,16 +21,11 @@ let
     };
 
   neovimPluginsOverlay = import ../home-manager/modules/neovim/plugins-overlay.nix;
-
-  markdownOxideOverlay = import ./markdown-oxide;
 in
 {
-  # Export overlays as flake outputs (single source of truth)
-  # When adding new overlays, also update nixos/modules/home-manager.nix sharedModules
   flake.overlays = {
     packages = packagesOverlay;
     neovimPlugins = neovimPluginsOverlay;
-    markdown-oxide = markdownOxideOverlay;
   };
 
   perSystem =
@@ -41,7 +40,6 @@ in
         overlays = [
           packagesOverlay
           neovimPluginsOverlay
-          markdownOxideOverlay
         ];
       };
     };
