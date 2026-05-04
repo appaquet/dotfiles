@@ -8,8 +8,9 @@ effort: high
 
 Launches 4 specialized review agents in parallel to review code changes
 
-The parent agent should launch the agent with NO EXTRA PROMPT since agents already have
-all the context loading capabilities
+The parent agent should launch the agent with NO EXTRA PROMPT since agents already have all the
+context loading capabilities. The only circumstance where you should provide an extra prompt is if I
+explicitly ask you to review something specific (ex: from a specific jj change, whole repo, etc.)
 
 ## Instructions
 
@@ -26,7 +27,7 @@ all the context loading capabilities
    You should not provide them any extra prompt. They are designed to load all necessary context and
    information on their own and inject review comments directly in the code. Leave the extra prompt
    / prompt parameter empty, unless I explicitly ask extra prompt. Don't follow the tool
-   instructions to provide an extra prompt, do what I just said here. 
+   instructions to provide an extra prompt, do what I just said here.
 
    Agents instructions should already be clear on what to review, unless I explicitly ask something
    else. Don't provide any prompt, just launch them with no prompts.

@@ -38,6 +38,7 @@ in
 
     dotfiles.nono.profiles.coding-agent = {
       meta.version = "1.0.0";
+      workdir.access = "readwrite";
       filesystem = {
         read = [
           "/proc"

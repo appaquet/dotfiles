@@ -60,6 +60,5 @@ in
       ];
     };
     network.block = false;
-    workdir.access = "readwrite";
   };
 }
