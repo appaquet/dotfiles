@@ -135,11 +135,16 @@ in
   dotfiles.nono.profiles.claude = {
     meta.version = "1.0.0";
     extends = "coding-agent";
+    security.groups = [ "claude_code_macos" ];
     filesystem = {
       read = [ ];
-      allow = [ "$HOME/.claude" ];
+      allow = [
+        "$HOME/.claude"
+        "$HOME/.claude.lock"
+      ];
       read_file = [ ];
-      write_file = [ ];
+      write_file = [
+      ];
     };
     network.block = false;
   };
