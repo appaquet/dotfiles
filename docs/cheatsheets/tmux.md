@@ -35,7 +35,12 @@ Prefix is `C-a`. Mouse is enabled by default.
 * `<prefix> [` Enter copy mode
 * `v` Start selection
 * `C-v` Toggle block / line selection
-* `y` Yank selection
+* tmux buffer
+  * `Enter` Copy selection to tmux buffer
+  * `<prefix> ]` Paste most recent tmux buffer
+* system clipboard
+  * `y` Yank selection to system clipboard (pbcopy)
+  * `p` Paste from system clipboard (pbpaste)
 * `H` / `L` Start / end of line
 * `?` / `/` Search backward / forward
 * `n` / `N` Next / previous match

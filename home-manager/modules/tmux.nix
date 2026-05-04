@@ -110,11 +110,15 @@
         bind r source-file ~/.config/tmux/tmux.conf \; display-message "Config reloaded"
 
         # Copy mode
-        bind -T copy-mode-vi C-v {
+        bind -T copy-mode-vi v {
           send-keys -X begin-selection
           send-keys -X rectangle-toggle
         }
         bind -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "pbcopy"
+        bind -T copy-mode-vi p {
+          run "pbpaste | tmux load-buffer -"
+          send-keys -X paste-buffer
+        }
 
         # Kill without confirmation
         bind x kill-pane
