@@ -5,7 +5,7 @@
   apple-sdk,
 }:
 
-rustPlatform.buildRustPackage {
+rustPlatform.buildRustPackage rec {
   pname = "macpow";
   version = "0.1.14";
 
@@ -13,7 +13,7 @@ rustPlatform.buildRustPackage {
   src = fetchFromGitHub {
     owner = "k06a";
     repo = "macpow";
-    rev = "v0.1.14";
+    rev = "v${version}";
     hash = "sha256-u3spvhamRmhcwLxrEcswgO7XU/w2JXANF2wk21ovH40=";
   };
 
