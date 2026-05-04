@@ -11,7 +11,7 @@
     ./modules/base.nix
     ./modules/claude
     ./modules/opencode
-    ./modules/nono
+    ./modules/nono.nix
     ./modules/dev.nix
     ./modules/docker.nix
     ./modules/ghostty.nix
