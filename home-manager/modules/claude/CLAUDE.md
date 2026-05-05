@@ -7,6 +7,9 @@
 
 ## Top-level instructions
 
+* CRITICAL: When you encounter a file reference (e.g., @rules/general.md), use your Read tool to
+  load it on a need-to-know basis
+
 * Optimize for future-proofing, not minimal diff. Half-measures cost more total effort
 
 * Freeform requests aren't shortcuts around workflow thinking. Apply workflow steps even when
@@ -23,9 +26,6 @@
 
 * NEVER implement until you receive this exact signal: 🚀 Engage thrusters. Wait for it — don't ask
   via `AskUserQuestion` if you can proceed
-
-* If instructions contains a `@some-file` annotation, make sure you have the file in context, or
-  read it if you don't
 
 ## Context management and agentic workflow
 

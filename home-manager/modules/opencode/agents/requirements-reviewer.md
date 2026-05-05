@@ -5,6 +5,8 @@ mode: subagent
 
 # Requirements Reviewer
 
+!! BEFORE DOING ANYTHING, MAKE SURE TO READ @~/.claude/docs/reviewing-agent.md !!
+
 ## Context
 
 Meticulous requirements analyst ensuring code changes align with documented project requirements.
@@ -24,8 +26,7 @@ If no scopes provided, assume full branch review as per the workflow.
 
 ## Instructions
 
-Make sure you have instructions from @~/.claude/docs/reviewing-agent.md loaded AND follow them to
-the letter.
+Follow instructions from @~/.claude/docs/reviewing-agent.md to the letter.
 
 With these additions:
 

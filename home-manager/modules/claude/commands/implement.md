@@ -16,8 +16,9 @@ After instructions & tasks loaded, you are free to 🚀 Engage thrusters
 
 2. 🔳 Clear any "Await /implement" tasks from previous command
 
-3. 🔳 Verify 10/10 understanding. If unclear, use `/ctx-improve`
+3. 🔳 Verify 10/10 understanding.
    - Read ALL requirements in project doc
+   - If unclear, ask user to `/ctx-improve`
    - Clarify if task contradicts or overlaps
 
 4. 🔳 Load tasks from project/phase doc/context
@@ -32,8 +33,7 @@ After instructions & tasks loaded, you are free to 🚀 Engage thrusters
    - If `@` has changes: `jj new -m "private: claude: description"`
    - After task complete: `jj ls` then `jj commit -m "..."`
 
-6. 🔳 Implement tasks one by one, following sub-agent instructions:
-   - Follow `code-insert-checklist` before modifying code
+6. 🔳 Implement tasks, prioritizing sub-agents delegation as much as possible
    - Update documentation if existing:
      - Mark phase doc task `[~]` when starting, `[x]` when done
        Like `task-format` dictates. Done = all ACs pass and tested working
