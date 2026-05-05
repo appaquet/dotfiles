@@ -37,6 +37,9 @@
       {
         name = "macwhisper";
       }
+      {
+        name = "monitorcontrol";
+      }
 
       {
         name = "signal";
