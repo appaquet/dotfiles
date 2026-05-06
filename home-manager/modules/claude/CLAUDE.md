@@ -10,6 +10,8 @@
 * CRITICAL: When you encounter a file reference (e.g., @rules/general.md), use your Read tool to
   load it on a need-to-know basis
 
+* CRITICAL: Follow sub-agents delegation instructions to preserve main agent context
+
 * Optimize for future-proofing, not minimal diff. Half-measures cost more total effort
 
 * Freeform requests aren't shortcuts around workflow thinking. Apply workflow steps even when
@@ -27,7 +29,7 @@
 * NEVER implement until you receive this exact signal: 🚀 Engage thrusters. Wait for it — don't ask
   via `AskUserQuestion` if you can proceed
 
-## Context management and agentic workflow
+## Context management and sub-agents delegation
 
 * Main agent should primarily be used for high-level planning, project management, jj (code
   versioning). Main agent context window is VERY VERY precious; Anything requiring reading,
@@ -101,7 +103,7 @@ Before executing instructions of any command/skill/agent instructions:
   follow the task management guidelines for executing and completing them. No tasks is trivial
   enough to skip the task management process
 
-* Your context is precious, make sure the follow the agentic workflow instructions
+* Your context is precious, make sure the follow the sub-agent delegation instructions
 
 * ALWAYS use project & phase docs to plan and track work as per project-doc.md rules, using the proper project editing skills
 
