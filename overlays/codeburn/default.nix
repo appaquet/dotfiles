@@ -1,8 +1,14 @@
-{ lib, buildNpmPackage, fetchFromGitHub, fetchurl, nodejs_22 }:
+{
+  lib,
+  buildNpmPackage,
+  fetchFromGitHub,
+  fetchurl,
+  nodejs_22,
+}:
 
 let
   litellmPrices = fetchurl {
-    url = "https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json";
+    url = "https://raw.githubusercontent.com/BerriAI/litellm/108b87fb246ff5da4d216b9fd2b862c3378590f8/model_prices_and_context_window.json";
     hash = "sha256-TMnhoz728sH4MQtYwkvrl6Kfx/YLrAXy3OeJDdegBns=";
   };
 in
