@@ -92,6 +92,7 @@ in
           which-key-nvim # show keymap hints
           todo-comments-nvim # highlight TODO, FIXME, etc
           auto-session # session management
+          snacks-nvim # nvim profiler
 
           # Notifications
           mini-notify
@@ -175,9 +176,6 @@ in
             nvim-dap-go
             nvim-dap-python
             nvim-dap-virtual-text
-
-            # Profiling
-            snacks-nvim # nvim profiler
           ]
         ));
 
@@ -186,8 +184,10 @@ in
           [
             nvimEnv
             (includeLuaFile "base.lua")
-
             (includeLuaFile "keymap.lua")
+
+            (includeLuaFile "profiling.lua")
+
             (includeLuaFile "template.lua")
             (includeLuaFile "theme.lua")
             (includeLuaFile "buffers.lua")
@@ -215,7 +215,6 @@ in
 
             (includeLuaFile "testing.lua")
             (includeLuaFile "debugging.lua")
-            (includeLuaFile "profiling.lua")
 
             (includeLuaFile "exomind.lua")
           ])
