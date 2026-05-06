@@ -12,8 +12,8 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>ql` Restore last session
 * `<leader>qL` Search / pick a session to restore
 * `<leader>o` Open messages in floating window
-* `<A-j>` Move down 5 lines
-* `<A-k>` Move up 5 lines
+* `<A-j>` or `<A-Down>` Move down 5 lines
+* `<A-k>` or `<A-Up>` Move up 5 lines
 * `<C-/>` Clear search highlights
 
 ## Buffers (b)
