@@ -48,13 +48,14 @@ let
 
     export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
     export CLAUDE_CODE_NO_FLICKER=1 # alt-mode
-    #export CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1
 
     ${claude-code}/bin/claude --verbose "$@"
   '';
 
   nono-claude = pkgs.writeShellScriptBin "nono-claude" ''
-    nono run --profile claude --allow-cwd -- claude --allow-dangerously-skip-permissions "$@"
+    [ -f ".nono/pre.sh" ] && . ".nono/pre.sh"
+    PROFILE=$(maymaybe-profile claude)
+    exec nono run --profile "$PROFILE" --allow-cwd -- maymaybe-in claude --allow-dangerously-skip-permissions "$@"
   '';
 
   # Utility to list project docs (avoids shell expansion issues in skill commands)
