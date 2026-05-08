@@ -2,6 +2,7 @@
 
 These are commands, internal skills, and agents designed to streamline workflows
 You should always prioritize those throughout our interactions
+If a workflow fits with a textual request, you should invoke it instead of following your default behavior
 
 ## Commands
 
@@ -36,7 +37,7 @@ Core workflows for main interactions
 - `/ctx-usage`: Break down Messages portion of context window (tool results by tool, largest items, hints)
   - User runs `/context` first for static overview, then `/ctx-usage` for message-level detail
 
-### Reviewing
+### Code reviewing
 
 - `/review-launch`: Launch review agents
   - Spawns 4 agents in parallel (style, correctness, architecture, requirements)

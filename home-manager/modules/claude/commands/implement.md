@@ -26,6 +26,8 @@ After instructions & tasks loaded, you are free to 🚀 Engage thrusters
      - Segment for better tracking
    - Create tasks for verification/testing each implementation step
      If user validation needed, task description should be clear about waiting for user input
+   - Think if any task can be delegated to sub-agents, and if so, make sure the task description is
+     clear about the delegation
 
 5. Create `jj` change for this implementation
    - Run `jj ls` to check state
@@ -33,8 +35,8 @@ After instructions & tasks loaded, you are free to 🚀 Engage thrusters
    - If `@` has changes: `jj new -m "private: claude: description"`
    - After task complete: `jj ls` then `jj commit -m "..."`
 
-6. 🔳 Implement tasks, ideally with sub-agents
-   - Prioritize sub-agent delegation for implementation
+6. 🔳 Implement tasks
+   - You need to follow sub-agent delegation instructions
    - Update documentation if existing:
      - Mark phase doc task `[~]` when starting, `[x]` when done
        Like `task-format` dictates. Done = all ACs pass and tested working

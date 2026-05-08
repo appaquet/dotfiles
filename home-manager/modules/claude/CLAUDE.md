@@ -7,48 +7,53 @@
 
 ## Top-level instructions
 
-* CRITICAL: When you encounter a file reference (e.g., @rules/general.md), use your Read tool to
-  load it on a need-to-know basis
-
-* CRITICAL: Follow sub-agents delegation instructions to preserve main agent context
+* CRITICAL: When encounter file reference (ex: @rules/general.md), if not already loaded, read it
 
 * Optimize for future-proofing, not minimal diff. Half-measures cost more total effort
 
-* Freeform requests aren't shortcuts around workflow thinking. Apply workflow steps even when
-  not explicitly invoked
+* Freeform requests aren't shortcuts around workflow thinking. Apply workflow steps even when not
+  explicitly invoked
 
 * ALWAYS use `AskUserQuestion` to ask questions
-  * Never ask directly in response or finish a message with a list of questions. Always use the tool
-  * Don't assume I have all context, always make sure to provide necessary context before asking
-    questions AND in questions themselves
+  * Never ask directly in response or finish a message with a list of questions
+  * Don't assume I have all context, always make sure provide necessary context before asking
+    questions AND in questions description
+
+* NEVER implement until you receive this exact signal: 🚀 Engage thrusters. Wait for it — don't ask
+  via `AskUserQuestion` if you can proceed
 
 * Planning is mandatory for ALL implementations, no matter how trivial. NEVER engage the native
   plan mode `EnterPlanMode`. Refer to workflows for planning instructions. When agreed on a plan,
   ALWAYS follow it and ALWAYS stop & ask if you deviate or the plan fails
 
-* NEVER implement until you receive this exact signal: 🚀 Engage thrusters. Wait for it — don't ask
-  via `AskUserQuestion` if you can proceed
+* If work fails after 5 attempts, STOP and ask user for instructions
+
+* Before potentially destructive actions (deleting/restoring files, reverting changes, etc.), ALWAYS
+  make sure we can restore by any means (backup, git/jj change, etc.). Ask user otherwise
+
+* I or other agents may work on code at same time, you may see changes that aren't yours and you
+  need to preserve them
 
 ## Context management and sub-agents delegation
 
 * Main agent should primarily be used for high-level planning, project management, jj (code
   versioning). Main agent context window is VERY VERY precious; Anything requiring reading,
   understanding and exploring code should be delegated to sub-agents. Implementation after planning
-  should ALWAYS be done by sub-agents
+  should ALWAYS ALWAYS be done by sub-agents
 
-* Sub agents should ALWAYS used for grunt work to preserve main agent context, no matter the task complexity
+* Sub-agents should ALWAYS used for grunt work to preserve main agent context, no matter the task complexity
   * Optimize prompts for sub-agents, but also ask them to optimize their own output message
     Enough information for crystal clear understanding, but no more than that: context window is
     precious
 
-  * If a sub-agent output is insufficient, send it a follow-up message to re-engage and ask targeted
-    follow-up questions. If I ask you a question that a previous sub-agent should have answered,
-    resume it instead of answering directly or launching a new one. If I ask for a small change to a
-    previous sub-agent's work, continue it instead of creating a new one to do the change
+  * If a sub-agent output is insufficient, send it a follow-up message / resume to re-engage and ask
+    targeted follow-up questions. If I ask you a question that a previous sub-agent should have
+    answered, resume it instead of answering directly or launching a new one. If I ask for a small
+    change to a previous sub-agent's work, resume it instead of creating a new one to do the change
 
-  * When a sub-agent comes back with an output, YOU HAVE TO BE CRITICAL. If it doesn't sound right,
-    you can send it a follow-up and ask for more details or clarifications. Avoid checking their
-    output code yourself, unless very trivial/small
+  * When a sub-agent comes back with an output, BE CRITICAL. If you have doubt in quality, if it's
+    the right solution, etc. you need to resume / follow-up / ask for more details/clarifications.
+    Avoid checking their output code yourself, unless very trivial/small
 
   * Assume that I don't have any context about what a sub-agent did and outputted. I don't see that
     output, and you have to give me some context if I need to answer questions about it or make
@@ -74,15 +79,6 @@
   * opus: planning, review comments research/planning, complex code exploration or debugging,
           complex code
 
-* If you are a sub-agent, and running into issues and unforeseen complications, while running sonnet
-  or haiku, STOP and tell the main agent. The main agent should be able to restart work with the
-  more capable opus model.
-
-* For any workflow that requires multiple steps, synchronization or communication between agents,
-  use a team of agent (`TeamCreate`) instead of individual agents
-  When using teams, don't kill agents until we're certain that we're done with them and have
-  validated their work. We will resume them if we need to go back to them
-
 ## Task management
 
 * ALWAYS use the Task tool to create tasks for any instruction step that has a 🔳 annotation, before
@@ -103,13 +99,17 @@ Before executing instructions of any command/skill/agent instructions:
   follow the task management guidelines for executing and completing them. No tasks is trivial
   enough to skip the task management process
 
-* Your context is precious, make sure the follow the sub-agent delegation instructions
+* Your context is precious, delegate to sub-agents
 
-* ALWAYS use project & phase docs to plan and track work as per project-doc.md rules, using the proper project editing skills
+* ALWAYS use project & phase docs to plan and track work as per project-doc.md rules, using the
+  proper project editing skills
 
 ## Context understanding
 
 Always ensure 10/10 understanding checklist: explore code + web search + `AskUserQuestion`
+
+Prioritize web search for tool/library/framework usage since they may have changed since your training data
+
 Always report on understanding at any decision point - verbalize WHAT you understand for each item, not just that you checked it. User validates your understanding
 
 <full-understanding-checklist>
@@ -121,6 +121,7 @@ Always report on understanding at any decision point - verbalize WHAT you unders
 * [ ] Have test strategy used to iterate: [describe approach]
 * [ ] Know which files to modify: [list files]
 * [ ] Know success criteria / ACs: [state acceptance criteria per task]
+* [ ] Have web searched to ensure fresh decisions: [list search queries and key findings]
 </full-understanding-checklist>
 
 ## Problem Solving
@@ -132,8 +133,9 @@ ALWAYS use this methodology to solve problems, issues, and bugs:
 2. Fix root cause, not symptom. Generic solution over specific case and bespoke fixes
 3. Ask user before destructive changes
 4. Test bugs: verify new test catches issue or update existing test to catch it
-5. Document investigation: capture uncertainty, what was tried, what was learned in phase doc Questions & Investigations
-   Use a SR&ED documentation style to capture learnings and prevent going in circles
+5. Document investigation: capture uncertainty, what was tried, what was learned in phase doc
+   Questions & Investigations Use a SR&ED documentation style to capture learnings and prevent going
+   in circles
 </problem-solving-checklist>
 
 ## Deep Thinking
@@ -143,15 +145,8 @@ thought — the cost of pausing is always less than rework.
 
 <deep-thinking>
 1. STOP rushing - invest thinking tokens now to save iteration tokens later
-2. Re-read all relevant context - don't rely on memory
-3. Analyze thoroughly (ultra think, be pedantic)
-4. Externalize your thinking - speak your mind LOUDLY, don't just use thinking blocks
-5. Think as a fresh agent - what could be misinterpreted? What's ambiguous?
-6. Question assumptions - what haven't you verified?
+2. Analyze thoroughly (ultra think, be pedantic)
+3. Externalize your thinking - speak your mind LOUDLY, don't just use thinking blocks
+4. Think as a fresh agent - what could be misinterpreted? What's ambiguous?
+5. Question assumptions - what haven't you verified?
 </deep-thinking>
-
-## Destructive Operations
-
-Before deleting files/content: ALWAYS make sure we can restore by any means
-Always assume you are not alone working on the same code at same time
-ALWAYS preserve unknown code and ask instead of deleting / restoring it

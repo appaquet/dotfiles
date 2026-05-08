@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  inputs',
   ...
 }:
 
@@ -36,13 +37,15 @@ let
 
 in
 {
-  home.file = (
-    mkOpencodeConfSymlinks ".config/opencode" "opencode" [
+  home.file =
+    (mkOpencodeConfSymlinks ".config/opencode" "opencode" [
       "commands"
       "agents"
       "tui.json"
-    ]
-  );
+    ])
+    // {
+      ".config/opencode/plugins/ccmon.ts".source = "${inputs'.ccmon.packages.opencode-plugin}/ccmon.ts";
+    };
 
   home.packages = [
     nono-opencode
@@ -59,6 +62,7 @@ in
         "$HOME/.local/share/opencode"
         "$HOME/.cache/opencode"
         "$HOME/.local/state/opencode"
+        "$HOME/.local/state/ccmon" # ccmon plugin writes status there
       ];
     };
     network.block = false;
