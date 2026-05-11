@@ -86,6 +86,8 @@ in
           "$HOME/.cache/go-build"
           "$HOME/.cache/golangci-lint"
 
+          "$HOME/.npm"
+
           "/tmp"
         ];
         read_file = [ "$HOME/.profile" ];

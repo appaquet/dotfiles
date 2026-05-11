@@ -437,10 +437,6 @@ not in Exomind, operates in-place when already in an Exomind buffer.
 * `<leader>yc` Copy line and comment previous one
 * `<leader>yf` Copy current file's absolute path
 
-## Marks (M)
-
-* `<leader>Mk` Delete all marks
-
 ## Folding
 
 * `zm` Fold more
@@ -454,6 +450,7 @@ not in Exomind, operates in-place when already in an Exomind buffer.
 
 * `m[a-z0-9A-Z]` Set mark
 * `'[a-z0-9A-Z]` List (which-key) and go to mark
+* `<leader>Mk` Delete all marks
 
 ## Recording & Registers
 
