@@ -88,7 +88,6 @@ in
 
           # Tools
           fzf-lua
-          delimitMate # auto close quotes, parens, etc
           which-key-nvim # show keymap hints
           todo-comments-nvim # highlight TODO, FIXME, etc
           auto-session # session management
