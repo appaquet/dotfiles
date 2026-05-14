@@ -10,16 +10,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "nono";
-  version = "0.49.0";
+  version = "0.54.0";
 
   src = fetchFromGitHub {
     owner = "always-further";
     repo = "nono";
     rev = "v${version}";
-    hash = "sha256-LUcod8nysDDQohUv8PAUuF91zsv3KWNY4I17s9/cYyA=";
+    hash = "sha256-ER/hJ4YQf+anxhXVq7RNvkvw02gU7JtLI+SZwr/a+ZU=";
   };
 
-  cargoHash = "sha256-T0MP+1KshqxWF7NbxHynEYFzyF6YDRaMyRsW7wPPfpI=";
+  cargoHash = "sha256-OhuCW5mYthC/MVhfbwhro8hnVWmiQUuIDPMn/auBDcQ=";
 
   preCheck = ''
     mkdir -p /tmp/a /tmp/b

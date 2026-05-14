@@ -176,10 +176,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '{\"additionalContext\": \"COMPACTION JUST OCCURRED. You MUST run /ctx-load NOW before any other action to reload project context.\"}'"
-          },
-          {
-            "type": "command",
             "command": "ccmon status"
           }
         ]
@@ -237,17 +233,6 @@
           {
             "type": "command",
             "command": "ccmon status"
-          }
-        ]
-      }
-    ],
-    "PostToolUseFailure": [
-      {
-        "matcher": "Read|Write|Edit|Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$HOME/.claude/hooks/nono-hook.sh"
           }
         ]
       }

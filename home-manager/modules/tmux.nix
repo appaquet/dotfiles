@@ -52,6 +52,9 @@
         set -g set-titles on
         set -g set-titles-string "#H · #S · #W"
 
+        # Allow passthrough of OSC sequences (notifications, etc.)
+        set -g allow-passthrough on
+
         # Truecolor passthrough
         set -sg terminal-overrides ',*:RGB'
 
