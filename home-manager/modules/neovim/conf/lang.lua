@@ -229,6 +229,7 @@ vim.keymap.set("n", "<Leader>Ti", function()
 end, { desc = "LSP: Toggle inlay hints" })
 
 -- Completion popup via blink.cmp
+-- https://github.com/saghen/blink.cmp
 require("blink.cmp").setup({
 	keymap = {
 		preset = "none",
@@ -242,7 +243,10 @@ require("blink.cmp").setup({
 	snippets = { preset = "luasnip" },
 	completion = {
 		list = {
-			selection = { preselect = false, auto_insert = false },
+			selection = {
+				preselect = false,
+				auto_insert = false,
+			},
 		},
 		trigger = {
 			show_on_keyword = true,
