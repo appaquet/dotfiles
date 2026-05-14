@@ -68,9 +68,12 @@ in
         read = [
           "/proc"
           "/nix"
+
           "$HOME/dotfiles"
+
           "$HOME/.config/jj"
           "$HOME/.config/git"
+          "$HOME/.gitignore"
 
           "$HOME/.nix-profile/bin"
           "$HOME/.local/state/nix"
