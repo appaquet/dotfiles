@@ -71,7 +71,6 @@ in
 
           "$HOME/dotfiles"
 
-          "$HOME/.config/jj"
           "$HOME/.config/git"
           "$HOME/.gitignore"
 
@@ -81,6 +80,8 @@ in
           "$HOME/.nix-defexpr"
         ];
         allow = [
+          "$HOME/.config/jj"
+
           "$HOME/.config/fish"
           "$HOME/.local/share/fish"
 

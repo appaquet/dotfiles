@@ -38,8 +38,13 @@
 
 * Main agent should primarily be used for high-level planning, project management, jj (code
   versioning). Main agent context window is VERY VERY precious; Anything requiring reading,
-  understanding and exploring code should be delegated to sub-agents. Implementation after planning
-  should ALWAYS ALWAYS be done by sub-agents
+  understanding and exploring code should be delegated to sub-agents.
+
+* Delegation threshold:
+  * Trivial, single-location edits (typo, test expected value, fixture data) → main agent may do directly
+  * Multi-file changes, new logic, non-trivial code, iterative test<>code → MUST delegate to a sub-agent
+  * When in doubt, delegate. Context is more expensive than spawning an agent
+  * During `/implement`: ALL planned code changes go through sub-agents. Main agent only validates, commits, and manages jj.
 
 * Sub-agents should ALWAYS used for grunt work to preserve main agent context, no matter the task complexity
   * Optimize prompts for sub-agents, but also ask them to optimize their own output message
@@ -74,10 +79,10 @@
     preserve context. Have it return the modified file list so you can read them for validation
 
 * For sub-agents, pick right model for task to optimize speed & accuracy:
-  * haiku: shallow code exploration and reconnaissance
-  * sonnet: straightforward code, code exploration
-  * opus: planning, review comments research/planning, complex code exploration or debugging,
-          complex code
+  * haiku/lightweight: shallow code exploration and reconnaissance
+  * sonnet/normal: straightforward code, code exploration
+  * opus/bigbrain: planning, review comments research/planning, complex code exploration or
+    debugging, complex code
 
 ## Task management
 
