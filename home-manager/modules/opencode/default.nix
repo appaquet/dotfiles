@@ -25,9 +25,7 @@ let
 
   nono-opencode = pkgs.writeShellScriptBin "nono-opencode" ''
     export OPENCODE_CONFIG=${./opencode-nono.json}
-    [ -f ".nono/pre.sh" ] && . ".nono/pre.sh"
-    PROFILE=$(maymaybe-profile opencode)
-    exec nono run --profile "$PROFILE" --allow-cwd -- maymaybe-in ${opencode-wrapped}/bin/opencode "$@"
+    exec maybe --profile opencode -- ${opencode-wrapped}/bin/opencode "$@"
   '';
 
   opencode = pkgs.writeShellScriptBin "opencode" ''

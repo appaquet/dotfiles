@@ -8,6 +8,8 @@ result
 docs/features
 *.local.*
 nvim.log
+__pycache__/
+*.pyc
 
 secrets/
 dotblip/

@@ -7,30 +7,10 @@
 
 let
   cfg = config.dotfiles.nono;
-
-  maymaybe-pre = pkgs.writeShellScriptBin "maymaybe-pre" ''
-    if [ -f ".nono/pre.sh" ]; then
-      . ".nono/pre.sh"
-    fi
-  '';
-
-  maymaybe-in = pkgs.writeShellScriptBin "maymaybe-in" ''
-    if [ -f ".nono/in.sh" ]; then
-      . ".nono/in.sh"
-    fi
-    exec "$@"
-  '';
-
-  maymaybe-profile = pkgs.writeShellScriptBin "maymaybe-profile" ''
-    DEFAULT="$1"
-    if [ -f ".nono/profile.json" ]; then
-      echo "$(pwd)/.nono/profile.json"
-    else
-      printf '%s' "$DEFAULT"
-    fi
-  '';
 in
 {
+  imports = [ ./maybe.nix ];
+
   options.dotfiles.nono = {
     profiles = lib.mkOption {
       type = lib.types.attrsOf (lib.types.attrsOf lib.types.anything);
@@ -56,9 +36,6 @@ in
 
     home.packages = [
       pkgs.nono
-      maymaybe-pre
-      maymaybe-in
-      maymaybe-profile
     ];
 
     dotfiles.nono.profiles.coding-agent = {

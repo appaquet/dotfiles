@@ -53,9 +53,7 @@ let
   '';
 
   nono-claude = pkgs.writeShellScriptBin "nono-claude" ''
-    [ -f ".nono/pre.sh" ] && . ".nono/pre.sh"
-    PROFILE=$(maymaybe-profile claude)
-    exec nono run --profile "$PROFILE" --allow-cwd -- maymaybe-in claude --allow-dangerously-skip-permissions "$@"
+    exec maybe --profile claude -- claude --allow-dangerously-skip-permissions "$@"
   '';
 
   # Utility to list project docs (avoids shell expansion issues in skill commands)
