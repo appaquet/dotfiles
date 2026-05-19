@@ -129,6 +129,7 @@ let
   nonoConfig = lib.recursiveUpdate baseConfig {
     permission = {
       "*" = "allow";
+      bash = "allow";
       webfetch = "allow";
       websearch = "allow";
     };
@@ -170,6 +171,7 @@ in
     ])
     // {
       ".config/opencode/opencode.json".source = opencodeJson;
+      ".config/opencode/opencode-nono.json".source = nonoOpencodeJson;
       ".config/opencode/tui.json".source = tuiJson;
       ".config/opencode/plugins/ccmon.ts".source = "${inputs'.ccmon.packages.opencode-plugin}/ccmon.ts";
     };
