@@ -19,85 +19,85 @@
     enable = true;
     enableDefaultConfig = false;
 
-    matchBlocks = {
+    settings = {
       "github.com" = {
-        identityFile = [
+        IdentityFile = [
           "~/.ssh/github_1pw.pub"
           config.sops.secrets."ssh/github_breakglass".path
         ];
       };
 
       "servapp.n3x.net" = {
-        forwardAgent = true;
-        identityFile = [
+        ForwardAgent = true;
+        IdentityFile = [
           "~/.ssh/ssh_1pw.pub"
           config.sops.secrets."ssh/ssh_breakglass".path
         ];
       };
 
       "deskapp.n3x.net" = {
-        forwardAgent = true;
-        identityFile = [
+        ForwardAgent = true;
+        IdentityFile = [
           "~/.ssh/ssh_1pw.pub"
           config.sops.secrets."ssh/ssh_breakglass".path
         ];
       };
 
       "exapp.n3x.net" = {
-        forwardAgent = true;
-        identityFile = [
+        ForwardAgent = true;
+        IdentityFile = [
           "~/.ssh/ssh_1pw.pub"
           config.sops.secrets."ssh/ssh_breakglass".path
         ];
       };
 
       "piapp.n3x.net" = {
-        forwardAgent = true;
-        identityFile = [
+        ForwardAgent = true;
+        IdentityFile = [
           "~/.ssh/ssh_1pw.pub"
           config.sops.secrets."ssh/ssh_breakglass".path
         ];
       };
 
       "vps.n3x.net" = {
-        port = 22222;
-        forwardAgent = true;
-        identityFile = [
+        Port = 22222;
+        ForwardAgent = true;
+        IdentityFile = [
           "~/.ssh/ssh_1pw.pub"
           config.sops.secrets."ssh/ssh_breakglass".path
         ];
       };
 
       "piups.n3x.net" = {
-        forwardAgent = true;
-        identityFile = [
+        ForwardAgent = true;
+        IdentityFile = [
           "~/.ssh/ssh_1pw.pub"
           config.sops.secrets."ssh/ssh_breakglass".path
         ];
       };
 
       "piprint.n3x.net" = {
-        forwardAgent = true;
-        identityFile = [
+        ForwardAgent = true;
+        IdentityFile = [
           "~/.ssh/ssh_1pw.pub"
           config.sops.secrets."ssh/ssh_breakglass".path
         ];
       };
 
       "utm.n3x.net" = {
-        forwardAgent = true;
-        identityFile = [
+        ForwardAgent = true;
+        IdentityFile = [
           "~/.ssh/ssh_1pw.pub"
           config.sops.secrets."ssh/ssh_breakglass".path
         ];
       };
 
       "pihole.n3x.net" = {
-        user = "root";
+        User = "root";
       };
 
       "pikvm.n3x.net" = {
-        user = "root";
+        User = "root";
       };
     };
   };
