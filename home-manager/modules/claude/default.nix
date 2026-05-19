@@ -134,7 +134,7 @@ in
   dotfiles.nono.profiles.claude = {
     meta.version = "1.0.0";
     extends = "coding-agent";
-    security.groups = [ "claude_code_macos" ];
+    groups.include = [ "claude_code_macos" ];
     filesystem = {
       read = [ ];
       allow = [

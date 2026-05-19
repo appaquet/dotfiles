@@ -35,7 +35,6 @@ NEVER make judgment calls on if something is simple enough to be done by main ag
    - Should not be too granular to avoid overhead, but not too broad to cause conflicts
    - If skill has multiple phases (ex: plan+implement) you MUST launch multiple sub agents to
      properly separate their context
-   - If skill contains `ultrathink`, make sure to include that specific keyword in sub-agent instructions
 
 4. For each agent to be launched, create tasks:
    - Launch agent to do X
