@@ -10,15 +10,15 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "nono";
-  version = "0.53.0";
+  version = "0.51.0";
 
   src = fetchFromGitHub {
     owner = "always-further";
     repo = "nono";
     tag = "v${version}";
-    hash = "sha256-jK3/NDNQkeeCKP2iMIJMCq9lrDZ9ksiEnHhFmrz+gew=";
+    hash = "sha256-yfZt3vKVxsmhqI3hvkcPknKTW2+0N1giEjADZ0G+tcw=";
   };
-  cargoHash = "sha256-OK2vlXYFdjMHqzVR6ZoRn7WEfAUVATGhk32JLoDED5c=";
+  cargoHash = "sha256-FXSM6gMPGqgHW+6x84VBwQ6MAF99jIYfzN6HfRGKmys=";
 
   preCheck = ''
     mkdir -p /tmp/a /tmp/b
