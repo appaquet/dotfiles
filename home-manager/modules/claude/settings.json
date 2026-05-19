@@ -246,7 +246,7 @@
     "plugin-dev@claude-plugins-official": true
   },
   "sandbox": {
-    "enabled": true,
+    "enabled": false,
     "autoAllowBashIfSandboxed": true,
     "network": {
       "allowUnixSockets": [
