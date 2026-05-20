@@ -1,5 +1,5 @@
 ---
-name: Continue
+name: continue
 description: Continue working on the current task before being interrupted
 ---
 

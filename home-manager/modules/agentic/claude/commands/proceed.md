@@ -1,5 +1,5 @@
 ---
-name: Proceed
+name: proceed
 description: Proceed with current workflow
 ---
 

@@ -9,7 +9,7 @@
   imports = [
     inputs.secrets.homeManager.exomind
     ./modules/base.nix
-    ./modules/agentic.nix
+    ./modules/agentic
     ./modules/dev.nix
     ./modules/docker.nix
     ./modules/ghostty.nix

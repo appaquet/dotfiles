@@ -13,7 +13,7 @@ let
       map (path: {
         name = ".claude/${path}";
         value = {
-          source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/home-manager/modules/claude/${path}";
+          source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/home-manager/modules/agentic/claude/${path}";
         };
       }) paths
     );

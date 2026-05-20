@@ -3,7 +3,7 @@
 {
   imports = [
     ./modules/base.nix
-    ./modules/agentic.nix
+    ./modules/agentic
     ./modules/dev.nix
   ];
 

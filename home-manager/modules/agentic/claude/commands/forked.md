@@ -1,5 +1,5 @@
 ---
-name: Forked
+name: forked
 description: Fork a skill's work to sub-agents for parallel execution
 argument-hint: [/skill1 & /skill2 ...] [instructions]
 ---

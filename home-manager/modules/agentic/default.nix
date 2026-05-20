@@ -7,7 +7,7 @@
   imports = [
     ./claude
     ./opencode
-    ./nono
+    ../nono
   ];
 
   home.packages = [

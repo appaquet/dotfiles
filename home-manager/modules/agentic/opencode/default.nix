@@ -165,7 +165,7 @@ let
 in
 {
   home.file =
-    (mkOpencodeConfSymlinks ".config/opencode" "opencode" [
+    (mkOpencodeConfSymlinks ".config/opencode" "agentic/opencode" [
       "commands"
       "agents"
     ])

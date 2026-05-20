@@ -1,5 +1,5 @@
 ---
-name: Implement
+name: implement
 description: Proceed to implementation of the plan
 effort: xhigh
 ---
