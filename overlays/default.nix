@@ -12,7 +12,8 @@ let
 
       codeburn = final.callPackage ./codeburn { };
 
-      nono = final.callPackage ./nono { };
+      #nono = final.callPackage ./nono { };
+      nono = inputs.llm-agents.packages.${system}.nono;
 
       opencode = inputs.llm-agents.packages.${system}.opencode;
       gemini-cli = inputs.llm-agents.packages.${system}.gemini-cli;
