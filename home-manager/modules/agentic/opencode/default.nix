@@ -12,6 +12,27 @@ let
     postProcess = config.dotfiles.agentic.instructions.postProcess;
   };
 
+  planningPermissions = {
+    "*" = "deny";
+    webfetch = "ask";
+    websearch = "allow";
+    read = "allow";
+    grep = "allow";
+    edit = {
+      "*" = "ask";
+      "proj/**" = "allow";
+      "docs/features/**" = "allow";
+      "secrets/docs/features/**" = "allow";
+    };
+    bash = {
+      "*" = "ask";
+      "ln -s * proj" = "allow";
+      "jj *" = "allow";
+      "jj-*" = "allow";
+      "claude-proj-docs *" = "allow";
+    };
+  };
+
   baseConfig = {
     "$schema" = "https://opencode.ai/config.json";
 
@@ -29,15 +50,36 @@ let
         model = "openai/gpt-5.5";
         description = "To be used for complex tasks (similar to opus)";
       };
+
       normal = {
         mode = "subagent";
         model = "opencode-go/deepseek-v4-pro";
         description = "To be used for general tasks (similar to sonnet)";
       };
+
       lightweight = {
         mode = "subagent";
         model = "opencode-go/deepseek-v4-flash";
         description = "To be used for lightweight tasks (similar to haiku)";
+      };
+
+      browser = {
+        mode = "all";
+        model = "openai/gpt-5.4-mini";
+        description = "To be used by any tasks requiring web browser interaction. Shouldn't be used for websearch or webfetch skills, only for actually using the browser to interact with websites.";
+        prompt = "You are an agent that can use a web browser to interact with websites. You should focus on that and not do any other work. If you are requested to do so, tell your manager agent that you should only be used for web browser related tasks.";
+      };
+
+      orchestrator = {
+        mode = "primary";
+        description = "Project manager agent that manages project documentation, code versioning and delegate work to sub-agents";
+        permission = planningPermissions;
+      };
+
+      plan = {
+        mode = "primary";
+        description = "Planning agent that creates project plans, break down tasks, and write to project docs. Should never engage in any code writing nor delegate such work";
+        permission = planningPermissions;
       };
     };
 
