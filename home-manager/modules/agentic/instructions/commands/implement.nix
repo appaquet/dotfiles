@@ -11,7 +11,7 @@
     "Grep"
     "Edit"
   ];
-  subtask = true;
+
   content = ''
     # Implement
 
