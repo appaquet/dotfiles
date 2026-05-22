@@ -7,7 +7,10 @@
 }:
 
 let
-  instructions = import ../instructions { inherit pkgs lib; };
+  instructions = import ../instructions {
+    inherit pkgs lib;
+    postProcess = config.dotfiles.agentic.instructions.postProcess;
+  };
 
   baseConfig = {
     "$schema" = "https://opencode.ai/config.json";
@@ -18,8 +21,7 @@ let
       if config.dotfiles.agentic.instructions.mode == "legacy" then
         [ "~/.claude/rules/*.md" ]
       else
-        [ "~/.config/opencode/rules/*.md" ]
-      ;
+        [ "~/.config/opencode/rules/*.md" ];
 
     agent = {
       bigbrain = {
@@ -205,8 +207,7 @@ in
         ".config/opencode/opencode-nono.json".source = nonoOpencodeJson;
         ".config/opencode/tui.json".source = tuiJson;
         ".config/opencode/plugins/ccmon.ts".source = "${inputs'.ccmon.packages.opencode-plugin}/ccmon.ts";
-      }
-    ;
+      };
 
   home.packages = [
     nono-opencode

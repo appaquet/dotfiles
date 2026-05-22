@@ -19,6 +19,7 @@
   ];
 
   dotfiles.agentic.instructions.mode = "nixified";
+  dotfiles.agentic.instructions.postProcess = true;
 
   dotfiles.neovim.devMode = true;
 

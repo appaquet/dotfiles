@@ -493,7 +493,7 @@ cmd_agent_build() {
   ${NIX_BUILDER} build --impure --out-link result --expr '
     let
       pkgs = import <nixpkgs> {};
-      instr = import ./home-manager/modules/agentic/instructions { inherit pkgs; lib = pkgs.lib; };
+      instr = import ./home-manager/modules/agentic/instructions { inherit pkgs; lib = pkgs.lib; postProcess = true; };
     in instr.package
   '
   echo "result -> $(readlink result)"

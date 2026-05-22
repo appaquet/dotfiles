@@ -7,7 +7,10 @@
 }:
 
 let
-  instructions = import ../instructions { inherit pkgs lib; };
+  instructions = import ../instructions {
+    inherit pkgs lib;
+    postProcess = config.dotfiles.agentic.instructions.postProcess;
+  };
 
   mkClaudeConfSymlinks =
     paths:
@@ -148,8 +151,7 @@ in
     if config.dotfiles.agentic.instructions.mode == "legacy" then
       mkClaudeConfSymlinks allLegacyPaths
     else
-      (mkClaudeConfSymlinks legacyOnlyPaths) // (mkClaudeGeneratedSymlinks generatedPaths)
-    ;
+      (mkClaudeConfSymlinks legacyOnlyPaths) // (mkClaudeGeneratedSymlinks generatedPaths);
 
   home.packages = [
     claude-wrapped

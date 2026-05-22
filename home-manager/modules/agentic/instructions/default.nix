@@ -1,4 +1,8 @@
-{ pkgs, lib }:
+{
+  pkgs,
+  lib,
+  postProcess ? false,
+}:
 
 let
   tooling = import ./tooling.nix { inherit pkgs lib; };
@@ -7,7 +11,7 @@ let
   scopes = lib.mapAttrs (_: harness: tooling.makeScope harness) harnesses;
   instructions = lib.mapAttrs (_: scope: scope.instructions) scopes;
 
-  package = tooling.mkPackage scopes;
+  package = tooling.mkPackage { inherit scopes postProcess; };
 
   frontmatterTestResult =
     let

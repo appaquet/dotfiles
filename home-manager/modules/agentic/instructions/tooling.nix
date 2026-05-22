@@ -480,6 +480,21 @@ let
       }
     );
 
+  postProcessContent =
+    text:
+    let
+      lines = lib.splitString "\n" text;
+      stripTrailingPeriod =
+        line:
+        let
+          m = builtins.match "(.*)\\.$" line;
+        in
+        if m != null then builtins.head m else line;
+      stripped = map stripTrailingPeriod lines;
+      nonEmpty = builtins.filter (line: null == builtins.match "^[[:space:]]*$" line) stripped;
+    in
+    builtins.concatStringsSep "\n" nonEmpty;
+
   mkFile =
     dir: path: filename: content:
     pkgs.writeTextFile {
@@ -489,8 +504,12 @@ let
     };
 
   mkPackage =
-    scopes:
+    {
+      scopes,
+      postProcess ? false,
+    }:
     let
+      process = if postProcess then postProcessContent else (x: x);
       allFiles = lib.concatLists (
         lib.mapAttrsToList (
           _: scope:
@@ -500,14 +519,14 @@ let
               filename =
                 if instr ? outputPath && instr.outputPath != null then instr.outputPath else "${path}.md";
             in
-            mkFile scope.harness.outputDir path filename instr.embed
+            mkFile scope.harness.outputDir path filename (process instr.embed)
           ) scope.instructions)
           ++ (lib.mapAttrsToList (
             path: f:
             let
               filename = if f ? outputPath && f.outputPath != null then f.outputPath else "${path}.md";
             in
-            mkFile scope.harness.outputDir path filename f.embed
+            mkFile scope.harness.outputDir path filename (process f.embed)
           ) (scope.skillFiles or { }))
         ) scopes
       );
@@ -525,6 +544,7 @@ in
     mkSkill
     mkCommand
     mkSkillFile
+    postProcessContent
     forHarness
     renderFrontmatter
     api
