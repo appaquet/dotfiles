@@ -7,6 +7,8 @@
 }:
 
 let
+  instructions = import ../instructions { inherit pkgs lib; };
+
   mkClaudeConfSymlinks =
     paths:
     lib.listToAttrs (
@@ -14,6 +16,17 @@ let
         name = ".claude/${path}";
         value = {
           source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/home-manager/modules/agentic/claude/${path}";
+        };
+      }) paths
+    );
+
+  mkClaudeGeneratedSymlinks =
+    paths:
+    lib.listToAttrs (
+      map (path: {
+        name = ".claude/${path}";
+        value = {
+          source = "${instructions.package}/claude/${path}";
         };
       }) paths
     );
@@ -104,9 +117,7 @@ let
     echo '{"continue":true,"suppressOutput":true}'
   '';
 
-in
-{
-  home.file = mkClaudeConfSymlinks [
+  allLegacyPaths = [
     "settings.json"
     "commands"
     "docs"
@@ -116,6 +127,29 @@ in
     "CLAUDE.md"
     "statusline.sh"
   ];
+
+  generatedPaths = [
+    "commands"
+    "agents"
+    "skills"
+    "rules"
+    "CLAUDE.md"
+  ];
+
+  legacyOnlyPaths = [
+    "settings.json"
+    "docs"
+    "statusline.sh"
+  ];
+
+in
+{
+  home.file =
+    if config.dotfiles.agentic.instructions.mode == "legacy" then
+      mkClaudeConfSymlinks allLegacyPaths
+    else
+      (mkClaudeConfSymlinks legacyOnlyPaths) // (mkClaudeGeneratedSymlinks generatedPaths)
+    ;
 
   home.packages = [
     claude-wrapped

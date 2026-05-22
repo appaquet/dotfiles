@@ -7,14 +7,19 @@
 }:
 
 let
+  instructions = import ../instructions { inherit pkgs lib; };
+
   baseConfig = {
     "$schema" = "https://opencode.ai/config.json";
 
     autoupdate = false;
 
-    instructions = [
-      "~/.claude/rules/*.md"
-    ];
+    instructions =
+      if config.dotfiles.agentic.instructions.mode == "legacy" then
+        [ "~/.claude/rules/*.md" ]
+      else
+        [ "~/.config/opencode/rules/*.md" ]
+      ;
 
     agent = {
       bigbrain = {
@@ -162,19 +167,46 @@ let
         };
       }) paths
     );
+
+  mkOpencodeGeneratedSymlinks =
+    paths:
+    lib.listToAttrs (
+      map (path: {
+        name = ".config/opencode/${path}";
+        value = {
+          source = "${instructions.package}/opencode/${path}";
+        };
+      }) paths
+    );
 in
 {
   home.file =
-    (mkOpencodeConfSymlinks ".config/opencode" "agentic/opencode" [
-      "commands"
-      "agents"
-    ])
-    // {
-      ".config/opencode/opencode.json".source = opencodeJson;
-      ".config/opencode/opencode-nono.json".source = nonoOpencodeJson;
-      ".config/opencode/tui.json".source = tuiJson;
-      ".config/opencode/plugins/ccmon.ts".source = "${inputs'.ccmon.packages.opencode-plugin}/ccmon.ts";
-    };
+    if config.dotfiles.agentic.instructions.mode == "legacy" then
+      (mkOpencodeConfSymlinks ".config/opencode" "agentic/opencode" [
+        "commands"
+        "agents"
+      ])
+      // {
+        ".config/opencode/opencode.json".source = opencodeJson;
+        ".config/opencode/opencode-nono.json".source = nonoOpencodeJson;
+        ".config/opencode/tui.json".source = tuiJson;
+        ".config/opencode/plugins/ccmon.ts".source = "${inputs'.ccmon.packages.opencode-plugin}/ccmon.ts";
+      }
+    else
+      (mkOpencodeGeneratedSymlinks [
+        "commands"
+        "agents"
+        "rules"
+        "skills"
+        "AGENTS.md"
+      ])
+      // {
+        ".config/opencode/opencode.json".source = opencodeJson;
+        ".config/opencode/opencode-nono.json".source = nonoOpencodeJson;
+        ".config/opencode/tui.json".source = tuiJson;
+        ".config/opencode/plugins/ccmon.ts".source = "${inputs'.ccmon.packages.opencode-plugin}/ccmon.ts";
+      }
+    ;
 
   home.packages = [
     nono-opencode

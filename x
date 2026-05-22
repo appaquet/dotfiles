@@ -489,6 +489,23 @@ cmd_copy() {
   fi
 }
 
+cmd_agent_build() {
+  ${NIX_BUILDER} build --impure --out-link result --expr '
+    let
+      pkgs = import <nixpkgs> {};
+      instr = import ./home-manager/modules/agentic/instructions { inherit pkgs; lib = pkgs.lib; };
+    in instr.package
+  '
+  echo "result -> $(readlink result)"
+}
+
+cmd_agent_help() {
+  cat >&2 <<EOF
+agent commands:
+  build     Build agentic instruction package → result
+EOF
+}
+
 cmd_help() {
   cat >&2 <<EOF
 usage: $0 <command> [args]
@@ -507,6 +524,7 @@ Unified:
 Utilities:
   fmt          Format nix files
   update (u)   Update flake inputs
+  agent (a)    build → agentic instruction package → result
   gc           Garbage collect
   optimize     Optimize nix store
 
@@ -638,6 +656,17 @@ n | nixos)
     cmd_nixos_generations
     ;;
   *) cmd_nixos_help ;;
+  esac
+  ;;
+
+a | agent)
+  shift
+  case $1 in
+  b | build)
+    shift
+    cmd_agent_build "$@"
+    ;;
+  *) cmd_agent_help ;;
   esac
   ;;
 

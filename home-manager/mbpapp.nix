@@ -18,6 +18,8 @@
     ./modules/work
   ];
 
+  dotfiles.agentic.instructions.mode = "nixified";
+
   dotfiles.neovim.devMode = true;
 
   dotfiles.ssh-agent.defaultSocket = "/Users/appaquet/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock";
