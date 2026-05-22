@@ -143,9 +143,13 @@ let
     };
 
   forHarness =
-    { harness, values }:
-    values.${harness.name}
-      or (throw "Unsupported harness: ${harness.name}. Available: ${builtins.concatStringsSep ", " (builtins.attrNames values)}");
+    scope: values:
+    values.${scope.harness.name} or (
+      if builtins.hasAttr "default" values then
+        values.default
+      else
+        throw "Unsupported harness: ${scope.harness.name}. Available: ${builtins.concatStringsSep ", " (builtins.attrNames values)}"
+    );
 
   renderFrontmatter = frontmatter.renderFrontmatter;
 
@@ -347,6 +351,8 @@ let
       in
       {
         inherit harness api;
+
+        forHarness = forHarness self;
 
         rawBlocks = importDir {
           dir = ./blocks;

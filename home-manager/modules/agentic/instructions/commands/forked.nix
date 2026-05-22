@@ -26,8 +26,7 @@
     2. 🔳 Make sure task at hand clear. If not, use `AskUserQuestion` to clarify
 
     3. 🔳 Parse `$ARGUMENTS` to identify skills and additional context
-       - Unless already loaded in your context, load each skill from ~/.claude/skills or
-         ~/.claude/commands
+       - Unless already loaded in your context, use the `Skill` tool to load each skill
        - Extract instructions & tasks from loaded skills
        - Think how to best decompose work into independent sub-tasks by agents
        - Make sure if more than one skill involved, dependencies between skills managed

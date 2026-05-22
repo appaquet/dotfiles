@@ -1,11 +1,8 @@
 { scope }:
 let
-  outputPath = scope.api.forHarness {
-    harness = scope.harness;
-    values = {
-      claude = "CLAUDE.md";
-      opencode = "AGENTS.md";
-    };
+  outputPath = scope.forHarness {
+    claude = "CLAUDE.md";
+    opencode = "AGENTS.md";
   };
 in
 {

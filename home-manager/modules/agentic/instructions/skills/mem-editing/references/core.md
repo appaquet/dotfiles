@@ -1,10 +1,10 @@
 # Core Instruction Writing Principles
 
-Foundational guidelines for writing effective Claude Code instructions.
+Foundational guidelines for writing effective agent instructions across supported harnesses.
 
 ## Self-Verification (Highest Leverage)
 
-**Give Claude ways to verify its work.** Single highest-leverage technique for instruction quality.
+**Give agents ways to verify their work.** Single highest-leverage technique for instruction quality.
 
 * Include tests, expected outputs, or success criteria in instructions
 * Add verification steps at the end of workflows ("Run X to confirm Y")
@@ -38,13 +38,13 @@ Verify each item: [ ] Plan addressed [ ] Diff reviewed [ ] Tests pass...
 Verify each item in `development-completion-checklist`. State each item aloud.
 </good-example>
 
-**Instruction Budget**: LLMs reliably follow only 150-200 instructions. Claude Code's system prompt uses ~50, so CLAUDE.md should stay well under 150 instructions.
+**Instruction Budget**: LLMs reliably follow only 150-200 instructions. Some harness system prompts consume a meaningful share of that budget, so root instruction files should stay well under 150 instructions.
 
-**Line Count**: Keep CLAUDE.md under 300 lines; under 60 lines is optimal. Put detailed docs in separate files.
+**Line Count**: Keep root instruction files (`CLAUDE.md`/`AGENTS.md`) under 300 lines; under 60 lines is optimal. Put detailed docs in separate files.
 
 ## Front-Load Critical Instructions
 
-Put most important instruction at the very top. Claude processes instructions sequentially; early content gets more attention weight.
+Put most important instruction at the very top. Models process instructions sequentially; early content gets more attention weight.
 
 * State the task clearly before providing context
 * Critical constraints go before background information
@@ -52,7 +52,7 @@ Put most important instruction at the very top. Claude processes instructions se
 
 ## Provide Context and Motivation
 
-Explain *why* instructions matter—helps Claude understand goals.
+Explain *why* instructions matter—helps the agent understand goals.
 
 **Good**: "Your response will be read aloud by text-to-speech engine, so never use ellipses since the engine won't know how to pronounce them."
 
@@ -60,18 +60,18 @@ Explain *why* instructions matter—helps Claude understand goals.
 
 ## Universal Applicability
 
-CLAUDE.md loads in every conversation. Include only instructions that apply to most tasks.
+Root instruction files (`CLAUDE.md`/`AGENTS.md`) load in every conversation. Include only instructions that apply to most tasks.
 
-* Move task-specific guidance to separate files Claude reads on-demand
-* If instruction applies to <50% of sessions, it doesn't belong in CLAUDE.md
-* The more irrelevant content, the more Claude filters out everything uniformly
+* Move task-specific guidance to separate files the agent reads on-demand
+* If instruction applies to <50% of sessions, it doesn't belong in root instructions
+* The more irrelevant content, the more the model filters out everything uniformly
 
 ## Hooks vs Instructions
 
 **Hooks** are shell commands that execute automatically on events (PreToolUse, PostToolUse, etc.). Use hooks instead of instructions when:
 
 * **Action must happen every time with zero exceptions** - hooks enforce mechanically, instructions can be ignored
-* **Claude already does it correctly without instruction** - delete the instruction, the behavior is trained-in
+* **The agent already does it correctly without instruction** - delete the instruction, the behavior is trained-in
 * **Instruction is frequently ignored** - convert to hook for enforcement
 
 **Keep as instructions when:**
@@ -79,15 +79,15 @@ CLAUDE.md loads in every conversation. Include only instructions that apply to m
 * Action varies based on situation
 * Hook implementation would be complex or brittle
 
-**Pruning strategy:** If Claude consistently follows a rule without the instruction, remove it. Instructions that duplicate trained-in behavior waste attention budget.
+**Pruning strategy:** If agents consistently follow a rule without the instruction, remove it. Instructions that duplicate trained-in behavior waste attention budget.
 
 ## Writing Style
 
 ### Be Explicit and Direct
 
-Claude 4.x excels with clear, specific instructions.
+Claude 4.x excels with clear, specific instructions. For harness-neutral instructions, use direct phrasing that does not rely on one model family's behavior unless the guidance is Claude-specific.
 
-**System prompt sensitivity**: Claude 4.x is highly responsive to system prompts. Dial back aggressive language—where you might have said "CRITICAL: You MUST...", use normal prompting like "Use this tool when...".
+**Claude-specific system prompt sensitivity**: Claude 4.x is highly responsive to system prompts. Dial back aggressive language—where you might have said "CRITICAL: You MUST...", use normal prompting like "Use this tool when...". For shared instructions, prefer harness-neutral phrasing that remains firm without model-specific assumptions.
 
 **Good**: "Include as many relevant features and interactions as possible. Go beyond basics to create fully-featured implementation."
 
@@ -112,7 +112,7 @@ The formatting style of your prompt influences response formatting.
 * Remove markdown from prompts to reduce markdown in responses
 * Use prose in prompts to encourage prose in responses
 * "Write in prose rather than lists unless presenting truly discrete items where list format is best option"
-* Avoid bold (`**text**`) in instruction files -- it adds tokens without increasing salience for Claude. Use plain text, CAPS for emphasis, or XML tags for boundaries.
+* Avoid bold (`**text**`) in instruction files -- it adds tokens without increasing salience. Use plain text, CAPS for emphasis, or XML tags for boundaries.
 
 ### Minimize Verbosity
 
@@ -181,7 +181,17 @@ For skills that use tools:
 * Tools should be self-contained and robust to error
 * Avoid overlapping tool functionality
 * Curated minimal viable set enables better maintenance
-* Use `allowed-tools` to restrict access when appropriate
+* Use `allowedTools`/`allowed-tools` to restrict access when appropriate for Claude; opencode skills omit it
+
+## Current Nix Authoring Model
+
+Instruction sources under `~/dotfiles/home-manager/modules/agentic/instructions/` return plain Nix data attrsets, not rendered markdown with hand-written frontmatter.
+
+* Source files return data only; generated markdown is produced by the instruction build
+* `makeScope` calls constructors centrally: `mkBlock`, `mkInstructions`, `mkAgent`, `mkCommand`, and `mkSkill`
+* Frontmatter is rendered by harnesses from structured Nix fields; source files never hand-write YAML frontmatter
+* Harness differences use `scope.forHarness {}` rather than duplicated source files
+* Run `./x agent build` to generate `result/claude/` and `result/opencode/` outputs
 
 ## Common Anti-Patterns
 
@@ -194,7 +204,8 @@ For skills that use tools:
 | Prose for discrete items | Lists for steps |
 | Vague descriptions: "Helps with files" | Specific: "Parse CSV files, convert to JSON" |
 | Split numbered lists across headers | Continuous list or separate lists per section |
-| Skill path reference: "Load skill `@~/.claude/skills/foo/SKILL.md`" | "Load `foo` skill using the `Skill` tool" |
+| Skill path reference: "Load skill `@skills/foo/SKILL.md`" | "Load `foo` skill using the `Skill` tool" |
+| Hand-written YAML frontmatter in Nix sources | Structured Nix fields rendered by harnesses |
 
 ## References
 

@@ -1,170 +1,220 @@
-# Skill Structure
+# Skill Source Structure
 
-Guidelines for writing skills for Claude Code. Based on Anthropic's skill guide and observed patterns.
+Guidelines for writing skills in the nixified multi-harness instruction authoring system. Skill
+source files return plain Nix attrsets only; `makeScope` in `tooling.nix` applies `mkSkill`
+centrally and harnesses render the generated markdown.
+
+Source files never hand-write YAML frontmatter.
 
 ## File Structure
 
 ```
 skill-name/                  # kebab-case, no spaces/capitals/underscores
-├── SKILL.md                 # Required - exact casing
-├── references/              # Optional - docs loaded as needed
+├── default.nix              # Required source data for mkSkill
+├── references/              # Optional raw markdown copied as skill subfiles
 │   └── detailed-guide.md
-├── scripts/                 # Optional - executable code
-│   └── validate.sh
-├── examples/                # Optional - working examples
-│   └── example.sh
-└── assets/                  # Optional - templates, icons, fonts
-    └── template.md
+└── extra.nix                # Optional processed skill subfile via mkSkillFile
 ```
+
+Generated output is harness-owned:
+
+* `instructions/skills/<name>/default.nix` returns data for `mkSkill`
+* `instructions/skills/<name>/references/*.md` is copied raw as skill subfiles
+* `instructions/skills/<name>/*.nix`, excluding `default.nix`, is processed with `mkSkillFile`
+* `makeScope` derives the skill name from the directory name
+* Harnesses generate `skills/<name>/SKILL.md`
 
 ### Naming Rules
 
 * Folder: kebab-case only (`notion-project-setup`, not `Notion_Project_Setup`)
-* Main file: exactly `SKILL.md` (case-sensitive, no variations)
-* No README.md inside skill folder - all docs go in SKILL.md or references/
+* Main source file: exactly `default.nix`
+* Do not add `name` to the skill source; the name is derived from the folder by `makeScope`
+* Do not edit generated `SKILL.md` files; update source data instead
+* Put long supporting docs in `references/` and link them with `@references/filename.md`
 
-## YAML Frontmatter
+## Structured Metadata Fields
 
-### Required Fields
+Skill `default.nix` files use structured Nix fields. Constructors and harnesses decide how those
+fields render to frontmatter, generated markdown, or runtime metadata.
 
-```yaml
----
-name: skill-name-here
-description: What it does. When to use it. Key capabilities.
----
+Common fields:
+
+| Field | Purpose | Harness notes |
+|-------|---------|---------------|
+| `description` | Skill discovery and trigger text | Supported by skill harnesses |
+| `argumentHint` | Optional argument display text | Rendered only by harnesses that support it |
+| `content` | Main skill body rendered into generated `SKILL.md` | Primary instruction text |
+| `effort` | Model effort metadata | Harness-selected output |
+| `model` | Model preference metadata | Harness-selected output |
+| `context` | Context-loading metadata | Harness-selected output |
+| `agent` | Agent metadata for harnesses that support it | Harness-selected output |
+| `allowedTools` | Tool restrictions for Claude output | Claude-only field |
+| `subtask` | Subtask metadata for OpenCode output | OpenCode-only field |
+| `whenToUse` | Optional source-level applicability guidance | Use only if consumed by the target harness |
+
+Use `scope.forHarness` when a value differs by harness:
+
+```nix
+{ scope }:
+
+{
+  description = "Edit instruction source files in the nixified authoring system.";
+  model = scope.forHarness {
+    claude = "sonnet";
+    opencode = "gpt-5.5";
+  };
+  allowedTools = [ "Read" "Grep" "Glob" "Edit" ];
+  subtask = false;
+
+  content = ''
+    # Instruction Editing Guidelines
+
+    Use this skill when modifying instruction source files.
+  '';
+}
 ```
 
-* `name`: kebab-case, must match folder name
-* `description`: under 1024 chars, no XML angle brackets (`<` or `>`)
+### Frontmatter-Sensitive Values
 
-### Optional Fields
+Frontmatter is rendered from structured fields by each harness. Treat metadata values as
+frontmatter-sensitive even though source files do not contain YAML.
 
-| Field | Purpose | Example |
-|-------|---------|---------|
-| license | Open source license | `MIT`, `Apache-2.0` |
-| compatibility | Environment requirements | `"Claude Code only"` |
-| allowed-tools | Restrict tool access | `"Bash(python:*) WebFetch"` |
-| metadata | Custom key-value pairs | `author: Name`, `version: 1.0.0` |
-
-### Security Restrictions
-
-* No XML angle brackets in frontmatter (appears in system prompt, could inject instructions)
-* Names with "claude" or "anthropic" prefix are reserved
+* Keep `description` concise and plain text
+* Avoid XML angle brackets in metadata fields unless the target harness explicitly supports them
+* Put markdown-heavy instructions in `content`, not metadata fields
+* Use structured Nix fields rather than embedding generated frontmatter manually
 
 ## Description Field
 
-The description determines when Claude loads the skill. Structure it as:
+The description determines when a skill is discovered or loaded. Structure it as:
 
 `[What it does] + [When to use it / trigger phrases] + [Key capabilities]`
 
 <good-example>
-description: Extract text and tables from PDF files, fill forms, merge documents. Use when working with PDFs or mentioning "document extraction", "PDF conversion", or "fill PDF form".
+description = "Extract text and tables from PDF files, fill forms, and merge documents. Use when working with PDFs or mentioning document extraction, PDF conversion, or PDF forms.";
 </good-example>
 
 <bad-example>
-description: Helps with documents.
+description = "Helps with documents.";
 </bad-example>
 
 <bad-example>
-description: Creates sophisticated multi-page documentation systems.
+description = "Creates sophisticated multi-page documentation systems.";
 </bad-example>
 
 ### Negative Triggers
 
-When a skill over-triggers on unrelated queries, add exclusions:
+When a skill over-triggers on unrelated requests, add exclusions to `description`:
 
-```yaml
-description: Advanced data analysis for CSV files. Use for statistical modeling, regression, clustering. Do NOT use for simple data exploration (use data-viz skill instead).
+```nix
+description = "Advanced data analysis for CSV files. Use for statistical modeling, regression, and clustering. Do NOT use for simple data exploration.";
 ```
 
 ### Triggering Diagnostics
 
-Under-triggering (skill doesn't load when it should):
+Under-triggering, where a skill does not load when it should:
+
 * Description too vague or generic
-* Missing trigger phrases users would actually say
+* Missing trigger phrases users actually say
 * Missing file types or technical terms
-* Fix: add specific phrases, file types, domain keywords
+* Fix: add specific phrases, file types, and domain keywords
 
-Over-triggering (skill loads for unrelated queries):
+Over-triggering, where a skill loads for unrelated requests:
+
 * Description too broad
-* Overlapping scope with other skills
-* Fix: add negative triggers, narrow scope, clarify boundaries
+* Overlapping scope with another skill
+* Fix: add negative triggers, narrow scope, and clarify boundaries
 
-Debug: ask Claude "When would you use the [skill name] skill?" - it quotes the description back.
+Debug by asking the agent when it would use the skill. The answer should reflect the description
+and boundaries clearly.
 
 ## Progressive Disclosure
 
-Skills use a three-level loading system:
+Skills use source-level progressive disclosure:
 
-1. **YAML frontmatter** - always in context (~100 words). Just enough for Claude to decide relevance
-2. **SKILL.md body** - loaded when skill triggers. Core instructions and workflow
-3. **Linked files** - loaded on-demand as Claude needs them (references/, scripts/, etc.)
+1. **Structured metadata in `default.nix`** - small routing fields used by harnesses for discovery
+2. **`content` in `default.nix`** - main generated `SKILL.md` body loaded when the skill triggers
+3. **`references/*.md`** - raw supporting docs loaded only when needed
+4. **Non-default `*.nix` files** - processed generated subfiles for content needing Nix interpolation
 
 ### Size Guidance
 
-* SKILL.md body: 1,500-2,000 words ideal, under 5,000 max
-* Move detailed content to references/ when SKILL.md exceeds target
-* Each reference file can be large (2,000-5,000+ words)
+* `content`: concise activation-time guidance, ideally 1,500-2,000 words or less
+* Move detailed reference material to `references/`
+* Keep generated subfiles focused on one topic so they can be loaded selectively
 
 ### What Goes Where
 
-SKILL.md (always loaded on trigger):
+`default.nix` metadata:
+
+* `description` and harness-specific routing fields
+* Model/tool/context metadata
+* Short applicability hints
+
+`default.nix` `content`:
+
 * Purpose statement and quick-start guidance
 * Essential instructions and workflow steps
-* References to supporting files with @references/filename.md
+* Portable links to supporting files with `@references/filename.md`
 
-references/ (loaded as needed):
+`references/*.md`:
+
 * Extended documentation and detailed patterns
 * Additional examples and API specifications
 * Edge cases and troubleshooting
 
-scripts/ (executed without loading into context):
-* Validation tools, testing helpers
-* Deterministic tasks that would otherwise be rewritten each time
+Non-default `*.nix` files:
 
-assets/ (used in output, not loaded into context):
-* Templates, fonts, icons, boilerplate
+* Processed skill subfiles that need shared blocks, Nix interpolation, or harness-specific text
 
 ### Avoiding Duplication
 
 * Keep detailed principles in supporting files
-* SKILL.md provides brief overview with cross-references
-* Pattern: "Apply principles from @references/best-practices.md" instead of repeating them
-* Information lives in ONE place - either SKILL.md or references, not both
+* Keep `content` focused on what must be available when the skill triggers
+* Use portable references such as `@references/best-practices.md`, `@skills/name/SKILL.md`, and `@rules/filename.md`
+* Use `scope.blocks.*` for shared instruction blocks instead of repeating shared text
+* Keep each piece of information in one place: metadata, `content`, a reference file, or a shared block
 
-## SKILL.md Template
+## `default.nix` Template
 
-```yaml
----
-name: skill-name-here
-description: Specific capability with trigger phrases. Include file types, concrete capabilities, and natural phrases users would say. Keep under 1024 chars.
----
+```nix
+{ scope }:
 
-# Skill Title
+{
+  description = "Specific capability with trigger phrases. Include file types, concrete capabilities, and natural phrases users would say.";
+  argumentHint = "[optional-arg]";
+  allowedTools = [ "Read" "Grep" "Glob" ];
+  subtask = false;
 
-Brief purpose statement.
+  content = ''
+    # Skill: skill-name
 
-## When to Use
+    Brief purpose statement.
 
-Specific triggers and scenarios.
+    ## When to Use
 
-## Core Principles
+    Specific triggers and scenarios.
 
-Key guidelines (reference supporting docs with @references/filename.md).
+    ## Core Principles
 
-## Workflow
+    Key guidelines. Reference supporting docs with `@references/filename.md`.
 
-Clear steps for different scenarios.
+    ## Workflow
 
-## Supporting Files
+    Clear steps for different scenarios.
 
-* @references/referenced-file.md: Purpose
+    ## Supporting Files
+
+    * `@references/referenced-file.md`: Purpose
+  '';
+}
 ```
 
 ## Instruction Best Practices
 
-* Be specific and actionable - "Run `scripts/validate.py --input {file}`" not "Validate the data"
+* Be specific and actionable: "Run `scripts/validate.py --input {file}`" not "Validate the data"
 * Include error handling for common failures
-* Reference bundled resources clearly - "Consult `references/api-patterns.md` for rate limiting"
-* Front-load critical instructions at the top of SKILL.md
-* Use verification steps - "Run X to confirm Y"
+* Reference bundled resources with portable paths
+* Front-load critical instructions at the top of `content`
+* Use verification steps: "Run X to confirm Y"
+* Generalize language across harnesses unless a rule is explicitly Claude-only or OpenCode-only
