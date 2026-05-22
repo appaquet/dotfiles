@@ -26,7 +26,7 @@
 
   options.dotfiles.agentic.instructions.postProcess = lib.mkOption {
     type = lib.types.bool;
-    default = false;
+    default = true;
     description = ''
       Apply post-processing to generated markdown files:
       - Remove empty and whitespace-only lines.
