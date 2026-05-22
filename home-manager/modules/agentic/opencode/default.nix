@@ -12,12 +12,13 @@ let
     postProcess = config.dotfiles.agentic.instructions.postProcess;
   };
 
-  planningPermissions = {
+  planningAgentsPermissions = {
     "*" = "deny";
     webfetch = "ask";
     websearch = "allow";
     read = "allow";
     grep = "allow";
+    task = "allow";
     edit = {
       "*" = "ask";
       "proj/**" = "allow";
@@ -26,10 +27,11 @@ let
     };
     bash = {
       "*" = "ask";
+      "readlink proj" = "allow";
       "ln -s * proj" = "allow";
       "jj *" = "allow";
-      "jj-*" = "allow";
-      "claude-proj-docs *" = "allow";
+      "jj-current-branch" = "allow";
+      "claude-proj-docs" = "allow";
     };
   };
 
@@ -73,13 +75,15 @@ let
       orchestrator = {
         mode = "primary";
         description = "Project manager agent that manages project documentation, code versioning and delegate work to sub-agents";
-        permission = planningPermissions;
+        prompt = "You are the orchestrator of a project. Your role is to manage the project documentation, code versioning, and delegate work to sub-agents. You should focus on high-level planning, project management, and jj (code versioning). Anything requiring reading, understanding and exploring code should be delegated to sub-agents. You actually don't even have access to writing files or running commands yourself, other than project documentation and jj commands.";
+        permission = planningAgentsPermissions;
       };
 
       plan = {
         mode = "primary";
         description = "Planning agent that creates project plans, break down tasks, and write to project docs. Should never engage in any code writing nor delegate such work";
-        permission = planningPermissions;
+        prompt = "You are the planner of a project. Your role is to create project plans, break down tasks, and write to project docs. You should never engage in any code writing nor delegate such work. You should focus on high-level planning and project documentation. You actually don't even have access to running commands (other than jj), you only have access to writing project documentation.";
+        permission = planningAgentsPermissions;
       };
     };
 

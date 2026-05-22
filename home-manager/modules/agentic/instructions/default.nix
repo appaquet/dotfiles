@@ -65,7 +65,7 @@ let
     "think"
   ];
 
-  rules = [
+  sharedRules = [
     "code-style"
     "development"
     "project-doc"
@@ -73,6 +73,10 @@ let
     "testing"
     "version-control"
     "workflows"
+  ];
+
+  opencodeRules = [
+    "browser"
   ];
 
   skills = [
@@ -106,7 +110,7 @@ let
         if [[ ! -f ${package}/$f ]]; then echo "MISSING: $f" >&2; exit 1; fi
       done
 
-      for rule in ${builtins.toString rules}; do
+      for rule in ${builtins.toString sharedRules}; do
         f="$harness/rules/$rule.md"
         if [[ ! -f ${package}/$f ]]; then echo "MISSING: $f" >&2; exit 1; fi
       done
@@ -115,6 +119,14 @@ let
         f="$harness/skills/$skill/SKILL.md"
         if [[ ! -f ${package}/$f ]]; then echo "MISSING: $f" >&2; exit 1; fi
       done
+    done
+
+    # Opencode-only rules
+    for rule in ${builtins.toString opencodeRules}; do
+      f="opencode/rules/$rule.md"
+      if [[ ! -f ${package}/$f ]]; then echo "MISSING: $f" >&2; exit 1; fi
+      f="claude/rules/$rule.md"
+      if [[ -f ${package}/$f ]]; then echo "UNEXPECTED: $f should be opencode-only" >&2; exit 1; fi
     done
 
     # Root instruction files use harness-specific filenames

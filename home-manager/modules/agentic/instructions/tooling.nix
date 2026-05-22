@@ -427,7 +427,11 @@ let
           )
         ) self.rawSkills;
 
-        authoredInstructions = lib.mapAttrs (_: data: self.api.mkInstructions data) rawAuthoredInstructions;
+        authoredInstructions = lib.mapAttrs (_: data: self.api.mkInstructions data) (
+          lib.filterAttrs (
+            _: data: !builtins.hasAttr "harnesses" data || builtins.elem self.harness.name data.harnesses
+          ) rawAuthoredInstructions
+        );
 
         agentInstructions = lib.mapAttrs' (
           name: agent: lib.nameValuePair "agents/${name}" agent

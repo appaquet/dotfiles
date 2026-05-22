@@ -87,6 +87,7 @@
     * [ ] Dependent code is still compiling & testing
     * [ ] After completing changes, consider: do changes affect other features or paths not covered by the task's tests?
     * [ ] Project doc updated (if exists)
+    * [ ] Sub-agent validation claims include methodology (commands run + results), not just outcomes
     </development-completion-checklist>
   '';
 }

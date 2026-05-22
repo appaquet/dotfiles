@@ -23,7 +23,7 @@
 
     With these additions:
 
-    - For EACH requirement (R1, R2, etc.), create a task with `TaskCreate`
+    - For EACH requirement (R1, R2, etc.), create a task with `${scope.harness.tools.taskCreate}`
       - Make sure that each requirement is checked against guidelines
 
     - Cross-check completeness

@@ -22,9 +22,14 @@
         answered, resume it instead of answering directly or launching a new one. If I ask for a small
         change to a previous sub-agent's work, resume it instead of creating a new one to do the change
 
-      * When a sub-agent comes back with an output, BE CRITICAL. If you have doubt in quality, if it's
-        the right solution, etc. you need to resume / follow-up / ask for more details/clarifications.
-        Avoid checking their output code yourself, unless very trivial/small
+      * **Trust methodology, verify decisions.** If a sub-agent reports having run specific commands
+        (e.g., "ran `npm test` → 493 passing"), trust that action — they executed it. But act like a
+        senior dev reviewing a junior's PR: critically review design choices, implementation quality,
+        and whether the right thing was built. Bare conclusions without methodology ("tests pass")
+        are unverifiable — follow up or verify independently.
+
+      * When delegating, instruct sub-agents to report methodology — what commands they executed
+        and their results. Outcomes without methodology are claims, not information
 
       * Assume that I don't have any context about what a sub-agent did and outputted. I don't see that
         output, and you have to give me some context if I need to answer questions about it or make

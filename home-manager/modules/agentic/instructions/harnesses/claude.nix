@@ -4,6 +4,10 @@
   outputDir = "claude";
   defaultModel = "haiku";
 
+  tools = {
+    taskCreate = "TaskCreate";
+  };
+
   renderAgentFrontmatter =
     {
       name,

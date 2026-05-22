@@ -18,7 +18,7 @@
        - Mark them completed
        - The calling workflow continues from where it left off
 
-    3. 🔳 Breakdown and create tasks as needed using `TaskCreate`
+     3. 🔳 Breakdown and create tasks as needed using `${scope.harness.tools.taskCreate}`
 
     4. 🔳 Execute tasks one by one
   '';

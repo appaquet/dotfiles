@@ -49,8 +49,8 @@
 
     After `/implement` is called, follow its workflow with these review-specific additions:
 
-    1. 🔳 Create tasks from REVIEW comments
-       - One TaskCreate per comment: "Fix: [file:line]"
+     1. 🔳 Create tasks from REVIEW comments
+        - One `${scope.harness.tools.taskCreate}` per comment: "Fix: [file:line]"
 
     2. 🔳 For each fix
        - Remove REVIEW comment after addressing it

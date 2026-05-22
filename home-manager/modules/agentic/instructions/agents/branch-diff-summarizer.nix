@@ -20,13 +20,13 @@
 
     ## Task Tracking
 
-    **FIRST**: Create one `TaskCreate` per row below BEFORE any other work:
+    **FIRST**: Create one `${scope.harness.tools.taskCreate}` per row below BEFORE any other work:
 
     | # | Subject | Description |
     | --- | --- | --- |
     | 1 | Check branch state | Get branch name and list of all changed files |
     | 2 | Read project doc | Check for existing Files section, note if update needed |
-    | 3 | Create file tasks | **FIRST**: Get file list via jj-diff-branch --stat. **THEN**: For each code file (skip docs/generated), create `TaskCreate` with subject "Summarize: [filename]" |
+      | 3 | Create file tasks | **FIRST**: Get file list via jj-diff-branch --stat. **THEN**: For each code file (skip docs/generated), create `${scope.harness.tools.taskCreate}` with subject "Summarize: [filename]" |
     | 4 | Summarize files | For each Summarize task: read diff, understand changes, write technical summary, mark complete |
     | 5 | Format and return | Compile summaries into Files section format, return result |
 
@@ -46,8 +46,8 @@
 
     4. Create file tasks:
        * **FIRST**: Get overview of changes via `jj-diff-branch --stat`
-       * **THEN**: For **EACH** code file (excluding project docs and generated files like *.pb.go):
-         * Create `TaskCreate` with subject "Summarize: [filename]"
+        * **THEN**: For **EACH** code file (excluding project docs and generated files like *.pb.go):
+          * Create `${scope.harness.tools.taskCreate}` with subject "Summarize: [filename]"
          * Description: "Read diff, understand purpose, write 1-2 sentence technical summary"
 
     5. Summarize files - For **EACH** Summarize task:

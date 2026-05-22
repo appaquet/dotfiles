@@ -128,7 +128,7 @@ in
     * Name: AP
 
     ${scope.blocks."top-level-instructions".embed}
-    ${scope.blocks."context-management".embed}
+    ${scope.blocks."sub-agents-workflows".embed}
   '';
   inherit outputPath;
 }

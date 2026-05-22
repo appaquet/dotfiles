@@ -30,9 +30,9 @@
        - If unclear, ask user to `/ctx-improve`
        - Clarify if task contradicts or overlaps
 
-    4. 🔳 Load tasks from project/phase doc/context
-       - For each task, create 1..n `TaskCreate`
-         - Segment for better tracking
+     4. 🔳 Load tasks from project/phase doc/context
+        - For each task, create 1..n `${scope.harness.tools.taskCreate}`
+          - Segment for better tracking
        - Create tasks for verification/testing each implementation step
          If user validation needed, task description should be clear about waiting for user input
        - Think if any task can be delegated to sub-agents, and if so, make sure the task description is
@@ -58,7 +58,11 @@
     7. 🔳 Validate via `development-completion-checklist`
        - State each item aloud, confirm compliance
 
-    8. 🔳 Validate formatting, linting and tests
+     8. 🔳 Validate formatting, linting and tests
+        - Re-run validation independently rather than trusting sub-agent claims. If a sub-agent
+          reported "tests pass" without methodology, it's unverified. Sub-agent reports that specify
+          the command and result (e.g., "ran `npm test` → 493 passing") are trustworthy on the action
+          but still review the quality of implementation independently
 
     9. 🔳 Run `/ctx-save` to update project and phase docs
 

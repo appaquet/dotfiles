@@ -4,6 +4,10 @@
   outputDir = "opencode";
   defaultModel = "anthropic/claude-haiku-4.5";
 
+  tools = {
+    taskCreate = "todowrite";
+  };
+
   # Agent frontmatter recognized by opencode:
   # - mode: "subagent" (required by our system; opencode docs: primary, subagent, all)
   # - description: shown when selecting subagents

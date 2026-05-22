@@ -18,11 +18,11 @@
        - User guidelines: Only if explicitly referenced in agent's Scope section
        - General Guidelines: Agent's built-in criteria (in agent file)
 
-    4. 🔳 Create rule tasks
-       - From merged guidelines (project > user > general), for EACH rule create `TaskCreate`:
-         - Subject: "Check: [rule name]"
-         - Description: What to look for + good/bad examples
-       - 🔳 Create one task using `TaskCreate` for EACH rule
+     4. 🔳 Create rule tasks
+        - From merged guidelines (project > user > general), for EACH rule create `${scope.harness.tools.taskCreate}`:
+          - Subject: "Check: [rule name]"
+          - Description: What to look for + good/bad examples
+        - 🔳 Create one task using `${scope.harness.tools.taskCreate}` for EACH rule
 
     5. 🔳 Load changed files
        - Run `jj-diff-branch --stat` to list modified files
