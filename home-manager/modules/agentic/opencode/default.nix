@@ -19,6 +19,8 @@ let
     read = "allow";
     grep = "allow";
     task = "allow";
+    glob = "allow";
+    todowrite = "allow";
     edit = {
       "*" = "ask";
       "proj/**" = "allow";
@@ -31,7 +33,10 @@ let
       "ln -s * proj" = "allow";
       "jj *" = "allow";
       "jj-current-branch" = "allow";
+      "jj-diff-working" = "allow";
+      "jj-diff-branch" = "allow";
       "claude-proj-docs" = "allow";
+      "grep *" = "allow";
     };
   };
 
@@ -45,6 +50,8 @@ let
         [ "~/.claude/rules/*.md" ]
       else
         [ "~/.config/opencode/rules/*.md" ];
+
+    default_agent = "orchestrator";
 
     agent = {
       bigbrain = {
@@ -97,6 +104,7 @@ let
         ctx-save = "allow";
         mem-editing = "allow";
         proj-editing = "allow";
+        customize-opencode = "allow";
       };
     };
   };
