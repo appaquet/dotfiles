@@ -12,31 +12,190 @@ let
     postProcess = config.dotfiles.agentic.instructions.postProcess;
   };
 
-  planningAgentsPermissions = {
-    "*" = "deny";
-    webfetch = "ask";
-    websearch = "allow";
-    read = "allow";
-    grep = "allow";
-    task = "allow";
-    glob = "allow";
-    todowrite = "allow";
-    edit = {
-      "*" = "ask";
-      "proj/**" = "allow";
-      "docs/features/**" = "allow";
-      "secrets/docs/features/**" = "allow";
-    };
+  permissions = rec {
+    mkAllowCommands = commands: lib.genAttrs commands (_: "allow");
+
     bash = {
-      "*" = "ask";
-      "readlink proj" = "allow";
-      "ln -s * proj" = "allow";
-      "jj *" = "allow";
-      "jj-current-branch" = "allow";
-      "jj-diff-working" = "allow";
-      "jj-diff-branch" = "allow";
-      "claude-proj-docs" = "allow";
-      "grep *" = "allow";
+      shellRead = mkAllowCommands [
+        "notify *"
+        "lsof *"
+        "readlink *"
+        "echo *"
+        "grep *"
+        "rg *"
+        "sed *"
+        "cat *"
+        "ls *"
+        "tail *"
+      ];
+
+      projectDocs = mkAllowCommands [
+        "claude-proj-docs *"
+      ];
+
+      dev = {
+        nix = mkAllowCommands [
+          "nix eval *"
+          "nix build *"
+          "nix flake *"
+          "nix develop *"
+          "nix run *"
+          "nix shell *"
+          "nix repl *"
+        ];
+
+        rust = mkAllowCommands [
+          "cargo test *"
+          "cargo check *"
+          "cargo clippy *"
+          "cargo fmt *"
+          "cargo build *"
+          "cargo tree *"
+        ];
+
+        go = mkAllowCommands [
+          "go build *"
+          "go fmt *"
+          "go mod *"
+          "go test *"
+          "go doc *"
+          "go vet *"
+          "gofmt *"
+          "goimports *"
+          "staticcheck *"
+        ];
+
+        node = mkAllowCommands [
+          "npm run build *"
+          "npm run lint *"
+          "npm run test *"
+          "npm run fmt *"
+        ];
+      };
+
+      vcs = {
+        jjRead = mkAllowCommands [
+          "jj log *"
+          "jj show *"
+          "jj diff *"
+          "jj status *"
+          "jj ls"
+          "jj st"
+          "jj file show *"
+          "jj op log *"
+          "jj describe *"
+          "jj-main-branch *"
+          "jj-current-branch *"
+          "jj-prev-branch *"
+          "jj-stacked-branches *"
+          "jj-diff-working *"
+          "jj-diff-branch *"
+          "jj-stacked-stats *"
+        ];
+
+        jjWrite = mkAllowCommands [
+          "jj commit *"
+          "jj new *"
+          "jj squash *"
+        ];
+
+        ghRead = mkAllowCommands [
+          "gh pr list *"
+          "gh pr view *"
+          "gh pr checks *"
+          "gh pr diff *"
+        ];
+      };
+
+      planner =
+        bash.shellRead
+        // bash.projectDocs
+        // bash.vcs.jjRead
+        // bash.vcs.ghRead
+        // mkAllowCommands [ "ln -s * proj" ];
+
+      developer =
+        bash.shellRead
+        // bash.projectDocs
+        // bash.dev.nix
+        // bash.dev.rust
+        // bash.dev.go
+        // bash.dev.node
+        // bash.vcs.jjRead
+        // bash.vcs.jjWrite
+        // bash.vcs.ghRead;
+    };
+
+    agent = {
+      base = {
+        read = "allow";
+        grep = "allow";
+        websearch = "allow";
+        webfetch = "ask";
+
+        external_directory = {
+          "~/.claude/**" = "allow";
+          "~/dotfiles/**" = "allow";
+        };
+
+        skill = {
+          "*" = "ask";
+          ctx-load = "allow";
+          ctx-save = "allow";
+          mem-editing = "allow";
+          proj-editing = "allow";
+          human-writer = "allow";
+          customize-opencode = "allow";
+        };
+      };
+
+      planner = {
+        "*" = "deny";
+
+        websearch = "allow";
+        read = "allow";
+        grep = "allow";
+        task = "allow";
+        glob = "allow";
+        todowrite = "allow";
+        question = "allow";
+
+        edit = {
+          "*" = "ask";
+          "proj/**" = "allow";
+          "docs/features/**" = "allow";
+          "secrets/docs/features/**" = "allow";
+        };
+
+        bash = (
+          {
+            "*" = "ask";
+          }
+          // bash.planner
+        );
+      };
+
+      developer = {
+        "*" = "ask";
+        edit = "allow";
+
+        bash =
+          bash.shellRead
+          // bash.projectDocs
+          // bash.dev.nix
+          // bash.dev.rust
+          // bash.dev.go
+          // bash.dev.node
+          // bash.vcs.jjRead
+          // bash.vcs.jjWrite
+          // bash.vcs.ghRead;
+      };
+
+      sandbox = {
+        "*" = "allow";
+        bash = "allow";
+        webfetch = "allow";
+      };
     };
   };
 
@@ -51,25 +210,27 @@ let
       else
         [ "~/.config/opencode/rules/*.md" ];
 
-    default_agent = "orchestrator";
+    #default_agent = "build";
+
+    permission = permissions.agent.base;
 
     agent = {
       bigbrain = {
         mode = "subagent";
         model = "openai/gpt-5.5";
-        description = "To be used for complex tasks (similar to opus)";
+        description = "To be used for complex coding & planning tasks";
       };
 
       normal = {
         mode = "subagent";
         model = "opencode-go/deepseek-v4-pro";
-        description = "To be used for general tasks (similar to sonnet)";
+        description = "To be used for general coding & planning tasks, should be the default choice for most work, unless the task is either very complex (bigbrain) or very simple (lightweight)";
       };
 
       lightweight = {
         mode = "subagent";
         model = "opencode-go/deepseek-v4-flash";
-        description = "To be used for lightweight tasks (similar to haiku)";
+        description = "To be used for lightweight / straightforward tasks that shouldn't require debugging or complex iterations";
       };
 
       browser = {
@@ -83,117 +244,25 @@ let
         mode = "primary";
         description = "Project manager agent that manages project documentation, code versioning and delegate work to sub-agents";
         prompt = "You are the orchestrator of a project. Your role is to manage the project documentation, code versioning, and delegate work to sub-agents. You should focus on high-level planning, project management, and jj (code versioning). Anything requiring reading, understanding and exploring code should be delegated to sub-agents. You actually don't even have access to writing files or running commands yourself, other than project documentation and jj commands.";
-        permission = planningAgentsPermissions;
+        permission = permissions.agent.planner;
       };
 
       plan = {
         mode = "primary";
         description = "Planning agent that creates project plans, break down tasks, and write to project docs. Should never engage in any code writing nor delegate such work";
         prompt = "You are the planner of a project. Your role is to create project plans, break down tasks, and write to project docs. You should never engage in any code writing nor delegate such work. You should focus on high-level planning and project documentation. You actually don't even have access to running commands (other than jj), you only have access to writing project documentation.";
-        permission = planningAgentsPermissions;
-      };
-    };
-
-    permission = {
-      external_directory = {
-        "~/.claude/**" = "allow";
-      };
-      skill = {
-        "*" = "ask";
-        ctx-load = "allow";
-        ctx-save = "allow";
-        mem-editing = "allow";
-        proj-editing = "allow";
-        customize-opencode = "allow";
+        permission = permissions.agent.planner;
       };
     };
   };
 
   mainConfig = lib.recursiveUpdate baseConfig {
-    permission = {
-      "*" = "ask";
-      read = "allow";
-      edit = "allow";
-      grep = "allow";
-      bash = {
-        "*" = "ask";
-        "notify *" = "allow";
-        "lsof *" = "allow";
-        "readlink *" = "allow";
-        "echo *" = "allow";
-        "grep *" = "allow";
-        "rg *" = "allow";
-        "sed *" = "allow";
-        "cat *" = "allow";
-        "ls *" = "allow";
-        "tail *" = "allow";
-        "ln -s * proj" = "allow";
-        "claude-proj-docs *" = "allow";
-        "jj log *" = "allow";
-        "jj show *" = "allow";
-        "jj diff *" = "allow";
-        "jj status *" = "allow";
-        "jj commit *" = "allow";
-        "jj new *" = "allow";
-        "jj squash *" = "allow";
-        "jj ls" = "allow";
-        "jj st" = "allow";
-        "jj file show *" = "allow";
-        "jj op log *" = "allow";
-        "jj describe *" = "allow";
-        "jj-main-branch *" = "allow";
-        "jj-current-branch *" = "allow";
-        "jj-prev-branch *" = "allow";
-        "jj-stacked-branches *" = "allow";
-        "jj-diff-working *" = "allow";
-        "jj-diff-branch *" = "allow";
-        "jj-stacked-stats *" = "allow";
-        "gh pr list *" = "allow";
-        "gh pr view *" = "allow";
-        "gh pr checks *" = "allow";
-        "gh pr diff *" = "allow";
-        "gh pr review *" = "allow";
-        "nix eval *" = "allow";
-        "nix build *" = "allow";
-        "nix flake *" = "allow";
-        "nix develop *" = "allow";
-        "nix run *" = "allow";
-        "nix shell *" = "allow";
-        "nix repl *" = "allow";
-        "cargo test *" = "allow";
-        "cargo check *" = "allow";
-        "cargo clippy *" = "allow";
-        "cargo fmt *" = "allow";
-        "cargo build *" = "allow";
-        "cargo tree *" = "allow";
-        "go build *" = "allow";
-        "go fmt *" = "allow";
-        "go mod *" = "allow";
-        "go test *" = "allow";
-        "go doc *" = "allow";
-        "go vet *" = "allow";
-        "gofmt *" = "allow";
-        "goimports *" = "allow";
-        "staticcheck *" = "allow";
-        "npm run build *" = "allow";
-        "npm run lint *" = "allow";
-        "npm run test *" = "allow";
-        "npm run fmt *" = "allow";
-      };
-      webfetch = "ask";
-      websearch = "allow";
-    };
+    permission = permissions.agent.developer;
   };
   opencodeJson = pkgs.writers.writeJSON "opencode.json" mainConfig;
 
-  # Inside nono, we allow everything as it's sandboxed.
   nonoConfig = lib.recursiveUpdate baseConfig {
-    permission = {
-      "*" = "allow";
-      bash = "allow";
-      webfetch = "allow";
-      websearch = "allow";
-    };
+    permission = permissions.agent.sandbox;
   };
   nonoOpencodeJson = pkgs.writers.writeJSON "opencode-nono.json" nonoConfig;
 

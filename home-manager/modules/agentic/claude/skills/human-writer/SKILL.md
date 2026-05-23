@@ -1,6 +1,6 @@
 ---
 name: human-writer
-description: Writing style rules to avoid AI-sounding patterns in prose. Use when writing documentation, PR descriptions, READMEs, changelogs, long explanations, or any user-facing text longer than a few sentences. Do NOT use for code, short factual answers, or command output.
+description: Writing style rules to avoid AI-sounding patterns in prose. Use when writing PR descriptions, READMEs, long explanations, or any user-facing text longer than a few sentences. Do NOT use for code, short factual answers, or command output, or project documentation.
 ---
 
 # Human Writer
