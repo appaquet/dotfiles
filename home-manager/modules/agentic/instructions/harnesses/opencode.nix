@@ -58,28 +58,12 @@
     }:
     renderFrontmatter [
       {
-        label = "name";
-        value = name;
-      }
-      {
         label = "description";
         value = description;
       }
       {
-        label = "argument-hint";
-        value = argumentHint;
-      }
-      {
         label = "model";
         value = model;
-      }
-      {
-        label = "effort";
-        value = effort;
-      }
-      {
-        label = "context";
-        value = context;
       }
       {
         label = "agent";

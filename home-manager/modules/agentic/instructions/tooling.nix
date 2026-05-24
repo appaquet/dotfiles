@@ -22,7 +22,7 @@ let
 
       reference =
         if tag != null then
-          "See <${tag}>"
+          "<${tag}>"
         else if heading != null then
           "(See: ${heading})"
         else

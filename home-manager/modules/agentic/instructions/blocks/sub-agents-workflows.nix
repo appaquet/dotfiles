@@ -1,7 +1,12 @@
 { scope }:
 {
-  heading = "Context management and sub-agents delegation";
+  heading = "Sub-agents workflows";
   content = ''
+    Rules for managing our context and maximizing sub-agents delegation to preserve it.
+  '';
+
+  tag = "sub-agents-workflows";
+  taggedContent = ''
     * Main agent should primarily be used for high-level planning, project management, jj (code
       versioning). Main agent context window is VERY VERY precious; Anything requiring reading,
       understanding and exploring code should be delegated to sub-agents.

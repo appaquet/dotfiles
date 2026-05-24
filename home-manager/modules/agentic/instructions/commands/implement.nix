@@ -3,34 +3,18 @@
   description = "Implement tasks from the approved plan";
   effort = "xhigh";
 
-  allowedTools = [
-    "Bash"
-    "Read"
-    "Write"
-    "Glob"
-    "Grep"
-    "Edit"
-  ];
-
   content = ''
-    # Implement
+    Goal: proceed to implementation of the plan/task at hand
+    After instructions & tasks loaded, 🚀 Engage thrusters
 
-    Goal is to proceed to implementation of the plan or task at hand.
+    1. 🔳 Clear any "Await /implement" tasks from previous command
 
-    After instructions & tasks loaded, you are free to 🚀 Engage thrusters
-
-    ## Instructions
-
-    1. Pre-flight then continue
-
-    2. 🔳 Clear any "Await /implement" tasks from previous command
-
-    3. 🔳 Verify 10/10 understanding.
+    2. 🔳 Verify 10/10 understanding.
        - Read ALL requirements in project doc
        - If unclear, ask user to `/ctx-improve`
        - Clarify if task contradicts or overlaps
 
-     4. 🔳 Load tasks from project/phase doc/context
+    3. 🔳 Load tasks from project/phase doc/context
         - For each task, create 1..n `${scope.harness.tools.taskCreate}`
           - Segment for better tracking
        - Create tasks for verification/testing each implementation step
@@ -38,14 +22,14 @@
        - Think if any task can be delegated to sub-agents, and if so, make sure the task description is
          clear about the delegation
 
-    5. Create `jj` change for this implementation
+    4. Create `jj` change for this implementation
        - Run `jj ls` to check state
        - If `@` is empty: `jj describe -m "private: claude: description"`
        - If `@` has changes: `jj new -m "private: claude: description"`
        - After task complete: `jj ls` then `jj commit -m "..."`
 
-    6. 🔳 Implement tasks, using sub-agents delegation
-       - You need to follow sub-agent delegation instructions
+    5. 🔳 Implement tasks, using sub-agents delegation
+       - You need to follow ${scope.blocks."sub-agents-workflows".reference}
        - Update documentation if existing:
          - Mark phase doc task `[~]` when starting, `[x]` when done
            Like `task-format` dictates. Done = all ACs pass and tested working
@@ -55,18 +39,18 @@
        - If deviating or overcomplicating, STOP and update user
        - If any decisions or discoveries, update project/phase doc
 
-    7. 🔳 Validate via `development-completion-checklist`
+    6. 🔳 Validate via `development-completion-checklist`
        - State each item aloud, confirm compliance
 
-     8. 🔳 Validate formatting, linting and tests
-        - Re-run validation independently rather than trusting sub-agent claims. If a sub-agent
-          reported "tests pass" without methodology, it's unverified. Sub-agent reports that specify
-          the command and result (e.g., "ran `npm test` → 493 passing") are trustworthy on the action
-          but still review the quality of implementation independently
+    7. 🔳 Validate formatting, linting and tests
+          If sub-agents did it, trust them
+          If not, ask them back instead of wasting your context
 
-    9. 🔳 Run `/ctx-save` to update project and phase docs
+    8. 🔳 Run `ctx-save` skill to update project and phase docs
 
-    10. 🔳 Commit / squash `jj` change with meaningful message if not already done
-           After checking state with `jj ls`
+    9. 🔳 Commit / squash `jj` change with meaningful message if not already done
+          After checking state with `jj ls`
+
+    ${scope.blocks."pre-flight".reference}
   '';
 }

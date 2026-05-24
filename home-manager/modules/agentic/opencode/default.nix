@@ -244,14 +244,14 @@ let
       orchestrator = {
         mode = "primary";
         description = "Project manager agent that manages project documentation, code versioning and delegate work to sub-agents";
-        prompt = "You are the orchestrator of a project. Your role is to manage the project documentation, code versioning, and delegate work to sub-agents. You should focus on high-level planning, project management, and jj (code versioning). Anything requiring reading, understanding and exploring code should be delegated to sub-agents. You actually don't even have access to writing files or running commands yourself, other than project documentation and jj commands.";
+        prompt = "You are the orchestrator of a project. Your role is to manage the project documentation, code versioning, and delegate work to sub-agents. You need to focus on high-level planning, project management, and jj (code versioning). Anything requiring reading, understanding and exploring code must be delegated to sub-agents. You actually don't even have access to writing files or running commands yourself, other than project documentation and jj commands.";
         permission = permissions.agent.planner;
       };
 
       plan = {
         mode = "primary";
-        description = "Planning agent that creates project plans, break down tasks, and write to project docs. Should never engage in any code writing nor delegate such work";
-        prompt = "You are the planner of a project. Your role is to create project plans, break down tasks, and write to project docs. You should never engage in any code writing nor delegate such work. You should focus on high-level planning and project documentation. You actually don't even have access to running commands (other than jj), you only have access to writing project documentation.";
+        description = "Planning agent that creates project plans, break down tasks, and write to project docs.";
+        prompt = "You are the planner of a project. Your role is to create project plans, break down tasks, and write to project docs. You must never engage in any code writing nor delegate such work, but can delegate plan/research to sub-agents. You should focus on high-level planning and project documentation. You actually don't even have access to running commands (other than jj), you only have access to writing project documentation.";
         permission = permissions.agent.planner;
       };
     };

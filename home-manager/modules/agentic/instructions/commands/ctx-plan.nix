@@ -4,8 +4,6 @@
   argumentHint = "[task-description]";
   effort = "xhigh";
   content = ''
-    # Plan
-
     Build a full plan for the task at hand: $ARGUMENTS
 
     Project files: !`claude-proj-docs`
@@ -19,13 +17,11 @@
 
     ## Instructions
 
-    1. Pre-flight then continue
+    1. 🔳 Ensure context loaded - run `/ctx-load` if not sufficient
 
-    2. 🔳 Ensure context loaded - run `/ctx-load` if not sufficient
+    2. 🔳 Ensure task defined - clarify via `AskUserQuestion` if empty or unclear
 
-    3. 🔳 Ensure task defined - clarify via `AskUserQuestion` if empty or unclear
-
-    4. 🔳 Research and clarify
+    3. 🔳 Research and clarify
        - Use sub-agents to explore codebase, find patterns
        - Using the <deep-thinking> procedure
        - Search web for unfamiliar concepts if needed
@@ -40,10 +36,10 @@
        - Use `AskUserQuestion` to clarify as you discover uncertainties
        - Persist all planning decisions and investigation outcomes to project/phase doc Questions & Investigations — conversation context is ephemeral
 
-    5. 🔳 Report 10/10 understanding via `full-understanding-checklist`
+    4. 🔳 Report 10/10 understanding via `full-understanding-checklist`
        - If not 10/10, suggest `/ctx-improve` to improve further more
 
-    6. 🔳 Create development plan
+    5. 🔳 Create development plan
        - Break into logical phases
        - Identify key files and components
        - Develop one component at the time, writing its test before if possible, and make it passes before
@@ -51,8 +47,10 @@
        - Consider dependencies and challenges
        - It is crucial to include testing strategy in plan so you are autonomous
 
-    7. 🔳 Write plan to docs via `proj-editing` skill if we have doc files
+    6. 🔳 Write plan to docs via `proj-editing` skill if we have doc files
 
-    8. **STOP**: User will decide next steps
+    7. **STOP**: User will decide next steps
+
+    ${scope.blocks."pre-flight".reference}
   '';
 }
