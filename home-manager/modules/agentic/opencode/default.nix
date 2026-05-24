@@ -111,6 +111,7 @@ let
         bash.shellRead
         // bash.projectDocs
         // bash.vcs.jjRead
+        // bash.vcs.jjWrite
         // bash.vcs.ghRead
         // mkAllowCommands [ "ln -s * proj" ];
 
@@ -161,7 +162,7 @@ let
         question = "allow";
 
         edit = {
-          "*" = "ask";
+          "*" = "deny";
           "proj/**" = "allow";
           "docs/features/**" = "allow";
           "secrets/docs/features/**" = "allow";
@@ -169,7 +170,7 @@ let
 
         bash = (
           {
-            "*" = "ask";
+            "*" = "deny";
           }
           // bash.planner
         );
