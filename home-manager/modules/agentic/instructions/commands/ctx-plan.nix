@@ -2,7 +2,9 @@
 {
   description = "Load repository context and create high-level development plans";
   argumentHint = "[task-description]";
+
   effort = "xhigh";
+
   content = ''
     Build a full plan for the task at hand: $ARGUMENTS
 

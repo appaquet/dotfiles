@@ -7,6 +7,8 @@
     Goal: proceed to implementation of the plan/task at hand
     After instructions & tasks loaded, 🚀 Engage thrusters
 
+    # Instructions
+
     1. 🔳 Clear any "Await /implement" tasks from previous command
 
     2. 🔳 Verify 10/10 understanding.
