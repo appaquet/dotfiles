@@ -118,6 +118,15 @@ Use portable references in generated command content:
 
 Avoid host-specific generated paths and old doc aliases.
 
+## Dual-output: asSkill
+
+Set `asSkill = true` to also expose a command as an opencode skill. This generates a
+`skills/<name>/SKILL.md` with skill frontmatter alongside the command output. The agent can
+then invoke it via the skill tool.
+
+Useful for context management commands like `ctx-save` that should be both user slash commands
+and agent-invokable skills.
+
 ## Optimization Workflow
 
 When optimizing existing instructions:

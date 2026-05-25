@@ -2,6 +2,9 @@
 {
   description = "Update project and phase docs with current state and progress";
   effort = "medium";
+  asSkill = {
+    opencode = true;
+  };
   content = ''
     # Save Context
 

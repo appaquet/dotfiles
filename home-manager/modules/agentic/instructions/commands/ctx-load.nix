@@ -2,6 +2,9 @@
 {
   description = "Load comprehensive project context including docs, project info, and branch status";
   effort = "medium";
+  asSkill = {
+    opencode = true;
+  };
   content = ''
     # Load Context
 

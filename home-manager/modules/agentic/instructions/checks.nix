@@ -114,5 +114,29 @@ pkgs.runCommand "agentic-instructions-check" { } ''
     done
   done
 
+  # Verify dual-output: ctx-load and ctx-save also appear as opencode skills
+  for cmd in ctx-load ctx-save; do
+    test -f ${package}/opencode/skills/$cmd/SKILL.md || { echo "MISSING: opencode dual-output skill from $cmd" >&2; exit 1; }
+  done
+
+  # Verify Claude does NOT get redundant skill output (Claude treats commands as skills natively)
+  for cmd in ctx-load ctx-save; do
+    test ! -f ${package}/claude/skills/$cmd/SKILL.md || { echo "STALE: claude should NOT have dual-output skill for $cmd" >&2; exit 1; }
+  done
+
+  # Verify dual-output skill frontmatter for opencode
+  for cmd in ctx-load ctx-save; do
+    f=${package}/opencode/skills/$cmd/SKILL.md
+    grep -q "name: $cmd" "$f" || { echo "MISSING name in dual-output skill-from-$cmd: $f" >&2; exit 1; }
+    grep -q "description:" "$f" || { echo "MISSING description in dual-output skill-from-$cmd: $f" >&2; exit 1; }
+  done
+
+  # Verify opencode skills from commands omit Claude-specific fields
+  for cmd in ctx-load ctx-save; do
+    grep -q "argument-hint:" ${package}/opencode/skills/$cmd/SKILL.md && {
+      echo "STALE argument-hint in opencode dual-output skill ($cmd)" >&2; exit 1;
+    }
+  done
+
   touch $out
 ''

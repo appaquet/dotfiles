@@ -106,6 +106,8 @@ let
       content,
       harness,
       kind ? "flat",
+      asSkill ? (kind == "directory"),
+      asCommand ? (kind == "flat"),
       outputPath ? null,
       argumentHint ? null,
       model ? null,
@@ -245,6 +247,15 @@ let
     lib.fix (
       self:
       let
+        isEnabledFor =
+          val:
+          if builtins.isBool val then
+            val
+          else if builtins.isAttrs val then
+            val.${self.harness.name} or false
+          else
+            false;
+
         rawAuthoredInstructions = importDir {
           dir = ./instructions;
           args = {
@@ -309,6 +320,36 @@ let
           )
         ) self.rawCommands;
 
+        extraSkillsFromCommands = lib.listToAttrs (
+          builtins.concatLists (
+            lib.mapAttrsToList (
+              key: data:
+              if data ? asSkill && isEnabledFor data.asSkill then
+                let
+                  skillName = data.name or key;
+                in
+                [
+                  {
+                    name = "skills/${skillName}/SKILL";
+                    value = self.scopeApi.mkSkill (
+                      {
+                        harness = self.harness;
+                        kind = "directory";
+                        outputPath = "skills/${skillName}/SKILL.md";
+                      }
+                      // data
+                      // {
+                        name = skillName;
+                      }
+                    );
+                  }
+                ]
+              else
+                [ ]
+            ) self.rawCommands
+          )
+        );
+
         rawSkills = importSkillsDir {
           dir = ./skills;
           args = {
@@ -330,6 +371,36 @@ let
             }
           )
         ) self.rawSkills;
+
+        extraCommandsFromSkills = lib.listToAttrs (
+          builtins.concatLists (
+            lib.mapAttrsToList (
+              key: entry:
+              if entry.main ? asCommand && isEnabledFor entry.main.asCommand then
+                let
+                  cmdName = entry.main.name or key;
+                in
+                [
+                  {
+                    name = "commands/${cmdName}";
+                    value = self.scopeApi.mkSkill (
+                      {
+                        harness = self.harness;
+                        kind = "flat";
+                        outputPath = "commands/${cmdName}.md";
+                      }
+                      // entry.main
+                      // {
+                        name = cmdName;
+                      }
+                    );
+                  }
+                ]
+              else
+                [ ]
+            ) self.rawSkills
+          )
+        );
 
         authoredInstructions = lib.mapAttrs (_: data: self.scopeApi.mkInstructions data) (
           lib.filterAttrs (
@@ -381,7 +452,9 @@ let
         collisions =
           builtins.attrNames (lib.intersectAttrs self.authoredInstructions self.agentInstructions)
           ++ builtins.attrNames (lib.intersectAttrs self.authoredInstructions self.commandInstructions)
-          ++ builtins.attrNames (lib.intersectAttrs self.authoredInstructions self.skillMainInstructions);
+          ++ builtins.attrNames (lib.intersectAttrs self.authoredInstructions self.skillMainInstructions)
+          ++ builtins.attrNames (lib.intersectAttrs self.commandInstructions self.extraCommandsFromSkills)
+          ++ builtins.attrNames (lib.intersectAttrs self.skillMainInstructions self.extraSkillsFromCommands);
 
         instructions =
           assert
@@ -390,7 +463,9 @@ let
           self.authoredInstructions
           // self.agentInstructions
           // self.commandInstructions
-          // self.skillMainInstructions;
+          // self.extraCommandsFromSkills
+          // self.skillMainInstructions
+          // self.extraSkillsFromCommands;
       }
     );
 

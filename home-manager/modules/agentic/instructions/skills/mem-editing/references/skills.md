@@ -175,6 +175,13 @@ Non-default `*.nix` files:
 * Use `scope.blocks.*` for shared instruction blocks instead of repeating shared text
 * Keep each piece of information in one place: metadata, `content`, a reference file, or a shared block
 
+## Dual-output: asCommand
+
+Set `asCommand = true` to also expose a skill as a slash command. This generates a
+`commands/<name>.md` with command frontmatter alongside the skill output.
+
+Useful when a skill should also be directly invocable by the user via `/skill-name`.
+
 ## `default.nix` Template
 
 ```nix
