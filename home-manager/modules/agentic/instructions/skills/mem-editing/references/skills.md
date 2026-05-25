@@ -1,7 +1,7 @@
 # Skill Source Structure
 
 Guidelines for writing skills in the nixified multi-harness instruction authoring system. Skill
-source files return plain Nix attrsets only; `makeScope` in `tooling.nix` applies `mkSkill`
+source files return plain Nix attrsets only; `makeScope` in `builders.nix` applies `mkSkill`
 centrally and harnesses render the generated markdown.
 
 Source files never hand-write YAML frontmatter.

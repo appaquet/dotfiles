@@ -20,7 +20,7 @@
     - `instructions/blocks/` — reusable content blocks
     - `instructions/harnesses/` — harness-specific renderers and behavior
     - `instructions/frontmatter.nix` — structured frontmatter rendering helpers
-    - `instructions/tooling.nix` — central scope construction and constructors
+    - `instructions/builders.nix` — central scope construction and constructors
 
     Generated markdown is produced via `./x agent build` and deployed by Home Manager.
     Always edit the Nix template sources above, not the generated output.

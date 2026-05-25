@@ -1,7 +1,7 @@
 # Slash Command Source Structure
 
 Guidelines for writing slash commands in the nixified multi-harness instruction authoring system.
-Command source files return plain Nix attrsets only; `makeScope` in `tooling.nix` applies
+Command source files return plain Nix attrsets only; `makeScope` in `builders.nix` applies
 `mkCommand` centrally and harnesses render supported fields.
 
 Source files never hand-write YAML frontmatter.

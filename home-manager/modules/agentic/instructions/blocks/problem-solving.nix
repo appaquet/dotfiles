@@ -1,10 +1,13 @@
 { scope }:
 {
   heading = "Problem Solving";
+
   content = ''
     ALWAYS use this methodology to solve problems, issues, and bugs:
   '';
+
   tag = "problem-solving-checklist";
+
   taggedContent = ''
     1. Understand WHY (trace data flow, logging, changes)
     2. Fix root cause, not symptom. Generic solution over specific case and bespoke fixes

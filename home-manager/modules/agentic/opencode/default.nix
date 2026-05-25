@@ -346,6 +346,7 @@ in
       allow = [
         "$HOME/.config/opencode"
         "$HOME/.local/share/opencode"
+        "$HOME/.local/share/opentui"
         "$HOME/.cache/opencode"
         "$HOME/.local/state/opencode"
         "$HOME/.local/state/ccmon" # ccmon plugin writes status there

@@ -2,12 +2,12 @@
 {
   name = "claude";
   outputDir = "claude";
-  defaultModel = "haiku";
 
   tools = {
     taskCreate = "TaskCreate";
   };
 
+  # Emits name, description, and model (null ok).
   renderAgentFrontmatter =
     {
       name,
@@ -29,6 +29,8 @@
       }
     ];
 
+  # Emits name, description, argument-hint, model, effort, context, agent, and allowed-tools.
+  # Null fields omitted.
   renderCommandFrontmatter =
     {
       name,
@@ -76,6 +78,9 @@
       }
     ];
 
+  # Emits name, description, argument-hint, model, effort, context, agent, allowed-tools,
+  # when_to_use, disable-model-invocation, user-invocable, license, compatibility, and metadata.
+  # Null fields omitted.
   renderSkillFrontmatter =
     {
       name,

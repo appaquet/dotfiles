@@ -1,8 +1,32 @@
 { pkgs, lib }:
 
+/*
+  Nix template-to-markdown generator for AI agent instructions (Claude + Opencode).
+
+  Data flow:
+    Harness definitions (claude.nix / opencode.nix) define platform-specific frontmatter rendering
+      → makeScope (lib.fix recursive attrset binding harness + content)
+      → mkPackage (symlinkJoin of all generated .md files)
+
+  Key concepts:
+    Harness - A platform adapter providing name, outputDir, tools, and three frontmatter
+              renderers (renderAgentFrontmatter, renderCommandFrontmatter,
+              renderSkillFrontmatter). See harnesses/default.nix for the full contract.
+    Scope   - A recursive attrset (via lib.fix) binding harness + scopeApi + all content
+              (blocks, agents, commands, skills, instructions). Content files receive `{ scope }`
+              and return plain data attrsets; makeScope interposes with constructors centrally.
+    Block   - A reusable instruction fragment. Returns `{ embed, reference }` where embed is
+              the rendered markdown string and reference is an inline link/citation.
+*/
+
 let
   frontmatter = import ./frontmatter.nix;
+  files = import ./files.nix { inherit pkgs lib; };
 
+  /*
+    Wraps authored content into `{ embed, reference }` with optional ## heading and XML tag.
+    When `tag` is set, wraps `taggedContent` in `<tag>...</tag>` after the main content.
+  */
   mkBlock =
     {
       heading ? null,
@@ -30,6 +54,7 @@ let
     }
     // extra;
 
+  # Wraps authored content into `{ embed, reference, outputPath? }` with # heading.
   mkInstructions =
     {
       heading,
@@ -44,17 +69,21 @@ let
       reference = "(See: ${heading})";
     };
 
+  /*
+    Wraps authored content into `{ embed, reference }` with harness-rendered agent frontmatter
+    (name, description, model). Calls `harness.renderAgentFrontmatter`.
+  */
   mkAgent =
     {
       name,
       description,
-      model ? { },
+      model ? null,
       content,
       harness,
       ...
     }:
     let
-      m = model.${harness.name} or harness.defaultModel;
+      m = if model != null then model.${harness.name} or null else null;
       frontmatter = harness.renderAgentFrontmatter {
         inherit name description;
         model = m;
@@ -65,6 +94,11 @@ let
       reference = "(See agent: ${name})";
     };
 
+  /*
+    Wraps authored content into `{ embed, reference, outputPath? }` with harness-rendered
+    frontmatter. Supports `kind = "directory"` (skills) and `kind = "flat"` (commands) frontmatter
+    via harness renderers.
+  */
   mkSkill =
     {
       name,
@@ -74,7 +108,7 @@ let
       kind ? "flat",
       outputPath ? null,
       argumentHint ? null,
-      model ? { },
+      model ? null,
       effort ? null,
       context ? null,
       agent ? null,
@@ -89,7 +123,7 @@ let
       ...
     }:
     let
-      m = if model != { } then model.${harness.name} or harness.defaultModel else null;
+      m = if model != null then model.${harness.name} or null else null;
       frontmatter =
         if kind == "directory" then
           harness.renderSkillFrontmatter {
@@ -131,6 +165,7 @@ let
       outputPath = if outputPath != null then outputPath else null;
     };
 
+  # Pass-through for skill sub-files (.nix/.md). Returns `{ embed = content, outputPath? }`.
   mkSkillFile =
     {
       content,
@@ -142,6 +177,26 @@ let
       embed = content;
     };
 
+  /*
+    Thin wrapper around mkSkill. Pre-sets `kind = "flat"` and
+    `outputPath = "commands/${name}.md"`. Callers can override defaults by passing explicit
+    fields.
+  */
+  mkCommand =
+    args:
+    let
+      attrs = {
+        kind = "flat";
+        outputPath = "commands/${args.name or (throw "mkCommand requires name")}.md";
+      }
+      // args;
+    in
+    mkSkill attrs;
+
+  /*
+    Dispatches on `scope.harness.name`, returning `values.<harness>` or `values.default` if
+    harness not found. Throws with available keys otherwise.
+  */
   forHarness =
     scope: values:
     values.${scope.harness.name} or (
@@ -151,11 +206,17 @@ let
         throw "Unsupported harness: ${scope.harness.name}. Available: ${builtins.concatStringsSep ", " (builtins.attrNames values)}"
     );
 
+  /*
+    Re-export of frontmatter.nix renderer. Renders YAML frontmatter from an ordered field list,
+    filtering null values.
+  */
   renderFrontmatter = frontmatter.renderFrontmatter;
 
-  mkCommand = mkSkill;
-
-  api = {
+  /*
+    Tool bundle injected into the recursive scope. Content authors access these via
+    `scope.scopeApi.mkBlock`, `scope.scopeApi.mkInstructions`, etc.
+  */
+  scopeApi = {
     inherit
       mkBlock
       mkInstructions
@@ -169,173 +230,16 @@ let
       ;
   };
 
-  importDir =
-    {
-      dir,
-      args,
-      recursive ? false,
-    }:
-    let
-      inherit (builtins)
-        readDir
-        attrNames
-        match
-        listToAttrs
-        concatMap
-        ;
+  importDir = files.importDir;
+  importSkillsDir = files.importSkillsDir;
 
-      flat =
-        d:
-        let
-          entries = readDir d;
-        in
-        listToAttrs (
-          builtins.filter (x: x != null) (
-            map (
-              name:
-              let
-                m = match "(.*)\\.nix" name;
-              in
-              if m != null && name != "default.nix" && entries.${name} == "regular" then
-                {
-                  name = builtins.head m;
-                  value = import (d + "/${name}") args;
-                }
-              else
-                null
-            ) (attrNames entries)
-          )
-        );
-
-      recurse =
-        d: prefix:
-        let
-          entries = readDir d;
-        in
-        concatMap (
-          name:
-          let
-            type = entries.${name};
-          in
-          if type == "directory" then
-            recurse (d + "/${name}") (if prefix == "" then name else "${prefix}/${name}")
-          else
-            let
-              m = match "(.*)\\.nix" name;
-            in
-            if m != null && name != "default.nix" && type == "regular" then
-              let
-                base = builtins.head m;
-                key = if prefix == "" then base else "${prefix}/${base}";
-              in
-              [
-                {
-                  name = key;
-                  value = import (d + "/${name}") args;
-                }
-              ]
-            else
-              [ ]
-        ) (attrNames entries);
-    in
-    if recursive then listToAttrs (recurse dir "") else flat dir;
-
-  importSkillsDir =
-    {
-      dir,
-      args,
-    }:
-    let
-      inherit (builtins)
-        attrNames
-        concatLists
-        listToAttrs
-        match
-        pathExists
-        readDir
-        ;
-
-      entries = readDir dir;
-
-      subdirs = builtins.filter (n: entries.${n} == "directory") (attrNames entries);
-
-      collectSubFiles =
-        d: args:
-        let
-          subs = readDir d;
-        in
-        listToAttrs (
-          concatLists (
-            map (
-              name:
-              let
-                fullPath = d + "/${name}";
-              in
-              if subs.${name} == "regular" then
-                if match ".*\\.md" name != null then
-                  [
-                    {
-                      inherit name;
-                      value = {
-                        kind = "md";
-                        content = builtins.readFile fullPath;
-                      };
-                    }
-                  ]
-                else if match ".*\\.nix" name != null && name != "default.nix" then
-                  [
-                    {
-                      inherit name;
-                      value = {
-                        kind = "nix";
-                        content = import fullPath args;
-                      };
-                    }
-                  ]
-                else
-                  [ ]
-              else if subs.${name} == "directory" then
-                let
-                  nested = collectSubFiles fullPath args;
-                in
-                map
-                  (nv: {
-                    name = "${name}/${nv.name}";
-                    value = nv.value;
-                  })
-                  (
-                    lib.mapAttrsToList (n: v: {
-                      name = n;
-                      value = v;
-                    }) nested
-                  )
-              else
-                [ ]
-            ) (attrNames subs)
-          )
-        );
-
-    in
-    listToAttrs (
-      map (
-        n:
-        let
-          d = dir + "/${n}";
-        in
-        if pathExists (d + "/default.nix") then
-          {
-            name = n;
-            value = {
-              kind = "directory";
-              main = import (d + "/default.nix") args;
-              files = collectSubFiles d args;
-            };
-          }
-        else
-          throw "Skills directory '${n}' has no default.nix"
-      ) subdirs
-    );
-
+  /*
+    Builds a per-harness recursive attrset via lib.fix. Returns
+    `{ harness, scopeApi, blocks, rawBlocks, agents, rawAgents, commands, rawCommands, skills,
+    rawSkills, authoredInstructions, agentInstructions, commandInstructions,
+    skillMainInstructions, skillFiles, collisions, instructions }`. Content files reference each
+    other through scope (e.g., `scope.blocks.deep-thinking.embed`).
+  */
   makeScope =
     harness:
     lib.fix (
@@ -350,7 +254,7 @@ let
         };
       in
       {
-        inherit harness api;
+        inherit harness scopeApi;
 
         forHarness = forHarness self;
 
@@ -361,7 +265,7 @@ let
           };
         };
 
-        blocks = lib.mapAttrs (_: data: self.api.mkBlock data) self.rawBlocks;
+        blocks = lib.mapAttrs (_: data: self.scopeApi.mkBlock data) self.rawBlocks;
 
         rawAgents = importDir {
           dir = ./agents;
@@ -372,7 +276,7 @@ let
 
         agents = lib.mapAttrs (
           key: data:
-          self.api.mkAgent (
+          self.scopeApi.mkAgent (
             {
               harness = self.harness;
             }
@@ -392,7 +296,7 @@ let
 
         commands = lib.mapAttrs (
           key: data:
-          self.api.mkCommand (
+          self.scopeApi.mkCommand (
             {
               harness = self.harness;
               kind = "flat";
@@ -414,7 +318,7 @@ let
 
         skills = lib.mapAttrs (
           key: entry:
-          self.api.mkSkill (
+          self.scopeApi.mkSkill (
             {
               harness = self.harness;
               kind = "directory";
@@ -427,7 +331,7 @@ let
           )
         ) self.rawSkills;
 
-        authoredInstructions = lib.mapAttrs (_: data: self.api.mkInstructions data) (
+        authoredInstructions = lib.mapAttrs (_: data: self.scopeApi.mkInstructions data) (
           lib.filterAttrs (
             _: data: !builtins.hasAttr "harnesses" data || builtins.elem self.harness.name data.harnesses
           ) rawAuthoredInstructions
@@ -455,7 +359,7 @@ let
                   fullPath = "skills/${skillKey}/${subPath}";
                   processed =
                     if subData.kind == "nix" then
-                      self.api.mkSkillFile {
+                      self.scopeApi.mkSkillFile {
                         content = subData.content;
                         outputPath = fullPath;
                       }
@@ -490,6 +394,7 @@ let
       }
     );
 
+  # Strips empty/whitespace-only lines and trailing periods from generated markdown.
   postProcessContent =
     text:
     let
@@ -505,6 +410,7 @@ let
     in
     builtins.concatStringsSep "\n" nonEmpty;
 
+  # Writes text content to a Nix store file at `/<dir>/<filename>`.
   mkFile =
     dir: path: filename: content:
     pkgs.writeTextFile {
@@ -513,6 +419,7 @@ let
       destination = "/${dir}/${filename}";
     };
 
+  # Bundles all generated markdown files from all scopes into a symlinkJoin store path.
   mkPackage =
     {
       scopes,
@@ -557,7 +464,7 @@ in
     postProcessContent
     forHarness
     renderFrontmatter
-    api
+    scopeApi
     importDir
     importSkillsDir
     makeScope

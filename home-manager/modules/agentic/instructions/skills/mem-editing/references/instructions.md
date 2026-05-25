@@ -4,7 +4,7 @@ Guidelines for root instruction files, rule instruction sources, reusable blocks
 prompting in the nixified instruction system.
 
 All authored instruction sources under `~/dotfiles/home-manager/modules/agentic/instructions/`
-return plain Nix attrsets. Constructors are called centrally from `makeScope` in `tooling.nix`.
+return plain Nix attrsets. Constructors are called centrally from `makeScope` in `builders.nix`.
 Do not edit generated output and do not hand-write YAML frontmatter in Nix sources.
 
 ## Structured prompting
@@ -149,7 +149,7 @@ Current authoring layout:
 
 ```text
 instructions/
-  tooling.nix                         # constructors and makeScope
+  constructors.nix                     # constructors and makeScope
   frontmatter.nix                     # shared frontmatter renderer
   harnesses/
     claude.nix                        # Claude field selection

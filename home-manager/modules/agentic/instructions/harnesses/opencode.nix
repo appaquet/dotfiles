@@ -2,16 +2,12 @@
 {
   name = "opencode";
   outputDir = "opencode";
-  defaultModel = "anthropic/claude-haiku-4.5";
 
   tools = {
     taskCreate = "todowrite";
   };
 
-  # Agent frontmatter recognized by opencode:
-  # - mode: "subagent" (required by our system; opencode docs: primary, subagent, all)
-  # - description: shown when selecting subagents
-  # - model: model to use, opencode format "provider/model-name"
+  # Emits mode=subagent, description, and model (null ok).
   renderAgentFrontmatter =
     {
       name,
@@ -33,17 +29,9 @@
       }
     ];
 
-  # Command frontmatter recognized by opencode (per opencode docs):
-  # - description: shown in TUI when typing the command
-  # - model: override default model for this command
-  # - agent: which agent should execute (defaults to current agent)
-  # - subtask: force subagent invocation (default false)
-  #
-  # Compatibility-only (not recognized by opencode; NOP / ignored):
-  # - name: filename determines command name in opencode, not frontmatter
-  # - argument-hint: Claude Code concept, no opencode equivalent
-  # - effort: Claude Code concept, no opencode equivalent
-  # - context: Claude Code concept, no opencode equivalent
+  # Emits description, model, agent, and subtask. Null fields omitted.
+  # Compatibility fields (name, argument-hint, effort, context, allowed-tools)
+  # are accepted but not emitted.
   renderCommandFrontmatter =
     {
       name,
@@ -75,6 +63,7 @@
       }
     ];
 
+  # Emits name, description, license, compatibility, and metadata.
   renderSkillFrontmatter =
     {
       name,
