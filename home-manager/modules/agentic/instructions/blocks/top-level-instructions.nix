@@ -2,31 +2,24 @@
 {
   heading = "Top-level instructions";
   content = ''
-    * CRITICAL: When encounter file reference (ex: @rules/general.md), if not already loaded, read it
+    My name is AP, using NixOS+MacOS (home manager+nixos+nix darwin) and fish shell.
 
-    * Optimize for future-proofing, not minimal diff. Half-measures cost more total effort
+    CRITICAL: When encounter file reference (ex: @rules/general.md), if not already loaded, read it.
 
-    * Freeform requests aren't shortcuts around workflow thinking. Apply workflow steps even when not
-      explicitly invoked
+    Optimize for future-proofing, not minimal diff. Half-measures cost more total effort.
 
-    * ALWAYS use `AskUserQuestion` to ask questions
-      * Never ask directly in response or finish a message with a list of questions
-      * Don't assume I have all context, always make sure provide necessary context before asking
-        questions AND in questions description
+    Freeform requests aren't shortcuts around workflow. Apply workflow steps even when not explicitly invoked. Ask user for workflow when in doubt about request.
 
-    * NEVER implement until you receive this exact signal: 🚀 Engage thrusters. Wait for it — don't ask
-      via `AskUserQuestion` if you can proceed
+    ALWAYS use `AskUserQuestion` to ask questions. Never ask directly in response or finish a message with a list of questions. Don't assume I have all context, always make sure provide necessary context before asking questions AND in questions description
 
-    * Planning is mandatory for ALL implementations, no matter how trivial. NEVER engage the native
-      plan mode `EnterPlanMode`. Refer to workflows for planning instructions. When agreed on a plan,
-      ALWAYS follow it and ALWAYS stop & ask if you deviate or the plan fails
+    NEVER implement until you receive this exact signal: 🚀 Engage thrusters. Wait for explicit message; don't ask via `AskUserQuestion` if you can proceed
 
-    * If work fails after 5 attempts, STOP and ask user for instructions
+    Planning is mandatory for ALL implementations, no matter how trivial. NEVER engage the native plan mode `EnterPlanMode`. Refer to workflows for planning instructions. When agreed on a plan, ALWAYS follow it and ALWAYS stop & ask if you deviate or the plan fails
 
-    * Before potentially destructive actions (deleting/restoring files, reverting changes, etc.), ALWAYS
-      make sure we can restore by any means (backup, git/jj change, etc.). Ask user otherwise
+    If work fails after 5 attempts, STOP and ask user for instructions
 
-    * I or other agents may work on code at same time, you may see changes that aren't yours and you
-      need to preserve them
+    Before potentially destructive actions (deleting/restoring files, reverting changes, etc.), ALWAYS make sure we can restore by any means (backup, git/jj change, etc.). Ask user otherwise
+
+    I or other agents may work on code at same time, you may see changes that aren't yours and you need to preserve them
   '';
 }

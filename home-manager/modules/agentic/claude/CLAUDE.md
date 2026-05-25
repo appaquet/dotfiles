@@ -79,9 +79,9 @@
     preserve context. Have it return the modified file list so you can read them for validation
 
 * For sub-agents, pick right model for task to optimize speed & accuracy:
-  * haiku/lightweight: shallow code exploration and reconnaissance
-  * sonnet/normal: straightforward code, code exploration
-  * opus/bigbrain: planning, review comments research/planning, complex code exploration or
+  * haiku/junior: shallow code exploration and reconnaissance
+  * sonnet/senior: straightforward code, code exploration
+  * opus/staff: planning, review comments research/planning, complex code exploration or
     debugging, complex code
 
 ## Task management

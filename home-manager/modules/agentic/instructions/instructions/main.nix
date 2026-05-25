@@ -6,13 +6,8 @@ let
   };
 in
 {
-  heading = "Instructions";
+  heading = "User instructions";
   content = ''
-    * Name: AP
-    * Environment:
-      * OS: NixOS + MacOS (home manager, nix darwin)
-      * Shell: fish
-
     ${scope.blocks."top-level-instructions".embed}
 
     ${scope.blocks."sub-agents-workflows".embed}

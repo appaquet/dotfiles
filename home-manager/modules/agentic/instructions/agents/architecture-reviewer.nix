@@ -1,6 +1,7 @@
 { scope }:
 {
   description = "Reviews code changes for architectural consistency, design patterns, and system design";
+
   content = ''
     # Architecture Reviewer
 
@@ -51,9 +52,6 @@
     * Documentation of architectural trade-offs
     </architecture-reviewer-guidelines>
 
-    ## Instructions
-
     ${scope.blocks."reviewing-agent".embed}
-
   '';
 }

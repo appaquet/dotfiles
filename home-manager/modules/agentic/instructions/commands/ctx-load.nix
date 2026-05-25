@@ -6,34 +6,33 @@
     opencode = true;
   };
   content = ''
-    # Load Context
+    Goal: load context about project / task.
 
-    Load context about the project and task at hand
+    Don't load ctx-load skill. This is the ctx-load skill.
 
     ## State
 
     * Current branch: !`jj-current-branch`
-    * Project files: !`claude-proj-docs`
+    * Project files: 
+      ```
+      !`claude-proj-docs`
+      ```
 
     ## Instructions
 
-    1. Pre-flight then continue
-
-    2. 🔳 Read project docs (use State above - don't re-discover)
+    1. 🔳 Read project docs (use state above, don't re-discover)
        * If project files found:
-         * Read main project doc for context, requirements, progress
-         * Read & summarize checkpoint section if exists
-       * If "No project files", may be uninitialized
+         * Read main project doc context, checkpoint, requirements, progress
+         * Don't re-read project simlink. Already in state.
+       * If "No project files", maybe uninitialized
          * STOP, inform user about missing context
 
-    3. 🔳 Load current phase docs if referenced in checkpoint or you think relevant for current work
-           But be mindful of context window cost
+    2. 🔳 Load current/next phase docs mentioned in checkpoint/next steps
+          Mindful of context window: don't read irrelevant old/future docs
+          On ambiguity about next steps, `AskUserQuestion` to clarify next focus
 
-    4. 🔳 Check & resolve ambiguity
-       * If multiple phases or tasks in progress, use `AskUserQuestion` to clarify focus unless the
-         checkpoint is clear on next steps
+    3. 🔳 Synthesize context & summarize current state
 
-    5. 🔳 Synthesize context
-       * Summarize current project state
+    ${scope.blocks."pre-flight".reference}
   '';
 }

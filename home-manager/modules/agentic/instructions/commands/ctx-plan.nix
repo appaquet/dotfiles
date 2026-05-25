@@ -6,26 +6,25 @@
   effort = "xhigh";
 
   content = ''
-    Build a full plan for the task at hand: $ARGUMENTS
+    Goal: build a full plan for the task at hand: $ARGUMENTS
 
     Project files: !`claude-proj-docs`
     If no project files, assume we are working in memory only and skip any steps related to project files
 
-    ALL implementations require completing this planning workflow and waiting for `/implement`. No
-    exceptions, no matter how trivial. There is no such thing as "quick fix not requiring planning"
-    since I explicitly called this command
-
-    NEVER engage the native plan mode `EnterPlanMode`
+    ${scope.forHarness {
+      claude = "NEVER engage the native plan mode `EnterPlanMode`";
+      default = "";
+    }}
 
     ## Instructions
 
-    1. 🔳 Ensure context loaded - run `/ctx-load` if not sufficient
+    1. 🔳 Ensure context loaded - run `ctx-load` skill if not sufficient
 
     2. 🔳 Ensure task defined - clarify via `AskUserQuestion` if empty or unclear
 
     3. 🔳 Research and clarify
        - Use sub-agents to explore codebase, find patterns
-       - Using the <deep-thinking> procedure
+       - Using the ${scope.blocks.deep-thinking.reference} procedure
        - Search web for unfamiliar concepts if needed
        - For each unknown, add sub-task to investigate
        - Make sure to identity ways to test work as we go
@@ -53,6 +52,6 @@
 
     7. **STOP**: User will decide next steps
 
-    ${scope.blocks."pre-flight".reference}
+    ${scope.blocks.pre-flight.reference}
   '';
 }

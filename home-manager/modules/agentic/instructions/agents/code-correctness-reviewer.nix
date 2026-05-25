@@ -50,8 +50,6 @@
     * Updated code documentation for changes impacting correctness
     </code-correctness-reviewer-guidelines>
 
-    ## Instructions
-
     ${scope.blocks."reviewing-agent".embed}
   '';
 }

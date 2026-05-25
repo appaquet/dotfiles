@@ -1,8 +1,9 @@
 { scope }:
 {
   description = "Reply to imported PR review comments and clean up inline comments";
+
   content = ''
-    # PR Reply Comments
+    Goal: Reply to imported PR review comments and clean up inline comments
 
     ## Prerequisites
 
@@ -10,15 +11,13 @@
 
     ## Instructions
 
-    1. Pre-flight then continue
-
-    2. 🔳 Find imported comments
+    1. 🔳 Find imported comments
        - Search for REVIEW: pr-import-comments pattern:
          ```bash
          rg "REVIEW: pr-import-comments \(DB: (\d+), Node: ([^,]+), PR: (\d+)\)" -o --replace='DB: $1, Node: $2, PR: $3'
          ```
 
-    3. 🔳 Reply to comments
+    2. 🔳 Reply to comments
        - For each imported comment, add sub-task "Reply: [DB_ID]"
        - Extract comment info:
          ```bash
@@ -50,7 +49,7 @@
          - Reply appears in PR conversation thread
        - Clean up by removing inline comment after successful reply
 
-    4. 🔳 Report
+    3. 🔳 Report
        - List all replies sent
 
     ## Troubleshooting
@@ -58,5 +57,7 @@
     * **404 Error**: Missing PR number in endpoint or wrong DATABASE_ID
     * **Not threaded**: Check `"in_reply_to_id"` field in response
     * **New inline comment**: Used wrong endpoint format
+
+    ${scope.blocks.pre-flight.reference}
   '';
 }

@@ -5,89 +5,37 @@
 
     ## General principles
 
-    * Never implement until you see exact phrase "🚀 Engage thrusters" (from /proceed or /implement). No variations.
-    * Scope discipline: during `/implement`, execute ONLY tasks from the approved plan
-      * Boy-scout fixes in code you're already touching are fine (small cleanup, typo fix)
-      * New tasks, inbox items, discovered issues beyond current scope: inform user, don't act
-      * Mental model: would a new developer start this work without team agreement?
-    * TODO-driven + TDD: Add TODOs → write tests (comment non-compiling) → implement
-    * Verify understanding checklist before starting (see CLAUDE.md)
-    * Iterate: add functions/structures/TODOs before implementation
-    * Follow existing patterns, use existing libraries
-    * Follow a SR&ED documentation style. Persist new uncertainties, hypothesis, decisions, insights,
-      failed approaches to phase doc Questions & Investigations immediately — docs are the single source
-      of truth, not conversation context
-    * Optimize for the target codebase, not minimal diff. When told to build X, build X — don't
-      build a half-measure Y because it's smaller or safer. Half-measures cost more total effort
-    * Write simple, non-overlapping tests (see <testing-principles>)
-    * Always leave existing TODO/FIXME/REVIEW comments intact, unless we implemented them or tracked
-      them in project doc.
+    * Never implement until exact phrase "🚀 Engage thrusters"
 
-    ## Before inserting any code
+    * Scope discipline: execute ONLY tasks from approved plan
+      * Boy-scout fixes in code already touching fine (small cleanup, typo fix)
+      * New tasks, inbox items, discovered issues beyond current scope: inform user, don't act, need plan
+      * Mental model: would a dev start this work without team/mgnt agreement?
 
-    Before adding/modifying code, ensure to follow this checklist:
+    * Optimize for future, not minimal diff. Half-measures cost more total effort
 
-    <code-insert-checklist>
-    * [ ] Make sure that code is being inserted following the ordering of methods as per code style guidelines (ex: `file-organization-order`)
-    * [ ] Comments/docs follow `Comments` rules in code-style.md
-    * [ ] Make sure reuse code and find existing utils before writing new code
-    * [ ] Make sure code strictly follows personal & project code style guidelines
-          (per code-style.md rules)
-    </code-insert-checklist>
+    * TODO+TDD-driven: 
+      * TODOs/stubs -> tests (comment if non-compiling) → implement -> iterate
 
-    ## Testing principles
+    * Follow existing patterns, use existing libraries. Don't reinvent.
 
-    <testing-principles>
-    * Tests must verify outcomes (state changes, return values), not just that code runs without error.
-      A test that only checks "no exception thrown" is incomplete — assert expected state
-    * For data-changing operations, verify before/after state deltas
-    * Unit tests verify isolated logic. Integration tests verify components work together.
-      Both are needed — passing unit tests alone does not guarantee the system works end-to-end
-    * Test at least one cross-feature interaction or integration seam per feature. Bugs cluster
-      at boundaries between components
-    * Never modify an existing test to make it pass — fix the code. If the test is genuinely wrong,
-      explain why before changing it
-    * Never write helper scripts that bypass the actual system under test
-    * Include at least one test with intentionally invalid input to verify error handling rejects it
-    * After writing tests, ask: would these tests catch the bug if the implementation were subtly
-      wrong? Tests that mirror the implementation's assumptions don't add safety
-    </testing-principles>
+    * Follow a SR&ED methodology: persist new uncertainties, hypothesis, decisions, insights,
+      failed approaches to phase doc
 
-    ## When to Stop
+    * Leave existing TODO/FIXME/REVIEW comments intact, unless current work address them
 
-    STEP IMPLEMENTATION as soon as any of these triggers occur:
+    ${scope.blocks."code-insert-checklist".embed}
 
-    <development-stop-triggers>
-    * Architectural mismatches (mutable vs immutable, incompatible structures)
-    * API incompatibilities requiring redesign
-    * Multiple failed workarounds
-    * No workarounds/reverts/continued coding - ask for help
-    * Never claim completion if incomplete
-    * Keep executing a command which never succeeds
-    * Version control state confusing or operations had unexpected effects
-    * Multiple consecutive test failures without progress toward a fix
-    * Generating work beyond the planned scope (all tasks complete, inventing new ones)
-    </development-stop-triggers>
+    ${scope.blocks."testing-principles".embed}
 
-    ## Before marking as completed
+    ${scope.blocks."development-stop-triggers".embed}
 
-    Before marking the development as completed, ensure to follow this checklist:
+    ${scope.blocks."development-completion-checklist".embed}
 
-    <development-completion-checklist>
-    * [ ] Initial plan/requirements/ACs/TODOs addressed
-    * [ ] Tests are added/updated and passing, using <testing-principles>
-    * [ ] All task ACs verified passing
-    * [ ] Diff reviewed (`jj-diff-working --git`)
-    * [ ] Temporary debug files/code removed
-    * [ ] Code style guidelines followed
-    * [ ] Strictly follow ordering in `file-organization-order`
-    * [ ] Formatting, linting (including type checking if applicable), tests pass (only affected modules)
-    * [ ] No unexpected file deletions in diff (check --stat)
-    * [ ] Full project test suite passes (not just tests for changed code)
-    * [ ] Dependent code is still compiling & testing
-    * [ ] After completing changes, consider: do changes affect other features or paths not covered by the task's tests?
-    * [ ] Project doc updated (if exists)
-    * [ ] Sub-agent validation claims include methodology (commands run + results), not just outcomes
-    </development-completion-checklist>
+    ${scope.blocks."code-commenting".embed}
+
+    ${scope.blocks."error-handling".embed}
+
+    ${scope.blocks."code-organization-order".embed}
   '';
 }

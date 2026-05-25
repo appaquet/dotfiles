@@ -54,8 +54,6 @@
       * Missing opportunities for simplification
       </code-style-reviewer-guidelines>
 
-      ## Instructions
-
       ${scope.blocks."reviewing-agent".embed}
     '';
 }

@@ -1,25 +1,23 @@
 { scope }:
 {
   description = "Proceed with current workflow";
-  content = ''
-    # Proceed
 
-    Proceed with the current workflow. Clears any pending "Await /proceed" gate tasks and lets the
-    calling command continue.
+  content = ''
+    Goal: proceed with the current workflow. Clears any pending "Await /proceed" gate tasks and lets the calling command continue.
 
     After instructions & tasks loaded, you are free to 🚀 Engage thrusters
 
     ## Instructions
 
-    1. Pre-flight then continue
-
-    2. 🔳 Clear gate tasks
+    1. 🔳 Clear gate tasks
        - Check `TaskList` for any "Await /proceed" tasks
        - Mark them completed
        - The calling workflow continues from where it left off
 
-     3. 🔳 Breakdown and create tasks as needed using `${scope.harness.tools.taskCreate}`
+    2. 🔳 Breakdown and create tasks as needed using `${scope.harness.tools.taskCreate}`
 
-    4. 🔳 Execute tasks one by one
+    3. 🔳 Execute tasks one by one
+
+    ${scope.blocks.pre-flight.reference}
   '';
 }

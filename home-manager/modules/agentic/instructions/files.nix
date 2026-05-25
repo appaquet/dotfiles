@@ -101,61 +101,52 @@ let
 
       subdirs = builtins.filter (n: entries.${n} == "directory") (attrNames entries);
 
-      collectSubFiles =
-        d: args:
+      collectSubFile =
+        d: name: args:
         let
-          subs = readDir d;
+          entries = readDir d;
+          fullPath = d + "/${name}";
         in
-        listToAttrs (
-          concatLists (
-            map (
-              name:
-              let
-                fullPath = d + "/${name}";
-              in
-              if subs.${name} == "regular" then
-                if match ".*\\.md" name != null then
-                  [
-                    {
-                      inherit name;
-                      value = {
-                        kind = "md";
-                        content = builtins.readFile fullPath;
-                      };
-                    }
-                  ]
-                else if match ".*\\.nix" name != null && name != "default.nix" then
-                  [
-                    {
-                      inherit name;
-                      value = {
-                        kind = "nix";
-                        content = import fullPath args;
-                      };
-                    }
-                  ]
-                else
-                  [ ]
-              else if subs.${name} == "directory" then
-                let
-                  nested = collectSubFiles fullPath args;
-                in
-                map
-                  (nv: {
-                    name = "${name}/${nv.name}";
-                    value = nv.value;
-                  })
-                  (
-                    lib.mapAttrsToList (n: v: {
-                      name = n;
-                      value = v;
-                    }) nested
-                  )
-              else
-                [ ]
-            ) (attrNames subs)
-          )
-        );
+        if entries.${name} == "regular" then
+          if match ".*\\.md" name != null then
+            [
+              {
+                inherit name;
+                value = {
+                  kind = "md";
+                  content = builtins.readFile fullPath;
+                };
+              }
+            ]
+          else if match ".*\\.nix" name != null && name != "default.nix" then
+            [
+              {
+                inherit name;
+                value = {
+                  kind = "nix";
+                  content = import fullPath args;
+                };
+              }
+            ]
+          else
+            [ ]
+        else if entries.${name} == "directory" then
+          map
+            (nv: {
+              name = "${name}/${nv.name}";
+              value = nv.value;
+            })
+            (
+              lib.mapAttrsToList (n: v: {
+                name = n;
+                value = v;
+              }) (collectSubFiles fullPath args)
+            )
+        else
+          [ ];
+
+      collectSubFiles =
+        d: args: listToAttrs (concatLists (map (name: collectSubFile d name args) (attrNames (readDir d))));
 
     in
     listToAttrs (

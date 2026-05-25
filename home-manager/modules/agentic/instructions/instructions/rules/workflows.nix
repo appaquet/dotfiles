@@ -18,9 +18,6 @@
       - Loads tasks from phase doc, executes, validates, runs `/ctx-save`
     - `/proceed`: Continue from STOP points
     - `/continue`: Resume interrupted work
-    - `/forked <skill>`: Fork to sub-agents
-      - Decomposes skill work, launches parallel agents, collects results
-      - Parent agent does everything to prevent overloading its context window
 
     ### Project Management
 

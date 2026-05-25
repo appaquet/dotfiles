@@ -118,7 +118,7 @@ let
           value = [ ];
         }
       ];
-      expected = "---\nallowed-tools: \n---\n";
+      expected = "";
     }
   ];
 

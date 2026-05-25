@@ -1,9 +1,16 @@
 { scope }:
 {
-  heading = "Before Inserting Code";
+  heading = "Before inserting any code";
+
   content = ''
-    * Follow method ordering per code style
-    * Reuse existing utils before writing new code
-    * Comments describe WHY, not WHAT
+    Before adding/modifying code, ensure to follow this checklist:
+  '';
+
+  tag = "code-insert-checklist";
+
+  taggedContent = ''
+    * [ ] Code ordering follows ${scope.blocks."code-organization-order".reference}
+    * [ ] Comments/docs follows ${scope.blocks."code-commenting".reference}
+    * [ ] Reuse surrounding/utils before writing new code
   '';
 }

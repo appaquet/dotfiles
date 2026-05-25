@@ -54,8 +54,6 @@
     * Requirement status markers match linked phase status
     </requirements-reviewer-guidelines>
 
-    ## Instructions
-
     ${scope.blocks."reviewing-agent".embed}
   '';
 }

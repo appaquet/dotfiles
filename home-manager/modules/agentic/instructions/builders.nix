@@ -18,6 +18,15 @@
     Block   - A reusable instruction fragment. Returns `{ embed, reference }` where embed is
               the rendered markdown string and reference is an inline link/citation.
 */
+# REVIEW: architecture-reviewer - `builders.nix` is 549 lines with multiple distinct concerns:
+# constructors (mkBlock, mkSkill, mkAgent, etc.), scope building (makeScope with import+transform
+# logic), post-processing (postProcessContent), file writing (mkFile), and package building
+# (mkPackage). Each concern maps to a different architectural layer. Consider extracting:
+# - `constructors.nix` — mkBlock, mkInstructions, mkAgent, mkSkill, mkCommand, mkSkillFile
+# - `scope.nix` — makeScope with import mappings, dual-output logic, collision detection
+# - `output.nix` — postProcessContent, mkFile, mkPackage
+# This would keep each file under ~200 lines with single-responsibility focus, improving testability
+# and reducing cognitive load when reasoning about scope-building vs. output-rendering concerns.
 
 let
   frontmatter = import ./frontmatter.nix;
@@ -36,7 +45,13 @@ let
       ...
     }@extra:
     let
-      inner = if taggedContent != null then taggedContent else content;
+      inner =
+        if taggedContent != null then
+          taggedContent
+        else if tag != null then
+          throw "mkBlock: taggedContent required when tag is set"
+        else
+          content;
       body = if tag != null then "${content}\n<${tag}>\n${inner}</${tag}>" else content;
     in
     rec {
@@ -54,7 +69,6 @@ let
     }
     // extra;
 
-  # Wraps authored content into `{ embed, reference, outputPath? }` with # heading.
   mkInstructions =
     {
       heading,
@@ -164,10 +178,9 @@ let
     {
       embed = "${frontmatter}\n${content}";
       reference = "(See ${if kind == "directory" then "skill" else "command"}: ${name})";
-      outputPath = if outputPath != null then outputPath else null;
+      inherit outputPath;
     };
 
-  # Pass-through for skill sub-files (.nix/.md). Returns `{ embed = content, outputPath? }`.
   mkSkillFile =
     {
       content,
@@ -208,10 +221,6 @@ let
         throw "Unsupported harness: ${scope.harness.name}. Available: ${builtins.concatStringsSep ", " (builtins.attrNames values)}"
     );
 
-  /*
-    Re-export of frontmatter.nix renderer. Renders YAML frontmatter from an ordered field list,
-    filtering null values.
-  */
   renderFrontmatter = frontmatter.renderFrontmatter;
 
   /*
@@ -235,6 +244,7 @@ let
   importDir = files.importDir;
   importSkillsDir = files.importSkillsDir;
 
+  # REVIEW: code-style-reviewer - `makeScope` is ~225 lines long and contains multiple logical sections: raw content loading, content processing (agents, commands, skills), dual-output generation, instruction assembly, collision detection, and output merging. Per guidelines: "Functions are short, focused, do one thing well". Consider extracting `addRawContent`, `addProcessedContent`, `addDualOutput`, and `addInstructions` sub-functions to keep `makeScope` focused on orchestration.
   /*
     Builds a per-harness recursive attrset via lib.fix. Returns
     `{ harness, scopeApi, blocks, rawBlocks, agents, rawAgents, commands, rawCommands, skills,
@@ -469,23 +479,16 @@ let
       }
     );
 
-  # Strips empty/whitespace-only lines and trailing periods from generated markdown.
+  # Removes blank lines and lone period sentinel lines from generated markdown.
   postProcessContent =
     text:
     let
-      lines = lib.splitString "\n" text;
-      stripTrailingPeriod =
-        line:
-        let
-          m = builtins.match "(.*)\\.$" line;
-        in
-        if m != null then builtins.head m else line;
-      stripped = map stripTrailingPeriod lines;
-      nonEmpty = builtins.filter (line: null == builtins.match "^[[:space:]]*$" line) stripped;
+      nonEmpty = builtins.filter (line: line != "." && null == builtins.match "^[[:space:]]*$" line) (
+        lib.splitString "\n" text
+      );
     in
     builtins.concatStringsSep "\n" nonEmpty;
 
-  # Writes text content to a Nix store file at `/<dir>/<filename>`.
   mkFile =
     dir: path: filename: content:
     pkgs.writeTextFile {
@@ -494,7 +497,6 @@ let
       destination = "/${dir}/${filename}";
     };
 
-  # Bundles all generated markdown files from all scopes into a symlinkJoin store path.
   mkPackage =
     {
       scopes,

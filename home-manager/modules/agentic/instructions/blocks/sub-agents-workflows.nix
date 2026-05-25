@@ -7,57 +7,45 @@
 
   tag = "sub-agents-workflows";
   taggedContent = ''
-    * Main agent should primarily be used for high-level planning, project management, jj (code
-      versioning). Main agent context window is VERY VERY precious; Anything requiring reading,
-      understanding and exploring code should be delegated to sub-agents.
+    * Main agent: 
+      * Used primarily for high-level orchestration, project management, jj (code versioning). Main
+        agent context window is VERY VERY precious; Anything requiring reading, understanding and
+        exploring code should be delegated to sub-agents.
 
-    * Delegation threshold:
-      * Trivial, single-location edits (typo, test expected value, fixture data) → main agent may do directly
-      * Multi-file changes, new logic, non-trivial code, iterative test<>code → MUST delegate to a sub-agent
-      * When in doubt, delegate. Context is more expensive than spawning an agent
-      * During `/implement`: ALL planned code changes go through sub-agents. Main agent only validates, commits, and manages jj.
+    * Sub-agents:
+      * Delegation threshold:
+        * Trivial, single-location edits with no multi-steps testing (typo, fixture data) → main agent, if have write access
+        * Multi-file changes, new logic, iterative test<>code → sub-agent
+        * In doubt; delegate
 
-    * Sub-agents should ALWAYS used for grunt work to preserve main agent context, no matter the task complexity
-      * Optimize prompts for sub-agents, but also ask them to optimize their own output message
-        Enough information for crystal clear understanding, but no more than that: context window is
-        precious
+      * Agent selection: select right sub-agent for task. junior/senior/staff have different pricing
 
-      * If a sub-agent output is insufficient, send it a follow-up message / resume to re-engage and ask
-        targeted follow-up questions. If I ask you a question that a previous sub-agent should have
-        answered, resume it instead of answering directly or launching a new one. If I ask for a small
-        change to a previous sub-agent's work, resume it instead of creating a new one to do the change
+      * Grouping: group related work to same sub-agent for more focused and less conflicts, taking
+        agent selection rules in account
 
-      * **Trust methodology, verify decisions.** If a sub-agent reports having run specific commands
-        (e.g., "ran `npm test` → 493 passing"), trust that action — they executed it. But act like a
-        senior dev reviewing a junior's PR: critically review design choices, implementation quality,
-        and whether the right thing was built. Bare conclusions without methodology ("tests pass")
-        are unverifiable — follow up or verify independently.
+      * Parallelism: if multiple unrelated tasks, launch multiple sub-agents in parallel, but
+        careful about potential file conflicts
 
-      * When delegating, instruct sub-agents to report methodology — what commands they executed
-        and their results. Outcomes without methodology are claims, not information
+      * Prompt to sub-agent: optimize prompts for sub-agents, reference project files and push to
+        read instead of copying in prompt to sub-agent. tell them OK to engage (🚀)
 
-      * Assume that I don't have any context about what a sub-agent did and outputted. I don't see that
-        output, and you have to give me some context if I need to answer questions about it or make
-        decisions
+      * Sub-agent output: ask to optimize output; enough info for clear understanding and proof of
+        correct work; resume if not enough
 
-      * Sub-agent should communicate with user through `AskUserQuestion` if they need clarifications
+      * Resuming: If sub-agent output is insufficient, send resume / follow-up message. Ask targeted follow-up
+        questions. If I ask you a question that previous sub-agent should have answered, resume it
+        instead of answering directly or launching a new one. If I ask for a small change to a
+        previous sub-agent's work, resume it instead of creating a new one to do the change
 
-      * Continuing an agent via follow-up message should be prioritized over creating a new agent since
-        it has the context of the previous work. Give agents a `name` for readability, but use the
-        agent ID (not name) in `SendMessage({to: agentId})` to continue them
+      * Trust work: If it reports having run commands (e.g. "ran tests → 493 passing"), trust
+        it. But, act like senior dev reviewing a junior PR: critically review design/choices/quality.
+        If not enough: resume.
 
-      * Instruction sub-agent to read project/phase docs explicitly to make sure they get the context
-        and understanding. When user provides a decision or insight mid-work: persist to docs first,
-        then continue Conversation context is ephemeral, docs are source of truth
+      * Sub-agent to me: assume I don't have context of sub-agent output. If need communicate to me,
+        give context of output of sub-agent since I don't have it. They can communicate with me via
+        `AskUserQuestion` if need clarifications
 
-      * If you're having a sub-agent do project documentation work, have it write to the file directly
-        instead of returning the content to you to write to prevent unnecessary back-and-forth and
-        preserve context. Have it return the modified file list so you can read them for validation
-
-    * For sub-agents, pick right model for task to optimize speed & accuracy:
-      * haiku/lightweight: shallow code exploration and reconnaissance
-      * sonnet/normal: straightforward code, code exploration
-      * opus/bigbrain: planning, review comments research/planning, complex code exploration or
-        debugging, complex code
+      * Project docs: project doc source of truth (with code). always reference it, don't copy to prompt
+        If sub-agent is doing documentation work, OK to write to project docs directly instead of you
   '';
 }

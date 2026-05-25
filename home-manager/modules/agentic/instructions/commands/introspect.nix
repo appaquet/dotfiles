@@ -1,38 +1,35 @@
 { scope }:
 {
   description = "Reflect on an error or undesired behavior to propose instruction improvements";
+
   argumentHint = "[description of issue]";
+
   effort = "xhigh";
   content = ''
-    # Introspect
-
-    Reflect on what went wrong and propose instruction changes to prevent recurrence.
+    Goal: reflect on what went wrong and propose instruction changes to prevent recurrence.
 
     Issue: `$ARGUMENTS`
 
     ## Instructions
 
-    1. Pre-flight then continue
+    1. If issue empty, use `AskUserQuestion` to get description
 
-    2. If issue empty, use `AskUserQuestion` to get description
-
-    3. Analyze the issue:
-       * Use the <deep-thinking> procedure
+    2. 🔳 Analyze the issue:
+       * Use the ${scope.blocks.deep-thinking.reference} procedure
        * What specific error/behavior occurred?
        * Trace back: what instruction was missing, unclear, or conflicting?
        * Which files might have related concepts? Search for them
        * We don't want specific fixes/root cause, we want to identify the generic underlying issue that
          caused this and how to prevent it in the future
 
-    4. Summarize findings:
+    3. 🔳 Summarize findings:
        * Root cause
        * Files that need changes (including files with related concepts)
        * Conceptual changes needed
        * Need to be generic, not specific to this case
 
-    5. Use `AskUserQuestion` to confirm analysis and suggest:
-       "Run `/mem-edit` to implement these changes with proper analysis workflow"
+    **STOP** - Do not implement changes directly. User will use `/mem-edit` to do it.
 
-    **STOP** - Do not implement changes directly. Use /mem-edit for implementation.
+    ${scope.blocks.pre-flight.reference}
   '';
 }

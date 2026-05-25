@@ -5,29 +5,23 @@
     claude = "sonnet";
     opencode = "anthropic/claude-sonnet-4.5";
   };
-  context = "fork";
-  content = ''
-    # PR Description
 
-    Generate a detailed changelog-style summary of branch changes for reference. Uses project context
-    and branch diff to create multi-level breakdown. Don't use sub-agents to do the work, since you're
-    already a forked context.
+  # REVIEW: Doesn't that map correctly in opencode?
+  context = "fork";
+
+  content = ''
+    Goal: generate a detailed changelog-style summary of branch changes for reference. Uses project context and branch diff to create multi-level breakdown. Don't use sub-agents to do the work, since you're already a forked context.
 
     ## Instructions
 
-    1. Pre-flight then continue
-
-    2. 🔳 Ensure context loaded
-       - Run `/ctx-load` to load project context (project doc, branch state, recent commits)
-
-    3. 🔳 Analyze changes
+    1. 🔳 Analyze changes
        - Get changed files: `jj-diff-branch --stat`
        - Read diffs for understanding: `jj-diff-branch --git <file>`
        - Use the <deep-thinking> procedure
        - If user specified a focus area, prioritize those components
        - You can inspire from project doc, but code remains the source of truth
 
-    4. 🔳 Generate report in one message, without any following messages:
+    2. 🔳 Generate report in one message, without any following messages:
        - Load the `human-writer` skill using the `Skill` tool for tone (no AI filler, no superlatives)
        - Wrap identifiers (types, functions, files, fields) in backticks
 
@@ -58,5 +52,7 @@
        - Summary: WHAT changed for a consumer (behavior, API, errors, fixes). Avoid internal
          identifiers unless consumer-visible
        - Implementation Notes: HOW it was built (types, refactors, algorithms, structural changes)
+
+    ${scope.blocks.pre-flight.reference}
   '';
 }

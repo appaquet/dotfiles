@@ -1,23 +1,19 @@
 { scope }:
 {
   description = "Edit project and phase docs with structure validation";
-  argumentHint = "[operation or file]";
-  content = ''
-    # Edit Project Docs
 
-    User-facing command for project/phase doc changes. Analyze first, then gates before applying
+  argumentHint = "[operation or file]";
+
+  content = ''
+    Goal: user-facing command for project/phase doc changes. Analyze first, then gates before applying
 
     Target: `$ARGUMENTS`
 
     ## Instructions
 
-    1. Pre-flight then continue
+    1. 🔳 Load `proj-editing` skill
 
-    2. 🔳 Load skills using the `Skill` tool
-       - `proj-editing` - for doc structure and validation
-       - `ctx-plan` - for planning steps
-
-    3. 🔳 Ensure scope identified
+    2. 🔳 Ensure scope identified
        - If target unclear, use `AskUserQuestion` to clarify what operation:
          - Create project doc
          - Create phase doc
@@ -25,15 +21,17 @@
          - Update phase status
          - Validate structure
 
-    4. 🔳 Analyze current state
+    3. 🔳 Analyze current state
        - Read relevant project/phase docs
        - Identify changes needed
 
-    5. 🔳 Report proposed changes
+    4. 🔳 Report proposed changes
        - Show before/after for each change
 
-    6. **GATE**: Await `/proceed` before applying changes
+    5. **GATE**: Await `/proceed` before applying changes
 
-    7. 🔳 Apply with proj-editing skill
+    6. 🔳 Apply with proj-editing skill
+
+    ${scope.blocks.pre-flight.reference}
   '';
 }

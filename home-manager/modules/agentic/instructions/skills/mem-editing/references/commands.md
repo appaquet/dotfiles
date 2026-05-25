@@ -46,7 +46,7 @@ Optional metadata can be added when needed:
   argumentHint = "[task-or-phase]";
   model = scope.forHarness {
     claude = "sonnet";
-    opencode = "gpt-5.5";
+    opencode = "openai/gpt-5.5";
   };
   effort = "high";
   allowedTools = [ "Read" "Grep" "Glob" ];

@@ -32,8 +32,6 @@ in
     mkSkill
     ;
 
-  mkCommand = tooling.mkSkill;
-
   blocks = scopes.claude.blocks;
   commands = scopes.claude.commands;
   skills = scopes.claude.skills;

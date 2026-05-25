@@ -13,9 +13,15 @@ let
         nativeBuildInputs = [ pkgs.nix ];
       }
       ''
-        expr='with import <nixpkgs> {}; (import ${./fixtures/bad-block-reference.nix} { scope = { blocks = {}; api = {}; harness = {}; }; }).content'
-        nix-instantiate --eval --strict -E "$expr" 2>/dev/null && {
+        expr='(import ${./fixtures/bad-block-reference.nix} { scope = { blocks = {}; api = {}; harness = {}; }; }).content'
+        err="$TMPDIR/bad-ref-check-err"
+        nix-instantiate --eval --strict -E "$expr" 2>"$err" && {
           echo "FAIL: nonexistent block reference should have failed evaluation" >&2
+          exit 1
+        }
+        grep -q 'nonexistent' "$err" || {
+          echo "FAIL: nonexistent block reference failed for an unexpected reason" >&2
+          cat "$err" >&2
           exit 1
         }
         touch $out

@@ -105,6 +105,10 @@ let
           "gh pr checks *"
           "gh pr diff *"
         ];
+
+        ghWrite = mkAllowCommands [
+          "gh pr review *"
+        ];
       };
 
       planner =
@@ -124,7 +128,8 @@ let
         // bash.dev.node
         // bash.vcs.jjRead
         // bash.vcs.jjWrite
-        // bash.vcs.ghRead;
+        // bash.vcs.ghRead
+        // bash.vcs.ghWrite;
     };
 
     agent = {
@@ -189,7 +194,8 @@ let
           // bash.dev.node
           // bash.vcs.jjRead
           // bash.vcs.jjWrite
-          // bash.vcs.ghRead;
+          // bash.vcs.ghRead
+          // bash.vcs.ghWrite;
       };
 
       sandbox = {
@@ -211,29 +217,12 @@ let
       else
         [ "~/.config/opencode/rules/*.md" ];
 
+    # REVIEW: code-style-reviewer - Commented-out dead code. Remove or restore with intent; commented-out config leaks stale settings into the source.
     #default_agent = "build";
 
     permission = permissions.agent.base;
 
     agent = {
-      bigbrain = {
-        mode = "subagent";
-        model = "openai/gpt-5.5";
-        description = "To be used for complex coding & planning tasks";
-      };
-
-      normal = {
-        mode = "subagent";
-        model = "opencode-go/deepseek-v4-pro";
-        description = "To be used for general coding & planning tasks, should be the default choice for most work, unless the task is either very complex (bigbrain) or very simple (lightweight)";
-      };
-
-      lightweight = {
-        mode = "subagent";
-        model = "opencode-go/deepseek-v4-flash";
-        description = "To be used for lightweight / straightforward tasks that shouldn't require debugging or complex iterations";
-      };
-
       browser = {
         mode = "all";
         model = "openai/gpt-5.4-mini";
@@ -304,34 +293,36 @@ let
         };
       }) paths
     );
+
+  legacyPaths = [
+    "commands"
+    "agents"
+  ];
+
+  generatedPaths = [
+    "commands"
+    "agents"
+    "rules"
+    "skills"
+    "AGENTS.md"
+  ];
+
+  commonSources = {
+    ".config/opencode/opencode.json".source = opencodeJson;
+    ".config/opencode/opencode-nono.json".source = nonoOpencodeJson;
+    ".config/opencode/tui.json".source = tuiJson;
+    ".config/opencode/plugins/ccmon.ts".source = "${inputs'.ccmon.packages.opencode-plugin}/ccmon.ts";
+  };
 in
 {
   home.file =
-    if config.dotfiles.agentic.instructions.mode == "legacy" then
-      (mkOpencodeConfSymlinks ".config/opencode" "agentic/opencode" [
-        "commands"
-        "agents"
-      ])
-      // {
-        ".config/opencode/opencode.json".source = opencodeJson;
-        ".config/opencode/opencode-nono.json".source = nonoOpencodeJson;
-        ".config/opencode/tui.json".source = tuiJson;
-        ".config/opencode/plugins/ccmon.ts".source = "${inputs'.ccmon.packages.opencode-plugin}/ccmon.ts";
-      }
-    else
-      (mkOpencodeGeneratedSymlinks [
-        "commands"
-        "agents"
-        "rules"
-        "skills"
-        "AGENTS.md"
-      ])
-      // {
-        ".config/opencode/opencode.json".source = opencodeJson;
-        ".config/opencode/opencode-nono.json".source = nonoOpencodeJson;
-        ".config/opencode/tui.json".source = tuiJson;
-        ".config/opencode/plugins/ccmon.ts".source = "${inputs'.ccmon.packages.opencode-plugin}/ccmon.ts";
-      };
+    (
+      if config.dotfiles.agentic.instructions.mode == "legacy" then
+        mkOpencodeConfSymlinks ".config/opencode" "agentic/opencode" legacyPaths
+      else
+        mkOpencodeGeneratedSymlinks generatedPaths
+    )
+    // commonSources;
 
   home.packages = [
     nono-opencode

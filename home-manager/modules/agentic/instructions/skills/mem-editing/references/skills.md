@@ -61,7 +61,7 @@ Use `scope.forHarness` when a value differs by harness:
   description = "Edit instruction source files in the nixified authoring system.";
   model = scope.forHarness {
     claude = "sonnet";
-    opencode = "gpt-5.5";
+    opencode = "openai/gpt-5.5";
   };
   allowedTools = [ "Read" "Grep" "Glob" "Edit" ];
   subtask = false;

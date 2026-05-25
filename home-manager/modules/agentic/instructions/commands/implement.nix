@@ -1,10 +1,12 @@
 { scope }:
 {
   description = "Implement tasks from the approved plan";
+
   effort = "xhigh";
 
   content = ''
     Goal: proceed to implementation of the plan/task at hand
+
     After instructions & tasks loaded, 🚀 Engage thrusters
 
     # Instructions

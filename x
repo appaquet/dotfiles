@@ -492,7 +492,7 @@ cmd_copy() {
 cmd_agent_build() {
   ${NIX_BUILDER} build --impure --out-link result --expr '
     let
-      pkgs = import <nixpkgs> {};
+      pkgs = (builtins.getFlake (toString ./.)).inputs.nixpkgs.legacyPackages.${builtins.currentSystem};
       instr = import ./home-manager/modules/agentic/instructions {
         inherit pkgs; 
         lib = pkgs.lib; 

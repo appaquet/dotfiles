@@ -1,14 +1,17 @@
 { scope }:
 {
   heading = "Context understanding";
+
   content = ''
     Always ensure 10/10 understanding checklist: explore code + web search + `AskUserQuestion`
 
-    Prioritize web search for tool/library/framework usage since they may have changed since your training data
+    Prioritize web search for tool/library/framework usage since may have changed since cutoff
 
-    Always report on understanding at any decision point - verbalize WHAT you understand for each item, not just that you checked it. User validates your understanding
+    Always report on understanding at any decision point - verbalize WHAT you understand for each item, not just that you checked it. User validates your understanding.
   '';
+
   tag = "full-understanding-checklist";
+
   taggedContent = ''
     * [ ] Clear on goal/user need: [state the goal]
     * [ ] Identified similar use cases: [list them]
