@@ -57,7 +57,5 @@
     * **404 Error**: Missing PR number in endpoint or wrong DATABASE_ID
     * **Not threaded**: Check `"in_reply_to_id"` field in response
     * **New inline comment**: Used wrong endpoint format
-
-    ${scope.blocks.pre-flight.reference}
   '';
 }

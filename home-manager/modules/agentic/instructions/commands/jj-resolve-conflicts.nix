@@ -31,7 +31,5 @@
        - `jj new <original_change_id>` to create a new empty change on top of where we started
        - `jj log` to confirm zero conflicts remain
        - Report what was resolved
-
-    ${scope.blocks.pre-flight.reference}
   '';
 }

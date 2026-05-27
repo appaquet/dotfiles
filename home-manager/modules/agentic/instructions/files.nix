@@ -1,11 +1,85 @@
 { pkgs, lib }:
 
+/*
+  File discovery — imports authored instruction sources from disk into the scope
+  pipeline. Import strategies cover legacy flat/recursive directories,
+  hierarchical authoring directories that export flat keys, local block
+  directories, and the directory-per-skill layout with subfile collection.
+*/
+
 let
-  /*
-    Recursively or flat-import all .nix files from a directory. Returns attrset keyed by filename
-    stem (flat) or relative path (recursive). Skips default.nix. Used by makeScope to discover
-    authored blocks, agents, commands, and instructions.
-  */
+  inherit (builtins)
+    attrNames
+    baseNameOf
+    concatLists
+    concatMap
+    concatStringsSep
+    filter
+    groupBy
+    head
+    length
+    listToAttrs
+    map
+    match
+    pathExists
+    readDir
+    toString
+    ;
+
+  artifactKindForDir =
+    dir:
+    {
+      agents = "agent";
+      blocks = "block";
+      commands = "command";
+    }
+    .${baseNameOf (toString dir)} or "artifact";
+
+  # listToAttrsUnique :: { kind, entries } -> attrs
+  #   Converts [{ key, value, path }] to an attrset after validating that no key
+  #   appears more than once. Unlike builtins.listToAttrs, duplicate keys are hard
+  #   errors because hierarchical importers flatten directory paths into one
+  #   namespace.
+  listToAttrsUnique =
+    {
+      kind,
+      entries,
+    }:
+    let
+      grouped = groupBy (entry: entry.key) entries;
+      duplicates = filter (key: length grouped.${key} > 1) (attrNames grouped);
+      duplicateMessages = map (
+        key:
+        let
+          paths = map (entry: toString entry.path) grouped.${key};
+        in
+        "Duplicate ${kind} key '${key}' found at: ${concatStringsSep ", " paths}"
+      ) duplicates;
+    in
+    if duplicates != [ ] then
+      throw (concatStringsSep "\n" duplicateMessages)
+    else
+      listToAttrs (
+        map (entry: {
+          name = entry.key;
+          inherit (entry) value;
+        }) entries
+      );
+
+  # importDir :: { dir, args, recursive ? false } -> attrs
+  #   Imports .nix files from a directory. Each file is imported with `args`
+  #   (which receives { scope = self } from scope.nix). Skips default.nix.
+  #
+  #   Flat mode (recursive = false):
+  #     Keys are filename stems. `my-block.nix` → key `my-block`.
+  #     Used for: blocks, agents, commands.
+  #
+  #   Recursive mode (recursive = true):
+  #     Keys are relative paths without .nix. `rules/development.nix` →
+  #     key `rules/development`. Traverses subdirectories.
+  #     Used for: authored instructions.
+  #
+  #   Returns: attrset of import results keyed by stem or relative path.
   importDir =
     {
       dir,
@@ -13,14 +87,6 @@ let
       recursive ? false,
     }:
     let
-      inherit (builtins)
-        readDir
-        attrNames
-        match
-        listToAttrs
-        concatMap
-        ;
-
       flat =
         d:
         let
@@ -77,26 +143,142 @@ let
     in
     if recursive then listToAttrs (recurse dir "") else flat dir;
 
-  /*
-    Traverses a directory of skill subdirectories, each with a default.nix. Returns attrset keyed
-    by directory name. Each value is `{ kind = "directory"; main = <imported data>; files = <subfile
-    attrset> }`. Collects .md and .nix subfiles recursively.
-  */
+  # importFlatTree :: { dir, args, reservedDirs ? [ "blocks" ] } -> attrs
+  #   Recursively imports .nix files from a directory tree while preserving a flat
+  #   key namespace. Keys are filename stems only; default.nix and reserved
+  #   directories are skipped. Duplicate stems across the tree throw descriptive
+  #   errors before attrset conversion.
+  importFlatTree =
+    {
+      dir,
+      args,
+      reservedDirs ? [ "blocks" ],
+    }:
+    let
+      kind = artifactKindForDir dir;
+
+      recurse =
+        d:
+        let
+          entries = readDir d;
+        in
+        concatMap (
+          name:
+          let
+            type = entries.${name};
+            fullPath = d + "/${name}";
+          in
+          if type == "directory" then
+            if builtins.elem name reservedDirs then [ ] else recurse fullPath
+          else
+            let
+              m = match "(.*)\\.nix" name;
+            in
+            if m != null && name != "default.nix" && type == "regular" then
+              [
+                {
+                  key = head m;
+                  path = fullPath;
+                  value = import fullPath args;
+                }
+              ]
+            else
+              [ ]
+        ) (attrNames entries);
+    in
+    listToAttrsUnique {
+      inherit kind;
+      entries = recurse dir;
+    };
+
+  # importBlocksTree :: { roots, args } -> attrs
+  #   Imports blocks from multiple source roots into one flat namespace. A root
+  #   named blocks contributes its direct .nix files. Other roots are searched
+  #   recursively for directories named blocks, and each discovered blocks
+  #   directory contributes its direct .nix files. Search continues through blocks
+  #   directories so nested blocks/ directories are discovered too.
+  importBlocksTree =
+    {
+      roots,
+      args,
+    }:
+    let
+      collectFilesInBlocksDir =
+        d:
+        let
+          entries = readDir d;
+        in
+        concatMap (
+          name:
+          let
+            type = entries.${name};
+            fullPath = d + "/${name}";
+            m = match "(.*)\\.nix" name;
+          in
+          if m != null && name != "default.nix" && type == "regular" then
+            [
+              {
+                key = head m;
+                path = fullPath;
+                value = import fullPath args;
+              }
+            ]
+          else
+            [ ]
+        ) (attrNames entries);
+
+      searchForBlocksDirs =
+        d:
+        let
+          entries = readDir d;
+        in
+        concatMap (
+          name:
+          let
+            type = entries.${name};
+            fullPath = d + "/${name}";
+          in
+          if type == "directory" then
+            (if name == "blocks" then collectFilesInBlocksDir fullPath else [ ]) ++ searchForBlocksDirs fullPath
+          else
+            [ ]
+        ) (attrNames entries);
+
+      collectRoot =
+        root:
+        if baseNameOf (toString root) == "blocks" then
+          collectFilesInBlocksDir root ++ searchForBlocksDirs root
+        else
+          searchForBlocksDirs root;
+    in
+    listToAttrsUnique {
+      kind = "block";
+      entries = concatLists (map collectRoot roots);
+    };
+
+  # importSkillsDir :: { dir, args } -> attrs
+  #   Imports a directory of skill subdirectories. Each subdirectory must
+  #   contain a default.nix. Returns an attrset keyed by directory name.
+  #
+  #   Return shape per skill:
+  #     {
+  #       kind = "directory";
+  #       main = <imported default.nix value>;
+  #       files = { <relative-path> = { kind = "nix"|"md"; content = ...; }; ... };
+  #     }
+  #
+  #   Subfile collection (collectSubFiles, recursive):
+  #     .nix files → { kind = "nix"; content = <imported value>; }
+  #     .md files  → { kind = "md";  content = <raw file contents>; }
+  #     Other files are silently skipped.
+  #
+  #   Used by scope.nix addRawContent for skills discovery.
   importSkillsDir =
     {
       dir,
       args,
     }:
     let
-      inherit (builtins)
-        attrNames
-        concatLists
-        listToAttrs
-        match
-        pathExists
-        readDir
-        ;
-
       entries = readDir dir;
 
       subdirs = builtins.filter (n: entries.${n} == "directory") (attrNames entries);
@@ -131,17 +313,20 @@ let
           else
             [ ]
         else if entries.${name} == "directory" then
-          map
-            (nv: {
-              name = "${name}/${nv.name}";
-              value = nv.value;
-            })
-            (
-              lib.mapAttrsToList (n: v: {
-                name = n;
-                value = v;
-              }) (collectSubFiles fullPath args)
-            )
+          if name == "blocks" then
+            [ ]
+          else
+            map
+              (nv: {
+                name = "${name}/${nv.name}";
+                value = nv.value;
+              })
+              (
+                lib.mapAttrsToList (n: v: {
+                  name = n;
+                  value = v;
+                }) (collectSubFiles fullPath args)
+              )
         else
           [ ];
 
@@ -170,5 +355,11 @@ let
     );
 in
 {
-  inherit importDir importSkillsDir;
+  inherit
+    listToAttrsUnique
+    importDir
+    importFlatTree
+    importBlocksTree
+    importSkillsDir
+    ;
 }

@@ -18,7 +18,5 @@
        If understanding < 10/10, suggest `/ctx-improve`
 
     3. **STOP**: User will decide next steps
-
-    ${scope.blocks.pre-flight.reference}
   '';
 }

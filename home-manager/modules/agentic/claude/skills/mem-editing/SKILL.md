@@ -11,17 +11,10 @@ Load supporting files as needed for the specific component type being edited.
 
 ## File Locations
 
-All my personal instruction Nix templates live in `~/dotfiles/home-manager/modules/agentic/instructions/`:
+All my personal instruction files live in `~/dotfiles/home-manager/modules/claude/`:
 
-- `instructions/main.nix` — root instruction file (generates CLAUDE.md or AGENTS.md)
-- `instructions/commands/` — slash command definitions
-- `instructions/skills/` — skill definitions
-- `instructions/agents/` — agent definitions
-- `instructions/instructions/rules/` — rule instruction files
-- `instructions/blocks/` — reusable content blocks
-
-Generated markdown is produced via `./x agent build` and deployed by Home Manager.
-Always edit the Nix template sources above, not the generated output.
+- `CLAUDE.md`, `commands/`, `skills/`, `agents/`, `docs/`
+- `~/.claude/` paths are symlinks to this location — always edit at the dotfiles source
 
 ## When to Use
 
@@ -45,8 +38,8 @@ refactoring, new commands/skills/agents.
 
 ## Supporting Files
 
-- @references/core.md: Core principles (self-verification, minimal info, writing style)
-- @references/skills.md: Skill structure, naming, progressive disclosure, description guidelines
-- @references/commands.md: Slash command structure and optimization workflow
-- @references/instructions.md: CLAUDE.md, memory files, structured prompting
-- @references/agents.md: Agent structure and patterns
+- @~/.claude/skills/mem-editing/references/core.md: Core principles (self-verification, minimal info, writing style)
+- @~/.claude/skills/mem-editing/references/skills.md: Skill structure, naming, progressive disclosure, description guidelines
+- @~/.claude/skills/mem-editing/references/commands.md: Slash command structure and optimization workflow
+- @~/.claude/skills/mem-editing/references/instructions.md: CLAUDE.md, memory files, structured prompting
+- @~/.claude/skills/mem-editing/references/agents.md: Agent structure and patterns

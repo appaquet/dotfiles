@@ -46,7 +46,5 @@
        - Use `AskUserQuestion` to confirm before applying
 
     8. 🔳 Apply fixes after user confirmation
-
-    ${scope.blocks.pre-flight.reference}
   '';
 }

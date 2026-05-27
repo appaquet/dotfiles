@@ -54,7 +54,5 @@
 
     9. 🔳 Commit / squash `jj` change with meaningful message if not already done
           After checking state with `jj ls`
-
-    ${scope.blocks."pre-flight".reference}
   '';
 }

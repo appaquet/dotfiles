@@ -4,7 +4,7 @@
 
   model = {
     claude = "sonnet";
-    opencode = "opencode/deepseek-v4-pro";
+    opencode = "opencode-go/deepseek-v4-pro";
   };
 
   content = ''

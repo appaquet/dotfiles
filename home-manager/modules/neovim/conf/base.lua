@@ -10,6 +10,9 @@ vim.opt.timeoutlen = 505 -- time to wait for a key code sequence to complete, ne
 
 vim.opt.textwidth = 100 -- max line length, because we aren't on a mainframe anymore
 vim.opt.formatoptions:remove("t") -- don't auto-wrap text (but comments will still auto-wrap (+c))
+vim.opt.linebreak = true -- wrap long lines at a character in 'breakat' rather than at the last character that fits on the screen
+vim.opt.breakindent = true -- wrapped line will continue visually indented (same amount of space as the beginning of that line)
+vim.opt.showbreak = "↪ " -- string to put at the start of wrapped lines
 
 -- Enable spell checking with camel case support
 vim.opt.spell = true

@@ -4,7 +4,7 @@
 
   model = {
     claude = "haiku";
-    opencode = "opencode/deepseek-v4-flash";
+    opencode = "opencode-go/deepseek-v4-flash";
   };
 
   content = ''
@@ -26,31 +26,28 @@
     | --- | --- | --- |
     | 1 | Check branch state | Get branch name and list of all changed files |
     | 2 | Read project doc | Check for existing Files section, note if update needed |
-      | 3 | Create file tasks | **FIRST**: Get file list via jj-diff-branch --stat. **THEN**: For each code file (skip docs/generated), create `${scope.harness.tools.taskCreate}` with subject "Summarize: [filename]" |
+    | 3 | Create file tasks | **FIRST**: Get file list via jj-diff-branch --stat. **THEN**: For each code file (skip docs/generated), create `${scope.harness.tools.taskCreate}` with subject "Summarize: [filename]" |
     | 4 | Summarize files | For each Summarize task: read diff, understand changes, write technical summary, mark complete |
     | 5 | Format and return | Compile summaries into Files section format, return result |
 
     ## Instructions
 
-    1. STOP, follow pre-flight instructions
-       THEN, continue
-
-    2. Check current branch state:
+    1. Check current branch state:
        * Get current branch name: !`jj-current-branch`
        * Get list of all changed files: !`jj-stacked-stats`
 
-    3. Read existing project doc (if it exists):
+    2. Read existing project doc (if it exists):
        * Check for `proj/` symlink at repository root → find `00-*.md` main doc
        * Note if it already has a Files section with summaries
        * If Files section exists and seems complete, ask if you should update it
 
-    4. Create file tasks:
+    3. Create file tasks:
        * **FIRST**: Get overview of changes via `jj-diff-branch --stat`
         * **THEN**: For **EACH** code file (excluding project docs and generated files like *.pb.go):
           * Create `${scope.harness.tools.taskCreate}` with subject "Summarize: [filename]"
          * Description: "Read diff, understand purpose, write 1-2 sentence technical summary"
 
-    5. Summarize files - For **EACH** Summarize task:
+    4. Summarize files - For **EACH** Summarize task:
        * Mark task in-progress
        * Run `jj-diff-branch --git <file>` to see the actual changes
        * If needed for context, read the full file or surrounding files
@@ -89,5 +86,7 @@
     * Always verify your understanding by checking the actual diff, not just filenames
     * Since you're a sub-agent, **NEVER** notify the user of the completion of your task. This will be
       done via the parent agent. Just return the result as specified.
+
+    ${scope.blocks."pre-flight".reference}
   '';
 }

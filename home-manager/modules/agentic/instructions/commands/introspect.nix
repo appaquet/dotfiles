@@ -29,7 +29,5 @@
        * Need to be generic, not specific to this case
 
     **STOP** - Do not implement changes directly. User will use `/mem-edit` to do it.
-
-    ${scope.blocks.pre-flight.reference}
   '';
 }

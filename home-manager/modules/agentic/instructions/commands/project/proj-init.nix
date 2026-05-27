@@ -41,7 +41,5 @@
        - Commit docs: `jj commit -m "private: claude: docs - <project-name>"`
 
     7. **GATE**: User decides when to `/implement`
-
-    ${scope.blocks.pre-flight.reference}
   '';
 }

@@ -22,7 +22,5 @@
     3. 🔳 Provide analysis, opinions, alternatives. Challenge assumptions
 
     4. **STOP**: User will decide next steps
-
-    ${scope.blocks.pre-flight.reference}
   '';
 }

@@ -2,6 +2,9 @@
 {
   description = "Import unresolved PR review comments as inline code comments with metadata for replies";
 
+  # Claude-only: runs command in a forked conversation context.
+  # Opencode does not support context:fork in command frontmatter;
+  # the opencode harness intentionally does not emit this field.
   context = "fork";
 
   model = {
@@ -81,7 +84,5 @@
     - Preserve exact line numbers from the API response
     - Handle edge cases like files that don't exist or invalid line numbers gracefully
     - Don't modify existing code, only add review comments
-
-    ${scope.blocks.pre-flight.reference}
   '';
 }

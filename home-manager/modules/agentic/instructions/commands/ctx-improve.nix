@@ -34,7 +34,5 @@
        - Requirements describe behavior (WHAT), not implementation (HOW)
 
     5. Report 10/10 understanding achieved. User decides next action.
-
-    ${scope.blocks.pre-flight.reference}
   '';
 }

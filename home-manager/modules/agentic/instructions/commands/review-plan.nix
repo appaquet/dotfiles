@@ -65,7 +65,5 @@
 
     * **NEVER** skip a comment. If you want to pushback, fix other comments first, then clearly
       state which you didn't address and why. User decides.
-
-    ${scope.blocks.pre-flight.reference}
   '';
 }

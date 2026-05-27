@@ -135,7 +135,7 @@ vim.keymap.set("n", "<C-w>m", win_width_80pc, { silent = true, desc = "Increase 
 local function toggle_zenmode()
 	require("zen-mode").toggle({
 		window = {
-			width = 0.7,
+			width = 120,
 		},
 	})
 end

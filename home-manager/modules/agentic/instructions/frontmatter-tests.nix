@@ -125,7 +125,7 @@ let
   checkCase =
     case:
     let
-      result = frontmatter.renderFrontmatterUnchecked case.fields;
+      result = frontmatter.renderFrontmatter case.fields;
     in
     if result == case.expected then
       true

@@ -49,7 +49,5 @@
        - `jj-stacked-stats` to show final stack
        - Note if source change is now empty (user decides whether to abandon)
        - Report what was absorbed where
-
-    ${scope.blocks.pre-flight.reference}
   '';
 }

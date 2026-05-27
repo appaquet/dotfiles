@@ -1,8 +1,6 @@
 { scope }:
 {
-  heading = "Code Review Agent Guidelines";
   content = ''
-
     ## Sub-agent Rules
 
     - NEVER notify user directly - return results to parent agent

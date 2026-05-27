@@ -31,7 +31,5 @@
     5. **GATE**: Await `/proceed` before applying changes
 
     6. 🔳 Apply with proj-editing skill
-
-    ${scope.blocks.pre-flight.reference}
   '';
 }

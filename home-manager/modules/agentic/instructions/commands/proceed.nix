@@ -17,7 +17,5 @@
     2. 🔳 Breakdown and create tasks as needed using `${scope.harness.tools.taskCreate}`
 
     3. 🔳 Execute tasks one by one
-
-    ${scope.blocks.pre-flight.reference}
   '';
 }

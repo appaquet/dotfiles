@@ -217,8 +217,7 @@ let
       else
         [ "~/.config/opencode/rules/*.md" ];
 
-    # REVIEW: code-style-reviewer - Commented-out dead code. Remove or restore with intent; commented-out config leaks stale settings into the source.
-    #default_agent = "build";
+    default_agent = "orchestrator";
 
     permission = permissions.agent.base;
 
@@ -232,8 +231,8 @@ let
 
       orchestrator = {
         mode = "primary";
-        description = "Project manager agent that manages project documentation, code versioning and delegate work to sub-agents";
-        prompt = "You are the orchestrator of a project. Your role is to manage the project documentation, code versioning, and delegate work to sub-agents. You need to focus on high-level planning, project management, and jj (code versioning). Anything requiring reading, understanding and exploring code must be delegated to sub-agents. You actually don't even have access to writing files or running commands yourself, other than project documentation and jj commands.";
+        description = "Project manager agent that manages project documentation, code versioning and delegates work to sub-agents.";
+        prompt = instructions.blocks.opencode."orchestrator-mode".body;
         permission = permissions.agent.planner;
       };
 

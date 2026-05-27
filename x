@@ -506,7 +506,7 @@ cmd_agent_build() {
 cmd_agent_help() {
   cat >&2 <<EOF
 agent commands:
-  build     Build agentic instruction package → result
+  build     Build agentic instruction package to result
 EOF
 }
 

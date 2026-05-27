@@ -29,7 +29,5 @@
     5. 🔳 Apply changes
        * Follow `mem-editing` guidelines during edits
        * Verify consistency across affected files
-
-    ${scope.blocks.pre-flight.reference}
   '';
 }

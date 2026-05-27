@@ -35,7 +35,5 @@
        * Challenge assumptions
 
     5. **STOP**: User will decide next steps
-
-    ${scope.blocks.pre-flight.reference}
   '';
 }

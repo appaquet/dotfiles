@@ -52,5 +52,6 @@
     - @references/commands.md: Slash command structure and optimization workflow
     - @references/instructions.md: Root instruction files, rule sources, reusable blocks, and structured prompting
     - @references/agents.md: Agent structure and patterns
+    - home-manager/modules/agentic/instructions/CLAUDE.md: full instruction authoring reference and data contracts
   '';
 }

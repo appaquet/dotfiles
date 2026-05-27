@@ -4,7 +4,7 @@
 
   model = {
     claude = "haiku";
-    opencode = "opencode/deepseek-v4-flash";
+    opencode = "opencode-go/deepseek-v4-flash";
   };
 
   content = ''

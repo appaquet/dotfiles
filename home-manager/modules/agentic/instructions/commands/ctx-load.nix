@@ -32,7 +32,5 @@
           On ambiguity about next steps, `AskUserQuestion` to clarify next focus
 
     3. 🔳 Synthesize context & summarize current state
-
-    ${scope.blocks."pre-flight".reference}
   '';
 }

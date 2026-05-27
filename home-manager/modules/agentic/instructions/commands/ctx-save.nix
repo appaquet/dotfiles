@@ -56,7 +56,5 @@
 
     6. 🔳 Commit doc changes:
        * Use the Version Control guidelines from the project doc instructions
-
-    ${scope.blocks.pre-flight.reference}
   '';
 }

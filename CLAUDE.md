@@ -11,27 +11,18 @@ Use `./x` script for building and evaluating nix configurations:
 - `./x darwin check` - Eval darwin config
 - `./x darwin build` - Build darwin config
 - `HOST=deskapp ./x nixos check` - Check specific host
-- `./x check` - Eval all nixos/home/darwin configs for all hosts
-- `./x agent build` - Build agentic instruction package → `./result`
+- `./x agent build` - Build agentic instruction package to `./result`
 - `./x fmt` - Format nix files (nixfmt)
+- `./x check` - Eval all nixos/home/darwin configs for all hosts. Heavy, only use on final step.
 
 For quick iteration, use `check` first (fast eval) before `build`.
 To find a missing hash, use build functions instead of trying to eval.
 
 ## Agentic Instructions
 
-Agent instructions (Claude + Opencode) share a single `nix` source tree in
-`home-manager/modules/agentic/instructions/`:
-
-- `blocks/` - reusable content blocks
-- `agents/` - agent definitions
-- `commands/` - slash command definitions
-- `skills/` - skill definitions
-- `instructions/rules/` - rule files
-
-Rendered via harness-specific frontmatter into `CLAUDE.md` (Claude) and `AGENTS.md` (opencode). `./x agent build` renders to `./result` for inspection.
-
-Editing: modify `.nix` sources, not installed markdown. Use `/mem-edit` for instruction file changes (commands, skills, agents, supporting docs). `./x home build` and then switch to install in system.
+Harness agnostic (Claude & Opencode)
+Instructions are authored in `home-manager/modules/agentic/instructions/`.
+When working on them, load `home-manager/modules/agentic/instructions/CLAUDE.md` for reference
 
 ## Documentation
 

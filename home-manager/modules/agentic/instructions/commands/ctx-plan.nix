@@ -1,6 +1,7 @@
 { scope }:
 {
   description = "Load repository context and create high-level development plans";
+
   argumentHint = "[task-description]";
 
   effort = "xhigh";
@@ -51,7 +52,5 @@
     6. 🔳 Write plan to docs via `proj-editing` skill if we have doc files
 
     7. **STOP**: User will decide next steps
-
-    ${scope.blocks.pre-flight.reference}
   '';
 }

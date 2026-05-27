@@ -6,7 +6,9 @@
     opencode = "anthropic/claude-sonnet-4.5";
   };
 
-  # REVIEW: Doesn't that map correctly in opencode?
+  # Claude-only: runs command in a forked conversation context.
+  # Opencode does not support context:fork in command frontmatter;
+  # the opencode harness intentionally does not emit this field.
   context = "fork";
 
   content = ''
@@ -52,7 +54,5 @@
        - Summary: WHAT changed for a consumer (behavior, API, errors, fixes). Avoid internal
          identifiers unless consumer-visible
        - Implementation Notes: HOW it was built (types, refactors, algorithms, structural changes)
-
-    ${scope.blocks.pre-flight.reference}
   '';
 }

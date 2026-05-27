@@ -39,7 +39,5 @@
        If an agent's summary lacks detail, send it a follow-up message to ask specific questions.
        Don't act on review comments — agents insert `// REVIEW:` comments in code directly.
        Summarize findings from agent summaries.
-
-    ${scope.blocks.pre-flight.reference}
   '';
 }

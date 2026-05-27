@@ -2,6 +2,11 @@
   package,
   pkgs,
   frontmatterTestResult,
+  dualOutputTestResult,
+  hierarchicalValidTestResult,
+  hierarchicalDupAgentsTestResult,
+  hierarchicalDupBlocksTestResult,
+  hierarchicalDupCmdsTestResult,
 }:
 
 let
@@ -29,6 +34,11 @@ let
 in
 pkgs.runCommand "agentic-instructions-check" { } ''
   : ${frontmatterTestResult}
+  : ${dualOutputTestResult}
+  : ${hierarchicalValidTestResult}
+  : ${hierarchicalDupAgentsTestResult}
+  : ${hierarchicalDupBlocksTestResult}
+  : ${hierarchicalDupCmdsTestResult}
   : ${badRefCheck}
 
   # Verify output directory structure
@@ -48,11 +58,20 @@ pkgs.runCommand "agentic-instructions-check" { } ''
   test ! -f ${package}/claude/main.md || { echo "STALE: claude/main.md" >&2; exit 1; }
   test ! -f ${package}/opencode/main.md || { echo "STALE: opencode/main.md" >&2; exit 1; }
 
+  # Verify harness-filtered commands only render for selected harnesses
+  test -f ${package}/claude/commands/orchestrator.md || { echo "MISSING: claude/commands/orchestrator.md" >&2; exit 1; }
+  test ! -f ${package}/opencode/commands/orchestrator.md || { echo "STALE: opencode/commands/orchestrator.md" >&2; exit 1; }
+
+  # Verify the reverse direction: an opencode-only definition (rules/browser.nix,
+  # harnesses = ["opencode"]) renders for opencode and is absent from Claude output.
+  test -f ${package}/opencode/rules/browser.md || { echo "MISSING: opencode/rules/browser.md" >&2; exit 1; }
+  test ! -f ${package}/claude/rules/browser.md || { echo "STALE: claude/rules/browser.md" >&2; exit 1; }
+
   # Verify CLAUDE.md contains expected sections
   claude_md="${package}/claude/CLAUDE.md"
   for section in \
     "Top-level instructions" \
-    "Context management and sub-agents delegation" \
+    "Sub-agents workflows" \
     "Task management" \
     "Pre-flight instructions" \
     "Context understanding" \
@@ -68,13 +87,13 @@ pkgs.runCommand "agentic-instructions-check" { } ''
     echo "MISSING Claude-specific phrasing in CLAUDE.md" >&2; exit 1;
   }
 
-  # Verify AGENTS.md has opencode-adapted phrasing
+  # Verify AGENTS.md carries the core question-asking and implement-gate guidance
   agents_md="${package}/opencode/AGENTS.md"
-  grep -q "Use interactive prompts to ask questions" "$agents_md" || {
-    echo "MISSING opencode phrasing in AGENTS.md" >&2; exit 1;
+  grep -q "finish a message with a list of questions" "$agents_md" || {
+    echo "MISSING question-asking guidance in AGENTS.md" >&2; exit 1;
   }
-  grep -q "Wait for explicit go signal before implementing" "$agents_md" || {
-    echo "MISSING opencode implement gate in AGENTS.md" >&2; exit 1;
+  grep -q "NEVER implement until you receive this exact signal" "$agents_md" || {
+    echo "MISSING implement gate in AGENTS.md" >&2; exit 1;
   }
 
   # Verify no testing-principles reference in root instruction files
@@ -92,6 +111,29 @@ pkgs.runCommand "agentic-instructions-check" { } ''
     awk '/^---$/ { if (++c == 2) exit; next } c == 1 && NF == 0 { exit 1 }' "$f" || {
       echo "BLANK LINE IN FRONTMATTER: $f" >&2; exit 1;
     }
+  done
+
+  # Verify command pre-flight injection defaults and opt-outs
+  preflight='Imperative follow <pre-flight> instructions before doing anything'
+  preflight_count() {
+    grep -F -c "$preflight" "$1" || true
+  }
+  assert_preflight_count() {
+    expected="$1"
+    f="$2"
+    count=$(preflight_count "$f")
+    [[ "$count" == "$expected" ]] || {
+      echo "WRONG pre-flight count in $f: expected $expected, got $count" >&2; exit 1;
+    }
+  }
+
+  for f in ${package}/claude/commands/*.md ${package}/opencode/commands/*.md; do
+    cmd=$(basename "$f" .md)
+    if [[ "$cmd" == "continue" ]]; then
+      assert_preflight_count 0 "$f"
+    else
+      assert_preflight_count 1 "$f"
+    fi
   done
 
   # Verify skill frontmatter validity across all harnesses
@@ -135,6 +177,7 @@ pkgs.runCommand "agentic-instructions-check" { } ''
     f=${package}/opencode/skills/$cmd/SKILL.md
     grep -q "name: $cmd" "$f" || { echo "MISSING name in dual-output skill-from-$cmd: $f" >&2; exit 1; }
     grep -q "description:" "$f" || { echo "MISSING description in dual-output skill-from-$cmd: $f" >&2; exit 1; }
+    assert_preflight_count 1 "$f"
   done
 
   # Verify opencode skills from commands omit Claude-specific fields
@@ -142,6 +185,45 @@ pkgs.runCommand "agentic-instructions-check" { } ''
     grep -q "argument-hint:" ${package}/opencode/skills/$cmd/SKILL.md && {
       echo "STALE argument-hint in opencode dual-output skill ($cmd)" >&2; exit 1;
     }
+  done
+
+  # ── Hierarchical authoring assertions ─────────────────────────────────────
+
+  # Verify no nested output paths: agent and command output files must be flat,
+  # even when source files are organized in subdirectories.
+  for harness in claude opencode; do
+    for nested_dir in agents/reviewers agents/other commands/project; do
+      if test -d ${package}/$harness/$nested_dir; then
+        echo "STALE: hierarchical source directory leaked into output: $harness/$nested_dir" >&2; exit 1;
+      fi
+    done
+  done
+
+  # Verify block content from local blocks/ (moved reviewing-agent.nix) still
+  # appears in generated reviewer agent .md files. The reviewing-agent block
+  # was moved from global blocks/ to agents/reviewers/blocks/ — this proves the
+  # multi-root block import works correctly.
+  reviewer_block_string="Sub-agent Rules"
+  for harness in claude opencode; do
+    for agent in code-style-reviewer code-correctness-reviewer architecture-reviewer requirements-reviewer; do
+      f=${package}/$harness/agents/$agent.md
+      if test -f "$f"; then
+        grep -q -F "$reviewer_block_string" "$f" || {
+          echo "MISSING reviewing-agent block content in: $f" >&2; exit 1;
+        }
+      fi
+    done
+  done
+
+  # Verify no blocks/ subdirectories leak into skill output.
+  for harness in claude opencode; do
+    if test -d ${package}/$harness/skills; then
+      for skill_dir in ${package}/$harness/skills/*/; do
+        if test -d "${skill_dir}blocks"; then
+          echo "STALE: blocks/ subdirectory leaked into skill output: ${skill_dir}blocks" >&2; exit 1;
+        fi
+      done
+    fi
   done
 
   touch $out

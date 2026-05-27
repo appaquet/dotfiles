@@ -34,12 +34,10 @@
 
     3. 🔳 Optimization hints
        Give specific, actionable suggestions based on the breakdown:
-       - Large Task agent results → use `/forked` to isolate agent work from parent context
-       - Many Read results → stale reads accumulate; fresh session + `/ctx-load` if nearing limit
-       - Repeated system reminder injections → note which memory files trigger most frequently
-       - Long assistant messages with thinking → reduce if not needed
-       - Messages > ~60k tokens → recommend fresh session with `/ctx-load`
-
-    ${scope.blocks.pre-flight.reference}
+       - Large Task agent results
+       - Many Read results
+       - Repeated system reminder injections
+       - Long assistant messages with thinking
+       - Messages > ~60k tokens
   '';
 }
