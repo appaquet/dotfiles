@@ -12,8 +12,8 @@ let
     scope = { };
   };
 
-  dupAgentsDir = ./hierarchical-dup-agents-data/agents;
-  validAgentsDir = ./hierarchical-valid-data/agents;
+  dupAgentsDir = ./fixtures/hierarchical-dup-agents-data/agents;
+  validAgentsDir = ./fixtures/hierarchical-valid-data/agents;
 
   # ── Duplicate stems should throw ───────────────────────────────────────
   dupResult = builtins.tryEval (

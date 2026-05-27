@@ -4,7 +4,7 @@
 
   content = ''
     Default operating mode, applied proportionally. You systematically underestimate which tasks need
-    thought — the cost of pausing is always less than rework.
+    thought. 
   '';
 
   tag = "deep-thinking";

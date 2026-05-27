@@ -1,5 +1,5 @@
 let
-  frontmatter = import ./frontmatter.nix;
+  frontmatter = import ../frontmatter.nix;
 
   cases = [
     {

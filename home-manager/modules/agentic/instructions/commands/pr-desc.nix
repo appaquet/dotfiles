@@ -6,9 +6,7 @@
     opencode = "anthropic/claude-sonnet-4.5";
   };
 
-  # Claude-only: runs command in a forked conversation context.
-  # Opencode does not support context:fork in command frontmatter;
-  # the opencode harness intentionally does not emit this field.
+  # Shared isolated execution intent; harnesses translate this to native frontmatter.
   context = "fork";
 
   content = ''

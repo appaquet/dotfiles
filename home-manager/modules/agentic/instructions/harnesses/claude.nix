@@ -41,7 +41,7 @@
       context ? null,
       agent ? null,
       allowedTools ? null,
-      subtask ? null,
+      ...
     }:
     renderFrontmatter [
       {

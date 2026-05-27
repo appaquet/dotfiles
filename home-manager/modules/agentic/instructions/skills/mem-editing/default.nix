@@ -1,7 +1,9 @@
 { scope }:
 {
   description = "Instructions to be used as soon as any instruction, CLAUDE.md, command, skill or agent file needs to be changed.";
+
   argumentHint = "[files or description]";
+
   content = ''
     # Instruction Editing Guidelines
 

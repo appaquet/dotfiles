@@ -1,13 +1,12 @@
 {
   package,
   pkgs,
-  frontmatterTestResult,
-  dualOutputTestResult,
-  hierarchicalValidTestResult,
-  hierarchicalDupAgentsTestResult,
-  hierarchicalDupBlocksTestResult,
-  hierarchicalDupCmdsTestResult,
+  testResult,
 }:
+
+# Integration check derivation for the rendered instruction package. Pure Nix
+# tests are forced through testResult; this file validates generated package
+# structure, frontmatter invariants, harness filtering, and rendered content.
 
 let
   # Verify that referencing a nonexistent block fails Nix evaluation.
@@ -18,7 +17,7 @@ let
         nativeBuildInputs = [ pkgs.nix ];
       }
       ''
-        expr='(import ${./fixtures/bad-block-reference.nix} { scope = { blocks = {}; api = {}; harness = {}; }; }).content'
+        expr='(import ${./tests/fixtures/bad-block-reference.nix} { scope = { blocks = {}; api = {}; harness = {}; }; }).content'
         err="$TMPDIR/bad-ref-check-err"
         nix-instantiate --eval --strict -E "$expr" 2>"$err" && {
           echo "FAIL: nonexistent block reference should have failed evaluation" >&2
@@ -33,12 +32,7 @@ let
       '';
 in
 pkgs.runCommand "agentic-instructions-check" { } ''
-  : ${frontmatterTestResult}
-  : ${dualOutputTestResult}
-  : ${hierarchicalValidTestResult}
-  : ${hierarchicalDupAgentsTestResult}
-  : ${hierarchicalDupBlocksTestResult}
-  : ${hierarchicalDupCmdsTestResult}
+  : ${testResult}
   : ${badRefCheck}
 
   # Verify output directory structure
@@ -110,6 +104,22 @@ pkgs.runCommand "agentic-instructions-check" { } ''
     # No blank lines inside frontmatter block (between --- delimiters)
     awk '/^---$/ { if (++c == 2) exit; next } c == 1 && NF == 0 { exit 1 }' "$f" || {
       echo "BLANK LINE IN FRONTMATTER: $f" >&2; exit 1;
+    }
+  done
+
+  # Verify shared isolated-execution intent renders to each harness's native field.
+  for cmd in pr-desc pr-import-comments; do
+    grep -q "^context: fork$" ${package}/claude/commands/$cmd.md || {
+      echo "MISSING context: fork in claude command: $cmd" >&2; exit 1;
+    }
+    grep -q "^subtask: true$" ${package}/opencode/commands/$cmd.md || {
+      echo "MISSING subtask: true in opencode command: $cmd" >&2; exit 1;
+    }
+    grep -q "^context:" ${package}/opencode/commands/$cmd.md && {
+      echo "STALE context field in opencode command: $cmd" >&2; exit 1;
+    }
+    grep -q "^subtask:" ${package}/claude/commands/$cmd.md && {
+      echo "STALE subtask field in claude command: $cmd" >&2; exit 1;
     }
   done
 
@@ -219,8 +229,8 @@ pkgs.runCommand "agentic-instructions-check" { } ''
   for harness in claude opencode; do
     if test -d ${package}/$harness/skills; then
       for skill_dir in ${package}/$harness/skills/*/; do
-        if test -d "${skill_dir}blocks"; then
-          echo "STALE: blocks/ subdirectory leaked into skill output: ${skill_dir}blocks" >&2; exit 1;
+        if test -d "''${skill_dir}blocks"; then
+          echo "STALE: blocks/ subdirectory leaked into skill output: ''${skill_dir}blocks" >&2; exit 1;
         fi
       done
     fi

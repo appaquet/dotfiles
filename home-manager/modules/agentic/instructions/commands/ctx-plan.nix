@@ -19,27 +19,24 @@
 
     ## Instructions
 
-    1. 🔳 Ensure context loaded - run `ctx-load` skill if not sufficient
+    1. 🔳 Ensure context loaded. Run `ctx-load` skill if not sufficient.
 
-    2. 🔳 Ensure task defined - clarify via `AskUserQuestion` if empty or unclear
+    2. 🔳 Ensure task defined. Clarify via `AskUserQuestion` if empty or unclear.
 
     3. 🔳 Research and clarify
-       - Use sub-agents to explore codebase, find patterns
-       - Using the ${scope.blocks.deep-thinking.reference} procedure
-       - Search web for unfamiliar concepts if needed
-       - For each unknown, add sub-task to investigate
-       - Make sure to identity ways to test work as we go
-         - If it's non-code or infra, design a way to test (ex: separate harness)
-         - If not possible to test, involve user at clear stages to validate work
-         - Should be done iteratively, not just at the end as validation step
-         - Never run blindly, always inform user if need way to validate
+       - Use ${scope.blocks.deep-thinking.reference}
+       - Use ${scope.blocks.sub-agents-workflows.reference} for exploration, research and investigation
+       - Search web for unfamiliar or potential oudated info
+       - For any uncertainty, add sub-task 🔳 to prevent forgetting to resolve it.
+       - Interview me relentlessly, using `AskUserQuestion, about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
+
        - List/understand/ask for requirements and acceptance criteria
        - Define ACs per task during planning — each AC is a specific verifiable condition that maps to a test assertion
-       - Use `AskUserQuestion` to clarify as you discover uncertainties
-       - Persist all planning decisions and investigation outcomes to project/phase doc Questions & Investigations — conversation context is ephemeral
+       - Persist all planning decisions and investigation outcomes to project/phase doc.
+       - Select agent that will accomplish each task (junior, senior or staff).
+       - Plan testing using ${scope.blocks.testing-principles.reference}
 
-    4. 🔳 Report 10/10 understanding via `full-understanding-checklist`
-       - If not 10/10, suggest `/ctx-improve` to improve further more
+    4. 🔳 Report your understanding using ${scope.blocks.context-understanding.reference}. If understanding < 10/10, suggest `ctx-improve`
 
     5. 🔳 Create development plan
        - Break into logical phases
@@ -49,7 +46,7 @@
        - Consider dependencies and challenges
        - It is crucial to include testing strategy in plan so you are autonomous
 
-    6. 🔳 Write plan to docs via `proj-editing` skill if we have doc files
+    6. 🔳 Write plan to docs via `proj-editing` skill if we have project documentation.
 
     7. **STOP**: User will decide next steps
   '';

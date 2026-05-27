@@ -15,11 +15,11 @@ let
     scope = { };
   };
 
-  validAgentsDir = ./hierarchical-valid-data/agents;
-  validBlocksDir = ./hierarchical-valid-data/blocks;
-  dupAgentsDir = ./hierarchical-dup-agents-data/agents;
-  dupBlocksDir = ./hierarchical-dup-blocks-data/blocks;
-  dupBlocksAgentsDir = ./hierarchical-dup-blocks-data/agents;
+  validAgentsDir = ./fixtures/hierarchical-valid-data/agents;
+  validBlocksDir = ./fixtures/hierarchical-valid-data/blocks;
+  dupAgentsDir = ./fixtures/hierarchical-dup-agents-data/agents;
+  dupBlocksDir = ./fixtures/hierarchical-dup-blocks-data/blocks;
+  dupBlocksAgentsDir = ./fixtures/hierarchical-dup-blocks-data/agents;
 
   # ── importFlatTree with nested agents: flat keys, no / ──────────────────
   flatTreeResult = builtins.tryEval (

@@ -14,25 +14,19 @@
        - Otherwise, tell me your current understanding on a 10 scale
 
     2. 🔳 Research context
-       - Launch sub-agents to explore codebase, find patterns
-       - Search web for external dependencies or unfamiliar concepts
-       - Use ${scope.blocks.deep-thinking.reference} procedure
-       - For each unknown discovered, add sub-task to investigate
+       - Use ${scope.blocks.deep-thinking.reference}
+       - Use ${scope.blocks.sub-agents-workflows.reference} for exploration, research and investigation
+       - Search web for unfamiliar or potential oudated info
+       - For any uncertainty, add sub-task to prevent forgetting to resolve it.
 
     3. 🔳 Ask clarifying questions
-       - Use `AskUserQuestion` for each ambiguity
-       - Research and ask until 10/10 understanding
-       - Clarification is not approval - do not jump to implementation
-       - Go back to step 2 after each answers that require further analysis
-         Should add more tasks 🔳 to track progress
+       - Interview me relentlessly, using `AskUserQuestion, about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
+       - Go back to step 2 after each answers that require further analysis. Should add more tasks 🔳 to track progress.
 
-    4. 🔳 Update project doc
-       - Use `proj-editing` skill
-       - If working on a planned task, update with new context
-       - Add/update requirements as R-numbered items (R1, R2, R1.1) for task traceability
-       - Add ACs to tasks: specific verifiable conditions that define done per task
-       - Requirements describe behavior (WHAT), not implementation (HOW)
+    4. 🔳 Update project doc using `proj-editing` skill
 
-    5. Report 10/10 understanding achieved. User decides next action.
+    5. 🔳 Report your understanding using ${scope.blocks.context-understanding.reference}.
+
+    6. **STOP**: User decides next action.
   '';
 }

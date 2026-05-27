@@ -10,9 +10,9 @@
   # Emits mode=subagent, description, and model (null ok).
   renderAgentFrontmatter =
     {
-      name,
       description,
       model,
+      ...
     }:
     renderFrontmatter [
       {
@@ -30,20 +30,28 @@
     ];
 
   # Emits description, model, agent, and subtask. Null fields omitted.
-  # Compatibility fields (name, argument-hint, effort, context, allowed-tools)
-  # are accepted but not emitted.
+  # Compatibility fields (name, argument-hint, effort, allowed-tools) are accepted
+  # but not emitted. Shared context="fork" intent renders as subtask=true.
   renderCommandFrontmatter =
     {
-      name,
       description,
-      argumentHint ? null,
       model ? null,
-      effort ? null,
-      context ? null,
       agent ? null,
-      allowedTools ? null,
+      context ? null,
       subtask ? null,
+      ...
     }:
+    let
+      translatedSubtask =
+        if subtask != null then
+          subtask
+        else if context == "fork" then
+          true
+        else if context == null then
+          null
+        else
+          throw "opencode command frontmatter: unsupported context '${context}'";
+    in
     renderFrontmatter [
       {
         label = "description";
@@ -59,7 +67,7 @@
       }
       {
         label = "subtask";
-        value = subtask;
+        value = translatedSubtask;
       }
     ];
 

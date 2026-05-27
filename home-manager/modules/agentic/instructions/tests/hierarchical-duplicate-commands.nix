@@ -12,7 +12,7 @@ let
     scope = { };
   };
 
-  dupCmdsDir = ./hierarchical-dup-cmds-data/commands;
+  dupCmdsDir = ./fixtures/hierarchical-dup-cmds-data/commands;
 
   dupResult = builtins.tryEval (
     files.importFlatTree {

@@ -2,9 +2,7 @@
 {
   description = "Import unresolved PR review comments as inline code comments with metadata for replies";
 
-  # Claude-only: runs command in a forked conversation context.
-  # Opencode does not support context:fork in command frontmatter;
-  # the opencode harness intentionally does not emit this field.
+  # Shared isolated execution intent; harnesses translate this to native frontmatter.
   context = "fork";
 
   model = {

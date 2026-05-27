@@ -1,7 +1,9 @@
 { scope }:
 {
   description = "Internal skill for project/phase doc editing. Called by /proj-edit command or other commands needing doc edits. No gate - flows with caller.";
+
   argumentHint = "[operation or file]";
+
   content = ''
     # Project Doc Editing
 

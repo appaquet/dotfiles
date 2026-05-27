@@ -12,8 +12,8 @@ let
     scope = { };
   };
 
-  dupBlocksDir = ./hierarchical-dup-blocks-data/blocks;
-  dupBlocksAgentsDir = ./hierarchical-dup-blocks-data/agents;
+  dupBlocksDir = ./fixtures/hierarchical-dup-blocks-data/blocks;
+  dupBlocksAgentsDir = ./fixtures/hierarchical-dup-blocks-data/agents;
 
   # ── Duplicate block keys across roots should throw ─────────────────────
   dupResult = builtins.tryEval (
