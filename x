@@ -496,7 +496,7 @@ cmd_agent_build() {
       instr = import ./home-manager/modules/agentic/instructions {
         inherit pkgs; 
         lib = pkgs.lib; 
-        postProcess = false; 
+        postProcess = true; 
       };
     in instr.package
   '

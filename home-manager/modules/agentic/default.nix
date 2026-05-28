@@ -22,7 +22,7 @@
   options.dotfiles.agentic.instructions.postProcess = lib.mkOption {
     type = lib.types.bool;
     default = true;
-    description = "Apply post-processing to slim down the generated markdown files.";
+    description = "Apply post-processing to generated markdown: strips one trailing '.' from each line, and removes blank lines, whitespace-only lines, and lone '.' sentinel lines.";
   };
 
   config = {

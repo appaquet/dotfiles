@@ -9,17 +9,26 @@
 
 let
   # postProcessContent :: string -> string
-  #   Cleans up generated markdown output. Removes:
-  #   - Blank lines (whitespace-only lines)
-  #   - Lone period sentinel lines (agents use `.` as a no-op output marker)
+  #   Cleans up generated markdown output. Applied when mkPackage is called
+  #   with postProcess = true. The transformation happens in two stages:
   #
-  #   Applied when mkPackage is called with postProcess = true.
+  #   1. Strip exactly one trailing `.` from each line that ends with `.`.
+  #   2. Remove blank lines, whitespace-only lines, and lone `.` sentinel
+  #      lines (`.`, sometimes emitted by agents as a no-op output marker).
   postProcessContent =
     text:
     let
-      nonEmpty = builtins.filter (line: line != "." && null == builtins.match "^[[:space:]]*$" line) (
-        lib.splitString "\n" text
-      );
+      # Strip trailing dot: "foo." -> "foo", "foo.." -> "foo.", "." -> ""
+      stripTrailingDot =
+        line:
+        if builtins.match ".*\\.$" line != null then
+          builtins.substring 0 (builtins.stringLength line - 1) line
+        else
+          line;
+      stripped = map stripTrailingDot (lib.splitString "\n" text);
+      nonEmpty = builtins.filter (
+        line: line != "." && null == builtins.match "^[[:space:]]*$" line
+      ) stripped;
     in
     builtins.concatStringsSep "\n" nonEmpty;
 

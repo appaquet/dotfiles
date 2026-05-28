@@ -121,6 +121,7 @@ let
           ./agents
           ./commands
           ./skills
+          ./instructions/rules
         ];
       };
       rawAgents = importFlatTree {
@@ -141,6 +142,7 @@ let
         inherit args;
         dir = ./instructions;
         recursive = true;
+        reservedDirs = [ "blocks" ];
       };
     };
 

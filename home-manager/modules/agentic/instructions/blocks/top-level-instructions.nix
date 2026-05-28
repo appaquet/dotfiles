@@ -16,10 +16,10 @@
 
     Planning is mandatory for ALL implementations, no matter how trivial. NEVER engage the native plan mode `EnterPlanMode`. Refer to workflows for planning instructions. When agreed on a plan, ALWAYS follow it and ALWAYS stop & ask if you deviate or the plan fails
 
+    NEVER do execute an irreversible action without explicit user approval. Before doing deleting/reverting/etc., ALWAYS make sure we can restore. Ask user otherwise.
+
+    NEVER revert changes that you don't recognize. They may be mine OR another agent.
+
     If work fails after 5 attempts, STOP and ask user for instructions
-
-    Before potentially destructive actions (deleting/restoring files, reverting changes, etc.), ALWAYS make sure we can restore by any means (backup, git/jj change, etc.). Ask user otherwise
-
-    I or other agents may work on code at same time, you may see changes that aren't yours and you need to preserve them
   '';
 }

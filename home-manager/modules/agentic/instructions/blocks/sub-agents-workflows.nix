@@ -12,6 +12,8 @@
 
     * Sub-agents:
       * Delegation threshold:
+        * Project document work
+          * No matter the size, always main agent
         * Writing code
           * Orchestrator mode (no write access) -> delegate
           * Trivial, single-location edits with no multi-steps testing (typo, fixture data) → main agent

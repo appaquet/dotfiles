@@ -66,7 +66,7 @@ let
         }) entries
       );
 
-  # importDir :: { dir, args, recursive ? false } -> attrs
+  # importDir :: { dir, args, recursive ? false, reservedDirs ? [ ] } -> attrs
   #   Imports .nix files from a directory. Each file is imported with `args`
   #   (which receives { scope = self } from scope.nix). Skips default.nix.
   #
@@ -76,7 +76,7 @@ let
   #
   #   Recursive mode (recursive = true):
   #     Keys are relative paths without .nix. `rules/development.nix` →
-  #     key `rules/development`. Traverses subdirectories.
+  #     key `rules/development`. Traverses subdirectories except reservedDirs.
   #     Used for: authored instructions.
   #
   #   Returns: attrset of import results keyed by stem or relative path.
@@ -85,6 +85,7 @@ let
       dir,
       args,
       recursive ? false,
+      reservedDirs ? [ ],
     }:
     let
       flat =
@@ -121,7 +122,10 @@ let
             type = entries.${name};
           in
           if type == "directory" then
-            recurse (d + "/${name}") (if prefix == "" then name else "${prefix}/${name}")
+            if builtins.elem name reservedDirs then
+              [ ]
+            else
+              recurse (d + "/${name}") (if prefix == "" then name else "${prefix}/${name}")
           else
             let
               m = match "(.*)\\.nix" name;

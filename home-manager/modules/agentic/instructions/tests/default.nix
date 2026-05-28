@@ -26,6 +26,10 @@ let
       name = "hierarchical-duplicate-commands";
       result = (import ./hierarchical-duplicate-commands.nix { inherit pkgs lib; }).allPass;
     }
+    {
+      name = "post-process";
+      result = (import ./post-process.nix { inherit pkgs lib; }).allPass;
+    }
   ];
 
   checkCase = case: if case.result then true else throw "FAIL [${case.name}]";

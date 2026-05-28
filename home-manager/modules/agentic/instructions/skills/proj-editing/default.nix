@@ -1,70 +1,39 @@
 { scope }:
 {
-  description = "Internal skill for project/phase doc editing. Called by /proj-edit command or other commands needing doc edits. No gate - flows with caller.";
+  description = "Editing skill for project doc & its phases";
 
-  argumentHint = "[operation or file]";
+  # REVIEW: TO delete + remove any ref
 
   content = ''
-    # Project Doc Editing
-
-    Edit project documentation following the project-doc.md rules.
-
-    Target: `$ARGUMENTS`
-
-    ## When to Use
-
-    - Creating or modifying project docs (`00-*.md`)
-    - Creating or modifying phase docs (`01-*.md`, `02-*.md`, etc.)
-    - Validating doc structure
-    - Updating task status, requirements, or phases
-
-    ## Key Structures
-
-    Reference these XML blocks from the project-doc.md rules:
-
-    - `<project-doc-sections>` - Sections for project doc (Context, Checkpoint, Requirements, Questions, Phases, Files)
-    - `<phase-doc-sections>` - Sections for phase docs (Context, Requirements, Questions, Tasks, Files)
-    - `<phase-format>` - How to reference phases in project doc
-    - `<task-format>` - Task indicators `[ ]`, `[~]`, `[x]`
-
-    ## Core Rules
-
-    1. **Tasks only in phase docs** - Project doc has Phases section (references), NOT Tasks section (items)
-    2. **Every phase gets a phase doc** - No exceptions, even for small projects
-    3. **Requirements in project doc** - Phase docs only expand with R5.A, R5.B notation
-    4. **Checkpoint in project doc only** - Phase docs don't have checkpoints
+    Goal: edit project documentations (project & phase docs)
 
     ## Operations
 
-    ### Create Project Doc
+    1. Create / update Project Doc
+      a. Recall project doc structure
+      b. Create `00-<name>.md` with all sections
+      c. Phases section references first phase doc
 
-    1. Read `<project-doc-sections>` structure
-    2. Create `00-<name>.md` with all sections
-    3. Phases section references first phase doc
+    2. Create Phase Doc
+      a. Recall phase doc structure
+      b. Create `NN-<phase-name>.md`
+      c. Context references project doc
+      d. All task `[ ]` items go here
 
-    ### Create Phase Doc
+    3. Update Task Status
+      a. Find task in phase doc
+      b. Update: `[ ]` → `[~]` → `[x]`
+      c. If all done, ask user if want to complete phase
 
-    1. Read `<phase-doc-sections>` structure
-    2. Create `NN-<phase-name>.md`
-    3. Context references project doc
-    4. All task `[ ]` items go here
+    3. Update Phase Status
+      a. In project doc Phases section
+      b. Update: `⬜` → `🔄` → `✅` (if user decides)
 
-    ### Update Task Status
-
-    1. Find task in **phase doc** (NOT project doc)
-    2. Update: `[ ]` → `[~]` → `[x]`
-    3. If all tasks done, ask user about phase ✅
-
-    ### Update Phase Status
-
-    1. In **project doc** Phases section
-    2. Update: `⬜` → `🔄` → `✅` (user decides ✅)
-
-    ### Validate Structure
-
-    1. Check project doc follows `<project-doc-sections>`
-    2. Check phase docs follow `<phase-doc-sections>`
-    3. Verify no task items in project doc
-    4. Verify all phases have phase docs
+    4. Validate Structure
+      a. Check project doc follows structure
+      b. Check phase docs follows structure
+      c. Verify no task items in project doc
+      d. Verify all phases have phase docs & linked
+      e. Update checkpoint with just-completed & next steps
   '';
 }

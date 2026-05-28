@@ -10,8 +10,8 @@
     ## Instructions
 
     1. 🔳 Check current understanding
-       - If 10/10 understanding, tell me and stop here
-       - Otherwise, tell me your current understanding on a 10 scale
+       - If 10/10 understanding, stop and report
+       - Otherwise, give your understanding on 10
 
     2. 🔳 Research context
        - Use ${scope.blocks.deep-thinking.reference}
@@ -20,10 +20,10 @@
        - For any uncertainty, add sub-task to prevent forgetting to resolve it.
 
     3. 🔳 Ask clarifying questions
-       - Interview me relentlessly, using `AskUserQuestion, about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
+       - Interview me relentlessly, using `AskUserQuestion`, about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
        - Go back to step 2 after each answers that require further analysis. Should add more tasks 🔳 to track progress.
 
-    4. 🔳 Update project doc using `proj-editing` skill
+    4. 🔳 Update project & phases docs
 
     5. 🔳 Report your understanding using ${scope.blocks.context-understanding.reference}.
 

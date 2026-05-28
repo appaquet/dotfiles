@@ -35,7 +35,7 @@
        - You need to follow ${scope.blocks."sub-agents-workflows".reference}
        - Update documentation if existing:
          - Mark phase doc task `[~]` when starting, `[x]` when done
-           Like `task-format` dictates. Done = all ACs pass and tested working
+           Like task format dictates. Done = all ACs pass and tested working
          - Add new tasks discovered to phase doc
          - Note critical decisions
          - Before marking task done: verify each AC sub-item passes
@@ -51,6 +51,6 @@
 
     8. 🔳 Run `ctx-save` skill to update project and phase docs
 
-    9. 🔳 Commit / squash `jj` change with meaningful message if not already done, after `jj ls` verification
+    9. 🔳 Commit / squash `jj` change with meaningful message if not already done, after `jj ls` verification. Changes you don't recognize may be mine.
   '';
 }

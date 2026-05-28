@@ -28,7 +28,7 @@
        - Use ${scope.blocks.sub-agents-workflows.reference} for exploration, research and investigation
        - Search web for unfamiliar or potential oudated info
        - For any uncertainty, add sub-task 🔳 to prevent forgetting to resolve it.
-       - Interview me relentlessly, using `AskUserQuestion, about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
+       - Interview me relentlessly, using `AskUserQuestion`, about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
 
        - List/understand/ask for requirements and acceptance criteria
        - Define ACs per task during planning — each AC is a specific verifiable condition that maps to a test assertion

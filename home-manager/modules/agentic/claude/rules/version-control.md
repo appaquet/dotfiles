@@ -4,6 +4,7 @@ We are using `jj` (collocated with git), which is always detached head state
 HARD GATE: `jj ls` before ANY write operation (see State Verification)
 Never use `git`, unless absolutely necessary, and should only be done for read-only
 Never use `git stash`
+Never revert changes you don't recognize. They may be mine.
 
 ## Commands
 

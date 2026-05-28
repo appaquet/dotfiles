@@ -3,7 +3,7 @@
 /*
   Duplicate block key detection tests — verifies that importBlocksTree throws
   when the same block name appears in multiple roots (e.g. global blocks/ and
-  local agents/[agent]/blocks/).
+  local agents/[agent]/blocks/ or instructions/rules/[rule]/blocks/).
 */
 
 let
@@ -14,6 +14,7 @@ let
 
   dupBlocksDir = ./fixtures/hierarchical-dup-blocks-data/blocks;
   dupBlocksAgentsDir = ./fixtures/hierarchical-dup-blocks-data/agents;
+  dupBlocksRulesDir = ./fixtures/hierarchical-dup-blocks-data/instructions/rules;
 
   # ── Duplicate block keys across roots should throw ─────────────────────
   dupResult = builtins.tryEval (
@@ -26,6 +27,18 @@ let
     }
   );
   dupThrows = !dupResult.success;
+
+  # ── Duplicate rule-local block keys should share the same collision path ──
+  dupRulesResult = builtins.tryEval (
+    files.importBlocksTree {
+      roots = [
+        dupBlocksDir
+        dupBlocksRulesDir
+      ];
+      inherit args;
+    }
+  );
+  dupRulesThrows = !dupRulesResult.success;
 
   # ── Single root should succeed ─────────────────────────────────────────
   singleResult = builtins.tryEval (
@@ -41,6 +54,11 @@ let
       name = "importBlocksTree throws on duplicate block keys across roots";
       pass = dupThrows;
       detail = "importBlocksTree should throw when same-name.nix exists in both global blocks/ and agents/some-agent/blocks/";
+    }
+    {
+      name = "importBlocksTree throws on duplicate rule-local block keys";
+      pass = dupRulesThrows;
+      detail = "importBlocksTree should throw when same-name.nix exists in both global blocks/ and instructions/rules/some-rule/blocks/";
     }
     {
       name = "importBlocksTree succeeds with single root";

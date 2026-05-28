@@ -8,8 +8,6 @@ effort: xhigh
 
 Use the full understanding checklist and verify our full (10/10) understanding of the task at hand.
 
-Important: any modifications to project or phase docs need to be done via `proj-editing` skill.
-
 ## Instructions
 
 1. Pre-flight then continue
@@ -32,9 +30,7 @@ Important: any modifications to project or phase docs need to be done via `proj-
      Should add more tasks 🔳 to track progress
 
 5. 🔳 Update project doc
-   - If working on a planned task, update with new context
-   - Add/update requirements as R-numbered items (R1, R2, R1.1) for task traceability
-   - Add ACs to tasks: specific verifiable conditions that define done per task
-   - Requirements describe behavior (WHAT), not implementation (HOW)
+   - Update phases & project docs with new information and understanding
+   - Update requirements, tasks, ACs, etc.
 
-6. Report 10/10 understanding achieved. User decides next action (may run /implement, /ctx-plan, or give direction).
+6. Report 10/10 understanding achieved. User decides next action, don't ask.

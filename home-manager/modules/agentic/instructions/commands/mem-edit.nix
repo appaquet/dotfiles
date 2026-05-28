@@ -11,9 +11,7 @@
 
     ## Instructions
 
-    1. 🔳 Load skills using the `Skill` tool
-        * `mem-editing` - editing guidelines and supporting files
-        * `ctx-plan` - planning steps
+    1. 🔳 Load `mem-editing` skill
 
     2. 🔳 Ensure scope identified
        If target unclear, use `AskUserQuestion` to clarify
@@ -21,7 +19,8 @@
     3. 🔳 Analyze target files
        * Load context around the target instruction file(s)
          * Load surrounding instructions/commands/skills/agents to understand the pattern and style
-       * Apply `mem-editing` guidelines: check for ambiguity, cross-file conflicts, redundancy
+       * If general instructions, changes should be done in nix files (~/dotfiles/.../instructions/**/*.nix), not in rendered version
+       * Apply `mem-editing` guidelines
        * Use the `<deep-thinking>` procedure
 
     4. **GATE**: Await `/proceed` before applying changes
