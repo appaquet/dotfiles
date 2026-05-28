@@ -7,10 +7,7 @@
 }:
 
 let
-  instructions = import ../instructions {
-    inherit pkgs lib;
-    postProcess = config.dotfiles.agentic.instructions.postProcess;
-  };
+  instructions = config.nixantic.instructions.rendered;
 
   permissions = rec {
     mkAllowCommands = commands: lib.genAttrs commands (_: "allow");
@@ -211,11 +208,7 @@ let
 
     autoupdate = false;
 
-    instructions =
-      if config.dotfiles.agentic.instructions.mode == "legacy" then
-        [ "~/.claude/rules/*.md" ]
-      else
-        [ "~/.config/opencode/rules/*.md" ];
+    instructions = [ "~/.config/opencode/rules/*.md" ];
 
     default_agent = "orchestrator";
 
@@ -232,7 +225,7 @@ let
       orchestrator = {
         mode = "primary";
         description = "Project manager agent that manages project documentation, code versioning and delegates work to sub-agents.";
-        prompt = instructions.blocks.opencode."orchestrator-mode".body;
+        prompt = instructions.blocks.opencode."orchestration-prompt".body;
         permission = permissions.agent.planner;
       };
 
@@ -271,17 +264,6 @@ let
     exec ${pkgs.opencode}/bin/opencode "$@"
   '';
 
-  mkOpencodeConfSymlinks =
-    prefix: basePath: paths:
-    lib.listToAttrs (
-      map (path: {
-        name = "${prefix}/${path}";
-        value = {
-          source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/home-manager/modules/${basePath}/${path}";
-        };
-      }) paths
-    );
-
   mkOpencodeGeneratedSymlinks =
     paths:
     lib.listToAttrs (
@@ -292,11 +274,6 @@ let
         };
       }) paths
     );
-
-  legacyPaths = [
-    "commands"
-    "agents"
-  ];
 
   generatedPaths = [
     "commands"
@@ -314,14 +291,7 @@ let
   };
 in
 {
-  home.file =
-    (
-      if config.dotfiles.agentic.instructions.mode == "legacy" then
-        mkOpencodeConfSymlinks ".config/opencode" "agentic/opencode" legacyPaths
-      else
-        mkOpencodeGeneratedSymlinks generatedPaths
-    )
-    // commonSources;
+  home.file = (mkOpencodeGeneratedSymlinks generatedPaths) // commonSources;
 
   home.packages = [
     nono-opencode

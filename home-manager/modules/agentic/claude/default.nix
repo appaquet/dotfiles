@@ -7,10 +7,7 @@
 }:
 
 let
-  instructions = import ../instructions {
-    inherit pkgs lib;
-    postProcess = config.dotfiles.agentic.instructions.postProcess;
-  };
+  instructions = config.nixantic.instructions.rendered;
 
   mkClaudeConfSymlinks =
     paths:
@@ -120,17 +117,6 @@ let
     echo '{"continue":true,"suppressOutput":true}'
   '';
 
-  allLegacyPaths = [
-    "settings.json"
-    "commands"
-    "docs"
-    "agents"
-    "skills"
-    "rules"
-    "CLAUDE.md"
-    "statusline.sh"
-  ];
-
   generatedPaths = [
     "commands"
     "agents"
@@ -147,11 +133,7 @@ let
 
 in
 {
-  home.file =
-    if config.dotfiles.agentic.instructions.mode == "legacy" then
-      mkClaudeConfSymlinks allLegacyPaths
-    else
-      (mkClaudeConfSymlinks legacyOnlyPaths) // (mkClaudeGeneratedSymlinks generatedPaths);
+  home.file = (mkClaudeConfSymlinks legacyOnlyPaths) // (mkClaudeGeneratedSymlinks generatedPaths);
 
   home.packages = [
     claude-wrapped

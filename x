@@ -492,13 +492,16 @@ cmd_copy() {
 cmd_agent_build() {
   ${NIX_BUILDER} build --impure --out-link result --expr '
     let
-      pkgs = (builtins.getFlake (toString ./.)).inputs.nixpkgs.legacyPackages.${builtins.currentSystem};
-      instr = import ./home-manager/modules/agentic/instructions {
-        inherit pkgs; 
-        lib = pkgs.lib; 
-        postProcess = true; 
+      flake = builtins.getFlake (toString ./.);
+      pkgs = flake.inputs.nixpkgs.legacyPackages.${builtins.currentSystem};
+      instructions = flake.nixantic.lib.mkInstructions {
+        inherit pkgs;
+        lib = pkgs.lib;
+        postProcess = true;
+        sourceRoots = [ ./home-manager/modules/agentic/instructions ];
       };
-    in instr.package
+    in
+    instructions.package
   '
   echo "result -> $(readlink result)"
 }
@@ -506,7 +509,10 @@ cmd_agent_build() {
 cmd_agent_help() {
   cat >&2 <<EOF
 agent commands:
-  build     Build agentic instruction package to result
+  build     Build nixantic instruction package to result
+
+Examples:
+  ./x agent build
 EOF
 }
 
@@ -528,7 +534,7 @@ Unified:
 Utilities:
   fmt          Format nix files
   update (u)   Update flake inputs
-  agent (a)    build → agentic instruction package → result
+  agent (a)    build for nixantic instruction package
   gc           Garbage collect
   optimize     Optimize nix store
 
