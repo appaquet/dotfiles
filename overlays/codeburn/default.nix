@@ -8,24 +8,24 @@
 
 let
   litellmPrices = fetchurl {
-    url = "https://raw.githubusercontent.com/BerriAI/litellm/108b87fb246ff5da4d216b9fd2b862c3378590f8/model_prices_and_context_window.json";
-    hash = "sha256-ERS+6lQgDUXCsqEonUQq9L+aNDgzYV5LNvlQ7ueizqc=";
+    url = "https://raw.githubusercontent.com/BerriAI/litellm/c23b19f09c5565abd3607eab540e7697a7fe6b2e/model_prices_and_context_window.json";
+    hash = "sha256-M8VM0qBnSNeWW2pxBWOhOsoShvx+SlYRH2y64Q+A4cY=";
   };
 in
 buildNpmPackage rec {
   pname = "codeburn";
-  version = "0.9.6";
+  version = "0.9.11";
 
   src = fetchFromGitHub {
     owner = "getagentseal";
     repo = "codeburn";
     rev = "v${version}";
-    hash = "sha256-bDBOqwv0U08XDlsmaHeu2/X6Z7S1txei93fVD3oI9kE=";
+    hash = "sha256-LbaN2fID/ucYjLebKlknh081hdP+h0VpP5Ex8rV1DUs=";
   };
 
   nodejs = nodejs_22;
 
-  npmDepsHash = "sha256-LNVzrP4F7JAhseo2ApXIvvl1vdbrVntrTlzsaEAhGDc=";
+  npmDepsHash = "sha256-Q/z7Pc5Rb1tQ7Fscugb8/qEzxWI2/UCb2OA20N/2Y24=";
 
   patches = [ ./bundle-litellm.patch ];
 
