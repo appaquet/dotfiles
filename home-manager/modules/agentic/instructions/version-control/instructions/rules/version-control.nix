@@ -1,133 +1,131 @@
 {
-  nixantic.sources.version-control.instructions."rules/version-control" =
-    { scope }:
-    {
-      heading = "Version Control (Jujutsu)";
-      content = ''
-        We are using `jj` (collocated with git), which is always detached head state
-        HARD GATE: `jj ls` before ANY write operation (see State Verification)
-        Never use `git`, unless absolutely necessary, and should only be done for read-only
-        Never use `git stash`
+  nixantic.sources.version-control.instructions."rules/version-control" = {
+    heading = "Version Control (Jujutsu)";
+    content = ''
+      We are using `jj` (collocated with git), which is always detached head state
+      HARD GATE: `jj ls` before ANY write operation (see State Verification)
+      Never use `git`, unless absolutely necessary, and should only be done for read-only
+      Never use `git stash`
 
-        ## Commands
+      ## Commands
 
 
-        | Purpose | Command |
-        |---------|---------|
-        | Commit current | `jj commit -m "private: claude: description"` |
-        | Commit specific files of current | `jj commit -m "private: claude: description" <files...>` |
-        | New empty change | `jj new -m "private: claude: description"` |
-        | Rename current change | `jj describe -m "private: claude: description"` |
-        | Squash current into parent, changing parent message | `jj squash -m "private: claude: description"` |
-        | Squash current into parent, keep parent message | `jj squash -u` |
-        | Squash specific files to parent | `jj squash -u <files...>` |
-        | Split a jj change, selecting files to remain in original | `jj split -m "private: claude: description" <files...>` |
-        | Diff (git style) | `jj diff --git` |
-        | Diff working | `jj-diff-working --git` (`--stat` for files) |
-        | Diff branch | `jj-diff-branch --git` |
-        | Current branch | `jj-current-branch` |
-        | Main branch | `jj-main-branch` |
-        | Previous branch | `jj-prev-branch` |
-        | Stacked branches | `jj-stacked-branches` |
-        | Stacked stats | `jj-stacked-stats` |
+      | Purpose | Command |
+      |---------|---------|
+      | Commit current | `jj commit -m "private: claude: description"` |
+      | Commit specific files of current | `jj commit -m "private: claude: description" <files...>` |
+      | New empty change | `jj new -m "private: claude: description"` |
+      | Rename current change | `jj describe -m "private: claude: description"` |
+      | Squash current into parent, changing parent message | `jj squash -m "private: claude: description"` |
+      | Squash current into parent, keep parent message | `jj squash -u` |
+      | Squash specific files to parent | `jj squash -u <files...>` |
+      | Split a jj change, selecting files to remain in original | `jj split -m "private: claude: description" <files...>` |
+      | Diff (git style) | `jj diff --git` |
+      | Diff working | `jj-diff-working --git` (`--stat` for files) |
+      | Diff branch | `jj-diff-branch --git` |
+      | Current branch | `jj-current-branch` |
+      | Main branch | `jj-main-branch` |
+      | Previous branch | `jj-prev-branch` |
+      | Stacked branches | `jj-stacked-branches` |
+      | Stacked stats | `jj-stacked-stats` |
 
-        ## Creating Changes
+      ## Creating Changes
 
-        Commands:
+      Commands:
 
-        * `jj commit -m "msg"` - Finalize CURRENT changes with message, create new empty change
-        * `jj new -m "msg"` - Create NEW empty change with message (current changes stay in parent)
-        * `jj describe -m "msg"` - Set message on current `@` without creating a new change
+      * `jj commit -m "msg"` - Finalize CURRENT changes with message, create new empty change
+      * `jj new -m "msg"` - Create NEW empty change with message (current changes stay in parent)
+      * `jj describe -m "msg"` - Set message on current `@` without creating a new change
 
-        Use `commit` after changes. Before starting new work, check if `@` is already empty:
+      Use `commit` after changes. Before starting new work, check if `@` is already empty:
 
-        * `@` is empty → `jj describe -m "..."` (avoid `jj new` which creates an orphaned empty intermediate)
-        * `@` has changes → `jj new -m "..."`
+      * `@` is empty → `jj describe -m "..."` (avoid `jj new` which creates an orphaned empty intermediate)
+      * `@` has changes → `jj new -m "..."`
 
-        When to create changes:
+      When to create changes:
 
-        * Before starting implementation (after planning)
-        * After tests pass
-        * Before refactoring working code
-        * Before addressing review comments
-        * When switching to different area of codebase
-        * Skip for: read-only ops, iteration within same logical step
+      * Before starting implementation (after planning)
+      * After tests pass
+      * Before refactoring working code
+      * Before addressing review comments
+      * When switching to different area of codebase
+      * Skip for: read-only ops, iteration within same logical step
 
-        Default to more changes - easier to squash than split
-        Never clean up commit history (squash, abandon empty changes, reorder). User handles that
+      Default to more changes - easier to squash than split
+      Never clean up commit history (squash, abandon empty changes, reorder). User handles that
 
-        ## Commit Messages
+      ## Commit Messages
 
-        Prefix commits with `"private: claude: "` so they can be easily identified and squashed before PR
-        Always use `-m "message"` for commands that expect a message since they could open editor:
-          `jj commit -m ...`
-          `jj new -m ...`
-          `jj split -m ...`
-          `jj squash -m ...` => will change destination message, use -u to keep destination (always `jj ls` before)
+      Prefix commits with `"private: claude: "` so they can be easily identified and squashed before PR
+      Always use `-m "message"` for commands that expect a message since they could open editor:
+        `jj commit -m ...`
+        `jj new -m ...`
+        `jj split -m ...`
+        `jj squash -m ...` => will change destination message, use -u to keep destination (always `jj ls` before)
 
-        <good-example>
-        jj commit -m "private: claude: fix validation bug"
-        jj commit -m "private: claude: feat(workspace): add collections API"
-        </good-example>
+      <good-example>
+      jj commit -m "private: claude: fix validation bug"
+      jj commit -m "private: claude: feat(workspace): add collections API"
+      </good-example>
 
-        <bad-example>
-        jj commit -m "fix validation bug"
-        jj commit -m "feat(workspace): add collections API"
-        </bad-example>
+      <bad-example>
+      jj commit -m "fix validation bug"
+      jj commit -m "feat(workspace): add collections API"
+      </bad-example>
 
-        ## State Verification
+      ## State Verification
 
-        HARD GATE: Verify graph state with `jj ls` before ANY write command (`commit`, `new`,
-        `describe`, `squash`, `abandon`, `restore`, `rebase`). Read the output — confirm `@`
-        parent and working copy match expectations. State changes from your operations, user
-        actions, or external tools at any time.
+      HARD GATE: Verify graph state with `jj ls` before ANY write command (`commit`, `new`,
+      `describe`, `squash`, `abandon`, `restore`, `rebase`). Read the output — confirm `@`
+      parent and working copy match expectations. State changes from your operations, user
+      actions, or external tools at any time.
 
-        * Expected: Clean working copy OR only changes you made in this session
-        * Shifted: Graph moved from previous operations or user actions — understand the new
-          state and adjust your command target accordingly
-        * Unexpected: Unknown modifications, conflicts, unrecognized content
+      * Expected: Clean working copy OR only changes you made in this session
+      * Shifted: Graph moved from previous operations or user actions — understand the new
+        state and adjust your command target accordingly
+      * Unexpected: Unknown modifications, conflicts, unrecognized content
 
-        If state is unexpected: STOP — do NOT attempt to fix, report and ask
+      If state is unexpected: STOP — do NOT attempt to fix, report and ask
 
-        ## Dangerous Operations
+      ## Dangerous Operations
 
-        Before using any of these, run `jj diff --stat -r <change>` to verify the change is truly empty/safe:
+      Before using any of these, run `jj diff --stat -r <change>` to verify the change is truly empty/safe:
 
-        * `jj abandon` - Removes change from history. Descendants re-parent onto abandoned change's parent
-        * `jj restore` (without paths) - Wipes all changes in target revision
-        * `jj squash --into <non-parent>` - Moves content across non-adjacent changes, graph shifts unpredictably
-        * `jj rebase -r` - Extracts change from chain, descendants lose its contribution
+      * `jj abandon` - Removes change from history. Descendants re-parent onto abandoned change's parent
+      * `jj restore` (without paths) - Wipes all changes in target revision
+      * `jj squash --into <non-parent>` - Moves content across non-adjacent changes, graph shifts unpredictably
+      * `jj rebase -r` - Extracts change from chain, descendants lose its contribution
 
-        If the change has content or you're unsure: STOP and ask user
+      If the change has content or you're unsure: STOP and ask user
 
-        <bad-example>
-        jj squash --into @--    # Moved content across non-adjacent changes
-        jj abandon @--          # Destroyed change with actual content (didn't verify first)
-        # Result: cascading abandonments, all implementation work lost
-        </bad-example>
+      <bad-example>
+      jj squash --into @--    # Moved content across non-adjacent changes
+      jj abandon @--          # Destroyed change with actual content (didn't verify first)
+      # Result: cascading abandonments, all implementation work lost
+      </bad-example>
 
-        ## Revset Safety
+      ## Revset Safety
 
-        * `@` and `@-`: safe for standard operations (commit, new, squash into parent)
-        * `@--` and beyond: NEVER use for write operations — relative targets shift after graph modifications
-        * After any graph-modifying operation: re-run `jj log` before using relative revsets
-        * For destructive operations: capture the change ID from `jj log`, use it directly
+      * `@` and `@-`: safe for standard operations (commit, new, squash into parent)
+      * `@--` and beyond: NEVER use for write operations — relative targets shift after graph modifications
+      * After any graph-modifying operation: re-run `jj log` before using relative revsets
+      * For destructive operations: capture the change ID from `jj log`, use it directly
 
-        ## Recovery
+      ## Recovery
 
-        If something goes wrong, STOP and report before attempting recovery:
+      If something goes wrong, STOP and report before attempting recovery:
 
-        * `jj undo` - Reverses last operation. NOT stackable (second undo = redo)
-        * `jj op log` - Shows all operations with IDs
-        * `jj --at-op <op_id> log` - Inspect repo state at a past operation (read-only)
-        * `jj op restore <op_id>` - Restores repo to a specific past state
+      * `jj undo` - Reverses last operation. NOT stackable (second undo = redo)
+      * `jj op log` - Shows all operations with IDs
+      * `jj --at-op <op_id> log` - Inspect repo state at a past operation (read-only)
+      * `jj op restore <op_id>` - Restores repo to a specific past state
 
-        For multi-step recovery: `jj op log` → `jj --at-op` to inspect → `jj op restore`. Not repeated `jj undo`
+      For multi-step recovery: `jj op log` → `jj --at-op` to inspect → `jj op restore`. Not repeated `jj undo`
 
-        ## Notes
+      ## Notes
 
-        * Use `--git` flag for readable diff output
-        * For `gh` commands: use `$(jj-current-branch)` since always detached
-      '';
-    };
+      * Use `--git` flag for readable diff output
+      * For `gh` commands: use `$(jj-current-branch)` since always detached
+    '';
+  };
 }

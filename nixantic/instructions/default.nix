@@ -14,14 +14,14 @@ let
     opencode = import ./harnesses/opencode.nix { renderFrontmatter = tooling.renderFrontmatter; };
   };
 
-  resolvedSources = sourceSets.resolveSources { inherit sourceRoots sources; };
-  normalizedSources = tooling.normalizeSourceDeclarations resolvedSources;
+  ownerIndexedSources = sourceSets.resolveSources { inherit sourceRoots sources; };
+  flattenedSources = tooling.normalizeSourceDeclarations ownerIndexedSources;
 
   scopes = lib.mapAttrs (
     _: harness:
     tooling.makeScope {
       inherit harness;
-      sources = normalizedSources.sources;
+      sources = flattenedSources.sources;
     }
   ) harnesses;
   instructions = lib.mapAttrs (_: scope: scope.instructions) scopes;

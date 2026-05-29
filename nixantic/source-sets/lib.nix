@@ -48,7 +48,16 @@ let
     instructions = "authored instruction";
   };
 
-  isReservedHelperPath = relativePath: match "(^|.*/)_support(/.*|$)" relativePath != null;
+  # Discovery contract: a sourceRoot is recursed for fragment files, but two
+  # path shapes are reserved and never discovered:
+  #   - `_support/` subtrees hold helper code, not source fragments.
+  #   - `tests/` subtrees hold test/fixture trees that must never leak into
+  #     shipped output. Consumers keep authored tests under a `tests/` directory
+  #     (or outside their sourceRoots entirely).
+  isReservedHelperPath =
+    relativePath:
+    match "(^|.*/)_support(/.*|$)" relativePath != null
+    || match "(^|.*/)tests(/.*|$)" relativePath != null;
 
   collectFragmentFiles =
     root:
@@ -73,12 +82,7 @@ let
                 [ ]
               else if type == "directory" then
                 recurse fullPath relativePath
-              else if
-                type == "regular"
-                && match ".*\\.nix" name != null
-                && relativePath != "lib.nix"
-                && relativePath != "default.nix"
-              then
+              else if type == "regular" && match ".*\\.nix" name != null then
                 [
                   {
                     path = fullPath;
@@ -92,12 +96,20 @@ let
     in
     recurse root "";
 
+  # A discovered fragment must export `nixantic.sources`. Anything else (a
+  # `{ pkgs, lib }:` function, or an attrset that forgot the wrapper) is a
+  # misplaced or malformed fragment; fail loudly rather than silently dropping
+  # it, so authoring mistakes never vanish from output. Genuine non-fragment
+  # files belong under a reserved `_support/` or `tests/` path.
   sourcesFromFragment =
     fragment:
     let
       imported = import fragment.path;
     in
-    if isAttrs imported && imported ? nixantic.sources then imported.nixantic.sources else { };
+    if isAttrs imported && imported ? nixantic.sources then
+      imported.nixantic.sources
+    else
+      builtins.throw "Discovered nixantic fragment at ${toString fragment.path} does not export nixantic.sources; place non-fragment files under a _support/ or tests/ path";
 
   artifactEntriesForSources =
     originForOwner: sources:
@@ -154,7 +166,19 @@ let
       sources ? { },
     }:
     let
-      fragments = concatLists (map collectFragmentFiles sourceRoots);
+      # Overlapping roots (the same root listed twice, or one nested under
+      # another) rediscover the same physical file. Dedup by absolute path so an
+      # identical re-discovery is not mistaken for a conflicting declaration;
+      # only genuinely distinct files reach the duplicate-key check.
+      discoveredFragments = concatLists (map collectFragmentFiles sourceRoots);
+      fragments = builtins.attrValues (
+        listToAttrs (
+          map (fragment: {
+            name = toString fragment.path;
+            value = fragment;
+          }) discoveredFragments
+        )
+      );
       entries =
         concatLists (map artifactEntriesForFragment fragments) ++ artifactEntriesForExplicitSources sources;
       duplicates = duplicateMessages entries;

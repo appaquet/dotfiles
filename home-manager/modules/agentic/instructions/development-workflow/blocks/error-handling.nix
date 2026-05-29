@@ -1,15 +1,14 @@
 {
-  nixantic.sources.development-workflow.blocks."error-handling" =
-    { scope }:
-    {
-      heading = "Error handling";
+  nixantic.sources.development-workflow.blocks."error-handling" = {
+    heading = "Error handling";
 
-      content = "";
+    content = "";
 
-      tag = "error-handling";
-      taggedContent = ''
-        * Error handling is descriptive and actionable
-          * In Go, no bare `return nil, err` - always wrap
-      '';
-    };
+    tag = "error-handling";
+
+    taggedContent = ''
+      * Error handling is descriptive and actionable
+        * In Go, no bare `return nil, err` - always wrap
+    '';
+  };
 }

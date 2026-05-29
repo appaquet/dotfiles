@@ -16,7 +16,7 @@ let
         nativeBuildInputs = [ pkgs.nix ];
       }
       ''
-        expr='(import ${./tests/fixtures/bad-block-reference.nix} { scope = { blocks = {}; api = {}; harness = {}; }; }).content'
+        expr='(import ${./tests/fixtures/bad-block-reference.nix} { scope = { blocks = {}; }; }).content'
         err="$TMPDIR/bad-ref-check-err"
         nix-instantiate --eval --strict -E "$expr" 2>"$err" && {
           echo "FAIL: nonexistent block reference should have failed evaluation" >&2

@@ -23,7 +23,7 @@
         3. 🔳 Load tasks from project/phase doc/context
            - For each task, create 1..n `${scope.harness.tools.taskCreate}`
              - Segment for better tracking
-           - Create tasks for verification/testing each implementation step. 
+           - Create tasks for verification/testing each implementation step.
            - If user validation needed, task description should be clear about waiting for user input
            - Think if any task can be delegated to sub-agents, and if so, make sure the task description is clear about the delegation and which sub-agent to select.
 

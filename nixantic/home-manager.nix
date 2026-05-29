@@ -56,12 +56,28 @@ let
     };
   };
 
-  installFiles = lib.listToAttrs (
-    map (file: {
-      name = file.target;
-      value.source = "${instructions.package}/${file.harness}/${file.source}";
-    }) cfg.instructions.install.files
-  );
+  describeInstallFile = file: "${file.harness}/${file.source}";
+
+  duplicateTargetMessages =
+    let
+      byTarget = lib.groupBy (file: file.target) cfg.instructions.install.files;
+      conflicting = lib.filterAttrs (_: files: builtins.length files > 1) byTarget;
+    in
+    lib.mapAttrsToList (
+      target: files:
+      "target '${target}' mapped by ${builtins.concatStringsSep ", " (map describeInstallFile files)}"
+    ) conflicting;
+
+  installFiles =
+    assert
+      duplicateTargetMessages == [ ]
+      || builtins.throw "Duplicate nixantic install.files targets: ${builtins.concatStringsSep "; " duplicateTargetMessages}";
+    lib.listToAttrs (
+      map (file: {
+        name = file.target;
+        value.source = "${instructions.package}/${file.harness}/${file.source}";
+      }) cfg.instructions.install.files
+    );
 in
 {
   options.nixantic = {

@@ -6,10 +6,10 @@
   sources do not currently trigger (no real skill sets asCommand).
 
   Covers:
-    - R24: a skill-derived command receives the pre-flight reference
+    - A skill-derived command receives the pre-flight reference
       (injectCommandPreFlight applied in extraCommandsFromSkills).
-    - R23.3: an authored instruction colliding with a dual-output entry is
-      detected by the collisions list (fail-loud merge).
+    - An authored instruction colliding with a dual-output entry is detected by
+      the collisions list (fail-loud merge).
 */
 
 let
@@ -89,6 +89,34 @@ let
   collisionScope = mkScopeWith (_: collidingSources);
   collisionDetected = builtins.elem "commands/collide-cmd" collisionScope.collisions;
 
+  # ── Test: real command colliding with a skill-derived command ─────────────
+  # Exercises the generic all-pairs collision check across the
+  # commandInstructions and extraCommandsFromSkills sources, and confirms a key
+  # declared by more than one source is reported exactly once.
+  commandPairCollision = {
+    commands = {
+      "shared" = {
+        embed = "Processed command body";
+        outputPath = "commands/shared.md";
+      };
+    };
+    rawSkills = {
+      "skill-shared" = {
+        kind = "directory";
+        main = {
+          name = "shared";
+          description = "Skill emitting a command colliding with the authored command";
+          content = "Skill body";
+          asCommand = true;
+        };
+        files = { };
+      };
+    };
+  };
+
+  commandPairScope = mkScopeWith (_: commandPairCollision);
+  commandPairCollisions = builtins.filter (k: k == "commands/shared") commandPairScope.collisions;
+
   cases = [
     {
       name = "skill-derived command receives pre-flight reference";
@@ -99,6 +127,11 @@ let
       name = "authored vs dual-output command collision detected";
       pass = collisionDetected;
       detail = "expected commands/collide-cmd in collisions list";
+    }
+    {
+      name = "generic collision check reports a colliding key exactly once";
+      pass = commandPairCollisions == [ "commands/shared" ];
+      detail = "expected commands/shared reported once across command and skill-derived sources";
     }
   ];
 

@@ -16,7 +16,7 @@
 
         * Optimize for future, not minimal diff. Half-measures cost more total effort
 
-        * TODO+TDD-driven: 
+        * TODO+TDD-driven:
           * TODOs/stubs -> tests (comment if non-compiling) → implement -> iterate
 
         * Follow existing patterns, use existing libraries. Don't reinvent.

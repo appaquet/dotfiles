@@ -10,15 +10,17 @@
 let
   # postProcessContent :: string -> string
   #   Cleans up generated markdown output. Applied when mkPackage is called
-  #   with postProcess = true. The transformation happens in two stages:
+  #   with postProcess = true. Two transformations run in order, line by line:
   #
-  #   1. Strip exactly one trailing `.` from each line that ends with `.`.
-  #   2. Remove blank lines, whitespace-only lines, and lone `.` sentinel
-  #      lines (`.`, sometimes emitted by agents as a no-op output marker).
+  #   1. Strip exactly one trailing `.` from every line that ends in `.`.
+  #      This is intentionally broad: it normalizes generated prose so a line
+  #      ending in `.` renders without it ("foo." -> "foo", "foo.." -> "foo.",
+  #      lone "." -> "").
+  #   2. Drop blank lines, whitespace-only lines, and lone `.` sentinel lines
+  #      (agents sometimes emit a bare `.` as a no-op output marker).
   postProcessContent =
     text:
     let
-      # Strip trailing dot: "foo." -> "foo", "foo.." -> "foo.", "." -> ""
       stripTrailingDot =
         line:
         if builtins.match ".*\\.$" line != null then
@@ -69,27 +71,49 @@ let
     }:
     let
       process = if postProcess then postProcessContent else (x: x);
-      allFiles = lib.concatLists (
+      resolveFilename =
+        path: item: if item ? outputPath && item.outputPath != null then item.outputPath else "${path}.md";
+      # Each entry tracks its final destination path so collisions can be caught
+      # with a clear diagnostic. Without this guard, two files resolving to the
+      # same destination (e.g. a skill sub-file whose path equals an
+      # instruction's outputPath) only surface as an opaque symlinkJoin clash.
+      fileEntries = lib.concatLists (
         lib.mapAttrsToList (
           _: scope:
           (lib.mapAttrsToList (
             path: instr:
             let
-              filename =
-                if instr ? outputPath && instr.outputPath != null then instr.outputPath else "${path}.md";
+              filename = resolveFilename path instr;
             in
-            mkFile scope.harness.outputDir path filename (process instr.embed)
+            {
+              destination = "${scope.harness.outputDir}/${filename}";
+              file = mkFile scope.harness.outputDir path filename (process instr.embed);
+            }
           ) scope.instructions)
           ++ (lib.mapAttrsToList (
             path: f:
             let
-              filename = if f ? outputPath && f.outputPath != null then f.outputPath else "${path}.md";
+              filename = resolveFilename path f;
             in
-            mkFile scope.harness.outputDir path filename (process f.embed)
+            {
+              destination = "${scope.harness.outputDir}/${filename}";
+              file = mkFile scope.harness.outputDir path filename (process f.embed);
+            }
           ) (scope.skillFiles or { }))
         ) scopes
       );
+
+      duplicateDestinations =
+        let
+          grouped = lib.groupBy (entry: entry.destination) fileEntries;
+        in
+        builtins.filter (dest: builtins.length grouped.${dest} > 1) (builtins.attrNames grouped);
+
+      allFiles = map (entry: entry.file) fileEntries;
     in
+    assert
+      duplicateDestinations == [ ]
+      || builtins.throw "Multiple nixantic files resolve to the same destination: ${builtins.concatStringsSep ", " duplicateDestinations}";
     pkgs.symlinkJoin {
       name = "nixantic-instructions";
       paths = allFiles;

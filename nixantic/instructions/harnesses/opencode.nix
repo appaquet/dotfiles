@@ -42,15 +42,17 @@
       ...
     }:
     let
+      # opencode only models the `fork` context (as subtask). Other context
+      # values are Claude-specific authoring metadata with no opencode
+      # equivalent, so they are ignored rather than emitted. An explicit
+      # `subtask` always wins.
       translatedSubtask =
         if subtask != null then
           subtask
         else if context == "fork" then
           true
-        else if context == null then
-          null
         else
-          throw "opencode command frontmatter: unsupported context '${context}'";
+          null;
     in
     renderFrontmatter [
       {

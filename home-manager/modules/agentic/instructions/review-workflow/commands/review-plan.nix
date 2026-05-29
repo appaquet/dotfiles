@@ -9,7 +9,7 @@
       content = ''
         Goal: research REVIEW comments, present prioritized plan, await for implement command and fix.
 
-        REVIEW comments are my way of communicating issues or improvements to act on right away. 
+        REVIEW comments are my way of communicating issues or improvements to act on right away.
         They aren't left for future consideration nor to be ignored.
 
         ## Instructions
@@ -18,8 +18,7 @@
 
         1. 🔳 Ensure REVIEW comments found
            - Follow the searching procedure from the reviewing doc unless we just searched
-           - If launching via forked, ask agents to follow the same procedure
-             Never roll your own search
+           - Never roll your own search
 
         2. 🔳 Research each comment
            - Read surrounding code to understand the issue

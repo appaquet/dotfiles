@@ -21,8 +21,8 @@ let
   #     heading        - Section title. Embed emits `## heading`; reference emits
   #                      `(See: heading)`.
   #     tag            - XML tag name. Wraps taggedContent; reference emits `<tag>`.
-  #     taggedContent  - XML tag body. Required when `tag` is set; replaces
-  #                      `content` inside the XML wrapper.
+  #     taggedContent  - XML tag body. Requires `tag`; replaces `content`
+  #                      inside the XML wrapper.
   #
   #   Scope behavior
   #     No harness filtering. Blocks are always included, regardless of harness.
@@ -50,7 +50,13 @@ let
           throw "mkBlock: taggedContent required when tag is set"
         else
           content;
-      body = if tag != null then "${content}\n<${tag}>\n${inner}</${tag}>" else content;
+      body =
+        if taggedContent != null && tag == null then
+          throw "mkBlock: taggedContent requires tag"
+        else if tag != null then
+          "${content}\n<${tag}>\n${inner}</${tag}>"
+        else
+          content;
     in
     rec {
       inherit heading content body;
@@ -257,12 +263,18 @@ let
   #   Returns: { embed, reference, outputPath }
   mkCommand =
     args:
+    let
+      name = args.name or (throw "mkCommand requires name");
+    in
     mkSkill (
       {
         kind = "flat";
-        outputPath = "commands/${args.name or (throw "mkCommand requires name")}.md";
+        outputPath = "commands/${name}.md";
       }
       // args
+      // {
+        inherit name;
+      }
     );
 
   # forHarness :: scope -> { <harness-name>?, default?, ... } -> value

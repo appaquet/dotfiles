@@ -96,92 +96,49 @@ let
     instructions = { };
   };
 
-  sourceKinds = {
-    blocks = "block";
-    agents = "agent";
-    commands = "command";
-    skills = "skill";
-    instructions = "authored instruction";
-  };
+  sourceKindNames = builtins.attrNames emptySources;
 
-  sourceKindNames = builtins.attrNames sourceKinds;
+  ensureSourceDefaults = sources: emptySources // sources;
 
-  normalizeSources = sources: emptySources // sources;
-
+  # normalizeSourceDeclarations :: sourceOwners -> { sources }
+  #   Flattens owner-keyed source declarations into flat per-kind maps
+  #   (`{ blocks, agents, commands, skills, instructions }`). The no-duplicate-key
+  #   invariant is enforced upstream in source-sets/lib.nix `resolveSources`,
+  #   where file-path origins make for the richest diagnostics; this function
+  #   trusts pre-validated input and only reshapes it.
   normalizeSourceDeclarations =
     sourceOwners:
     let
       owners = builtins.attrNames sourceOwners;
 
-      sourceEntriesFor =
-        kind:
-        builtins.concatLists (
-          map (
-            owner:
-            lib.mapAttrsToList (key: value: {
-              inherit
-                key
-                owner
-                value
-                ;
-            }) (sourceOwners.${owner}.${kind} or { })
-          ) owners
-        );
-
-      duplicateEntries =
-        entries:
-        lib.filterAttrs (_: matches: builtins.length matches > 1) (lib.groupBy (entry: entry.key) entries);
-
-      checkedEntriesFor =
-        kind:
-        let
-          entries = sourceEntriesFor kind;
-          duplicates = duplicateEntries entries;
-          duplicateMessages = lib.mapAttrsToList (
-            key: matches:
-            "${sourceKinds.${kind}} '${key}' declared by source owners: ${
-              builtins.concatStringsSep ", " (map (entry: entry.owner) matches)
-            }"
-          ) duplicates;
-        in
-        assert
-          duplicateMessages == [ ]
-          || builtins.throw "Duplicate nixantic source keys: ${builtins.concatStringsSep "; " duplicateMessages}";
-        entries;
+      flattenedFor =
+        kind: builtins.foldl' (acc: owner: acc // (sourceOwners.${owner}.${kind} or { })) { } owners;
     in
     {
-      sources = lib.genAttrs sourceKindNames (
-        kind:
-        builtins.listToAttrs (
-          map (entry: {
-            name = entry.key;
-            value = entry.value;
-          }) (checkedEntriesFor kind)
-        )
-      );
-
-      provenance = lib.genAttrs sourceKindNames (
-        kind:
-        builtins.listToAttrs (
-          map (entry: {
-            name = entry.key;
-            value = [ "source '${entry.owner}'" ];
-          }) (checkedEntriesFor kind)
-        )
-      );
+      sources = lib.genAttrs sourceKindNames flattenedFor;
     };
 
-  # injectCommandPreFlight :: self -> data -> data
+  # preFlightReference :: self -> artifactName -> string
+  #   Returns the pre-flight block reference or fails with a command-oriented
+  #   diagnostic instead of leaking an internal missing-attribute error.
+  preFlightReference =
+    self: artifactName:
+    if builtins.hasAttr "pre-flight" self.blocks then
+      self.blocks."pre-flight".reference
+    else
+      builtins.throw "Nixantic command '${artifactName}' requires blocks.pre-flight for automatic pre-flight injection; add the block or set noInjectPreFlight = true";
+
+  # injectCommandPreFlight :: self -> artifactName -> data -> data
   #   Appends the pre-flight block reference to command content, unless
   #   noInjectPreFlight is true. Consumed by addProcessedContent and addDualOutput.
   injectCommandPreFlight =
-    self: data:
+    self: artifactName: data:
     if data.noInjectPreFlight or false then
       data
     else
       data
       // {
-        content = "${data.content}\n\n${self.blocks."pre-flight".reference}";
+        content = "${data.content}\n\n${preFlightReference self artifactName}";
       };
 
   # ── Pipeline stages ────────────────────────────────────────────────────────
@@ -201,21 +158,22 @@ let
   addRawContent =
     self:
     let
-      selectedSources = normalizeSources self.sources;
+      selectedSources = ensureSourceDefaults self.sources;
     in
     {
       rawBlocks = lib.mapAttrs (_: applySource self) selectedSources.blocks;
       rawAgents = lib.mapAttrs (_: applySource self) selectedSources.agents;
       rawCommands = lib.mapAttrs (_: applySource self) selectedSources.commands;
       rawSkills = lib.mapAttrs (
-        _: entry:
-        let
-          appliedEntry = applySource self entry;
-        in
-        appliedEntry
-        // {
-          main = applySource self appliedEntry.main;
-        }
+        key: entry:
+        if !(builtins.isAttrs entry) || !(builtins.hasAttr "main" entry) then
+          builtins.throw "Nixantic skill '${key}' must be an attrset with a main attribute"
+        else
+          entry
+          // {
+            main = applySource self entry.main;
+            files = entry.files or { };
+          }
       ) selectedSources.skills;
       rawAuthoredInstructions = lib.mapAttrs (_: applySource self) selectedSources.instructions;
     };
@@ -240,7 +198,7 @@ let
     commands = lib.mapAttrs (
       key: data:
       let
-        commandData = injectCommandPreFlight self data;
+        commandData = injectCommandPreFlight self key data;
       in
       self.scopeApi.mkCommand (
         {
@@ -317,7 +275,7 @@ let
           if data ? asSkill && isEnabledFor self data.asSkill then
             let
               skillName = data.name or key;
-              commandData = injectCommandPreFlight self data;
+              commandData = injectCommandPreFlight self skillName data;
             in
             [
               {
@@ -348,7 +306,7 @@ let
           if entry.main ? asCommand && isEnabledFor self entry.main.asCommand then
             let
               cmdName = entry.main.name or key;
-              commandData = injectCommandPreFlight self entry.main;
+              commandData = injectCommandPreFlight self cmdName entry.main;
             in
             [
               {
@@ -406,14 +364,27 @@ let
       key: _: lib.nameValuePair "skills/${key}/SKILL" self.skills.${key}
     ) self.skills;
 
+    # Detect any key declared by more than one instruction source generically,
+    # rather than enumerating a hand-picked subset of source pairs. A key that
+    # the final `//` merge would silently resolve is reported here instead.
     collisions =
-      builtins.attrNames (lib.intersectAttrs self.authoredInstructions self.agentInstructions)
-      ++ builtins.attrNames (lib.intersectAttrs self.authoredInstructions self.commandInstructions)
-      ++ builtins.attrNames (lib.intersectAttrs self.authoredInstructions self.skillMainInstructions)
-      ++ builtins.attrNames (lib.intersectAttrs self.authoredInstructions self.extraCommandsFromSkills)
-      ++ builtins.attrNames (lib.intersectAttrs self.authoredInstructions self.extraSkillsFromCommands)
-      ++ builtins.attrNames (lib.intersectAttrs self.commandInstructions self.extraCommandsFromSkills)
-      ++ builtins.attrNames (lib.intersectAttrs self.skillMainInstructions self.extraSkillsFromCommands);
+      let
+        instructionSources = [
+          self.authoredInstructions
+          self.agentInstructions
+          self.commandInstructions
+          self.extraCommandsFromSkills
+          self.skillMainInstructions
+          self.extraSkillsFromCommands
+        ];
+        keyCounts = builtins.foldl' (
+          counts: source:
+          builtins.foldl' (acc: key: acc // { ${key} = (acc.${key} or 0) + 1; }) counts (
+            builtins.attrNames source
+          )
+        ) { } instructionSources;
+      in
+      builtins.filter (key: keyCounts.${key} > 1) (builtins.attrNames keyCounts);
 
     instructions =
       assert
@@ -432,14 +403,6 @@ let
   #   pipeline. The returned scope is a lib.fix self-referencing record
   #   containing all imported and processed instruction data for the given
   #   harness.
-  #
-  #   Base attrs (before pipeline stages):
-  #     harness    — the harness definition (e.g. from harnesses/claude.nix)
-  #     scopeApi   — constructors and helpers available as self.scopeApi.*
-  #     forHarness — harness-specific value selector bound to this scope
-  #
-  #   Pipeline stages are merged via // in order. Each stage reads from `self`
-  #   attrs produced by earlier stages.
   makeScope =
     {
       harness,

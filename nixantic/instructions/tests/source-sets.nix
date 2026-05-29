@@ -164,6 +164,14 @@ let
     sources = helperSkipSources.sources;
   };
 
+  rootFragmentSources = builders.normalizeSourceDeclarations (
+    sourcesLib.discoverSources ./fixtures/fragment-semantics/root-fragments
+  );
+
+  rootFragmentScope = mkScope {
+    sources = rootFragmentSources.sources;
+  };
+
   # High-level source roots
 
   sourceRootsOnlyRendered = import ../default.nix {
@@ -184,6 +192,44 @@ let
 
   additiveSourceRootsScope = mkScope {
     sources = additiveResolvedSources.sources;
+  };
+
+  # A command carrying a Claude-only context must not abort the opencode render.
+  claudeOnlyContextSources = builders.normalizeSourceDeclarations {
+    "ctx-test" = {
+      commands = {
+        "compacting-cmd" = {
+          description = "Command with a Claude-only context";
+          content = "Body";
+          context = "compact";
+          noInjectPreFlight = true;
+        };
+      };
+    };
+  };
+
+  claudeOnlyContextOpencodeScope = mkOpencodeScope {
+    sources = claudeOnlyContextSources.sources;
+  };
+
+  # Discovered fragment lacking the nixantic.sources wrapper must fail loudly.
+  nonSourceFragmentResult = builtins.tryEval (
+    sourcesLib.discoverSources ./fixtures/fragment-semantics/non-source
+  );
+
+  # The same root listed twice rediscovers identical files; dedup keeps this
+  # from being mistaken for a conflicting declaration.
+  repeatedRootSources = builders.normalizeSourceDeclarations (
+    sourcesLib.resolveSources {
+      sourceRoots = [
+        ./fixtures/fragment-semantics/helper-skip
+        ./fixtures/fragment-semantics/helper-skip
+      ];
+    }
+  );
+
+  repeatedRootScope = mkScope {
+    sources = repeatedRootSources.sources;
   };
 
   duplicateSourceRootsResult = builtins.tryEval (
@@ -212,20 +258,22 @@ let
   # ── Duplicate source-set artifact keys ──
 
   duplicateSourceResult = builtins.tryEval (
-    (builders.normalizeSourceDeclarations {
-      "ss-owner-a" = {
-        blocks.duplicate-key = {
-          heading = "Owner A";
-          content = "A";
+    sourcesLib.resolveSources {
+      sources = {
+        "ss-owner-a" = {
+          blocks.duplicate-key = {
+            heading = "Owner A";
+            content = "A";
+          };
+        };
+        "ss-owner-b" = {
+          blocks.duplicate-key = {
+            heading = "Owner B";
+            content = "B";
+          };
         };
       };
-      "ss-owner-b" = {
-        blocks.duplicate-key = {
-          heading = "Owner B";
-          content = "B";
-        };
-      };
-    }).sources.blocks
+    }
   );
 
   # ── Multi-owner source-set flattening with owner provenance ──
@@ -443,6 +491,13 @@ let
       detail = "expected default.nix to contribute normal source-set data with no reserved semantics";
     }
     {
+      name = "fragment discovery includes root default.nix and lib.nix";
+      pass =
+        builtins.hasAttr "root-default-block" rootFragmentScope.blocks
+        && builtins.hasAttr "root-lib-command" rootFragmentScope.commands;
+      detail = "expected root-level default.nix and lib.nix to match the documented fragment contract";
+    }
+    {
       name = "fragment relocation preserves runtime meaning";
       pass =
         relocationAScope.commands."relocated-command".embed
@@ -472,6 +527,23 @@ let
       detail = "expected high-level discovered roots and low-level explicit sources to both contribute artifacts";
     }
     {
+      name = "claude-only context does not abort opencode render";
+      pass =
+        builtins.hasAttr "compacting-cmd" claudeOnlyContextOpencodeScope.commands
+        && !(lib.hasInfix "subtask" claudeOnlyContextOpencodeScope.commands."compacting-cmd".embed);
+      detail = "expected an opencode command with a Claude-only context to render without subtask and without aborting";
+    }
+    {
+      name = "discovered non-source fragment fails loudly";
+      pass = !nonSourceFragmentResult.success;
+      detail = "expected a discovered .nix lacking nixantic.sources to fail discovery, not be silently dropped";
+    }
+    {
+      name = "repeated sourceRoot is deduped, not a false duplicate";
+      pass = builtins.hasAttr "helper-visible-block" repeatedRootScope.blocks;
+      detail = "expected listing the same root twice to render once without a false-positive duplicate-key failure";
+    }
+    {
       name = "duplicate sourceRoots fail explicitly";
       pass = !duplicateSourceRootsResult.success;
       detail = "expected duplicate artifact keys across high-level roots to fail before rendering";
@@ -482,24 +554,7 @@ let
       detail = "expected duplicate artifact keys across discovered roots and explicit sources to fail before rendering";
     }
 
-    # Multi-owner flattening with owner provenance
-    {
-      name = "multi-owner flattening keeps correct owner provenance";
-      pass =
-        lib.hasInfix "owner-alpha" (
-          builtins.head multiOwnerSourceDeclarations.provenance.blocks."alpha-block"
-        )
-        && lib.hasInfix "owner-beta" (
-          builtins.head multiOwnerSourceDeclarations.provenance.blocks."beta-block"
-        )
-        && lib.hasInfix "owner-alpha" (
-          builtins.head multiOwnerSourceDeclarations.provenance.commands."alpha-cmd"
-        )
-        && lib.hasInfix "owner-beta" (
-          builtins.head multiOwnerSourceDeclarations.provenance.agents."beta-agent"
-        );
-      detail = "expected each artifact to report its declaring owner in provenance after multi-owner flattening";
-    }
+    # Multi-owner flattening
     {
       name = "multi-owner flattening exposes all artifacts in flat scope";
       pass =
@@ -517,11 +572,11 @@ let
       detail = "expected owner-two command to reference owner-one block through flat scope.blocks";
     }
 
-    # Duplicate source-set artifact keys with owner/kind/key error text
+    # Duplicate source-set artifact keys across owners
     {
-      name = "duplicate source-set artifact keys fail with owner/kind/key error";
+      name = "duplicate source-set artifact keys fail during resolveSources";
       pass = !duplicateSourceResult.success;
-      detail = "expected duplicate source-set block key to fail with owner provenance during normalizeSourceDeclarations";
+      detail = "expected duplicate source-set block key across owners to fail in resolveSources";
     }
 
     # Self-reference failure for source-set function referencing its own processed artifact

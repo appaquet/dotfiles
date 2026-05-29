@@ -8,6 +8,7 @@
 
 let
   builders = import ../builders.nix { inherit pkgs lib; };
+  sourcesLib = import ../../source-sets/lib.nix;
   harnesses = {
     claude = import ../harnesses/claude.nix { renderFrontmatter = builders.renderFrontmatter; };
     opencode = import ../harnesses/opencode.nix { renderFrontmatter = builders.renderFrontmatter; };
@@ -122,24 +123,98 @@ let
   skillEntryFunctionScope = mkScope {
     sources = optionBase // {
       skills = {
-        "function-skill" =
-          { scope }:
-          {
-            kind = "directory";
-            main = {
+        "function-skill" = {
+          kind = "directory";
+          main =
+            { scope }:
+            {
               description = "Option skill declared as a function";
               content = "Function skill uses ${scope.blocks."pre-flight".reference}.";
             };
-            files = {
-              "generated.md" = {
-                kind = "nix";
-                content = { scope }: "Generated file uses ${scope.blocks."pre-flight".reference}.";
-              };
+          files = {
+            "generated.md" = {
+              kind = "nix";
+              content = { scope }: "Generated file uses ${scope.blocks."pre-flight".reference}.";
             };
           };
+        };
       };
     };
   };
+
+  missingPreFlightResult = builtins.tryEval (
+    (mkScope {
+      sources = {
+        blocks = { };
+        agents = { };
+        commands = {
+          "needs-preflight" = {
+            description = "Command missing pre-flight block";
+            content = "Body";
+          };
+        };
+        skills = { };
+        instructions = { };
+      };
+    }).commands."needs-preflight".embed
+  );
+
+  missingDualPreFlightResult = builtins.tryEval (
+    (mkScope {
+      sources = {
+        blocks = { };
+        agents = { };
+        commands = {
+          "dual-needs-preflight" = {
+            description = "Dual command missing pre-flight block";
+            content = "Body";
+            asSkill = true;
+          };
+        };
+        skills = { };
+        instructions = { };
+      };
+    }).extraSkillsFromCommands."skills/dual-needs-preflight/SKILL".embed
+  );
+
+  missingSkillMainResult = builtins.tryEval (
+    (mkScope {
+      sources = optionBase // {
+        skills = {
+          "malformed-skill" = {
+            kind = "directory";
+            description = "Missing main wrapper";
+            content = "Body";
+          };
+        };
+      };
+    }).skills."malformed-skill".embed
+  );
+
+  unsupportedSkillEntryFunctionResult = builtins.tryEval (
+    (mkScope {
+      sources = optionBase // {
+        skills = {
+          "whole-entry-function" =
+            { scope }:
+            {
+              main = {
+                description = "Unsupported whole-entry function";
+                content = "Body uses ${scope.blocks."pre-flight".reference}.";
+              };
+              files = { };
+            };
+        };
+      };
+    }).skills."whole-entry-function".embed
+  );
+
+  taggedContentWithoutTagResult = builtins.tryEval (
+    (builders.mkBlock {
+      content = "Plain content";
+      taggedContent = "Tagged content";
+    }).embed
+  );
 
   sourceDeclarationsNormalized = builders.normalizeSourceDeclarations {
     workflow = {
@@ -185,20 +260,22 @@ let
   };
 
   duplicateSourceResult = builtins.tryEval (
-    (builders.normalizeSourceDeclarations {
-      owner-a = {
-        blocks.duplicate = {
-          heading = "Duplicate A";
-          content = "A";
+    sourcesLib.resolveSources {
+      sources = {
+        owner-a = {
+          blocks.duplicate = {
+            heading = "Duplicate A";
+            content = "A";
+          };
+        };
+        owner-b = {
+          blocks.duplicate = {
+            heading = "Duplicate B";
+            content = "B";
+          };
         };
       };
-      owner-b = {
-        blocks.duplicate = {
-          heading = "Duplicate B";
-          content = "B";
-        };
-      };
-    }).sources.blocks
+    }
   );
 
   selfReferenceResult = builtins.tryEval (
@@ -257,7 +334,32 @@ let
         &&
           skillEntryFunctionScope.skillFiles."skills/function-skill/generated.md".embed
           == "Generated file uses (See: Pre Flight).";
-      detail = "expected whole skill entry and nix subfile functions to receive scope";
+      detail = "expected skill main and nix subfile functions to receive scope";
+    }
+    {
+      name = "command pre-flight injection fails clearly when block is missing";
+      pass = !missingPreFlightResult.success;
+      detail = "expected missing pre-flight block to fail during command injection";
+    }
+    {
+      name = "dual command pre-flight injection fails clearly when block is missing";
+      pass = !missingDualPreFlightResult.success;
+      detail = "expected missing pre-flight block to fail during command-derived skill injection";
+    }
+    {
+      name = "malformed skill missing main fails";
+      pass = !missingSkillMainResult.success;
+      detail = "expected skill entries without main to fail before constructor use";
+    }
+    {
+      name = "skill whole entry functions are unsupported";
+      pass = !unsupportedSkillEntryFunctionResult.success;
+      detail = "expected skill source application to target main, not the whole entry";
+    }
+    {
+      name = "taggedContent requires tag";
+      pass = !taggedContentWithoutTagResult.success;
+      detail = "expected mkBlock to reject taggedContent without tag";
     }
     {
       name = "source sets flatten without owner scope paths";
