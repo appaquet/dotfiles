@@ -1,6 +1,8 @@
 {
   nixantic.sources.context-management.commands."ctx-usage" = {
-    description = "Break down Messages portion of context window - turns, tools, large items, optimization hints...";
+    description = "Analyze context window, breakdown messages by turns, tools, large items. Give optimization hints...";
+
+    harnesses = [ "claude" ];
 
     content = ''
       Goal: analyze the **Messages** portion of context window in detail.

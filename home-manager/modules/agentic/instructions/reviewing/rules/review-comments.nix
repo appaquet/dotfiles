@@ -23,7 +23,7 @@
       If no grep tool, can use rg, but careful with glob exclusions failing silently.
 
       ## Addressing
-      * Never delete unless addressed.
+      * Never remove unless addressed.
       * After fixed/addressed: remove.
       * Implement what comment describes. If names an abstraction or solution, build that. NOT OK to implement something else.
       * Never replace by other comment with explanation.
