@@ -11,22 +11,23 @@ Use `./x` script for building and evaluating nix configurations:
 - `./x darwin check` - Eval darwin config
 - `./x darwin build` - Build darwin config
 - `HOST=deskapp ./x nixos check` - Check specific host
-- `./x agent build` - Build agentic instruction package to `./result`
+- `./x agent build` - Build nixantic instruction package to `./result`
 - `./x fmt` - Format nix files (nixfmt)
-- `./x check` - Eval all nixos/home/darwin configs for all hosts. Heavy, only use on final step.
+- `./x check` - Eval all nixos/home/darwin configs for all hosts. Heavy, only use if you think a change could affect another host.
 
 For quick iteration, use `check` first (fast eval) before `build`.
 To find a missing hash, use build functions instead of trying to eval.
 
 ## Agentic Instructions
 
-Harness agnostic (Claude & Opencode)
-Instructions are authored in `home-manager/modules/agentic/instructions/`.
-When working on them, load `home-manager/modules/agentic/instructions/CLAUDE.md` for reference
+`nixantic/` contains the reusable instruction renderer and Home Manager module.
+Repo's personal instructions in `home-manager/modules/agentic/instructions/`.
+Before editing any opencode/claude/agentic source/instructions, read `nixantic/instructions/CLAUDE.md` and `home-manager/modules/agentic/CLAUDE.md`.
 
 ## Documentation
 
-`docs/features/` is a symlink to a **separate ./secrets repo**. This means:
+`docs/features/` is a symlink to a separate ./secrets repo.
+This means:
 
 - Project docs (`proj/` → `docs/features/.../00-*.md`) are NOT in this repo
 - Changes to project docs are tracked in the secrets repo, not here

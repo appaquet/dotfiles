@@ -70,7 +70,7 @@
       ...
     }:
     flake-parts.lib.mkFlake { inherit inputs; } (
-      { ... }:
+      { inputs, ... }:
       {
         systems = [
           "x86_64-linux"
@@ -79,6 +79,7 @@
         ];
 
         imports = [
+          ./nixantic
           ./overlays
           ./home-manager
           ./nixos
