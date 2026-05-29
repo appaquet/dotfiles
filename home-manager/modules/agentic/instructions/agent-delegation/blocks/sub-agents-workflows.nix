@@ -23,7 +23,7 @@
             * unbounded reading, exploration → delegate
           * In doubt -> delegate
 
-        * Agent selection: select right sub-agent for task. junior/senior/staff have different pricing. before every launch, say out loud why you think an agent is the right one for the task
+        * Agent selection: select right sub-agent for task. junior/senior/staff have different pricing. in planning & before launch, say why you think an agent is right one for task
 
         * Grouping: group related work to same sub-agent for more focused and less conflicts, taking agent selection rules in account
 

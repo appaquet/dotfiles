@@ -125,7 +125,7 @@ let
     "CLAUDE.md"
   ];
 
-  legacyOnlyPaths = [
+  localPaths = [
     "settings.json"
     "docs"
     "statusline.sh"
@@ -133,7 +133,7 @@ let
 
 in
 {
-  home.file = (mkClaudeConfSymlinks legacyOnlyPaths) // (mkClaudeGeneratedSymlinks generatedPaths);
+  home.file = (mkClaudeConfSymlinks localPaths) // (mkClaudeGeneratedSymlinks generatedPaths);
 
   home.packages = [
     claude-wrapped
