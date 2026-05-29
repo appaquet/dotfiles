@@ -11,7 +11,7 @@ Read `nixantic/CLAUDE.md` to understand the reusable instruction system.
 
 ## Where To Look
 
-- If you are changing reusable `nixantic` behavior or the generic source contract, read `nixantic/instructions/CLAUDE.md`.
+- If you are changing reusable `nixantic` behavior or the generic source contract, read `nixantic/CLAUDE.md`.
 - If you are changing AP-specific instructions, start in `home-manager/modules/agentic/instructions/`.
 - If you are changing how the personal corpus is wired into Home Manager, read `home-manager/modules/agentic/default.nix`.
 

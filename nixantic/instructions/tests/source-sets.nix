@@ -33,7 +33,7 @@ let
             description = "Feature command that emits a skill";
             content = "Feature command uses ${scope.blocks."feature-block".reference}.";
             asSkill = true;
-            noInjectCommandBoilerplate = true;
+            onlyInjectBlockReferences = [ ];
           };
       };
 
@@ -182,7 +182,7 @@ let
       sources.explicit-owner.commands."explicit-command" = {
         description = "Explicit command";
         content = "Explicit low-level source";
-        noInjectCommandBoilerplate = true;
+        onlyInjectBlockReferences = [ ];
       };
     }
   );
@@ -199,7 +199,7 @@ let
           description = "Command with a Claude-only context";
           content = "Body";
           context = "compact";
-          noInjectCommandBoilerplate = true;
+          onlyInjectBlockReferences = [ ];
         };
       };
     };
@@ -289,7 +289,7 @@ let
           {
             description = "Alpha command";
             content = "Alpha command: ${scope.blocks."alpha-block".reference}";
-            noInjectCommandBoilerplate = true;
+            onlyInjectBlockReferences = [ ];
           };
       };
     };
@@ -333,7 +333,7 @@ let
           {
             description = "Command referencing cross-owner block";
             content = "CMD: ${scope.blocks."shared-block".reference}";
-            noInjectCommandBoilerplate = true;
+            onlyInjectBlockReferences = [ ];
           };
       };
     };

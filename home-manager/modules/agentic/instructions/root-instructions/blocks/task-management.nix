@@ -14,5 +14,9 @@
           previous tasks if you forgot to mark them on a later step
           Never mark a task as completed before it's actually completed
       '';
+
+      preFlightRecall = ''
+        Following Task management guidelines, create tasks for 🔳 annotated instructions and strictly follow the task management guidelines for executing and completing them. No tasks is trivial enough to skip the task management process
+      '';
     };
 }

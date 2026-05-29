@@ -6,7 +6,7 @@
   sources do not currently trigger (no real skill sets asCommand).
 
   Covers:
-    - A skill-derived command receives source-declared command boilerplate.
+    - A skill-derived command receives default injected block references.
     - An authored instruction colliding with a dual-output entry is detected by
       the collisions list (fail-loud merge).
 */
@@ -15,7 +15,7 @@ let
   builders = import ../builders.nix { inherit pkgs lib; };
   harness = import ../harnesses/claude.nix { renderFrontmatter = builders.renderFrontmatter; };
 
-  boilerplateRef = "(See pre-flight)";
+  injectedReference = "(See pre-flight)";
 
   # Minimal synthetic scope shared base. Each test overrides the raw* inputs it
   # needs; lib.fix wires the stage outputs the way makeScope does.
@@ -24,8 +24,8 @@ let
     scopeApi = builders.scopeApi;
     blocks = {
       "pre-flight" = {
-        reference = boilerplateRef;
-        commandBoilerplate = true;
+        reference = injectedReference;
+        injectReferenceIntoCommands = true;
       };
     };
     rawCommands = { };
@@ -45,7 +45,7 @@ let
       // builders.addInstructions self
     );
 
-  # ── Test: skill→command gets command boilerplate injected ─────────────────
+  # ── Test: skill→command gets default block references injected ────────────
   skillWithCommand = {
     rawSkills = {
       mySkill = {
@@ -60,9 +60,9 @@ let
     };
   };
 
-  boilerplateScope = mkScopeWith (_: skillWithCommand);
-  derivedCommand = boilerplateScope.extraCommandsFromSkills."commands/mySkill";
-  boilerplatePresent = lib.hasInfix boilerplateRef derivedCommand.embed;
+  injectedReferenceScope = mkScopeWith (_: skillWithCommand);
+  derivedCommand = injectedReferenceScope.extraCommandsFromSkills."commands/mySkill";
+  injectedReferencePresent = lib.hasInfix injectedReference derivedCommand.embed;
 
   # ── Test: authored instruction colliding with dual-output entry ───────────
   collidingSources = {
@@ -119,9 +119,9 @@ let
 
   cases = [
     {
-      name = "skill-derived command receives source-declared boilerplate";
-      pass = boilerplatePresent;
-      detail = "expected boilerplate reference in extraCommandsFromSkills output";
+      name = "skill-derived command receives default injected references";
+      pass = injectedReferencePresent;
+      detail = "expected default injected reference in extraCommandsFromSkills output";
     }
     {
       name = "authored vs dual-output command collision detected";

@@ -2,7 +2,7 @@
   nixantic.sources.development-workflow.commands."continue" = {
     description = "Continue working on the current task before being interrupted";
 
-    noInjectCommandBoilerplate = true;
+    onlyInjectBlockReferences = [ ];
 
     content = ''
       Sorry, I interrupted you. I may have pressed escape by mistake.

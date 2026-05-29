@@ -17,12 +17,26 @@ let
   preFlightBlock = {
     heading = "Pre Flight";
     content = "Pre-flight option block";
-    commandBoilerplate = true;
+    injectReferenceIntoCommands = true;
+  };
+
+  taskManagementBlock = {
+    heading = "Task Management";
+    content = "Task-management option block";
+    injectReferenceIntoCommands = true;
+  };
+
+  additionalDefaultBlock = {
+    heading = "Additional Default";
+    content = "Additional default option block";
+    injectReferenceIntoCommands = true;
   };
 
   optionBase = {
     blocks = {
       "pre-flight" = preFlightBlock;
+      "task-management" = taskManagementBlock;
+      "additional-default" = additionalDefaultBlock;
     };
     agents = { };
     commands = { };
@@ -48,6 +62,43 @@ let
       };
     };
   };
+
+  onlyInjectBlockReferencesScope = mkScope {
+    sources = optionBase // {
+      commands = {
+        "ordered-references" = {
+          description = "Command replacing default block references";
+          content = "Ordered body";
+          onlyInjectBlockReferences = [
+            "pre-flight"
+            "task-management"
+          ];
+        };
+        "empty-references" = {
+          description = "Command injecting no block references";
+          content = "Empty body";
+          onlyInjectBlockReferences = [ ];
+        };
+      };
+    };
+  };
+
+  duplicateOnlyInjectBlockReferencesResult = builtins.tryEval (
+    (mkScope {
+      sources = optionBase // {
+        commands = {
+          duplicate = {
+            description = "Command with duplicate replacement references";
+            content = "Duplicate body";
+            onlyInjectBlockReferences = [
+              "pre-flight"
+              "pre-flight"
+            ];
+          };
+        };
+      };
+    }).commands.duplicate.embed
+  );
 
   authoredClaudeScope = mkScope {
     sources = optionBase // {
@@ -228,7 +279,7 @@ let
           {
             description = "Command referencing a source-set block";
             content = "Use ${scope.blocks."source-set-block".reference}.";
-            noInjectCommandBoilerplate = true;
+            onlyInjectBlockReferences = [ ];
           };
       };
       agents = { };
@@ -245,7 +296,7 @@ let
           {
             description = "Command referencing another source set";
             content = "Use ${scope.blocks."source-set-block".reference}.";
-            noInjectCommandBoilerplate = true;
+            onlyInjectBlockReferences = [ ];
           };
       };
       skills = { };
@@ -297,7 +348,37 @@ let
       pass =
         lib.hasInfix "(See: Shared Option)" optionBlockCommandScope.commands."use-option-block".embed
         && lib.hasInfix "(See: Pre Flight)" optionBlockCommandScope.commands."use-option-block".embed;
-      detail = "expected option block and source-declared boilerplate references in command output";
+      detail = "expected option block and default injected references in command output";
+    }
+    {
+      name = "command replacement references preserve authored order";
+      pass =
+        lib.hasInfix "Ordered body\n\n(See: Pre Flight)\n\n(See: Task Management)"
+          onlyInjectBlockReferencesScope.commands."ordered-references".embed
+        && !(lib.hasInfix "(See: Additional Default)"
+          onlyInjectBlockReferencesScope.commands."ordered-references".embed
+        );
+      detail = "expected onlyInjectBlockReferences to inject exactly pre-flight then task-management";
+    }
+    {
+      name = "empty command replacement references inject nothing";
+      pass =
+        lib.hasInfix "Empty body" onlyInjectBlockReferencesScope.commands."empty-references".embed
+        && !(lib.hasInfix "(See: Pre Flight)"
+          onlyInjectBlockReferencesScope.commands."empty-references".embed
+        )
+        && !(lib.hasInfix "(See: Task Management)"
+          onlyInjectBlockReferencesScope.commands."empty-references".embed
+        )
+        && !(lib.hasInfix "(See: Additional Default)"
+          onlyInjectBlockReferencesScope.commands."empty-references".embed
+        );
+      detail = "expected onlyInjectBlockReferences = [ ] to suppress all injected references";
+    }
+    {
+      name = "duplicate command replacement references fail";
+      pass = !duplicateOnlyInjectBlockReferencesResult.success;
+      detail = "expected duplicate onlyInjectBlockReferences entries to fail";
     }
     {
       name = "option authored instruction outputPath and harness filtering";
@@ -335,16 +416,16 @@ let
       detail = "expected skill main and nix subfile functions to receive scope";
     }
     {
-      name = "commands without source-declared boilerplate render";
+      name = "commands without default injected references render";
       pass = lib.hasInfix "Body" missingBoilerplateScope.commands."needs-preflight".embed;
-      detail = "expected commands to render without implicit boilerplate when no block opts in";
+      detail = "expected commands to render without implicit references when no block opts in";
     }
     {
-      name = "dual commands without source-declared boilerplate render";
+      name = "dual commands without default injected references render";
       pass =
         lib.hasInfix "Body"
           missingDualBoilerplateScope.extraSkillsFromCommands."skills/dual-needs-preflight/SKILL".embed;
-      detail = "expected command-derived skills to render without implicit boilerplate when no block opts in";
+      detail = "expected command-derived skills to render without implicit references when no block opts in";
     }
     {
       name = "malformed skill missing main fails";

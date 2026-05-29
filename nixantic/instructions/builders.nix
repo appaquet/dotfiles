@@ -162,13 +162,13 @@ let
     embed = args.content;
   };
 
-  # mkCommand :: { harness, name, description, content, kind?, outputPath?, model?, harnesses?, asSkill?, noInjectCommandBoilerplate?, argumentHint?, effort?, context?, agent?, allowedTools?, subtask?, ... }
+  # mkCommand :: { harness, name, description, content, kind?, outputPath?, model?, harnesses?, asSkill?, onlyInjectBlockReferences?, argumentHint?, effort?, context?, agent?, allowedTools?, subtask?, ... }
   #   Slash-command definitions. Delegates to mkSkill with kind="flat".
   #   Source: nixantic.sources.<source-owner>.commands.*, keyed by artifact key.
   #
   #   Required
   #     content      - Command body text. Scope appends references for blocks with
-  #                    commandBoilerplate = true before constructor call unless suppressed.
+  #                    injectReferenceIntoCommands = true before constructor call unless replaced.
   #     description  - Frontmatter description.
   #
   #   Optional (authored)
@@ -185,7 +185,7 @@ let
   #     harnesses        - Restrict to specific harnesses. Omitted = all harnesses.
   #     asSkill          - bool | { <harness> = bool; }. When enabled, creates a
   #                        companion skill output.
-  #     noInjectCommandBoilerplate - Suppress source-declared command boilerplate injection.
+  #     onlyInjectBlockReferences - Optional replacement list of block keys whose references are injected.
   #
   #   Scope-injected (authors do not set)
   #     harness      - Active harness renderer.
@@ -309,7 +309,7 @@ in
     scopeApi
     makeScope
     normalizeSourceDeclarations
-    injectCommandBoilerplate
+    injectCommandBlockReferences
     addDualOutput
     addInstructions
     ;

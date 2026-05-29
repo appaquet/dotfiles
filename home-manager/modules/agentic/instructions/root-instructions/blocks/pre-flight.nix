@@ -10,9 +10,7 @@
 
       tag = "pre-flight";
       taggedContent = ''
-        * Following Task management guidelines, create tasks for 🔳 annotated instructions and strictly
-          follow the task management guidelines for executing and completing them. No tasks is trivial
-          enough to skip the task management process
+        * ${scope.blocks."task-management".preFlightRecall}
 
         * Your context is precious, use ${scope.blocks."sub-agents-workflows".reference}
 
@@ -22,6 +20,6 @@
 
       reference = "Imperative follow <pre-flight> instructions before doing anything";
 
-      commandBoilerplate = true;
+      injectReferenceIntoCommands = true;
     };
 }

@@ -45,7 +45,7 @@ checks, tests, generated sources, or local inspection.
 
 - Every non-reserved `.nix` file under a source root must export `nixantic.sources.<owner>...`.
 - Harness filtering is opt-in through authored `harnesses` fields.
-- Command boilerplate is source-declared, not hardcoded engine policy.
+- Default command block-reference injection is source-declared, not hardcoded engine policy.
 
 ## Renderer Map
 

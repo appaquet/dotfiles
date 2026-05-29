@@ -114,7 +114,7 @@ let
   # Produces:
   #   blocks     — all blocks → mkBlock (no filtering)
   #   agents     — filtered rawAgents → mkAgent(harness, name)
-  #   commands   — filtered rawCommands → boilerplate injection → mkCommand(harness, kind, outputPath, name)
+  #   commands   — filtered rawCommands → block-reference injection → mkCommand(harness, kind, outputPath, name)
   #   skills     — filtered rawSkills → mkSkill(harness, kind="directory", outputPath, name)
   #   skillFiles — filtered skill sub-files → mkSkillFile (nix) or raw pass-through (md)
   addProcessedContent = self: {
@@ -128,7 +128,7 @@ let
     commands = lib.mapAttrs (
       key: data:
       let
-        commandData = injectCommandBoilerplate self data;
+        commandData = injectCommandBlockReferences self data;
       in
       self.scopeApi.mkCommand (
         {
@@ -190,7 +190,7 @@ let
 
   # Stage 3: Create cross-artifact dual outputs.
   #
-  # Consumes: self.rawCommands, self.rawSkills, self.blocks (via injectCommandBoilerplate)
+  # Consumes: self.rawCommands, self.rawSkills, self.blocks (via injectCommandBlockReferences)
   # Produces:
   #   extraSkillsFromCommands — commands with asSkill flag → mkSkill(kind="directory")
   #   extraCommandsFromSkills — skills with asCommand flag → mkSkill(kind="flat")
@@ -205,7 +205,7 @@ let
           if data ? asSkill && isEnabledForHarness self data.asSkill then
             let
               skillName = data.name or key;
-              commandData = injectCommandBoilerplate self data;
+              commandData = injectCommandBlockReferences self data;
             in
             [
               {
@@ -236,7 +236,7 @@ let
           if entry.main ? asCommand && isEnabledForHarness self entry.main.asCommand then
             let
               cmdName = entry.main.name or key;
-              commandData = injectCommandBoilerplate self entry.main;
+              commandData = injectCommandBlockReferences self entry.main;
             in
             [
               {
@@ -401,44 +401,65 @@ let
       sources = lib.genAttrs sourceKindNames flattenedFor;
     };
 
-  # commandBoilerplateReferences :: self -> [ string ]
-  #   Source blocks may opt into command boilerplate injection with
-  #   commandBoilerplate = true. Reusable consumers that do not declare such a
-  #   block get no implicit command content.
-  commandBoilerplateReferences =
+  # defaultCommandBlockReferences :: self -> [ string ]
+  #   Source blocks may opt into default command reference injection with
+  #   injectReferenceIntoCommands = true. Reusable consumers that do not declare
+  #   such a block get no implicit command content.
+  defaultCommandBlockReferences =
     self:
     map (blockName: self.blocks.${blockName}.reference) (
-      builtins.filter (blockName: self.blocks.${blockName}.commandBoilerplate or false) (
+      builtins.filter (blockName: self.blocks.${blockName}.injectReferenceIntoCommands or false) (
         builtins.attrNames self.blocks
       )
     );
 
-  # injectCommandBoilerplate :: self -> data -> data
-  #   Appends source-declared command boilerplate references to command content,
-  #   unless noInjectCommandBoilerplate is true. Consumed by addProcessedContent
-  #   and addDualOutput.
-  injectCommandBoilerplate =
+  # requestedCommandBlockReferences :: self -> data -> [ string ]
+  #   When onlyInjectBlockReferences is present, it is a replacement list of
+  #   block names whose references are injected in authored order. When absent,
+  #   defaults come from blocks that opted into command reference injection.
+  requestedCommandBlockReferences =
     self: data:
-    if data.noInjectCommandBoilerplate or false then
+    if builtins.hasAttr "onlyInjectBlockReferences" data then
+      let
+        requestedNames = data.onlyInjectBlockReferences;
+        duplicateNames = builtins.filter (name: countOccurrences name requestedNames > 1) (
+          lib.unique requestedNames
+        );
+      in
+      if duplicateNames != [ ] then
+        throw "onlyInjectBlockReferences contains duplicate block names: ${builtins.concatStringsSep ", " duplicateNames}"
+      else
+        map (blockName: self.blocks.${blockName}.reference) requestedNames
+    else
+      defaultCommandBlockReferences self;
+
+  # injectCommandBlockReferences :: self -> data -> data
+  #   Appends selected block references to command content. Consumed by
+  #   addProcessedContent and addDualOutput.
+  injectCommandBlockReferences =
+    self: data:
+    let
+      references = builtins.filter (reference: reference != "") (
+        requestedCommandBlockReferences self data
+      );
+    in
+    if references == [ ] then
       data
     else
-      let
-        references = builtins.filter (reference: reference != "") (commandBoilerplateReferences self);
-      in
-      if references == [ ] then
-        data
-      else
-        data
-        // {
-          content = "${data.content}\n\n${builtins.concatStringsSep "\n\n" references}";
-        };
+      data
+      // {
+        content = "${data.content}\n\n${builtins.concatStringsSep "\n\n" references}";
+      };
+
+  countOccurrences =
+    needle: values: builtins.length (builtins.filter (value: value == needle) values);
 in
 {
   inherit
     scopeApi
     makeScope
     normalizeSourceDeclarations
-    injectCommandBoilerplate
+    injectCommandBlockReferences
     addDualOutput
     addInstructions
     ;

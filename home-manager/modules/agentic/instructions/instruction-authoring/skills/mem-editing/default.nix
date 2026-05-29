@@ -1,93 +1,67 @@
-let
-  main = {
-    description = "Instructions to be used as soon as any instruction, CLAUDE.md, command, skill or agent file needs to be changed.";
-
-    argumentHint = "[files or description]";
-
-    content = ''
-      # Instruction Editing Guidelines
-
-      Guidelines for editing agent instruction sources for Claude and opencode.
-      Load supporting files as needed for the specific component type being edited.
-
-      ## File Locations
-
-      Production instruction authoring lives in feature/domain instruction directories under `~/dotfiles/home-manager/modules/agentic/instructions/`.
-      Use the existing source set that owns the workflow or create a new clearly named directory when adding a new feature/domain boundary.
-
-      - `instructions/root-instructions/instructions/main.nix` — root instruction fragment (generates CLAUDE.md or AGENTS.md)
-      - `instructions/development-workflow/instructions/rules/development.nix` — rule instruction fragment
-      - `instructions/context-management/commands/ctx-load.nix` — slash command fragment
-      - `instructions/instruction-authoring/skills/mem-editing/default.nix` — skill fragment with explicit bundled files
-      - `instructions/agent-delegation/agents/staff-dev.nix` — agent fragment
-      - `instructions/development-workflow/blocks/testing-principles.nix` — reusable content block fragment
-
-      Renderer internals live in `nixantic/instructions/`:
-
-      - `harnesses/` — harness-specific renderers and behavior
-      - `frontmatter.nix` — structured frontmatter rendering helpers
-      - `builders.nix` — central scope construction and constructors
-      - `nixantic/source-sets.nix` — free-form fragment discovery
-
-      Generated markdown is produced via `./x agent build` and deployed by Home Manager.
-      Always edit the Nix template sources above, not the generated output.
-
-      ## When to Use
-
-      Any time instruction files are created or modified: optimization, bug fixes, adding rules,
-      refactoring, new commands/skills/agents.
-
-      ## Editing Principles
-
-      - Preserve all salient information - never silently drop content
-      - Check for redundancy and conflicts across files before editing
-      - Apply principles from supporting docs below (match the component type)
-      - Consider surrounding style: load neighboring commands/skills/agents to match patterns
-      - Use the active harness's question/prompt tool for ambiguities
-
-      ## What to Check
-
-      - Ambiguity - what could a fresh agent misinterpret?
-      - Cross-file conflicts - do related files have contradicting rules?
-      - Redundancy - is this duplicated elsewhere?
-      - Missing context - does this assume knowledge not provided?
-
-      ## Supporting Files
-
-      - @references/core.md: Core principles (self-verification, minimal info, writing style)
-      - @references/skills.md: Skill structure, naming, progressive disclosure, description guidelines
-      - @references/commands.md: Slash command structure and optimization workflow
-      - @references/instructions.md: Root instruction files, rule sources, reusable blocks, and structured prompting
-      - @references/agents.md: Agent structure and patterns
-      - nixantic/instructions/CLAUDE.md: full instruction authoring reference and data contracts
-    '';
-  };
-in
 {
   nixantic.sources.instruction-authoring.skills."mem-editing" = {
     kind = "directory";
-    inherit main;
+
+    main =
+      { scope }:
+      {
+        description = "Guidelines for editing agentic coding instructions: CLAUDE.md/AGENTS.md, command, skill or agent files.";
+        content = ''
+          # Agentic Instruction Editing
+
+          Lingua: harness = agentic coding = claude code / opencode / pi
+
+          ## Instructions kinds
+
+          - Main instruction files (CLAUDE.md, AGENTS.md, rules/*, etc.): automatically loaded by agentic harnesses, at start or directory based. Expect in opencode config, should always be CLAUDE.md to make sure all harnesses load them.
+
+          - Commands: invoked by user. Claude can also invoke them.
+
+          - Skills: loaded by LLMs based on user instructions or when think that they could be useful for their task. In Claude, skills=commands. Opencode, skills are dictincts.
+
+          - Agents: instructions for sub-agents that can be spawned by harnesses. In opencode, can also describe instructions for main agents.
+
+          - Blocks: own nixantic construct. Allow reusable instruction snippets and references. Can be embedded, but also referenced. Can be rendered as XML blocks, and then referred to with those (see tag)
+
+          ## Instructions locations
+
+          Project/directory specific instructions: CLAUDE.md, AGENTS.md, .opencode/AGENTS.md
+
+          User instructions / commands / agents:
+          - Don't try to edit ~/.claude or ~/.config/opencode directly, as they are rendered version of instructions in my dotfiles
+          - All instructions in ~/dotfiles/home-manager/modules/agentic/instructions/
+          - Rendering driven by `nixantic` component that lives in `~/dotfiles/nixantic`
+          - You MUST read both CLAUDE.md to understand structure:
+            - ~/dotfiles/nixantic/CLAUDE.md for renderer and reusable instruction patterns
+            - ~/dotfiles/home-manager/modules/agentic/CLAUDE.md for my setup specific instructions
+          - In ~/dotfiles/home-manager/modules/agentic/instructions, folders are organization feature, not actually rendered. Nix files define fragments.
+
+          ## Instructions principles
+
+          - Instructions should be for steering and routing, not contain duplicate information from code. Code is source of truth, while instructions/docs can easily rot as they aren't compiled/refactored as easily.
+          - When steering, prefer mentioning what to do and reason to do so, instead of what not to do. What not to do can help on repeated failures.
+          - Instructions must be clear, unambiguous, complete and imperative.
+          - Instructions must be concise, avoid repetitions as they consume context tokens. You need to sacrifice style/syntax/proze for brevity.
+          - Repetitions must be avoided across instructions. Do reconnaisance first. Propose or use reusable blocks.
+          - Checklists should be block rendered as xml tag for higher recall salience.
+          - Empty lines are automatically removed by renderer, so you can use them for readability in source files. Avoid multi-lines wrapping as they consume uncessary tokens on indented lines.
+          - When writing procedures with step by steps, push LLM to use ${
+            scope.blocks."task-management".reference
+          } methodology.
+
+          ## Instructions editing
+          Which instruction to edit should be based on context. If not clear what/where to edit, STOP and ask user.
+
+          You may not be able to edit them directly either if you're in a sandbox. If that's the case, tell the userr and give a detailed description of changes that need to be done. User will ask an agent inside ~/dotfiles.
+
+          Before editing, do reconnaissance, find edit locations and then propose plan to user.
+          If user agrees, proceed with edits.
+
+          If you spent too much time finding information about nixantic or dotfiles setup, propose changes to dotfiles CLAUDE.md's.
+        '';
+      };
+
     files = {
-      "references/agents.md" = {
-        kind = "md";
-        content = builtins.readFile ./references/agents.md;
-      };
-      "references/commands.md" = {
-        kind = "md";
-        content = builtins.readFile ./references/commands.md;
-      };
-      "references/core.md" = {
-        kind = "md";
-        content = builtins.readFile ./references/core.md;
-      };
-      "references/instructions.md" = {
-        kind = "md";
-        content = builtins.readFile ./references/instructions.md;
-      };
-      "references/skills.md" = {
-        kind = "md";
-        content = builtins.readFile ./references/skills.md;
-      };
     };
   };
 }

@@ -21,7 +21,7 @@
 
         ## Instructions
 
-        1. 🔳 Ensure context loaded. Run `ctx-load` skill if not sufficient.
+        1. 🔳 Ensure context loaded. User `ctx-load` if not sufficient.
 
         2. 🔳 Ensure task defined. Clarify via `AskUserQuestion` if empty or unclear.
 
