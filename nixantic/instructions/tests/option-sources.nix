@@ -8,11 +8,8 @@
 
 let
   builders = import ../builders.nix { inherit pkgs lib; };
-  sourcesLib = import ../../source-sets/lib.nix;
-  harnesses = {
-    claude = import ../harnesses/claude.nix { renderFrontmatter = builders.renderFrontmatter; };
-    opencode = import ../harnesses/opencode.nix { renderFrontmatter = builders.renderFrontmatter; };
-  };
+  sourcesLib = import ../../source-sets.nix;
+  harnesses = import ../harnesses { renderFrontmatter = builders.renderFrontmatter; };
 
   mkScope = args: builders.makeScope ({ harness = harnesses.claude; } // args);
   mkOpencodeScope = args: builders.makeScope ({ harness = harnesses.opencode; } // args);
@@ -20,6 +17,7 @@ let
   preFlightBlock = {
     heading = "Pre Flight";
     content = "Pre-flight option block";
+    commandBoilerplate = true;
   };
 
   optionBase = {
@@ -142,31 +140,31 @@ let
     };
   };
 
-  missingPreFlightResult = builtins.tryEval (
-    (mkScope {
+  missingBoilerplateScope = (
+    mkScope {
       sources = {
         blocks = { };
         agents = { };
         commands = {
           "needs-preflight" = {
-            description = "Command missing pre-flight block";
+            description = "Command without boilerplate block";
             content = "Body";
           };
         };
         skills = { };
         instructions = { };
       };
-    }).commands."needs-preflight".embed
+    }
   );
 
-  missingDualPreFlightResult = builtins.tryEval (
-    (mkScope {
+  missingDualBoilerplateScope = (
+    mkScope {
       sources = {
         blocks = { };
         agents = { };
         commands = {
           "dual-needs-preflight" = {
-            description = "Dual command missing pre-flight block";
+            description = "Dual command without boilerplate block";
             content = "Body";
             asSkill = true;
           };
@@ -174,7 +172,7 @@ let
         skills = { };
         instructions = { };
       };
-    }).extraSkillsFromCommands."skills/dual-needs-preflight/SKILL".embed
+    }
   );
 
   missingSkillMainResult = builtins.tryEval (
@@ -230,7 +228,7 @@ let
           {
             description = "Command referencing a source-set block";
             content = "Use ${scope.blocks."source-set-block".reference}.";
-            noInjectPreFlight = true;
+            noInjectCommandBoilerplate = true;
           };
       };
       agents = { };
@@ -247,7 +245,7 @@ let
           {
             description = "Command referencing another source set";
             content = "Use ${scope.blocks."source-set-block".reference}.";
-            noInjectPreFlight = true;
+            noInjectCommandBoilerplate = true;
           };
       };
       skills = { };
@@ -299,7 +297,7 @@ let
       pass =
         lib.hasInfix "(See: Shared Option)" optionBlockCommandScope.commands."use-option-block".embed
         && lib.hasInfix "(See: Pre Flight)" optionBlockCommandScope.commands."use-option-block".embed;
-      detail = "expected option block and pre-flight references in command output";
+      detail = "expected option block and source-declared boilerplate references in command output";
     }
     {
       name = "option authored instruction outputPath and harness filtering";
@@ -337,14 +335,16 @@ let
       detail = "expected skill main and nix subfile functions to receive scope";
     }
     {
-      name = "command pre-flight injection fails clearly when block is missing";
-      pass = !missingPreFlightResult.success;
-      detail = "expected missing pre-flight block to fail during command injection";
+      name = "commands without source-declared boilerplate render";
+      pass = lib.hasInfix "Body" missingBoilerplateScope.commands."needs-preflight".embed;
+      detail = "expected commands to render without implicit boilerplate when no block opts in";
     }
     {
-      name = "dual command pre-flight injection fails clearly when block is missing";
-      pass = !missingDualPreFlightResult.success;
-      detail = "expected missing pre-flight block to fail during command-derived skill injection";
+      name = "dual commands without source-declared boilerplate render";
+      pass =
+        lib.hasInfix "Body"
+          missingDualBoilerplateScope.extraSkillsFromCommands."skills/dual-needs-preflight/SKILL".embed;
+      detail = "expected command-derived skills to render without implicit boilerplate when no block opts in";
     }
     {
       name = "malformed skill missing main fails";

@@ -1,6 +1,7 @@
 {
   package,
   pkgs,
+  lib,
   testResult,
 }:
 
@@ -8,6 +9,41 @@
 # belong with the corpus that owns those sources.
 
 let
+  tooling = import ./builders.nix { inherit pkgs lib; };
+  sourceSets = import ../source-sets.nix;
+  harnesses = import ./harnesses { renderFrontmatter = tooling.renderFrontmatter; };
+
+  renderedPackageSources = tooling.normalizeSourceDeclarations (
+    sourceSets.resolveSources { sourceRoots = [ ./tests/fixtures/rendered-package ]; }
+  );
+  renderedPackageScopes = lib.mapAttrs (
+    _: harness:
+    tooling.makeScope {
+      inherit harness;
+      sources = renderedPackageSources.sources;
+    }
+  ) harnesses;
+  renderedPackage = tooling.mkPackage {
+    scopes = renderedPackageScopes;
+    postProcess = false;
+  };
+
+  renderedPackageCheck = pkgs.runCommand "rendered-package-check" { } ''
+    test -f ${renderedPackage}/claude/CLAUDE.md
+    test -f ${renderedPackage}/claude/commands/safe-command.md
+    test -f ${renderedPackage}/opencode/AGENTS.md
+    test -f ${renderedPackage}/opencode/skills/safe-skill/SKILL.md
+    test -f ${renderedPackage}/opencode/skills/safe-skill/refs/example.md
+
+    grep -F 'description: "Run: safely # not a YAML comment"' ${renderedPackage}/claude/commands/safe-command.md
+    grep -F 'argument-hint: "[path:with:colon]"' ${renderedPackage}/claude/commands/safe-command.md
+    grep -F 'allowed-tools: ["Bash(command: test)", "Read # docs"]' ${renderedPackage}/claude/commands/safe-command.md
+    grep -F 'Command body.' ${renderedPackage}/claude/commands/safe-command.md
+    grep -F '# Rendered Package OpenCode' ${renderedPackage}/opencode/AGENTS.md
+    grep -F 'Bundled reference body.' ${renderedPackage}/opencode/skills/safe-skill/refs/example.md
+    touch $out
+  '';
+
   # Verify that referencing a nonexistent block fails Nix evaluation.
   # Proves the Nix-level reference validation mechanism works at build time.
   badRefCheck =
@@ -33,6 +69,7 @@ in
 pkgs.runCommand "nixantic-instructions-check" { } ''
   : ${testResult}
   : ${badRefCheck}
+  : ${renderedPackageCheck}
   : ${package}
   touch $out
 ''

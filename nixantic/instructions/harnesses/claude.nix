@@ -7,7 +7,8 @@
     taskCreate = "TaskCreate";
   };
 
-  # Emits name, description, and model (null ok).
+  # https://code.claude.com/docs/en/sub-agents#supported-frontmatter-fields
+  # Check `mkAgent` for available options
   renderAgentFrontmatter =
     {
       name,
@@ -29,8 +30,8 @@
       }
     ];
 
-  # Emits name, description, argument-hint, model, effort, context, agent, and allowed-tools.
-  # Null fields omitted.
+  # https://code.claude.com/docs/en/skills#frontmatter-reference
+  # Check `mkCommand` for available options
   renderCommandFrontmatter =
     {
       name,
@@ -78,9 +79,8 @@
       }
     ];
 
-  # Emits name, description, argument-hint, model, effort, context, agent, allowed-tools,
-  # when_to_use, disable-model-invocation, user-invocable, license, compatibility, and metadata.
-  # Null fields omitted.
+  # https://code.claude.com/docs/en/skills#frontmatter-reference
+  # Check `mkSkill` for available options
   renderSkillFrontmatter =
     {
       name,
@@ -94,8 +94,6 @@
       whenToUse ? null,
       disableModelInvocation ? null,
       userInvocable ? null,
-      license ? null,
-      compatibility ? null,
       metadata ? null,
       ...
     }:
@@ -143,14 +141,6 @@
       {
         label = "user-invocable";
         value = userInvocable;
-      }
-      {
-        label = "license";
-        value = license;
-      }
-      {
-        label = "compatibility";
-        value = compatibility;
       }
       {
         label = "metadata";

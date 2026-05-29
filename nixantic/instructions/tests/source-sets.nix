@@ -8,11 +8,8 @@
 
 let
   builders = import ../builders.nix { inherit pkgs lib; };
-  sourcesLib = import ../../source-sets/lib.nix;
-  harnesses = {
-    claude = import ../harnesses/claude.nix { renderFrontmatter = builders.renderFrontmatter; };
-    opencode = import ../harnesses/opencode.nix { renderFrontmatter = builders.renderFrontmatter; };
-  };
+  sourcesLib = import ../../source-sets.nix;
+  harnesses = import ../harnesses { renderFrontmatter = builders.renderFrontmatter; };
 
   mkScope = args: builders.makeScope ({ harness = harnesses.claude; } // args);
   mkOpencodeScope = args: builders.makeScope ({ harness = harnesses.opencode; } // args);
@@ -36,7 +33,7 @@ let
             description = "Feature command that emits a skill";
             content = "Feature command uses ${scope.blocks."feature-block".reference}.";
             asSkill = true;
-            noInjectPreFlight = true;
+            noInjectCommandBoilerplate = true;
           };
       };
 
@@ -185,7 +182,7 @@ let
       sources.explicit-owner.commands."explicit-command" = {
         description = "Explicit command";
         content = "Explicit low-level source";
-        noInjectPreFlight = true;
+        noInjectCommandBoilerplate = true;
       };
     }
   );
@@ -202,7 +199,7 @@ let
           description = "Command with a Claude-only context";
           content = "Body";
           context = "compact";
-          noInjectPreFlight = true;
+          noInjectCommandBoilerplate = true;
         };
       };
     };
@@ -292,7 +289,7 @@ let
           {
             description = "Alpha command";
             content = "Alpha command: ${scope.blocks."alpha-block".reference}";
-            noInjectPreFlight = true;
+            noInjectCommandBoilerplate = true;
           };
       };
     };
@@ -336,7 +333,7 @@ let
           {
             description = "Command referencing cross-owner block";
             content = "CMD: ${scope.blocks."shared-block".reference}";
-            noInjectPreFlight = true;
+            noInjectCommandBoilerplate = true;
           };
       };
     };

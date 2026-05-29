@@ -7,7 +7,8 @@
     taskCreate = "todowrite";
   };
 
-  # Emits mode=subagent, description, and model (null ok).
+  # https://opencode.ai/docs/agents/#options
+  # Check `mkAgent` for available options
   renderAgentFrontmatter =
     {
       description,
@@ -29,9 +30,8 @@
       }
     ];
 
-  # Emits description, model, agent, and subtask. Null fields omitted.
-  # Compatibility fields (name, argument-hint, effort, allowed-tools) are accepted
-  # but not emitted. Shared context="fork" intent renders as subtask=true.
+  # https://opencode.ai/docs/commands/#options
+  # Check `mkCommand` for available options
   renderCommandFrontmatter =
     {
       description,
@@ -42,10 +42,6 @@
       ...
     }:
     let
-      # opencode only models the `fork` context (as subtask). Other context
-      # values are Claude-specific authoring metadata with no opencode
-      # equivalent, so they are ignored rather than emitted. An explicit
-      # `subtask` always wins.
       translatedSubtask =
         if subtask != null then
           subtask
@@ -73,13 +69,12 @@
       }
     ];
 
-  # Emits name, description, license, compatibility, and metadata.
+  # https://opencode.ai/docs/commands/#options
+  # Check `mkSkill` for available options
   renderSkillFrontmatter =
     {
       name,
       description,
-      license ? null,
-      compatibility ? null,
       metadata ? null,
       ...
     }:
@@ -91,14 +86,6 @@
       {
         label = "description";
         value = description;
-      }
-      {
-        label = "license";
-        value = license;
-      }
-      {
-        label = "compatibility";
-        value = compatibility;
       }
       {
         label = "metadata";

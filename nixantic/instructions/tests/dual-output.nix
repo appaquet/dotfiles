@@ -6,8 +6,7 @@
   sources do not currently trigger (no real skill sets asCommand).
 
   Covers:
-    - A skill-derived command receives the pre-flight reference
-      (injectCommandPreFlight applied in extraCommandsFromSkills).
+    - A skill-derived command receives source-declared command boilerplate.
     - An authored instruction colliding with a dual-output entry is detected by
       the collisions list (fail-loud merge).
 */
@@ -16,7 +15,7 @@ let
   builders = import ../builders.nix { inherit pkgs lib; };
   harness = import ../harnesses/claude.nix { renderFrontmatter = builders.renderFrontmatter; };
 
-  preFlightRef = "(See pre-flight)";
+  boilerplateRef = "(See pre-flight)";
 
   # Minimal synthetic scope shared base. Each test overrides the raw* inputs it
   # needs; lib.fix wires the stage outputs the way makeScope does.
@@ -25,7 +24,8 @@ let
     scopeApi = builders.scopeApi;
     blocks = {
       "pre-flight" = {
-        reference = preFlightRef;
+        reference = boilerplateRef;
+        commandBoilerplate = true;
       };
     };
     rawCommands = { };
@@ -45,7 +45,7 @@ let
       // builders.addInstructions self
     );
 
-  # ── Test: skill→command gets pre-flight injected ──────────────────────────
+  # ── Test: skill→command gets command boilerplate injected ─────────────────
   skillWithCommand = {
     rawSkills = {
       mySkill = {
@@ -60,9 +60,9 @@ let
     };
   };
 
-  preflightScope = mkScopeWith (_: skillWithCommand);
-  derivedCommand = preflightScope.extraCommandsFromSkills."commands/mySkill";
-  preflightPresent = lib.hasInfix preFlightRef derivedCommand.embed;
+  boilerplateScope = mkScopeWith (_: skillWithCommand);
+  derivedCommand = boilerplateScope.extraCommandsFromSkills."commands/mySkill";
+  boilerplatePresent = lib.hasInfix boilerplateRef derivedCommand.embed;
 
   # ── Test: authored instruction colliding with dual-output entry ───────────
   collidingSources = {
@@ -119,9 +119,9 @@ let
 
   cases = [
     {
-      name = "skill-derived command receives pre-flight reference";
-      pass = preflightPresent;
-      detail = "expected pre-flight ref in extraCommandsFromSkills output";
+      name = "skill-derived command receives source-declared boilerplate";
+      pass = boilerplatePresent;
+      detail = "expected boilerplate reference in extraCommandsFromSkills output";
     }
     {
       name = "authored vs dual-output command collision detected";

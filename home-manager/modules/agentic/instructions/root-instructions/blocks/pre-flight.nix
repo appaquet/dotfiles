@@ -21,5 +21,7 @@
       '';
 
       reference = "Imperative follow <pre-flight> instructions before doing anything";
+
+      commandBoilerplate = true;
     };
 }

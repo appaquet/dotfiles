@@ -7,19 +7,19 @@
 }:
 
 let
-  tooling = import ./builders.nix { inherit pkgs lib; };
-  sourceSets = import ../source-sets/lib.nix;
-  harnesses = {
-    claude = import ./harnesses/claude.nix { renderFrontmatter = tooling.renderFrontmatter; };
-    opencode = import ./harnesses/opencode.nix { renderFrontmatter = tooling.renderFrontmatter; };
+  instructionApi = import ./builders.nix { inherit pkgs lib; };
+  sourceSets = import ../source-sets.nix;
+  harnesses = import ./harnesses {
+    renderFrontmatter = instructionApi.renderFrontmatter;
   };
+  harnessNames = builtins.attrNames harnesses;
 
   ownerIndexedSources = sourceSets.resolveSources { inherit sourceRoots sources; };
-  flattenedSources = tooling.normalizeSourceDeclarations ownerIndexedSources;
+  flattenedSources = instructionApi.normalizeSourceDeclarations ownerIndexedSources;
 
   scopes = lib.mapAttrs (
     _: harness:
-    tooling.makeScope {
+    instructionApi.makeScope {
       inherit harness;
       sources = flattenedSources.sources;
     }
@@ -27,7 +27,7 @@ let
   instructions = lib.mapAttrs (_: scope: scope.instructions) scopes;
   blocks = lib.mapAttrs (_: scope: scope.blocks) scopes;
 
-  package = tooling.mkPackage { inherit scopes postProcess; };
+  package = instructionApi.mkPackage { inherit scopes postProcess; };
 
   testResult =
     let
@@ -39,6 +39,7 @@ let
     inherit
       package
       pkgs
+      lib
       testResult
       ;
   };
@@ -48,9 +49,11 @@ in
     package
     check
     blocks
+    harnessNames
+    harnesses
     ;
-
-  # Rendered instructions for each harness
-  claude = instructions.claude;
-  opencode = instructions.opencode;
+}
+// instructions
+// {
+  harnesses = harnesses;
 }

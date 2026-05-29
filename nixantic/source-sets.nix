@@ -48,8 +48,11 @@ let
     instructions = "authored instruction";
   };
 
-  # Discovery contract: a sourceRoot is recursed for fragment files, but two
-  # path shapes are reserved and never discovered:
+  # Discovery contract: a sourceRoot is a fragment-only authoring tree. Every
+  # non-reserved `.nix` file under it is imported as a fragment and must export
+  # `nixantic.sources`; this keeps missing wrappers and accidental misplaced files
+  # fail-loud. Keep ordinary helper/generated Nix outside sourceRoots or under a
+  # reserved path. Two path shapes are reserved and never discovered:
   #   - `_support/` subtrees hold helper code, not source fragments.
   #   - `tests/` subtrees hold test/fixture trees that must never leak into
   #     shipped output. Consumers keep authored tests under a `tests/` directory

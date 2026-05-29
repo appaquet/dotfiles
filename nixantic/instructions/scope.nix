@@ -7,15 +7,14 @@
   mkCommand,
   forHarness,
   renderFrontmatter,
-  pkgs,
   lib,
+  pkgs,
 }:
 
 /*
   Scope pipeline — imports authored instruction sources, applies harness filtering,
   injects generated defaults, calls constructors, and assembles the final
-  instruction map. The per-artifact authoring contract is documented on the
-  constructors in builders.nix.
+  instruction map.
 
   Pipeline stages (makeScope):
     1. addRawContent        — normalize source inputs
@@ -28,6 +27,33 @@
 */
 
 let
+  # makeScope :: { harness, sources? } -> scope
+  #   Creates a harness-specific instruction scope by executing the 4-stage
+  #   pipeline. The returned scope is a lib.fix self-referencing record
+  #   containing all imported and processed instruction data for the given
+  #   harness.
+  makeScope =
+    {
+      harness,
+      sources ? { },
+    }:
+    lib.fix (
+      self:
+      {
+        inherit
+          harness
+          scopeApi
+          sources
+          ;
+
+        forHarness = forHarness self;
+      }
+      // addRawContent self
+      // addProcessedContent self
+      // addDualOutput self
+      // addInstructions self
+    );
+
   # scopeApi :: { mkBlock, mkInstructions, mkAgent, mkSkill, mkCommand, mkSkillFile, forHarness, renderFrontmatter }
   #   Constructors and helpers bound as `self.scopeApi` within the scope. Enables
   #   self-referential constructor calls throughout the pipeline (e.g.
@@ -44,102 +70,6 @@ let
       renderFrontmatter
       ;
   };
-
-  # ── Helpers ────────────────────────────────────────────────────────────────
-
-  # isEnabledFor :: self -> val -> bool
-  #   Resolves dual-output flags (asSkill, asCommand). Accepts a boolean or a
-  #   per-harness attrset (e.g. { claude = true; opencode = false; }). For
-  #   attrsets, selects the active harness key; absent = false.
-  isEnabledFor =
-    self: val:
-    if builtins.isBool val then
-      val
-    else if builtins.isAttrs val then
-      val.${self.harness.name} or false
-    else
-      false;
-
-  # isForHarness :: self -> data -> bool
-  #   True if data has no `harnesses` field (available to all), or if the active
-  #   harness name is listed in data.harnesses.
-  isForHarness =
-    self: data: !builtins.hasAttr "harnesses" data || builtins.elem self.harness.name data.harnesses;
-
-  # filterForHarness :: self -> attrs -> attrs
-  #   Filters an attrset by isForHarness, removing entries restricted to other harnesses.
-  filterForHarness = self: lib.filterAttrs (_: data: isForHarness self data);
-
-  # filterSkillsForHarness :: self -> attrs -> attrs
-  #   Same as filterForHarness but checks entry.main (skills use { main, files } structure).
-  filterSkillsForHarness = self: lib.filterAttrs (_: entry: isForHarness self entry.main);
-
-  applySource =
-    self: value:
-    if builtins.isFunction value then
-      value {
-        scope = self // {
-          agents = builtins.throw "Nixantic source functions must not reference processed scope.agents while raw sources are being normalized";
-          commands = builtins.throw "Nixantic source functions must not reference processed scope.commands while raw sources are being normalized";
-          skills = builtins.throw "Nixantic source functions must not reference processed scope.skills while raw sources are being normalized";
-          instructions = builtins.throw "Nixantic source functions must not reference final scope.instructions while raw sources are being normalized";
-        };
-      }
-    else
-      value;
-
-  emptySources = {
-    blocks = { };
-    agents = { };
-    commands = { };
-    skills = { };
-    instructions = { };
-  };
-
-  sourceKindNames = builtins.attrNames emptySources;
-
-  ensureSourceDefaults = sources: emptySources // sources;
-
-  # normalizeSourceDeclarations :: sourceOwners -> { sources }
-  #   Flattens owner-keyed source declarations into flat per-kind maps
-  #   (`{ blocks, agents, commands, skills, instructions }`). The no-duplicate-key
-  #   invariant is enforced upstream in source-sets/lib.nix `resolveSources`,
-  #   where file-path origins make for the richest diagnostics; this function
-  #   trusts pre-validated input and only reshapes it.
-  normalizeSourceDeclarations =
-    sourceOwners:
-    let
-      owners = builtins.attrNames sourceOwners;
-
-      flattenedFor =
-        kind: builtins.foldl' (acc: owner: acc // (sourceOwners.${owner}.${kind} or { })) { } owners;
-    in
-    {
-      sources = lib.genAttrs sourceKindNames flattenedFor;
-    };
-
-  # preFlightReference :: self -> artifactName -> string
-  #   Returns the pre-flight block reference or fails with a command-oriented
-  #   diagnostic instead of leaking an internal missing-attribute error.
-  preFlightReference =
-    self: artifactName:
-    if builtins.hasAttr "pre-flight" self.blocks then
-      self.blocks."pre-flight".reference
-    else
-      builtins.throw "Nixantic command '${artifactName}' requires blocks.pre-flight for automatic pre-flight injection; add the block or set noInjectPreFlight = true";
-
-  # injectCommandPreFlight :: self -> artifactName -> data -> data
-  #   Appends the pre-flight block reference to command content, unless
-  #   noInjectPreFlight is true. Consumed by addProcessedContent and addDualOutput.
-  injectCommandPreFlight =
-    self: artifactName: data:
-    if data.noInjectPreFlight or false then
-      data
-    else
-      data
-      // {
-        content = "${data.content}\n\n${preFlightReference self artifactName}";
-      };
 
   # ── Pipeline stages ────────────────────────────────────────────────────────
 
@@ -167,7 +97,7 @@ let
       rawSkills = lib.mapAttrs (
         key: entry:
         if !(builtins.isAttrs entry) || !(builtins.hasAttr "main" entry) then
-          builtins.throw "Nixantic skill '${key}' must be an attrset with a main attribute"
+          throw "Nixantic skill '${key}' must be an attrset with a main attribute"
         else
           entry
           // {
@@ -184,7 +114,7 @@ let
   # Produces:
   #   blocks     — all blocks → mkBlock (no filtering)
   #   agents     — filtered rawAgents → mkAgent(harness, name)
-  #   commands   — filtered rawCommands → pre-flight injection → mkCommand(harness, kind, outputPath, name)
+  #   commands   — filtered rawCommands → boilerplate injection → mkCommand(harness, kind, outputPath, name)
   #   skills     — filtered rawSkills → mkSkill(harness, kind="directory", outputPath, name)
   #   skillFiles — filtered skill sub-files → mkSkillFile (nix) or raw pass-through (md)
   addProcessedContent = self: {
@@ -198,7 +128,7 @@ let
     commands = lib.mapAttrs (
       key: data:
       let
-        commandData = injectCommandPreFlight self key data;
+        commandData = injectCommandBoilerplate self data;
       in
       self.scopeApi.mkCommand (
         {
@@ -260,22 +190,22 @@ let
 
   # Stage 3: Create cross-artifact dual outputs.
   #
-  # Consumes: self.rawCommands, self.rawSkills, self.blocks (via injectCommandPreFlight)
+  # Consumes: self.rawCommands, self.rawSkills, self.blocks (via injectCommandBoilerplate)
   # Produces:
   #   extraSkillsFromCommands — commands with asSkill flag → mkSkill(kind="directory")
   #   extraCommandsFromSkills — skills with asCommand flag → mkSkill(kind="flat")
   #
   # Dual-output flags (asSkill, asCommand) accept bool or per-harness attrsets,
-  # resolved via isEnabledFor.
+  # resolved via isEnabledForHarness.
   addDualOutput = self: {
     extraSkillsFromCommands = lib.listToAttrs (
       builtins.concatLists (
         lib.mapAttrsToList (
           key: data:
-          if data ? asSkill && isEnabledFor self data.asSkill then
+          if data ? asSkill && isEnabledForHarness self data.asSkill then
             let
               skillName = data.name or key;
-              commandData = injectCommandPreFlight self skillName data;
+              commandData = injectCommandBoilerplate self data;
             in
             [
               {
@@ -303,10 +233,10 @@ let
       builtins.concatLists (
         lib.mapAttrsToList (
           key: entry:
-          if entry.main ? asCommand && isEnabledFor self entry.main.asCommand then
+          if entry.main ? asCommand && isEnabledForHarness self entry.main.asCommand then
             let
               cmdName = entry.main.name or key;
-              commandData = injectCommandPreFlight self cmdName entry.main;
+              commandData = injectCommandBoilerplate self entry.main;
             in
             [
               {
@@ -389,7 +319,7 @@ let
     instructions =
       assert
         self.collisions == [ ]
-        || builtins.throw "Generated instructions collide with authored instructions: ${builtins.concatStringsSep ", " self.collisions}";
+        || throw "Generated instructions collide with authored instructions: ${builtins.concatStringsSep ", " self.collisions}";
       self.authoredInstructions
       // self.agentInstructions
       // self.commandInstructions
@@ -398,39 +328,117 @@ let
       // self.extraSkillsFromCommands;
   };
 
-  # makeScope :: { harness, sources? } -> scope
-  #   Creates a harness-specific instruction scope by executing the 4-stage
-  #   pipeline. The returned scope is a lib.fix self-referencing record
-  #   containing all imported and processed instruction data for the given
-  #   harness.
-  makeScope =
-    {
-      harness,
-      sources ? { },
-    }:
-    lib.fix (
-      self:
-      {
-        inherit
-          harness
-          scopeApi
-          sources
-          ;
+  # ── Helpers ────────────────────────────────────────────────────────────────
 
-        forHarness = forHarness self;
+  # isEnabledForHarness :: self -> val -> bool
+  #   Resolves dual-output flags (asSkill, asCommand). Accepts a boolean or a
+  #   per-harness attrset (e.g. { claude = true; opencode = false; }). For
+  #   attrsets, selects the active harness key; absent = false.
+  isEnabledForHarness =
+    self: val:
+    if builtins.isBool val then
+      val
+    else if builtins.isAttrs val then
+      val.${self.harness.name} or false
+    else
+      false;
+
+  # isForHarness :: self -> data -> bool
+  #   True if data has no `harnesses` field (available to all), or if the active
+  #   harness name is listed in data.harnesses.
+  isForHarness =
+    self: data: !builtins.hasAttr "harnesses" data || builtins.elem self.harness.name data.harnesses;
+
+  # filterForHarness :: self -> attrs -> attrs
+  #   Filters an attrset by isForHarness, removing entries restricted to other harnesses.
+  filterForHarness = self: lib.filterAttrs (_: data: isForHarness self data);
+
+  # filterSkillsForHarness :: self -> attrs -> attrs
+  #   Same as filterForHarness but checks entry.main (skills use { main, files } structure).
+  filterSkillsForHarness = self: lib.filterAttrs (_: entry: isForHarness self entry.main);
+
+  applySource =
+    self: value:
+    if builtins.isFunction value then
+      value {
+        scope = self // {
+          agents = throw "Nixantic source functions must not reference processed scope.agents while raw sources are being normalized";
+          commands = throw "Nixantic source functions must not reference processed scope.commands while raw sources are being normalized";
+          skills = throw "Nixantic source functions must not reference processed scope.skills while raw sources are being normalized";
+          instructions = throw "Nixantic source functions must not reference final scope.instructions while raw sources are being normalized";
+        };
       }
-      // addRawContent self
-      // addProcessedContent self
-      // addDualOutput self
-      // addInstructions self
+    else
+      value;
+
+  emptySources = {
+    blocks = { };
+    agents = { };
+    commands = { };
+    skills = { };
+    instructions = { };
+  };
+
+  sourceKindNames = builtins.attrNames emptySources;
+
+  ensureSourceDefaults = sources: emptySources // sources;
+
+  # normalizeSourceDeclarations :: sourceOwners -> { sources }
+  #   Flattens owner-keyed source declarations into flat per-kind maps
+  #   (`{ blocks, agents, commands, skills, instructions }`). The no-duplicate-key
+  #   invariant is enforced upstream in source-sets.nix `resolveSources`,
+  #   where file-path origins make for the richest diagnostics; this function
+  #   trusts pre-validated input and only reshapes it.
+  normalizeSourceDeclarations =
+    sourceOwners:
+    let
+      owners = builtins.attrNames sourceOwners;
+
+      flattenedFor =
+        kind: builtins.foldl' (acc: owner: acc // (sourceOwners.${owner}.${kind} or { })) { } owners;
+    in
+    {
+      sources = lib.genAttrs sourceKindNames flattenedFor;
+    };
+
+  # commandBoilerplateReferences :: self -> [ string ]
+  #   Source blocks may opt into command boilerplate injection with
+  #   commandBoilerplate = true. Reusable consumers that do not declare such a
+  #   block get no implicit command content.
+  commandBoilerplateReferences =
+    self:
+    map (blockName: self.blocks.${blockName}.reference) (
+      builtins.filter (blockName: self.blocks.${blockName}.commandBoilerplate or false) (
+        builtins.attrNames self.blocks
+      )
     );
+
+  # injectCommandBoilerplate :: self -> data -> data
+  #   Appends source-declared command boilerplate references to command content,
+  #   unless noInjectCommandBoilerplate is true. Consumed by addProcessedContent
+  #   and addDualOutput.
+  injectCommandBoilerplate =
+    self: data:
+    if data.noInjectCommandBoilerplate or false then
+      data
+    else
+      let
+        references = builtins.filter (reference: reference != "") (commandBoilerplateReferences self);
+      in
+      if references == [ ] then
+        data
+      else
+        data
+        // {
+          content = "${data.content}\n\n${builtins.concatStringsSep "\n\n" references}";
+        };
 in
 {
   inherit
     scopeApi
     makeScope
     normalizeSourceDeclarations
-    injectCommandPreFlight
+    injectCommandBoilerplate
     addDualOutput
     addInstructions
     ;

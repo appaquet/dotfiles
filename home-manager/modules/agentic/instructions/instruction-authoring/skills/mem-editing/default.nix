@@ -27,7 +27,7 @@ let
       - `harnesses/` — harness-specific renderers and behavior
       - `frontmatter.nix` — structured frontmatter rendering helpers
       - `builders.nix` — central scope construction and constructors
-      - `nixantic/source-sets/lib.nix` — free-form fragment discovery
+      - `nixantic/source-sets.nix` — free-form fragment discovery
 
       Generated markdown is produced via `./x agent build` and deployed by Home Manager.
       Always edit the Nix template sources above, not the generated output.

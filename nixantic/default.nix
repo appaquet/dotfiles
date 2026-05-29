@@ -71,7 +71,7 @@
     nixantic = {
       lib = {
         mkInstructions = args: import ./instructions args;
-        sourceDiscovery = import ./source-sets/lib.nix;
+        sourceDiscovery = import ./source-sets.nix;
       };
     };
   };

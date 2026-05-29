@@ -113,7 +113,7 @@ let
     in
     assert
       duplicateDestinations == [ ]
-      || builtins.throw "Multiple nixantic files resolve to the same destination: ${builtins.concatStringsSep ", " duplicateDestinations}";
+      || throw "Multiple nixantic files resolve to the same destination: ${builtins.concatStringsSep ", " duplicateDestinations}";
     pkgs.symlinkJoin {
       name = "nixantic-instructions";
       paths = allFiles;

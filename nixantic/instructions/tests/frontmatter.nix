@@ -14,7 +14,7 @@ let
           value = "haiku";
         }
       ];
-      expected = "---\nname: test\nmodel: haiku\n---\n";
+      expected = "---\nname: \"test\"\nmodel: \"haiku\"\n---\n";
     }
     {
       name = "null omitted";
@@ -32,7 +32,7 @@ let
           value = "haiku";
         }
       ];
-      expected = "---\nname: test\nmodel: haiku\n---\n";
+      expected = "---\nname: \"test\"\nmodel: \"haiku\"\n---\n";
     }
     {
       name = "boolean true";
@@ -66,7 +66,7 @@ let
           value = "first";
         }
       ];
-      expected = "---\nz: last\na: first\n---\n";
+      expected = "---\nz: \"last\"\na: \"first\"\n---\n";
     }
     {
       name = "all-null / empty output";
@@ -98,7 +98,7 @@ let
           ];
         }
       ];
-      expected = "---\nallowed-tools: Bash, Read\n---\n";
+      expected = "---\nallowed-tools: [\"Bash\", \"Read\"]\n---\n";
     }
     {
       name = "list single entry";
@@ -108,7 +108,7 @@ let
           value = [ "Bash" ];
         }
       ];
-      expected = "---\nallowed-tools: Bash\n---\n";
+      expected = "---\nallowed-tools: [\"Bash\"]\n---\n";
     }
     {
       name = "list empty";
@@ -120,7 +120,50 @@ let
       ];
       expected = "";
     }
+    {
+      name = "yaml-sensitive scalar characters are quoted";
+      fields = [
+        {
+          label = "description";
+          value = "Use foo: bar # not a comment\nnext line";
+        }
+      ];
+      expected = "---\ndescription: \"Use foo: bar # not a comment\\nnext line\"\n---\n";
+    }
+    {
+      name = "yaml-sensitive list entries are quoted";
+      fields = [
+        {
+          label = "allowed-tools";
+          value = [
+            "Bash(command: test)"
+            "Read # docs"
+          ];
+        }
+      ];
+      expected = "---\nallowed-tools: [\"Bash(command: test)\", \"Read # docs\"]\n---\n";
+    }
   ];
+
+  invalidLabelResult = builtins.tryEval (
+    frontmatter.renderFrontmatter [
+      {
+        label = "bad:label";
+        value = "x";
+      }
+    ]
+  );
+
+  invalidValueResult = builtins.tryEval (
+    frontmatter.renderFrontmatter [
+      {
+        label = "metadata";
+        value = {
+          unsupported = true;
+        };
+      }
+    ]
+  );
 
   checkCase =
     case:
@@ -132,7 +175,10 @@ let
     else
       throw "FAIL [${case.name}]: expected '${case.expected}', got '${result}'";
 
-  allPass = builtins.foldl' (acc: case: acc && checkCase case) true cases;
+  allPass =
+    builtins.foldl' (acc: case: acc && checkCase case) true cases
+    && !invalidLabelResult.success
+    && !invalidValueResult.success;
 in
 {
   inherit allPass;

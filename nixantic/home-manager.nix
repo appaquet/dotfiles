@@ -14,6 +14,7 @@ let
     sourceRoots = cfg.sourceRoots;
     sources = cfg.sources;
   };
+  harnessNames = instructions.harnessNames;
 
   sourceType = lib.types.lazyAttrsOf lib.types.raw;
   kinds = [
@@ -37,11 +38,8 @@ let
   installFileType = lib.types.submodule {
     options = {
       harness = lib.mkOption {
-        type = lib.types.enum [
-          "claude"
-          "opencode"
-        ];
-        description = "Rendered harness output directory to install from.";
+        type = lib.types.enum harnessNames;
+        description = "Rendered built-in harness output directory to install from.";
       };
 
       source = lib.mkOption {

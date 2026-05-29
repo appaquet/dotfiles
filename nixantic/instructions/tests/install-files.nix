@@ -19,16 +19,20 @@ let
 
   evalWith =
     installFiles:
-    (lib.evalModules {
-      modules = [
-        homeFileStub
-        ../../home-manager.nix
-        {
-          _module.args = { inherit pkgs; };
-          nixantic.instructions.install.files = installFiles;
-        }
-      ];
-    }).config.home.file;
+    let
+      homeFile =
+        (lib.evalModules {
+          modules = [
+            homeFileStub
+            ../../home-manager.nix
+            {
+              _module.args = { inherit pkgs; };
+              nixantic.instructions.install.files = installFiles;
+            }
+          ];
+        }).config.home.file;
+    in
+    builtins.deepSeq homeFile homeFile;
 
   uniqueTargetsResult = builtins.tryEval (evalWith [
     {
@@ -56,6 +60,14 @@ let
     }
   ]);
 
+  invalidHarnessResult = builtins.tryEval (evalWith [
+    {
+      harness = "not-a-built-in-harness";
+      source = "README.md";
+      target = ".agent/README.md";
+    }
+  ]);
+
   cases = [
     {
       name = "distinct install.files targets evaluate";
@@ -66,6 +78,11 @@ let
       name = "duplicate install.files target fails";
       pass = !duplicateTargetResult.success;
       detail = "expected two install.files mapping to the same target to fail evaluation";
+    }
+    {
+      name = "install.files rejects harnesses outside built-in registry";
+      pass = !invalidHarnessResult.success;
+      detail = "expected install.files harness to be validated against the shared built-in registry";
     }
   ];
 
