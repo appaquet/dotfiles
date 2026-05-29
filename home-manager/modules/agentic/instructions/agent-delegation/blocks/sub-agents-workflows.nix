@@ -1,9 +1,11 @@
 {
-  nixantic.sources.agent-delegation.blocks."sub-agents-workflows" = {
+  nixantic.sources.agent-delegation.blocks."sub-agents-workflows" = rec {
     heading = "Sub-agents workflows";
     content = ''
       Rules for managing our context and maximizing sub-agents delegation to preserve it.
     '';
+
+    preFlightRecall = "Your context precious, use <sub-agent-workflows>";
 
     tag = "sub-agents-workflows";
     taggedContent = ''

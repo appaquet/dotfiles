@@ -30,6 +30,10 @@ let
       name = "package-collisions";
       result = (import ./package-collisions.nix { inherit pkgs lib; }).allPass;
     }
+    {
+      name = "bom";
+      result = (import ./bom.nix { inherit pkgs lib; }).allPass;
+    }
   ];
 
   checkCase = case: if case.result then true else throw "FAIL [${case.name}]";

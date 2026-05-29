@@ -2,6 +2,7 @@
   pkgs,
   lib,
   postProcess ? false,
+  bom ? { },
   sourceRoots ? [ ],
   sources ? { },
 }:
@@ -27,7 +28,7 @@ let
   instructions = lib.mapAttrs (_: scope: scope.instructions) scopes;
   blocks = lib.mapAttrs (_: scope: scope.blocks) scopes;
 
-  package = instructionApi.mkPackage { inherit scopes postProcess; };
+  package = instructionApi.mkPackage { inherit scopes postProcess bom; };
 
   testResult =
     let

@@ -11,7 +11,12 @@
       cfg = config.nixantic;
       instructions = import ./instructions {
         inherit lib pkgs;
-        inherit (cfg) postProcess sourceRoots sources;
+        inherit (cfg)
+          postProcess
+          bom
+          sourceRoots
+          sources
+          ;
       };
     in
     {
@@ -34,6 +39,14 @@
           type = lib.types.bool;
           default = true;
           description = "Apply markdown post-processing to generated instruction files.";
+        };
+
+        bom = {
+          encoding = lib.mkOption {
+            type = lib.types.str;
+            default = "cl100k_base";
+            description = "tiktoken encoding name used for estimated BOM token counts.";
+          };
         };
 
         packageName = lib.mkOption {

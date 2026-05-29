@@ -16,7 +16,8 @@ Normal consumers should:
 - optionally set `nixantic.instructions.install.files`
 
 Flake-side rendering through `default.nix` and direct `lib.mkInstructions` use are advanced paths for
-checks, tests, generated sources, or local inspection.
+checks, tests, generated sources, or local inspection. Rendered packages include per-harness `BOM.md`
+reports for local inspection by default.
 
 ## Product Boundaries
 
@@ -25,6 +26,8 @@ checks, tests, generated sources, or local inspection.
 - Flake outputs and direct rendering exist, but they are secondary to Home Manager consumption.
 - Source discovery, rendering, and installation are separate concerns; do not collapse them into one
   subsystem mentally.
+- Instruction BOM reports are package/render artifacts only. They do not imply Home Manager install
+  behavior.
 
 ## Hard Invariants
 
@@ -33,6 +36,8 @@ checks, tests, generated sources, or local inspection.
 - Runtime scope is flat; source-tree layout never creates runtime namespaces.
 - Built-in harnesses are a closed product surface unless widened intentionally.
 - Generated markdown is output, not authored source.
+- BOM token counts are tiktoken-based estimates for planning. They are not provider-authoritative
+  prompt accounting.
 
 ## Subsystems
 
@@ -65,6 +70,7 @@ checks, tests, generated sources, or local inspection.
 - Change source shape or authored fields: `instructions/builders.nix`
 - Change renderer filtering, boilerplate, or dual outputs: `instructions/scope.nix`
 - Change rendered metadata or formatting: `instructions/harnesses/`, `instructions/frontmatter.nix`
+- Change package BOM estimates or report shape: `instructions/output.nix`, `instructions/render-bom.py`
 - Change renderer validation expectations: `instructions/checks.nix`, `instructions/tests/`
 
 ## Guardrails

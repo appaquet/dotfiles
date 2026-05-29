@@ -1,6 +1,12 @@
 {
+  nixantic.sources.project-docs.blocks."project-doc-recall" = {
+    preFlightRecall = "ALWAYS use project & phase docs to plan and track work as per project doc rules, using the proper project editing skills";
+    content = "";
+  };
+
   nixantic.sources.project-docs.instructions."rules/project-doc" = rec {
     heading = "Project Doc Structure";
+
     content = ''
       Project/feature docs spanning potentially multiple PRs. Docs updated continuously. Context window ephemeral, docs durable. Should show history, append/amend, not rewrite.
 

@@ -30,8 +30,10 @@ let
 
   renderedPackageCheck = pkgs.runCommand "rendered-package-check" { } ''
     test -f ${renderedPackage}/claude/CLAUDE.md
+    test -f ${renderedPackage}/claude/BOM.md
     test -f ${renderedPackage}/claude/commands/safe-command.md
     test -f ${renderedPackage}/opencode/AGENTS.md
+    test -f ${renderedPackage}/opencode/BOM.md
     test -f ${renderedPackage}/opencode/skills/safe-skill/SKILL.md
     test -f ${renderedPackage}/opencode/skills/safe-skill/refs/example.md
 
@@ -41,6 +43,17 @@ let
     grep -F 'Command body.' ${renderedPackage}/claude/commands/safe-command.md
     grep -F '# Rendered Package OpenCode' ${renderedPackage}/opencode/AGENTS.md
     grep -F 'Bundled reference body.' ${renderedPackage}/opencode/skills/safe-skill/refs/example.md
+    grep -F '# Instruction BOM: claude' ${renderedPackage}/claude/BOM.md
+    grep -F 'Estimated token counts using tiktoken encoding `cl100k_base`' ${renderedPackage}/claude/BOM.md
+    grep -F 'not provider-authoritative context billing' ${renderedPackage}/claude/BOM.md
+    grep -F '| Generated instructions | 1 |' ${renderedPackage}/claude/BOM.md
+    grep -F '| Commands | 1 |' ${renderedPackage}/claude/BOM.md
+    grep -F '| Skills | 1 |' ${renderedPackage}/opencode/BOM.md
+    grep -F '| Skill subfiles | 1 |' ${renderedPackage}/opencode/BOM.md
+    grep -F '| skills/safe-skill/refs/example.md |' ${renderedPackage}/opencode/BOM.md
+    grep -F '## Root/main instruction summary' ${renderedPackage}/claude/BOM.md
+    grep -F '## Per-command file-cost' ${renderedPackage}/claude/BOM.md
+    ! grep -F '| BOM.md |' ${renderedPackage}/claude/BOM.md
     touch $out
   '';
 

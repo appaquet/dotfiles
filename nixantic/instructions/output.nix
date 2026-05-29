@@ -51,7 +51,7 @@ let
       destination = "/${dir}/${filename}";
     };
 
-  # mkPackage :: { scopes, postProcess ? false } -> derivation
+  # mkPackage :: { scopes, postProcess ? false, bom ? { ... } } -> derivation
   #   Assembles all harness scopes into a single symlinkJoin package.
   #
   #   For each scope, processes two instruction sources:
@@ -64,15 +64,54 @@ let
   #   postProcess: when true, applies postProcessContent to every file's embed
   #     before writing. Useful for agent-to-human output where agents may emit
   #     blank lines or `.` sentinels.
+  #
+  #   bom: package/render-only bill-of-materials export.
+  #     Uses tiktoken with an encoding-first configuration and writes one
+  #     estimated-count markdown report to each harness root.
   mkPackage =
     {
       scopes,
       postProcess ? false,
+      bom ? { },
     }:
     let
       process = if postProcess then postProcessContent else (x: x);
+      bomConfig = {
+        encoding = "cl100k_base";
+        tiktokenPackage = pkgs.python3Packages.tiktoken;
+      }
+      // bom;
       resolveFilename =
         path: item: if item ? outputPath && item.outputPath != null then item.outputPath else "${path}.md";
+      startsWith = prefix: text: builtins.substring 0 (builtins.stringLength prefix) text == prefix;
+      classifyEntry =
+        source: relativePath:
+        if source == "skillFile" then
+          "skillSubfiles"
+        else if startsWith "agents/" relativePath then
+          "agents"
+        else if startsWith "commands/" relativePath then
+          "commands"
+        else if builtins.match "skills/[^/]+/SKILL\\.md" relativePath != null then
+          "skills"
+        else
+          "instructions";
+      mkEntry =
+        scope: source: path: item:
+        let
+          harnessName = scope.harness.name or scope.harness.outputDir;
+          filename = resolveFilename path item;
+          content = process item.embed;
+        in
+        {
+          inherit content source;
+          inherit harnessName;
+          harnessDir = scope.harness.outputDir;
+          relativePath = filename;
+          destination = "${scope.harness.outputDir}/${filename}";
+          category = classifyEntry source filename;
+          file = mkFile scope.harness.outputDir path filename content;
+        };
       # Each entry tracks its final destination path so collisions can be caught
       # with a clear diagnostic. Without this guard, two files resolving to the
       # same destination (e.g. a skill sub-file whose path equals an
@@ -80,36 +119,46 @@ let
       fileEntries = lib.concatLists (
         lib.mapAttrsToList (
           _: scope:
-          (lib.mapAttrsToList (
-            path: instr:
-            let
-              filename = resolveFilename path instr;
-            in
-            {
-              destination = "${scope.harness.outputDir}/${filename}";
-              file = mkFile scope.harness.outputDir path filename (process instr.embed);
-            }
-          ) scope.instructions)
-          ++ (lib.mapAttrsToList (
-            path: f:
-            let
-              filename = resolveFilename path f;
-            in
-            {
-              destination = "${scope.harness.outputDir}/${filename}";
-              file = mkFile scope.harness.outputDir path filename (process f.embed);
-            }
-          ) (scope.skillFiles or { }))
+          (lib.mapAttrsToList (mkEntry scope "instruction") scope.instructions)
+          ++ (lib.mapAttrsToList (mkEntry scope "skillFile") (scope.skillFiles or { }))
         ) scopes
       );
 
+      bomDestinations = lib.mapAttrsToList (_: scope: "${scope.harness.outputDir}/BOM.md") scopes;
+
       duplicateDestinations =
         let
-          grouped = lib.groupBy (entry: entry.destination) fileEntries;
+          destinations = (map (entry: entry.destination) fileEntries) ++ bomDestinations;
+          grouped = lib.groupBy (destination: destination) destinations;
         in
-        builtins.filter (dest: builtins.length grouped.${dest} > 1) (builtins.attrNames grouped);
+        builtins.filter (destination: builtins.length grouped.${destination} > 1) (
+          builtins.attrNames grouped
+        );
 
-      allFiles = map (entry: entry.file) fileEntries;
+      bomEntries = lib.mapAttrs (
+        _: scope:
+        let
+          harnessName = scope.harness.name or scope.harness.outputDir;
+        in
+        builtins.map (entry: {
+          inherit (entry)
+            category
+            content
+            relativePath
+            source
+            ;
+        }) (builtins.filter (entry: entry.harnessName == harnessName) fileEntries)
+      ) scopes;
+
+      bomFiles = lib.mapAttrsToList (
+        _: scope:
+        let
+          harnessName = scope.harness.name or scope.harness.outputDir;
+        in
+        mkBomFile scope bomConfig.encoding bomConfig.tiktokenPackage bomEntries.${harnessName}
+      ) scopes;
+
+      allFiles = (map (entry: entry.file) fileEntries) ++ bomFiles;
     in
     assert
       duplicateDestinations == [ ]
@@ -117,8 +166,38 @@ let
     pkgs.symlinkJoin {
       name = "nixantic-instructions";
       paths = allFiles;
+      passthru.bom = {
+        encoding = bomConfig.encoding;
+        entries = bomEntries;
+      };
     };
+
+  mkBomFile =
+    scope: encoding: tiktokenPackage: entries:
+    let
+      harnessName = scope.harness.name or scope.harness.outputDir;
+      manifest = pkgs.writeText "${scope.harness.outputDir}-bom-manifest.json" (
+        builtins.toJSON {
+          harness = harnessName;
+          inherit encoding entries;
+        }
+      );
+      python = pkgs.python3.withPackages (_: [ tiktokenPackage ]);
+    in
+    pkgs.runCommand "${scope.harness.outputDir}-bom"
+      {
+        nativeBuildInputs = [ python ];
+      }
+      ''
+        mkdir -p "$out/${scope.harness.outputDir}"
+        python ${./render-bom.py} ${manifest} "$out/${scope.harness.outputDir}/BOM.md"
+      '';
 in
 {
-  inherit postProcessContent mkFile mkPackage;
+  inherit
+    postProcessContent
+    mkFile
+    mkPackage
+    mkBomFile
+    ;
 }
