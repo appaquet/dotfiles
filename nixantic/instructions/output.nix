@@ -8,6 +8,12 @@
 */
 
 let
+  vendoredCl100kBaseHash = "223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7";
+  vendoredCl100kBase = pkgs.fetchurl {
+    url = "https://openaipublic.blob.core.windows.net/encodings/cl100k_base.tiktoken";
+    hash = "sha256-Ijkht27pm96ZW3/3OFE+7xAPtR0YyTWXoRO8/+hlsqc=";
+  };
+
   # postProcessContent :: string -> string
   #   Cleans up generated markdown output. Applied when mkPackage is called
   #   with postProcess = true. Two transformations run in order, line by line:
@@ -78,6 +84,8 @@ let
       process = if postProcess then postProcessContent else (x: x);
       bomConfig = {
         encoding = "cl100k_base";
+        encodingPath = vendoredCl100kBase;
+        encodingHash = vendoredCl100kBaseHash;
         tiktokenPackage = pkgs.python3Packages.tiktoken;
       }
       // bom;
@@ -155,7 +163,9 @@ let
         let
           harnessName = scope.harness.name or scope.harness.outputDir;
         in
-        mkBomFile scope bomConfig.encoding bomConfig.tiktokenPackage bomEntries.${harnessName}
+        mkBomFile scope bomConfig.encoding bomConfig.tiktokenPackage bomConfig.encodingPath
+          bomConfig.encodingHash
+          bomEntries.${harnessName}
       ) scopes;
 
       allFiles = (map (entry: entry.file) fileEntries) ++ bomFiles;
@@ -173,13 +183,14 @@ let
     };
 
   mkBomFile =
-    scope: encoding: tiktokenPackage: entries:
+    scope: encoding: tiktokenPackage: encodingPath: encodingHash: entries:
     let
       harnessName = scope.harness.name or scope.harness.outputDir;
       manifest = pkgs.writeText "${scope.harness.outputDir}-bom-manifest.json" (
         builtins.toJSON {
           harness = harnessName;
-          inherit encoding entries;
+          inherit encoding encodingHash entries;
+          encodingPath = toString encodingPath;
         }
       );
       python = pkgs.python3.withPackages (_: [ tiktokenPackage ]);
@@ -189,6 +200,11 @@ let
         nativeBuildInputs = [ python ];
       }
       ''
+        if [ ! -f ${lib.escapeShellArg (toString encodingPath)} ]; then
+          echo "missing local tiktoken encoding asset: ${toString encodingPath}" >&2
+          exit 1
+        fi
+
         mkdir -p "$out/${scope.harness.outputDir}"
         python ${./render-bom.py} ${manifest} "$out/${scope.harness.outputDir}/BOM.md"
       '';

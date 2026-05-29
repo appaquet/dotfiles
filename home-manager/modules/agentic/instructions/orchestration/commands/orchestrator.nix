@@ -5,6 +5,10 @@
       description = "Activate orchestrator mode";
       harnesses = [ "claude" ];
 
-      content = scope.blocks."orchestration-prompt".body;
+      content = ''
+        ${scope.blocks."orchestration-prompt".body}
+
+        STOP. Don't do anything until I tell you to.
+      '';
     };
 }

@@ -10,8 +10,18 @@
 
 let
   tooling = import ./builders.nix { inherit pkgs lib; };
+  bomRendererPython = pkgs.python3.withPackages (_: [ pkgs.python3Packages.tiktoken ]);
   sourceSets = import ../source-sets.nix;
   harnesses = import ./harnesses { renderFrontmatter = tooling.renderFrontmatter; };
+  missingVendoredEncodingManifest = pkgs.writeText "missing-vendored-encoding-manifest.json" (
+    builtins.toJSON {
+      harness = "claude";
+      encoding = "cl100k_base";
+      encodingPath = "/definitely/missing-cl100k_base.tiktoken";
+      encodingHash = "223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7";
+      entries = [ ];
+    }
+  );
 
   renderedPackageSources = tooling.normalizeSourceDeclarations (
     sourceSets.resolveSources { sourceRoots = [ ./tests/fixtures/rendered-package ]; }
@@ -57,6 +67,25 @@ let
     touch $out
   '';
 
+  missingVendoredEncodingCheck =
+    pkgs.runCommand "missing-vendored-encoding-check"
+      {
+        nativeBuildInputs = [ bomRendererPython ];
+      }
+      ''
+        err="$TMPDIR/missing-vendored-encoding.err"
+        python ${./render-bom.py} ${missingVendoredEncodingManifest} "$TMPDIR/BOM.md" 2>"$err" && {
+          echo "FAIL: missing vendored encoding asset should have failed" >&2
+          exit 1
+        }
+        grep -F 'Missing local tiktoken encoding asset for BOM generation' "$err" || {
+          echo "FAIL: missing vendored encoding asset failed for an unexpected reason" >&2
+          cat "$err" >&2
+          exit 1
+        }
+        touch $out
+      '';
+
   # Verify that referencing a nonexistent block fails Nix evaluation.
   # Proves the Nix-level reference validation mechanism works at build time.
   badRefCheck =
@@ -82,6 +111,7 @@ in
 pkgs.runCommand "nixantic-instructions-check" { } ''
   : ${testResult}
   : ${badRefCheck}
+  : ${missingVendoredEncodingCheck}
   : ${renderedPackageCheck}
   : ${package}
   touch $out

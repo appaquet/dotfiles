@@ -40,6 +40,10 @@ let
     scopes.claude = scope;
     bom.encoding = "cl100k_base";
   };
+  packageWithVendoredPath = output.mkPackage {
+    scopes.claude = scope;
+    bom.encodingPath = "/tmp/cl100k_base.tiktoken";
+  };
   defaultContents = map (entry: entry.content) packageWithDefaults.passthru.bom.entries.claude;
 
   authoredBomCollision = builtins.tryEval (
@@ -65,6 +69,11 @@ let
       name = "BOM encoding can be configured first-class";
       pass = packageWithEncoding.passthru.bom.encoding == "cl100k_base";
       detail = "expected explicit encoding to be surfaced in package metadata";
+    }
+    {
+      name = "BOM path override does not change manifest entry collection";
+      pass = builtins.length packageWithVendoredPath.passthru.bom.entries.claude == 4;
+      detail = "expected vendored encoding path overrides to leave BOM manifest entries intact";
     }
     {
       name = "BOM manifest uses final rendered content";
