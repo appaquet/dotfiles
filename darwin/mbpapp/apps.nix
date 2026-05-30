@@ -86,6 +86,9 @@
       {
         name = "google-gemini";
       }
+      {
+        name = "chatgpt";
+      }
 
       {
         name = "docker-desktop";
