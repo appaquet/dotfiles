@@ -170,6 +170,13 @@ let
           "secrets/docs/features/**" = "allow";
         };
 
+        skill = {
+          "*" = "ask";
+          ctx-load = "allow";
+          ctx-save = "allow";
+          proj-editing = "allow";
+        };
+
         bash = (
           {
             "*" = "deny";

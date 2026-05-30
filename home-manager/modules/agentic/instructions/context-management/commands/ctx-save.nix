@@ -12,7 +12,7 @@
 
       ## Instructions
 
-      1. Load the `proj-editing` skill
+      1. Ensure `proj-editing` skill loaded.
 
       2. 🔳 Note `proj` symlink (see above). Identify current phase from checkpoint or ask user
 

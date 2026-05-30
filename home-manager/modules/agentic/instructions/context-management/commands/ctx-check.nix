@@ -13,8 +13,7 @@
 
         ## Instructions
 
-        1. 🔳 Review current conversation and task
-           - Apply ${scope.blocks.deep-thinking.reference} procedure
+        1. 🔳 Review current conversation and task. Use ${scope.blocks.deep-thinking.reference}.
 
         2. 🔳 Report your understanding using ${scope.blocks.context-understanding.reference}. If understanding < 10/10, suggest `/ctx-improve`
 
