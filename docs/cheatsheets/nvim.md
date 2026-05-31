@@ -350,6 +350,8 @@ keymaps, but also default/built-ins that I tend to forget.
 Personal Knowledge Management System keymaps. Works from any directory - opens floating window when
 not in Exomind, operates in-place when already in an Exomind buffer.
 
+* `<leader>mgh` Go to `derived/home.md`
+* `<leader>mgt` Go to `derived/todos.md`
 * `<leader>mjj` Open today's note
 * `<leader>mjp` Open yesterday's note
 * `<leader>mjn` Open tomorrow's note

@@ -4,6 +4,7 @@ local fzf = require("fzf-lua")
 
 require("which-key").add({
 	{ "<leader>m", group = "Exomind" },
+	{ "<leader>mg", group = "Goto" },
 	{ "<leader>mj", group = "Journal" },
 	{ "<leader>mt", group = "Templates" },
 })
@@ -37,6 +38,17 @@ local function ensure_exomind_context(wait_for_lsp)
 			return #vim.lsp.get_clients({ bufnr = 0, name = "markdown_oxide" }) > 0
 		end, 50)
 	end
+end
+
+local function open_exomind_file(relative_path)
+	local path = exomind_dir .. "/" .. relative_path
+	if vim.fn.filereadable(path) ~= 1 then
+		vim.notify("Exomind file not found: " .. path, vim.log.levels.WARN)
+		return
+	end
+
+	ensure_exomind_context(false)
+	vim.cmd("edit " .. vim.fn.fnameescape(path))
 end
 
 -- fzf action that opens file in Exomind float
@@ -214,7 +226,15 @@ local function open_daily_with_hydrate(day_arg)
 		nil, vim.api.nvim_get_current_buf())
 end
 
--- Journal keymaps
+-- Exomind keymaps
+vim.keymap.set("n", "<leader>mgh", function()
+	open_exomind_file("derived/home.md")
+end, { silent = true, desc = "Exomind: Goto home" })
+
+vim.keymap.set("n", "<leader>mgt", function()
+	open_exomind_file("derived/todos.md")
+end, { silent = true, desc = "Exomind: Goto todos" })
+
 vim.keymap.set("n", "<leader>mjj", function()
 	open_daily_with_hydrate("today")
 end, { silent = true, desc = "Exomind: Today's note" })
