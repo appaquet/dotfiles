@@ -143,8 +143,8 @@ let
 
         skill = {
           "*" = "ask";
-          ctx-load = "allow";
-          ctx-save = "allow";
+          proj-load = "allow";
+          proj-save = "allow";
           mem-editing = "allow";
           proj-editing = "allow";
           human-writer = "allow";
@@ -172,8 +172,8 @@ let
 
         skill = {
           "*" = "ask";
-          ctx-load = "allow";
-          ctx-save = "allow";
+          proj-load = "allow";
+          proj-save = "allow";
           proj-editing = "allow";
         };
 

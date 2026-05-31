@@ -102,8 +102,8 @@
       "WebFetch(domain:docs.rs)",
       "WebFetch(domain:jj-vcs.github.io)",
       "WebFetch(domain:docs.jj-vcs.dev)",
-      "Skill(ctx-load)",
-      "Skill(ctx-save)",
+      "Skill(proj-load)",
+      "Skill(proj-save)",
       "Skill(mem-editing)",
       "Skill(proj-editing)"
     ],

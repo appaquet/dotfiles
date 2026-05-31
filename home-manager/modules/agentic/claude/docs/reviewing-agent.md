@@ -8,7 +8,7 @@ Shared infrastructure for code review agents. All review agents follow this work
    THEN, continue
 
 2. 🔳 Load context
-   - Run `/ctx-load` for project context, branch state, project docs
+   - Run `/proj-load` for project context, branch state, project docs
    - 🚀 Engage thrusters - As sub-agent, proceed immediately after loading
 
 3. 🔳 Gather guidelines (merge in priority order)
