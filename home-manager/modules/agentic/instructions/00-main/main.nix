@@ -35,7 +35,6 @@
 
         If work fails after 5 attempts, STOP and ask user for instructions
 
-
         ${scope.blocks."task-management".embed}
 
         ${scope.blocks."pre-flight".embed}
