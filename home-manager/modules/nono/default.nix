@@ -55,6 +55,8 @@ in
           "$HOME/.local/state/nix"
           "$HOME/.local/share/nix"
           "$HOME/.nix-defexpr"
+
+          "$HOME/.local/utils"
         ];
         allow = [
           "$HOME/.config/jj"
