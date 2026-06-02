@@ -17,7 +17,7 @@
         * `proj` symlink in jj change with desc `private: proj - <project-name>`
           * Contains symlink file, nothing else. Never mix doc changes into it.
         * Doc file changes (00-*.md, 01-*.md, etc.)
-          * jj change desc: `private: claude: docs -`
+          * jj change desc: `private: agent: docs -`
           * Only doc files, no code or symlink. Use jj fileset to commit/squash doc files.
 
         ## Overall writing rules

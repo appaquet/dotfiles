@@ -29,7 +29,7 @@
         "closest_bookmark(to)" = "heads(::to & bookmarks())";
         "recent()" = "committer_date(after:\"1 months ago\")";
         "private()" = "description(glob:'private:*')";
-        "claude()" = "description(glob:'private: claude:*')";
+        "agent()" = "description(glob:'private: agent:*') | description(glob:'private: claude:*')";
       };
 
       aliases = {
@@ -78,11 +78,11 @@
           "trunk()" # rebase on trunk
         ];
 
-        # Squash consecutive working changes (claude's, empty, undescribed) into @
+        # Squash consecutive working changes (agent-authored, empty, undescribed) into @
         "squash-working" = [
           "squash"
           "--from"
-          "(trunk()..@) & latest((trunk()..@) & ~(empty() | claude() | description(exact:'')))..(@- & (empty() | claude() | description(exact:'')))"
+          "(trunk()..@) & latest((trunk()..@) & ~(empty() | agent() | description(exact:'')))..(@- & (empty() | agent() | description(exact:'')))"
           "--to"
           "@"
         ];

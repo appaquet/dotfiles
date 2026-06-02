@@ -12,14 +12,14 @@
 
       | Purpose | Command |
       |---------|---------|
-      | Commit current | `jj commit -m "private: claude: description"` |
-      | Commit specific files of current | `jj commit -m "private: claude: description" <files...>` |
-      | New empty change | `jj new -m "private: claude: description"` |
-      | Rename current change | `jj describe -m "private: claude: description"` |
-      | Squash current into parent, changing parent message | `jj squash -m "private: claude: description"` |
+| Commit current | `jj commit -m "private: agent: description"` |
+| Commit specific files of current | `jj commit -m "private: agent: description" <files...>` |
+| New empty change | `jj new -m "private: agent: description"` |
+| Rename current change | `jj describe -m "private: agent: description"` |
+| Squash current into parent, changing parent message | `jj squash -m "private: agent: description"` |
       | Squash current into parent, keep parent message | `jj squash -u` |
       | Squash specific files to parent | `jj squash -u <files...>` |
-      | Split a jj change, selecting files to remain in original | `jj split -m "private: claude: description" <files...>` |
+| Split a jj change, selecting files to remain in original | `jj split -m "private: agent: description" <files...>` |
       | Diff (git style) | `jj diff --git` |
       | Diff working | `jj-diff-working --git` (`--stat` for files) |
       | Diff branch | `jj-diff-branch --git` |
@@ -56,7 +56,7 @@
 
       ## Commit Messages
 
-      Prefix commits with `"private: claude: "` so they can be easily identified and squashed before PR
+      Prefix commits with `"private: agent: "` so they can be easily identified and squashed before PR
       Always use `-m "message"` for commands that expect a message since they could open editor:
         `jj commit -m ...`
         `jj new -m ...`
@@ -64,8 +64,8 @@
         `jj squash -m ...` => will change destination message, use -u to keep destination (always `jj ls` before)
 
       <good-example>
-      jj commit -m "private: claude: fix validation bug"
-      jj commit -m "private: claude: feat(workspace): add collections API"
+      jj commit -m "private: agent: fix validation bug"
+      jj commit -m "private: agent: feat(workspace): add collections API"
       </good-example>
 
       <bad-example>

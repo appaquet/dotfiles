@@ -29,8 +29,8 @@
 
         4. Create `jj` change for this implementation
            - Run `jj ls` to check state
-           - If `@` is empty: `jj describe -m "private: claude: description"`
-           - If `@` has changes: `jj new -m "private: claude: description"`
+           - If `@` is empty: `jj describe -m "private: agent: description"`
+           - If `@` has changes: `jj new -m "private: agent: description"`
            - After task complete: `jj ls` then `jj commit -m "..."`
 
         5. 🔳 Implement tasks, using sub-agents delegation

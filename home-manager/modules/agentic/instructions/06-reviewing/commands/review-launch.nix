@@ -16,7 +16,7 @@
 
       ## Instructions
 
-      1. Create a new jj change: `jj new -m "private: claude: agents review"`
+      1. Create a new jj change: `jj new -m "private: agent: agents review"`
 
       2. Launch 4 specialized agents in BACKGROUND PARALLEL:
           * Agent 1: launch the "code-style-reviewer" agent

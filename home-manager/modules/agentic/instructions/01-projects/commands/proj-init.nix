@@ -35,7 +35,7 @@
          - Follow the phase doc rules
          - Confirm phase name(s) with `AskUserQuestion`
          - Make sure project links to phase
-         - Commit docs: `jj commit -m "private: claude: docs - <project-name>"`
+         - Commit docs: `jj commit -m "private: agent: docs - <project-name>"`
 
       7. **STOP**: User will decide next steps. You can propose, but not via ask.
     '';
