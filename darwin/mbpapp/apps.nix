@@ -84,9 +84,6 @@
       }
 
       {
-        name = "google-gemini";
-      }
-      {
         name = "chatgpt";
       }
 
