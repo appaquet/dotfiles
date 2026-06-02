@@ -178,6 +178,13 @@ in
     "amdgpu"
   ];
 
+  # Prevent X from automatically binding the nvidia card. This allows the gpu-switch script to
+  # manage it without fighting with X.
+  services.xserver.serverFlagsSection = ''
+    Option "AutoAddGPU" "false"
+    Option "AutoBindGPU" "false"
+  '';
+
   # From https://nixos.wiki/wiki/Nvidia
   hardware.nvidia = {
     # Hinders with dynamic switching since it manages the card using KMS
@@ -204,7 +211,10 @@ in
 
   systemd.services.switch-gpu-boot = {
     description = "Switch GPU to NVIDIA on boot";
-    after = [ "libvirtd.service" ];
+    after = [
+      "libvirtd.service"
+      "display-manager.service" # prevent X from grabbing dGPU
+    ];
     requires = [ "libvirtd.service" ];
     serviceConfig = {
       Type = "oneshot";
