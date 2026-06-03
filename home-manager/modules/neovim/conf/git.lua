@@ -20,6 +20,12 @@ require("diffview").setup({
 	enhanced_diff_hl = true,
 	diffopt = { algorithm = "histogram" },
 	keymaps = {},
+	view = {
+		cycle_layouts = {
+			default = { "diff2_horizontal", "diff1_inline" },
+		},
+		inline = { style = "overleaf" },
+	},
 })
 
 -- Close all open diffview instances across all tabs
