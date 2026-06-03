@@ -80,10 +80,7 @@
 
       ## State Verification
 
-      HARD GATE: Verify graph state with `jj ls` before ANY write command (`commit`, `new`,
-      `describe`, `squash`, `abandon`, `restore`, `rebase`). Read the output — confirm `@`
-      parent and working copy match expectations. State changes from your operations, user
-      actions, or external tools at any time.
+      HARD GATE: Verify graph state with `jj ls` before ANY write command (`commit`, `new`, `describe`, `squash`, `abandon`, `restore`, `rebase`). Read the output — confirm `@` parent and working copy match expectations. State changes from your operations, user actions, or external tools at any time. `jj ls` is the equivalent of `jj status` and `jj log` combined in one output.
 
       * Expected: Clean working copy OR only changes you made in this session
       * Shifted: Graph moved from previous operations or user actions — understand the new
