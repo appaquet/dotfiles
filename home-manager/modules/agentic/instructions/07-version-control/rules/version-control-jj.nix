@@ -8,7 +8,7 @@
 
       A jj change is like git commit, but keeps id even if changed. When mentionning commit in instructions, this means jj change.
 
-      Before every version control write operation, execute `jj ls`, in separate tool call to verify current state. May have concurrent changes and state drift.
+      Before any jj write operation, check state with `jj ls` in separate tool call. May have concurrent changes and state drift, never combine state verification and write in same command.
 
       Never use `git`, unless absolutely necessary, and should only be done for read-only. Write operations should be user approved.
       Never use `git stash` to temporarily save changes, use `jj new` to fork instead.

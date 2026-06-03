@@ -3,7 +3,7 @@
     content = ''
       Project files:
       ```
-      !`claude-proj-docs`
+      !`agentic-proj-docs`
       ```
     '';
   };

@@ -27,7 +27,7 @@ let
       ];
 
       projectDocs = mkAllowCommands [
-        "claude-proj-docs *"
+        "agentic-proj-docs *"
       ];
 
       dev = {
@@ -268,6 +268,7 @@ let
 
   opencode = pkgs.writeShellScriptBin "opencode" ''
     export OPENCODE_ENABLE_EXA=1
+    export OPENCODE_ROOT="$(pwd)"
     exec ${pkgs.opencode}/bin/opencode "$@"
   '';
 

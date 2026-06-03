@@ -18,7 +18,7 @@
       * Main doc: `00-<project-name>.md` inside the folder
       * Phase docs: `01-<phase-name>.md`, `02-<phase-name>.md`, etc. (numbered for ordering)
       * Symlink: `proj/` at repo root pointing to the project folder
-      * To print location of `proj` and its content, run `claude-proj-docs`
+      * To print location of `proj` and its content, run `agentic-proj-docs`
 
       ## Creation & update
       Always via `proj-editing` skill.

@@ -69,18 +69,6 @@ let
     exec maybe --profile claude -- claude --allow-dangerously-skip-permissions "$@"
   '';
 
-  # Utility to list project docs (avoids shell expansion issues in skill commands)
-  claude-proj-docs = pkgs.writeShellScriptBin "claude-proj-docs" ''
-    proj="''${CLAUDE_ROOT:-$(pwd)}/proj"
-    if [ -d "$proj" ]; then
-      abs=$(readlink -f "$proj")
-      echo "proj/ ($abs) files:"
-      ls "$proj/"
-    else
-      echo "No project files"
-    fi
-  '';
-
   # Toggle tmux window indicator when Claude is working (used by hooks)
   claude-tmux-indicator = pkgs.writeShellScriptBin "claude-tmux-indicator" ''
     CLAUDE_DIR="''${CLAUDE_ROOT:-.}"
@@ -139,7 +127,6 @@ in
     claude-wrapped
     nono-claude
 
-    claude-proj-docs
     claude-tmux-indicator
 
     pkgs.socat # required for sandboxing

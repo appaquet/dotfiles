@@ -42,7 +42,7 @@
       "Bash(gh pr checks:*)",
       "Bash(gh pr diff:*)",
       "Bash(gh pr review:*)",
-      "Bash(claude-proj-docs:*)",
+      "Bash(agentic-proj-docs:*)",
       "Bash(nix eval:*)",
       "Bash(nix build:*)",
       "Bash(nix flake:*)",
