@@ -17,6 +17,9 @@
           sourceRoots
           sources
           ;
+        settings = {
+          versionControl = cfg.versionControl;
+        };
       };
     in
     {
@@ -47,6 +50,15 @@
             default = "cl100k_base";
             description = "tiktoken encoding name used for estimated BOM token counts.";
           };
+        };
+
+        versionControl.mode = lib.mkOption {
+          type = lib.types.enum [
+            "jj"
+            "git"
+          ];
+          default = "jj";
+          description = "Version-control mode used when rendering VCS-aware nixantic instruction sources.";
         };
 
         packageName = lib.mkOption {

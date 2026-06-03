@@ -5,9 +5,14 @@
   bom ? { },
   sourceRoots ? [ ],
   sources ? { },
+  settings ? { },
 }:
 
 let
+  defaultSettings = {
+    versionControl.mode = "jj";
+  };
+  effectiveSettings = lib.recursiveUpdate defaultSettings settings;
   instructionApi = import ./builders.nix { inherit pkgs lib; };
   sourceSets = import ../source-sets.nix;
   harnesses = import ./harnesses {
@@ -23,6 +28,7 @@ let
     instructionApi.makeScope {
       inherit harness;
       sources = flattenedSources.sources;
+      settings = effectiveSettings;
     }
   ) harnesses;
   instructions = lib.mapAttrs (_: scope: scope.instructions) scopes;

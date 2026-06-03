@@ -11,20 +11,16 @@
       content = ''
         Goal: build a full plan for the task at hand: $ARGUMENTS
 
-        Project files: !`claude-proj-docs`
+        ## State
 
-        If no project files, STOP, and tell user. If in-memory planing required, should use `ctx-plan` instead.
-
-        ${scope.forHarness {
-          claude = "NEVER engage the native plan mode `EnterPlanMode`";
-          default = "";
-        }}
+        ${scope.blocks."project-files".embed}
 
         ## Instructions
         1. Ensure `proj-editing` skill loaded.
+           - If project files above empty, STOP, and tell user. If in-memory planning required, use `ctx-plan` instead.
 
         2. 🔳 Ensure context loaded, task define. 
-           - Use `proj-load` if not done.
+           - Use `proj-load` if not already loaded.
            - Clarify via `AskUserQuestion` if empty or unclear.
 
         3. 🔳 Research, clarify and plan
@@ -36,6 +32,11 @@
            - Need to use `proj-editing` skill, use project & phase docs rules and structure
 
         6. **STOP**: User will decide next steps
+
+        ${scope.forHarness {
+          claude = "NEVER engage the native plan mode `EnterPlanMode`";
+          default = "";
+        }}
       '';
     };
 }

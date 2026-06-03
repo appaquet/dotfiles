@@ -34,6 +34,10 @@ let
       name = "bom";
       result = (import ./bom.nix { inherit pkgs lib; }).allPass;
     }
+    {
+      name = "settings";
+      result = (import ./settings.nix { inherit pkgs lib; }).allPass;
+    }
   ];
 
   checkCase = case: if case.result then true else throw "FAIL [${case.name}]";

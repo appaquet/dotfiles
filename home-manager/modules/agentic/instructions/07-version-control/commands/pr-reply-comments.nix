@@ -40,7 +40,7 @@
            ```
          - Send reply via correct endpoint with PR number:
            ```bash
-           gh api repos/OWNER/REPO/pulls/''${PR_NUMBER}/comments/''${DATABASE_ID}/replies \
+           gh api repos/<OWNER>/<REPO>/pulls/''${PR_NUMBER}/comments/''${DATABASE_ID}/replies \
              -X POST \
              -f body="''${REPLY_BODY}"
            ```

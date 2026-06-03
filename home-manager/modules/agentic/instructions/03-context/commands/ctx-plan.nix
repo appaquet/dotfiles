@@ -11,7 +11,8 @@
       content = ''
         Goal: build a full plan for the task at hand, in memory/context: $ARGUMENTS
 
-        Project files: !`claude-proj-docs`
+        ## State
+        ${scope.blocks."project-files".embed}
 
         ${scope.forHarness {
           claude = "NEVER engage the native plan mode `EnterPlanMode`";
@@ -19,7 +20,7 @@
         }}
 
         ## Instructions
-        1. If project files exist, confirm with user if they want to write plan to project docs. If yes, STOP, and tell user to run `proj-plan`.
+        1. If project files listed above show, confirm with user if they want to write plan to project docs. If yes, STOP, and tell user to run `proj-plan`.
 
         2. 🔳 Ensure task define. 
            - Clarify via `AskUserQuestion` if empty or unclear.

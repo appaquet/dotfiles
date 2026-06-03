@@ -27,11 +27,9 @@
            - If user validation needed, task description should be clear about waiting for user input
            - Think if any task can be delegated to sub-agents, and if so, make sure the task description is clear about the delegation and which sub-agent to select.
 
-        4. Create `jj` change for this implementation
-           - Run `jj ls` to check state
-           - If `@` is empty: `jj describe -m "private: agent: description"`
-           - If `@` has changes: `jj new -m "private: agent: description"`
-           - After task complete: `jj ls` then `jj commit -m "..."`
+        4. Create version control commits for this implementation
+           - Check active changes
+           - Commit with proper message or change active commit message
 
         5. 🔳 Implement tasks, using sub-agents delegation
            - You need to follow ${scope.blocks."sub-agents-workflows".reference}
@@ -53,7 +51,7 @@
 
         8. 🔳 Run `proj-save` skill to update project and phase docs
 
-        9. 🔳 Commit / squash `jj` change with meaningful message if not already done, after `jj ls` verification. Changes you don't recognize may be mine.
+        9. 🔳 If this work is not yet saved, finalize it with the repository version-control workflow. Re-verify repository state first. Changes you don't recognize may be mine.
       '';
     };
 }

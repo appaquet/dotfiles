@@ -15,7 +15,7 @@
         * [ ] Tests are added/updated and passing using ${scope.blocks.testing-principles.reference}
         * [ ] Strictly follow ordering in ${scope.blocks.code-organization-order.reference}
         * [ ] All task ACs verified passing
-        * [ ] Diff reviewed (`jj-diff-working --git`)
+        * [ ] Changes diff reviewed
         * [ ] Temporary debug files/code removed
         * [ ] Code style guidelines followed
         * [ ] Formatting, linting, type check, tests pass

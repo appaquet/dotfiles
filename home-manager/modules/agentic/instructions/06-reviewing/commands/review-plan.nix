@@ -12,6 +12,10 @@
         REVIEW comments are my way of communicating issues or improvements to act on right away.
         They aren't left for future consideration nor to be ignored.
 
+        ## State
+
+        ${scope.blocks."project-files".embed}
+
         ## Instructions
 
         ### Phase 1: Plan
@@ -35,12 +39,13 @@
         4. 🔳 Check requirements
            - Verify fixes don't contradict existing requirements
            - Update existing requirements if needed (don't create new ones)
+           - Use the project file listing above to locate the relevant docs
 
         5. 🔳 Update project doc
            - Add fixes to Tasks section with priorities
 
         6. 🔳 Present plan
-           - Show prioritized list with research findings
+           - Show prioritized list with research findings, formatted as table
 
         7. **GATE**: Wait for `/implement`
 

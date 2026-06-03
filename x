@@ -490,15 +490,23 @@ cmd_copy() {
 }
 
 cmd_agent_build() {
+  local vcs_mode="${NIXANTIC_VCS_MODE:-jj}"
+  if [[ "$vcs_mode" != "jj" && "$vcs_mode" != "git" ]]; then
+    echo "NIXANTIC_VCS_MODE must be 'jj' or 'git'" >&2
+    exit 1
+  fi
+
   ${NIX_BUILDER} build --impure --out-link result --expr '
     let
       flake = builtins.getFlake (toString ./.);
       pkgs = flake.inputs.nixpkgs.legacyPackages.${builtins.currentSystem};
+      vcsMode = builtins.getEnv "NIXANTIC_VCS_MODE";
       instructions = flake.nixantic.lib.mkInstructions {
         inherit pkgs;
         lib = pkgs.lib;
         postProcess = true;
         sourceRoots = [ ./home-manager/modules/agentic/instructions ];
+        settings.versionControl.mode = if vcsMode == "" then "jj" else vcsMode;
       };
     in
     instructions.package
@@ -509,10 +517,11 @@ cmd_agent_build() {
 cmd_agent_help() {
   cat >&2 <<EOF
 agent commands:
-  build     Build nixantic instruction package to result
+  build     Build nixantic instruction package to result. Set NIXANTIC_VCS_MODE=jj|git to switch rendered VCS mode.
 
 Examples:
   ./x agent build
+  NIXANTIC_VCS_MODE=git ./x agent build
 EOF
 }
 

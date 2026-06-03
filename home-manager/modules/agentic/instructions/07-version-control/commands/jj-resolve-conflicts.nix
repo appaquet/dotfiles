@@ -1,5 +1,6 @@
 {
   nixantic.sources.version-control.commands."jj-resolve-conflicts" = {
+    when = { scope }: scope.settings.versionControl.mode == "jj";
     description = "Resolve jj conflicts in the current change stack, oldest to newest";
 
     effort = "xhigh";

@@ -13,8 +13,8 @@
           - Only insert REVIEW comments
           - User will decide on actual code changes
 
-        - NEVER create `jj` changes since multiple reviewers run in parallel
-          - Parent agent manages `jj` operations after collecting all reviews
+        - NEVER create version control commits since multiple reviewers run in parallel
+          - Parent agent manages vcs operations after collecting all reviews
 
         - Do NOT use external tools (bash, formatter, linters, etc.)
           Rely solely on your training and the guidelines provided
@@ -35,18 +35,18 @@
            - General Guidelines: Agent's built-in criteria (in agent file)
 
         3. 🔳 Create rule tasks
-            - From merged guidelines (project > user > general), for EACH rule create `${scope.harness.tools.taskCreate}`:
-              - Subject: "Check: [rule name]"
-              - Description: What to look for + good/bad examples
-            - 🔳 Create one task using `${scope.harness.tools.taskCreate}` for EACH rule
+           - From merged guidelines (project > user > general), for EACH rule create `${scope.harness.tools.taskCreate}`:
+             - Subject: "Check: [rule name]"
+             - Description: What to look for + good/bad examples
+           - 🔳 Create one task using `${scope.harness.tools.taskCreate}` for EACH rule
 
         4. 🔳 Load changed files
-           - Run `jj-diff-branch --stat` to list modified files
+           - List version control changed files (not code diff yet)
              - Exclude reviewing docs themselves and generated files (e.g., *.pb.go)
-           - For safety-critical patterns (exposed secrets, hardcoded credentials, debug statements),
-             supplement LLM judgment with deterministic Grep-based checks across changed files
+             - For safety-critical patterns (exposed secrets, hardcoded credentials, debug statements),
+               supplement LLM judgment with deterministic Grep-based checks across changed files
            - For each file to be reviewed:
-             - Load diff: `jj-diff-branch --git <file>`
+             - Load diff for file
              - Load surrounding context if needed to understand changes
 
         5. 🔳 Execute rule checks

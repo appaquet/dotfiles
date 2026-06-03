@@ -1,25 +1,30 @@
 {
-  nixantic.sources.version-control.instructions."rules/version-control" = {
+  nixantic.sources.version-control.instructions."rules/version-control-jj" = {
+    when = { scope }: scope.settings.versionControl.mode == "jj";
+    outputPath = "rules/version-control.md";
     heading = "Version Control (Jujutsu)";
     content = ''
-      We are using `jj` (collocated with git), which is always detached head state
-      HARD GATE: `jj ls` before ANY write operation (see State Verification)
-      Never use `git`, unless absolutely necessary, and should only be done for read-only
-      Never use `git stash`
+      We are using Jujutsu (`jj`), in collocated mode with git, which is always detached head state.
+
+      A jj change is like git commit, but keeps id even if changed. When mentionning commit in instructions, this means jj change.
+
+      Before every version control write operation, execute `jj ls`, in separate tool call to verify current state. May have concurrent changes and state drift.
+
+      Never use `git`, unless absolutely necessary, and should only be done for read-only. Write operations should be user approved.
+      Never use `git stash` to temporarily save changes, use `jj new` to fork instead.
 
       ## Commands
 
-
       | Purpose | Command |
       |---------|---------|
-| Commit current | `jj commit -m "private: agent: description"` |
-| Commit specific files of current | `jj commit -m "private: agent: description" <files...>` |
-| New empty change | `jj new -m "private: agent: description"` |
-| Rename current change | `jj describe -m "private: agent: description"` |
-| Squash current into parent, changing parent message | `jj squash -m "private: agent: description"` |
+      | Commit current | `jj commit -m "private: agent: description"` |
+      | Commit specific files of current | `jj commit -m "private: agent: description" <files...>` |
+      | New empty change | `jj new -m "private: agent: description"` |
+      | Rename current change | `jj describe -m "private: agent: description"` |
+      | Squash current into parent, changing parent message | `jj squash -m "private: agent: description"` |
       | Squash current into parent, keep parent message | `jj squash -u` |
       | Squash specific files to parent | `jj squash -u <files...>` |
-| Split a jj change, selecting files to remain in original | `jj split -m "private: agent: description" <files...>` |
+      | Split a jj change, selecting files to remain in original | `jj split -m "private: agent: description" <files...>` |
       | Diff (git style) | `jj diff --git` |
       | Diff working | `jj-diff-working --git` (`--stat` for files) |
       | Diff branch | `jj-diff-branch --git` |

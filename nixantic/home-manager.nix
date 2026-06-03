@@ -13,6 +13,9 @@ let
     postProcess = cfg.instructions.postProcess;
     sourceRoots = cfg.sourceRoots;
     sources = cfg.sources;
+    settings = {
+      versionControl = cfg.versionControl;
+    };
   };
   harnessNames = instructions.harnessNames;
 
@@ -116,6 +119,16 @@ in
         description = "Generated instruction files to install into the Home Manager profile.";
       };
     };
+
+    versionControl.mode = lib.mkOption {
+      type = lib.types.enum [
+        "jj"
+        "git"
+      ];
+      default = "jj";
+      description = "Version-control mode used when rendering VCS-aware nixantic instruction sources.";
+    };
+
   };
 
   config = {

@@ -231,7 +231,7 @@ let
 
       orchestrator = {
         mode = "primary";
-        description = "Project manager agent that manages project documentation, code versioning and delegates work to sub-agents.";
+        description = "Project manager agent that manages project documentation, version control and delegates work to sub-agents.";
         prompt = instructions.blocks.opencode."orchestration-prompt".body;
         permission = permissions.agent.planner;
       };

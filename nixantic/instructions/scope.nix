@@ -6,6 +6,7 @@
   mkSkillFile,
   mkCommand,
   forHarness,
+  forSetting,
   renderFrontmatter,
   lib,
   pkgs,
@@ -36,6 +37,7 @@ let
     {
       harness,
       sources ? { },
+      settings ? { },
     }:
     lib.fix (
       self:
@@ -44,9 +46,11 @@ let
           harness
           scopeApi
           sources
+          settings
           ;
 
         forHarness = forHarness self;
+        forSetting = forSetting self;
       }
       // addRawContent self
       // addProcessedContent self
@@ -54,7 +58,7 @@ let
       // addInstructions self
     );
 
-  # scopeApi :: { mkBlock, mkInstructions, mkAgent, mkSkill, mkCommand, mkSkillFile, forHarness, renderFrontmatter }
+  # scopeApi :: { mkBlock, mkInstructions, mkAgent, mkSkill, mkCommand, mkSkillFile, forHarness, forSetting, renderFrontmatter }
   #   Constructors and helpers bound as `self.scopeApi` within the scope. Enables
   #   self-referential constructor calls throughout the pipeline (e.g.
   #   self.scopeApi.mkAgent). See builders.nix for constructor signatures.
@@ -67,6 +71,7 @@ let
       mkCommand
       mkSkillFile
       forHarness
+      forSetting
       renderFrontmatter
       ;
   };
@@ -349,13 +354,32 @@ let
   isForHarness =
     self: data: !builtins.hasAttr "harnesses" data || builtins.elem self.harness.name data.harnesses;
 
+  doesWhenPredicateMatch =
+    self: kind: key: data:
+    if !(builtins.hasAttr "when" data) then
+      true
+    else if !(builtins.isFunction data.when) then
+      throw "Nixantic ${kind} '${key}' when predicate must be a function"
+    else
+      let
+        result = data.when { scope = self; };
+      in
+      if builtins.isBool result then
+        result
+      else
+        throw "Nixantic ${kind} '${key}' when predicate must return a boolean";
+
+  isIncluded =
+    self: kind: key: data:
+    isForHarness self data && doesWhenPredicateMatch self kind key data;
+
   # filterForHarness :: self -> attrs -> attrs
-  #   Filters an attrset by isForHarness, removing entries restricted to other harnesses.
-  filterForHarness = self: lib.filterAttrs (_: data: isForHarness self data);
+  #   Filters an attrset by harness and declaration-level `when` predicates.
+  filterForHarness = self: lib.filterAttrs (key: data: isIncluded self "source" key data);
 
   # filterSkillsForHarness :: self -> attrs -> attrs
   #   Same as filterForHarness but checks entry.main (skills use { main, files } structure).
-  filterSkillsForHarness = self: lib.filterAttrs (_: entry: isForHarness self entry.main);
+  filterSkillsForHarness = self: lib.filterAttrs (key: entry: isIncluded self "skill" key entry.main);
 
   applySource =
     self: value:

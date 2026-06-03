@@ -18,7 +18,11 @@
         role is to analyze branch diffs and provide clear, concise summaries of what changed in each file,
         focusing on the technical implementation rather than business value.
 
-        Project files: !`claude-proj-docs`
+        ## State
+
+        ${scope.blocks."project-files".embed}
+        ${scope.blocks."current-branch".embed}
+        ${scope.blocks."current-change-files".embed}
 
         ## Task Tracking
 
@@ -26,17 +30,17 @@
 
         | # | Subject | Description |
         | --- | --- | --- |
-        | 1 | Check branch state | Get branch name and list of all changed files |
+        | 1 | Check branch state | Reuse current branch state and changed-file list |
         | 2 | Read project doc | Check for existing Files section, note if update needed |
-        | 3 | Create file tasks | **FIRST**: Get file list via jj-diff-branch --stat. **THEN**: For each code file (skip docs/generated), create `${scope.harness.tools.taskCreate}` with subject "Summarize: [filename]" |
+        | 3 | Create file tasks | **FIRST**: Reuse the changed-file list above. **THEN**: For each code file (skip docs/generated), create `${scope.harness.tools.taskCreate}` with subject "Summarize: [filename]" |
         | 4 | Summarize files | For each Summarize task: read diff, understand changes, write technical summary, mark complete |
         | 5 | Format and return | Compile summaries into Files section format, return result |
 
         ## Instructions
 
         1. Check current branch state:
-           * Get current branch name: !`jj-current-branch`
-           * Get list of all changed files: !`jj-stacked-stats`
+           * Use the current branch / change state above
+           * If needed, check changed files in stacked branches
 
         2. Read existing project doc (if it exists):
            * Check for `proj/` symlink at repository root → find `00-*.md` main doc
@@ -44,14 +48,14 @@
            * If Files section exists and seems complete, ask if you should update it
 
         3. Create file tasks:
-           * **FIRST**: Get overview of changes via `jj-diff-branch --stat`
+            * **FIRST**: Get overview of changes from the changed-file list above
             * **THEN**: For **EACH** code file (excluding project docs and generated files like *.pb.go):
               * Create `${scope.harness.tools.taskCreate}` with subject "Summarize: [filename]"
              * Description: "Read diff, understand purpose, write 1-2 sentence technical summary"
 
         4. Summarize files - For **EACH** Summarize task:
            * Mark task in-progress
-           * Run `jj-diff-branch --git <file>` to see the actual changes
+           * Check code diff for each file
            * If needed for context, read the full file or surrounding files
            * Understand both what the file does and what changes were made
            * Create a concise technical summary

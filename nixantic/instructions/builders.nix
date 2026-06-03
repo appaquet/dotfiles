@@ -285,6 +285,22 @@ let
         throw "Unsupported harness: ${scope.harness.name}. Available: ${builtins.concatStringsSep ", " (builtins.attrNames values)}"
     );
 
+  # forSetting :: scope -> string|[string] -> { <setting-value>?, default?, ... } -> value
+  #   Selects authored content from structured scope.settings. The path may be a
+  #   dot-separated string such as "versionControl.mode" or a list of attr names.
+  forSetting =
+    scope: path: values:
+    let
+      pathParts = if builtins.isList path then path else lib.splitString "." path;
+      settingValue = lib.getAttrFromPath pathParts scope.settings;
+    in
+    values.${settingValue} or (
+      if builtins.hasAttr "default" values then
+        values.default
+      else
+        throw "Unsupported setting ${builtins.concatStringsSep "." pathParts}: ${settingValue}. Available: ${builtins.concatStringsSep ", " (builtins.attrNames values)}"
+    );
+
   renderFrontmatter = frontmatter.renderFrontmatter;
 
   scopeMod = import ./scope.nix {
@@ -296,6 +312,7 @@ let
       mkSkillFile
       mkCommand
       forHarness
+      forSetting
       renderFrontmatter
       pkgs
       lib
@@ -326,6 +343,7 @@ in
     mkCommand
     mkSkillFile
     forHarness
+    forSetting
     renderFrontmatter
     ;
 }

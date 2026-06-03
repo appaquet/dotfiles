@@ -1,5 +1,6 @@
 {
   nixantic.sources.version-control.commands."jj-absorb" = {
+    when = { scope }: scope.settings.versionControl.mode == "jj";
     description = "Distribute files from current change into their matching ancestor changes in the stack";
 
     argumentHint = "[change-id]";
@@ -12,11 +13,9 @@
 
       Source: `$ARGUMENTS` (change to absorb from, defaults to `@`)
 
-      Current branch: `!`jj-current-branch``
-
       ## Instructions
 
-       1. 🔳 Survey the stack
+      1. 🔳 Survey the stack
           - Run `jj-stacked-stats` to see all stacked branch changes and their files
           - Run `jj diff --stat -r <source>` to see files to distribute
           - If no files to distribute, report and stop
