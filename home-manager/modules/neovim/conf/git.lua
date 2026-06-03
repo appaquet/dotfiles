@@ -3,11 +3,24 @@ require("which-key").add({
 })
 
 -- Diffview
--- https://github.com/sindrets/diffview.nvim
+-- https://github.com/dlyongemallo/diffview-plus.nvim/
+-- https://github.com/dlyongemallo/diffview-plus.nvim/blob/main/lua/diffview/config.lua
 -- `--imply-local` means it will use the local version of the file on the right side
-require("diffview").setup({})
-
 local diffview_lib = require("diffview.lib")
+require("diffview").setup({
+	-- Persist file selections & show marks even when no selection
+	file_panel = {
+		always_show_marks = true,
+	},
+	persist_selections = {
+		enabled = true,
+	},
+
+	-- Better diffing
+	enhanced_diff_hl = true,
+	diffopt = { algorithm = "histogram" },
+	keymaps = {},
+})
 
 -- Close all open diffview instances across all tabs
 local function close_all_diffviews()

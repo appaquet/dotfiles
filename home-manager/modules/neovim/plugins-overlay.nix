@@ -13,5 +13,20 @@ final: prev: {
       meta.homepage = "https://github.com/zbirenbaum/copilot.lua/";
       meta.hydraPlatforms = [ ];
     };
+
+    # https://github.com/dlyongemallo/diffview-plus.nvim
+    diffview-nvim = prev.vimUtils.buildVimPlugin {
+      pname = "diffview-nvim";
+      version = "v0.34";
+      src = prev.fetchFromGitHub {
+        owner = "dlyongemallo";
+        repo = "diffview-plus.nvim";
+        rev = "v0.34";
+        sha256 = "sha256-M3Hf4y9HGFquBOK/Stv5FIxoVYX4aoO4dbbYQNPhisk=";
+      };
+      doCheck = false;
+      meta.homepage = "https://github.com/dlyongemallo/diffview-plus.nvim/";
+      meta.hydraPlatforms = [ ];
+    };
   };
 }
