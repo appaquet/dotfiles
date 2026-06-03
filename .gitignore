@@ -5,6 +5,7 @@ result
 .env
 .luarc.json
 .opencode
+.claude/*.lock
 docs/features
 *.local.*
 nvim.log
