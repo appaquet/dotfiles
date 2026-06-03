@@ -13,7 +13,7 @@
 
           ## Project docs creation
           - Should always be done via `proj-init`, don't attempt create without that procedure. This creates proper symlink (`proj`)  and initial project file (`proj/00-<name>.md`).
-          - Phase docs (`proj/NN-<phas>.md`) created mainly via `ctx-plan`, but can be created adhoc on user request. If phase doc unrelated to new work, ask user if split. Updated on task complete, on `proj-save` call, significant new info, uncertainties, decisions, insights, etc.
+          - Phase docs (`proj/NN-<phas>.md`) created mainly via `proj-plan`, but can be created adhoc on user request. If phase doc unrelated to new work, ask user if split. Updated on task complete, on `proj-save` call, significant new info, uncertainties, decisions, insights, etc.
 
           ## Version control
           - Keep the `proj` symlink in own commit named `private: proj - <project-name>`

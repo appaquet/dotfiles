@@ -114,7 +114,7 @@ let
         // bash.vcs.jjRead
         // bash.vcs.jjWrite
         // bash.vcs.ghRead
-        // mkAllowCommands [ "ln -s * proj" ];
+        // mkAllowCommands [ "ln * proj" ];
 
       developer =
         bash.shellRead

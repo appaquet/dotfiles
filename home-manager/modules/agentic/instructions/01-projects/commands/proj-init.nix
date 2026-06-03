@@ -31,7 +31,7 @@
            - Keep the `proj` symlink isolated in own commit named `private: proj - <project-name>`
 
         4. 🔳 Clarify project details if needed so that we can fill the project squeleton
-           - Otherwise, propose user running `/ctx-plan` after
+           - Otherwise, propose user running `proj-plan` after
 
         5. 🔳 Create project doc (00-<name>.md)
            - Follow the project doc rules
