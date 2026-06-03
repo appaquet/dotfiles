@@ -174,7 +174,10 @@ let
           "*" = "ask";
           proj-load = "allow";
           proj-save = "allow";
+          mem-editing = "allow";
           proj-editing = "allow";
+          human-writer = "allow";
+          customize-opencode = "allow";
         };
 
         bash = (
