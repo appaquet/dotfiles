@@ -86,14 +86,10 @@ vim.keymap.set(
 	":'<,'>CodeCompanion Add documentation to the selected text if it's missing. If it's a whole function, add proper function documentation. If it already exist, improve it. If it's code, add inline comments explaining it. If there are existing documentation, just improve it if needed. @insert_edit_into_file #buffer<CR>",
 	{ silent = true, desc = "CodeCompanion: Comment code" }
 )
-vim.keymap.set(
-	"n",
-	"gA",
-	"<cmd>CodeCompanion /prose<cr>",
-	{ silent = true, desc = "CodeCompanion: Inline prose completion" }
-)
+vim.keymap.set("n", "gA", "<cmd>CodeCompanion /prose<cr>", { silent = true, desc = "CodeCompanion: Inline prose completion" })
 vim.keymap.set({ "n", "v" }, "<leader>aa", ":'<,'>CodeCompanionActions<CR>", { silent = true, desc = "CodeCompanion: Actions" })
-vim.keymap.set("v", "<leader>ae", function()
+
+local function codecompanion_inline_edit()
 	vim.ui.input({ prompt = "Describe what needs to be done:" }, function(input)
 		if input and input ~= "" then
 			local system_prompt = "Use @insert_edit_into_file and #buffer for tool use."
@@ -102,7 +98,9 @@ vim.keymap.set("v", "<leader>ae", function()
 			vim.cmd(cmd)
 		end
 	end)
-end, { silent = true, desc = "CodeCompanion: Inline edit with prompt" })
+end
+vim.keymap.set("v", "<leader>ae", codecompanion_inline_edit, { silent = true, desc = "CodeCompanion: Inline edit with prompt" })
+vim.keymap.set("v", "ge", codecompanion_inline_edit, { silent = true, desc = "CodeCompanion: Inline edit with prompt" })
 
 -- ClaudeCode.nvim
 -- https://github.com/coder/claudecode.nvim

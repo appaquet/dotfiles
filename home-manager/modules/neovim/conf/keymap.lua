@@ -87,6 +87,10 @@ vim.keymap.set({ "n", "v" }, "<A-j>", "5j", { silent = true, desc = "Down 5 line
 vim.keymap.set({ "n", "v" }, "<A-k>", "5k", { silent = true, desc = "Up 5 lines" })
 vim.keymap.set({ "n", "v" }, "<A-Down>", "5j", { silent = true, desc = "Down 5 lines" })
 vim.keymap.set({ "n", "v" }, "<A-Up>", "5k", { silent = true, desc = "Up 5 lines" })
+vim.keymap.set({ "n", "v" }, "<A-h>", "e", { silent = true, desc = "Move to end of word" })
+vim.keymap.set({ "n", "v" }, "<A-l>", "b", { silent = true, desc = "Move to beginning of word" })
+vim.keymap.set({ "n", "v" }, "<A-Left>", "e", { silent = true, desc = "Move to end of word" })
+vim.keymap.set({ "n", "v" }, "<A-Right>", "e", { silent = true, desc = "Move to end of word" })
 
 -- Clipboard / yanking
 local function copy_selection_to_clipboard()

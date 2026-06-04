@@ -326,8 +326,10 @@ keymaps, but also default/built-ins that I tend to forget.
 ## AI Tools (a)
 
 * `<leader>aa` Show CodeCompanion actions
-* `<leader>ae` Inline edit with prompt (visual mode)
+* `<leader>ae` / `ge` Inline edit with prompt (visual mode)
 * `gA` Inline prose completion at cursor with prompt (normal mode)
+* `gs` Fix spelling and improve clarity (visual mode)
+* `gC` Add or improve documentation/comments (visual mode)
 
 ### Claude Integration (c)
 
@@ -476,7 +478,7 @@ not in Exomind, operates in-place when already in an Exomind buffer.
 * `zg` Add word to spelling dictionary
   (Use `1zg`, `2zg` for multiple dictionaries)
 * `zw` Remove word from spelling dictionary
-* `gs` Fix spelling/clarity (visual mode)
+* `gs` Fix spelling/clarity using ai (visual mode)
 
 ## Command-line Shortcuts
 
