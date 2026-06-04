@@ -14,7 +14,6 @@
         "nix-command"
         "fetch-closure"
       ];
-      auto-optimise-store = true;
       keep-outputs = true;
       keep-derivations = true;
       builders-use-substitutes = true;
@@ -23,6 +22,7 @@
         "@admin"
       ];
     };
+    optimise.automatic = true;
   };
 
   security.pam.services.sudo_local = {
