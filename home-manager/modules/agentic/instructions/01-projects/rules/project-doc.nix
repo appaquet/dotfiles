@@ -37,7 +37,7 @@
     projectDoc = ''
       ### Sections
       Keep ordered. Never reorder/rename/create more sections. Some optional (opt)
-      Order: Context, Checkpoint, Inbox (opt.), Requirements, Questions & Investigations (opt.), Phases, Files
+      Order: Context, Checkpoint, Inbox (opt.), Requirements, Design, Questions & Investigations (opt.), Phases, Files
 
       ### Context
       Purpose and scope of changes
@@ -53,11 +53,9 @@
       Acceptance criteria (ACs) on tasks define DONE. Verifiable conditions per task.
 
       #### Req. format
-      * R-numbered with status markers: `R1: ⬜ Description`
-      * Sub-levels when needed: R1.1, R1.2
-      * Phase annotation: `(Phase: Auth)` - by name, not number
-      * Tasks reference requirements: `[ ] Implement X (R1, R2.1)`
+      * R-numbered with status markers (R1, R2) w/ sub-levels when needed (R1.1, R1.2)
       * Status markers: ⬜ Not started, 🔄 In progress, ✅ Complete
+      * Phase annotation: `(Phase: Auth)`. By name, not number
       * Out of scopes (OOS) can be added as sub-sections under requirements
       * Example:
         ```markdown
@@ -65,6 +63,10 @@
           * R1.1: Sub-requirement if hierarchical
         * R2: 🔄 Another essential feature (Phase: Auth)
         * R3: ✅ Important supplementary feature (Phase: Setup)
+
+      ### Design (optional)
+      High-level design decisions and architecture. Should use ASCII diagrams for visual clarity.
+      Should be updated as design / phases evolve.
 
       ### Questions & Investigations (optional)
       Checklist of questions, decisions, and investigation records. Capture uncertainties when encountered, outcomes when discovered. Update continuously.
@@ -100,7 +102,7 @@
     phasesDoc = ''
       ### Sections
       Keep ordered. Never reorder/rename/create more sections. Some optional (opt)
-      Order: Context, Requirements (opt.), Questions & Investigations (opt.), Tasks, Files
+      Order: Context, Requirements (opt.), DEsign, Questions & Investigations (opt.), Tasks, Files
 
       ### Context
       Brief context + referencing project doc via markdown link.
@@ -111,12 +113,15 @@
       ### Questions & Investigations (optional)
       Phase-specific questions, decisions, and investigation records. Same format as project doc.
 
+      ### Design (optional)
+      Phase-specific design decisions and architecture. Should follow same format as project doc design section, with ASCII diagrams when needed.
+
       ### Tasks
       Flat checkmark list of work items
 
       * Status markers: `[ ]` Not started, `[~]` In progress, `[x]` Complete
-      * Should reference requirements when applicable
-      * Should have AC sub-items for each task, defining clear verifiable conditions for completion
+      * Reference requirements when applicable
+      * AC sub-items for each task, defining clear verifiable conditions for completion
       * Example:
         ```
         - [ ] Implement X (R1, R2.1)

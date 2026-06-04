@@ -25,6 +25,8 @@
              * Read/validate current requirements
              * Update or add new ones if needed based on work done
              * Bubble up to main doc if needed
+           * Design
+             * If needed, update with any design decisions made during work
            * Questions & investigations
              * Add resolved phase related questions if any
              * Add new if arose during work
@@ -43,6 +45,8 @@
              * Read/validate current requirements
              * Update or add new ones if needed based on work done
              * Bubble down to phase docs if needed
+           * Design
+             * If needed, update with any design decisions made during work
            * Questions & Investigations
              * Add resolved questions if any
              * Add new questions if arose during work
