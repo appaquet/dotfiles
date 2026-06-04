@@ -94,18 +94,19 @@ let
     self:
     let
       selectedSources = ensureSourceDefaults self.sources;
+      rawAgentMetadata = mkRawAgentMetadata selectedSources.agents;
       rawCommandMetadata = mkRawCommandMetadata selectedSources.commands;
       rawSkillMetadata = mkRawSkillMetadata selectedSources.skills self.rawCommands;
     in
     {
       rawBlocks = lib.mapAttrs (
-        _: applySource self rawCommandMetadata rawSkillMetadata
+        _: applySource self rawAgentMetadata rawCommandMetadata rawSkillMetadata
       ) selectedSources.blocks;
       rawAgents = lib.mapAttrs (
-        _: applySource self rawCommandMetadata rawSkillMetadata
+        _: applySource self rawAgentMetadata rawCommandMetadata rawSkillMetadata
       ) selectedSources.agents;
       rawCommands = lib.mapAttrs (
-        _: applySource self rawCommandMetadata rawSkillMetadata
+        _: applySource self rawAgentMetadata rawCommandMetadata rawSkillMetadata
       ) selectedSources.commands;
       rawSkills = lib.mapAttrs (
         key: entry:
@@ -114,12 +115,12 @@ let
         else
           entry
           // {
-            main = applySource self rawCommandMetadata rawSkillMetadata entry.main;
+            main = applySource self rawAgentMetadata rawCommandMetadata rawSkillMetadata entry.main;
             files = entry.files or { };
           }
       ) selectedSources.skills;
       rawAuthoredInstructions = lib.mapAttrs (
-        _: applySource self rawCommandMetadata rawSkillMetadata
+        _: applySource self rawAgentMetadata rawCommandMetadata rawSkillMetadata
       ) selectedSources.instructions;
     };
 
@@ -185,7 +186,7 @@ let
                 if subData.kind == "nix" then
                   self.scopeApi.mkSkillFile {
                     content =
-                      applySource self (mkRawCommandMetadata self.rawCommands)
+                      applySource self (mkRawAgentMetadata self.rawAgents) (mkRawCommandMetadata self.rawCommands)
                         (mkRawSkillMetadata self.rawSkills self.rawCommands)
                         subData.content;
                     outputPath = fullPath;
@@ -395,11 +396,11 @@ let
   filterSkillsForHarness = self: lib.filterAttrs (key: entry: isIncluded self "skill" key entry.main);
 
   applySource =
-    self: rawCommandMetadata: rawSkillMetadata: value:
+    self: rawAgentMetadata: rawCommandMetadata: rawSkillMetadata: value:
     if builtins.isFunction value then
       value {
         scope = self // {
-          agents = throw "Nixantic source functions must not reference processed scope.agents while raw sources are being normalized";
+          agents = rawAgentMetadata;
           commands = rawCommandMetadata;
           skills = rawSkillMetadata;
           instructions = throw "Nixantic source functions must not reference final scope.instructions while raw sources are being normalized";
@@ -419,6 +420,29 @@ let
   sourceKindNames = builtins.attrNames emptySources;
 
   ensureSourceDefaults = sources: emptySources // sources;
+
+  # mkRawAgentMetadata :: rawAgents -> { <agent-key> = { name, description, reference }; }
+  #   Safe raw-phase agent surface for source functions. It intentionally uses
+  #   only declaration keys and authored metadata, never rendered or processed
+  #   agent content, so agent references can be reused without renderer cycles.
+  mkRawAgentMetadata =
+    rawAgents:
+    lib.mapAttrs (
+      key: data:
+      let
+        isAttrDeclaration = builtins.isAttrs data;
+        name = if isAttrDeclaration && builtins.hasAttr "name" data then data.name else key;
+        description =
+          if isAttrDeclaration && builtins.hasAttr "description" data then
+            data.description
+          else
+            throw "Nixantic raw agent metadata for '${key}' requires an authored description";
+      in
+      {
+        inherit name description;
+        reference = "(See agent: ${name})";
+      }
+    ) rawAgents;
 
   # mkRawCommandMetadata :: rawCommands -> { <command-key> = { name, reference }; }
   #   Safe raw-phase command surface for source functions. It intentionally uses

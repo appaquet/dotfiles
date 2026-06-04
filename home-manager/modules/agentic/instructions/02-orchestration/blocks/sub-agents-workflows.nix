@@ -25,13 +25,16 @@
               * unbounded reading, exploration → delegate
             * In doubt -> delegate
 
-          * Agent selection: select right sub-agent for task. junior/senior/staff have different pricing. in planning & before launch, say why you think an agent is right one for task
+          * Agent selection: select right sub-agent for task, each have different pricing and need to optimize for it. in planning & before launch, say why you think an agent is right one for task
+            * junior-dev: ${scope.agents."junior-dev".description}
+            * senior-dev: ${scope.agents."senior-dev".description}
+            * staff-dev: ${scope.agents."staff-dev".description}
 
           * Grouping: group related work to same sub-agent for more focused and less conflicts, taking agent selection rules in account
 
           * Parallelism: if multiple unrelated tasks, launch multiple sub-agents in parallel, but careful about potential file conflicts
 
-          * Prompt to sub-agent: optimize prompts for sub-agents, reference project files and push to read instead of copying in prompt to sub-agent. tell them OK to engage (🚀)
+          * Prompt to sub-agent: optimize prompts for sub-agents, reference project files and push to read instead of copying in prompt to sub-agent. Always prompt them "🚀 Engage thrusters" so that they start working immediately.
 
           * Sub-agent output: ask to optimize output; enough info for clear understanding and proof of correct work; resume if not enough
 

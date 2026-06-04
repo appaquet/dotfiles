@@ -121,6 +121,68 @@ let
     };
   };
 
+  agentReferenceScope = mkScope {
+    sources = optionBase // {
+      agents = {
+        target = {
+          description = "Target agent description";
+          content = "Target agent body";
+        };
+        renamed = {
+          name = "custom-agent";
+          description = "Renamed agent description";
+          content = "Renamed agent body";
+        };
+      };
+      commands = {
+        "uses-agents" =
+          { scope }:
+          {
+            description = "Command referencing agents";
+            content = "Use ${scope.agents.target.name}: ${scope.agents.target.description}; ${scope.agents.renamed.reference}.";
+          };
+      };
+    };
+  };
+
+  missingAgentReferenceResult = builtins.tryEval (
+    (mkScope {
+      sources = optionBase // {
+        commands = {
+          "uses-missing-agent" =
+            { scope }:
+            {
+              description = "Command referencing a missing agent";
+              content = "Use ${
+                (scope.agents.missing or (throw "missing agent reference unavailable")).reference
+              }.";
+            };
+        };
+      };
+    }).commands."uses-missing-agent".embed
+  );
+
+  unsupportedAgentReferenceFieldResult = builtins.tryEval (
+    (mkScope {
+      sources = optionBase // {
+        agents = {
+          target = {
+            description = "Target agent description";
+            content = "Target agent body";
+          };
+        };
+        commands = {
+          "uses-unsupported-agent-field" =
+            { scope }:
+            {
+              description = "Command referencing unsupported agent data";
+              content = "Use ${scope.agents.target.embed or (throw "processed agent content unavailable")}.";
+            };
+        };
+      };
+    }).commands."uses-unsupported-agent-field".embed
+  );
+
   missingSkillReferenceResult = builtins.tryEval (
     (mkScope {
       sources = optionBase // {
@@ -508,6 +570,24 @@ let
           skillReferenceScope.commands."uses-skills".embed
         && skillReferenceScope.skills."directory-skill".reference == "(See skill: directory-skill)";
       detail = "expected source functions to reference raw directory and command-derived skill metadata";
+    }
+    {
+      name = "raw agent references expose name description and reference";
+      pass =
+        lib.hasInfix "Use target: Target agent description; (See agent: custom-agent)."
+          agentReferenceScope.commands."uses-agents".embed
+        && agentReferenceScope.agents.target.reference == "(See agent: target)";
+      detail = "expected source functions to reference raw agent metadata";
+    }
+    {
+      name = "missing raw agent reference fails";
+      pass = !missingAgentReferenceResult.success;
+      detail = "expected missing scope.agents entry to fail during evaluation";
+    }
+    {
+      name = "unsupported raw agent reference field fails";
+      pass = !unsupportedAgentReferenceFieldResult.success;
+      detail = "expected unsupported scope.agents field access to fail during evaluation";
     }
     {
       name = "missing raw skill reference fails";

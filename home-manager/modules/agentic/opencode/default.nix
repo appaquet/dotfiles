@@ -226,7 +226,7 @@ let
 
     agent = {
       browser = {
-        mode = "all";
+        mode = "subagent";
         model = "openai/gpt-5.4-mini";
         description = "To be used by any tasks requiring web browser interaction. Shouldn't be used for websearch or webfetch skills, only for actually using the browser to interact with websites.";
         prompt = "You are an agent that can use a web browser to interact with websites. You should focus on that and not do any other work. If you are requested to do so, tell your manager agent that you should only be used for web browser related tasks.";
