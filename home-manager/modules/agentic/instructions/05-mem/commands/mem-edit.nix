@@ -5,7 +5,7 @@
     argumentHint = "[files or description]";
 
     content = ''
-      Goal: user-facing command for instruction file changes. Analyzes first, then gates before applying
+      Goal: user-facing command for instruction file changes.
 
       Target: `$ARGUMENTS`
 
@@ -19,10 +19,7 @@
       3. 🔳 Analyze target files
          * Apply `mem-editing` guidelines for analysis & proposal
 
-      4. **GATE**: Await `/proceed` before applying changes
-
-      5. 🔳 Apply changes
-         * Follow `mem-editing` guidelines during edits
+      4. **STOP**: User will need to use `/proceed` to apply changes.
     '';
   };
 }

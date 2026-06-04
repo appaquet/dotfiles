@@ -8,7 +8,7 @@
 
       User or agents write them to flag issues, ask questions, propose things.
 
-      ## Format
+      ## Review comment format
       ```
       // REVIEW: <description>
       // REVIEW: <agent-name> - <description>
@@ -17,12 +17,12 @@
       // <<
       ```
 
-      ## Searching
+      ## Searching for review comments
       Using grep tool: `pattern="(//|#|--|/\\*|\\*)\\s*REVIEW:")`
       Ignore results in `proj/`
       If no grep tool, can use rg, but careful with glob exclusions failing silently.
 
-      ## Addressing
+      ## Addressing review comments
       * Never remove unless addressed.
       * After fixed/addressed: remove.
       * Implement what comment describes. If names an abstraction or solution, build that. NOT OK to implement something else.

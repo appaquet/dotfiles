@@ -42,7 +42,8 @@
         7. 🔳 Present findings
            - Group issues by category
            - Show current state and proposed fix for each
-           - Tell user await proceed before applying
+
+        8. **STOP**: User will need to use `/proceed` to apply changes.
       '';
     };
 }

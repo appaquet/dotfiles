@@ -10,10 +10,9 @@
 
       tag = "sub-agents-workflows";
       taggedContent = ''
-        * Main agent:
-          * Used primarily for high-level orchestration, project management, version control. Main agent context window is VERY VERY precious; Anything requiring reading, understanding and exploring code should be delegated to sub-agents.
+        * Main agent: Used primarily for high-level orchestration, project management, version control. Main agent context window is VERY precious; Anything requiring reading, understanding and exploring code should be delegated to sub-agents.
 
-        * Sub-agents:
+        * Sub-agents
           * Delegation threshold:
             * Project document work
               * No matter the size, always main agent
