@@ -63,6 +63,148 @@ let
     };
   };
 
+  commandReferenceScope = mkScope {
+    sources = optionBase // {
+      commands = {
+        target = {
+          description = "Target command";
+          content = "Target body";
+        };
+        renamed = {
+          name = "custom-target";
+          description = "Renamed target command";
+          content = "Renamed body";
+        };
+        "uses-command" =
+          { scope }:
+          {
+            description = "Command referencing commands";
+            content = "Use ${scope.commands.target.reference} or ${scope.commands.renamed.reference}.";
+          };
+      };
+    };
+  };
+
+  skillReferenceScope = mkScope {
+    sources = optionBase // {
+      commands = {
+        "skill-command" = {
+          description = "Command emitting a skill";
+          content = "Command body";
+          asSkill = true;
+        };
+        "renamed-skill-command" = {
+          name = "custom-skill-command";
+          description = "Renamed command emitting a skill";
+          content = "Renamed command body";
+          asSkill = true;
+        };
+        "uses-skills" =
+          { scope }:
+          {
+            description = "Command referencing skills";
+            content = "Use ${scope.skills."directory-skill".reference}, ${
+              scope.skills."skill-command".reference
+            }, and ${scope.skills."custom-skill-command".name}.";
+          };
+      };
+      skills = {
+        "directory-skill" = {
+          kind = "directory";
+          main = {
+            description = "Directory skill";
+            content = "Skill body";
+          };
+          files = { };
+        };
+      };
+    };
+  };
+
+  missingSkillReferenceResult = builtins.tryEval (
+    (mkScope {
+      sources = optionBase // {
+        commands = {
+          "uses-missing-skill" =
+            { scope }:
+            {
+              description = "Command referencing a missing skill";
+              content = "Use ${
+                (scope.skills.missing or (throw "missing skill reference unavailable")).reference
+              }.";
+            };
+        };
+      };
+    }).commands."uses-missing-skill".embed
+  );
+
+  unsupportedSkillReferenceFieldResult = builtins.tryEval (
+    (mkScope {
+      sources = optionBase // {
+        commands = {
+          "directory-skill" = {
+            description = "Unrelated command";
+            content = "Command body";
+          };
+          "uses-unsupported-skill-field" =
+            { scope }:
+            {
+              description = "Command referencing unsupported skill data";
+              content = "Use ${
+                scope.skills."directory-skill".embed or (throw "processed skill content unavailable")
+              }.";
+            };
+        };
+        skills = {
+          "directory-skill" = {
+            kind = "directory";
+            main = {
+              description = "Directory skill";
+              content = "Skill body";
+            };
+            files = { };
+          };
+        };
+      };
+    }).commands."uses-unsupported-skill-field".embed
+  );
+
+  missingCommandReferenceResult = builtins.tryEval (
+    (mkScope {
+      sources = optionBase // {
+        commands = {
+          "uses-missing" =
+            { scope }:
+            {
+              description = "Command referencing a missing command";
+              content = "Use ${
+                (scope.commands.missing or (throw "missing command reference unavailable")).reference
+              }.";
+            };
+        };
+      };
+    }).commands."uses-missing".embed
+  );
+
+  unsupportedCommandReferenceFieldResult = builtins.tryEval (
+    (mkScope {
+      sources = optionBase // {
+        commands = {
+          target = {
+            description = "Target command";
+            content = "Target body";
+          };
+          "uses-unsupported-field" =
+            { scope }:
+            {
+              description = "Command referencing unsupported command data";
+              content = "Use ${scope.commands.target.embed or (throw "processed command content unavailable")}.";
+            };
+        };
+      };
+    }).commands."uses-unsupported-field".embed
+  );
+
   onlyInjectBlockReferencesScope = mkScope {
     sources = optionBase // {
       commands = {
@@ -335,7 +477,7 @@ let
             { scope }:
             {
               description = "Self-referential command";
-              content = scope.commands.self.embed;
+              content = scope.commands.self.embed or (throw "processed command content unavailable");
             };
         };
       };
@@ -349,6 +491,43 @@ let
         lib.hasInfix "(See: Shared Option)" optionBlockCommandScope.commands."use-option-block".embed
         && lib.hasInfix "(See: Pre Flight)" optionBlockCommandScope.commands."use-option-block".embed;
       detail = "expected option block and default injected references in command output";
+    }
+    {
+      name = "raw command references expose name and reference";
+      pass =
+        lib.hasInfix "Use (See command: target) or (See command: custom-target)."
+          commandReferenceScope.commands."uses-command".embed
+        && commandReferenceScope.commands."uses-command".reference == "(See command: uses-command)";
+      detail = "expected command source functions to reference raw command metadata";
+    }
+    {
+      name = "raw skill references expose name and reference";
+      pass =
+        lib.hasInfix
+          "Use (See skill: directory-skill), (See skill: skill-command), and custom-skill-command."
+          skillReferenceScope.commands."uses-skills".embed
+        && skillReferenceScope.skills."directory-skill".reference == "(See skill: directory-skill)";
+      detail = "expected source functions to reference raw directory and command-derived skill metadata";
+    }
+    {
+      name = "missing raw skill reference fails";
+      pass = !missingSkillReferenceResult.success;
+      detail = "expected missing scope.skills entry to fail during evaluation";
+    }
+    {
+      name = "unsupported raw skill reference field fails";
+      pass = !unsupportedSkillReferenceFieldResult.success;
+      detail = "expected unsupported scope.skills field access to fail during evaluation";
+    }
+    {
+      name = "missing raw command reference fails";
+      pass = !missingCommandReferenceResult.success;
+      detail = "expected missing scope.commands entry to fail during evaluation";
+    }
+    {
+      name = "unsupported raw command reference field fails";
+      pass = !unsupportedCommandReferenceFieldResult.success;
+      detail = "expected unsupported scope.commands field access to fail during evaluation";
     }
     {
       name = "command replacement references preserve authored order";

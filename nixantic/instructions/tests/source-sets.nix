@@ -35,6 +35,13 @@ let
             asSkill = true;
             onlyInjectBlockReferences = [ ];
           };
+        "uses-feature-skill-ref" =
+          { scope }:
+          {
+            description = "Command referencing a command-derived skill";
+            content = "Feature skill reference: ${scope.skills."feature-cmd".reference}";
+            onlyInjectBlockReferences = [ ];
+          };
       };
 
       skills = {
@@ -351,7 +358,7 @@ let
         { scope }:
         {
           description = "Self-referential source-set command";
-          content = scope.commands."self-ref-cmd".embed;
+          content = scope.commands."self-ref-cmd".embed or (throw "processed command content unavailable");
         };
     };
   };
@@ -370,6 +377,14 @@ let
       name = "source-set command asSkill produces skill instruction";
       pass = builtins.hasAttr "skills/feature-cmd/SKILL" featureScope.instructions;
       detail = "expected source-set command with asSkill to generate skill instruction";
+    }
+
+    {
+      name = "source-set command asSkill exposes raw skill reference";
+      pass =
+        lib.hasInfix "Feature skill reference: (See skill: feature-cmd)"
+          featureScope.commands."uses-feature-skill-ref".embed;
+      detail = "expected command-derived skills from source-set functions to be available through scope.skills metadata";
     }
 
     # Source-set skill asCommand

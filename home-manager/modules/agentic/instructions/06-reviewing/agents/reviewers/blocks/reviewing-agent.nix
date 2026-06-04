@@ -26,7 +26,7 @@
         ## Reviewer Workflow
 
         1. 🔳 Load context
-           - Run `/proj-load` for project context, branch state, project docs
+           - Run ${scope.commands."proj-load".reference} for project context, branch state, project docs
            - 🚀 Engage thrusters - As sub-agent, proceed immediately after loading
 
         2. 🔳 Gather guidelines (merge in priority order)

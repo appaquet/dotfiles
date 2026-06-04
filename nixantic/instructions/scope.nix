@@ -94,11 +94,19 @@ let
     self:
     let
       selectedSources = ensureSourceDefaults self.sources;
+      rawCommandMetadata = mkRawCommandMetadata selectedSources.commands;
+      rawSkillMetadata = mkRawSkillMetadata selectedSources.skills self.rawCommands;
     in
     {
-      rawBlocks = lib.mapAttrs (_: applySource self) selectedSources.blocks;
-      rawAgents = lib.mapAttrs (_: applySource self) selectedSources.agents;
-      rawCommands = lib.mapAttrs (_: applySource self) selectedSources.commands;
+      rawBlocks = lib.mapAttrs (
+        _: applySource self rawCommandMetadata rawSkillMetadata
+      ) selectedSources.blocks;
+      rawAgents = lib.mapAttrs (
+        _: applySource self rawCommandMetadata rawSkillMetadata
+      ) selectedSources.agents;
+      rawCommands = lib.mapAttrs (
+        _: applySource self rawCommandMetadata rawSkillMetadata
+      ) selectedSources.commands;
       rawSkills = lib.mapAttrs (
         key: entry:
         if !(builtins.isAttrs entry) || !(builtins.hasAttr "main" entry) then
@@ -106,11 +114,13 @@ let
         else
           entry
           // {
-            main = applySource self entry.main;
+            main = applySource self rawCommandMetadata rawSkillMetadata entry.main;
             files = entry.files or { };
           }
       ) selectedSources.skills;
-      rawAuthoredInstructions = lib.mapAttrs (_: applySource self) selectedSources.instructions;
+      rawAuthoredInstructions = lib.mapAttrs (
+        _: applySource self rawCommandMetadata rawSkillMetadata
+      ) selectedSources.instructions;
     };
 
   # Stage 2: Filter by harness, inject defaults, call constructors.
@@ -174,7 +184,10 @@ let
               processed =
                 if subData.kind == "nix" then
                   self.scopeApi.mkSkillFile {
-                    content = applySource self subData.content;
+                    content =
+                      applySource self (mkRawCommandMetadata self.rawCommands)
+                        (mkRawSkillMetadata self.rawSkills self.rawCommands)
+                        subData.content;
                     outputPath = fullPath;
                   }
                 else
@@ -382,13 +395,13 @@ let
   filterSkillsForHarness = self: lib.filterAttrs (key: entry: isIncluded self "skill" key entry.main);
 
   applySource =
-    self: value:
+    self: rawCommandMetadata: rawSkillMetadata: value:
     if builtins.isFunction value then
       value {
         scope = self // {
           agents = throw "Nixantic source functions must not reference processed scope.agents while raw sources are being normalized";
-          commands = throw "Nixantic source functions must not reference processed scope.commands while raw sources are being normalized";
-          skills = throw "Nixantic source functions must not reference processed scope.skills while raw sources are being normalized";
+          commands = rawCommandMetadata;
+          skills = rawSkillMetadata;
           instructions = throw "Nixantic source functions must not reference final scope.instructions while raw sources are being normalized";
         };
       }
@@ -406,6 +419,73 @@ let
   sourceKindNames = builtins.attrNames emptySources;
 
   ensureSourceDefaults = sources: emptySources // sources;
+
+  # mkRawCommandMetadata :: rawCommands -> { <command-key> = { name, reference }; }
+  #   Safe raw-phase command surface for source functions. It intentionally uses
+  #   only declaration keys and authored names, never processed command content,
+  #   so command references can fail on rename without creating renderer cycles.
+  mkRawCommandMetadata =
+    rawCommands:
+    lib.mapAttrs (
+      key: data:
+      let
+        name = if builtins.isAttrs data && builtins.hasAttr "name" data then data.name else key;
+      in
+      {
+        inherit name;
+        reference = "(See command: ${name})";
+      }
+    ) rawCommands;
+
+  # mkRawSkillMetadata :: rawSkills -> rawCommands -> { <skill-key> = { name, reference }; }
+  #   Safe raw-phase skill surface for source functions. It intentionally exposes
+  #   only stable pointer metadata for directory-declared skills and commands
+  #   marked with asSkill, avoiding rendered bodies or processed skill values.
+  mkRawSkillMetadata =
+    rawSkills: rawCommands:
+    let
+      directorySkillMetadata = lib.mapAttrs (key: _: mkRawSkillReference key) rawSkills;
+
+      commandSkillMetadata = lib.listToAttrs (
+        builtins.concatLists (
+          lib.mapAttrsToList (
+            key: data:
+            if builtins.isAttrs data && isRawAsSkillDeclared data then
+              let
+                name = if builtins.hasAttr "name" data then data.name else key;
+              in
+              [
+                {
+                  inherit name;
+                  value = mkRawSkillReference name;
+                }
+              ]
+            else
+              [ ]
+          ) rawCommands
+        )
+      );
+    in
+    directorySkillMetadata // commandSkillMetadata;
+
+  mkRawSkillReference = name: {
+    inherit name;
+    reference = "(See skill: ${name})";
+  };
+
+  isRawAsSkillDeclared =
+    data:
+    let
+      asSkill = data.asSkill;
+    in
+    if !(builtins.hasAttr "asSkill" data) then
+      false
+    else if builtins.isBool asSkill then
+      asSkill
+    else if builtins.isAttrs asSkill then
+      builtins.any (harness: asSkill.${harness} or false) (builtins.attrNames asSkill)
+    else
+      false;
 
   # normalizeSourceDeclarations :: sourceOwners -> { sources }
   #   Flattens owner-keyed source declarations into flat per-kind maps

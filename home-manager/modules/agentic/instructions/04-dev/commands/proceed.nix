@@ -7,7 +7,7 @@
       content = ''
         Goal: proceed with the current workflow.
 
-        After instructions & tasks loaded, you are free to 🚀 Engage thrusters
+        After instructions & tasks loaded, 🚀 Engage thrusters
 
         ## Instructions
 

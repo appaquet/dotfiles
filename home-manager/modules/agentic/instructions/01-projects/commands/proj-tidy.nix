@@ -15,7 +15,7 @@
 
         ## Instructions
 
-        1. Ensure `proj-editing` skill loaded.
+        1. Ensure ${scope.skills."proj-editing".reference} loaded.
 
         2. 🔳 Read project & phase docs listed above
 
@@ -25,12 +25,11 @@
            - Cross-references between docs are valid
 
         4. 🔳 Check requirement consistency
-           - Flag overlapping requirements as potential conflicts
-           - Phase doc requirements must derive from parent R-numbers
-           - Project doc references phase doc when phase expands requirements
-           - Tasks without AC sub-items: warn if tasks lack acceptance criteria
+           - Project requirements should strictly follow project requirement rules
+           - Phase requirements should strictly follow phase requirement rules
 
         5. 🔳 Check completable items
+           - Flag tasks that are done but not marked ✅
            - Flag phases where all tasks `[x]` but phase still 🔄
            - Flag requirements where linked work done but still 🔄
            - Use `AskUserQuestion` before marking ✅
@@ -43,7 +42,7 @@
            - Group issues by category
            - Show current state and proposed fix for each
 
-        8. **STOP**: User will need to use `/proceed` to apply changes.
+        8. **STOP**: User will need to use ${scope.commands.proceed.reference} to apply changes.
       '';
     };
 }

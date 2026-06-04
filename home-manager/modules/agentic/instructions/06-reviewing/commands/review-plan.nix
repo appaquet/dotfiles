@@ -43,7 +43,7 @@
            - Add fixes to Tasks section with priorities
            - Update as user give further feedback
            
-        7. **STOP**: Wait for `/implement`
+        7. **STOP**: Wait for ${scope.commands.implement.reference}
       '';
     };
 }

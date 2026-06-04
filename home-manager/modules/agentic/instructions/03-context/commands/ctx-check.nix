@@ -15,7 +15,9 @@
 
         1. 🔳 Review current conversation and task. Use ${scope.blocks.deep-thinking.reference}.
 
-        2. 🔳 Report your understanding using ${scope.blocks.context-understanding.reference}. If understanding < 10/10, suggest `/ctx-improve`
+        2. 🔳 Report your understanding using ${scope.blocks.context-understanding.reference}. If understanding < 10/10, suggest ${
+          scope.commands."ctx-improve".reference
+        }
 
         3. **STOP**: User will decide next steps
       '';

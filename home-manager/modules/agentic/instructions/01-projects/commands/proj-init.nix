@@ -18,7 +18,7 @@
 
         ## Instructions
 
-        1. Ensure `proj-editing` skill loaded.
+        1. Ensure ${scope.skills."proj-editing".reference} loaded.
 
         2. 🔳 Ensure **high level** task description is clear so that we can name it properly
            - If empty, ask user for clarification.
@@ -31,7 +31,7 @@
            - Keep the `proj` symlink isolated in own commit named `private: proj - <project-name>`
 
         4. 🔳 Clarify project details if needed so that we can fill the project squeleton
-           - Otherwise, propose user running `proj-plan` after
+           - Otherwise, propose user running ${scope.commands."proj-plan".reference} after
 
         5. 🔳 Create project doc (00-<name>.md)
            - Follow the project doc rules

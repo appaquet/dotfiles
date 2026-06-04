@@ -15,7 +15,7 @@
 
         1. 🔳 Verify 10/10 understanding.
            - Read ALL requirements in project doc
-           - If unclear, ask user to `/ctx-improve`
+           - If unclear, ask user to ${scope.commands."ctx-improve".reference}
            - Clarify if task contradicts or overlaps
 
         2. 🔳 Load tasks from project/phase doc/context
@@ -47,7 +47,7 @@
            - If sub-agents did it, trust them
            - If not, ask them back instead of wasting your context
 
-        7. 🔳 Run `proj-save` skill to update project and phase docs
+        7. 🔳 Run ${scope.commands."proj-save".reference} to update project and phase docs
 
         8. 🔳 If this work is not yet saved, finalize it with the repository version-control workflow. Re-verify repository state first. Changes you don't recognize may be mine.
       '';

@@ -12,8 +12,14 @@
           Docs updated continuously as we plan, develop, review, etc.. Because context window ephemeral while docs durable. Should show history, append/amend, not rewrite.
 
           ## Project docs creation
-          - Should always be done via `proj-init`, don't attempt create without that procedure. This creates proper symlink (`proj`)  and initial project file (`proj/00-<name>.md`).
-          - Phase docs (`proj/NN-<phas>.md`) created mainly via `proj-plan`, but can be created adhoc on user request. If phase doc unrelated to new work, ask user if split. Updated on task complete, on `proj-save` call, significant new info, uncertainties, decisions, insights, etc.
+          - Should always be done via ${
+            scope.commands."proj-init".reference
+          }, don't attempt create without that procedure. This creates proper symlink (`proj`)  and initial project file (`proj/00-<name>.md`).
+          - Phase docs (`proj/NN-<phas>.md`) created mainly via ${
+            scope.commands."proj-plan".reference
+          }, but can be created adhoc on user request. If phase doc unrelated to new work, ask user if split. Updated on task complete, on ${
+            scope.commands."proj-save".reference
+          } call, significant new info, uncertainties, decisions, insights, etc.
 
           ## Version control
           - Keep the `proj` symlink in own commit named `private: proj - <project-name>`
@@ -31,6 +37,7 @@
           ## Project doc editing rules
 
           ### Project requirements rules
+          - Requirements should be non-overlapping, non-redundant, self-contained, clear, concise, and testable.
           - Read ALL existing req before create/update
           - Update existing rather than create parallel ones
           - All req go in ONE section, not breaking down (other than OOS)
@@ -53,7 +60,7 @@
 
           ### Phase requirements rules
           - Same rules as project doc
-          - Numbering: Derive parent R-number: `R5.A`, `R5.B` (never top-level `R1`, ...)
+          - Numbering: Need to derive parent R-number: `R5.A`, `R5.B` (never top-level `R1`, ...)
           - Refererence in project doc: `R5: ⬜ Feature X (Phase: Auth, see R5.A-C in phase doc)`
 
           ### Phase tasks rules

@@ -29,7 +29,9 @@
            - Code remain source of truth. You can check project docs, but may have drifted.
 
         2. 🔳 Generate report in one message, without any following messages:
-           - Load the `human-writer` skill using the `Skill` tool for tone (no AI filler, no superlatives)
+           - Load the `${
+             scope.skills."human-writer".name
+           }` skill using the `Skill` tool for tone (no AI filler, no superlatives)
            - Wrap identifiers (types, functions, files, fields) in backticks
 
            Emit two sections in order:

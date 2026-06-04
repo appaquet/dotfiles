@@ -1,5 +1,5 @@
 {
-  # Keep in sync with `ctx-plan`
+  # Keep in sync with ctx-plan.
   nixantic.sources.projects.commands."proj-plan" =
     { scope }:
     {
@@ -16,20 +16,26 @@
         ${scope.blocks."project-files".embed}
 
         ## Instructions
-        1. Ensure `proj-editing` skill loaded.
-           - If project files above empty, STOP, and tell user. If in-memory planning required, use `ctx-plan` instead.
+        1. Ensure ${scope.skills."proj-editing".reference} loaded.
+           - If project files above empty, STOP, and tell user. If in-memory planning required, use ${
+             scope.commands."ctx-plan".reference
+           } instead.
 
         2. 🔳 Ensure context loaded, task define. 
-           - Use `proj-load` if not already loaded.
+           - Use ${scope.commands."proj-load".reference} if not already loaded.
            - Clarify via `AskUserQuestion` if empty or unclear.
 
         3. 🔳 Research, clarify and plan
            ${scope.blocks."plan-procedure".embed}
 
-        4. 🔳 Report your understanding using ${scope.blocks.context-understanding.reference}. If understanding < 10/10, suggest `ctx-improve`
+        4. 🔳 Report your understanding using ${scope.blocks.context-understanding.reference}. If understanding < 10/10, suggest ${
+          scope.commands."ctx-improve".reference
+        }
 
         5. 🔳 Write plan to docs 
-           - Need to use `proj-editing` skill, use project & phase docs rules and structure
+           - Need to use ${
+             scope.skills."proj-editing".reference
+           }, use project & phase docs rules and structure
 
         6. **STOP**: User will decide next steps
 
