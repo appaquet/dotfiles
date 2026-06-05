@@ -82,14 +82,14 @@ vim.keymap.set("n", "<Leader>rb", send_block_to_sh, { silent = true, desc = "Exe
 vim.keymap.set("n", "<C-/>", ":nohlsearch<CR>", { silent = true, desc = "Clear search highlight" })
 vim.keymap.set("n", "<C-_>", ":nohlsearch<CR>", { silent = true, desc = "Clear search highlight" })
 
--- Navigation
+-- Quick navigation
 vim.keymap.set({ "n", "v" }, "<A-j>", "5j", { silent = true, desc = "Down 5 lines" })
 vim.keymap.set({ "n", "v" }, "<A-k>", "5k", { silent = true, desc = "Up 5 lines" })
 vim.keymap.set({ "n", "v" }, "<A-Down>", "5j", { silent = true, desc = "Down 5 lines" })
 vim.keymap.set({ "n", "v" }, "<A-Up>", "5k", { silent = true, desc = "Up 5 lines" })
-vim.keymap.set({ "n", "v" }, "<A-h>", "e", { silent = true, desc = "Move to end of word" })
-vim.keymap.set({ "n", "v" }, "<A-l>", "b", { silent = true, desc = "Move to beginning of word" })
-vim.keymap.set({ "n", "v" }, "<A-Left>", "e", { silent = true, desc = "Move to end of word" })
+vim.keymap.set({ "n", "v" }, "<A-h>", "b", { silent = true, desc = "Move to beginning of word" })
+vim.keymap.set({ "n", "v" }, "<A-l>", "e", { silent = true, desc = "Move to end of word" })
+vim.keymap.set({ "n", "v" }, "<A-Left>", "b", { silent = true, desc = "Move to beginning of word" })
 vim.keymap.set({ "n", "v" }, "<A-Right>", "e", { silent = true, desc = "Move to end of word" })
 
 -- Clipboard / yanking

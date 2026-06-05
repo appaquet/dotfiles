@@ -39,8 +39,9 @@
              - Before marking task done: verify each AC sub-item passes
            - If deviating or overcomplicating, STOP and update user
            - If any decisions or discoveries, update project/phase doc
+           - Review agents can be used on uncertain steps, targetting working diff
 
-        5. 🔳 Validate via `development-completion-checklist`
+        5. 🔳 Validate via ${scope.blocks."development-completion-checklist".reference}
            - State each item aloud, confirm compliance
 
         6. 🔳 Validate formatting, linting, tests done
