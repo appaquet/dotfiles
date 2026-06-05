@@ -22,7 +22,7 @@
            - Add sub-task 🔳 to prevent forgetting uncertainties, work them out until full understanding
 
         3. 🔳 Ask clarifying questions
-           - Interview me relentlessly, using `AskUserQuestion`, about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
+           - Interview me relentlessly, using `AskUserQuestion`, about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer. Any questions you could answer yourself through research should be researched first. If still unsure, give me as much context as possible in questions.
            - Go back to step 2 after each answers that require further analysis. Should add more tasks 🔳 to track progress.
 
         4. 🔳 Update project & phases docs
