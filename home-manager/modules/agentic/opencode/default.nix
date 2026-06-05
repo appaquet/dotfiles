@@ -265,12 +265,16 @@ let
 
   nono-opencode = pkgs.writeShellScriptBin "nono-opencode" ''
     export OPENCODE_ENABLE_EXA=1
+    export OPENCODE_EXPERIMENTAL_PARALLEL=1 # parallel web search
+    export OPENCODE_EXPERIMENTAL_BACKGROUND_SUBAGENTS=1 # non-blocking background sub-agents
     export OPENCODE_CONFIG=${nonoOpencodeJson}
     exec maybe --profile opencode -- ${pkgs.opencode}/bin/opencode "$@"
   '';
 
   opencode = pkgs.writeShellScriptBin "opencode" ''
     export OPENCODE_ENABLE_EXA=1
+    export OPENCODE_EXPERIMENTAL_PARALLEL=1 # parallel web search
+    export OPENCODE_EXPERIMENTAL_BACKGROUND_SUBAGENTS=1 # non-blocking background sub-agents
     export OPENCODE_ROOT="$(pwd)"
     exec ${pkgs.opencode}/bin/opencode "$@"
   '';
