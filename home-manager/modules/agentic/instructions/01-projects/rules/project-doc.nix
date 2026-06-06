@@ -51,7 +51,7 @@
         ### Checkpoint
         Brief 1-2 paragraph summary for resuming work. References phase (if applicable), tasks worked on, and next step if decided/obvious. Updated by ${
           scope.commands."proj-save".reference
-        }, preserved until next save overwrites.
+        }, preserved until next save overwrites. Always replace whole, keep short and referencing instead.
 
         ### Inbox (optional)
         Unprocessed user items (feedback, bugs, ideas, tasks). Don't take action on them, user will edit and tell you when.

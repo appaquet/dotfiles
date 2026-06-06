@@ -457,7 +457,7 @@ let
       in
       {
         inherit name;
-        reference = "(See command: ${name})";
+        reference = "${name} command/skill";
       }
     ) rawCommands;
 

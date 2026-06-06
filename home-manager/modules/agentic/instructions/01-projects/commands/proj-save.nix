@@ -55,9 +55,8 @@
            * Files
              * Update with summary, with phase reference
            * Checkpoint
-             * Update summary of work done
-             * Reference current phase and tasks
-             * Next step if decided/obvious
+             * Replace with summary of work done, phase & tasks
+             * Update next step if decided/obvious
 
         6. 🔳 Commit doc changes
            * Use the project doc version control guidelines

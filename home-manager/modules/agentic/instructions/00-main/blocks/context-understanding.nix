@@ -3,11 +3,11 @@
     heading = "Context understanding";
 
     content = ''
-      Always ensure 10/10 understanding checklist: explore code + web search + `AskUserQuestion`
+      Always ensure 10/10 understanding checklist and report it to user, before and after improving it.
+
+      Use explore code + web search + `AskUserQuestion` to fill gaps in understanding until 10/10.
 
       Prioritize web search for tool/library/framework usage since may have changed since cutoff
-
-      Always report on understanding at any decision point - verbalize WHAT you understand for each item, not just that you checked it. User validates your understanding.
     '';
 
     tag = "full-understanding-checklist";
