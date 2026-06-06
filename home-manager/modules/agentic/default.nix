@@ -37,6 +37,12 @@ let
 
     echo "No project files found."
   '';
+
+  # npx wrapper for mcp use in coding agents
+  mcp-npx = pkgs.writeShellScriptBin "mcp-npx" ''
+    export PATH="$PATH:${pkgs.nodejs}/bin"
+    npx "$@"
+  '';
 in
 {
   imports = [
@@ -51,6 +57,7 @@ in
 
     home.packages = [
       agentic-proj-docs
+      mcp-npx
       pkgs.codeburn
     ];
   };
