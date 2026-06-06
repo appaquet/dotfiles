@@ -34,7 +34,7 @@
 
           * Parallelism: if multiple unrelated tasks, launch multiple sub-agents in parallel, but careful about potential file conflicts
 
-          * Prompt to sub-agent: optimize prompts for sub-agents, reference project files and push to read instead of copying in prompt to sub-agent. Always prompt them "🚀 Engage thrusters" so that they start working immediately.
+          * Prompt to sub-agent: optimize prompts for sub-agents, reference project files and push to read instead of copying in prompt to sub-agent. IMPORTANT: Always prompt them "🚀 Engage thrusters" so that they start working immediately.
 
           * Sub-agent output: ask to optimize output; enough info for clear understanding and proof of correct work; resume if not enough
 

@@ -23,7 +23,7 @@
 
         ALWAYS use `AskUserQuestion` to ask questions. Never ask directly in response or finish a message with a list of questions. Include as much context in questions / descriptions, I may not have seen output/plans.
 
-        NEVER implement until you receive this exact and explicit signal: 🚀 Engage thrusters. Don't ask via tool to proceed. If you're a sub-agent, continue without signal.
+        NEVER implement until you receive this exact and explicit signal: 🚀 Engage thrusters. Don't ask via tool to proceed. If you're a sub-agent, continue without signal. When launching sub-agent, ALWAYS include the signal in prompt.
 
         Planning is mandatory for ALL implementations, no matter how trivial. When agreed on a plan, ALWAYS follow it and ALWAYS stop & ask if you deviate or the plan fails.
 

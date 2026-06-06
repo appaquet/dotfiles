@@ -8,6 +8,8 @@ require("which-key").add({
 -- `--imply-local` means it will use the local version of the file on the right side
 local diffview_lib = require("diffview.lib")
 require("diffview").setup({
+	preferred_adapter = "jj",
+
 	-- Persist file selections & show marks even when no selection
 	file_panel = {
 		always_show_marks = true,
