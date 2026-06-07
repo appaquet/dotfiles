@@ -7,13 +7,13 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-26.05";
+      url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     secrets = {
       url = "github:appaquet/dotfiles-secrets";
-      #url = "path:/Users/appaquet/dotfiles/secrets";
+      #url = "path:/home/appaquet/dotfiles/secrets";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
