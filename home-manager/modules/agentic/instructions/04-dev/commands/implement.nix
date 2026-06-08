@@ -11,6 +11,10 @@
 
         After instructions & tasks loaded, 🚀 Engage thrusters
 
+        IMPORTANT: If plannined was done via ${
+          scope.commands."ctx-plan".reference
+        }, you should NOT read/write to project docs. Assume they don't exist.
+
         # Instructions
 
         1. 🔳 Verify 10/10 understanding.
