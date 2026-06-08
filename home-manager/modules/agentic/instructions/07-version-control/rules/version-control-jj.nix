@@ -26,7 +26,7 @@
       | Squash specific files to parent | `jj squash -u <files...>` |
       | Split a jj change, selecting files to remain in original | `jj split -m "private: agent: description" <files...>` |
       | Diff (git style) | `jj diff --git` |
-      | Diff working | `jj-diff-working --git` (`--stat` for files) |
+      | Diff working, including revent private changes, not just @ | `jj-diff-working --git` (`--stat` for files) |
       | Diff branch | `jj-diff-branch --git` |
       | Current branch | `jj-current-branch` |
       | Main branch | `jj-main-branch` |
