@@ -77,7 +77,7 @@
         Should be updated as design / phases evolve.
 
         ### Questions & Investigations (optional)
-        Checklist of questions, decisions, and investigation records. Capture uncertainties when encountered, outcomes when discovered. Update continuously.
+        Checklist of questions, decisions, and investigation records. Capture uncertainties when encountered, outcomes when discovered. Every questions asked during planning/implementation, with answers, should be captured. Update continuously.
 
         Format:
         ```markdown

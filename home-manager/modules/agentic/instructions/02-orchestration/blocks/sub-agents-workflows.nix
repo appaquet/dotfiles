@@ -25,7 +25,7 @@
               * unbounded reading, exploration → delegate
             * In doubt -> delegate
 
-          * Agent selection: select right sub-agent for task, each have different pricing and need to optimize for it. in planning & before launch, say why you think an agent is right one for task
+          * Agent selection: select right sub-agent for task, each have different pricing and need to optimize for it. in planning & before launch, say why you think an agent is right one for task. avoid using explore/general/plan agents, select proper dev agent instead.
             * junior-dev: ${scope.agents."junior-dev".description}
             * senior-dev: ${scope.agents."senior-dev".description}
             * staff-dev: ${scope.agents."staff-dev".description}

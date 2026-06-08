@@ -1,6 +1,6 @@
 {
   nixantic.sources.orchestration.agents."senior-dev" = {
-    description = "Senior developer who's good planning and most implementations";
+    description = "Senior developer, good at simple planning and general and complex implementations";
 
     model = {
       claude = "sonnet";

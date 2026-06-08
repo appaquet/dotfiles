@@ -113,6 +113,7 @@
       "~/dotfiles"
     ]
   },
+  "model": "haiku",
   "hooks": {
     "Notification": [
       {
@@ -263,6 +264,7 @@
   "autoMemoryEnabled": false,
   "showThinkingSummaries": true,
   "skipDangerousModePermissionPrompt": true,
+  "theme": "dark",
   "editorMode": "vim",
   "verbose": true,
   "preferredNotifChannel": "ghostty",
