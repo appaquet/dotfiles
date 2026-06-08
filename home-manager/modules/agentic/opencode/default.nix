@@ -261,6 +261,9 @@ let
   tuiJson = pkgs.writers.writeJSON "tui.json" {
     "$schema" = "https://opencode.ai/tui.json";
     theme = "tokyonight";
+    plugin = [
+      "vimcode@git+https://github.com/oribarilan/vimcode.git#v0.11.0"
+    ];
   };
 
   nono-opencode = pkgs.writeShellScriptBin "nono-opencode" ''
