@@ -16,6 +16,7 @@ buildNpmPackage rec {
   pname = "codeburn";
   version = "0.9.11";
 
+  # https://github.com/getagentseal/codeburn
   src = fetchFromGitHub {
     owner = "getagentseal";
     repo = "codeburn";
