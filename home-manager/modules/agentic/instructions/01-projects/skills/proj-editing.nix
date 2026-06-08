@@ -10,6 +10,7 @@
           # Project & phase documentations editing skill
 
           Docs updated continuously as we plan, develop, review, etc.. Because context window ephemeral while docs durable. Should show history, append/amend, not rewrite.
+          Update docs via the symlink (`./proj`) as permissions may only allow that.
 
           ## Project docs creation
           - Should always be done via ${

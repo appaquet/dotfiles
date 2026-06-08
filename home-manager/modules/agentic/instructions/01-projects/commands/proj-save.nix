@@ -57,6 +57,7 @@
            * Checkpoint
              * Replace with summary of work done, phase & tasks
              * Update next step if decided/obvious
+             * Keep short like project docs mention
 
         6. 🔳 Commit doc changes
            * Use the project doc version control guidelines
