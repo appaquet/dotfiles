@@ -4,8 +4,8 @@ let
 
   # https://oxide.md/Configuration
   moxideConfig = ''
-    # Daily notes date format (strftime). Creates daily/2026/02/2026-02-01-daily.md
-    dailynote = "%Y/%m/%Y-%m-%d-daily"
+    # Daily notes date format (strftime). Creates daily/2026/02/01/2026-02-01-daily.md
+    dailynote = "%Y/%m/%d/%Y-%m-%d-daily"
 
     # Folder for daily notes (relative to vault root)
     daily_notes_folder = "${exomindDir}/daily"

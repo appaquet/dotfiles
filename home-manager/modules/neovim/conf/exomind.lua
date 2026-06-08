@@ -151,25 +151,48 @@ local function buf_is_empty(bufnr)
 	return first_line == nil or first_line:match("^%s*$") ~= nil
 end
 
-local function hydrate_daily_if_empty()
+local function canonical_daily_note_info(path)
+	local daily_root = exomind_dir .. "/daily/"
+	if path:sub(1, #daily_root) ~= daily_root then
+		return nil
+	end
+
+	local relative_path = path:sub(#daily_root + 1)
+	local y, m, d, basename = relative_path:match("^(%d%d%d%d)/(%d%d)/(%d%d)/([^.]+)%.md$")
+	if not y or not m or not d or not basename then
+		return nil
+	end
+
+	local date = y .. "-" .. m .. "-" .. d
+	if basename ~= date .. "-daily" then
+		return nil
+	end
+
+	return { date = date }
+end
+
+local function hydrate_daily_if_empty(bufnr)
 	vim.schedule(function()
-		if not buf_is_empty() then
+		if not vim.api.nvim_buf_is_valid(bufnr) or not vim.api.nvim_buf_is_loaded(bufnr) then
 			return
 		end
+
+		if not buf_is_empty(bufnr) then
+			return
+		end
+
+		local daily_note = canonical_daily_note_info(vim.api.nvim_buf_get_name(bufnr))
+		if not daily_note then
+			return
+		end
+
 		local template_path = templates_dir .. "/daily.md"
 		if vim.fn.filereadable(template_path) ~= 1 then
 			return
 		end
-		-- Extract date from filename (e.g., "2026-02-07-daily.md" → "2026-02-07")
-		local ctx = {}
-		local fname = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":t")
-		local y, m, d = fname:match("^(%d%d%d%d)%-(%d%d)%-(%d%d)")
-		if y then
-			ctx.date = y .. "-" .. m .. "-" .. d
-		end
-		local lines = read_and_render_template(template_path, ctx)
+		local lines = read_and_render_template(template_path, { date = daily_note.date })
 		if lines then
-			vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
+			vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
 		end
 	end)
 end
@@ -209,10 +232,13 @@ local function open_daily_with_hydrate(day_arg)
 	local group = vim.api.nvim_create_augroup("ExomindDailyHydrate", { clear = true })
 	vim.api.nvim_create_autocmd("BufEnter", {
 		group = group,
-		pattern = "*/daily/*.md",
-		once = true,
-		callback = function()
-			hydrate_daily_if_empty()
+		pattern = "*.md",
+		callback = function(args)
+			if not canonical_daily_note_info(vim.api.nvim_buf_get_name(args.buf)) then
+				return
+			end
+			vim.api.nvim_del_augroup_by_id(group)
+			hydrate_daily_if_empty(args.buf)
 		end,
 	})
 
