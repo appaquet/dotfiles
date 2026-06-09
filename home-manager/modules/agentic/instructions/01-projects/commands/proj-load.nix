@@ -21,16 +21,16 @@
 
         ## Instructions
 
-        1. 🔳 Read project docs
+        1. 🔳 Read project doc entirely
            * Use current branch / change state above, don't re-discover
            * If project files found:
-             * Read main project doc context, checkpoint, requirements, progress
+             * Read FULLY main project doc context, checkpoint, requirements, progress
              * Don't re-read project symlink. Already in state above.
            * If "No project files", maybe uninitialized
              * STOP, inform user about missing context
 
-        2. 🔳 Load current/next phase docs mentioned in checkpoint/next steps
-              Mindful of context window: don't read irrelevant old/future docs
+        2. 🔳 Read current/next phase docs mentioned in checkpoint/next steps entirely
+              Mindful of context window: don't read irrelevant old/future docs, but read relevant phase docs fully
               On ambiguity about next steps, `AskUserQuestion` to clarify next focus
 
         3. 🔳 Synthesize context & summarize current state

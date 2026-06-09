@@ -27,7 +27,6 @@
 
         1. 🔳 Load context
            - Run ${scope.commands."proj-load".reference} for project context, branch state, project docs
-           - 🚀 Engage thrusters - As sub-agent, proceed immediately after loading
 
         2. 🔳 Gather guidelines (merge in priority order)
            - Project guidelines: Find via Scope patterns (highest salience)
@@ -80,6 +79,8 @@
            - If no issues: explain what was examined
 
         ${scope.blocks.pre-flight.reference}
+
+        You are a sub-agent, you are free to proceed right away 🚀 Engage thrusters
       '';
     };
 }
