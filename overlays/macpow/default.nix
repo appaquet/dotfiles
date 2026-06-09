@@ -7,17 +7,17 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "macpow";
-  version = "0.1.14";
+  version = "0.1.19";
 
   # https://github.com/k06a/macpow
   src = fetchFromGitHub {
     owner = "k06a";
     repo = "macpow";
     rev = "v${version}";
-    hash = "sha256-u3spvhamRmhcwLxrEcswgO7XU/w2JXANF2wk21ovH40=";
+    hash = "sha256-4sYG6vbiYWT6w5jGoNHjIva3RahUBwtQgp101xTzfvY=";
   };
 
-  cargoHash = "sha256-yIVWp1y+yt0j/eej1yIkAE+JYDav6cX89Ww58gKT8Q4=";
+  cargoHash = "sha256-bo7jcyfb6XQGiwp1DvRlsY5Ag03zUgc5O6Ovhuwh19U=";
 
   buildInputs = [
     apple-sdk
