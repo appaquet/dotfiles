@@ -26,13 +26,13 @@ Before editing any opencode/claude/agentic source/instructions, read `nixantic/i
 
 ## Documentation
 
-`docs/features/` is a symlink to a separate ./secrets repo.
-This means:
+IMPORTANT: `docs/features/` is a symlink to a separate repo, checked-out at `./secrets`
 
+This means:
 - Project docs (`proj/` → `docs/features/.../00-*.md`) are NOT in this repo
 - Changes to project docs are tracked in the secrets repo, not here
 - `jj status` in dotfiles will NOT show project doc changes
-- Only commit dotfiles changes (commands, skills, etc.) in this repo
+- Only commit dotfiles changes (commands, skills, etc.) in this repo, don't need to commit secrets, I'll do it.
 
 ## Nix Conventions
 
