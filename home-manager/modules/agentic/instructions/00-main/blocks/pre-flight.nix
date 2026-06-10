@@ -15,7 +15,7 @@
         * ${scope.blocks."project-doc-recall".preFlightRecall}
       '';
 
-      reference = "Imperative follow <pre-flight> instructions before doing anything";
+      reference = "**STOP**: Before proceeding with any instructions above, you NEED to follow <pre-flight> instructions.";
       injectReferenceIntoCommands = true;
     };
 }
