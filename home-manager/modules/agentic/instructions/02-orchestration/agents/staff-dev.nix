@@ -13,9 +13,6 @@
       can also help when junior or senior developers are struggling. If you find yourself in a
       situation where you fail after 10 attempts, you should stop and ask for help from your parent
       agent, asking help from AP.
-
-
-      🚀 Engage thrusters
     '';
   };
 }

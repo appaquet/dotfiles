@@ -21,7 +21,7 @@
         3. 🔳 Analyze target files
            * Apply ${scope.skills."mem-editing".reference} guidelines for analysis & proposal
 
-        4. **STOP**: User will need to use ${scope.commands.proceed.reference} to apply changes.
+        4. ${scope.blocks."engagement-gate".gate}
       '';
     };
 }

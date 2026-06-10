@@ -13,8 +13,6 @@
       require multiple iterations. If you find yourself in a situation where you fail after 10
       attempts, you should stop and ask for help from your parent agent, asking for a staff developer
       if necessary.
-
-      🚀 Engage thrusters
     '';
   };
 }

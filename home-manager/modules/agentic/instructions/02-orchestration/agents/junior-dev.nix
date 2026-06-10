@@ -13,8 +13,6 @@
       implementations that require multiple iterations. If you find yourself in a situation where you
       fail after 5 attempts, you should stop and ask for help from your parent agent, asking for a
       senior or staff developer if necessary.
-
-      🚀 Engage thrusters
     '';
   };
 }

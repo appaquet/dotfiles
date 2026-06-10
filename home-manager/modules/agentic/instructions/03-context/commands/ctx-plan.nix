@@ -37,7 +37,7 @@
         5. 🔳 Expose plan to user without writing to docs.
            - Use ${scope.skills."proj-editing".reference} for structure, but don't actually write to docs.
 
-        6. **STOP**: User will decide next steps.
+        6. ${scope.blocks."engagement-gate".gate}
       '';
     };
 }

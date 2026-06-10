@@ -9,8 +9,6 @@
       content = ''
         Goal: proceed to implementation of the plan/task at hand
 
-        After instructions & tasks loaded, 🚀 Engage thrusters
-
         IMPORTANT: If plannined was done via ${
           scope.commands."ctx-plan".reference
         }, you should NOT read/write to project docs. Assume they don't exist.
@@ -55,6 +53,8 @@
         7. 🔳 Run ${scope.commands."proj-save".reference} to update project and phase docs
 
         8. 🔳 If this work is not yet saved, finalize it with the repository version-control workflow. Re-verify repository state first. Changes you don't recognize may be mine.
+
+        ${scope.blocks."engagement-gate".release}
       '';
     };
 }

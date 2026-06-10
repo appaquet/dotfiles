@@ -7,8 +7,6 @@
 
         ## General principles
 
-        * Never implement until exact phrase "🚀 Engage thrusters"
-
         * Scope discipline: execute ONLY tasks from approved plan
           * Boy-scout fixes in code already touching fine (small cleanup, typo fix)
           * New tasks, inbox items, discovered issues beyond current scope: inform user, don't act, need plan

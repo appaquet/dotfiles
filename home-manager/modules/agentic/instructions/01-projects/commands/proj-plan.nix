@@ -37,7 +37,7 @@
              scope.skills."proj-editing".reference
            }, use project & phase docs rules and structure
 
-        6. **STOP**: User will decide next steps
+        6. ${scope.blocks."engagement-gate".gate}
 
         ${scope.forHarness {
           claude = "NEVER engage the native plan mode `EnterPlanMode`";

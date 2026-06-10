@@ -79,8 +79,6 @@
            - If no issues: explain what was examined
 
         ${scope.blocks.pre-flight.reference}
-
-        You are a sub-agent, you are free to proceed right away 🚀 Engage thrusters
       '';
     };
 }

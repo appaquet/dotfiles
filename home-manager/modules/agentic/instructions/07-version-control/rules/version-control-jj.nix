@@ -7,6 +7,7 @@
       We are using Jujutsu (`jj`), in collocated mode with git, which is always detached head state.
 
       A jj change is like git commit, but keeps id even if changed. When mentionning commit in instructions, this means jj change.
+
       Staging changes doesn't work like in git, where you usually create new jj change, work on it, then commit. So it's normal to be working on an empty jj change.
 
       Before any jj write operation, check state with `jj ls` in separate tool call. May have concurrent changes and state drift, never combine state verification and write in same command.

@@ -42,7 +42,7 @@
            - Group issues by category
            - Show current state and proposed fix for each
 
-        8. **STOP**: User will need to use ${scope.commands.proceed.reference} to apply changes.
+        8. ${scope.blocks."engagement-gate".gate}
       '';
     };
 }

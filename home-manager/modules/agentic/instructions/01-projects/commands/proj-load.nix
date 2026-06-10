@@ -21,7 +21,7 @@
 
         ## Instructions
 
-        1. 🔳 Read project doc entirely
+        1. 🔳 Read project doc
            * Use current branch / change state above, don't re-discover
            * If project files found:
              * Read FULLY main project doc context, checkpoint, requirements, progress
@@ -29,7 +29,7 @@
            * If "No project files", maybe uninitialized
              * STOP, inform user about missing context
 
-        2. 🔳 Read current/next phase docs mentioned in checkpoint/next steps entirely
+        2. 🔳 Read current/next phase docs mentioned in checkpoint/next steps
               Mindful of context window: don't read irrelevant old/future docs, but read relevant phase docs fully
               On ambiguity about next steps, `AskUserQuestion` to clarify next focus
 
