@@ -1,6 +1,6 @@
 {
   nixantic.sources.orchestration.agents."junior-dev" = {
-    description = "Junior developer who's good at simple code exploration/reconnaissance and very-straightforward implementations";
+    description = "Junior developer who's good at simple code exploration/reconnaissance and straightforward implementations";
 
     model = {
       claude = "haiku";

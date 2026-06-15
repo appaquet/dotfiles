@@ -35,7 +35,7 @@
         }
 
         5. 🔳 Expose plan to user without writing to docs.
-           - Use ${scope.skills."proj-editing".reference} for structure, but don't actually write to docs.
+           - Use the project doc structure and rules as a template, but keep the plan in memory and do not write docs.
 
         6. ${scope.blocks."engagement-gate".gate}
       '';

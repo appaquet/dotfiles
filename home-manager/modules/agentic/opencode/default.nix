@@ -145,8 +145,8 @@ let
           "*" = "ask";
           proj-load = "allow";
           proj-save = "allow";
-          mem-editing = "allow";
-          proj-editing = "allow";
+          mem-writing = "allow";
+          proj-writing = "allow";
           human-writer = "allow";
           customize-opencode = "allow";
         };
@@ -174,8 +174,8 @@ let
           "*" = "ask";
           proj-load = "allow";
           proj-save = "allow";
-          mem-editing = "allow";
-          proj-editing = "allow";
+          mem-writing = "allow";
+          proj-writing = "allow";
           human-writer = "allow";
           customize-opencode = "allow";
         };

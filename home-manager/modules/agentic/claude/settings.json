@@ -104,8 +104,8 @@
       "WebFetch(domain:docs.jj-vcs.dev)",
       "Skill(proj-load)",
       "Skill(proj-save)",
-      "Skill(mem-editing)",
-      "Skill(proj-editing)"
+      "Skill(mem-writing)",
+      "Skill(proj-writing)"
     ],
     "deny": [],
     "defaultMode": "auto",

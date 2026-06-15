@@ -1,6 +1,6 @@
 {
   nixantic.sources.orchestration.agents."staff-dev" = {
-    description = "Staff developer, good complex planning, very complex implementations and debugging. Can help when junior or senior are struggling. Very expensive, should only be used for very complex work.";
+    description = "Staff developer, good complex planning, very complex and hairy implementations and debugging. Can help when junior or senior are struggling. Very expensive, should only be used for very complex work.";
 
     model = {
       claude = "opus";

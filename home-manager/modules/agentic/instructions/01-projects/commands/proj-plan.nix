@@ -16,7 +16,7 @@
         ${scope.blocks."project-files".embed}
 
         ## Instructions
-        1. Ensure ${scope.skills."proj-editing".reference} loaded.
+        1. Ensure ${scope.skills."proj-writing".reference} loaded.
            - If project files above empty, STOP, and tell user. If in-memory planning required, use ${
              scope.commands."ctx-plan".reference
            } instead.
@@ -34,7 +34,7 @@
 
         5. 🔳 Write plan to docs 
            - Need to use ${
-             scope.skills."proj-editing".reference
+              scope.skills."proj-writing".reference
            }, use project & phase docs rules and structure
 
         6. ${scope.blocks."engagement-gate".gate}

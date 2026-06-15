@@ -16,7 +16,7 @@
 
         ## Instructions
 
-        1. Ensure ${scope.skills."proj-editing".reference} loaded.
+        1. Ensure ${scope.skills."proj-writing".reference} loaded.
 
         2. 🔳 Note `proj` symlink from state above. Identify current phase from checkpoint or ask user
 

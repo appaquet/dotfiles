@@ -13,13 +13,13 @@
 
         ## Instructions
 
-        1. 🔳 Load `${scope.skills."mem-editing".name}` skill
+        1. 🔳 Load `${scope.skills."mem-writing".name}` skill
 
         2. 🔳 Ensure scope identified
            If unclear, use `AskUserQuestion`
 
         3. 🔳 Analyze target files
-           * Apply ${scope.skills."mem-editing".reference} guidelines for analysis & proposal
+           * Apply ${scope.skills."mem-writing".reference} guidelines for analysis & proposal
 
         4. ${scope.blocks."engagement-gate".gate}
       '';

@@ -3,8 +3,8 @@
     { scope }:
     {
       preFlightRecall = "ALWAYS use project & phase docs to plan and track work as per project doc rules. When writing project/phase docs, use ${
-        scope.skills."proj-editing".reference
-      }. Don't load it until you need to create/edit them.";
+        scope.skills."proj-writing".reference
+      }. Don't load it until you need to create or update them.";
       content = "";
     };
 
@@ -16,7 +16,7 @@
       content = ''
         Project/feature docs spanning potentially multiple PRs. Source of truth as context window ephemeral.
 
-        Before creating/editing, make sure ${scope.skills."proj-editing".reference} loaded.
+        Before authoring project docs, make sure ${scope.skills."proj-writing".reference} loaded.
 
         ## File Location
         Unless project instructions specify otherwise:
@@ -27,7 +27,7 @@
         * To print location of `proj` and its content, run `agentic-proj-docs`
 
         ## Creation & update
-        Always via ${scope.skills."proj-editing".reference}.
+        Always via ${scope.skills."proj-writing".reference}.
 
         ## Project Doc (00-XYZ.md)
         Overview and navigation. Requirements live here. Tasks do NOT

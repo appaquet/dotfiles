@@ -1,13 +1,13 @@
 {
-  nixantic.sources.instruction-authoring.skills."mem-editing" = {
+  nixantic.sources.instruction-authoring.skills."mem-writing" = {
     kind = "directory";
 
     main =
       { scope }:
       {
-        description = "Guidelines for editing agentic coding instructions: CLAUDE.md/AGENTS.md, command, skill or agent files.";
+        description = "Guidelines for writing agentic coding instructions: CLAUDE.md/AGENTS.md, command, skill or agent files.";
         content = ''
-          # Agentic Instruction Editing
+          # Agentic Instruction Writing
 
           Lingua: harness = agentic coding = claude code / opencode / pi
 
@@ -45,7 +45,7 @@
             scope.blocks."task-management".reference
           } methodology.
 
-          ## Instructions editing
+          ## Instructions writing
 
           - Which instruction to edit should be based on context. If not clear what/where to edit, STOP and ask user.
           - You may not be able to edit them directly either if you're in a sandbox. If that's the case, tell the userr and give a detailed description of changes that need to be done. User will ask an agent inside ~/dotfiles.

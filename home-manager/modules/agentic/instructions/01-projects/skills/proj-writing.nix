@@ -1,13 +1,13 @@
 {
-  nixantic.sources.projects.skills."proj-editing" = {
+  nixantic.sources.projects.skills."proj-writing" = {
     kind = "directory";
     main =
       { scope }:
       {
-        description = "Skill for editing project & its phases docs";
+        description = "Skill for writing and updating project & phase docs";
 
         content = ''
-          # Project & phase documentations editing skill
+          # Project & phase documentation writing skill
 
           Docs updated continuously as we plan, develop, review, etc.. Because context window ephemeral while docs durable. Should show history, append/amend, not rewrite.
           Update docs via the symlink (`./proj`) as permissions may only allow that.
@@ -35,7 +35,7 @@
           - Should follow a SR&ED style, showing uncertainties, hyptheses, experiments, decisions, outcomes, etc.
           - Respect section ordering rules.
 
-          ## Project doc editing rules
+          ## Project doc writing rules
 
           ### Project requirements rules
           - Requirements should be non-overlapping, non-redundant, self-contained, clear, concise, and testable.
@@ -57,7 +57,7 @@
           - Should mention phase in which got modified. Don't remove previous ones, always include all of them
           - If too many in project files, put directories, but link to phases & make sure phases have full file list.
 
-          ## Phase doc editing
+          ## Phase doc writing
 
           ### Phase requirements rules
           - Same rules as project doc

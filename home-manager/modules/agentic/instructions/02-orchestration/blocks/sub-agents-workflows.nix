@@ -39,7 +39,7 @@
 
           * Sub-agent output: ask to optimize output; enough info for clear understanding and proof of correct work; resume if not enough
 
-          * Resuming: If sub-agent output is insufficient, send resume / follow-up message. Ask targeted follow-up questions. If I ask you a question that previous sub-agent should have answered, resume it instead of answering directly or launching a new one. If I ask for a small change to a previous sub-agent's work, resume it instead of creating a new one to do the change
+          * Resuming: If sub-agent output is insufficient, send resume / follow-up message. Ask targeted follow-up questions. If I ask you a question that previous sub-agent should have answered, resume it instead of answering directly or launching a new one. If I ask for a small change to a previous sub-agent's work, resume it instead of creating a new one to do the change. For new work, use new sub-agents to prevent blowing up context.
 
           * Trust work: If it reports having run commands (e.g. "ran tests → 493 passing"), trust it. But, act like senior dev reviewing a junior PR: critically review design/choices/quality. If not enough: resume. Don't re-analyze work that a sub-agent did. if it's not enough, ask it to do more. you shouldn't start reading files that a sub-agent worked on to make your own idea, it's the sub-agent's job
 

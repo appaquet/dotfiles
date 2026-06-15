@@ -18,7 +18,7 @@
 
         ## Instructions
 
-        1. Ensure ${scope.skills."proj-editing".reference} loaded.
+        1. Ensure ${scope.skills."proj-writing".reference} loaded.
 
         2. 🔳 Ensure **high level** task description is clear so that we can name it properly
            - If empty, ask user for clarification.

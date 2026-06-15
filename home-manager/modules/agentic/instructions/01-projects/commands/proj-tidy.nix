@@ -15,7 +15,7 @@
 
         ## Instructions
 
-        1. Ensure ${scope.skills."proj-editing".reference} loaded.
+        1. Ensure ${scope.skills."proj-writing".reference} loaded.
 
         2. 🔳 Read project & phase docs listed above
 
