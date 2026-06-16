@@ -9,7 +9,7 @@
       content = ''
         Goal: proceed to implementation of the plan/task at hand
 
-        IMPORTANT: If plannined was done via ${
+        IMPORTANT: If planning was done via ${
           scope.commands."ctx-plan".reference
         }, you should NOT read/write to project docs. Assume they don't exist.
 
@@ -41,7 +41,8 @@
              - Before marking task done: verify each AC sub-item passes
            - If deviating or overcomplicating, STOP and update user
            - If any decisions or discoveries, update project/phase doc
-           - Review agents can be used on uncertain steps, targetting working diff
+           - Review agents can be used on uncertain steps, be specific on which commits/changes to review
+           - If agent is stuck, you can ask from more senior agent (or same seniority in case of most senior) for insights/review/help, but without having them to do work
 
         5. 🔳 Validate via ${scope.blocks."development-completion-checklist".reference}
            - State each item aloud, confirm compliance

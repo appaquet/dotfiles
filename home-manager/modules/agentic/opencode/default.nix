@@ -191,6 +191,7 @@ let
       developer = {
         "*" = "ask";
         edit = "allow";
+        task = "allow";
 
         bash =
           bash.shellRead
@@ -209,6 +210,7 @@ let
         "*" = "allow";
         bash = "allow";
         webfetch = "allow";
+        task = "allow";
       };
     };
   };
