@@ -21,7 +21,7 @@
              scope.commands."ctx-plan".reference
            } instead.
 
-        2. 🔳 Ensure context loaded, task define. 
+        2. 🔳 Ensure context loaded, goal clear, task defined
            - Use ${scope.commands."proj-load".reference} if not already loaded.
            - Clarify via `AskUserQuestion` if empty or unclear.
 
@@ -34,7 +34,7 @@
 
         5. 🔳 Write plan to docs 
            - Need to use ${
-              scope.skills."proj-writing".reference
+             scope.skills."proj-writing".reference
            }, use project & phase docs rules and structure
 
         6. ${scope.blocks."engagement-gate".gate}

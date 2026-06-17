@@ -46,7 +46,7 @@
         Order: Context, Checkpoint, Inbox (opt.), Requirements, Design, Questions & Investigations (opt.), Phases, Files
 
         ### Context
-        Purpose and scope of changes
+        Precise goal of the project + brief context project
 
         ### Checkpoint
         Brief 1-2 paragraph summary for resuming work. References current & next phases (if applicable), tasks worked on, and next step if decided/obvious. Updated by ${
@@ -110,10 +110,10 @@
       phasesDoc = ''
         ### Sections
         Keep ordered. Never reorder/rename/create more sections. Some optional (opt)
-        Order: Context, Requirements (opt.), DEsign, Questions & Investigations (opt.), Tasks, Files
+        Order: Context, Requirements (opt.), Design, Questions & Investigations (opt.), Tasks, Files
 
         ### Context
-        Brief context + referencing project doc via markdown link.
+        Precise goal of the phase, aligned with goal of project + Brief context of phase
 
         ### Requirements (optional)
         Only needed when expanding project doc requirements with phase-specific details.

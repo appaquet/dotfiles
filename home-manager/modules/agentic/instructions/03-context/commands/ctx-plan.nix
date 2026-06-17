@@ -24,7 +24,7 @@
           scope.commands."proj-plan".reference
         }.
 
-        2. 🔳 Ensure task define. 
+        2. 🔳 Ensure context loaded, goal clear, task defined
            - Clarify via `AskUserQuestion` if empty or unclear.
 
         3. 🔳 Research, clarify and plan

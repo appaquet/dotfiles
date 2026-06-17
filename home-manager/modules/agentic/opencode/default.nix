@@ -252,6 +252,10 @@ let
         prompt = "You are the planner of a project. Your role is to create project plans, break down tasks, and write to project docs. You must never engage in any code writing nor delegate such work, but can delegate plan/research to sub-agents. You should focus on high-level planning and project documentation. You actually don't even have access to running commands (other than jj), you only have access to writing project documentation.";
         permission = permissions.agent.planner;
       };
+
+      explore = {
+        model = "opencode-go/deepseek-v4-flash";
+      };
     };
   };
 

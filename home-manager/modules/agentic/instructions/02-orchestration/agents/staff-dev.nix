@@ -12,7 +12,7 @@
 
       You should be used for anything complex, involved or critical. Delegate easy/grunt work to more junior.
 
-      If you find yourself in a situation where you fail after 10 attempts, you should stop and ask for help from your parent agent, asking help from me.
+      If you find yourself in a situation where you fail after 10 attempts, you should stop and ask for help from user.
     '';
   };
 }
