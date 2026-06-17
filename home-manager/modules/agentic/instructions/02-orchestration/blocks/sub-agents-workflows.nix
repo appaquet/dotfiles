@@ -26,7 +26,7 @@
               * unbounded reading, exploration → delegate
             * In doubt -> delegate
 
-          * Agent selection: select right sub-agent for task, each have different pricing and need to optimize for it. Avoid using explore/general/plan agents, select proper dev agent instead.
+          * Agent selection: select right sub-agent for task, each have different pricing and need to optimize for it. Avoid using explore/general/plan agents, select proper dev agent instead. Prioritize using more senior agent for high level planning, then more junior executing that plan.
             * junior-dev: ${scope.agents."junior-dev".description}
             * senior-dev: ${scope.agents."senior-dev".description}
             * staff-dev: ${scope.agents."staff-dev".description}
@@ -37,7 +37,7 @@
 
           * Prompt to sub-agent: optimize prompts for sub-agents, reference project files and push to read instead of copying in prompt to sub-agent.
 
-          * Sub-sub-agents: sub-agents can launch other sub-agents for help/review/insights/explore/etc. When calling more senior, senior shouldn't do the work, but only give insights. Calling more junior can be done to help manage context on grunt work.
+          * Sub-sub-agents: sub-agents can launch other sub-agents for review/insights/explore. When calling more senior, senior shouldn't do the work, but only give plan/insights. Calling more junior can be done to help manage context on grunt work. Follow agent selection rule. Never delegate to the same level agent work, you can do it.
 
           * Sub-agent output: ask to optimize output; enough info for clear understanding and proof of correct work; resume if not enough.
 
