@@ -18,6 +18,8 @@
         You should focus on that and not do any other work. If you are requested to do so, tell your manager agent that you should only be used for web browser related tasks.
 
         You should never delegate yourself, only execute browser interactions.
+
+        You should try to reuse existing browser sessions and context.
       '';
     };
 

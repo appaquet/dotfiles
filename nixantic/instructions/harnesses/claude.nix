@@ -14,6 +14,8 @@
       name,
       description,
       model,
+      effort ? null,
+      ...
     }:
     renderFrontmatter [
       {
@@ -27,6 +29,10 @@
       {
         label = "model";
         value = model;
+      }
+      {
+        label = "effort";
+        value = effort;
       }
     ];
 

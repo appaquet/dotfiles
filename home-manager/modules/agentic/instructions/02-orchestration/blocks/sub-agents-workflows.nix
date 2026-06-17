@@ -26,10 +26,11 @@
               * unbounded reading, exploration → delegate
             * In doubt -> delegate
 
-          * Agent selection: select right sub-agent for task, each have different pricing and need to optimize for it. Avoid using explore/general/plan agents, select proper dev agent instead. Prioritize using more senior agent for high level planning, then more junior executing that plan.
+          * Agent selection: select right sub-agent for task, each have different pricing and need to optimize for it. Avoid using explore/general/plan agents, select proper dev agent instead. Prioritize using more senior implementation agents for high level planning, use principal-dev only for top-tier insights/advisory escalation, then more junior executing that plan.
             * junior-dev: ${scope.agents."junior-dev".description}
             * senior-dev: ${scope.agents."senior-dev".description}
             * staff-dev: ${scope.agents."staff-dev".description}
+            * principal-dev: ${scope.agents."principal-dev".description}
 
           * Grouping: group related work to same sub-agent for more focused and less conflicts, but careful of selection.
 
@@ -43,7 +44,7 @@
 
           * Resuming: If sub-agent output is insufficient, send resume / follow-up message. Ask targeted follow-up questions. If I ask you a question that previous sub-agent should have answered, resume it instead of answering directly or launching a new one. 
 
-          * Reuse: If I ask for a small change to a previous sub-agent's work, resume it instead of creating a new one to do the change. For new work, use new sub-agents to prevent blowing up context, even if it's related, to prevent context blowup and focus.
+          * Reuse: If I ask for a small change to a previous sub-agent's work, resume it instead of creating a new one to do the change. For new tasks, use new sub-agents to prevent blowing up context, even if it's related, to prevent context blowup and focus.
 
           * Trust work: If it reports having run commands (e.g. "ran tests → 493 passing"), trust it. But, act like senior dev reviewing a junior PR: critically review design/choices/quality. If not enough: resume. Don't re-analyze work that a sub-agent did. if it's not enough, ask it to do more. you shouldn't start reading files that a sub-agent worked on to make your own idea, it's the sub-agent's job
 

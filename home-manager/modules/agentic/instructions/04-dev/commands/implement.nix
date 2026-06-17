@@ -42,7 +42,7 @@
            - If deviating or overcomplicating, STOP and update user
            - If any decisions or discoveries, update project/phase doc
            - Review agents can be used on uncertain steps, be specific on which commits/changes to review
-           - If agent is stuck, you can ask from more senior agent (or same seniority in case of most senior) for insights/review/help, but without having them to do work
+            - If agent is stuck, you can ask a more senior agent for insights/review/help, escalating up to principal-dev as the highest dev tier, but without having them to do the work
 
         5. 🔳 Validate via ${scope.blocks."development-completion-checklist".reference}
            - State each item aloud, confirm compliance
