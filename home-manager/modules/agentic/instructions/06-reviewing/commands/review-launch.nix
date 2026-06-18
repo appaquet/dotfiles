@@ -24,7 +24,7 @@
 
         They have all of the necessary instructions internally to figure out what to review, don't instruct
         them on otherwise since you may bias them, unless the user explicitly asks you to review something
-        specific. The only thing you can press is to follow their internal instructions to the letter
+        specific.
 
         The parent agent should launch the agent with NO EXTRA PROMPT since agents already have all the
         context loading capabilities
@@ -41,7 +41,7 @@
 
            - Again, they already have internal instructions. Don't provide them any extra prompt, unless the user explicitly asks you to (e.g. review something specific).
            - By default, they will compute their own changed file list and use their built-in per-file diff. Do not override that unless the user explicitly asks for something specific.
-           - Tell them to follow their internal instructions to the letter, without biasing them with any extra instructions.
+           - Tell them to process with the review by following their internal instructions to the letter, without biasing them with any extra instructions.
 
            - Note: If an agent doesn't return any results but has finished, don't assume that it failed and
              just consider it as "no issues found". Don't restart the agents as they consume many tokens.
