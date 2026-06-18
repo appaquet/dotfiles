@@ -3,6 +3,14 @@
     { scope }:
     {
       description = "Reviews code for logic correctness, potential bugs, and runtime issues";
+      permission = {
+        opencode = {
+          task = "deny";
+        };
+        claude = {
+          disallowedTools = [ "Agent" ];
+        };
+      };
       content = ''
         # Code Correctness Reviewer
 

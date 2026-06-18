@@ -3,6 +3,14 @@
     { scope }:
     {
       description = "Reviews code changes for architectural consistency, design patterns, and system design";
+      permission = {
+        opencode = {
+          task = "deny";
+        };
+        claude = {
+          disallowedTools = [ "Agent" ];
+        };
+      };
 
       content = ''
         # Architecture Reviewer

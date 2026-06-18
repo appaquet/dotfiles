@@ -15,8 +15,12 @@
       description,
       model,
       effort ? null,
+      permission ? null,
       ...
     }:
+    let
+      permissionValue = if permission != null then permission else { };
+    in
     renderFrontmatter [
       {
         label = "name";
@@ -33,6 +37,18 @@
       {
         label = "effort";
         value = effort;
+      }
+      {
+        label = "tools";
+        value = permissionValue.tools or null;
+      }
+      {
+        label = "disallowedTools";
+        value = permissionValue.disallowedTools or null;
+      }
+      {
+        label = "permissionMode";
+        value = permissionValue.permissionMode or null;
       }
     ];
 

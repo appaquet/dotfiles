@@ -3,6 +3,14 @@
     { scope }:
     {
       description = "Reviews code for style issues, formatting, syntax errors, and code quality problems";
+      permission = {
+        opencode = {
+          task = "deny";
+        };
+        claude = {
+          disallowedTools = [ "Agent" ];
+        };
+      };
 
       content = ''
         # Code Style Reviewer

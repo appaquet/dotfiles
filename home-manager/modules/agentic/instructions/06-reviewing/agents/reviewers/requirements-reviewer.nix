@@ -3,6 +3,14 @@
     { scope }:
     {
       description = "Reviews code changes against project requirements and specifications";
+      permission = {
+        opencode = {
+          task = "deny";
+        };
+        claude = {
+          disallowedTools = [ "Agent" ];
+        };
+      };
       content = ''
         # Requirements Reviewer
 

@@ -24,7 +24,7 @@ let
     reference = "(See: ${args.heading})";
   };
 
-  # mkAgent :: { harness, name, description, content, model?, effort?, harnesses?, ... }
+  # mkAgent :: { harness, name, description, content, model?, effort?, permission?, harnesses?, ... }
   #   AI agent definitions.
   #   Source: nixantic.sources.<source-owner>.agents.*, keyed by artifact key.
   #
@@ -41,6 +41,8 @@ let
   #                    - Attrset: keyed by harness name (e.g. { claude = "max"; opencode = "xhigh"; })
   #                    Constructor selects effort.<active-harness> or uses the string as-is.
   #                    Harness-rendered: Claude renders as `effort`; OpenCode renders as `reasoningEffort`.
+  #     permission   - Attrset keyed by harness name (e.g. { claude = { disallowedTools = [ "Agent" ]; }; }).
+  #                    Constructor selects permission.<active-harness> or null.
   #
   #   Scope-consumed
   #     harnesses    - Restrict to specific harnesses. Omitted = all harnesses.
@@ -61,10 +63,13 @@ let
           if builtins.isAttrs effort then effort.${args.harness.name} or null else effort
         else
           null;
+      permission = args.permission or null;
+      selectedPermission = if permission != null then permission.${args.harness.name} or null else null;
       frontmatter = args.harness.renderAgentFrontmatter {
         inherit (args) name description;
         model = selectedModel;
         effort = selectedEffort;
+        permission = selectedPermission;
       };
     in
     {

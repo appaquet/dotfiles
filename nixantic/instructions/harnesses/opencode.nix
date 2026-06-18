@@ -14,6 +14,7 @@
       description,
       model,
       effort ? null,
+      permission ? null,
       ...
     }:
     renderFrontmatter [
@@ -32,6 +33,10 @@
       {
         label = "reasoningEffort";
         value = effort;
+      }
+      {
+        label = "permission";
+        value = permission;
       }
     ];
 

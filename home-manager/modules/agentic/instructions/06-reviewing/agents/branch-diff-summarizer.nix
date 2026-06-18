@@ -9,6 +9,15 @@
         opencode = "opencode-go/deepseek-v4-flash";
       };
 
+      permission = {
+        opencode = {
+          task = "deny";
+        };
+        claude = {
+          disallowedTools = [ "Agent" ];
+        };
+      };
+
       content = ''
         # Branch Diff Summarizer
 

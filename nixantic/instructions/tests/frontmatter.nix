@@ -143,6 +143,30 @@ let
       ];
       expected = "---\nallowed-tools: [\"Bash(command: test)\", \"Read # docs\"]\n---\n";
     }
+    {
+      name = "nested attrsets render as yaml mappings";
+      fields = [
+        {
+          label = "permission";
+          value = {
+            task = "deny";
+            bash = {
+              "*" = "ask";
+              "git *" = "allow";
+            };
+          };
+        }
+      ];
+      expected = ''
+        ---
+        permission:
+          bash:
+            "*": "ask"
+            "git *": "allow"
+          task: "deny"
+        ---
+      '';
+    }
   ];
 
   invalidLabelResult = builtins.tryEval (
@@ -157,10 +181,8 @@ let
   invalidValueResult = builtins.tryEval (
     frontmatter.renderFrontmatter [
       {
-        label = "metadata";
-        value = {
-          unsupported = true;
-        };
+        label = "pi";
+        value = 3.14;
       }
     ]
   );
