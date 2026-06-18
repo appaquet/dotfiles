@@ -34,6 +34,7 @@
            - **Effort**: Quick Win, Moderate, Extensive
            - **Dependencies**: Note order requirements
            - **Validity**: If you believe a comment is invalid or debatable, explain why and let user decide
+           - **Agent**: If we're in orchestrator mode, which agent could be best to address the issue
 
         5. 🔳 Present plan
            - Show prioritized list with research findings, formatted as table
