@@ -3,7 +3,7 @@
     { scope }:
     {
       content = ''
-        ## Sub-agent Rules
+        ## Review agent rules
 
         - NEVER notify user directly - return results to parent agent
           - Results returned via comprehensive summary message
@@ -18,6 +18,8 @@
 
         - Do NOT use external tools (bash, formatter, linters, etc.)
           Rely solely on your training and the guidelines provided
+
+        - NEVER delegate work to sub-agents. You should be doing that yourself. You are a reviewer sub-agent already.
 
         - Other reviewer agents may run in parallel
           - It's normal for code to change, and you may have to re-read for latest changes
