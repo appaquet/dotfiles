@@ -6,6 +6,7 @@
       content = ''
         * ALWAYS use the task tool (`${scope.harness.tools.taskCreate}`) to create tasks for any instruction step that has a 🔳 annotation, before
           executing any of the instructions
+          * If you don't have access to the tool, just mention the tasks out loud and mention them as you complete them
           * Create one or more tasks per 🔳 step, 1:n mapping using the `${scope.harness.tools.taskCreate}` tool
           * No ad-hoc replacements or broader grouping
           * THEN execute the instructions & tasks in order

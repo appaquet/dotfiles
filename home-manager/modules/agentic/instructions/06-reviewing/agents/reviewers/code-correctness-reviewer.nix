@@ -23,7 +23,7 @@
 
         ## Comment Format
 
-        Insert via the Edit tool using this exact format:
+        Insert comments with this exact format:
 
         <edit-comment-format>
         // REVIEW: code-correctness-reviewer - <description of issue, consequences, suggested fix>
