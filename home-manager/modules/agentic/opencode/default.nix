@@ -165,8 +165,10 @@ let
 
         edit = {
           "*" = "deny";
+          "*.md" = "allow";
           "proj/**" = "allow";
           "docs/features/**" = "allow";
+          "dev/features/**" = "allow";
           "secrets/docs/features/**" = "allow";
         };
 
