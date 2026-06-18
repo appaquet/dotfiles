@@ -54,10 +54,10 @@
              - Examine changed hunks for this issue
                - Apply `<deep-thinking>` procedure
                - Focus on changed code, not unrelated areas (unless blatant problem)
-             - For EACH violation found, IMMEDIATELY call the `Edit` tool to insert a comment:
+             - For EACH violation found, IMMEDIATELY insert a comment:
                `// REVIEW: [agent-name] - <description of issue, consequences, suggested fix>`
                - Place the comment on the line above or next to the issue
-               - Edit tool is the ONLY way to report issues — text in your response does not count
+               - Inserting comment is the ONLY way to report issues — text in your response does not count
                - If Edit fails (parallel agent modified file), re-read the file and retry Edit
                - Insert ALL violations, minor or major
              - Mark task complete before next rule
@@ -67,7 +67,7 @@
              have been missed
 
         7. 🔳 Verify insertions
-           - Search changed files for `// REVIEW:` using the Grep tool
+           - Search changed files for `// REVIEW:`
            - If you found issues but grep returns no matches, go back to step 6 and insert via Edit
            - Every reported issue MUST have a corresponding comment in the code
 

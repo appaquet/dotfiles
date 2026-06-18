@@ -20,7 +20,6 @@
       ## Searching for review comments
       Using grep tool: `pattern="(//|#|--|/\\*|\\*)\\s*REVIEW:")`
       Ignore results in `proj/`
-      If no grep tool, can use rg, but careful with glob exclusions failing silently.
 
       ## Addressing review comments
       * Never remove unless addressed.
