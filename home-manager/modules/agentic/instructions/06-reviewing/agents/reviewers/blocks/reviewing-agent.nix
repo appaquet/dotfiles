@@ -42,6 +42,7 @@
            - 🔳 Create one task using `${scope.harness.tools.taskCreate}` for EACH rule
 
         4. 🔳 Load changed files
+           - Based on requested scope. If no scope, assume full branch review
            - List version control changed files (not code diff yet)
              - Exclude reviewing docs themselves and generated files (e.g., *.pb.go)
              - For safety-critical patterns (exposed secrets, hardcoded credentials, debug statements),
