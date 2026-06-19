@@ -1,4 +1,5 @@
 {
+  inputs,
   pkgs,
   ...
 }:
@@ -46,15 +47,13 @@ let
 in
 {
   imports = [
-    ../../../nixantic/home-manager.nix
+    inputs.harness.homeManagerModules.default
     ./claude
     ./opencode
     ../nono
   ];
 
   config = {
-    nixantic.sourceRoots = [ ./instructions ];
-
     home.packages = [
       agentic-proj-docs
       mcp-npx

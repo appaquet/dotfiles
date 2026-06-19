@@ -20,9 +20,9 @@ To find a missing hash, use build functions instead of trying to eval.
 
 ## Agentic Instructions
 
-`nixantic/` contains the reusable instruction renderer and Home Manager module.
-Repo's personal instructions in `home-manager/modules/agentic/instructions/`.
-Before editing any opencode/claude/agentic source/instructions, read `nixantic/instructions/CLAUDE.md` and `home-manager/modules/agentic/CLAUDE.md`.
+`inputs.harness` consumes the external `harness` repo, which owns nixantic — the reusable instruction renderer, Home Manager module, and built-in instruction corpus.
+A local `harness/` checkout may or may not be present. It is only kept when needed for local work. If a task requires local `harness/` content and the directory is absent, report that rather than assuming it exists.
+If you are editing the reusable agentic framework or built-in instruction corpus, work in the harness repo and read `harness/CLAUDE.md` when that checkout exists. If you are editing AP-specific runtime glue in this repo, read `home-manager/modules/agentic/CLAUDE.md`.
 
 ## Documentation
 

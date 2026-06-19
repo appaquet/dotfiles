@@ -11,6 +11,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    harness = {
+      url = "github:dotcoreinc/harness";
+      #url = "path:/home/appaquet/dotfiles/harness";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
+    };
+
     secrets = {
       url = "github:appaquet/dotfiles-secrets";
       #url = "path:/home/appaquet/dotfiles/secrets";
@@ -79,7 +86,7 @@
         ];
 
         imports = [
-          ./nixantic
+          inputs.harness.flakeModules.default
           ./overlays
           ./home-manager
           ./nixos

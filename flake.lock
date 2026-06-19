@@ -265,6 +265,29 @@
         "type": "github"
       }
     },
+    "harness": {
+      "inputs": {
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1781897156,
+        "narHash": "sha256-1nviVXxQClFbwKOOUzi6fx56rTSNjlCO/QS+v2rLj9Q=",
+        "owner": "dotcoreinc",
+        "repo": "harness",
+        "rev": "7e32a421ef5089f94ebb266b64a70950029e7b7e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "dotcoreinc",
+        "repo": "harness",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -505,6 +528,7 @@
         "disko": "disko",
         "dotblip": "dotblip",
         "flake-parts": "flake-parts",
+        "harness": "harness",
         "home-manager": "home-manager",
         "llm-agents": "llm-agents",
         "nix-index-database": "nix-index-database",
@@ -524,11 +548,11 @@
         "sops-nix": "sops-nix"
       },
       "locked": {
-        "lastModified": 1781185941,
-        "narHash": "sha256-y3l3dRUcZgU1m/eTPLPiiGbxjCfE+8CpZTZXSnKKvvg=",
+        "lastModified": 1781878512,
+        "narHash": "sha256-e417U3aIrULZhd5/xQPjo6Y9iS1eeDtSIlk0tEFuc4A=",
         "owner": "appaquet",
         "repo": "dotfiles-secrets",
-        "rev": "14857f1fc92652e47a5b00db7aa52809034c4beb",
+        "rev": "bccf6aeb9176ac1ef54ac016d4e3f1435202af9b",
         "type": "github"
       },
       "original": {
