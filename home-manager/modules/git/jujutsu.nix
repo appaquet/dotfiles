@@ -140,21 +140,23 @@
           echo -e "\n"
       done
     '')
+
     (writeShellScriptBin "jj-workspace-exists" ''
       set -euo pipefail
       name="$1"
-      if jj workspace list | grep -q "$name"; then
+      if jj workspace list --ignore-working-copy -T 'name ++ "\n"' | grep -Fxq "$name"; then
         exit 0
       else
         echo "Workspace '$name' not found" >&2
         exit 1
       fi
     '')
+
     (writeShellScriptBin "jj-workspace-add" ''
       set -euo pipefail
       name="$1"
       if [ -z "$name" ]; then
-        echo "Usage: jj-workspace-add <name>" >&2
+        echo "Usage: jj-workspace-add <workspace-name>" >&2
         exit 1
       fi
       if jj-workspace-exists "$name"; then
@@ -162,24 +164,64 @@
         exit 1
       fi
       root=$(jj workspace root)
+      mkdir -p "$root/.workspaces"
       jj workspace add --name "$name" "$root/.workspaces/$name"
     '')
+
     (writeShellScriptBin "jj-workspace-delete" ''
       set -euo pipefail
-      name="$1"
-      if [ -z "$name" ]; then
-        echo "Usage: jj-workspace-delete <name>" >&2
+      if [ "$#" -gt 1 ]; then
+        echo "Usage: jj-workspace-delete [workspace-name]" >&2
         exit 1
       fi
-      if ! jj-workspace-exists "$name"; then
-        echo "Workspace '$name' does not exist" >&2
+
+      if ! name=$(jj-workspace-select "$@"); then
         exit 1
       fi
+
       root=$(jj workspace root)
       jj workspace forget "$name"
       if [ -d "$root/.workspaces/$name" ]; then
         rm -rf "$root/.workspaces/$name"
       fi
+    '')
+
+    (writeShellScriptBin "jj-workspace-root-resolve" ''
+      set -euo pipefail
+
+      name="''${1-}"
+      if [ -z "$name" ]; then
+        echo "Usage: jj-workspace-root-resolve <name>" >&2
+        exit 1
+      fi
+
+      if root=$(jj workspace root --ignore-working-copy --name "$name" 2>/dev/null); then
+        printf '%s\n' "$root"
+        exit 0
+      fi
+
+      if [ "$name" != "default" ]; then
+        echo "Workspace '$name' not found" >&2
+        exit 1
+      fi
+
+      current_root=$(jj workspace root --ignore-working-copy)
+      parent_dir=$(dirname "$current_root")
+
+      if [ "$(basename "$parent_dir")" != ".workspaces" ]; then
+        echo "Workspace 'default' has no recorded path, and legacy fallback only works from a workspace under .workspaces/" >&2
+        exit 1
+      fi
+
+      candidate_root=$(dirname "$parent_dir")
+
+      if [ -d "$candidate_root/.jj" ]; then
+        printf '%s\n' "$candidate_root"
+        exit 0
+      fi
+
+      echo "Workspace 'default' could not be resolved from legacy .workspaces layout" >&2
+      exit 1
     '')
   ];
 
@@ -191,6 +233,38 @@
 
       jj-b-select = ''
         jj log --no-graph -r 'bookmarks()' -T 'coalesce(local_bookmarks) ++ "\n"' --color always | sed 's/ *\\*$//' | fzf --ansi | cut -f1
+      '';
+
+      jj-workspace-switch = ''
+        set -l name
+
+        if test (count $argv) -gt 1
+          echo "Usage: jj-workspace-switch [workspace-name]" >&2
+          return 1
+        end
+
+        if test (count $argv) -eq 1
+          set name $argv[1]
+        else
+          set name (
+            jj workspace list --ignore-working-copy -T 'name ++ "\n"' \
+              | fzf --prompt 'Workspace > ' \
+              | string trim
+          )
+
+          if test -z "$name"
+            return 1
+          end
+        end
+
+        set -l root (jj-workspace-root-resolve "$name")
+        or return 1
+
+        cd "$root"
+      '';
+
+      jjws = ''
+        jj-workspace-switch $argv
       '';
     };
 
@@ -222,7 +296,9 @@
       jjwu = "jj workspace update-stale";
       jjwls = "jj workspace list";
       jjwa = "jj-workspace-add";
+      jjwc = "jj-workspace-add";
       jjwd = "jj-workspace-delete";
+      jjwrm = "jj-workspace-delete";
     };
 
     interactiveShellInit = ''
