@@ -546,15 +546,24 @@ cmd_agent_build() {
     exit 1
   fi
 
-  ${NIX_BUILDER} build --impure --out-link result --expr '
-    let
-      flake = builtins.getFlake (toString ./.);
-      system = builtins.currentSystem;
-      vcsMode = builtins.getEnv "NIXANTIC_VCS_MODE";
-      packageName = if vcsMode == "git" then "builtin-git" else "builtin";
-    in
-    flake.inputs.harness.packages.${system}.${packageName}
-  '
+  local flake_ref flake_expr
+  flake_ref="$(local_flake_ref)"
+  if [[ "$flake_ref" == "." ]]; then
+    flake_expr="(toString ./.)"
+  else
+    flake_expr="\"${flake_ref}\""
+  fi
+
+  with_local_flake_note \
+    ${NIX_BUILDER} build --impure --out-link result --expr "
+      let
+        flake = builtins.getFlake ${flake_expr};
+        system = builtins.currentSystem;
+        vcsMode = builtins.getEnv \"NIXANTIC_VCS_MODE\";
+        packageName = if vcsMode == \"git\" then \"builtin-git\" else \"builtin\";
+      in
+        flake.inputs.harness.packages.\${system}.\${packageName}
+    "
   echo "result -> $(readlink result)"
 }
 
