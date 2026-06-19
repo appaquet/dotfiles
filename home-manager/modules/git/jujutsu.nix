@@ -177,6 +177,8 @@
         expansion = "jj commit -i -m \"%\"";
         setCursor = true;
       };
+
+      jjwu = "jj workspace update-stale";
     };
 
     interactiveShellInit = ''
