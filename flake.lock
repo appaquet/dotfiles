@@ -275,17 +275,14 @@
         ]
       },
       "locked": {
-        "lastModified": 1781897156,
-        "narHash": "sha256-1nviVXxQClFbwKOOUzi6fx56rTSNjlCO/QS+v2rLj9Q=",
-        "owner": "dotcoreinc",
-        "repo": "harness",
-        "rev": "7e32a421ef5089f94ebb266b64a70950029e7b7e",
-        "type": "github"
+        "lastModified": 1781899599,
+        "narHash": "sha256-Oi4cOePt9W0SwXa0nIl06pQgPPCBl3mn10waJejLwFs=",
+        "path": "/home/appaquet/dotfiles/harness",
+        "type": "path"
       },
       "original": {
-        "owner": "dotcoreinc",
-        "repo": "harness",
-        "type": "github"
+        "path": "/home/appaquet/dotfiles/harness",
+        "type": "path"
       }
     },
     "home-manager": {

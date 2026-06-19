@@ -54,6 +54,8 @@ in
   ];
 
   config = {
+    nixantic.sourceRoots = [ ./instructions ];
+
     home.packages = [
       agentic-proj-docs
       mcp-npx
