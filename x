@@ -549,17 +549,11 @@ cmd_agent_build() {
   ${NIX_BUILDER} build --impure --out-link result --expr '
     let
       flake = builtins.getFlake (toString ./.);
-      pkgs = flake.inputs.nixpkgs.legacyPackages.${builtins.currentSystem};
+      system = builtins.currentSystem;
       vcsMode = builtins.getEnv "NIXANTIC_VCS_MODE";
-      instructions = flake.nixantic.lib.mkInstructions {
-        inherit pkgs;
-        lib = pkgs.lib;
-        postProcess = true;
-        sourceRoots = [ ./home-manager/modules/agentic/instructions ];
-        settings.versionControl.mode = if vcsMode == "" then "jj" else vcsMode;
-      };
+      packageName = if vcsMode == "git" then "builtin-git" else "builtin";
     in
-    instructions.package
+    flake.inputs.harness.packages.${system}.${packageName}
   '
   echo "result -> $(readlink result)"
 }
