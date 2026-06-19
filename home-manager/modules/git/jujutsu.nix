@@ -140,6 +140,47 @@
           echo -e "\n"
       done
     '')
+    (writeShellScriptBin "jj-workspace-exists" ''
+      set -euo pipefail
+      name="$1"
+      if jj workspace list | grep -q "$name"; then
+        exit 0
+      else
+        echo "Workspace '$name' not found" >&2
+        exit 1
+      fi
+    '')
+    (writeShellScriptBin "jj-workspace-add" ''
+      set -euo pipefail
+      name="$1"
+      if [ -z "$name" ]; then
+        echo "Usage: jj-workspace-add <name>" >&2
+        exit 1
+      fi
+      if jj-workspace-exists "$name"; then
+        echo "Workspace '$name' already exists" >&2
+        exit 1
+      fi
+      root=$(jj workspace root)
+      jj workspace add --name "$name" "$root/.workspaces/$name"
+    '')
+    (writeShellScriptBin "jj-workspace-delete" ''
+      set -euo pipefail
+      name="$1"
+      if [ -z "$name" ]; then
+        echo "Usage: jj-workspace-delete <name>" >&2
+        exit 1
+      fi
+      if ! jj-workspace-exists "$name"; then
+        echo "Workspace '$name' does not exist" >&2
+        exit 1
+      fi
+      root=$(jj workspace root)
+      jj workspace forget "$name"
+      if [ -d "$root/.workspaces/$name" ]; then
+        rm -rf "$root/.workspaces/$name"
+      fi
+    '')
   ];
 
   programs.fish = {
@@ -179,6 +220,9 @@
       };
 
       jjwu = "jj workspace update-stale";
+      jjwls = "jj workspace list";
+      jjwa = "jj-workspace-add";
+      jjwd = "jj-workspace-delete";
     };
 
     interactiveShellInit = ''
