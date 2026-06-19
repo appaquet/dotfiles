@@ -31,6 +31,7 @@
             - ~/dotfiles/nixantic/CLAUDE.md for renderer and reusable instruction patterns
             - ~/dotfiles/home-manager/modules/agentic/CLAUDE.md for my setup specific instructions
           - In ~/dotfiles/home-manager/modules/agentic/instructions, folders are organization feature, not actually rendered. Nix files define fragments.
+          - Commands/skills or sub-directory instruction files should not needlessy repeat information in more global instruction files.
 
           ## Instructions principles
 
