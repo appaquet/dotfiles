@@ -1,0 +1,3 @@
+[submodule "bluecap-harness"]
+	path = bluecap-harness
+	url = git@github.com:bluecap-co/harness.git
