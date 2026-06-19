@@ -144,12 +144,7 @@
     (writeShellScriptBin "jj-workspace-exists" ''
       set -euo pipefail
       name="$1"
-      if jj workspace list --ignore-working-copy -T 'name ++ "\n"' | grep -Fxq "$name"; then
-        exit 0
-      else
-        echo "Workspace '$name' not found" >&2
-        exit 1
-      fi
+      jj workspace list --ignore-working-copy -T 'name ++ "\n"' | grep -Fxq "$name"
     '')
 
     (writeShellScriptBin "jj-workspace-add" ''
@@ -186,12 +181,12 @@
       fi
     '')
 
-    (writeShellScriptBin "jj-workspace-root-resolve" ''
+    (writeShellScriptBin "jj-workspace-path" ''
       set -euo pipefail
 
       name="''${1-}"
       if [ -z "$name" ]; then
-        echo "Usage: jj-workspace-root-resolve <name>" >&2
+        echo "Usage: jj-workspace-path <workspace-name>" >&2
         exit 1
       fi
 
@@ -209,7 +204,12 @@
       parent_dir=$(dirname "$current_root")
 
       if [ "$(basename "$parent_dir")" != ".workspaces" ]; then
-        echo "Workspace 'default' has no recorded path, and legacy fallback only works from a workspace under .workspaces/" >&2
+        if [ -d "$current_root/.jj" ]; then
+          printf '%s\n' "$current_root"
+          exit 0
+        fi
+
+        echo "Workspace 'default' has no recorded path, and legacy fallback only works from the repo root or a workspace under .workspaces/" >&2
         exit 1
       fi
 
@@ -222,6 +222,64 @@
 
       echo "Workspace 'default' could not be resolved from legacy .workspaces layout" >&2
       exit 1
+    '')
+
+    (writeShellScriptBin "jj-workspace-select" ''
+      set -euo pipefail
+
+      if [ "$#" -gt 1 ]; then
+        echo "Usage: jj-workspace-select [workspace-name]" >&2
+        exit 1
+      fi
+
+      if [ "$#" -eq 1 ]; then
+        if ! jj-workspace-exists "$1"; then
+          echo "Workspace '$1' not found" >&2
+          exit 1
+        fi
+
+        printf '%s\n' "$1"
+        exit 0
+      fi
+
+      if ! name=$(jj workspace list --ignore-working-copy -T 'name ++ "\n"' | fzf --prompt 'Workspace > ' --height 40% --layout reverse --border); then
+        exit 1
+      fi
+
+      if [ -z "$name" ]; then
+        exit 1
+      fi
+
+      printf '%s\n' "$name"
+    '')
+
+    (writeShellScriptBin "jj-workspace-tmux" ''
+      set -euo pipefail
+
+      if [ -z "''${TMUX-}" ]; then
+        echo "jjwt only works inside tmux" >&2
+        exit 1
+      fi
+
+      name=$(jj-workspace-select "$@")
+      root=$(jj-workspace-path "$name")
+
+      window_id=$(
+        tmux list-windows -F '#{window_id}\t#{window_name}\t#{@jj_workspace_root}\t#{pane_current_path}' \
+          | while IFS="$(printf '\t')" read -r id window_name workspace_root pane_path; do
+              if [ "$window_name" = "$name" ] && { [ "$workspace_root" = "$root" ] || [ "$pane_path" = "$root" ]; }; then
+                printf '%s\n' "$id"
+                break
+              fi
+            done
+      )
+
+      if [ -n "$window_id" ]; then
+        tmux select-window -t "$window_id"
+      else
+        window_id=$(tmux new-window -P -F '#{window_id}' -c "$root" -n "$name")
+        tmux set-window-option -t "$window_id" @jj_workspace_root "$root" >/dev/null
+      fi
     '')
   ];
 
@@ -236,28 +294,10 @@
       '';
 
       jj-workspace-switch = ''
-        set -l name
+        set -l name (jj-workspace-select $argv)
+        or return 1
 
-        if test (count $argv) -gt 1
-          echo "Usage: jj-workspace-switch [workspace-name]" >&2
-          return 1
-        end
-
-        if test (count $argv) -eq 1
-          set name $argv[1]
-        else
-          set name (
-            jj workspace list --ignore-working-copy -T 'name ++ "\n"' \
-              | fzf --prompt 'Workspace > ' \
-              | string trim
-          )
-
-          if test -z "$name"
-            return 1
-          end
-        end
-
-        set -l root (jj-workspace-root-resolve "$name")
+        set -l root (jj-workspace-path "$name")
         or return 1
 
         cd "$root"
@@ -265,6 +305,10 @@
 
       jjws = ''
         jj-workspace-switch $argv
+      '';
+
+      jjwt = ''
+        jj-workspace-tmux $argv
       '';
     };
 

@@ -95,6 +95,56 @@ check_eval() {
   nix eval --raw "${1}"
 }
 
+local_flake_uses_enclosing_git_snapshot() {
+  local git_root flake_path
+
+  git_root=$(git -C "$ROOT" rev-parse --show-toplevel 2>/dev/null || true)
+  if [[ -z "$git_root" ]]; then
+    return 1
+  fi
+
+  flake_path="$(git -C "$ROOT" rev-parse --show-prefix)flake.nix"
+  if git -C "$ROOT" ls-files --error-unmatch -- "$flake_path" >/dev/null 2>&1; then
+    return 1
+  fi
+
+  return 0
+}
+
+local_flake_ref() {
+  if [[ -n "${LOCAL_FLAKE_REF:-}" ]]; then
+    printf '%s\n' "$LOCAL_FLAKE_REF"
+    return
+  fi
+
+  LOCAL_FLAKE_REF="."
+  if local_flake_uses_enclosing_git_snapshot; then
+    LOCAL_FLAKE_REF="path:$ROOT"
+  fi
+
+  printf '%s\n' "$LOCAL_FLAKE_REF"
+}
+
+local_flake_attr_ref() {
+  printf '%s#%s\n' "$(local_flake_ref)" "$1"
+}
+
+note_local_flake_path_fallback() {
+  if [[ "${LOCAL_FLAKE_PATH_NOTE_EMITTED:-0}" -eq 1 ]]; then
+    return
+  fi
+
+  if [[ "$(local_flake_ref)" == path:* ]]; then
+    echo "Note: using $(local_flake_ref) to prefer the workspace flake." >&2
+    LOCAL_FLAKE_PATH_NOTE_EMITTED=1
+  fi
+}
+
+with_local_flake_note() {
+  note_local_flake_path_fallback
+  "$@"
+}
+
 # Remote operation functions
 remote_copy() {
   local result_path
@@ -133,11 +183,11 @@ remote_home_switch() {
 # Home command handlers
 cmd_home_check() {
   echo "Checking home ${HOME_CONFIG}"
-  check_eval ".#homeConfigurations.${HOME_CONFIG}.activationPackage"
+  with_local_flake_note check_eval "$(local_flake_attr_ref "homeConfigurations.${HOME_CONFIG}.activationPackage")"
 }
 
 cmd_home_build() {
-  ${NIX_BUILDER} build "$@" ".#homeConfigurations.${HOME_CONFIG}.activationPackage"
+  with_local_flake_note ${NIX_BUILDER} build "$@" "$(local_flake_attr_ref "homeConfigurations.${HOME_CONFIG}.activationPackage")"
 }
 
 cmd_home_switch() {
@@ -198,16 +248,16 @@ EOF
 # Darwin command handlers
 cmd_darwin_check() {
   echo "Checking darwin ${HOST}"
-  check_eval ".#darwinConfigurations.${HOST}.system"
+  with_local_flake_note check_eval "$(local_flake_attr_ref "darwinConfigurations.${HOST}.system")"
 }
 
 cmd_darwin_build() {
-  ${NIX_BUILDER} build "$@" ".#darwinConfigurations.${HOST}.system"
+  with_local_flake_note ${NIX_BUILDER} build "$@" "$(local_flake_attr_ref "darwinConfigurations.${HOST}.system")"
 }
 
 cmd_darwin_switch() {
   require_local
-  sudo ./result/sw/bin/darwin-rebuild switch --flake .
+  with_local_flake_note sudo ./result/sw/bin/darwin-rebuild switch --flake "$(local_flake_ref)"
 }
 
 cmd_darwin_diff() {
@@ -235,16 +285,16 @@ EOF
 # NixOS command handlers
 cmd_nixos_check() {
   echo "Checking nixos ${HOST}"
-  check_eval ".#nixosConfigurations.${HOST}.config.system.build.toplevel"
+  with_local_flake_note check_eval "$(local_flake_attr_ref "nixosConfigurations.${HOST}.config.system.build.toplevel")"
 }
 
 cmd_nixos_build() {
-  ${NIX_BUILDER} build "$@" ".#nixosConfigurations.${HOST}.config.system.build.toplevel"
+  with_local_flake_note ${NIX_BUILDER} build "$@" "$(local_flake_attr_ref "nixosConfigurations.${HOST}.config.system.build.toplevel")"
 }
 
 cmd_nixos_sdimage() {
   echo "Building SD card image for ${HOST}..."
-  ${NIX_BUILDER} build ".#nixosConfigurations.${HOST}.config.system.build.sdImage"
+  with_local_flake_note ${NIX_BUILDER} build "$(local_flake_attr_ref "nixosConfigurations.${HOST}.config.system.build.sdImage")"
 
   if [[ -L ./result ]]; then
     local image
@@ -271,7 +321,7 @@ cmd_nixos_boot() {
   fi
 
   prime_sudo
-  sudo nixos-rebuild boot --flake ".#${HOST}"
+  with_local_flake_note sudo nixos-rebuild boot --flake "$(local_flake_attr_ref "$HOST")"
 }
 
 cmd_nixos_switch() {
@@ -300,7 +350,7 @@ cmd_nixos_switch() {
     sudo "$gen_path"/activate
   else
     echo "Activating latest generation"
-    sudo nixos-rebuild switch --flake ".#${HOST}"
+    with_local_flake_note sudo nixos-rebuild switch --flake "$(local_flake_attr_ref "$HOST")"
   fi
 }
 
@@ -367,16 +417,16 @@ cmd_check_all() {
     resolve_host "$host"
     [[ -n "$HOME_CONFIG" ]] && {
       echo "Checking home ${HOME_CONFIG}"
-      check_eval ".#homeConfigurations.${HOME_CONFIG}.activationPackage"
+      with_local_flake_note check_eval "$(local_flake_attr_ref "homeConfigurations.${HOME_CONFIG}.activationPackage")"
     }
     case "$OS_TYPE" in
     nixos)
       echo "Checking nixos ${host}"
-      check_eval ".#nixosConfigurations.${host}.config.system.build.toplevel"
+      with_local_flake_note check_eval "$(local_flake_attr_ref "nixosConfigurations.${host}.config.system.build.toplevel")"
       ;;
     darwin)
       echo "Checking darwin ${host}"
-      check_eval ".#darwinConfigurations.${host}.system"
+      with_local_flake_note check_eval "$(local_flake_attr_ref "darwinConfigurations.${host}.system")"
       ;;
     esac
   done
@@ -387,14 +437,14 @@ cmd_update() {
   if [[ -z "$package" ]]; then
     echo "Updating all flakes..."
     nix-channel --update
-    nix flake update
+    with_local_flake_note nix flake update "$(local_flake_ref)"
 
     read -r -p "Do you want to update all shells? (y/n): " confirm
     if [[ "$confirm" == [yY] ]]; then
       echo "Updating all shells..."
       for shell in shells/*; do
         pushd "${shell}" >/dev/null
-        nix flake update
+        nix flake update .
         popd >/dev/null
       done
     else
@@ -403,7 +453,7 @@ cmd_update() {
 
     echo -e "\n\n!! Don't forget to update explicit package fetches !!"
   else
-    nix flake lock --update-input "$package"
+    with_local_flake_note nix flake lock "$(local_flake_ref)" --update-input "$package"
   fi
 }
 
