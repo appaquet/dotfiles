@@ -9,4 +9,5 @@
 .opencode
 .nono
 .nvimlog
+nvim.log
 .workspaces
