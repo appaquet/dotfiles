@@ -259,8 +259,12 @@ let
         model = "opencode-go/deepseek-v4-flash";
       };
 
+      scout = {
+        model = "opencode-go/deepseek-v4-flash";
+      };
+
       general = {
-        prompt = "You are a general purpose sub-agent.";
+        disabled = true; # Should use dev insteads. Don't have proper prompts for sub-agents work and keep recursively spawn.
       };
     };
   };
