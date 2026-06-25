@@ -258,6 +258,10 @@ let
       explore = {
         model = "opencode-go/deepseek-v4-flash";
       };
+
+      general = {
+        prompt = "You are a general purpose sub-agent.";
+      };
     };
   };
 
