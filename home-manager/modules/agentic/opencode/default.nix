@@ -264,7 +264,7 @@ let
       };
 
       general = {
-        disabled = true; # Should use dev insteads. Don't have proper prompts for sub-agents work and keep recursively spawn.
+        disable = true; # Should use dev insteads. Don't have proper prompts for sub-agents work and keep recursively spawn.
       };
     };
   };
