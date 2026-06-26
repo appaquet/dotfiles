@@ -259,10 +259,6 @@ let
         model = "opencode-go/deepseek-v4-flash";
       };
 
-      scout = {
-        model = "opencode-go/deepseek-v4-flash";
-      };
-
       general = {
         disable = true; # Should use dev insteads. Don't have proper prompts for sub-agents work and keep recursively spawn.
       };
