@@ -8,7 +8,7 @@ let
     {
       macpow = final.callPackage ./macpow { };
 
-      markdown-oxide = final.callPackage ./markdown-oxide { };
+      #markdown-oxide = final.callPackage ./markdown-oxide { };
 
       codeburn = final.callPackage ./codeburn { };
 
