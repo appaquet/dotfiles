@@ -11,3 +11,4 @@
 .nvimlog
 nvim.log
 .workspaces
+proj-adhoc

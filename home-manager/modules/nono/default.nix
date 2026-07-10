@@ -38,8 +38,14 @@ in
       pkgs.nono
     ];
 
+    # Per machine profile
+    dotfiles.nono.profiles.machine = {
+      meta.version = "1.0.0";
+    };
+
     dotfiles.nono.profiles.coding-agent = {
       meta.version = "1.0.0";
+      extends = [ "machine" ];
       workdir.access = "readwrite";
       filesystem = {
         read = [

@@ -16,6 +16,7 @@ Use `./x` script for building and evaluating nix configurations:
 - `./x check` - Eval all nixos/home/darwin configs for all hosts. Heavy, only use if you think a change could affect another host.
 
 For quick iteration, use `check` first (fast eval) before `build`.
+Always pipe `* build` output to temp file since it can be massive, then read it in part.
 To find a missing hash, use build functions instead of trying to eval.
 
 ## Agentic Instructions

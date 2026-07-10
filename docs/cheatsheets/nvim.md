@@ -364,10 +364,12 @@ not in Exomind, operates in-place when already in an Exomind buffer.
 
 ## Projects (p)
 
-* `<leader>po` Open main project doc (00-*.md)
-* `<leader>pf` Find files in proj/
-* `<leader>fp` Find files in proj/ (alias)
-* `<leader>ps` Search content in proj/
+Agentic project related keymaps. These files are in `./proj` or `./proj-adhoc`.
+
+* `<leader>po` Open the main project document (00-*.md)
+* `<leader>pf` Find project-documentation files
+* `<leader>fp` Find project-documentation files (alias)
+* `<leader>ps` Search project-documentation content
 
 ## Object selection (in visual mode)
 

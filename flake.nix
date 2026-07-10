@@ -13,7 +13,7 @@
 
     harness = {
       url = "github:dotcoreinc/harness";
-      #url = "path:/home/appaquet/dotfiles/harness";
+      #url = "path:/Users/appaquet/dotfiles/harness";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-parts.follows = "flake-parts";
     };
