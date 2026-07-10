@@ -19,7 +19,7 @@
   * `<ctl><alt>p`: search processes
   * `<ctl><alt>l`: search git log
   * `<ctl><alt>s`: search git status
+  * `<ctl>g`: select a Jujutsu revision
   * `<ctrl>v`: search env variables
   * `<ctl><alt>n`: search nix packages
   * `<ctl><alt>g`: rigrep search
-
