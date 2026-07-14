@@ -58,6 +58,11 @@ host_config_exapp() {
   OS_TYPE="darwin"
 }
 
+host_config_sparkbud2() {
+  HOME_CONFIG="appaquet@sparkbud2"
+  OS_TYPE="linux"
+}
+
 ALL_HOSTS=(deskapp servapp utm piapp piprint piups vps mbpapp exapp)
 
 # Core helper functions

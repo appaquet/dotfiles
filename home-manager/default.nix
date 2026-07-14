@@ -22,5 +22,6 @@ in
     "appaquet@piprint" = mkHomeConfig "aarch64-linux" ./piprint.nix;
     "appaquet@piups" = mkHomeConfig "aarch64-linux" ./piups.nix;
     "appaquet@vps" = mkHomeConfig "x86_64-linux" ./vps.nix;
+    "appaquet@sparkbud2" = mkHomeConfig "aarch64-linux" ./sparkbud2.nix;
   };
 }
