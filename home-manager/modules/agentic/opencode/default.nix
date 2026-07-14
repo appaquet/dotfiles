@@ -235,7 +235,7 @@ let
     agent = {
       browser = {
         mode = "subagent";
-        model = "openai/gpt-5.4-mini";
+        model = "openai/gpt-5.6-luna";
         description = "Browser agent, to be used by any tasks requiring web browser interaction. Shouldn't be used for web search and web fetch, only for actually using the browser to interact with websites.";
         prompt = instructions.blocks.opencode."browser-agent-prompt".body;
         permission = permissions.agent.browser;
