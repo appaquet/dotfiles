@@ -1,21 +1,23 @@
 --- a/scripts/bundle-litellm.mjs
 +++ b/scripts/bundle-litellm.mjs
-@@ -1,8 +1,9 @@
+@@ -1,3 +1,3 @@
 -import { writeFileSync, mkdirSync } from 'fs'
 +import { writeFileSync, mkdirSync, readFileSync } from 'fs'
  import { dirname, join } from 'path'
  import { fileURLToPath } from 'url'
- 
+@@ -20,4 +20,5 @@
 -const LITELLM_URL = 'https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json'
 +const LITELLM_URL = process.env.LITELLM_PRICES_PATH
 +  || 'https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json'
- const __dirname = dirname(fileURLToPath(import.meta.url))
- const outPath = join(__dirname, '..', 'src', 'data', 'litellm-snapshot.json')
+-const MODELS_DEV_URL = 'https://models.dev/api.json'
+-const OPENROUTER_URL = 'https://openrouter.ai/api/v1/models'
++const MODELS_DEV_URL = process.env.MODELS_DEV_PATH || 'https://models.dev/api.json'
++const OPENROUTER_URL = process.env.OPENROUTER_MODELS_PATH || 'https://openrouter.ai/api/v1/models'
  
-@@ -12,7 +13,12 @@
-   'MiniMax-M2.7-highspeed': [0.6e-6, 2.4e-6, 0.375e-6, 0.06e-6],
- }
+@@ -50,7 +51,12 @@
+ const snapshot = {}
  
+ // --- Pass 1+2: LiteLLM (primary) ---
 -const res = await fetch(LITELLM_URL)
 -if (!res.ok) throw new Error(`HTTP ${res.status}`)
 -const data = await res.json()
@@ -27,3 +29,21 @@
 +  if (!res.ok) throw new Error(`HTTP ${res.status}`)
 +  data = await res.json()
 +}
+ const entries = Object.entries(data).filter(([k]) => k !== 'sample_spec')
+@@ -118,4 +124,6 @@
+ // --- Pass 3: models.dev first-party makers (official list prices) ---
+ try {
+-  const md = await (await fetch(MODELS_DEV_URL)).json()
++  const md = process.env.MODELS_DEV_PATH
++    ? JSON.parse(readFileSync(process.env.MODELS_DEV_PATH, 'utf-8'))
++    : await (await fetch(MODELS_DEV_URL)).json()
+   // Surface drift in our hand-maintained maker allowlist: if an id we classify
+@@ -147,4 +155,7 @@
+ // --- Pass 4: OpenRouter (resale backstop) ---
+ try {
+-  const or = (await (await fetch(OPENROUTER_URL)).json()).data ?? []
++  const openRouterData = process.env.OPENROUTER_MODELS_PATH
++    ? JSON.parse(readFileSync(process.env.OPENROUTER_MODELS_PATH, 'utf-8'))
++    : await (await fetch(OPENROUTER_URL)).json()
++  const or = Array.isArray(openRouterData) ? openRouterData : openRouterData.data ?? []
+   let added = 0
