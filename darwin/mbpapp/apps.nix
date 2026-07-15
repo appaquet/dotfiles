@@ -86,6 +86,9 @@
       {
         name = "chatgpt";
       }
+      {
+        name = "opencode-desktop";
+      }
 
       {
         name = "docker-desktop";
