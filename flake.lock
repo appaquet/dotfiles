@@ -522,11 +522,11 @@
         "sops-nix": "sops-nix"
       },
       "locked": {
-        "lastModified": 1784128971,
-        "narHash": "sha256-xuzuEeqS5jumRhzNPnSajjtgE8WM8T+oy6gV1Dek8eQ=",
+        "lastModified": 1784151119,
+        "narHash": "sha256-JZvJsp+tGcRY6HNgwJlwsvtkfZboz+lrgfKlkIp/v7w=",
         "owner": "appaquet",
         "repo": "dotfiles-secrets",
-        "rev": "93fc0e102f5c4e6a3ddda750017eff53b0b795ca",
+        "rev": "fa48e931871e92f75cbb62a36fec11435f6739f7",
         "type": "github"
       },
       "original": {
