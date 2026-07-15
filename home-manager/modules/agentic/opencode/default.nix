@@ -28,6 +28,7 @@ let
 
       projectDocs = mkAllowCommands [
         "agentic-proj-docs *"
+        "agentic-proj-create-adhoc *"
       ];
 
       dev = {
@@ -270,10 +271,10 @@ let
   };
   opencodeJson = pkgs.writers.writeJSON "opencode.json" mainConfig;
 
-  nonoConfig = lib.recursiveUpdate baseConfig {
+  yoloConfig = lib.recursiveUpdate baseConfig {
     permission = permissions.agent.sandbox;
   };
-  nonoOpencodeJson = pkgs.writers.writeJSON "opencode-nono.json" nonoConfig;
+  yoloOpencodeJson = pkgs.writers.writeJSON "opencode-yolo.json" yoloConfig;
 
   tuiJson = pkgs.writers.writeJSON "tui.json" {
     "$schema" = "https://opencode.ai/tui.json";
@@ -284,8 +285,17 @@ let
     export OPENCODE_ENABLE_EXA=1
     export OPENCODE_EXPERIMENTAL_PARALLEL=1 # parallel web search
     #export OPENCODE_EXPERIMENTAL_BACKGROUND_SUBAGENTS=1 # non-blocking background sub-agents
-    export OPENCODE_CONFIG=${nonoOpencodeJson}
+    export OPENCODE_CONFIG=${yoloOpencodeJson}
     exec maybe --profile opencode -- ${pkgs.opencode}/bin/opencode "$@"
+  '';
+
+  yolo-opencode = pkgs.writeShellScriptBin "yolo-opencode" ''
+    export OPENCODE_ENABLE_EXA=1
+    export OPENCODE_EXPERIMENTAL_PARALLEL=1 # parallel web search
+    #export OPENCODE_EXPERIMENTAL_BACKGROUND_SUBAGENTS=1 # non-blocking background sub-agents
+    export OPENCODE_ROOT="$(pwd)"
+    export OPENCODE_CONFIG=${yoloOpencodeJson}
+    exec ${pkgs.opencode}/bin/opencode "$@"
   '';
 
   opencode = pkgs.writeShellScriptBin "opencode" ''
@@ -317,7 +327,7 @@ let
 
   commonSources = {
     ".config/opencode/opencode.json".source = opencodeJson;
-    ".config/opencode/opencode-nono.json".source = nonoOpencodeJson;
+    ".config/opencode/opencode-yolo.json".source = yoloOpencodeJson;
     ".config/opencode/tui.json".source = tuiJson;
     ".config/opencode/plugins/ccmon.ts".source = "${inputs'.ccmon.packages.opencode-plugin}/ccmon.ts";
   };
@@ -327,6 +337,7 @@ in
 
   home.packages = [
     nono-opencode
+    yolo-opencode
     opencode
   ];
 
