@@ -28,7 +28,6 @@ let
 
       projectDocs = mkAllowCommands [
         "agentic-proj-docs *"
-        "agentic-proj-create-adhoc *"
       ];
 
       dev = {
@@ -115,7 +114,13 @@ let
         // bash.vcs.jjRead
         // bash.vcs.jjWrite
         // bash.vcs.ghRead
-        // mkAllowCommands [ "ln * proj" ];
+        // mkAllowCommands [
+          "agentic-proj-create-adhoc *"
+          "ln * proj"
+          "ln * proj-adhoc"
+          "rm proj"
+          "rm proj-adhoc"
+        ];
 
       developer =
         bash.shellRead
