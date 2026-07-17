@@ -224,24 +224,22 @@ in
   };
 
   systemd.services.switch-gpu-boot-after-resume = {
-    description = "Switch GPU to NVIDIA on resume (rebinding it to make sure it works)";
-    after = [
-      "suspend.target"
-      "hibernate.target"
-      "hybrid-sleep.target"
-    ];
+    description = "Switch GPU to NVIDIA on resume";
+    # Keep the no-op oneshot active while sleeping; once sleep.target becomes unneeded after
+    # resume, systemd stops it and runs ExecStop.
+    before = [ "sleep.target" ];
+    unitConfig = {
+      DefaultDependencies = false;
+      StopWhenUnneeded = true;
+    };
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${pkgs.writeShellScript "switch-gpu-after-resume" ''
-        ${gpuSwitch}/bin/gpu-switch vfio
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.coreutils}/bin/true";
+      ExecStop = "${pkgs.writeShellScript "switch-gpu-after-resume" ''
         ${gpuSwitch}/bin/gpu-switch nvidia
       ''}";
     };
-    wantedBy = [
-      "suspend.target"
-      "hibernate.target"
-      "hybrid-sleep.target"
-    ];
+    wantedBy = [ "sleep.target" ];
   };
-
 }
