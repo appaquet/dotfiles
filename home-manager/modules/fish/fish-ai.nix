@@ -1,6 +1,6 @@
 { pkgs, ... }:
 let
-  version = "2.11.1";
+  version = "2.13.1";
 
   # https://github.com/Realiserad/fish-ai
   src = pkgs.fetchFromGitHub {
@@ -37,8 +37,8 @@ let
         anthropic
         keyring
         groq
-        cohere
         binaryornot
+        boto3
         google-genai
         simple-term-menu
       ]
