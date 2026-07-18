@@ -7,7 +7,7 @@ let
     owner = "Realiserad";
     repo = "fish-ai";
     rev = "v${version}";
-    sha256 = "sha256-4jCOCx6bLrugIrTRz/Ut/SIMknMTXgyJJINxA9SljCA=";
+    sha256 = "sha256-ZSFoE9/UesA6GVSYyRKAfj7+uw1gTZ/E08zAHPizAAQ=";
   };
 
   python = pkgs.python3;
