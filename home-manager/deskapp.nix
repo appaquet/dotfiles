@@ -13,6 +13,11 @@
     ./modules/work
   ];
 
+  dotfiles.nono.profiles.machine.filesystem.allow = [
+    "$HOME/Projects"
+    "$HOME/Work"
+  ];
+
   dotfiles.neovim.devMode = true;
 
   home.username = "appaquet";
