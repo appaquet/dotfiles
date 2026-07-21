@@ -6,33 +6,39 @@
 }:
 
 let
-  syncoidDatasets = lib.attrNames (lib.filterAttrs (_: ds: ds.vps_backup) config.nas.datasets);
-  offlineDatasets = lib.attrNames (lib.filterAttrs (_: ds: ds.offline_backup) config.nas.datasets);
+  inherit (lib) attrNames filterAttrs mapAttrs' nameValuePair;
+  datasets = config.nas.datasets;
+
+  syncoidDatasets = attrNames (filterAttrs (_: ds: ds.vps_backup) datasets);
+  offlineDatasets = attrNames (filterAttrs (_: ds: ds.offline_backup) datasets);
+  noAutoSnapDatasets = filterAttrs (_: ds: !ds.autosnap) datasets;
 in
 
 {
   services.sanoid = {
     enable = true;
 
-    datasets."tank1" = {
-      autosnap = true;
-      autoprune = true;
-      daily = 30;
-      hourly = 0;
-      monthly = 12;
-      yearly = 0;
-      recursive = true;
-    };
+    datasets = {
+      tank1 = {
+        autosnap = true;
+        autoprune = true;
+        daily = 30;
+        hourly = 0;
+        monthly = 12;
+        yearly = 0;
+        recursive = true;
+      };
 
-    datasets."offline" = {
-      autosnap = false;
-      autoprune = true;
-      daily = 30;
-      hourly = 0;
-      monthly = 24;
-      yearly = 0;
-      recursive = true;
-    };
+      offline = {
+        autosnap = false;
+        autoprune = true;
+        daily = 30;
+        hourly = 0;
+        monthly = 24;
+        yearly = 0;
+        recursive = true;
+      };
+    } // mapAttrs' (name: _: nameValuePair "tank1/${name}" { autosnap = false; }) noAutoSnapDatasets;
   };
 
   sops.secrets."syncoid/ssh_key" = {

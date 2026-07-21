@@ -4,6 +4,11 @@
     type = lib.types.attrsOf (
       lib.types.submodule {
         options = {
+          autosnap = lib.mkOption {
+            type = lib.types.bool;
+            default = true;
+          };
+
           vps_backup = lib.mkOption {
             type = lib.types.bool;
             default = false;
