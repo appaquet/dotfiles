@@ -1,0 +1,11 @@
+{ ... }:
+
+{
+  homebrew = {
+    casks = [
+      {
+        name = "battery";
+      }
+    ];
+  };
+}
