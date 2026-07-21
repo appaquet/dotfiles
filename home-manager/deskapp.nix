@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ inputs, pkgs, ... }:
 
 {
   imports = [
@@ -19,6 +19,11 @@
   ];
 
   dotfiles.neovim.devMode = true;
+
+  home.packages = with pkgs; [
+    ollama-cuda
+    pkgsCuda.llama-cpp
+  ];
 
   home.username = "appaquet";
   home.homeDirectory = "/home/appaquet";
