@@ -16,12 +16,9 @@ type Lifecycle = "active" | "idle" | "terminal";
 type BlockerKind = "permission" | "question";
 type UnknownRecord = Record<string, unknown>;
 
-const tmux = "tmux";
 const tmuxStatusline = "tmux-statusline";
 
 export const TmuxStatuslinePlugin: Plugin = async ({ client, $ }) => {
-  if (!process.env.TMUX) return {};
-
   async function logFailure(context: string, error: unknown): Promise<void> {
     const detail = error instanceof Error ? error.message : String(error);
 
@@ -40,10 +37,10 @@ export const TmuxStatuslinePlugin: Plugin = async ({ client, $ }) => {
 
   let windowId: string;
   try {
-    // Capture the target once so every later utility invocation reaches the
-    // window in which this OpenCode process started.
-    windowId = (await $`${tmux} display-message -p "#{window_id}"`.quiet().text()).trim();
-    if (!windowId) throw new Error("tmux returned an empty window ID");
+    // Initialization clears stale state and returns the window in which this
+    // OpenCode process started, keeping later lifecycle calls pinned there.
+    windowId = (await $`${tmuxStatusline} init`.quiet().text()).trim();
+    if (!windowId) return {};
   } catch (error) {
     await logFailure("initialization", error);
     return {};
@@ -313,8 +310,6 @@ export const TmuxStatuslinePlugin: Plugin = async ({ client, $ }) => {
       await logFailure(context, error);
     }
   }
-
-  await render("initialization", true);
 
   return {
     event: async (context) => safely("event", () => handleEvent(context)),

@@ -44,18 +44,20 @@ let
     export CLAUDE_CONFIG_DIR="${config.home.homeDirectory}/.claude"
     export CLAUDE_ROOT="''${CLAUDE_PROJECT_DIR:-$(pwd)}"
 
-    # Capture tmux window ID so indicator targets correct window even if user switches
-    if [ -n "$TMUX" ]; then
-      if CLAUDE_TMUX_WINDOW="$(tmux display-message -p '#{window_id}')" && [ -n "$CLAUDE_TMUX_WINDOW" ]; then
+    # Initialize the shared statusline once. It clears stale state and returns the
+    # window ID that later hooks must keep targeting after the user switches windows.
+    if CLAUDE_TMUX_WINDOW="$(tmux-statusline init)"; then
+      if [ -n "$CLAUDE_TMUX_WINDOW" ]; then
         export CLAUDE_TMUX_WINDOW
       else
         unset CLAUDE_TMUX_WINDOW
-        ${claude-tmux-indicator}/bin/claude-tmux-indicator startup-discovery-failed > /dev/null
       fi
+    else
+      unset CLAUDE_TMUX_WINDOW
+      ${claude-tmux-indicator}/bin/claude-tmux-indicator startup-initialization-failed > /dev/null
     fi
 
-    # Clear tmux indicator on start (in case previous session was killed) and exit
-    ${claude-tmux-indicator}/bin/claude-tmux-indicator off wrapper-start > /dev/null
+    # Clear the pinned indicator when Claude exits.
     trap '${claude-tmux-indicator}/bin/claude-tmux-indicator off wrapper-exit-trap > /dev/null' EXIT
 
     # Enable telemetry and non-essential traffic since some features aren't enabled without

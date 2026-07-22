@@ -11,7 +11,6 @@ let
     npx "$@"
   '';
 
-  tmuxStatusline = "${import ./tmux-statusline.nix { inherit pkgs; }}/bin/tmux-statusline";
 in
 {
   imports = [
@@ -23,8 +22,6 @@ in
   ];
 
   config = {
-    _module.args.tmuxStatusline = tmuxStatusline;
-
     nixantic.sourceRoots = [ ./instructions ];
 
     home.packages = [
