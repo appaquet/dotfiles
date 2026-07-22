@@ -45,4 +45,4 @@ This means:
 - Eval first (`./x <home|nixos|...> check`), then build — builds are expensive
 - Missing hash: build instead of eval (builds surface hash mismatch errors)
 - Agent guidance: most nix changes are fine for senior dev. Use staff dev for complex nix structures (recursive attrsets, `lib.fix`, the `builders.nix` pattern)
-- When updating rev (commit,tag,etc.) of a nix fetch, always blank the hash to force a new hash to be computed. Do not copy the hash from the previous version, it will be wrong.
+- When updating rev (commit,tag,etc.) of a nix fetch, set hash to `lib.fakeHash` so Nix computes the correct value at fetch time
