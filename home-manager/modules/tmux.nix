@@ -73,6 +73,7 @@
         bind '"' split-window -c "#{pane_current_path}"
         bind % split-window -h -c "#{pane_current_path}"
         bind c new-window -c "#{pane_current_path}"
+        bind g split-window -v -p 33 -c "#{pane_current_path}" \; split-window -h -p 50 -c "#{pane_current_path}"
 
         # Vim-style pane navigation
         bind h select-pane -L
