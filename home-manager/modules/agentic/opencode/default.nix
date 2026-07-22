@@ -269,6 +269,27 @@ let
         disable = true; # Should use dev insteads. Don't have proper prompts for sub-agents work and keep recursively spawn.
       };
     };
+
+    provider = {
+      sparkbud2 = {
+        npm = "@ai-sdk/openai-compatible";
+        name = "Sparkbud2";
+        options = {
+          baseURL = "http://sparkbud2.n3x.net:8080/v1";
+        };
+        models = {
+          "unsloth/Qwen3.6-27B-NVFP4" = {
+            name = "unsloth/Qwen3.6-27B-NVFP4";
+          };
+          laguna = {
+            name = "laguna";
+          };
+          "deepreinforce-ai/Ornith-1.0-35B" = {
+            name = "deepreinforce-ai/Ornith-1.0-35B";
+          };
+        };
+      };
+    };
   };
 
   mainConfig = lib.recursiveUpdate baseConfig {
