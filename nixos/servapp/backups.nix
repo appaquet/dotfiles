@@ -6,7 +6,12 @@
 }:
 
 let
-  inherit (lib) attrNames filterAttrs mapAttrs' nameValuePair;
+  inherit (lib)
+    attrNames
+    filterAttrs
+    mapAttrs'
+    nameValuePair
+    ;
   datasets = config.nas.datasets;
 
   syncoidDatasets = attrNames (filterAttrs (_: ds: ds.vps_backup) datasets);
@@ -38,7 +43,8 @@ in
         yearly = 0;
         recursive = true;
       };
-    } // mapAttrs' (name: _: nameValuePair "tank1/${name}" { autosnap = false; }) noAutoSnapDatasets;
+    }
+    // mapAttrs' (name: _: nameValuePair "tank1/${name}" { autosnap = false; }) noAutoSnapDatasets;
   };
 
   sops.secrets."syncoid/ssh_key" = {

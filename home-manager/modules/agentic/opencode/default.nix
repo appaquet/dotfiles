@@ -307,6 +307,10 @@ let
     theme = "tokyonight";
   };
 
+  tmuxStatuslinePlugin = pkgs.writeText "tmux-statusline.ts" (
+    builtins.readFile ./plugins/tmux-statusline.ts
+  );
+
   nono-opencode = pkgs.writeShellScriptBin "nono-opencode" ''
     export OPENCODE_ENABLE_EXA=1
     export OPENCODE_EXPERIMENTAL_PARALLEL=1 # parallel web search
@@ -356,6 +360,7 @@ let
     ".config/opencode/opencode-yolo.json".source = yoloOpencodeJson;
     ".config/opencode/tui.json".source = tuiJson;
     ".config/opencode/plugins/ccmon.ts".source = "${inputs'.ccmon.packages.opencode-plugin}/ccmon.ts";
+    ".config/opencode/plugins/tmux-statusline.ts".source = tmuxStatuslinePlugin;
   };
 in
 {

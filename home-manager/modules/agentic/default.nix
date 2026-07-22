@@ -10,16 +10,21 @@ let
     export PATH="$PATH:${pkgs.nodejs}/bin"
     npx "$@"
   '';
+
+  tmuxStatusline = "${import ./tmux-statusline.nix { inherit pkgs; }}/bin/tmux-statusline";
 in
 {
   imports = [
     inputs.harness.homeManagerModules.default
     ./claude
     ./opencode
+    ./tmux-statusline.nix
     ../nono
   ];
 
   config = {
+    _module.args.tmuxStatusline = tmuxStatusline;
+
     nixantic.sourceRoots = [ ./instructions ];
 
     home.packages = [

@@ -46,7 +46,12 @@ let
 
     # Capture tmux window ID so indicator targets correct window even if user switches
     if [ -n "$TMUX" ]; then
-      export CLAUDE_TMUX_WINDOW=$(${pkgs.tmux}/bin/tmux display-message -p '#{window_id}')
+      if CLAUDE_TMUX_WINDOW="$(tmux display-message -p '#{window_id}')" && [ -n "$CLAUDE_TMUX_WINDOW" ]; then
+        export CLAUDE_TMUX_WINDOW
+      else
+        unset CLAUDE_TMUX_WINDOW
+        ${claude-tmux-indicator}/bin/claude-tmux-indicator startup-discovery-failed > /dev/null
+      fi
     fi
 
     # Clear tmux indicator on start (in case previous session was killed) and exit
@@ -69,7 +74,8 @@ let
     exec maybe --profile claude -- claude --allow-dangerously-skip-permissions "$@"
   '';
 
-  # Toggle tmux window indicator when Claude is working (used by hooks)
+  # Toggle tmux window indicator when Claude is working (used by hooks).
+  # Delegates title changes to the shared tmux-statusline utility.
   claude-tmux-indicator = pkgs.writeShellScriptBin "claude-tmux-indicator" ''
     CLAUDE_DIR="''${CLAUDE_ROOT:-.}"
     LOG_FILE="/tmp/claude-tmux-''${CLAUDE_DIR//\//-}.log"
@@ -79,26 +85,24 @@ let
     # Log state change with timestamp
     echo "$(date '+%Y-%m-%d %H:%M:%S.%3N') [$HOOK_NAME] $ACTION" >> "$LOG_FILE"
 
-    if [ -z "$TMUX" ] || [ -z "$CLAUDE_TMUX_WINDOW" ]; then
-      echo '{"continue":true,"suppressOutput":true}'
-      exit 0
-    fi
-
-    WORKING=" 🔄"
-    PERMISSION=" 🔐"
-    CURRENT=$(${pkgs.tmux}/bin/tmux display-message -t "$CLAUDE_TMUX_WINDOW" -p '#{window_name}')
-    BASE="''${CURRENT%$WORKING}"
-    BASE="''${BASE%$PERMISSION}"
+    run_statusline() {
+      if ! TMUX_WINDOW_ID="$CLAUDE_TMUX_WINDOW" tmux-statusline "$@" > /dev/null 2>&1; then
+        echo "$(date '+%Y-%m-%d %H:%M:%S.%3N') [$HOOK_NAME] statusline-failed" >> "$LOG_FILE"
+      fi
+    }
 
     case "$ACTION" in
-      on)
-        [[ "$CURRENT" != *"$WORKING" ]] && ${pkgs.tmux}/bin/tmux rename-window -t "$CLAUDE_TMUX_WINDOW" "$BASE$WORKING"
+      on|permission|off)
+        if [ -n "$TMUX" ] && [ -n "$CLAUDE_TMUX_WINDOW" ]; then
+          case "$ACTION" in
+            on)         run_statusline set '🔄';;
+            permission) run_statusline set '🔐';;
+            off)        run_statusline clear;;
+          esac
+        fi
         ;;
-      permission)
-        ${pkgs.tmux}/bin/tmux rename-window -t "$CLAUDE_TMUX_WINDOW" "$BASE$PERMISSION"
-        ;;
-      off)
-        ${pkgs.tmux}/bin/tmux rename-window -t "$CLAUDE_TMUX_WINDOW" "$BASE"
+      *)
+        # Unknown actions: log only, no title mutation
         ;;
     esac
 
