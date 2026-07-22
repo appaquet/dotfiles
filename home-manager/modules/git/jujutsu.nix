@@ -67,6 +67,7 @@
           "heads(::@- & bookmarks())"
           "--to"
           "heads(::@- & ~private())"
+          "--allow-backwards"
         ];
 
         # Rebase current branch onto trunk with support for multi-parents
@@ -93,10 +94,12 @@
   home.packages = with pkgs; [
     jjui
     (writeShellScriptBin "jj-proj-tug" ''
+      set -euo pipefail
+
       if [ "$(jj log --no-graph -r '@' -T 'empty')" = "false" ]; then
         jj new
       fi
-      PROJ=$(jj log --no-graph -r 'latest(proj())' -T 'change_id.shortest()')
+      PROJ=$(jj log --no-graph -r 'heads(first_ancestors(@) & proj())' -T 'change_id.shortest()')
       if [ -n "$PROJ" ]; then
         jj rebase -r "$PROJ" -B @
       fi
