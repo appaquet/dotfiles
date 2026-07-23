@@ -42,7 +42,7 @@ done
 }
 
 PROFILE=$(maybe-profile "$PROFILE")
-ARGS=(run --profile "$PROFILE" --allow-cwd)
+ARGS=(run --profile "$PROFILE" --allow-cwd --no-diagnostics)
 
 if [ -S ".nono/socket" ]; then
   ARGS+=(--allow-unix-socket .nono/socket)
