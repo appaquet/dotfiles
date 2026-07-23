@@ -112,7 +112,14 @@ local function copy_selection_to_clipboard()
 	-- Remove the temp file
 	os.remove(temp_file)
 end
+local function yank_block_to_clipboard()
+	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "x", true)
+	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("vib", true, false, true), "x", true)
+
+	copy_selection_to_clipboard()
+end
 vim.keymap.set("v", "<Leader>yy", copy_selection_to_clipboard, { desc = "Clipboard: Copy to system clipboard" })
+vim.keymap.set("n", "<Leader>yb", yank_block_to_clipboard, { silent = true, desc = "Clipboard: Yank code block" })
 vim.keymap.set("n", "<Leader>yp", ":read !pbpaste<CR>", { desc = "Clipboard: Paste from system clipboard" })
 vim.keymap.set("n", "<Leader>yc", "yygccp", { remap = true, desc = "Clipboard: Copy line & comment it" })
 

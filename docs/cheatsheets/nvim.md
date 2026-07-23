@@ -439,6 +439,7 @@ Agentic project related keymaps. These files are in `./proj` or `./proj-adhoc`.
 ## Clipboard Operations (y)
 
 * `<leader>yy` Yank selection to system clipboard (visual mode)
+* `<leader>yb` Yank code block to system clipboard
 * `<leader>yp` Paste from system clipboard
 * `<leader>yc` Copy line and comment previous one
 * `<leader>yf` Copy current file's absolute path
