@@ -74,6 +74,7 @@ in
 
           "$HOME/.cache/go-build"
           "$HOME/.cache/golangci-lint"
+          "$HOME/.cargo/registry"
 
           "$HOME/.npm"
 
