@@ -94,6 +94,7 @@ let
           "jj commit *"
           "jj new *"
           "jj squash *"
+          "jj workspace update"
         ];
 
         ghRead = mkAllowCommands [
