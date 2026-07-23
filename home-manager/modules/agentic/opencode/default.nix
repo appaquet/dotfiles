@@ -311,9 +311,14 @@ let
     builtins.readFile ./plugins/tmux-statusline.ts
   );
 
+  direnvPlugin = pkgs.writeText "direnv.ts" (
+    builtins.readFile ./plugins/direnv.ts
+  );
+
   nono-opencode = pkgs.writeShellScriptBin "nono-opencode" ''
     export OPENCODE_ENABLE_EXA=1
     export OPENCODE_EXPERIMENTAL_PARALLEL=1 # parallel web search
+    export OPENCODE_EXPERIMENTAL_FILEWATCHER=1 # reload direnv after devshell file changes
     #export OPENCODE_EXPERIMENTAL_BACKGROUND_SUBAGENTS=1 # non-blocking background sub-agents
     export OPENCODE_CONFIG=${yoloOpencodeJson}
     exec maybe --profile opencode -- ${pkgs.opencode}/bin/opencode "$@"
@@ -322,6 +327,7 @@ let
   yolo-opencode = pkgs.writeShellScriptBin "yolo-opencode" ''
     export OPENCODE_ENABLE_EXA=1
     export OPENCODE_EXPERIMENTAL_PARALLEL=1 # parallel web search
+    export OPENCODE_EXPERIMENTAL_FILEWATCHER=1 # reload direnv after devshell file changes
     #export OPENCODE_EXPERIMENTAL_BACKGROUND_SUBAGENTS=1 # non-blocking background sub-agents
     export OPENCODE_ROOT="$(pwd)"
     export OPENCODE_CONFIG=${yoloOpencodeJson}
@@ -331,6 +337,7 @@ let
   opencode = pkgs.writeShellScriptBin "opencode" ''
     export OPENCODE_ENABLE_EXA=1
     export OPENCODE_EXPERIMENTAL_PARALLEL=1 # parallel web search
+    export OPENCODE_EXPERIMENTAL_FILEWATCHER=1 # reload direnv after devshell file changes
     #export OPENCODE_EXPERIMENTAL_BACKGROUND_SUBAGENTS=1 # non-blocking background sub-agents
     export OPENCODE_ROOT="$(pwd)"
     exec ${pkgs.opencode}/bin/opencode "$@"
@@ -361,7 +368,8 @@ let
     ".config/opencode/tui.json".source = tuiJson;
     ".config/opencode/plugins/ccmon.ts".source = "${inputs'.ccmon.packages.opencode-plugin}/ccmon.ts";
     ".config/opencode/plugins/tmux-statusline.ts".source = tmuxStatuslinePlugin;
-  };
+    ".config/opencode/plugins/direnv.ts".source = direnvPlugin;
+    };
 in
 {
   home.file = (mkOpencodeGeneratedSymlinks generatedPaths) // commonSources;
