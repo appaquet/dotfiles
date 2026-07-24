@@ -64,6 +64,11 @@ host_config_exapp() {
   OS_TYPE="darwin"
 }
 
+host_config_sparkbud1() {
+  HOME_CONFIG="appaquet@sparkbud1"
+  OS_TYPE="linux"
+}
+
 host_config_sparkbud2() {
   HOME_CONFIG="appaquet@sparkbud2"
   OS_TYPE="linux"
