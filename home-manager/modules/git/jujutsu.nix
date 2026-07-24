@@ -12,6 +12,10 @@
         email = "appaquet@gmail.com";
       };
 
+      snapshot = {
+        auto-update-stale = true; # Automatically update stale workspaces
+      };
+
       ui = {
         paginate = "never";
         default-command = [
@@ -341,6 +345,7 @@
         setCursor = true;
       };
 
+      jjwt = "jj-workspace-tmux";
       jjwu = "jj workspace update-stale";
       jjwls = "jj workspace list";
       jjwa = "jj-workspace-add";
