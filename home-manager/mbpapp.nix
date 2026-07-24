@@ -38,8 +38,9 @@
         "Applications"
         "Library"
         "documents_app" # Syncthing
-        "Documents" # On iCloud, nothing important
-        "Desktop" # On iCloud, nothing important
+        "Documents" # On iCloud
+        "Desktop" # On iCloud
+        "Pictures" # On iCloud
       ];
     };
   };
