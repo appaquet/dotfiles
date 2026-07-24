@@ -233,7 +233,14 @@ let
 
     autoupdate = false;
 
-    instructions = [ "~/.config/opencode/rules/*.md" ];
+    experimental = {
+      disable_paste_summary = true;
+    };
+
+    instructions = [
+      # Main instruction is written to AGENTS.md, which will be loaded as well
+      "~/.config/opencode/rules/*.md"
+    ];
 
     default_agent = "orchestrator";
 
