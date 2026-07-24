@@ -131,7 +131,6 @@ in
             p.nix
             p.proto
             p.python
-            p.tmux
             p.rust
             p.sql
             p.toml
