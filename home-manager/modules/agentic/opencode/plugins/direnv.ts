@@ -2,6 +2,11 @@
 // Branch: feat/auto-reload-devshell
 // Commit: d902c6fc7efe74ed673fc147bcccd6290f858385
 // Fork of https://github.com/simonwjackson/opencode-direnv (PR #3)
+//
+// Diverges from upstream: this copy applies `direnv export json` as a sparse
+// patch. Upstream treats each export as a full snapshot and deletes keys absent
+// from it, which drops the inherited Home Manager/fish PATH. Re-apply when
+// re-vendoring.
 
 import type { Plugin } from "@opencode-ai/plugin"
 
@@ -15,8 +20,8 @@ import type { Plugin } from "@opencode-ai/plugin"
  * Behavior:
  * - On session.created: load env once (awaited, so the first command is ready)
  * - On file.watcher.updated for .envrc/flake.nix/flake.lock: debounced reload
- * - Reloads diff against the previously applied vars and *remove* dropped keys
- *   from process.env (so removed variables don't linger)
+ * - Applies each `direnv export json` result as a sparse patch to process.env
+ *   (explicit null values remove variables; omitted keys are left untouched)
  * - Shows toast notifications for blocked .envrc, successful loads and changes
  * - Silently skips if direnv is not installed or .envrc is missing
  */
@@ -42,8 +47,10 @@ type ReloadOutcome = {
   added: number
   /** number of existing variables whose value changed */
   changed: number
-  /** number of previously-applied variables that were removed */
+  /** number of variables explicitly removed by the patch */
   removed: number
+  /** number of entries in the most recent direnv patch */
+  patched: number
 }
 
 type SessionCreatedEvent = {
@@ -59,6 +66,7 @@ type FileWatcherUpdatedEvent = {
 type ShellCommand = {
   quiet: () => ShellCommand
   cwd: (dir: string) => ShellCommand
+  env: (env: Record<string, string | undefined>) => ShellCommand
   text: () => Promise<string>
 }
 
@@ -80,19 +88,12 @@ export const DirenvLoader: Plugin = async ({ client, $, directory }) => {
   const typedClient = client as unknown as SessionClient
   const shell = $ as unknown as ShellExecutor
 
-  /**
-   * Keys we have written into process.env. Tracked globally (process.env is
-   * shared across sessions in the plugin process) so reloads can remove vars
-   * that the devshell no longer exports without touching anything we didn't set.
-   */
-  const appliedKeys = new Set<string>()
-
   /** cached .envrc location (only cached once successfully found) */
   let envrcDir: string | null = null
   let discovered = false
 
-  /** prevents overlapping `direnv export json` invocations */
-  let reloading = false
+  /** in-flight export; later callers chain a fresh run after it */
+  let inFlight: Promise<ReloadOutcome> | null = null
 
   let reloadTimer: ReturnType<typeof setTimeout> | null = null
   let firstLoadComplete = false
@@ -106,11 +107,16 @@ export const DirenvLoader: Plugin = async ({ client, $, directory }) => {
   }
 
   /**
-   * Find git root directory, if one exists
+   * Find git root directory for the plugin's directory, if one exists.
+   * Resolved against `directory` so the boundary matches where the .envrc
+   * search starts, regardless of the host process's cwd.
    */
   const findGitRoot = async (): Promise<string | null> => {
     try {
-      const result = await shell`git rev-parse --show-toplevel`.quiet().text()
+      const result = await shell`git rev-parse --show-toplevel`
+        .cwd(directory)
+        .quiet()
+        .text()
       return result.trim() || null
     } catch {
       return null
@@ -175,19 +181,15 @@ export const DirenvLoader: Plugin = async ({ client, $, directory }) => {
     added: 0,
     changed: 0,
     removed: 0,
+    patched: 0,
   })
 
   /**
-   * Re-run `direnv export json` and reconcile process.env.
-   *
-   * Idempotent and mutex-guarded: safe to call from any trigger. Cheap when
-   * nothing changed (direnv's own watch cache makes the export ~milliseconds).
+   * Run `direnv export json` once and apply its sparse patch to process.env.
    * Returns a summary describing what (if anything) changed.
    */
-  const reloadEnv = async (): Promise<ReloadOutcome> => {
+  const runExport = async (): Promise<ReloadOutcome> => {
     const outcome = newOutcome()
-    if (reloading) return outcome
-    reloading = true
 
     try {
       const dir = await resolveEnvrcDir()
@@ -198,7 +200,11 @@ export const DirenvLoader: Plugin = async ({ client, $, directory }) => {
 
       let jsonText: string
       try {
-        jsonText = await shell`direnv export json`.cwd(dir).quiet().text()
+        jsonText = await shell`direnv export json`
+          .cwd(dir)
+          .env({ ...process.env })
+          .quiet()
+          .text()
       } catch (error: unknown) {
         const stderr =
           error && typeof error === "object" && "stderr" in error
@@ -213,39 +219,56 @@ export const DirenvLoader: Plugin = async ({ client, $, directory }) => {
       }
 
       const parsed = jsonText.trim() ? JSON.parse(jsonText) : {}
-      const newVars: Record<string, string> =
+      const patch: Record<string, string | null> =
         parsed && typeof parsed === "object" ? parsed : {}
+      const entries = Object.entries(patch)
+      outcome.patched = entries.length
 
-      // 1. Remove vars we previously applied that the devshell no longer exports.
-      //    direnv may also emit explicit `null` values to signal unsets.
-      for (const key of appliedKeys) {
-        const keep = key in newVars && newVars[key] != null
-        if (!keep && key in process.env) {
-          delete process.env[key]
-          outcome.removed++
+      for (const [key, value] of entries) {
+        if (value === null) {
+          if (key in process.env) {
+            delete process.env[key]
+            outcome.removed++
+          }
+          continue
         }
-      }
 
-      // 2. Apply current vars, counting additions and value changes.
-      const nextApplied = new Set<string>()
-      for (const [key, value] of Object.entries(newVars)) {
-        if (value == null) continue
         const current = process.env[key]
         if (current === undefined) outcome.added++
         else if (current !== value) outcome.changed++
         process.env[key] = value
-        nextApplied.add(key)
       }
-
-      appliedKeys.clear()
-      for (const key of nextApplied) appliedKeys.add(key)
 
       return outcome
     } catch {
       outcome.error = true
       return outcome
+    }
+  }
+
+  /**
+   * Serialized reload, safe to call from any trigger.
+   *
+   * A caller arriving while an export is in flight waits for a fresh export
+   * chained after it rather than being dropped: that in-flight export may
+   * predate whatever triggered this call, so its result cannot be reused. This
+   * keeps direnv invocations non-overlapping while guaranteeing an awaited
+   * initial load never returns before the environment has been applied.
+   *
+   * Cheap when nothing changed (direnv's own watch cache makes the export
+   * ~milliseconds), and debouncing collapses trigger bursts before they reach
+   * here, so the chain stays short.
+   */
+  const reloadEnv = async (): Promise<ReloadOutcome> => {
+    const run = inFlight
+      ? inFlight.catch(() => {}).then(runExport)
+      : runExport()
+    inFlight = run
+
+    try {
+      return await run
     } finally {
-      reloading = false
+      if (inFlight === run) inFlight = null
     }
   }
 
@@ -271,7 +294,7 @@ export const DirenvLoader: Plugin = async ({ client, $, directory }) => {
 
     if (opts.initial && !firstLoadComplete) {
       firstLoadComplete = true
-      if (total > 0 || appliedKeys.size > 0) {
+      if (total > 0 || outcome.patched > 0) {
         void showToast("direnv: environment loaded", "info")
       }
       return
