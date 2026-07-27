@@ -21,7 +21,6 @@
   dotfiles.neovim.devMode = true;
 
   home.packages = with pkgs; [
-    ollama-cuda
     pkgsCuda.llama-cpp
   ];
 
