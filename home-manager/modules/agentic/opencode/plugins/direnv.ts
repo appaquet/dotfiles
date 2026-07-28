@@ -19,7 +19,7 @@ import type { Plugin } from "@opencode-ai/plugin"
  *
  * Behavior:
  * - On session.created: load env once (awaited, so the first command is ready)
- * - On file.watcher.updated for .envrc/flake.nix/flake.lock: debounced reload
+ * - On file.watcher.updated for direnv's evaluated watch set: debounced reload
  * - Applies each `direnv export json` result as a sparse patch to process.env
  *   (explicit null values remove variables; omitted keys are left untouched)
  * - Shows toast notifications for blocked .envrc, successful loads and changes
@@ -39,7 +39,7 @@ type SessionClient = {
 type ReloadOutcome = {
   /** .envrc exists but is blocked (`direnv allow` needed) */
   blocked: boolean
-  /** direnv not installed / no .envrc / discovery failed */
+  /** direnv not installed or no .envrc found */
   unavailable: boolean
   /** a transient error occurred talking to direnv */
   error: boolean
@@ -77,7 +77,7 @@ type ShellExecutor = (
 
 type ShellError = Error & { stderr?: string }
 
-/** devshell files whose modification should trigger a reload */
+/** fallback devshell filenames whose modification should trigger a reload */
 const RELEVANT_FILES = new Set([".envrc", "flake.nix", "flake.lock"])
 
 /** debounce window for background reloads (ms) */
@@ -91,6 +91,9 @@ export const DirenvLoader: Plugin = async ({ client, $, directory }) => {
   /** cached .envrc location (only cached once successfully found) */
   let envrcDir: string | null = null
   let discovered = false
+
+  /** evaluated direnv dependencies; null preserves the hardcoded fallback */
+  let watchedPaths: Set<string> | null = null
 
   /** in-flight export; later callers chain a fresh run after it */
   let inFlight: Promise<ReloadOutcome> | null = null
@@ -185,6 +188,56 @@ export const DirenvLoader: Plugin = async ({ client, $, directory }) => {
   })
 
   /**
+   * Replace the evaluated direnv watch set after a successful export.
+   *
+   * `watch-print --null` is intentionally queried only after the export patch
+   * has updated process.env: direnv reads the current DIRENV_WATCHES value.
+   * Discovery errors do not invalidate that export; they select the legacy
+   * basename fallback until a later successful export can discover a new set.
+   */
+  const refreshWatchSet = async (dir: string) => {
+    try {
+      const output = await shell`direnv watch-print --null`
+        .cwd(dir)
+        .env({ ...process.env })
+        .quiet()
+        .text()
+      const { isAbsolute, normalize } = await import("node:path")
+      const paths = output.split("\0")
+      const trailing = paths.pop()
+
+      if (
+        trailing !== "" ||
+        paths.length === 0 ||
+        paths.some((path) => !path || !isAbsolute(path))
+      ) {
+        watchedPaths = null
+        return
+      }
+
+      watchedPaths = new Set(paths.map(normalize))
+    } catch {
+      watchedPaths = null
+    }
+  }
+
+  /** Normalize an event path for exact comparison with direnv's absolute paths. */
+  const normalizeEventPath = async (file: string) => {
+    const { isAbsolute, normalize, resolve } = await import("node:path")
+    return normalize(isAbsolute(file) ? file : resolve(directory, file))
+  }
+
+  /** Select dynamic exact matching or the hardcoded compatibility fallback. */
+  const shouldReloadFor = async (file: string) => {
+    if (watchedPaths) {
+      return watchedPaths.has(await normalizeEventPath(file))
+    }
+
+    const filename = file.split("/").pop() ?? ""
+    return RELEVANT_FILES.has(filename)
+  }
+
+  /**
    * Run `direnv export json` once and apply its sparse patch to process.env.
    * Returns a summary describing what (if anything) changed.
    */
@@ -239,6 +292,7 @@ export const DirenvLoader: Plugin = async ({ client, $, directory }) => {
         process.env[key] = value
       }
 
+      await refreshWatchSet(dir)
       return outcome
     } catch {
       outcome.error = true
@@ -345,11 +399,10 @@ export const DirenvLoader: Plugin = async ({ client, $, directory }) => {
         return
       }
 
-      // Devshell file edited/created/deleted -> reload (debounced).
+      // Tracked devshell file edited/created/deleted -> reload (debounced).
       if (event.type === "file.watcher.updated") {
         const typedEvent = event as FileWatcherUpdatedEvent
-        const filename = typedEvent.properties.file.split("/").pop() ?? ""
-        if (RELEVANT_FILES.has(filename)) {
+        if (await shouldReloadFor(typedEvent.properties.file)) {
           scheduleReload(RELOAD_DEBOUNCE_MS)
         }
         return
