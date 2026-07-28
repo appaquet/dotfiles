@@ -12,7 +12,8 @@ const statusline = {
 } as const;
 
 type DesiredState = keyof typeof statusline;
-type Lifecycle = "active" | "idle" | "terminal";
+type RootLifecycle = "active" | "terminal";
+type SessionLifecycle = "active" | "idle" | "terminal";
 type BlockerKind = "permission" | "question";
 type UnknownRecord = Record<string, unknown>;
 
@@ -46,14 +47,16 @@ export const TmuxStatuslinePlugin: Plugin = async ({ client, $ }) => {
     return {};
   }
 
-  // The latest root chat owns the window. Descendants can contribute blockers,
-  // but only their root can clear the indicator when its chat lifecycle ends.
+  // The latest root chat owns the window. Its known descendants contribute both
+  // lifecycle and blocker state to the pinned window's aggregate indicator.
   const parents = new Map<string, string>();
+  const createdSessions = new Set<string>();
+  const sessions = new Map<string, SessionLifecycle>();
   const blockers = new Set<string>();
   let activeRoot: string | undefined;
-  // Terminal roots remain selected but inactive, so delayed blocker and tool
-  // callbacks cannot revive an indicator after the root errors or is deleted.
-  let lifecycle: Lifecycle = "idle";
+  // Terminal roots remain selected but inactive, so delayed descendant events
+  // cannot revive an indicator after the root errors or is deleted.
+  let rootLifecycle: RootLifecycle = "active";
   let lastRequested: DesiredState | undefined;
   // Hooks can overlap. Serialize tmux mutations in reducer order so newer
   // state wins, and avoid spawning duplicate effects for the same state.
@@ -132,13 +135,33 @@ export const TmuxStatuslinePlugin: Plugin = async ({ client, $ }) => {
     return sessionId;
   }
 
+  function belongsToSelectedRoot(sessionId: string): boolean {
+    return activeRoot !== undefined && resolveRoot(sessionId) === activeRoot;
+  }
+
+  function hasTerminalAncestor(sessionId: string): boolean {
+    const visited = new Set<string>();
+    let current = sessionId;
+
+    while (!visited.has(current)) {
+      visited.add(current);
+      const parent = parents.get(current);
+      if (!parent) return false;
+      if (sessions.get(parent) === "terminal") return true;
+      current = parent;
+    }
+
+    return false;
+  }
+
   function isActiveSession(sessionId: string): boolean {
-    // Lifecycle is part of ownership: terminal and idle roots ignore late
-    // descendant updates instead of restoring a stale statusline.
+    // A terminal session (or ancestor) retires its subtree. Idle sessions also
+    // reject late work and blocker requests, while allowing blocker resolution.
     return (
-      activeRoot !== undefined &&
-      lifecycle === "active" &&
-      resolveRoot(sessionId) === activeRoot
+      rootLifecycle === "active" &&
+      belongsToSelectedRoot(sessionId) &&
+      sessions.get(sessionId) === "active" &&
+      !hasTerminalAncestor(sessionId)
     );
   }
 
@@ -160,8 +183,34 @@ export const TmuxStatuslinePlugin: Plugin = async ({ client, $ }) => {
     }
   }
 
+  function retireSubtree(sessionId: string): void {
+    const pending = [sessionId];
+    const retired = new Set<string>();
+
+    while (pending.length > 0) {
+      const current = pending.pop();
+      if (!current || retired.has(current)) continue;
+
+      retired.add(current);
+      sessions.set(current, "terminal");
+      removeSessionBlockers(current);
+
+      for (const [child, parent] of parents) {
+        if (parent === current) pending.push(child);
+      }
+    }
+  }
+
+  function hasActiveSessions(): boolean {
+    for (const [sessionId, lifecycle] of sessions) {
+      if (lifecycle === "active" && isActiveSession(sessionId)) return true;
+    }
+
+    return false;
+  }
+
   function desiredState(): DesiredState {
-    if (!activeRoot || lifecycle !== "active") return "clear";
+    if (!activeRoot || rootLifecycle !== "active") return "clear";
     // Questions require a direct user answer, so surface them ahead of a
     // concurrent permission request for the same active root.
     if ([...blockers].some((blocker) => blocker.startsWith("question\u0000"))) {
@@ -170,7 +219,7 @@ export const TmuxStatuslinePlugin: Plugin = async ({ client, $ }) => {
     if ([...blockers].some((blocker) => blocker.startsWith("permission\u0000"))) {
       return "permission";
     }
-    return "working";
+    return hasActiveSessions() ? "working" : "clear";
   }
 
   async function applyStatusline(
@@ -202,7 +251,8 @@ export const TmuxStatuslinePlugin: Plugin = async ({ client, $ }) => {
 
   function selectRoot(sessionId: string): Promise<void> {
     activeRoot = resolveRoot(sessionId);
-    lifecycle = "active";
+    rootLifecycle = "active";
+    sessions.set(activeRoot, "active");
     blockers.clear();
     return render("chat.message");
   }
@@ -214,7 +264,16 @@ export const TmuxStatuslinePlugin: Plugin = async ({ client, $ }) => {
     action: "asked" | "resolved",
     context: string,
   ): Promise<void> {
-    if (!isActiveSession(sessionId)) return effects;
+    const lifecycle = sessions.get(sessionId);
+    if (
+      rootLifecycle !== "active" ||
+      !belongsToSelectedRoot(sessionId) ||
+      lifecycle === "terminal" ||
+      hasTerminalAncestor(sessionId) ||
+      (action === "asked" && lifecycle !== "active")
+    ) {
+      return effects;
+    }
 
     const key = blockerKey(kind, sessionId, requestId);
     if (action === "asked") blockers.add(key);
@@ -222,30 +281,64 @@ export const TmuxStatuslinePlugin: Plugin = async ({ client, $ }) => {
     return render(context);
   }
 
-  function finishRoot(
+  function transitionSession(
     sessionId: string,
-    nextLifecycle: Exclude<Lifecycle, "active">,
+    nextLifecycle: Exclude<SessionLifecycle, "active">,
     context: string,
   ): Promise<void> {
-    if (sessionId !== activeRoot) return effects;
+    if (nextLifecycle === "terminal") {
+      if (sessions.get(sessionId) === "terminal") return effects;
 
-    lifecycle = nextLifecycle;
-    blockers.clear();
-    return render(context);
+      const endsActiveRoot =
+        sessionId === activeRoot && rootLifecycle === "active";
+      retireSubtree(sessionId);
+      if (endsActiveRoot) {
+        rootLifecycle = "terminal";
+        blockers.clear();
+      }
+
+      return endsActiveRoot ||
+        (rootLifecycle === "active" &&
+          belongsToSelectedRoot(sessionId) &&
+          !hasTerminalAncestor(sessionId))
+        ? render(context)
+        : effects;
+    }
+
+    if (sessions.get(sessionId) === "terminal" || sessions.get(sessionId) === "idle") {
+      return effects;
+    }
+
+    sessions.set(sessionId, "idle");
+    return rootLifecycle === "active" &&
+      belongsToSelectedRoot(sessionId) &&
+      !hasTerminalAncestor(sessionId)
+      ? render(context)
+      : effects;
   }
 
-  function recordSession(context: unknown): void {
+  function recordSession(context: unknown): Promise<void> {
     const properties = eventProperties(context);
     const info = asRecord(properties?.info);
     const sessionId = firstString(info?.id, properties?.sessionID, properties?.sessionId);
-    if (!sessionId) return;
+    if (!sessionId) return effects;
+    if (createdSessions.has(sessionId)) return effects;
 
     const parentId = firstString(info?.parentID, info?.parentId, properties?.parentID);
+    createdSessions.add(sessionId);
     if (parentId) {
       parents.set(sessionId, parentId);
     } else {
       parents.delete(sessionId);
     }
+
+    if (!sessions.has(sessionId)) {
+      sessions.set(
+        sessionId,
+        hasTerminalAncestor(sessionId) ? "terminal" : "active",
+      );
+    }
+    return isActiveSession(sessionId) ? render("session.created") : effects;
   }
 
   async function handleEvent(context: unknown): Promise<void> {
@@ -256,7 +349,7 @@ export const TmuxStatuslinePlugin: Plugin = async ({ client, $ }) => {
     if (!type) return;
 
     if (type === "session.created") {
-      recordSession(context);
+      await recordSession(context);
       return;
     }
 
@@ -279,25 +372,22 @@ export const TmuxStatuslinePlugin: Plugin = async ({ client, $ }) => {
         await updateBlocker(sessionId, "question", extractRequestId(context), "resolved", type);
         return;
       case "session.status":
-        if (extractSessionStatus(context) === "idle") {
-          await finishRoot(sessionId, "idle", type);
+        switch (extractSessionStatus(context)) {
+          case "busy":
+          case "retry":
+            if (isActiveSession(sessionId)) await render(type);
+            return;
+          case "idle":
+            await transitionSession(sessionId, "idle", type);
+            return;
         }
         return;
       case "session.idle":
-        await finishRoot(sessionId, "idle", type);
+        await transitionSession(sessionId, "idle", type);
         return;
       case "session.error":
-        await finishRoot(sessionId, "terminal", type);
-        return;
       case "session.deleted":
-        if (sessionId === activeRoot) {
-          await finishRoot(sessionId, "terminal", type);
-        } else {
-          const wasActiveDescendant = isActiveSession(sessionId);
-          removeSessionBlockers(sessionId);
-          parents.delete(sessionId);
-          if (wasActiveDescendant) await render(type);
-        }
+        await transitionSession(sessionId, "terminal", type);
     }
   }
 
