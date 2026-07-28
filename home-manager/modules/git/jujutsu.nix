@@ -150,29 +150,35 @@
 
     (writeShellScriptBin "jj-workspace-exists" ''
       set -euo pipefail
+      if [ "$#" -ne 1 ] || [ -z "$1" ]; then
+        echo "Usage: jj-workspace-exists <workspace-name>" >&2
+        exit 1
+      fi
+
       name="$1"
       jj workspace list --ignore-working-copy -T 'name ++ "\n"' | grep -Fxq "$name"
     '')
 
     (writeShellScriptBin "jj-workspace-add" ''
       set -euo pipefail
-      name="$1"
-      if [ -z "$name" ]; then
+      if [ "$#" -ne 1 ] || [ -z "$1" ]; then
         echo "Usage: jj-workspace-add <workspace-name>" >&2
         exit 1
       fi
+
+      name="$1"
       if jj-workspace-exists "$name"; then
         echo "Workspace '$name' already exists" >&2
         exit 1
       fi
-      root=$(jj workspace root)
+      root=$(jj-workspace-path default)
       mkdir -p "$root/.workspaces"
       jj workspace add --name "$name" "$root/.workspaces/$name"
     '')
 
     (writeShellScriptBin "jj-workspace-delete" ''
       set -euo pipefail
-      if [ "$#" -gt 1 ]; then
+      if [ "$#" -gt 1 ] || { [ "$#" -eq 1 ] && [ -z "$1" ]; }; then
         echo "Usage: jj-workspace-delete [workspace-name]" >&2
         exit 1
       fi
@@ -181,7 +187,7 @@
         exit 1
       fi
 
-      root=$(jj workspace root)
+      root=$(jj-workspace-path default)
       jj workspace forget "$name"
       if [ -d "$root/.workspaces/$name" ]; then
         rm -rf "$root/.workspaces/$name"
@@ -191,12 +197,12 @@
     (writeShellScriptBin "jj-workspace-path" ''
       set -euo pipefail
 
-      name="''${1-}"
-      if [ -z "$name" ]; then
+      if [ "$#" -ne 1 ] || [ -z "$1" ]; then
         echo "Usage: jj-workspace-path <workspace-name>" >&2
         exit 1
       fi
 
+      name="$1"
       if root=$(jj workspace root --ignore-working-copy --name "$name" 2>/dev/null); then
         printf '%s\n' "$root"
         exit 0
@@ -207,22 +213,12 @@
         exit 1
       fi
 
-      current_root=$(jj workspace root --ignore-working-copy)
-      parent_dir=$(dirname "$current_root")
+      candidate_root=$(jj workspace root --ignore-working-copy)
+      while [ "$(basename "$(dirname "$candidate_root")")" = ".workspaces" ]; do
+        candidate_root=$(dirname "$(dirname "$candidate_root")")
+      done
 
-      if [ "$(basename "$parent_dir")" != ".workspaces" ]; then
-        if [ -d "$current_root/.jj" ]; then
-          printf '%s\n' "$current_root"
-          exit 0
-        fi
-
-        echo "Workspace 'default' has no recorded path, and legacy fallback only works from the repo root or a workspace under .workspaces/" >&2
-        exit 1
-      fi
-
-      candidate_root=$(dirname "$parent_dir")
-
-      if [ -d "$candidate_root/.jj" ]; then
+      if [ -d "$candidate_root/.jj/repo" ]; then
         printf '%s\n' "$candidate_root"
         exit 0
       fi
@@ -234,7 +230,7 @@
     (writeShellScriptBin "jj-workspace-select" ''
       set -euo pipefail
 
-      if [ "$#" -gt 1 ]; then
+      if [ "$#" -gt 1 ] || { [ "$#" -eq 1 ] && [ -z "$1" ]; }; then
         echo "Usage: jj-workspace-select [workspace-name]" >&2
         exit 1
       fi
@@ -262,6 +258,11 @@
 
     (writeShellScriptBin "jj-workspace-tmux" ''
       set -euo pipefail
+
+      if [ "$#" -gt 1 ] || { [ "$#" -eq 1 ] && [ -z "$1" ]; }; then
+        echo "Usage: jj-workspace-tmux [workspace-name]" >&2
+        exit 1
+      fi
 
       if [ -z "''${TMUX-}" ]; then
         echo "jjwt only works inside tmux" >&2
