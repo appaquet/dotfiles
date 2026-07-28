@@ -18,6 +18,7 @@ let
       opencode = inputs.llm-agents.packages.${system}.opencode;
       gemini-cli = inputs.llm-agents.packages.${system}.gemini-cli;
       codex = inputs.llm-agents.packages.${system}.codex;
+      ccusage = inputs.llm-agents.packages.${system}.ccusage;
 
       # claude-code = final.callPackage ./claude-code/package.nix { };
       claude-code = inputs.llm-agents.packages.${system}.claude-code;

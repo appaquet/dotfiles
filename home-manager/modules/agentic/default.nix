@@ -26,8 +26,9 @@ in
 
     home.packages = [
       mcp-npx
-      pkgs.codeburn
       pkgs.codex
+      pkgs.codeburn
+      pkgs.ccusage
     ];
   };
 }
