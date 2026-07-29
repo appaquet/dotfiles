@@ -16,7 +16,7 @@ let
       nono = inputs.llm-agents.packages.${system}.nono;
 
       opencode = inputs.llm-agents.packages.${system}.opencode;
-      gemini-cli = inputs.llm-agents.packages.${system}.gemini-cli;
+      antigravity-cli = inputs.llm-agents.packages.${system}.antigravity-cli;
       codex = inputs.llm-agents.packages.${system}.codex;
       ccusage = inputs.llm-agents.packages.${system}.ccusage;
 

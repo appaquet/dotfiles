@@ -27,6 +27,7 @@ in
     home.packages = [
       mcp-npx
       pkgs.codex
+      pkgs.antigravity-cli
       pkgs.codeburn
       pkgs.ccusage
     ];
