@@ -2,6 +2,12 @@
 set -e
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# If this is the global x and there's a local x in the current directory, delegate to it
+if [[ -x "$PWD/x" ]] && [[ "$PWD" != "$ROOT" ]]; then
+  exec "$PWD/x" "$@"
+fi
+
 pushd "$ROOT" >/dev/null
 
 LOCAL_HOSTNAME=$(uname -n | tr '[:upper:]' '[:lower:]' | sed 's/\.local//')

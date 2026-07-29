@@ -279,6 +279,18 @@ let
     };
 
     provider = {
+      sparkbud1 = {
+        npm = "@ai-sdk/openai-compatible";
+        name = "Sparkbud1";
+        options = {
+          baseURL = "http://sparkbud1.n3x.net:8080/v1";
+        };
+        models = {
+          "bottlecapai/ThinkingCap-Qwen3.6-27B-NVFP4" = {
+            name = "bottlecapai/ThinkingCap-Qwen3.6-27B-NVFP4";
+          };
+        };
+      };
       sparkbud2 = {
         npm = "@ai-sdk/openai-compatible";
         name = "Sparkbud2";
