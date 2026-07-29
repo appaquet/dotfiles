@@ -34,8 +34,8 @@ let
   claude-code = pkgs.claude-code;
 
   claude-wrapped = pkgs.writeShellScriptBin "claude" ''
-    if [ ! -d ".git" ]; then
-      echo -e "\e[31mWARNING: No .git, are you at the root of a project?\e[0m" >&2
+    if [ ! -d ".git" ] && [ ! -d ".jj" ]; then
+      echo -e "\e[31mWARNING: No .git or .jj, are you at the root of a project?\e[0m" >&2
       sleep 5
     fi
 
