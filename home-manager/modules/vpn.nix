@@ -33,10 +33,10 @@ let
       RUN apt update && \
           apt install -y fish sudo
 
-      RUN groupadd --gid 100 users2
-      RUN adduser --uid 1000 --gid 100 --disabled-password --gecos "" --shell /usr/bin/bash appaquet
+      RUN usermod --login appaquet --home /home/appaquet --move-home --gid users --shell /usr/bin/bash ubuntu
       RUN mkdir -p /usr/local/gcloud && chown 1000:100 /usr/local/gcloud
-      RUN echo 'appaquet ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+      RUN printf '%s\n' 'appaquet ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/appaquet && \
+          chmod 0440 /etc/sudoers.d/appaquet
       EOF
 
         docker build -t openvpn-shell .
@@ -50,6 +50,7 @@ let
       # Start the vpn container if it doesn't already run
       if ! docker ps | grep -q openvpn-shell; then
         trap 'docker rm -f openvpn-shell' EXIT
+        # FIXME: Remove the server pin when NordVPN recommendations consistently have published configs.
         docker run --rm \
           --name openvpn-shell \
           --hostname openvpn-shell \
@@ -64,6 +65,7 @@ let
           -v /data:/data \
           -v /run:/run \
           -e OPENVPN_PROVIDER=NORDVPN \
+          -e NORDVPN_SERVER=ca2260.nordvpn.com \
           -e OPENVPN_USERNAME="$OPENVPN_USERNAME" \
           -e OPENVPN_PASSWORD="$OPENVPN_PASSWORD" \
           -e CONFIG_MOD_PING=0 \
