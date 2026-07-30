@@ -336,6 +336,8 @@ let
 
   direnvPlugin = pkgs.writeText "direnv.ts" (builtins.readFile ./plugins/direnv.ts);
 
+  notifyPlugin = pkgs.writeText "notify.ts" (builtins.readFile ./plugins/notify.ts);
+
   nono-opencode = pkgs.writeShellScriptBin "nono-opencode" ''
     export OPENCODE_ENABLE_EXA=1
     export OPENCODE_EXPERIMENTAL_PARALLEL=1 # parallel web search
@@ -390,6 +392,7 @@ let
     ".config/opencode/plugins/ccmon.ts".source = "${inputs'.ccmon.packages.opencode-plugin}/ccmon.ts";
     ".config/opencode/plugins/tmux-statusline.ts".source = tmuxStatuslinePlugin;
     ".config/opencode/plugins/direnv.ts".source = direnvPlugin;
+    ".config/opencode/plugins/notify.ts".source = notifyPlugin;
   };
 in
 {

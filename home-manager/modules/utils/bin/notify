@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 
 MESSAGE="${1:-"<no message>"}"
+TITLE="${2:-"Notification"}"
 
 TM="/opt/homebrew/bin/terminal-notifier"
 
 HOSTNAME=$(uname -n | tr '[:upper:]' '[:lower:]' | sed 's/\.local//')
 if [[ "${HOSTNAME}" == "mbpapp"* ]]; then
-  $TM -message "${MESSAGE}" -timeout 15 -sound glass
+  $TM -title "${TITLE}" -message "${MESSAGE}" -timeout 15 -sound glass
 else
-  ssh -o ConnectTimeout=5 -o PasswordAuthentication=no -o KbdInteractiveAuthentication=no mbpapp.n3x.net "$TM -message \"${MESSAGE}\" -timeout 15 -sound glass" 2>/dev/null || true
+  printf -v REMOTE_TITLE '%q' "${TITLE}"
+  printf -v REMOTE_MESSAGE '%q' "${MESSAGE}"
+  ssh -o ConnectTimeout=5 -o PasswordAuthentication=no -o KbdInteractiveAuthentication=no mbpapp.n3x.net "$TM -title ${REMOTE_TITLE} -message ${REMOTE_MESSAGE} -timeout 15 -sound glass" 2>/dev/null || true
 fi
