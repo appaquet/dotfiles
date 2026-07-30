@@ -289,6 +289,9 @@ let
           "bottlecapai/ThinkingCap-Qwen3.6-27B-NVFP4" = {
             name = "bottlecapai/ThinkingCap-Qwen3.6-27B-NVFP4";
           };
+          "unsloth/Qwen3.6-27B-NVFP4" = {
+            name = "unsloth/Qwen3.6-27B-NVFP4";
+          };
         };
       };
       sparkbud2 = {
