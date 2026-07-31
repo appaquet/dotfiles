@@ -292,6 +292,9 @@ let
           "unsloth/Qwen3.6-27B-NVFP4" = {
             name = "unsloth/Qwen3.6-27B-NVFP4";
           };
+          "deepseek-v4-flash-dspark" = {
+            name = "deepseek-v4-flash-dspark";
+          };
         };
       };
       sparkbud2 = {
