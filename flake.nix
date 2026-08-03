@@ -92,6 +92,22 @@
           ./nixos
           ./darwin
         ];
+
+        perSystem =
+          { pkgs, ... }:
+          {
+            checks.maybe-portal =
+              pkgs.runCommand "maybe-portal-tests"
+                {
+                  nativeBuildInputs = [ pkgs.python3 ];
+                  src = ./home-manager/modules/nono;
+                }
+                ''
+                  cp -r "$src"/* .
+                  python3 -m unittest discover -s . -p 'test_*.py'
+                  touch "$out"
+                '';
+          };
       }
     );
 }

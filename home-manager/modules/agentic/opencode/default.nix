@@ -346,13 +346,39 @@ let
 
   notifyPlugin = pkgs.writeText "notify.ts" (builtins.readFile ./plugins/notify.ts);
 
+  maybePortalTmuxSetup = ''
+    if [ -n "$TMUX" ]; then
+      sock="$(printf '%s' "$TMUX" | cut -d, -f1)"
+      client="$(tmux -S "$sock" display-message -p '#{client_name}' 2>/dev/null)"
+      if [ -z "$client" ]; then
+        client="$(tmux -S "$sock" list-clients -F '#{client_name}' 2>/dev/null | head -1)"
+      fi
+
+      MAYBE_PORTAL_TMUX=1 \
+        MAYBE_PORTAL_TMUX_SOCKET="$sock" \
+        MAYBE_PORTAL_TMUX_CLIENT="$client" \
+        maybe-portal --tmux >/dev/null 2>&1 &
+      portal_pid=$!
+      trap 'if kill -0 "$portal_pid" 2>/dev/null; then kill "$portal_pid" 2>/dev/null; fi; rm -f .nono/socket' EXIT
+
+      for _ in 1 2 3 4 5 6 7 8 9 10; do
+        [ -S ".nono/socket" ] && break
+        sleep 0.5
+      done
+    fi
+  '';
+
   nono-opencode = pkgs.writeShellScriptBin "nono-opencode" ''
     export OPENCODE_ENABLE_EXA=1
     export OPENCODE_EXPERIMENTAL_PARALLEL=1 # parallel web search
     export OPENCODE_EXPERIMENTAL_FILEWATCHER=1 # reload direnv after devshell file changes
     export OPENCODE_EXPERIMENTAL_BACKGROUND_SUBAGENTS=1 # non-blocking background sub-agents
     export OPENCODE_CONFIG=${yoloOpencodeJson}
-    exec maybe --profile opencode -- ${pkgs.opencode}/bin/opencode "$@"
+    ${maybePortalTmuxSetup}
+    # No exec: the shell must survive opencode so the EXIT trap stops the portal daemon.
+    maybe --profile opencode -- ${pkgs.opencode}/bin/opencode "$@"
+    rc=$?
+    exit "$rc"
   '';
 
   yolo-opencode = pkgs.writeShellScriptBin "yolo-opencode" ''

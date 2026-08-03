@@ -22,6 +22,7 @@ import subprocess
 import sys
 import termios
 import threading
+import time
 import tty
 
 SOCKET_DIR = ".nono"
@@ -47,12 +48,17 @@ def main(argv):
     if argv and argv[0] in ("-h", "--help"):
         sys.stdout.write(USAGE)
         return 0
+    if argv and argv[0] == "--portal-ui":
+        return run_portal_ui()
+    if argv and argv[0] == "--tmux":
+        return run_approver(tmux_mode=True)
     if not argv:
-        return run_approver()
+        tmux_mode = os.environ.get("MAYBE_PORTAL_TMUX") in ("1", "true", "yes")
+        return run_approver(tmux_mode=tmux_mode)
     return run_client(argv)
 
 
-def run_approver():
+def run_approver(tmux_mode=False):
     sock_path = os.path.join(SOCKET_DIR, SOCKET_NAME)
     os.makedirs(SOCKET_DIR, exist_ok=True)
 
@@ -99,7 +105,7 @@ def run_approver():
                     continue
                 raise
             try:
-                stop_after = _handle_connection(conn)
+                stop_after = _handle_connection(conn, tmux_mode=tmux_mode)
             finally:
                 try:
                     conn.close()
@@ -204,7 +210,7 @@ def run_client(argv):
     return 2
 
 
-def _handle_connection(conn):
+def _handle_connection(conn, tmux_mode=False):
     """Run a single approver/client transaction. Returns True if approver should stop."""
     conn.settimeout(None)
     reader = conn.makefile("r", encoding="utf-8", errors="replace", newline="\n")
@@ -244,7 +250,7 @@ def _handle_connection(conn):
         sys.stderr.write(f"auto-approved by pattern: {matched}\n")
         sys.stderr.flush()
     else:
-        decision = _prompt_user(pid, cwd, quoted, argv)
+        decision = _prompt_user(pid, cwd, quoted, argv, tmux_mode=tmux_mode)
         if decision == "deny":
             _send_event(conn, {"event": "denied", "reason": "user denied"})
             return False
@@ -263,7 +269,10 @@ def _handle_connection(conn):
     return stop_after
 
 
-def _prompt_user(pid, cwd, quoted, argv):
+def _prompt_user(pid, cwd, quoted, argv, tmux_mode=False):
+    if tmux_mode:
+        return _prompt_user_tmux(pid, cwd, quoted)
+
     sys.stderr.write("\n")
     sys.stderr.write("maybe-portal: incoming request\n")
     sys.stderr.write(f"  pid: {pid}\n")
@@ -298,6 +307,165 @@ def _prompt_user(pid, cwd, quoted, argv):
         sys.stderr.flush()
         return "approve"
     return "deny"
+
+
+def _prompt_user_tmux(pid, cwd, quoted):
+    client = _resolve_tmux_client()
+    if not client:
+        return "deny"
+
+    project_dir = os.path.abspath(os.getcwd())
+    nono_dir = os.path.join(project_dir, SOCKET_DIR)
+    decision_file = os.path.join(
+        nono_dir, f"decision-{os.getpid()}-{time.monotonic_ns()}"
+    )
+    _safe_unlink(decision_file)
+
+    tmux_socket = os.environ.get("MAYBE_PORTAL_TMUX_SOCKET", "")
+    ui_env = {
+        "MAYBE_PORTAL_TMUX_SOCKET": tmux_socket,
+        "MAYBE_PORTAL_TMUX_CLIENT": client,
+        "MAYBE_PORTAL_TMUX_PROJECT_DIR": project_dir,
+        "MAYBE_PORTAL_TMUX_NONO_DIR": nono_dir,
+        "MAYBE_PORTAL_TMUX_DECISION_FILE": decision_file,
+        "MAYBE_PORTAL_TMUX_PID": str(pid),
+        "MAYBE_PORTAL_TMUX_CWD": cwd,
+        "MAYBE_PORTAL_TMUX_COMMAND": quoted,
+        "MAYBE_PORTAL_TMUX_PATTERN": _default_pattern(quoted),
+        "MAYBE_PORTAL_TMUX_TIMEOUT": os.environ.get("MAYBE_PORTAL_TMUX_TIMEOUT", "300"),
+    }
+    command = ["tmux"]
+    if tmux_socket:
+        command.extend(("-S", tmux_socket))
+    command.extend(("display-popup", "-E", "-w", "90%", "-h", "90%"))
+    command.extend(("-T", " portal ", "-c", client, "-d", project_dir))
+    for name, value in ui_env.items():
+        command.extend(("-e", f"{name}={value}"))
+    command.append(
+        shlex.join((sys.executable, os.path.abspath(__file__), "--portal-ui"))
+    )
+
+    try:
+        result = subprocess.run(
+            command,
+            cwd=project_dir,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError as exc:
+        sys.stderr.write(f"maybe-portal: tmux popup failed: {exc}\n")
+        return "deny"
+
+    if result.returncode not in (0, 1, 2, 3, 4):
+        _safe_unlink(decision_file)
+        if result.stderr:
+            sys.stderr.write(result.stderr)
+        return "deny"
+    if result.returncode == 0:
+        _safe_unlink(decision_file)
+        return "approve"
+    if result.returncode == 1:
+        _safe_unlink(decision_file)
+        return "deny"
+    if result.returncode == 2:
+        _safe_unlink(decision_file)
+        return "deny_stop"
+    if result.returncode == 3:
+        _safe_unlink(decision_file)
+        return "approve_stop"
+
+    pattern = _consume_decision_pattern(decision_file)
+    if pattern is not None:
+        try:
+            re.compile(pattern)
+        except re.error as exc:
+            sys.stderr.write(f"invalid regex, not saved: {exc}\n")
+        else:
+            _persist_pattern(pattern)
+            sys.stderr.write(f"saved pattern: {pattern}\n")
+    return "approve"
+
+
+def _resolve_tmux_client():
+    requested = os.environ.get("MAYBE_PORTAL_TMUX_CLIENT")
+    socket_path = os.environ.get("MAYBE_PORTAL_TMUX_SOCKET", "")
+    command = ["tmux"]
+    if socket_path:
+        command.extend(("-S", socket_path))
+    command.extend(("list-clients", "-F", "#{client_name}"))
+    try:
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError:
+        return None
+    if result.returncode != 0:
+        return requested
+    clients = [line for line in result.stdout.splitlines() if line]
+    if requested in clients:
+        return requested
+    return clients[0] if clients else None
+
+
+def _consume_decision_pattern(path):
+    try:
+        with open(path, "r", encoding="utf-8") as fp:
+            pattern = fp.read().strip()
+    except (FileNotFoundError, OSError):
+        return None
+    finally:
+        _safe_unlink(path)
+    return pattern or None
+
+
+def run_portal_ui():
+    pid = os.environ.get("MAYBE_PORTAL_TMUX_PID", "unknown")
+    cwd = os.environ.get("MAYBE_PORTAL_TMUX_CWD", "unknown")
+    quoted = os.environ.get("MAYBE_PORTAL_TMUX_COMMAND", "")
+    pattern = os.environ.get("MAYBE_PORTAL_TMUX_PATTERN", "")
+    try:
+        timeout = float(os.environ.get("MAYBE_PORTAL_TMUX_TIMEOUT", "300"))
+    except ValueError:
+        timeout = 300
+
+    sys.stdout.write("maybe-portal: incoming request\n")
+    sys.stdout.write(f"  pid: {pid}\n")
+    sys.stdout.write(f"  cwd: {cwd}\n")
+    sys.stdout.write(f"  cmd: {quoted}\n")
+    sys.stdout.write("  [a]pprove  [d]eny  [w]hitelist+approve  [q]deny+stop: ")
+    sys.stdout.flush()
+
+    choice = _read_one_key_timeout(timeout)
+    if choice in ("", "\x1b", "d"):
+        return 1
+    if choice == "a":
+        return 0
+    if choice == "q":
+        return 2
+    if choice == "w":
+        if not pattern:
+            return 0
+        _write_decision_pattern(pattern)
+        return 4
+    return 1
+
+
+def _write_decision_pattern(pattern):
+    path = os.environ["MAYBE_PORTAL_TMUX_DECISION_FILE"]
+    nono_dir = os.environ.get("MAYBE_PORTAL_TMUX_NONO_DIR", SOCKET_DIR)
+    os.makedirs(nono_dir, exist_ok=True)
+    tmp_path = f"{path}.tmp-{os.getpid()}"
+    try:
+        with open(tmp_path, "w", encoding="utf-8") as fp:
+            fp.write(pattern)
+            fp.write("\n")
+        os.replace(tmp_path, path)
+    finally:
+        _safe_unlink(tmp_path)
 
 
 def _run_subprocess(conn, argv, cwd):
@@ -473,6 +641,33 @@ def _read_one_key():
             tty.setcbreak(fd)
             # Block until at least one byte is available.
             rlist, _, _ = select.select([fd], [], [])
+            if not rlist:
+                return ""
+            ch = os.read(fd, 1).decode("utf-8", errors="replace")
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old)
+    finally:
+        os.close(fd)
+    return ch.lower()
+
+
+def _read_one_key_timeout(timeout):
+    try:
+        fd = os.open("/dev/tty", os.O_RDONLY)
+    except OSError:
+        try:
+            rlist, _, _ = select.select([sys.stdin], [], [], timeout)
+        except (OSError, ValueError):
+            return ""
+        if not rlist:
+            return ""
+        ch = sys.stdin.read(1)
+        return ch.lower() if ch else ""
+    try:
+        old = termios.tcgetattr(fd)
+        try:
+            tty.setcbreak(fd)
+            rlist, _, _ = select.select([fd], [], [], timeout)
             if not rlist:
                 return ""
             ch = os.read(fd, 1).decode("utf-8", errors="replace")
