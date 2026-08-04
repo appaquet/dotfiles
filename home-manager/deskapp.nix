@@ -16,6 +16,7 @@
   dotfiles.nono.profiles.machine.filesystem.allow = [
     "$HOME/Projects"
     "$HOME/Work"
+    "$HOME/.cache/dotcore"
   ];
 
   dotfiles.neovim.devMode = true;
