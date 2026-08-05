@@ -274,9 +274,13 @@ let
         model = "opencode-go/deepseek-v4-flash";
       };
 
-      general = {
-        disable = true; # Should use dev insteads. Don't have proper prompts for sub-agents work and keep recursively spawn.
+      build = {
+        prompt = "You are in build mode, with orchestration off. Sub-agents should not be used, unless explicitly requested by the user";
       };
+
+      # general = {
+      #   disable = true; # Should use dev insteads. Don't have proper prompts for sub-agents work and keep recursively spawn.
+      # };
     };
 
     provider = {
@@ -396,7 +400,7 @@ let
     ".config/opencode/plugins/ccmon.ts".source = "${inputs'.ccmon.packages.opencode-plugin}/ccmon.ts";
     ".config/opencode/plugins/tmux-statusline.ts".source = tmuxStatuslinePlugin;
     ".config/opencode/plugins/direnv.ts".source = direnvPlugin;
-    ".config/opencode/plugins/notify.ts".source = notifyPlugin;
+    #".config/opencode/plugins/notify.ts".source = notifyPlugin; # FIXME: doesn't work because ssh key unavailable in sandbox
   };
 in
 {
