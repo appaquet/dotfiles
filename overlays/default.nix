@@ -8,6 +8,8 @@ let
     {
       macpow = final.callPackage ./macpow { };
 
+      jujutsu = final.callPackage ./jj { };
+
       #markdown-oxide = final.callPackage ./markdown-oxide { };
 
       codeburn = final.callPackage ./codeburn { };
