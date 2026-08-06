@@ -61,7 +61,7 @@ local function on_attach(bufnr)
 	end, opts("Git: open file/dir history"))
 end
 
-require("nvim-tree").setup({
+local nvim_tree_config = {
 	actions = {
 		open_file = {
 			resize_window = false, -- Prevent resizing tree on opening file
@@ -86,5 +86,23 @@ require("nvim-tree").setup({
 		},
 	},
 	on_attach = on_attach,
-})
+}
+require("nvim-tree").setup(nvim_tree_config)
+
+-- Toggle between a docked sidebar and a transient float
+local function toggle_docked()
+	local config = require("nvim-tree.config")
+	local new_float = not config.g.view.float.enable
+
+	local setup_config = vim.deepcopy(nvim_tree_config)
+	setup_config.view.float.enable = new_float
+	setup_config.view.float.quit_on_focus_loss = new_float
+	setup_config.actions.open_file.quit_on_open = new_float
+
+	require("nvim-tree").setup(setup_config)
+	require("nvim-tree.api").tree.open()
+	vim.notify(new_float and "Tree: Floating" or "Tree: Docked")
+end
+
 vim.keymap.set("n", "<Leader>e", ":NvimTreeToggle<CR>zz", { desc = "Tree: Toggle", silent = true })
+vim.keymap.set("n", "<Leader>Te", toggle_docked, { desc = "Tree: Toggle docked / float", silent = true })
