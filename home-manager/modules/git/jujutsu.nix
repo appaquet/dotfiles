@@ -173,7 +173,7 @@
       fi
       root=$(jj-workspace-path default)
       mkdir -p "$root/.workspaces"
-      jj workspace add --name "$name" "$root/.workspaces/$name"
+      jj workspace add --colocate --name "$name" "$root/.workspaces/$name"
     '')
 
     (writeShellScriptBin "jj-workspace-delete" ''
