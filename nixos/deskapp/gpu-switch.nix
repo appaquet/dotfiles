@@ -35,19 +35,30 @@ let
 
     function kill_nvidia_users() {
         # Kill all processes using /dev/nvidia* (e.g. chromium on igpu still opens nvidiactl)
-        if ls /dev/nvidia* &>/dev/null; then
-            echo "Killing processes using /dev/nvidia*..."
-            ${pkgs.psmisc}/bin/fuser -k /dev/nvidia* 2>/dev/null || true
-            sleep 2
-            ${pkgs.psmisc}/bin/fuser -k -9 /dev/nvidia* 2>/dev/null || true
+        if ! ls /dev/nvidia* &>/dev/null; then
+            return 0
+        fi
+
+        echo "Killing processes using /dev/nvidia*..."
+        local remaining
+        for ((attempt = 1; attempt <= 10; attempt++)); do
+            if [ "$attempt" -eq 1 ]; then
+                ${pkgs.psmisc}/bin/fuser -k /dev/nvidia* 2>/dev/null || true
+            else
+                ${pkgs.psmisc}/bin/fuser -k -9 /dev/nvidia* 2>/dev/null || true
+            fi
             sleep 2
 
-            local remaining
             remaining=$(${pkgs.psmisc}/bin/fuser /dev/nvidia* 2>/dev/null) || true
-            if [ -n "$remaining" ]; then
-                echo "WARNING: processes still using nvidia devices: $remaining"
+            if [ -z "$remaining" ]; then
+                echo "All processes using /dev/nvidia* killed"
+                return 0
             fi
-        fi
+            echo "Attempt $attempt/10: processes still using nvidia devices: $remaining"
+        done
+
+        echo "ERROR: could not kill processes using /dev/nvidia* after 10 attempts: $remaining" 1>&2
+        exit 1
     }
 
     function get_bus_driver() {
@@ -129,6 +140,7 @@ let
 
         # Restart nvidia docker related stuff to make sure they get rebound
         systemctl reset-failed docker.service
+        systemctl restart docker.socket
         systemctl restart docker.service
     }
 
@@ -152,6 +164,7 @@ let
         # Nvidia containers will keep trying to use the nvidia driver if it's loaded
         # Leading to spammy errors in the logs. We don't need it while we're gaming anyway.
         systemctl stop nvidia-container-toolkit-cdi-generator.service
+        systemctl stop docker.socket
         systemctl stop docker.service
 
         kill_nvidia_users
