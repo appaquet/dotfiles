@@ -16,8 +16,8 @@
     gpuPassthrough = {
       enable = true;
       devices = [
-        "10de:2216" # Graphics
-        "10de:1aef" # Audio
+        "10de:2b85" # Graphics
+        "10de:22e8" # Audio
       ];
     };
 

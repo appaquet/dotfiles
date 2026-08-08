@@ -2,8 +2,8 @@
 
 let
   # Keep in sync with ./virt/default.nix
-  gpuPci = "10de:2216";
-  audioPci = "10de:1aef";
+  gpuPci = "10de:2b85";
+  audioPci = "10de:22e8";
 
   # GPU switching script
   # Used in qemu hooks defined in `./virt/default.nix`
@@ -207,7 +207,7 @@ in
     powerManagement.enable = false;
     powerManagement.finegrained = false;
 
-    open = false;
+    open = true;
 
     nvidiaSettings = false; # no need for settings menu
 
