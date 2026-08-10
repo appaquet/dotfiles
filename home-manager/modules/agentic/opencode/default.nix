@@ -246,6 +246,23 @@ let
 
     permission = permissions.agent.base;
 
+    mcp = {
+      chrome = {
+        type = "local";
+        command = [
+          "mcp-npx"
+          "-y"
+          "chrome-devtools-mcp@latest"
+          "--browser-url=http://127.0.0.1:9222"
+          "--experimentalPageIdRouting"
+        ];
+        enabled = true;
+      };
+    };
+    tools = {
+      "chrome*" = false;
+    };
+
     agent = {
       browser = {
         mode = "subagent";
@@ -253,6 +270,9 @@ let
         description = "Browser agent, to be used by any tasks requiring web browser interaction. Shouldn't be used for web search and web fetch, only for actually using the browser to interact with websites.";
         prompt = instructions.blocks.opencode."browser-agent-prompt".body;
         permission = permissions.agent.browser;
+        tools = {
+          "chrome*" = true;
+        };
       };
 
       orchestrator = {
@@ -277,10 +297,6 @@ let
       build = {
         prompt = "You are in build mode, with orchestration off. Sub-agents should not be used, unless explicitly requested by the user";
       };
-
-      # general = {
-      #   disable = true; # Should use dev insteads. Don't have proper prompts for sub-agents work and keep recursively spawn.
-      # };
     };
 
     provider = {
