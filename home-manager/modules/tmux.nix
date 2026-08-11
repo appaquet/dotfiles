@@ -58,6 +58,10 @@
         # Truecolor passthrough
         set -sg terminal-overrides ',*:RGB'
 
+        # Preserve modifier information for keys such as Shift+Enter
+        set -g extended-keys on
+        set -g extended-keys-format csi-u
+
         # Resize to most recent client
         set -g window-size latest
 
