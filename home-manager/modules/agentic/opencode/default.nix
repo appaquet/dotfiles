@@ -261,6 +261,7 @@ let
         enabled = true;
       };
     };
+
     agent = {
       browser = {
         mode = "subagent";
@@ -290,7 +291,15 @@ let
       };
 
       build = {
-        prompt = "You are in build mode, with orchestration off. Sub-agents should not be used, unless explicitly requested by the user";
+        prompt = "You are in direct build mode, with orchestration off. You should not use sub-agents to do any development work. You can only use the explore agent for code exploration and research.";
+        permission = {
+          task = {
+            "*" = "deny";
+            explore = "allow";
+            general = "allow";
+          };
+          "chrome*" = "allow";
+        };
       };
     };
 
@@ -408,32 +417,47 @@ let
 
   notifyPlugin = pkgs.writeText "notify.ts" (builtins.readFile ./plugins/notify.ts);
 
-  nono-opencode = pkgs.writeShellScriptBin "nono-opencode" ''
-    export OPENCODE_ENABLE_EXA=1
-    export OPENCODE_EXPERIMENTAL_PARALLEL=1 # parallel web search
-    export OPENCODE_EXPERIMENTAL_FILEWATCHER=1 # reload direnv after devshell file changes
-    export OPENCODE_EXPERIMENTAL_BACKGROUND_SUBAGENTS=1 # non-blocking background sub-agents
-    export OPENCODE_CONFIG=${yoloOpencodeJson}
-    exec maybe --profile opencode -- ${pkgs.opencode}/bin/opencode "$@"
-  '';
-
-  yolo-opencode = pkgs.writeShellScriptBin "yolo-opencode" ''
+  commonExports = ''
     export OPENCODE_ENABLE_EXA=1
     export OPENCODE_EXPERIMENTAL_PARALLEL=1 # parallel web search
     export OPENCODE_EXPERIMENTAL_FILEWATCHER=1 # reload direnv after devshell file changes
     export OPENCODE_EXPERIMENTAL_BACKGROUND_SUBAGENTS=1 # non-blocking background sub-agents
     export OPENCODE_ROOT="$(pwd)"
-    export OPENCODE_CONFIG=${yoloOpencodeJson}
-    exec ${pkgs.opencode}/bin/opencode "$@"
   '';
 
   opencode = pkgs.writeShellScriptBin "opencode" ''
-    export OPENCODE_ENABLE_EXA=1
-    export OPENCODE_EXPERIMENTAL_PARALLEL=1 # parallel web search
-    export OPENCODE_EXPERIMENTAL_FILEWATCHER=1 # reload direnv after devshell file changes
-    export OPENCODE_EXPERIMENTAL_BACKGROUND_SUBAGENTS=1 # non-blocking background sub-agents
-    export OPENCODE_ROOT="$(pwd)"
+    ${commonExports}
     exec ${pkgs.opencode}/bin/opencode "$@"
+  '';
+
+  nono-opencode = pkgs.writeShellScriptBin "nono-opencode" ''
+    export OPENCODE_CONFIG=${yoloOpencodeJson}
+    exec maybe --profile opencode -- ${opencode}/bin/opencode "$@"
+  '';
+
+  yolo-opencode = pkgs.writeShellScriptBin "yolo-opencode" ''
+    export OPENCODE_CONFIG=${yoloOpencodeJson}
+    exec ${opencode}/bin/opencode "$@"
+  '';
+
+  closecode = pkgs.writeShellScriptBin "closecode" ''
+    SANDBOX=$(mktemp -d /tmp/closecode-XXXXXX)
+    trap "rm -rf "$SANDBOX"" EXIT
+    export XDG_DATA_HOME="$SANDBOX/data"
+    export XDG_CACHE_HOME="$SANDBOX/cache"
+    export XDG_STATE_HOME="$SANDBOX/state"
+
+    exec ${opencode}/bin/opencode "$@"
+  '';
+
+  nono-closecode = pkgs.writeShellScriptBin "nono-closecode" ''
+    export OPENCODE_CONFIG=${yoloOpencodeJson}
+    exec maybe --profile opencode -- ${closecode}/bin/closecode "$@"
+  '';
+
+  yolo-closecode = pkgs.writeShellScriptBin "yolo-closecode" ''
+    export OPENCODE_CONFIG=${yoloOpencodeJson}
+    exec ${closecode}/bin/closecode "$@"
   '';
 
   mkOpencodeGeneratedSymlinks =
@@ -469,9 +493,12 @@ in
   home.file = (mkOpencodeGeneratedSymlinks generatedPaths) // commonSources;
 
   home.packages = [
+    opencode
     nono-opencode
     yolo-opencode
-    opencode
+    closecode
+    nono-closecode
+    yolo-closecode
   ];
 
   dotfiles.nono.profiles.opencode = {
