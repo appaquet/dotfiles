@@ -142,6 +142,7 @@ let
         grep = "allow";
         websearch = "allow";
         webfetch = "ask";
+        "chrome*" = "deny";
 
         external_directory = {
           "~/.claude/**" = "allow";
@@ -224,6 +225,7 @@ let
 
       browser = {
         task = "deny";
+        "chrome*" = "allow";
       };
     };
   };
@@ -259,10 +261,6 @@ let
         enabled = true;
       };
     };
-    tools = {
-      "chrome*" = false;
-    };
-
     agent = {
       browser = {
         mode = "subagent";
@@ -270,9 +268,6 @@ let
         description = "Browser agent, to be used by any tasks requiring web browser interaction. Shouldn't be used for web search and web fetch, only for actually using the browser to interact with websites.";
         prompt = instructions.blocks.opencode."browser-agent-prompt".body;
         permission = permissions.agent.browser;
-        tools = {
-          "chrome*" = true;
-        };
       };
 
       orchestrator = {
@@ -346,11 +341,43 @@ let
           "unsloth/gemma-4-12B-it-qat-GGUF" = {
             name = "unsloth/gemma-4-12B-it-qat-GGUF";
           };
+          "unsloth/Qwen3.6-27B-MTP-GGUF" = {
+            name = "unsloth/Qwen3.6-27B-MTP-GGU";
+          };
           "unsloth/Qwen3.6-27B-NVFP4" = {
             name = "unsloth/Qwen3.6-27B-NVFP4";
             limit = {
-              context = 200000;
-              output = 20000;
+              context = 150000;
+              output = 12000;
+            };
+            options = {
+              chat_template_kwargs.enable_thinking = true;
+              temperature = 0.6;
+              top_p = 0.95;
+              top_k = 20;
+              min_p = 0;
+              presence_penalty = 0;
+              repetition_penalty = 1;
+            };
+            variants = {
+              thinking = {
+                chat_template_kwargs.enable_thinking = true;
+                temperature = 0.6;
+                top_p = 0.95;
+                top_k = 20;
+                min_p = 0;
+                presence_penalty = 0;
+                repetition_penalty = 1;
+              };
+              non-thinking = {
+                chat_template_kwargs.enable_thinking = false;
+                temperature = 0.7;
+                top_p = 0.8;
+                top_k = 20;
+                min_p = 0;
+                presence_penalty = 1.5;
+                repetition_penalty = 1;
+              };
             };
           };
         };
