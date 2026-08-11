@@ -41,11 +41,6 @@
           fenv source ~/.profile
         end
 
-        # Enable direnv
-        if command -v direnv &>/dev/null
-            eval (direnv hook fish)
-        end
-
         # Apparently the plugin doesn't do this for us on MacOS for some reason
         fzf_configure_bindings
 
