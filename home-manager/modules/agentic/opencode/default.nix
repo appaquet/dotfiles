@@ -336,6 +336,25 @@ let
           };
         };
       };
+      deskapp = {
+        npm = "@ai-sdk/openai-compatible";
+        name = "deskapp";
+        options = {
+          baseURL = "http://deskapp.n3x.net:15000/v1";
+        };
+        models = {
+          "unsloth/gemma-4-12B-it-qat-GGUF" = {
+            name = "unsloth/gemma-4-12B-it-qat-GGUF";
+          };
+          "unsloth/Qwen3.6-27B-NVFP4" = {
+            name = "unsloth/Qwen3.6-27B-NVFP4";
+            limit = {
+              context = 200000;
+              output = 20000;
+            };
+          };
+        };
+      };
     };
   };
 
