@@ -142,7 +142,6 @@ let
         grep = "allow";
         websearch = "allow";
         webfetch = "ask";
-        "chrome*" = "deny";
 
         external_directory = {
           "~/.claude/**" = "allow";
@@ -263,26 +262,24 @@ let
     };
 
     agent = {
-      browser = {
-        mode = "subagent";
-        model = "openai/gpt-5.6-luna";
-        description = "Browser agent, to be used by any tasks requiring web browser interaction. Shouldn't be used for web search and web fetch, only for actually using the browser to interact with websites.";
-        prompt = instructions.blocks.opencode."browser-agent-prompt".body;
-        permission = permissions.agent.browser;
-      };
-
       orchestrator = {
         mode = "primary";
+        color = "#fdba74";
         description = "Project manager agent that manages project documentation, version control and delegates work to sub-agents.";
         prompt = instructions.blocks.opencode."orchestration-prompt".body;
         permission = permissions.agent.planner;
       };
 
+      # Built-in plan agents doesn't allow any edits even if we pass permission overrides.
+      # Redefine as `planner` instead
       plan = {
         disable = true;
+      };
+      planner = {
         mode = "primary";
+        color = "#93c5fd";
         description = "Planning agent that creates project plans, break down tasks, and write to project docs.";
-        prompt = "You are the planner of a project. Your role is to create project plans, break down tasks, and write to project docs. You must never engage in any code writing nor delegate such work, but can delegate plan/research to sub-agents. You should focus on high-level planning and project documentation. You actually don't even have access to running commands (other than jj), you only have access to writing project documentation.";
+        prompt = "You are the planner of a project. Your role is to create project plans, break down tasks, and write to project docs. You must never engage in any code writing nor delegate such work, but can delegate exploration/search to sub-agents. You actually don't even have access to running commands (other than jj), you only have access to writing to project documentation.";
         permission = permissions.agent.planner;
       };
 
@@ -291,6 +288,7 @@ let
       };
 
       build = {
+        color = "#f87171";
         prompt = "You are in direct build mode, with orchestration off. You should not use sub-agents to do any development work. You can only use the explore agent for code exploration and research.";
         permission = {
           task = {
@@ -298,7 +296,6 @@ let
             explore = "allow";
             general = "allow";
           };
-          "chrome*" = "allow";
         };
       };
     };
@@ -366,9 +363,6 @@ let
               temperature = 0.6;
               top_p = 0.95;
               top_k = 20;
-              min_p = 0;
-              presence_penalty = 0;
-              repetition_penalty = 1;
             };
             variants = {
               thinking = {
@@ -376,18 +370,13 @@ let
                 temperature = 0.6;
                 top_p = 0.95;
                 top_k = 20;
-                min_p = 0;
-                presence_penalty = 0;
-                repetition_penalty = 1;
               };
               non-thinking = {
                 chat_template_kwargs.enable_thinking = false;
                 temperature = 0.7;
                 top_p = 0.8;
                 top_k = 20;
-                min_p = 0;
                 presence_penalty = 1.5;
-                repetition_penalty = 1;
               };
             };
           };

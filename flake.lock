@@ -250,11 +250,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1786380460,
-        "narHash": "sha256-5LzdWDgmgmkkBP8OSd1lTRXeR3YuLHuo+uCgFjo3DZg=",
+        "lastModified": 1786497169,
+        "narHash": "sha256-LV0EbRKimCa+5ov0g3ladxjs4JdvsdRojwqr+QLnytw=",
         "owner": "dotcoreinc",
         "repo": "harness",
-        "rev": "d71af5fef71cec30195d40305e795c11862720fc",
+        "rev": "6a0fc0842912542de2440ae65c46061afaedffe2",
         "type": "github"
       },
       "original": {
