@@ -322,6 +322,7 @@ let
           };
         };
       };
+
       sparkbud2 = {
         npm = "@ai-sdk/openai-compatible";
         name = "Sparkbud2";
@@ -340,6 +341,7 @@ let
           };
         };
       };
+
       deskapp = {
         npm = "@ai-sdk/openai-compatible";
         name = "deskapp";
