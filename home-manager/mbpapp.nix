@@ -23,6 +23,13 @@
     "$HOME/work/dotcore"
     "$HOME/dotfiles"
   ];
+  programs.direnv.config = {
+    whitelist = {
+      prefix = [
+        "/Users/appaquet/work/dotcore/dotcore"
+      ];
+    };
+  };
 
   dotfiles.neovim.devMode = true;
 
