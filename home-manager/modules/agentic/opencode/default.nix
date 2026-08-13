@@ -361,9 +361,6 @@ let
           "unsloth/gemma-4-12B-it-qat-GGUF" = {
             name = "unsloth/gemma-4-12B-it-qat-GGUF";
           };
-          "unsloth/Qwen3.6-27B-MTP-GGUF" = {
-            name = "unsloth/Qwen3.6-27B-MTP-GGU";
-          };
           "RedHatAI/Muse-Glimmer-30B-NVFP4" = {
             name = "RedHatAI/Muse-Glimmer-30B-NVFP4";
           };
