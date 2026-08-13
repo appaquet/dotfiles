@@ -352,6 +352,8 @@ let
           "unsloth/Qwen3.6-27B-MTP-GGUF" = {
             name = "unsloth/Qwen3.6-27B-MTP-GGU";
           };
+
+          # Official sampling params: https://huggingface.co/Qwen/Qwen3.6-27B
           "unsloth/Qwen3.6-27B-NVFP4" = {
             name = "unsloth/Qwen3.6-27B-NVFP4";
             limit = {
