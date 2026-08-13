@@ -77,7 +77,15 @@
         bind '"' split-window -c "#{pane_current_path}"
         bind % split-window -h -c "#{pane_current_path}"
         bind c new-window -c "#{pane_current_path}"
-        bind g split-window -v -p 33 -c "#{pane_current_path}" \; split-window -h -p 50 -c "#{pane_current_path}"
+
+        set-window-option -g main-pane-height 67%
+        bind g if-shell -F '#{==:#{window_panes},1}' {
+          split-window -d -v -p 33 -c "#{pane_current_path}"
+          split-window -d -h -p 50 -t '{bottom}' -c "#{pane_current_path}"
+          select-layout main-horizontal
+        } {
+          select-layout main-horizontal
+        }
 
         # Vim-style pane navigation
         bind h select-pane -L
@@ -140,17 +148,16 @@
         set -g status-position bottom
 
         set -g status-left-length 100
-        set -gF status-left "#{E:@catppuccin_status_host}"
+        set -g status-left ""
+        set -g status-right-length 100
+        set -g status-right ""
+
+        set -agF status-left "#{E:@catppuccin_status_host}"
         set -ag status-left "#{E:@catppuccin_status_session}"
+        set -agF status-left "#{E:@catppuccin_status_cpu}"
         set -ag status-left "#[default] "
 
-        set -g status-right-length 100
-        set -gF status-right "#{E:@catppuccin_status_cpu}"
-        set -ag status-right "#{E:@catppuccin_status_uptime}"
-        set -agF status-right "#{E:@catppuccin_status_battery}"
-
         run-shell ${pkgs.tmuxPlugins.cpu}/share/tmux-plugins/cpu/cpu.tmux
-        run-shell ${pkgs.tmuxPlugins.battery}/share/tmux-plugins/battery/battery.tmux
       '';
   };
 

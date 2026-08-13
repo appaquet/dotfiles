@@ -6,7 +6,7 @@ Prefix is `C-a`. Mouse is enabled by default.
 
 * `<prefix> "` Split horizontally (inherits cwd)
 * `<prefix> %` Split vertically (inherits cwd)
-* `<prefix> g` Create a workspace split (top pane + two bottom panes)
+* `<prefix> g` Apply workspace layout; create panes if needed (top pane + bottom panes)
 * `<prefix> h/j/k/l` Navigate panes (vim-style)
 * `<prefix> H/J/K/L` Resize pane (repeatable)
 * `<prefix> =` Equalize pane layout
