@@ -298,6 +298,18 @@ let
           };
         };
       };
+
+      build-local = {
+        color = "#34d399";
+        prompt = "You are in direct build mode, with orchestration off. You should not use sub-agents to do any development work. You can only use the explore agent for code exploration and research. You need to only use local models and prevent any code/data leaks via network.";
+        permission = {
+          task = {
+            "*" = "deny";
+            general = "allow";
+          };
+          "chrome*" = "deny";
+        };
+      };
     };
 
     provider = {
@@ -351,6 +363,9 @@ let
           };
           "unsloth/Qwen3.6-27B-MTP-GGUF" = {
             name = "unsloth/Qwen3.6-27B-MTP-GGU";
+          };
+          "RedHatAI/Muse-Glimmer-30B-NVFP4" = {
+            name = "RedHatAI/Muse-Glimmer-30B-NVFP4";
           };
 
           # Official sampling params: https://huggingface.co/Qwen/Qwen3.6-27B
