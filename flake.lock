@@ -522,11 +522,11 @@
         "sops-nix": "sops-nix"
       },
       "locked": {
-        "lastModified": 1785779511,
-        "narHash": "sha256-cdSDbsr0Iklib2YuEfsQ888e5CNjOv7qdUmXKnShkLc=",
+        "lastModified": 1786631499,
+        "narHash": "sha256-NZJ2aizYZTxrkRHdpoIx+ay2iaId4MeeghUWRKuVxso=",
         "owner": "appaquet",
         "repo": "dotfiles-secrets",
-        "rev": "71a0c49790571f8ac5bab902afc55d9501166edd",
+        "rev": "52597275f42fba7ade5cdaa9604c62cd47938cfb",
         "type": "github"
       },
       "original": {
@@ -543,11 +543,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1774303811,
-        "narHash": "sha256-fhG4JAcLgjKwt+XHbjs8brpWnyKUfU4LikLm3s0Q/ic=",
+        "lastModified": 1786629091,
+        "narHash": "sha256-gkig4nPi1CWc4Z50GBsjE4ygSE7hMpl/TwID2an2Cck=",
         "owner": "Mic92",
         "repo": "sops-nix",
-        "rev": "614e256310e0a4f8a9ccae3fa80c11844fba7042",
+        "rev": "a8627b21b9107c5711c96b84f32a9a4b3d45295f",
         "type": "github"
       },
       "original": {

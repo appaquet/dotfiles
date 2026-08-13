@@ -138,7 +138,7 @@ in
     pkgs.socat # required for sandboxing
     inputs'.ccmon.packages.default
   ]
-  ++ lib.optionals pkgs.stdenv.isLinux [
+  ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
     pkgs.bubblewrap # required for sandboxing
   ];
 

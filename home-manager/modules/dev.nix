@@ -11,7 +11,7 @@ let
   cargoConfig =
     ""
     + (
-      if pkgs.stdenv.isLinux then
+      if pkgs.stdenv.hostPlatform.isLinux then
         ''
           [target.x86_64-unknown-linux-gnu]
           linker = "clang"
@@ -44,7 +44,7 @@ in
       bintools # ld, objdump, etc.
 
     ])
-    ++ lib.optionals pkgs.stdenv.isLinux [
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
       pkgs.mold
       pkgs.binsider # binary analysis tool
     ];

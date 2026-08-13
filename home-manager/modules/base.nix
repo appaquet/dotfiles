@@ -89,14 +89,14 @@
       rsync
       rclone
     ])
-    ++ lib.optionals pkgs.stdenv.isLinux [
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
       pkgs.libtree # recursive ldd
       pkgs.dool # dstat alternative, only on linux
       pkgs.wol # wake on lan
       pkgs.iotop
       pkgs.systemctl-tui
     ]
-    ++ lib.optionals pkgs.stdenv.isDarwin [
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
       pkgs.macpow
     ];
 }
