@@ -372,8 +372,8 @@ let
           };
 
           # Official sampling params: https://huggingface.co/Qwen/Qwen3.6-27B
-          "unsloth/Qwen3.8-27B-NVFP4" = {
-            name = "unsloth/Qwen3.8-27B-NVFP4";
+          "qwen3.8-27b" = {
+            name = "qwen3.8-27b";
             limit = {
               context = 165000;
               output = 15000;
@@ -381,6 +381,7 @@ let
             options = {
               chat_template_kwargs.enable_thinking = true;
               chat_template_kwargs.reasoning_effort = "medium";
+              reasoningEffort = "medium";
               temperature = 1.0;
               top_p = 0.95;
               top_k = 20;
@@ -391,14 +392,20 @@ let
               low = {
                 chat_template_kwargs.enable_thinking = true;
                 chat_template_kwargs.reasoning_effort = "low";
+                reasoningEffort = "low";
+                # thinking_token_budget = 2048;
               };
               medium = {
                 chat_template_kwargs.enable_thinking = true;
                 chat_template_kwargs.reasoning_effort = "medium";
+                reasoningEffort = "medium";
+                # thinking_token_budget = 4096;
               };
               xhigh = {
                 chat_template_kwargs.enable_thinking = true;
                 chat_template_kwargs.reasoning_effort = "xhigh";
+                reasoningEffort = "xhigh";
+                # thinking_token_budget = 8192;
               };
               none = {
                 chat_template_kwargs.enable_thinking = false;
