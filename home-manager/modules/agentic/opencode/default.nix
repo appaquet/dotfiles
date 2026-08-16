@@ -279,7 +279,7 @@ let
         mode = "primary";
         color = "#93c5fd";
         description = "Planning agent that creates project plans, break down tasks, and write to project docs.";
-        prompt = "You are the planner of a project. Your role is to create project plans, break down tasks, and write to project docs. You must never engage in any code writing nor delegate such work, but can delegate exploration/search to sub-agents. You actually don't even have access to running commands (other than jj), you only have access to writing to project documentation.";
+        prompt = "You are the planner of a project. Your role is to create project plans, break down tasks, and write to project docs. You must never engage in any code writing nor delegate such work, but can delegate exploration/search to sub-agents. You can only execute shell commands related to your role (version control, project management).";
         permission = permissions.agent.planner;
       };
 
@@ -301,7 +301,7 @@ let
 
       build-local = {
         color = "#34d399";
-        prompt = "You are in direct build mode, with orchestration off. You should not use sub-agents to do any development work. You can only use the explore agent for code exploration and research. You need to only use local models and prevent any code/data leaks via network.";
+        prompt = "You are in direct build mode, with orchestration off. You should not use sub-agents to do any development work. You can only use the **general purpose** agent, one at the time, for code exploration and research, explore agent is blocked.";
         permission = {
           task = {
             "*" = "deny";
@@ -361,36 +361,61 @@ let
           "unsloth/gemma-4-12B-it-qat-GGUF" = {
             name = "unsloth/gemma-4-12B-it-qat-GGUF";
           };
+          "unsloth/Qwen3.6-35B-A3B-NVFP4" = {
+            name = "unsloth/Qwen3.6-35B-A3B-NVFP4";
+          };
           "RedHatAI/Muse-Glimmer-30B-NVFP4" = {
             name = "RedHatAI/Muse-Glimmer-30B-NVFP4";
           };
-
-          # Official sampling params: https://huggingface.co/Qwen/Qwen3.6-27B
           "unsloth/Qwen3.6-27B-NVFP4" = {
             name = "unsloth/Qwen3.6-27B-NVFP4";
+          };
+
+          # Official sampling params: https://huggingface.co/Qwen/Qwen3.6-27B
+          # Thinking Mode: temperature=1.0, top_p=0.95, top_k=20, min_p=0.0, presence_penalty=0.0, repetition_penalty=1.0
+          # Instruct (or non-thinking) mode: temperature=0.7, top_p=0.80, top_k=20, min_p=0.0, presence_penalty=1.5, repetition_penalty=1.0
+          "unsloth/Qwen3.8-27B-NVFP4" = {
+            name = "unsloth/Qwen3.8-27B-NVFP4";
             limit = {
-              context = 150000;
-              output = 12000;
+              context = 165000;
+              output = 15000;
             };
             options = {
               chat_template_kwargs.enable_thinking = true;
-              temperature = 0.6;
+              chat_template_kwargs.reasoning_effort = "medium";
+              #reasoningEffort = "medium";
+              temperature = 1.0;
               top_p = 0.95;
               top_k = 20;
+              presence_penalty = 0.0;
+              repetition_penalty = 1.0;
             };
             variants = {
-              thinking = {
+              low = {
                 chat_template_kwargs.enable_thinking = true;
-                temperature = 0.6;
-                top_p = 0.95;
-                top_k = 20;
+                chat_template_kwargs.reasoning_effort = "low";
+                #reasoningEffort = "low";
+                # thinking_token_budget = 2048;
               };
-              non-thinking = {
+              medium = {
+                chat_template_kwargs.enable_thinking = true;
+                chat_template_kwargs.reasoning_effort = "medium";
+                #reasoningEffort = "medium";
+                # thinking_token_budget = 4096;
+              };
+              xhigh = {
+                chat_template_kwargs.enable_thinking = true;
+                chat_template_kwargs.reasoning_effort = "xhigh";
+                #reasoningEffort = "xhigh";
+                # thinking_token_budget = 8192;
+              };
+              none = {
                 chat_template_kwargs.enable_thinking = false;
                 temperature = 0.7;
-                top_p = 0.8;
+                top_p = 0.80;
                 top_k = 20;
                 presence_penalty = 1.5;
+                repetition_penalty = 1.0;
               };
             };
           };
