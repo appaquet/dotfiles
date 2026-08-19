@@ -10,10 +10,42 @@ let
   instructions = config.nixantic.instructions.rendered;
 
   permissions = rec {
-    mkAllowCommands = commands: lib.genAttrs commands (_: "allow");
+    mkAllow = names: lib.genAttrs names (_: "allow");
+
+    mkTaskDenyDefault = agents: { "*" = "deny"; } // agents;
+
+    task = rec {
+      exploration = mkAllow [
+        "explore"
+      ];
+
+      development = mkAllow [
+        "junior-dev"
+        "mid-dev"
+        "senior-dev"
+        "staff-dev"
+      ];
+
+      review = mkAllow [
+        "architecture-reviewer"
+        "branch-diff-summarizer"
+        "code-correctness-reviewer"
+        "code-style-reviewer"
+        "requirements-reviewer"
+      ];
+
+      general = mkAllow [
+        "general"
+      ];
+
+      planner = exploration;
+      orchestrator = exploration // development // review;
+      build = exploration // general;
+      buildLocal = general;
+    };
 
     bash = {
-      shellRead = mkAllowCommands [
+      shellRead = mkAllow [
         "notify *"
         "lsof *"
         "readlink *"
@@ -26,12 +58,12 @@ let
         "tail *"
       ];
 
-      projectDocs = mkAllowCommands [
+      projectDocs = mkAllow [
         "agentic-proj-docs *"
       ];
 
       dev = {
-        nix = mkAllowCommands [
+        nix = mkAllow [
           "nix eval *"
           "nix build *"
           "nix flake *"
@@ -41,7 +73,7 @@ let
           "nix repl *"
         ];
 
-        rust = mkAllowCommands [
+        rust = mkAllow [
           "cargo test *"
           "cargo check *"
           "cargo clippy *"
@@ -50,7 +82,7 @@ let
           "cargo tree *"
         ];
 
-        go = mkAllowCommands [
+        go = mkAllow [
           "go build *"
           "go fmt *"
           "go mod *"
@@ -62,7 +94,7 @@ let
           "staticcheck *"
         ];
 
-        node = mkAllowCommands [
+        node = mkAllow [
           "npm run build *"
           "npm run lint *"
           "npm run test *"
@@ -71,7 +103,7 @@ let
       };
 
       vcs = {
-        jjRead = mkAllowCommands [
+        jjRead = mkAllow [
           "jj log *"
           "jj show *"
           "jj diff *"
@@ -90,21 +122,21 @@ let
           "jj-stacked-stats *"
         ];
 
-        jjWrite = mkAllowCommands [
+        jjWrite = mkAllow [
           "jj commit *"
           "jj new *"
           "jj squash *"
           "jj workspace update"
         ];
 
-        ghRead = mkAllowCommands [
+        ghRead = mkAllow [
           "gh pr list *"
           "gh pr view *"
           "gh pr checks *"
           "gh pr diff *"
         ];
 
-        ghWrite = mkAllowCommands [
+        ghWrite = mkAllow [
           "gh pr review *"
         ];
       };
@@ -115,7 +147,7 @@ let
         // bash.vcs.jjRead
         // bash.vcs.jjWrite
         // bash.vcs.ghRead
-        // mkAllowCommands [
+        // mkAllow [
           "agentic-proj-create-adhoc *"
           "ln * proj"
           "ln * proj-adhoc"
@@ -136,7 +168,7 @@ let
         // bash.vcs.ghWrite;
     };
 
-    agent = {
+    agent = rec {
       base = {
         read = "allow";
         grep = "allow";
@@ -165,7 +197,7 @@ let
         websearch = "allow";
         read = "allow";
         grep = "allow";
-        task = "allow";
+        task = mkTaskDenyDefault task.planner;
         glob = "allow";
         todowrite = "allow";
         question = "allow";
@@ -195,6 +227,10 @@ let
           }
           // bash.planner
         );
+      };
+
+      orchestrator = planner // {
+        task = mkTaskDenyDefault task.orchestrator;
       };
 
       developer = {
@@ -267,7 +303,7 @@ let
         color = "#fdba74";
         description = "Project manager agent that manages project documentation, version control and delegates work to sub-agents.";
         prompt = instructions.blocks.opencode."orchestration-prompt".body;
-        permission = permissions.agent.planner;
+        permission = permissions.agent.orchestrator;
       };
 
       # Built-in plan agents doesn't allow any edits even if we pass permission overrides.
@@ -289,13 +325,9 @@ let
 
       build = {
         color = "#f87171";
-        prompt = "You are in direct build mode, with orchestration off. You should not use sub-agents to do any development work. You can only use the explore agent for code exploration and research.";
+        prompt = "You are in direct build mode, with orchestration off. You should not use sub-agents to do any development work. You can use the explore or general agent for code exploration and research.";
         permission = {
-          task = {
-            "*" = "deny";
-            explore = "allow";
-            general = "allow";
-          };
+          task = permissions.mkTaskDenyDefault permissions.task.build;
         };
       };
 
@@ -303,10 +335,7 @@ let
         color = "#34d399";
         prompt = "You are in direct build mode, with orchestration off. You should not use sub-agents to do any development work. You can only use the **general purpose** agent, one at the time, for code exploration and research, explore agent is blocked.";
         permission = {
-          task = {
-            "*" = "deny";
-            general = "allow";
-          };
+          task = permissions.mkTaskDenyDefault permissions.task.buildLocal;
           "chrome*" = "deny";
         };
       };
@@ -361,14 +390,11 @@ let
           "unsloth/gemma-4-12B-it-qat-GGUF" = {
             name = "unsloth/gemma-4-12B-it-qat-GGUF";
           };
-          "unsloth/Qwen3.6-35B-A3B-NVFP4" = {
-            name = "unsloth/Qwen3.6-35B-A3B-NVFP4";
-          };
           "RedHatAI/Muse-Glimmer-30B-NVFP4" = {
             name = "RedHatAI/Muse-Glimmer-30B-NVFP4";
           };
-          "unsloth/Qwen3.6-27B-NVFP4" = {
-            name = "unsloth/Qwen3.6-27B-NVFP4";
+          "ornith-1.5-35b" = {
+            name = "ornith-1.5-35b";
           };
 
           # Official sampling params: https://huggingface.co/Qwen/Qwen3.6-27B
