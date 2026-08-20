@@ -40,7 +40,7 @@ let
 
       planner = exploration;
       orchestrator = exploration // development // review;
-      build = exploration // general;
+      build = exploration // development;
       buildLocal = general;
     };
 
