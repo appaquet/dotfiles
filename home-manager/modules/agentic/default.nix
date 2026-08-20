@@ -1,5 +1,6 @@
 {
   inputs,
+  inputs',
   pkgs,
   ...
 }:
@@ -17,6 +18,7 @@ in
     inputs.harness.homeManagerModules.default
     ./claude
     ./opencode
+    ./pi
     ./tmux-statusline.nix
     ../nono
   ];
