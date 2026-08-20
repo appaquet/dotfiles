@@ -113,7 +113,7 @@
       "~/dotfiles"
     ]
   },
-  "model": "haiku",
+  "model": "sonnet",
   "hooks": {
     "Notification": [
       {
@@ -178,6 +178,16 @@
           {
             "type": "command",
             "command": "ccmon status"
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '~/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10
           }
         ]
       }
