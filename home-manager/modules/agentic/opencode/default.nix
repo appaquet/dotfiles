@@ -552,7 +552,9 @@ in
 
   dotfiles.nono.profiles.opencode = {
     meta.version = "1.0.0";
+
     extends = "coding-agent";
+
     filesystem = {
       read = [ "$HOME/.claude" ];
       allow = [
@@ -564,6 +566,7 @@ in
         "$HOME/.local/state/ccmon" # ccmon plugin writes status there
       ];
     };
+
     network.block = false;
   };
 }

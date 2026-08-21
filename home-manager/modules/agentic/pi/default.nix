@@ -8,6 +8,11 @@
 
 let
   instructions = config.nixantic.instructions.rendered;
+  piPackage = config.programs.pi.coding-agent.finalPackage;
+
+  nono-pi = pkgs.writeShellScriptBin "nono-pi" ''
+    exec maybe --profile pi -- ${piPackage}/bin/pi "$@"
+  '';
 in
 {
   imports = [
@@ -65,5 +70,24 @@ in
         "--experimentalPageIdRouting"
       ];
     };
+  };
+
+  home.packages = [ nono-pi ];
+
+  dotfiles.nono.profiles.pi = {
+    meta.version = "1.0.0";
+
+    extends = "coding-agent";
+
+    filesystem.allow = [
+      "$HOME/.pi"
+      "$HOME/.local/share/pi"
+    ];
+
+    filesystem.read_file = [
+      "$HOME/.config/sops-nix/secrets/pi_exa_api_key"
+    ];
+
+    network.block = false;
   };
 }
