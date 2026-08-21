@@ -11,6 +11,7 @@ let
   piPackage = config.programs.pi.coding-agent.finalPackage;
 
   nono-pi = pkgs.writeShellScriptBin "nono-pi" ''
+    export HERDR_AGENT=pi
     exec maybe --profile pi -- ${piPackage}/bin/pi "$@"
   '';
 in

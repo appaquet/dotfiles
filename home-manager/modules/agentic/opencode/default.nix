@@ -479,6 +479,7 @@ let
 
   nono-opencode = pkgs.writeShellScriptBin "nono-opencode" ''
     export OPENCODE_CONFIG=${yoloOpencodeJson}
+    export HERDR_AGENT=opencode
     exec maybe --profile opencode -- ${opencode}/bin/opencode "$@"
   '';
 
@@ -499,6 +500,7 @@ let
 
   nono-closecode = pkgs.writeShellScriptBin "nono-closecode" ''
     export OPENCODE_CONFIG=${yoloOpencodeJson}
+    export HERDR_AGENT=opencode
     exec maybe --profile opencode -- ${closecode}/bin/closecode "$@"
   '';
 
