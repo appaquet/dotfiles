@@ -119,3 +119,18 @@ vim.keymap.set("v", "<leader>cs", "<cmd>ClaudeCodeSend<cr>", { desc = "Send to C
 vim.keymap.set("n", "<leader>cs", "<cmd>ClaudeCodeTreeAdd<cr>", { desc = "Add file" }) -- , ft = { "NvimTree", "neo-tree", "oil" }
 vim.keymap.set("n", "<leader>ca", "<cmd>ClaudeCodeDiffAccept<cr>", { desc = "Accept diff" })
 vim.keymap.set("n", "<leader>cd", "<cmd>ClaudeCodeDiffDeny<cr>", { desc = "Deny diff" })
+
+-- pi-x-ide
+-- https://github.com/balaenis/pi-x-ide
+local node = vim.fn.exepath("node")
+if node == "" then
+	error("pi-x-ide requires Node.js; 'node' not found in PATH")
+end
+
+local pi_x_ide_sidecar = vim.api.nvim_get_runtime_file("bin/pi-x-ide-nvim-sidecar.cjs", false)[1]
+if not pi_x_ide_sidecar then
+	error("pi-x-ide sidecar not found on runtimepath; tracked CJS sidecar is missing")
+end
+require("pi_x_ide").setup({
+	sidecar_cmd = { node, pi_x_ide_sidecar },
+})

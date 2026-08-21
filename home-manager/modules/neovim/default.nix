@@ -167,6 +167,7 @@ in
             # AI assistants
             codecompanion-nvim
             claudecode-nvim
+            pi-x-ide-nvim
 
             # Debugging
             nvim-dap
@@ -227,7 +228,7 @@ in
           markdown-oxide # markdown lsp
           markdownlint-cli # via nvim-lint
 
-          nodejs # for copilot
+          nodejs_26 # for copilot and pi-x-ide
           typescript-language-server
 
           stylua # lua formatting, `npx` for some MCPs

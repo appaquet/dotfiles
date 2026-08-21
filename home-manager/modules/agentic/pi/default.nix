@@ -1,6 +1,8 @@
 {
   config,
   inputs,
+  inputs',
+  pkgs,
   ...
 }:
 
@@ -16,6 +18,9 @@ in
 
   programs.pi.coding-agent = {
     enable = true;
+    package = inputs'.pi.packages.coding-agent.override {
+      nodejs = pkgs.nodejs_26;
+    };
 
     #models = ./models.json; # This is not used here so that we use a symlinked version
 
@@ -28,10 +33,13 @@ in
         "npm:@tintinweb/pi-tasks@0.7.2"
         "npm:@juicesharp/rpiv-ask-user-question@2.4.0"
         "npm:pi-web-access@0.22.0"
+        "npm:pi-mcp-adapter@2.25.0"
+        "npm:pi-x-ide@1.19.4"
       ];
     };
 
     environment.EXA_API_KEY.file = config.sops.secrets.pi_exa_api_key.path;
+    environment.PI_X_IDE_AUTO_INSTALL.value = "0";
   };
 
   home.file.".pi/agent/AGENTS.md".source = "${instructions.package}/pi/AGENTS.md";
@@ -44,5 +52,18 @@ in
     provider = "exa";
     workflow = "none";
     autoOpenBrowser = false;
+  };
+
+  home.file.".pi/agent/mcp.json".text = builtins.toJSON {
+    scriptMode = false;
+    mcpServers.chrome = {
+      command = "mcp-npx";
+      args = [
+        "-y"
+        "chrome-devtools-mcp@latest"
+        "--browser-url=http://127.0.0.1:9222"
+        "--experimentalPageIdRouting"
+      ];
+    };
   };
 }
