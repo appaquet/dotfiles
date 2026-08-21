@@ -42,6 +42,18 @@ in
         exit 0
       fi
 
+      validatePluginList() {
+        if ! printf '%s' "$currentPlugins" | "$jq" -e \
+          '.result.plugins | type == "array"' > /dev/null; then
+          echo "Herdr returned malformed plugin list JSON; expected an array at .result.plugins." >&2
+          return 1
+        fi
+      }
+
+      if ! validatePluginList; then
+        exit 1
+      fi
+
       managedPluginsEstablished=true
 
       ${lib.concatStringsSep "\n" (
@@ -51,7 +63,7 @@ in
           if ! printf '%s' "$currentPlugins" | "$jq" -e \
             --arg pluginId "${pluginId}" \
             --arg pluginPath "${plugin.path}" \
-            'any(.plugins[]; .plugin_id == $pluginId and .plugin_root == $pluginPath)' > /dev/null; then
+            'any(.result.plugins[]; .plugin_id == $pluginId and .plugin_root == $pluginPath)' > /dev/null; then
             if ! "$herdr" plugin link "${plugin.path}"; then
               echo "Failed to link Herdr plugin ${pluginId}." >&2
               pluginEstablished=false
@@ -89,13 +101,17 @@ in
           exit 0
         fi
 
+        if ! validatePluginList; then
+          exit 1
+        fi
+
         while IFS= read -r pluginId; do
           if ! "$jq" -e -n --arg pluginId "$pluginId" \
             --argjson declaredIds "$declaredIdsJson" \
             '$declaredIds | index($pluginId) != null' > /dev/null; then
             "$herdr" plugin disable "$pluginId"
           fi
-        done < <(printf '%s' "$currentPlugins" | "$jq" -r '.plugins[].plugin_id')
+        done < <(printf '%s' "$currentPlugins" | "$jq" -r '.result.plugins[].plugin_id')
       fi
     '';
   };

@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 let
   worktreeHooks = pkgs.stdenvNoCC.mkDerivation {
     pname = "herdr-worktree-hooks";
@@ -18,6 +18,7 @@ let
 
   worktreeHooksConfig = (pkgs.formats.toml { }).generate "herdr-worktree-hooks.toml" {
     default = {
+      # TODO: Replace by jj workspace sync once stable https://github.com/jj-vcs/jj/pull/9943
       created = [ ''echo "herdr worktree created: $WT_WORKTREE_PATH" >> /tmp/herdr-worktree-hooks.log'' ];
       opened = [ ];
       removed = [ ];
@@ -46,6 +47,17 @@ in
 
       keys = {
         prefix = "ctrl+a";
+
+        command = [
+          {
+            key = "prefix+t";
+            type = "popup";
+            command = lib.getExe pkgs.btop;
+            description = "Open btop system monitor";
+            width = "90%";
+            height = "90%";
+          }
+        ];
       };
 
       theme = {
