@@ -402,7 +402,7 @@ let
           "qwen3.8-27b" = {
             name = "qwen3.8-27b";
             limit = {
-              context = 165000;
+              context = 185000;
               output = 15000;
             };
             options = {

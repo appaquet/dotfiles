@@ -20,7 +20,7 @@
           "name": "qwen3.8-27b (deskapp)",
           "reasoning": true,
           "input": ["text"],
-          "contextWindow": 165000,
+          "contextWindow": 185000,
           "maxTokens": 15000,
           "samplingParams": {
             "temperature": 1.0,
