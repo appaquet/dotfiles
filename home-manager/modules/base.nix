@@ -16,6 +16,7 @@
     ./utils
     ./ssh.nix
     ./ssh-agent.nix
+    ./herdr
   ];
 
   programs.home-manager.enable = true;

@@ -30,7 +30,6 @@ in
   imports = [
     inputs.secrets.homeManager.dev
     inputs.secrets.homeManager.nixAuth
-    ./herdr
   ];
 
   home.packages =

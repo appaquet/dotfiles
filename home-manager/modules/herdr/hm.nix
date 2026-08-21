@@ -60,7 +60,7 @@ in
               --arg pluginId "${pluginId}" \
               --arg pluginPath "${plugin.path}" \
               'any(.result.plugins[]; .plugin_id == $pluginId and .plugin_root == $pluginPath)' > /dev/null; then
-              if ! "$herdr" plugin link "${plugin.path}" > /dev/null; then
+              if ! "$herdr" plugin link "${plugin.path}" > /dev/null 2>&1; then
                 echo "Failed to link Herdr plugin ${pluginId}." >&2
                 pluginEstablished=false
                 managedPluginsEstablished=false
@@ -68,7 +68,7 @@ in
             fi
 
             if [ "$pluginEstablished" = true ]; then
-              if ! "$herdr" plugin enable "${pluginId}" > /dev/null; then
+              if ! "$herdr" plugin enable "${pluginId}" > /dev/null 2>&1; then
                 echo "Failed to enable Herdr plugin ${pluginId}." >&2
                 pluginEstablished=false
                 managedPluginsEstablished=false
@@ -101,7 +101,7 @@ in
               if ! "$jq" -e -n --arg pluginId "$pluginId" \
                 --argjson declaredIds "$declaredIdsJson" \
                 '$declaredIds | index($pluginId) != null' > /dev/null; then
-                "$herdr" plugin disable "$pluginId" > /dev/null
+                "$herdr" plugin disable "$pluginId" > /dev/null 2>&1
               fi
             done < <(printf '%s' "$currentPlugins" | "$jq" -r '.result.plugins[].plugin_id')
           else
