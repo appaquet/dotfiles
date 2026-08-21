@@ -24,6 +24,7 @@ let
         "mid-dev"
         "senior-dev"
         "staff-dev"
+        "principal-dev"
       ];
 
       review = mkAllow [
