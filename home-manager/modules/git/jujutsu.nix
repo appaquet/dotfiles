@@ -156,7 +156,7 @@
       fi
 
       name="$1"
-      jj workspace list --ignore-working-copy -T 'name ++ "\n"' | grep -Fxq "$name"
+      jj workspace list --ignore-working-copy -T 'name ++ "\n"' | grep -Fx -- "$name" > /dev/null
     '')
 
     (writeShellScriptBin "jj-workspace-add" ''
@@ -171,6 +171,7 @@
         echo "Workspace '$name' already exists" >&2
         exit 1
       fi
+
       root=$(jj-workspace-path default)
       mkdir -p "$root/.workspaces"
       jj workspace add --colocate --name "$name" "$root/.workspaces/$name"
@@ -187,11 +188,40 @@
         exit 1
       fi
 
-      root=$(jj-workspace-path default)
-      jj workspace forget "$name"
-      if [ -d "$root/.workspaces/$name" ]; then
-        rm -rf "$root/.workspaces/$name"
+      if [ "$name" = "default" ]; then
+        echo "Refusing to delete the default workspace" >&2
+        exit 1
       fi
+
+      root=$(jj-workspace-path default)
+      if ! ws_root=$(jj-workspace-path "$name"); then
+        echo "Could not resolve the path of workspace '$name'" >&2
+        exit 1
+      fi
+      if [ ! -d "$ws_root" ]; then
+        echo "Workspace '$name' directory not found: $ws_root" >&2
+        echo "Untrack it manually with: jj workspace forget $name" >&2
+        exit 1
+      fi
+
+      jj workspace forget "$name"
+
+      # Best-effort herdr cleanup if opened (the remove also closes the workspace).
+      if wt_json=$(herdr worktree list --json 2>/dev/null); then
+        wsid=$(printf '%s' "$wt_json" \
+          | jq -r --arg path "$ws_root" '[.result.worktrees[] | select(.path == $path) | .open_workspace_id] | .[0] // empty' \
+          2>/dev/null || true)
+        if [ -n "$wsid" ] && [ "$wsid" != "null" ]; then
+          herdr worktree remove --workspace "$wsid" --force >/dev/null 2>&1 || true
+        fi
+      fi
+
+      if [ -d "$ws_root" ]; then
+        rm -rf "$ws_root"
+      fi
+
+      # Prune any stale git worktrees
+      git -C "$root" worktree prune >/dev/null 2>&1 || true
     '')
 
     (writeShellScriptBin "jj-workspace-path" ''
@@ -269,7 +299,14 @@
         exit 1
       fi
 
-      name=$(jj-workspace-select "$@")
+      # Creates if it doesn't exist
+      if [ "$#" -eq 1 ] && [ -n "$1" ] && ! jj-workspace-exists "$1"; then
+        jj-workspace-add "$1" || exit 1
+        name="$1"
+      else
+        name=$(jj-workspace-select "$@")
+      fi
+
       root=$(jj-workspace-path "$name")
 
       window_id=$(
@@ -287,6 +324,32 @@
       else
         window_id=$(tmux new-window -P -F '#{window_id}' -c "$root" -n "$name")
         tmux set-window-option -t "$window_id" @jj_workspace_root "$root" >/dev/null
+      fi
+    '')
+
+    (writeShellScriptBin "jj-workspace-herdr" ''
+      set -euo pipefail
+
+      if ! herdr worktree list --json > /dev/null 2>&1; then
+        echo "jjwh: cannot reach the herdr server; start herdr first" >&2
+        exit 1
+      fi
+
+      # Creates if it doesn't exist
+      if [ "$#" -eq 1 ] && [ -n "$1" ] && ! jj-workspace-exists "$1"; then
+        jj-workspace-add "$1" || exit 1
+        name="$1"
+      else
+        name=$(jj-workspace-select "$@")
+      fi
+
+      default=$(jj-workspace-path default)
+      root=$(jj-workspace-path "$name")
+
+      if ! out=$(herdr worktree open --cwd "$default" --path "$root" --label "$name" --focus 2>&1); then
+        echo "jjwh: failed to open workspace '$name' in herdr:" >&2
+        printf '%s\n' "$out" >&2
+        exit 1
       fi
     '')
   ];
@@ -319,6 +382,10 @@
       jjwt = ''
         jj-workspace-tmux $argv
       '';
+
+      jjwh = ''
+        jj-workspace-herdr $argv
+      '';
     };
 
     shellAbbrs = {
@@ -347,6 +414,7 @@
       };
 
       jjwt = "jj-workspace-tmux";
+      jjwh = "jj-workspace-herdr";
       jjwu = "jj workspace update-stale";
       jjwls = "jj workspace list";
       jjwa = "jj-workspace-add";

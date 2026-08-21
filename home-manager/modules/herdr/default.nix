@@ -72,6 +72,7 @@ in
 
       ui = {
         window_title = "{hostname}: {workspace}";
+        mobile_width_threshold = 100;
       };
     };
 
