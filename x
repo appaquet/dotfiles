@@ -493,7 +493,7 @@ cmd_gc() {
 }
 
 cmd_fmt() {
-  find . -name "*.nix" -exec nixfmt "$@" {} \;
+  git ls-files -z --cached --others --exclude-standard -- '*.nix' | xargs -0 -r nixfmt "$@"
 }
 
 cmd_optimize() {
@@ -562,24 +562,13 @@ cmd_agent_build() {
     exit 1
   fi
 
-  local flake_ref flake_expr
-  flake_ref="$(local_flake_ref)"
-  if [[ "$flake_ref" == "." ]]; then
-    flake_expr="(toString ./.)"
-  else
-    flake_expr="\"${flake_ref}\""
+  local package_name="agent-instructions"
+  if [[ "$vcs_mode" == "git" ]]; then
+    package_name+="-git"
   fi
 
   with_local_flake_note \
-    ${NIX_BUILDER} build --impure --out-link result --expr "
-      let
-        flake = builtins.getFlake ${flake_expr};
-        system = builtins.currentSystem;
-        vcsMode = builtins.getEnv \"NIXANTIC_VCS_MODE\";
-        packageName = if vcsMode == \"git\" then \"builtin-git\" else \"builtin\";
-      in
-        flake.inputs.harness.packages.\${system}.\${packageName}
-    "
+    ${NIX_BUILDER} build --out-link result "$(local_flake_attr_ref "$package_name")"
   echo "result -> $(readlink result)"
 }
 

@@ -21,20 +21,16 @@ To find a missing hash, use build functions instead of trying to eval.
 
 ## Agentic Instructions
 
-`inputs.harness` consumes the external `harness` repo, which owns nixantic — the reusable
-instruction renderer, Home Manager module, and built-in instruction corpus.
+The local `nixantic/` flake owns the generic instruction renderer, Nix modules, framework checks,
+and helper packages. The `home-manager/modules/agentic/` tree owns production instruction sources,
+acceptance checks, and AP runtime glue. Read the relevant tree's `CLAUDE.md` before editing it.
 
-A local `harness/` checkout may or may not be present. It is only kept when needed for local work.
-If a task requires local `harness/` content and the directory is absent, report that rather than
-assuming it exists.
-
-If you are editing the reusable agentic framework or built-in instruction corpus, work in the
-harness repo and read `harness/CLAUDE.md` when that checkout exists. If you are editing AP-specific
-runtime glue in this repo, read `home-manager/modules/agentic/CLAUDE.md`.
-
-If you need to iterate on the harness with local changes, change the flake path in `flake.nix` to
-point to your local `harness/` checkout first. You may need to update with `nix flake update
-harness` for latest changes. Revert flake.nix when done, tell me to commit, push and update.
+Run `nix flake check path:./nixantic --show-trace` for the standalone framework. Run
+`HOST=deskapp ./x home check` and `./x agent build` for the current dotfiles integration; use
+`NIXANTIC_VCS_MODE=git ./x agent build` to check the Git rendering mode. The parent currently uses
+`path:./nixantic`; future extraction should replace that input URL with the published repository
+URL and update the lock file. Choose a license before publishing or extracting nixantic; none is
+selected in this repository.
 
 ## Documentation
 

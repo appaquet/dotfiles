@@ -15,7 +15,8 @@ let
 in
 {
   imports = [
-    inputs.harness.homeManagerModules.default
+    inputs.nixantic.homeManagerModules.default
+    ./nixantic.nix
     ./claude
     ./opencode
     ./pi
@@ -24,10 +25,10 @@ in
   ];
 
   config = {
-    nixantic.sourceRoots = [ ./instructions ];
-
     home.packages = [
       mcp-npx
+      inputs'.nixantic.packages.agentic-proj-docs
+      inputs'.nixantic.packages.agentic-proj-create-adhoc
       pkgs.codex
       pkgs.antigravity-cli
       pkgs.codeburn

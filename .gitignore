@@ -1,7 +1,8 @@
 result
 .vscode
 .DS_Store
-.envrc
+.direnv/
+!.envrc
 .env
 .luarc.json
 .opencode

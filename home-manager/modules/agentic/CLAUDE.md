@@ -1,25 +1,27 @@
 # Agentic Personal Layer
 
-Personal runtime glue built on top of nixantic from `inputs.harness`.
-The harness repo owns the reusable instruction renderer, Home Manager module, and built-in instruction corpus.
-A local `harness/` checkout may or may not be present. If a task requires local `harness/` content and the directory is absent, report that rather than assuming it exists.
+This tree owns all production instruction sources, acceptance checks, and AP runtime glue.
 
 ## Boundary
 
-- The reusable nixantic framework and built-in instruction corpus live in the harness repo, consumed via `inputs.harness`.
-- AP-specific runtime glue lives in this repo under `home-manager/modules/agentic/{claude,opencode,default.nix}`.
+- Production instructions live under `instructions/`.
+- Production acceptance checks live under `checks/`.
+- Runtime glue lives under `claude/`, `opencode/`, `pi/`, and the module files in this tree.
+- Generic renderer, module, check, and helper changes belong in the local `nixantic/` flake.
 
 ## Where To Look
 
-- If you are changing the reusable framework or built-in instruction corpus, work in the harness repo and read `harness/CLAUDE.md` when that checkout exists.
-- If you are changing how AP-specific runtime glue is wired into Home Manager, read `home-manager/modules/agentic/default.nix`.
+- For production instruction or acceptance changes, edit the source `.nix` files in this tree.
+- For generic framework changes, read and edit `nixantic/CLAUDE.md` and the source under `nixantic/`.
+- For Home Manager wiring, read `default.nix` and `nixantic.nix`.
 
 ## Notes
 
-- This tree is personal to this repo. It consumes harness, but it is not the source of truth for the reusable framework or instruction corpus.
-- The personal Home Manager module uses `nixantic.instructions.profile = "builtin"` (the default). If you need to change instructions, edit the harness repo's source `.nix` files rather than generated markdown outputs.
+Generated outputs under `result/` and downstream configuration trees are never edited. Change the
+source `.nix` files and regenerate them with the validation commands.
 
 ## Validation
 
-- `./x agent build`: build the personal rendered instruction package to `./result` for inspection.
-- `./x home check`: evaluate the current host's Home Manager configuration.
+- `./x agent build`: build the rendered production instruction package to `./result`.
+- `NIXANTIC_VCS_MODE=git ./x agent build`: build the Git-mode package.
+- `HOST=deskapp ./x home check`: evaluate the current Home Manager configuration.

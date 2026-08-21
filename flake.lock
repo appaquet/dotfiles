@@ -290,29 +290,6 @@
         "type": "github"
       }
     },
-    "harness": {
-      "inputs": {
-        "flake-parts": [
-          "flake-parts"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1787190801,
-        "narHash": "sha256-y+oq87b1dKqKxcG3TGDvIhmXt+Wq5dt62VMAuFPnLGM=",
-        "owner": "dotcoreinc",
-        "repo": "harness",
-        "rev": "61cd8d3ce284cc4f2c4b1b905a47ee0e7272a347",
-        "type": "github"
-      },
-      "original": {
-        "owner": "dotcoreinc",
-        "repo": "harness",
-        "type": "github"
-      }
-    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -391,6 +368,28 @@
         "repo": "nix-index-database",
         "type": "github"
       }
+    },
+    "nixantic": {
+      "inputs": {
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "home-manager": [
+          "home-manager"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "path": "./nixantic",
+        "type": "path"
+      },
+      "original": {
+        "path": "./nixantic",
+        "type": "path"
+      },
+      "parent": []
     },
     "nixd": {
       "inputs": {
@@ -590,10 +589,10 @@
         "disko": "disko",
         "dotblip": "dotblip",
         "flake-parts": "flake-parts",
-        "harness": "harness",
         "home-manager": "home-manager",
         "llm-agents": "llm-agents",
         "nix-index-database": "nix-index-database",
+        "nixantic": "nixantic",
         "nixd": "nixd",
         "nixos": "nixos",
         "nixos-raspberrypi": "nixos-raspberrypi",
