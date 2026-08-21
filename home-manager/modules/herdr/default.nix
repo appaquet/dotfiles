@@ -66,6 +66,10 @@ in
         light_name = "catppuccin-latte";
         dark_name = "catppuccin";
       };
+
+      ui = {
+        window_title = "{hostname}: {workspace}";
+      };
     };
 
     managedPlugins = managedPlugins;

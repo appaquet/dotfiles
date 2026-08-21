@@ -38,10 +38,11 @@ harness` for latest changes. Revert flake.nix when done, tell me to commit, push
 
 ## Documentation
 
-IMPORTANT: `docs/features/` is a symlink to a separate repo, checked-out at `./secrets`
+IMPORTANT: project files should be stored into `~dotfiles/secrets/docs/features`
 
 This means:
-- Project docs (`proj/` → `docs/features/.../00-*.md`) are NOT in this repo
+
+- Project docs (`proj/` → `~dotfiles/secrets/docs/features/.../00-*.md`) are NOT in this repo
 - Changes to project docs are tracked in the secrets repo, not here
 - `jj status` in dotfiles will NOT show project doc changes
 - Only commit dotfiles changes (commands, skills, etc.) in this repo, don't need to commit secrets, I'll do it.
