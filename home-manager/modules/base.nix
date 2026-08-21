@@ -29,6 +29,13 @@
     enable = true;
     nix-direnv.enable = true;
     enableFishIntegration = true;
+    config = {
+      whitelist = {
+        prefix = [
+          "~/dotfiles"
+        ];
+      };
+    };
   };
 
   # pre-built nix-index (nix-locate <file>, comma (,))
