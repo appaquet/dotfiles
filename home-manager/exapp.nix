@@ -14,7 +14,7 @@
     ./modules/restic/backup.nix
   ];
 
-  dotfiles.neovim.devMode = true;
+  dotfiles.neovim.devMode = false;
 
   restic-backup = {
     enable = true;

@@ -31,7 +31,7 @@
     };
   };
 
-  dotfiles.neovim.devMode = true;
+  dotfiles.neovim.devMode = false;
 
   dotfiles.ssh-agent.defaultSocket = "/Users/appaquet/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock";
 

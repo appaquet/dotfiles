@@ -26,7 +26,7 @@
     };
   };
 
-  dotfiles.neovim.devMode = true;
+  dotfiles.neovim.devMode = false;
 
   home.packages = with pkgs; [
     pkgsCuda.llama-cpp
