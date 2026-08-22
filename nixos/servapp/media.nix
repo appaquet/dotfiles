@@ -1,5 +1,7 @@
 {
+  inputs,
   lib,
+  pkgs,
   ...
 }:
 
@@ -10,6 +12,9 @@
     host = "0.0.0.0";
     mediaLocation = "/data/photos/immich";
     group = "photos";
+
+    # use unstable for 3.0
+    package = inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system}.immich;
   };
 
   # Module defaults to 0077/0700 (owner-only).
