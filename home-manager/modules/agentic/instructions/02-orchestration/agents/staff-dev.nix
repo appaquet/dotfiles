@@ -19,6 +19,7 @@
       model = {
         claude = "opus";
         opencode = "openai/gpt-5.6-sol";
+        pi = "openai/gpt-5.6-sol";
       };
 
       content = ''

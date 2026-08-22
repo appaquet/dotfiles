@@ -35,6 +35,7 @@ in
       defaultModel = "qwen3.8-27b";
       defaultThinkingLevel = "medium";
       packages = [
+        "npm:@tigorhutasuhut/pi-rules@0.5.4"
         "npm:@tintinweb/pi-subagents@0.14.3"
         "npm:@tintinweb/pi-tasks@0.7.2"
         "npm:@juicesharp/rpiv-ask-user-question@2.4.0"
@@ -54,6 +55,12 @@ in
   home.file.".pi/agent/agents".source = "${instructions.package}/pi/agents";
   home.file.".pi/agent/models.json".source = ./models.json;
 
+  # pi-rules skips symlinked entries during rule discovery, so materialize
+  # the rendered rule files as regular files.
+  home.file.".pi/agent/rules".source = pkgs.runCommand "pi-rules-materialized" {
+    preferLocalBuild = true;
+  } "cp -rL ${instructions.package}/pi/rules $out";
+
   home.file.".pi/web-search.json".text = builtins.toJSON {
     provider = "exa";
     workflow = "none";
@@ -62,6 +69,7 @@ in
 
   home.file.".pi/agent/mcp.json".text = builtins.toJSON {
     scriptMode = false;
+    settings.mcpFooterStatus = "off";
     mcpServers.chrome = {
       command = "mcp-npx";
       args = [

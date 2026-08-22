@@ -22,6 +22,10 @@
           model = "openai/gpt-5.6-sol";
           effort = "xhigh";
         };
+        pi = {
+          model = "openai/gpt-5.6-sol";
+          effort = "xhigh";
+        };
       };
 
       content = ''

@@ -69,6 +69,18 @@ let
     "version-control"
   ];
   opencodeRules = builtins.filter (rule: rule != "planning") claudeRules;
+  piRules = [
+    "development"
+    "orchestration"
+    "personal-context"
+    "pi-prompts"
+    "pi-questionnaire"
+    "pi-workflows"
+    "project-doc"
+    "review-comments"
+    "task-management"
+    "version-control"
+  ];
   claudeSkills = [
     "human-writer"
     "mem-writing"
@@ -105,6 +117,7 @@ let
       ++ skillFiles "opencode" opencodeSkills
       ++ filesIn "pi" "agents" agents
       ++ filesIn "pi" "prompts" commonCommandsForMode
+      ++ filesIn "pi" "rules" piRules
       ++ skillFiles "pi" claudeSkills
     );
   mkAcceptanceCheck =
@@ -132,13 +145,13 @@ let
       test -d ${instructions.package}/opencode/commands
       test -d ${instructions.package}/opencode/skills
       test -d ${instructions.package}/pi/prompts
+      test -d ${instructions.package}/pi/rules
       test -d ${instructions.package}/pi/skills
-      test ! -e ${instructions.package}/pi/rules
 
       personal_context='My name is AP, using NixOS+MacOS (home manager+nixos+nix darwin) and fish shell'
       grep -F "$personal_context" ${instructions.package}/claude/rules/personal-context.md
       grep -F "$personal_context" ${instructions.package}/opencode/rules/personal-context.md
-      grep -F "$personal_context" ${instructions.package}/pi/AGENTS.md
+      grep -F "$personal_context" ${instructions.package}/pi/rules/personal-context.md
 
       pi=${instructions.package}/pi
       grep -R -F '`Agent`' "$pi"
@@ -198,7 +211,7 @@ let
       for version_control in \
         ${instructions.package}/claude/rules/version-control.md \
         ${instructions.package}/opencode/rules/version-control.md \
-        "$pi/AGENTS.md"; do
+        "$pi/rules/version-control.md"; do
         grep -F '${expectedVcs}' "$version_control"
         ! grep -F '${unexpectedVcs}' "$version_control"
       done

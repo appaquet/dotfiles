@@ -22,6 +22,10 @@
           model = "openai/gpt-5.6-luna";
           effort = "high";
         };
+        pi = {
+          model = "openai/gpt-5.6-luna";
+          effort = "high";
+        };
       };
 
       content = ''

@@ -12,7 +12,7 @@
         claude.rules.output = "files";
         opencode.rules.output = "files";
         pi = {
-          rules.output = "merge-main";
+          rules.output = "files";
           agents = "tintinweb";
           tasks = "tintinweb";
           questions = "rpiv-ask-user-question";

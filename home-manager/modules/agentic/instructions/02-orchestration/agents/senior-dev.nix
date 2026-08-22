@@ -25,6 +25,10 @@
           model = "openai/gpt-5.6-terra";
           effort = "high";
         };
+        pi = {
+          model = "openai/gpt-5.6-terra";
+          effort = "high";
+        };
       };
 
       content = ''
