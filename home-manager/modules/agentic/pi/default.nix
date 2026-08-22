@@ -34,6 +34,7 @@ in
       defaultProvider = "deskapp";
       defaultModel = "qwen3.8-27b";
       defaultThinkingLevel = "medium";
+      theme = "catppuccin-mocha";
       packages = [
         "npm:@tigorhutasuhut/pi-rules@0.5.4"
         "npm:@tintinweb/pi-subagents@0.14.3"
@@ -42,6 +43,7 @@ in
         "npm:pi-web-access@0.22.0"
         "npm:pi-mcp-adapter@2.25.0"
         "npm:pi-x-ide@1.19.4"
+        "npm:@ifi/oh-pi-themes@0.5.1"
       ];
     };
 
