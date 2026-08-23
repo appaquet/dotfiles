@@ -37,11 +37,11 @@ in
       theme = "catppuccin-mocha";
       packages = [
         "npm:@tigorhutasuhut/pi-rules@0.5.4"
-        "npm:@tintinweb/pi-subagents@0.14.3"
-        "npm:@tintinweb/pi-tasks@0.7.2"
-        "npm:@juicesharp/rpiv-ask-user-question@2.4.0"
-        "npm:pi-web-access@0.22.0"
-        "npm:pi-mcp-adapter@2.25.0"
+        "npm:@tintinweb/pi-subagents@0.17.1"
+        "npm:@tintinweb/pi-tasks@0.8.0"
+        "npm:@juicesharp/rpiv-ask-user-question@2.6.2"
+        "npm:pi-web-access@0.24.0"
+        "npm:pi-mcp-adapter@2.26.1"
         "npm:pi-x-ide@1.19.4"
         "npm:@ifi/oh-pi-themes@0.5.1"
       ];
