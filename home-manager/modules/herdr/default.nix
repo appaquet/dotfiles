@@ -51,6 +51,9 @@ in
       keys = {
         prefix = "ctrl+a";
 
+        next_agent = "ctrl+'";
+        previous_agent = "ctrl+;";
+
         command = [
           {
             key = "prefix+t";
