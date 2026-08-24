@@ -67,7 +67,6 @@ let
     "project-doc"
     "review-comments"
     "task-management"
-    "version-control"
   ];
   opencodeRules = builtins.filter (rule: rule != "planning") claudeRules;
   piRules = [
@@ -80,12 +79,12 @@ let
     "project-doc"
     "review-comments"
     "task-management"
-    "version-control"
   ];
   claudeSkills = [
     "human-writer"
     "mem-writing"
     "proj-writing"
+    "version-control"
   ];
   opencodeSkills = claudeSkills ++ [
     "proj-load"
@@ -209,14 +208,6 @@ let
         grep -F 'agentic-proj-create-adhoc' "$root/commands/ctx-plan.md"
       done
       grep -F 'agentic-proj-create-adhoc' "$pi/prompts/ctx-plan.md"
-
-      for version_control in \
-        ${instructions.package}/claude/rules/version-control.md \
-        ${instructions.package}/opencode/rules/version-control.md \
-        "$pi/rules/version-control.md"; do
-        grep -F '${expectedVcs}' "$version_control"
-        ! grep -F '${unexpectedVcs}' "$version_control"
-      done
 
       touch "$out"
     '';

@@ -1,9 +1,5 @@
 {
-  nixantic.sources.version-control.instructions."version-control-git" = {
-    when = { scope }: scope.settings.versionControl.mode == "git";
-    role = "rule";
-    outputPath = "rules/version-control.md";
-    heading = "Version Control (Git)";
+  nixantic.sources.version-control.blocks."version-control-git" = {
     content = ''
       We are using `git` for version control.
       HARD GATE: inspect repository state before ANY write operation
