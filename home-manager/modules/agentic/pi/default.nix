@@ -38,6 +38,32 @@ in
 
       theme = "catppuccin-mocha";
 
+      powerline = {
+        preset = "default";
+        placement = "below";
+        welcome = false;
+        layout = {
+          left = [
+            "model"
+            "thinking"
+            "custom:scope"
+            "path"
+          ];
+          right = [
+            "subagents"
+            "context_pct"
+          ];
+        };
+        customItems = [
+          {
+            id = "scope";
+            statusKey = "scope";
+            position = "right";
+            color = "warning";
+          }
+        ];
+      };
+
       scopeProvider = {
         local = {
           main = {
@@ -70,7 +96,7 @@ in
         cloud = {
           main = {
             model = "openai-codex/gpt-5.6-sol";
-            thinking = "high";
+            thinking = "medium";
           };
           remap = {
             "scoped/junior" = {
@@ -93,14 +119,15 @@ in
       };
 
       packages = [
-        "npm:@tigorhutasuhut/pi-rules@0.5.4"
-        "npm:@tintinweb/pi-subagents@0.17.1"
-        "npm:@tintinweb/pi-tasks@0.8.0"
-        "npm:@juicesharp/rpiv-ask-user-question@2.6.2"
-        "npm:pi-web-access@0.24.0"
-        "npm:pi-mcp-adapter@2.26.1"
-        "npm:pi-x-ide@1.19.4"
-        "npm:@ifi/oh-pi-themes@0.5.1"
+        "npm:@tigorhutasuhut/pi-rules@0.5.4" # https://github.com/tigorlazuardi/pi-rules
+        "npm:@tintinweb/pi-subagents@0.17.1" # https://github.com/tintinweb/pi-subagents
+        "npm:@tintinweb/pi-tasks@0.8.0" # https://github.com/tintinweb/pi-tasks
+        "npm:@juicesharp/rpiv-ask-user-question@2.6.2" # https://github.com/juicesharp/rpiv-mono
+        "npm:pi-web-access@0.24.0" # https://github.com/nicobailon/pi-web-access
+        "npm:pi-mcp-adapter@2.26.1" # https://github.com/nicobailon/pi-mcp-adapter
+        "npm:pi-x-ide@1.19.4" # https://github.com/balaenis/pi-x-ide
+        "npm:@ifi/oh-pi-themes@0.5.1" # https://github.com/ifiokjr/oh-pi
+        "npm:pi-powerline-footer@0.15.1" # https://github.com/nicobailon/pi-powerline-footer
       ];
     };
 
@@ -119,8 +146,7 @@ in
   home.file.".pi/agent/models.json".source = ./models.json;
   home.file.".pi/agent/extensions/scope-provider.ts".source = ./scope-provider.ts;
 
-  # pi-rules skips symlinked entries during rule discovery, so materialize
-  # the rendered rule files as regular files.
+  # pi-rules skips symlinked entries during rule discovery, so materialize the rendered rule files as regular files.
   home.file.".pi/agent/rules".source = pkgs.runCommand "pi-rules-materialized" {
     preferLocalBuild = true;
   } "cp -rL ${instructions.package}/pi/rules $out";
@@ -129,6 +155,10 @@ in
     provider = "exa";
     workflow = "none";
     autoOpenBrowser = false;
+  };
+
+  home.file.".pi/agent/subagents.json".text = builtins.toJSON {
+    disableDefaultAgents = true;
   };
 
   home.file.".pi/agent/mcp.json".text = builtins.toJSON {
