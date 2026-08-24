@@ -157,6 +157,10 @@ in
     autoOpenBrowser = false;
   };
 
+  home.file.".pi/pi-x-ide/config.json".text = builtins.toJSON {
+    status_display = "statusline";
+  };
+
   home.file.".pi/agent/subagents.json".text = builtins.toJSON {
     disableDefaultAgents = true;
   };
