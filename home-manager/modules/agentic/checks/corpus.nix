@@ -17,6 +17,7 @@ let
     "senior-dev"
     "staff-dev"
   ];
+  piAgents = [ "Explore" ];
   claudeCommands = [
     "ask"
     "continue"
@@ -116,6 +117,7 @@ let
       ++ filesIn "opencode" "rules" opencodeRules
       ++ skillFiles "opencode" opencodeSkills
       ++ filesIn "pi" "agents" agents
+      ++ filesIn "pi" "agents" piAgents
       ++ filesIn "pi" "prompts" commonCommandsForMode
       ++ filesIn "pi" "rules" piRules
       ++ skillFiles "pi" claudeSkills
@@ -178,7 +180,7 @@ let
       grep -F 'Agent Skills under `skills/<name>/SKILL.md`' "$pi/skills/mem-writing/SKILL.md"
       grep -F 'Markdown prompt templates under `prompts/`' "$pi/skills/mem-writing/SKILL.md"
 
-      for agent in ${builtins.concatStringsSep " " agents}; do
+      for agent in ${builtins.concatStringsSep " " (agents ++ piAgents)}; do
         agent_path="$pi/agents/$agent.md"
         test -f "$agent_path"
         grep -F "name: \"$agent\"" "$agent_path"

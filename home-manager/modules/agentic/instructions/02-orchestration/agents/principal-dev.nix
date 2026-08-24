@@ -23,7 +23,7 @@
           effort = "xhigh";
         };
         pi = {
-          model = "openai/gpt-5.6-sol";
+          model = "scoped/principal";
           effort = "xhigh";
         };
       };

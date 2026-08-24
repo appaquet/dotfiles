@@ -26,7 +26,7 @@
           effort = "high";
         };
         pi = {
-          model = "openai/gpt-5.6-terra";
+          model = "scoped/senior";
           effort = "high";
         };
       };

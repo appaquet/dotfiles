@@ -31,10 +31,67 @@ in
     #models = ./models.json; # This is not used here so that we use a symlinked version
 
     settings = {
-      defaultProvider = "deskapp";
-      defaultModel = "qwen3.8-27b";
+      defaultProvider = "scoped";
+      defaultModel = "main";
+
       defaultThinkingLevel = "medium";
+
       theme = "catppuccin-mocha";
+
+      scopeProvider = {
+        local = {
+          main = {
+            model = "deskapp/qwen3.8-27b";
+            thinking = "medium";
+          };
+          remap = {
+            "scoped/junior" = {
+              model = "deskapp/qwen3.8-27b";
+              thinking = "medium";
+            };
+            "scoped/mid" = {
+              model = "deskapp/qwen3.8-27b";
+              thinking = "medium";
+            };
+            "scoped/senior" = {
+              model = "deskapp/qwen3.8-27b";
+              thinking = "medium";
+            };
+            "scoped/staff" = {
+              model = "deskapp/qwen3.8-27b";
+              thinking = "medium";
+            };
+            "scoped/principal" = {
+              model = "deskapp/qwen3.8-27b";
+              thinking = "xhigh";
+            };
+          };
+        };
+        cloud = {
+          main = {
+            model = "openai-codex/gpt-5.6-sol";
+            thinking = "high";
+          };
+          remap = {
+            "scoped/junior" = {
+              model = "openai-codex/gpt-5.6-luna";
+            };
+            "scoped/mid" = {
+              model = "openai-codex/gpt-5.6-luna";
+            };
+            "scoped/senior" = {
+              model = "openai-codex/gpt-5.6-terra";
+            };
+            "scoped/staff" = {
+              model = "openai-codex/gpt-5.6-sol";
+            };
+            "scoped/principal" = {
+              model = "openai-codex/gpt-5.6-sol";
+            };
+          };
+        };
+      };
+
       packages = [
         "npm:@tigorhutasuhut/pi-rules@0.5.4"
         "npm:@tintinweb/pi-subagents@0.17.1"
@@ -47,15 +104,20 @@ in
       ];
     };
 
-    environment.EXA_API_KEY.file = config.sops.secrets.pi_exa_api_key.path;
-    environment.PI_X_IDE_AUTO_INSTALL.value = "0";
+    environment = {
+      EXA_API_KEY.file = config.sops.secrets.pi_exa_api_key.path;
+      PI_X_IDE_AUTO_INSTALL.value = "0";
+      JJ_EDITOR.value = "false"; # fail loud if a jj command tries to open an editor
+    };
   };
 
   home.file.".pi/agent/AGENTS.md".source = "${instructions.package}/pi/AGENTS.md";
   home.file.".pi/agent/prompts".source = "${instructions.package}/pi/prompts";
   home.file.".pi/agent/skills".source = "${instructions.package}/pi/skills";
   home.file.".pi/agent/agents".source = "${instructions.package}/pi/agents";
+
   home.file.".pi/agent/models.json".source = ./models.json;
+  home.file.".pi/agent/extensions/scope-provider.ts".source = ./scope-provider.ts;
 
   # pi-rules skips symlinked entries during rule discovery, so materialize
   # the rendered rule files as regular files.

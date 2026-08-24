@@ -19,7 +19,7 @@
       model = {
         claude = "haiku";
         opencode = "openai/gpt-5.6-luna";
-        pi = "openai/gpt-5.6-luna";
+        pi = "scoped/junior";
       };
 
       content = ''

@@ -470,6 +470,8 @@ let
     export OPENCODE_EXPERIMENTAL_FILEWATCHER=1 # reload direnv after devshell file changes
     export OPENCODE_EXPERIMENTAL_BACKGROUND_SUBAGENTS=1 # non-blocking background sub-agents
     export OPENCODE_ROOT="$(pwd)"
+
+    export JJ_EDITOR=false # fail loud if a jj command tries to open an editor
   '';
 
   opencode = pkgs.writeShellScriptBin "opencode" ''
