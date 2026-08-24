@@ -5,6 +5,47 @@ let
   gpuPci = "10de:2b85";
   audioPci = "10de:22e8";
 
+  killNvidiaUsers = pkgs.writeShellScript "kill-nvidia-users" ''
+    set -euo pipefail
+    shopt -s nullglob
+
+    nvidiaDevices=(/dev/nvidia*)
+    if (( ''${#nvidiaDevices[@]} == 0 )); then
+        exit 0
+    fi
+
+    echo "Killing processes using /dev/nvidia*..."
+    remaining=""
+    errorFile=$(${pkgs.coreutils}/bin/mktemp)
+    trap '${pkgs.coreutils}/bin/rm -f "$errorFile"' EXIT
+
+    for ((attempt = 1; attempt <= 10; attempt++)); do
+        if [ "$attempt" -eq 1 ]; then
+            ${pkgs.psmisc}/bin/fuser -k "''${nvidiaDevices[@]}" 2>/dev/null || true
+        else
+            ${pkgs.psmisc}/bin/fuser -k -9 "''${nvidiaDevices[@]}" 2>/dev/null || true
+        fi
+        ${pkgs.coreutils}/bin/sleep 2
+
+        : > "$errorFile"
+        if ! remaining=$(${pkgs.psmisc}/bin/fuser "''${nvidiaDevices[@]}" 2>"$errorFile"); then
+            if [ -s "$errorFile" ]; then
+                echo "ERROR: failed to check processes using /dev/nvidia*:" 1>&2
+                ${pkgs.coreutils}/bin/cat "$errorFile" 1>&2
+                exit 1
+            fi
+        fi
+        if [ -z "$remaining" ]; then
+            echo "All processes using /dev/nvidia* killed"
+            exit 0
+        fi
+        echo "Attempt $attempt/10: processes still using nvidia devices: $remaining"
+    done
+
+    echo "ERROR: could not kill processes using /dev/nvidia* after 10 attempts: $remaining" 1>&2
+    exit 1
+  '';
+
   # GPU switching script
   # Used in qemu hooks defined in `./virt/default.nix`
   gpuSwitch = pkgs.writeShellScriptBin "gpu-switch" ''
@@ -31,34 +72,6 @@ let
     function write_sysfs() {
         # Subshell contains any fd clobbering; timeout prevents infinite spin
         timeout 30 bash -c 'echo "$1" > "$2"' _ "$1" "$2"
-    }
-
-    function kill_nvidia_users() {
-        # Kill all processes using /dev/nvidia* (e.g. chromium on igpu still opens nvidiactl)
-        if ! ls /dev/nvidia* &>/dev/null; then
-            return 0
-        fi
-
-        echo "Killing processes using /dev/nvidia*..."
-        local remaining
-        for ((attempt = 1; attempt <= 10; attempt++)); do
-            if [ "$attempt" -eq 1 ]; then
-                ${pkgs.psmisc}/bin/fuser -k /dev/nvidia* 2>/dev/null || true
-            else
-                ${pkgs.psmisc}/bin/fuser -k -9 /dev/nvidia* 2>/dev/null || true
-            fi
-            sleep 2
-
-            remaining=$(${pkgs.psmisc}/bin/fuser /dev/nvidia* 2>/dev/null) || true
-            if [ -z "$remaining" ]; then
-                echo "All processes using /dev/nvidia* killed"
-                return 0
-            fi
-            echo "Attempt $attempt/10: processes still using nvidia devices: $remaining"
-        done
-
-        echo "ERROR: could not kill processes using /dev/nvidia* after 10 attempts: $remaining" 1>&2
-        exit 1
     }
 
     function get_bus_driver() {
@@ -100,7 +113,7 @@ let
             sleep 5
         elif [ "$to_driver" == "vfio-pci" ]; then
             echo "Loading vfio drivers..."
-            kill_nvidia_users
+            ${killNvidiaUsers} || exit $?
             rmmod nvidia_drm # modprobe -r doesn't seem to always work... order is important
             rmmod nvidia_uvm
             rmmod nvidia_modeset
@@ -167,7 +180,7 @@ let
         systemctl stop docker.socket
         systemctl stop docker.service
 
-        kill_nvidia_users
+        ${killNvidiaUsers} || exit $?
 
         switch_driver "vfio-pci"
     }
@@ -236,9 +249,9 @@ in
     wantedBy = [ "multi-user.target" ];
   };
 
-  systemd.services.switch-gpu-boot-after-resume = {
-    description = "Switch GPU to NVIDIA on resume";
-    # Keep the no-op oneshot active while sleeping; once sleep.target becomes unneeded after
+  systemd.services.nvidia-sleep-guard = {
+    description = "Block sleep until NVIDIA users exit and restore the GPU on resume";
+    # Keep the cleanup oneshot active while sleeping; once sleep.target becomes unneeded after
     # resume, systemd stops it and runs ExecStop.
     before = [ "sleep.target" ];
     unitConfig = {
@@ -248,11 +261,11 @@ in
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
-      ExecStart = "${pkgs.coreutils}/bin/true";
+      ExecStart = killNvidiaUsers;
       ExecStop = "${pkgs.writeShellScript "switch-gpu-after-resume" ''
         ${gpuSwitch}/bin/gpu-switch nvidia
       ''}";
     };
-    wantedBy = [ "sleep.target" ];
+    requiredBy = [ "sleep.target" ];
   };
 }
