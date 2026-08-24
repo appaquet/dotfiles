@@ -7,7 +7,7 @@
  * preset entry sets `thinking`).
  *
  * Env:
- *  PI_SCOPE            active preset at launch (default "cloud")
+ *  PI_SCOPE            active preset at launch (default "codex")
  *  PI_SCOPE_LOG        path to append debug lines + one JSON line per payload
  *  PI_SCOPE_REWRITE=0  kill switch: disable the model rewrite (pass-through)
  */
@@ -59,7 +59,7 @@ let source;
 // `state`), so a child resolves scoped/<id> against the parent's live preset,
 // not the env default.
 const scopeProcess: { activePreset?: string; upgradedPreset?: string; rewriteDisabled?: boolean } = globalThis as any;
-if (!scopeProcess.activePreset) scopeProcess.activePreset = process.env.PI_SCOPE ?? "cloud";
+if (!scopeProcess.activePreset) scopeProcess.activePreset = process.env.PI_SCOPE ?? "codex";
 
 const state: {
   preset: string;
@@ -67,7 +67,7 @@ const state: {
   targets: Record<string, { provider: string; id: string }>;
   meta: Record<string, { api: string; thinkingFormat?: string; thinkingLevelMap?: Record<string, string | null> }>;
 } = {
-  preset: process.env.PI_SCOPE ?? "cloud",
+  preset: process.env.PI_SCOPE ?? "codex",
   entries: {},
   targets: {},
   meta: {},

@@ -33,7 +33,6 @@ in
     settings = {
       defaultProvider = "scoped";
       defaultModel = "main";
-
       defaultThinkingLevel = "medium";
 
       theme = "catppuccin-mocha";
@@ -93,7 +92,7 @@ in
             };
           };
         };
-        cloud = {
+        codex = {
           main = {
             model = "openai-codex/gpt-5.6-sol";
             thinking = "medium";

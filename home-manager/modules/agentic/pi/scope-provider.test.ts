@@ -102,10 +102,10 @@ mock.module("@earendil-works/pi-coding-agent", () => ({
 beforeEach(() => {
   testDir = mkdtempSync(join(tmpdir(), "scope-provider-test-"));
   agentDir = testDir;
-  process.env.PI_SCOPE = "cloud";
+  process.env.PI_SCOPE = "codex";
   delete process.env.PI_SCOPE_REWRITE;
   delete (globalThis as Record<string, unknown>).__PI_SCOPE_SEQ__;
-  (globalThis as Record<string, unknown>).activePreset = "cloud";
+  (globalThis as Record<string, unknown>).activePreset = "codex";
   (globalThis as Record<string, unknown>).upgradedPreset = undefined;
   (globalThis as Record<string, unknown>).rewriteDisabled = false;
 });
@@ -206,7 +206,7 @@ function target(provider: string, id: string, name: string): Model {
 }
 
 const presets: ScopeConfig = {
-  cloud: { main: { model: "old/old-main" }, remap: {} },
+  codex: { main: { model: "old/old-main" }, remap: {} },
   noauth: { main: { model: "noauth/noauth-main" }, remap: {} },
   unavailable: { main: { model: "missing/missing-main" }, remap: {} },
   local: { main: { model: "next/next-main" }, remap: {} },
@@ -238,13 +238,13 @@ test("a UI selection uses configured order and the transactional switch path", a
   expect(harness.commandDescription).toBe("Select a preset with /scope, or switch directly with /scope <preset>");
   expect(harness.selectCalls).toEqual([{
     title: "Select scope:",
-    options: ["cloud", "noauth", "unavailable", "local"],
+    options: ["codex", "noauth", "unavailable", "local"],
   }]);
   expect(harness.messages).toEqual([
     "scope preset: local\nscope preset: local\n  id         target\n  main       next/next-main (force thinking: high)",
   ]);
   expect(harness.statuses).toEqual([
-    { key: "scope", value: "scope:cloud" },
+    { key: "scope", value: "scope:codex" },
     { key: "scope", value: "scope:local" },
   ]);
   expect(harness.ctx.model).toEqual({ provider: "scoped", id: "main" });
@@ -282,7 +282,7 @@ test("cancelling the UI selector is a complete no-op", async () => {
 
   expect(harness.selectCalls).toEqual([{
     title: "Select scope:",
-    options: ["cloud", "noauth", "unavailable", "local"],
+    options: ["codex", "noauth", "unavailable", "local"],
   }]);
   expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(beforeConfig);
   expect(harness.ctx.model).toEqual(beforeModel);
@@ -302,19 +302,19 @@ test("a selected current preset keeps direct same-preset behavior", async () => 
     apiKeys: { old: "old-key" },
     models: [target("old", "old-main", "Cloud main model")],
   });
-  harness.selection = "cloud";
+  harness.selection = "codex";
   const beforeConfig = structuredClone(harness.registry.getRegisteredProviderConfig("scoped"));
 
   await harness.command("", harness.ctx);
 
   expect(harness.selectCalls).toEqual([{
     title: "Select scope:",
-    options: ["cloud", "noauth", "unavailable", "local"],
+    options: ["codex", "noauth", "unavailable", "local"],
   }]);
   expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(beforeConfig);
-  expect(harness.statuses).toEqual([{ key: "scope", value: "scope:cloud" }]);
+  expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
   expect(harness.messages).toEqual([
-    'already on preset "cloud"\nscope preset: cloud\n  id         target\n  main       old/old-main',
+    'already on preset "codex"\nscope preset: codex\n  id         target\n  main       old/old-main',
   ]);
 });
 
@@ -337,7 +337,7 @@ test("non-UI no-argument scope retains the table fallback", async () => {
   expect(harness.ctx.model).toEqual(beforeModel);
   expect(harness.ctx.thinkingLevel).toBe(beforeThinking);
   expect(harness.messages).toEqual([
-    "scope preset: cloud\n  id         target\n  main       old/old-main",
+    "scope preset: codex\n  id         target\n  main       old/old-main",
   ]);
   expect(harness.statuses).toEqual(beforeStatuses);
   expect(rewrite(harness)).toEqual(beforeRewrite);
@@ -358,15 +358,15 @@ test("a selected failed switch rolls back like a direct argument", async () => {
 
   expect(harness.selectCalls).toEqual([{
     title: "Select scope:",
-    options: ["cloud", "noauth", "unavailable", "local"],
+    options: ["codex", "noauth", "unavailable", "local"],
   }]);
   expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(previous);
   expect(harness.ctx.model).toEqual({ provider: "scoped", id: "main" });
   expect(harness.ctx.thinkingLevel).toBe("medium");
-  expect(harness.statuses).toEqual([{ key: "scope", value: "scope:cloud" }]);
+  expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
   expect(rewrite(harness)).toEqual({ model: "old-main" });
   expect(harness.messages).toEqual([
-    'scope: ERROR — preset "noauth" no credentials resolved for noauth/noauth-main; scoped provider registration was not changed. Check the provider credentials.\nscope: previous preset "cloud" restored; request rewriting remains on its targets.',
+    'scope: ERROR — preset "noauth" no credentials resolved for noauth/noauth-main; scoped provider registration was not changed. Check the provider credentials.\nscope: previous preset "codex" restored; request rewriting remains on its targets.',
   ]);
 });
 
@@ -386,8 +386,8 @@ test("missing target auth preserves the previous scoped provider and rewrite tab
   expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(previous);
   expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe("old-key");
   expect(rewrite(harness)).toEqual({ model: "old-main" });
-  expect(harness.statuses).toEqual([{ key: "scope", value: "scope:cloud" }]);
-  expect(harness.messages.at(-1)).toContain('previous preset "cloud" restored');
+  expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
+  expect(harness.messages.at(-1)).toContain('previous preset "codex" restored');
 });
 
 test("an unresolvable target rolls back to the previous provider and rewrite table", async () => {
@@ -403,8 +403,8 @@ test("an unresolvable target rolls back to the previous provider and rewrite tab
 
   expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe("old-key");
   expect(rewrite(harness)).toEqual({ model: "old-main" });
-  expect(harness.statuses).toEqual([{ key: "scope", value: "scope:cloud" }]);
-  expect(harness.messages.at(-1)).toContain('previous preset "cloud" restored');
+  expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
+  expect(harness.messages.at(-1)).toContain('previous preset "codex" restored');
 });
 
 test("a failed registry rollback disables rewriting and requires a restart", async () => {
@@ -422,7 +422,7 @@ test("a failed registry rollback disables rewriting and requires a restart", asy
 
   expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe("next-key");
   expect(rewrite(harness)).toEqual({ model: "main" });
-  expect(harness.statuses).toEqual([{ key: "scope", value: "scope:cloud" }]);
+  expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
   expect(harness.messages.at(-1)).toContain("restart the session");
 });
 
@@ -440,7 +440,7 @@ test("repeated switches refresh scoped/main and preserve concrete selections", a
 
   await harness.command("local", harness.ctx);
   expect(harness.statuses).toEqual([
-    { key: "scope", value: "scope:cloud" },
+    { key: "scope", value: "scope:codex" },
     { key: "scope", value: "scope:local" },
   ]);
   expect(harness.ctx.model).toEqual({ provider: "scoped", id: "main" });
@@ -449,11 +449,11 @@ test("repeated switches refresh scoped/main and preserve concrete selections", a
   expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe("next-key");
   expect(rewrite(harness)).toEqual({ model: "next-main" });
 
-  await harness.command("cloud", harness.ctx);
+  await harness.command("codex", harness.ctx);
   expect(harness.statuses).toEqual([
-    { key: "scope", value: "scope:cloud" },
+    { key: "scope", value: "scope:codex" },
     { key: "scope", value: "scope:local" },
-    { key: "scope", value: "scope:cloud" },
+    { key: "scope", value: "scope:codex" },
   ]);
   expect(harness.ctx.model).toEqual({ provider: "scoped", id: "main" });
   expect(harness.registry.find("scoped", "main")).toMatchObject({ provider: "scoped", id: "main" });
