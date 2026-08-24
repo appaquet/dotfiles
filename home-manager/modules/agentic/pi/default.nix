@@ -72,11 +72,11 @@ in
           remap = {
             "scoped/junior" = {
               model = "deskapp/qwen3.8-27b";
-              thinking = "medium";
+              thinking = "off";
             };
             "scoped/mid" = {
               model = "deskapp/qwen3.8-27b";
-              thinking = "medium";
+              thinking = "low";
             };
             "scoped/senior" = {
               model = "deskapp/qwen3.8-27b";
@@ -84,7 +84,7 @@ in
             };
             "scoped/staff" = {
               model = "deskapp/qwen3.8-27b";
-              thinking = "medium";
+              thinking = "xhigh";
             };
             "scoped/principal" = {
               model = "deskapp/qwen3.8-27b";
