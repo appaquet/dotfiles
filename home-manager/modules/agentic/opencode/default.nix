@@ -189,6 +189,7 @@ let
           proj-writing = "allow";
           human-writer = "allow";
           customize-opencode = "allow";
+          version-control = "allow";
         };
       };
 
@@ -220,6 +221,7 @@ let
           proj-writing = "allow";
           human-writer = "allow";
           customize-opencode = "allow";
+          version-control = "allow";
         };
 
         bash = (

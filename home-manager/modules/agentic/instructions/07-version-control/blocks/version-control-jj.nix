@@ -1,9 +1,5 @@
 {
-  nixantic.sources.version-control.instructions."version-control-jj" = {
-    when = { scope }: scope.settings.versionControl.mode == "jj";
-    role = "rule";
-    outputPath = "rules/version-control.md";
-    heading = "Version Control (Jujutsu)";
+  nixantic.sources.version-control.blocks."version-control-jj" = {
     content = ''
       We are using Jujutsu (`jj`), in collocated mode with git, which is always detached head state.
 

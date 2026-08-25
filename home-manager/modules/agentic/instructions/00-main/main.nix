@@ -13,6 +13,9 @@
           pi = "CRITICAL: When encountering a referenced instruction or skill file, read it before acting.";
           default = "CRITICAL: When encounter file reference (ex: @rules/general.md), if not already loaded, read it right away.";
         }}
+        CRITICAL: Whenever version control is needed, load and follow ${
+          scope.skills."version-control".reference
+        } before acting.
 
         When talking to me, be brief, clear and direct. Assume I'm on a small mobile screen and can't read pages of text. Talk as if you were talking to a junior. Prefer bullet points lists to prose/dense format. Prefer repeating words instead of using synonyms.
 
