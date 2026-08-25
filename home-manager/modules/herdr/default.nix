@@ -76,6 +76,9 @@ in
       ui = {
         window_title = "{hostname}: {workspace}";
         mobile_width_threshold = 100;
+        toast = {
+          delivery = "terminal"; # OSC 9/777 via attached terminal; works local + herdr --remote
+        };
       };
     };
 
