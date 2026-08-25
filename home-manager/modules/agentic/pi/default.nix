@@ -125,6 +125,7 @@ in
         "npm:pi-web-access@0.24.0" # https://github.com/nicobailon/pi-web-access
         "npm:pi-mcp-adapter@2.26.1" # https://github.com/nicobailon/pi-mcp-adapter
         "npm:pi-x-ide@1.19.4" # https://github.com/balaenis/pi-x-ide
+        "npm:pi-tool-display@0.5.0" # https://github.com/MasuRii/pi-tool-display
         "npm:@ifi/oh-pi-themes@0.5.1" # https://github.com/ifiokjr/oh-pi
         "npm:pi-powerline-footer@0.15.1" # https://github.com/nicobailon/pi-powerline-footer
       ];
