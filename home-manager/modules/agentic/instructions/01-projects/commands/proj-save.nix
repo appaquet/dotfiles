@@ -16,7 +16,7 @@
 
         ## Instructions
 
-        1. Ensure ${scope.skills."proj-writing".reference} loaded.
+        1. Ensure ${scope.skills."project-docs".reference} loaded.
 
         2. 🔳 Note the active project link (`proj` or `proj-adhoc`) from state above. Identify current phase from checkpoint or ask user
 

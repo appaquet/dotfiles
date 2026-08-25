@@ -5,7 +5,6 @@
       role = "rule";
       heading = "Development Instructions";
       content = ''
-
         ## General principles
 
         * Scope discipline: execute ONLY tasks from approved plan

@@ -493,7 +493,11 @@ cmd_gc() {
 }
 
 cmd_fmt() {
-  git ls-files -z --cached --others --exclude-standard -- '*.nix' | xargs -0 -r nixfmt "$@"
+  git ls-files -z --cached --others --exclude-standard -- '*.nix' |
+    while IFS= read -r -d '' path; do
+      [[ -e "$path" ]] && printf '%s\0' "$path"
+    done |
+    xargs -0 -r nixfmt "$@"
 }
 
 cmd_optimize() {

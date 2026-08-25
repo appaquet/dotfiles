@@ -40,8 +40,9 @@
            - Show prioritized list with research findings, formatted as table
            - Should address each comment using the addressing rule of review flow
 
-        6. 🔳 Update project doc
-           - Add fixes to Tasks section with priorities
+        6. 🔳 Update project docs
+           - Add fixes to the Tasks section of the best matching phase document, with priorities
+           - Never add review tasks to the main project document
            - Update as user give further feedback
            
         7. ${scope.blocks."engagement-gate".gate}

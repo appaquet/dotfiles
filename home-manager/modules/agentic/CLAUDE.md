@@ -22,6 +22,8 @@ source `.nix` files and regenerate them with the validation commands.
 
 ## Validation
 
-- `./x agent build`: build the rendered production instruction package to `./result`.
-- `NIXANTIC_VCS_MODE=git ./x agent build`: build the Git-mode package.
+- Do not add production checks that assert AP's production instruction wording or policy content. Keep deterministic code/configuration checks and normal Nixantic framework validation.
+- Build production instruction packages and inspect their generated output directly:
+  - `./x agent build`: build the rendered production instruction package to `./result`.
+  - `NIXANTIC_VCS_MODE=git ./x agent build`: build the Git-mode package.
 - `HOST=deskapp ./x home check`: evaluate the current Home Manager configuration.

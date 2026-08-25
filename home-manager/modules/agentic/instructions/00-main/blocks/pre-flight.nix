@@ -19,7 +19,9 @@
         Before proceeding with any instructions above, you NEED to follow <pre-flight> instructions. 
         * Use task tool (`${scope.harness.tools.taskCreate}`) for each 🔳 step
         * Follow sub-agents workflows
-        * Maintain project docs and stricly follow instructions to maintain their freshness and accuracy
+        * Use & maintain freshness/accuracy of project/phase docs. Use ${
+          scope.skills."project-docs".reference
+        }.
       '';
       injectReferenceIntoCommands = true;
     };

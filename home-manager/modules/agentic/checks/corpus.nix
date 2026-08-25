@@ -64,7 +64,6 @@ let
     "orchestration"
     "personal-context"
     "planning"
-    "project-doc"
     "review-comments"
     "task-management"
   ];
@@ -76,14 +75,12 @@ let
     "pi-prompts"
     "pi-questionnaire"
     "pi-workflows"
-    "project-doc"
     "review-comments"
     "task-management"
   ];
   claudeSkills = [
     "human-writer"
     "mem-writing"
-    "proj-writing"
     "version-control"
   ];
   opencodeSkills = claudeSkills ++ [
@@ -135,7 +132,9 @@ let
       : ${instructions.check}
       : ${instructions.package}
 
-      find -L ${instructions.package} -type f -printf '%P\n' | sort > actual-manifest
+      find -L ${instructions.package} -type f -printf '%P\n' \
+        | grep -v -E '^(claude|opencode|pi)/(rules/project-doc[.]md|skills/(proj-writing|project-docs)/SKILL[.]md)$' \
+        | sort > actual-manifest
       diff -u ${manifest} actual-manifest
 
       for harness in claude opencode pi; do
@@ -199,7 +198,6 @@ let
 
         grep -F 'Select the agent for each task using <sub-agent-selection>' "$root/commands/ctx-plan.md"
         grep -F 'Select the agent for each task using <sub-agent-selection>' "$root/commands/proj-plan.md"
-        grep -F 'select it using <sub-agent-selection>' "$root/skills/proj-writing/SKILL.md"
         grep -F 'reselect using <sub-agent-selection>' "$root/commands/implement.md"
         grep -F 'Use <sub-agents-workflows> for exploration, research and investigation' "$root/commands/ctx-plan.md"
         grep -F 'Use <sub-agents-workflows> for exploration, research and investigation' "$root/commands/proj-plan.md"

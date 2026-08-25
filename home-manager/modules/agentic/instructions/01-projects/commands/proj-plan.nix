@@ -23,7 +23,7 @@
         If ad-hoc project files are listed, stop and report. This command creates committed project files.
 
         ## Instructions
-        1. Ensure ${scope.skills."proj-writing".reference} loaded.
+        1. Ensure ${scope.skills."project-docs".reference} loaded.
 
         2. 🔳 Ensure context loaded, goal clear, task defined
            - ${scope.harness.prose.questions.request} if the goal or task is empty or unclear.
@@ -42,7 +42,7 @@
         }
 
         6. 🔳 Write plan to docs
-           - Use ${scope.skills."proj-writing".reference} and the project and phase doc rules.
+           - Use ${scope.skills."project-docs".reference} for project and phase document rules.
 
         7. ${scope.blocks."engagement-gate".gate}
 

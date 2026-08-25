@@ -44,6 +44,7 @@
       "Bash(gh pr diff:*)",
       "Bash(gh pr review:*)",
       "Bash(agentic-proj-docs:*)",
+      "Bash(agentic-proj-create-adhoc:*)",
       "Bash(nix eval:*)",
       "Bash(nix build:*)",
       "Bash(nix flake:*)",
@@ -106,7 +107,7 @@
       "Skill(proj-load)",
       "Skill(proj-save)",
       "Skill(mem-writing)",
-      "Skill(proj-writing)"
+      "Skill(project-docs)"
     ],
     "deny": [],
     "defaultMode": "auto",

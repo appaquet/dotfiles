@@ -26,6 +26,7 @@
         ## Reviewer Workflow
 
         1. 🔳 Load context
+           - Load project / phase docs using ${scope.skills."project-docs".reference}.
            - If not very clear in prompt, use ${
              scope.commands."proj-load".reference
            } to load project context, branch state, project docs

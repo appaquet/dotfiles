@@ -19,7 +19,9 @@
 
         ## Instructions
 
-        1. 🔳 Read project doc
+        1. Ensure ${scope.skills."project-docs".reference} loaded.
+
+        2. 🔳 Read project doc
            * Use current branch / change state above, don't re-discover
            * If project files found:
              * Read FULLY main project doc context, checkpoint, requirements, progress
@@ -27,11 +29,11 @@
            * If "No project files", maybe uninitialized
              * STOP, inform user about missing context
 
-        2. 🔳 Read current/next phase docs mentioned in checkpoint/next steps
+        3. 🔳 Read current/next phase docs mentioned in checkpoint/next steps
               Mindful of context window: don't read irrelevant old/future docs, but read relevant phase docs fully
               On ambiguity about next steps, ${scope.harness.prose.questions.request} to clarify next focus
 
-        3. 🔳 Synthesize context & summarize current state
+        4. 🔳 Synthesize context & summarize current state
       '';
     };
 }

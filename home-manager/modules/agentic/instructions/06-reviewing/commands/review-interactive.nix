@@ -5,6 +5,10 @@
     content = ''
       Goal: Interactively review feedback/comments, investigate each with sub-agent, and collect into phase documentation.
 
+      Before reading, interpreting, or updating project or phase documents, load ${
+        scope.skills."project-docs".reference
+      }.
+
       ## Instructions
 
       1. 🔳 Create a new phase in project documentation for this review session.

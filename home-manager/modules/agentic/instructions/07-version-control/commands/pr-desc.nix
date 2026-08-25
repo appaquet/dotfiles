@@ -29,13 +29,15 @@
 
         ## Instructions
 
-        1. 🔳 Analyze changes
+        1. Ensure ${scope.skills."project-docs".reference} loaded before reading project documents.
+
+        2. 🔳 Analyze changes
            - Start from the changed-file list above
            - Read per-file diff, one by one
            - If user specified a focus area, prioritize those components
            - Code remain source of truth. You can check project docs, but may have drifted.
 
-        2. 🔳 Generate report in one message, without any following messages:
+        3. 🔳 Generate report in one message, without any following messages:
             - ${
               scope.forHarness {
                 pi = "Load the `${humanWriter}` Agent Skill guidance for tone (no AI filler, no superlatives).";

@@ -32,6 +32,8 @@
 
         ## State
 
+        Before reading or interpreting project or phase docs, load ${scope.skills."project-docs".reference}.
+
         ${scope.blocks."project-files".embed}
         ${scope.blocks."current-branch".embed}
         ${scope.blocks."current-change-files".embed}

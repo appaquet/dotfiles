@@ -15,13 +15,17 @@
 
         # Instructions
 
-        1. 🔳 Verify 10/10 understanding, if not already done
+        1. Ensure ${
+          scope.skills."project-docs".reference
+        } loaded before reading or updating project or phase documents.
+
+        2. 🔳 Verify 10/10 understanding, if not already done
            - Skip if we just planned and understanding is already in context
            - Read ALL requirements in project doc
            - If unclear, ask user to use ${scope.commands."ctx-improve".reference}
            - Clarify if task contradicts or overlaps
 
-        2. 🔳 Load tasks from project/phase docs
+        3. 🔳 Load tasks from project/phase docs
            - For each task, create 1..n `${scope.harness.tools.taskCreate}`
              - Segment for better tracking
            - Create tasks for verification/testing each implementation step.
@@ -30,11 +34,11 @@
              scope.blocks."sub-agent-selection".reference
            }.
 
-        3. Create version control commits for this implementation
+        4. Create version control commits for this implementation
            - Check active changes
            - Commit with proper message or change active commit message
 
-        4. 🔳 Implement tasks, using sub-agents delegation
+        5. 🔳 Implement tasks, using sub-agents delegation
            - You need to follow ${scope.blocks."sub-agents-workflows".reference}
            - Update documentation if existing:
              - Mark phase doc task `[~]` when starting, `[x]` when done
@@ -53,16 +57,16 @@
              scope.blocks."sub-agent-selection".reference
            } when the task needs a different agent
 
-        5. 🔳 Validate via ${scope.blocks."development-completion-checklist".reference}
+        6. 🔳 Validate via ${scope.blocks."development-completion-checklist".reference}
            - State each item aloud, confirm compliance
 
-        6. 🔳 Validate formatting, linting, tests done
+        7. 🔳 Validate formatting, linting, tests done
            - If sub-agents did it, trust them
            - If not, ask them back instead of wasting your context
 
-        7. 🔳 Run ${scope.commands."proj-save".reference} to update project and phase docs
+        8. 🔳 Run ${scope.commands."proj-save".reference} to update project and phase docs
 
-        8. 🔳 If this work is not yet saved, finalize it with the repository version-control workflow. Re-verify repository state first. Changes you don't recognize may be mine.
+        9. 🔳 If this work is not yet saved, finalize it with the repository version-control workflow. Re-verify repository state first. Changes you don't recognize may be mine.
 
         ${scope.blocks."engagement-gate".release}
       '';

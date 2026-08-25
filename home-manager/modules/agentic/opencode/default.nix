@@ -186,7 +186,7 @@ let
           proj-load = "allow";
           proj-save = "allow";
           mem-writing = "allow";
-          proj-writing = "allow";
+          project-docs = "allow";
           human-writer = "allow";
           customize-opencode = "allow";
           version-control = "allow";
@@ -218,7 +218,7 @@ let
           proj-load = "allow";
           proj-save = "allow";
           mem-writing = "allow";
-          proj-writing = "allow";
+          project-docs = "allow";
           human-writer = "allow";
           customize-opencode = "allow";
           version-control = "allow";

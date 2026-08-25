@@ -7,7 +7,7 @@
       effort = "xhigh";
 
       content = ''
-        Goal: validate project doc against the standard structure (per project-doc rules) and fix inconsistencies.
+        Goal: validate project doc against the standard structure and fix inconsistencies.
 
         ## State
 
@@ -15,7 +15,7 @@
 
         ## Instructions
 
-        1. Ensure ${scope.skills."proj-writing".reference} loaded.
+        1. Ensure ${scope.skills."project-docs".reference} loaded.
 
         2. 🔳 Read project & phase docs listed above
 

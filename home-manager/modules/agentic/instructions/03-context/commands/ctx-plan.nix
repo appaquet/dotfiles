@@ -18,7 +18,7 @@
         If committed / non ad-hoc project files are listed, STOP and report. This command only creates ad hoc project files.
 
         ## Instructions
-        1. Ensure ${scope.skills."proj-writing".reference} loaded.
+        1. Ensure ${scope.skills."project-docs".reference} loaded.
 
         2. 🔳 Create the ad hoc folder
            - From the workspace root, run `agentic-proj-create-adhoc` with no arguments.
@@ -35,9 +35,7 @@
         }
 
         6. 🔳 Write plan to docs
-           - Need to use ${
-             scope.skills."proj-writing".reference
-           }, use project & phase docs rules and structure
+           - Using ${scope.skills."project-docs".reference}, use project & phase docs rules and structure
 
         7. ${scope.blocks."engagement-gate".gate}
 
