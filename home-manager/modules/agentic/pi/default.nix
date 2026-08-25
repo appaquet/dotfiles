@@ -123,6 +123,7 @@ in
 
       packages = [
         "npm:@tigorhutasuhut/pi-rules@0.5.4" # https://github.com/tigorlazuardi/pi-rules
+        "npm:@quartermaster-labs/pi-on-demand-context@0.3.1" # https://github.com/Quartermaster-Labs/pi-on-demand-context
         "npm:@tintinweb/pi-subagents@0.17.1" # https://github.com/tintinweb/pi-subagents
         "npm:@tintinweb/pi-tasks@0.8.0" # https://github.com/tintinweb/pi-tasks
         "npm:@juicesharp/rpiv-ask-user-question@2.6.2" # https://github.com/juicesharp/rpiv-mono
