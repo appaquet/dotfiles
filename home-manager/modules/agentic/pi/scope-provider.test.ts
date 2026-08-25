@@ -24,6 +24,7 @@ type ScopePreset = { main: ScopeEntry; remap: Record<string, ScopeEntry> };
 type ScopeConfig = Record<string, ScopePreset>;
 type ScopeCommand = (args: string, ctx: TestContext) => Promise<void>;
 type ScopeHandler = (event: { payload: Record<string, unknown> }) => void;
+type ScopeShortcut = (ctx: TestContext) => Promise<void>;
 type StatusEvent = { key: string; value: string };
 
 type TestContext = {
@@ -80,9 +81,11 @@ class TestRegistry {
 
 type Harness = {
   registry: TestRegistry;
+  factoryConfig?: ProviderConfig;
   ctx: TestContext;
   command: ScopeCommand;
   commandDescription: string;
+  shortcuts: Array<{ key: string; description: string; handler: ScopeShortcut }>;
   beforeRequest: ScopeHandler;
   messages: string[];
   statuses: StatusEvent[];
@@ -129,6 +132,7 @@ async function createHarness(
   const selectCalls: Array<{ title: string; options: string[] }> = [];
   let command: ScopeCommand | undefined;
   let beforeRequest: ScopeHandler | undefined;
+  const shortcuts: Array<{ key: string; description: string; handler: ScopeShortcut }> = [];
   const harness: Harness = {
     registry,
     ctx: {
@@ -151,6 +155,7 @@ async function createHarness(
       throw new Error("scope command was not registered");
     },
     commandDescription: "",
+    shortcuts,
     beforeRequest: () => {
       throw new Error("before_provider_request handler was not registered");
     },
@@ -174,6 +179,9 @@ async function createHarness(
       command = registration.handler;
       harness.commandDescription = registration.description;
     },
+    registerShortcut: (key: string, registration: { description: string; handler: ScopeShortcut }) => {
+      shortcuts.push({ key, ...registration });
+    },
     sendMessage: ({ content }: { content: string }) => messages.push(content),
     setThinkingLevel: (level: string) => {
       harness.ctx.thinkingLevel = level;
@@ -182,6 +190,7 @@ async function createHarness(
 
   const module = await import(`./scope-provider.ts?${crypto.randomUUID()}`);
   module.default(pi);
+  harness.factoryConfig = structuredClone(registry.getRegisteredProviderConfig("scoped"));
   const sessionStart = (harness as Harness & { sessionStart?: (event: unknown, ctx: TestContext) => Promise<void> }).sessionStart;
   if (!sessionStart || !command || !beforeRequest) throw new Error("scope extension did not register its handlers");
   harness.command = command;
@@ -217,11 +226,186 @@ const selectorPresets: ScopeConfig = {
   local: { main: { model: "next/next-main", thinking: "high" }, remap: {} },
 };
 
+const shortcutPresets: ScopeConfig = {
+  codex: { main: { model: "old/old-main", thinking: "medium" }, remap: {} },
+  local: { main: { model: "next/next-main", thinking: "high" }, remap: {} },
+};
+
+const markerPresets: ScopeConfig = {
+  codex: {
+    main: { model: "old/old-main" },
+    remap: {
+      "scoped/junior": { model: "old/old-junior" },
+      "scoped/mid": { model: "old/old-main" },
+    },
+  },
+  local: {
+    main: { model: "next/next-main" },
+    remap: {
+      "scoped/junior": { model: "next/next-junior" },
+      "scoped/mid": { model: "next/next-main" },
+    },
+  },
+};
+
+function markerModels(): Model[] {
+  return [
+    target("old", "old-main", "Cloud main model"),
+    target("old", "old-junior", "Cloud junior model"),
+    target("next", "next-main", "Local main model"),
+    target("next", "next-junior", "Local junior model"),
+  ];
+}
+
+function scopedNames(harness: Harness): Record<string, string> {
+  return Object.fromEntries(
+    (harness.registry.getRegisteredProviderConfig("scoped")?.models ?? []).map((model) => [model.id, model.name]),
+  );
+}
+
 function rewrite(harness: Harness): Record<string, unknown> {
   const payload: Record<string, unknown> = { model: "main" };
   harness.beforeRequest({ payload });
   return payload;
 }
+
+test("registers the fixed scope cycling shortcut", async () => {
+  const harness = await createHarness(shortcutPresets, {
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: [
+      target("old", "old-main", "Cloud main model"),
+      target("next", "next-main", "Local main model"),
+    ],
+  });
+
+  expect(harness.shortcuts).toHaveLength(1);
+  expect(harness.shortcuts[0]).toMatchObject({
+    key: "ctrl+shift+z",
+    description: "Cycle scope preset",
+  });
+});
+
+test("cycles scopes in configured order and wraps around", async () => {
+  const harness = await createHarness(shortcutPresets, {
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: [
+      target("old", "old-main", "Cloud main model"),
+      target("next", "next-main", "Local main model"),
+    ],
+  });
+  const cycle = harness.shortcuts[0].handler;
+
+  await cycle(harness.ctx);
+
+  expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe("next-key");
+  expect(harness.registry.find("scoped", "main")?.name).toBe("Local main model [S]");
+  expect(harness.ctx.model).toEqual({ provider: "scoped", id: "main" });
+  expect(harness.ctx.thinkingLevel).toBe("high");
+  expect((globalThis as Record<string, unknown>).activePreset).toBe("local");
+  expect((globalThis as Record<string, unknown>).upgradedPreset).toBe("local");
+  expect(harness.statuses).toEqual([
+    { key: "scope", value: "scope:codex" },
+    { key: "scope", value: "scope:local" },
+  ]);
+  expect(harness.messages).toEqual([
+    "scope preset: local\nscope preset: local\n  id         target\n  main       next/next-main (force thinking: high)",
+  ]);
+  expect(rewrite(harness)).toEqual({ model: "next-main", reasoning_effort: "high" });
+
+  await cycle(harness.ctx);
+
+  expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe("old-key");
+  expect(harness.registry.find("scoped", "main")?.name).toBe("Cloud main model [S]");
+  expect(harness.ctx.model).toEqual({ provider: "scoped", id: "main" });
+  expect(harness.ctx.thinkingLevel).toBe("medium");
+  expect((globalThis as Record<string, unknown>).activePreset).toBe("codex");
+  expect((globalThis as Record<string, unknown>).upgradedPreset).toBe("codex");
+  expect(harness.statuses).toEqual([
+    { key: "scope", value: "scope:codex" },
+    { key: "scope", value: "scope:local" },
+    { key: "scope", value: "scope:codex" },
+  ]);
+  expect(harness.messages).toEqual([
+    "scope preset: local\nscope preset: local\n  id         target\n  main       next/next-main (force thinking: high)",
+    "scope preset: codex\nscope preset: codex\n  id         target\n  main       old/old-main (force thinking: medium)",
+  ]);
+  expect(rewrite(harness)).toEqual({ model: "old-main", reasoning_effort: "medium" });
+});
+
+test("a failed next scope keeps the existing transaction rollback", async () => {
+  const harness = await createHarness(presets, {
+    apiKeys: { old: "old-key", noauth: undefined },
+    models: [
+      target("old", "old-main", "Cloud main model"),
+      target("noauth", "noauth-main", "Unauthenticated main model"),
+    ],
+  });
+  const cycle = harness.shortcuts[0].handler;
+  const previous = structuredClone(harness.registry.getRegisteredProviderConfig("scoped"));
+
+  await cycle(harness.ctx);
+
+  expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(previous);
+  expect(harness.registry.find("scoped", "main")?.name).toBe("Cloud main model [S]");
+  expect(harness.ctx.model).toEqual({ provider: "scoped", id: "main" });
+  expect(harness.ctx.thinkingLevel).toBe("medium");
+  expect((globalThis as Record<string, unknown>).activePreset).toBe("codex");
+  expect((globalThis as Record<string, unknown>).upgradedPreset).toBe("codex");
+  expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
+  expect(rewrite(harness)).toEqual({ model: "old-main" });
+  expect(harness.messages).toEqual([
+    'scope: ERROR — preset "noauth" no credentials resolved for noauth/noauth-main; scoped provider registration was not changed. Check the provider credentials.\nscope: previous preset "codex" restored; request rewriting remains on its targets.',
+  ]);
+});
+
+test("factory stubs mark only the scoped/main alias", async () => {
+  const harness = await createHarness(markerPresets, {
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: markerModels(),
+  });
+
+  const names = Object.fromEntries(
+    (harness.factoryConfig?.models ?? []).map(({ id, name }) => [id, name]),
+  );
+
+  expect(names).toEqual({
+    main: "scoped/main (preset stub, upgraded at session start) [S]",
+    junior: "scoped/junior (preset stub, upgraded at session start)",
+    mid: "scoped/mid (preset stub, upgraded at session start)",
+    senior: "scoped/senior (preset stub, upgraded at session start)",
+    staff: "scoped/staff (preset stub, upgraded at session start)",
+    principal: "scoped/principal (preset stub, upgraded at session start)",
+  });
+});
+
+test("resolved aliases mark only scoped/main across preset refreshes", async () => {
+  const harness = await createHarness(markerPresets, {
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: markerModels(),
+  });
+
+  expect(scopedNames(harness)).toEqual({
+    main: "Cloud main model [S]",
+    junior: "Cloud junior model",
+    mid: "Cloud main model",
+  });
+
+  await harness.command("local", harness.ctx);
+
+  expect(scopedNames(harness)).toEqual({
+    main: "Local main model [S]",
+    junior: "Local junior model",
+    mid: "Local main model",
+  });
+
+  await harness.command("codex", harness.ctx);
+
+  expect(scopedNames(harness)).toEqual({
+    main: "Cloud main model [S]",
+    junior: "Cloud junior model",
+    mid: "Cloud main model",
+  });
+});
 
 test("a UI selection uses configured order and the transactional switch path", async () => {
   const harness = await createHarness(selectorPresets, {

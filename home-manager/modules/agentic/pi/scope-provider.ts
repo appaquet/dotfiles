@@ -125,7 +125,7 @@ function registerScopeStubs(pi: any): void {
     apiKey: "local",
     models: SCOPE_IDS.map((id) => ({
       id,
-      name: `scoped/${id} (preset stub, upgraded at session start)`,
+      name: scopedModelName(id, `scoped/${id} (preset stub, upgraded at session start)`),
       ...STUB_MODEL,
     })),
   });
@@ -155,7 +155,7 @@ async function registerScope(pi: any, ctx: any): Promise<ScopeRegistration> {
 
     models.push({
       id,
-      name: `${m.name} [S]`,
+      name: scopedModelName(id, m.name),
       api: m.api,
       baseUrl: m.baseUrl,
       reasoning: m.reasoning,
@@ -473,6 +473,23 @@ export default function scopeProvider(pi: any): void {
     pi.sendMessage({ customType: "scoped", content: `scope preset: ${name}\n${scopeTable()}`, display: true });
   };
 
+  const cycleScope = async (ctx: any): Promise<void> => {
+    const names = Object.keys(readScopeConfig());
+    if (names.length === 0) {
+      pi.sendMessage({ customType: "scoped", content: "scope: ERROR — no scope presets are configured; add scopeProvider settings before cycling.", display: true });
+      return;
+    }
+
+    const currentIndex = names.indexOf(state.preset);
+    const next = names[(currentIndex + 1) % names.length];
+    await switchScope(next, ctx);
+  };
+
+  pi.registerShortcut("ctrl+shift+z", {
+    description: "Cycle scope preset",
+    handler: cycleScope,
+  });
+
   pi.registerCommand("scope", {
     description: "Select a preset with /scope, or switch directly with /scope <preset>",
     handler: async (args: string, ctx: any) => {
@@ -493,4 +510,8 @@ export default function scopeProvider(pi: any): void {
       await switchScope(name, ctx);
     },
   });
+}
+
+function scopedModelName(id: string, name: string): string {
+  return id === "main" ? `${name} [S]` : name;
 }
