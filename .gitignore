@@ -17,3 +17,5 @@ __pycache__/
 secrets/
 dotblip/
 harness/
+nixantic/
+nixantic-old/

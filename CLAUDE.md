@@ -21,16 +21,11 @@ To find a missing hash, use build functions instead of trying to eval.
 
 ## Agentic Instructions
 
-The local `nixantic/` flake owns the generic instruction renderer, Nix modules, framework checks,
-and helper packages. The `home-manager/modules/agentic/` tree owns production instruction sources,
-acceptance checks, and AP runtime glue. Read the relevant tree's `CLAUDE.md` before editing it.
-
-Run `nix flake check path:./nixantic --show-trace` for the standalone framework. Run
-`HOST=deskapp ./x home check` and `./x agent build` for the current dotfiles integration; use
-`NIXANTIC_VCS_MODE=git ./x agent build` to check the Git rendering mode. The parent currently uses
-`path:./nixantic`; future extraction should replace that input URL with the published repository
-URL and update the lock file. Choose a license before publishing or extracting nixantic; none is
-selected in this repository.
+AP's personal agentic instructions (CLAUDE/AGENTS files, commands, skills, rules) are rendered by
+`nixantic` from .nix sources under `home-manager/modules/agentic/instructions/`. `nixantic` is a
+separate external repo (`github:appaquet/nixantic`) consumed as a flake input. For where to edit
+what, the nixantic change workflow (clone, `path:` override, no-push), and validation: read
+`home-manager/modules/agentic/CLAUDE.md` before editing.
 
 ## Documentation
 

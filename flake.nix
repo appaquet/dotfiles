@@ -12,7 +12,8 @@
     };
 
     nixantic = {
-      url = "path:./nixantic";
+      url = "github:appaquet/nixantic";
+      # url = "path:/home/appaquet/dotfiles/nixantic";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-parts.follows = "flake-parts";
       inputs.home-manager.follows = "home-manager";

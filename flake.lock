@@ -382,14 +382,18 @@
         ]
       },
       "locked": {
-        "path": "./nixantic",
-        "type": "path"
+        "lastModified": 1787691435,
+        "narHash": "sha256-azDDuo75SvjbOJqDuOxzSZWuQQ8a9dK+mqJM9+Jr1mE=",
+        "owner": "appaquet",
+        "repo": "nixantic",
+        "rev": "86de248b59e6feaa9412db748d9fec1d5dc59ec4",
+        "type": "github"
       },
       "original": {
-        "path": "./nixantic",
-        "type": "path"
-      },
-      "parent": []
+        "owner": "appaquet",
+        "repo": "nixantic",
+        "type": "github"
+      }
     },
     "nixd": {
       "inputs": {

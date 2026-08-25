@@ -4,16 +4,28 @@ This tree owns all production instruction sources, acceptance checks, and AP run
 
 ## Boundary
 
-- Production instructions live under `instructions/`.
+- Production instructions live under `instructions/`: .nix fragments rendered by nixantic into harness artifacts (CLAUDE/AGENTS files, commands, skills, rules).
 - Production acceptance checks live under `checks/`.
 - Runtime glue lives under `claude/`, `opencode/`, `pi/`, and the module files in this tree.
-- Generic renderer, module, check, and helper changes belong in the local `nixantic/` flake.
+- Generic renderer, module, and check changes belong in the external `nixantic` repo (see Nixantic).
 
 ## Where To Look
 
-- For production instruction or acceptance changes, edit the source `.nix` files in this tree.
-- For generic framework changes, read and edit `nixantic/CLAUDE.md` and the source under `nixantic/`.
+- For production instruction or acceptance changes, edit the source .nix files under `instructions/` and `checks/` — never the rendered artifacts (e.g. `~/.claude/commands/`, `~/.config/opencode/prompts/`, rendered CLAUDE/AGENTS files).
+- For generic framework changes, work in a clone of the `nixantic` repo (see Nixantic) and read its `CLAUDE.md` first.
 - For Home Manager wiring, read `default.nix` and `nixantic.nix`.
+
+## Nixantic
+
+`nixantic` (`github:appaquet/nixantic`) is a separate external repo, consumed as a flake input. The dotfiles `flake.nix` has a commented local `path:` override.
+
+To change nixantic:
+1. Clone the repo (e.g. into the gitignored `./nixantic` dir) + jj git colocate and make the changes there, as separate commits in that repo, alongside the dotfiles change.
+   It may already exists, in that case, update to latest.
+2. Switch the dotfiles nixantic input to the `path:` override so dotfiles acts on the unpushed local changes.
+3. Never push to the nixantic repo: when a push is required, tell the user and let the user push. After the push, the user removes the `path:` override and updates the input back to `github:appaquet/nixantic` (`nix flake update nixantic`).
+
+Validate the standalone framework with `nix flake check --show-trace` inside a nixantic clone.
 
 ## Notes
 
