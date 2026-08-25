@@ -27,6 +27,26 @@ To change nixantic:
 
 Validate the standalone framework with `nix flake check --show-trace` inside a nixantic clone.
 
+## Editing Production Instructions
+
+Before editing anything under `instructions/`, load and follow the `mem-writing` skill.
+
+Nixantic sources compose prompt text at build time. They do not define runtime workflow or control flow.
+
+- Framework fields affect rendering; extra block attributes are text fragments until interpolated.
+- Main instructions become persistent context.
+- Commands become complete prompts when invoked.
+- Source position controls text placement, not execution timing.
+- The model sees rendered text, not Nix attributes, block provenance, or AP's external workflow.
+
+Before planning an instruction change:
+
+1. Review the full branch diff.
+2. Render the affected artifacts.
+3. Inspect the complete model-visible context.
+4. Describe the behavioral change without Nix terminology.
+5. Remove every file change that has no model-visible effect.
+
 ## Notes
 
 Generated outputs under `result/` and downstream configuration trees are never edited. Change the

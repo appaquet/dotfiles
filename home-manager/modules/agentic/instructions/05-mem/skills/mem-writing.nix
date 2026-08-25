@@ -53,6 +53,7 @@
           - Instructions should be for steering and routing, no duplication information from code. Code is source of truth, while instructions/docs can easily rot as they aren't compiled/refactored as easily.
           - When steering, prefer mentioning what to do and reason to do so, instead of what not to do. What not to do can help on repeated failures.
           - Instructions must be clear, unambiguous, complete and imperative.
+          - Reason from the instructions delivered to the model, not from their authoring or storage structure.
           - For style, follow the global telegraphic-style rule.
           - When editing instructions: preserve local syntax/style, change only requested wording; no surrounding fluency rewrites.
           - One authoritative location per policy; reference/embed elsewhere. Do reconnaissance first, propose or use reusable blocks.

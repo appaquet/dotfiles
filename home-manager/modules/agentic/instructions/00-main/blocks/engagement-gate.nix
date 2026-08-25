@@ -14,7 +14,7 @@
       inherit signal;
 
       gate = ''
-        **STOP**: Await for `${signal}` from user before proceeding.
+        **STOP**: Await for engagement signal `${signal}` before proceeding. Do not ask the user for this signal or approval through a question tool. The user will engage the gate when ready.
       '';
 
       release = ''
