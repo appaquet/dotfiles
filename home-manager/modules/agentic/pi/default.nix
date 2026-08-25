@@ -51,7 +51,11 @@ in
           right = [
             "subagents"
             "context_pct"
+            "cache_read"
           ];
+        };
+        cache_read = {
+          format = "percent";
         };
         customItems = [
           {
