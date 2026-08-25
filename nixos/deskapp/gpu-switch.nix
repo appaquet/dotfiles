@@ -5,46 +5,557 @@ let
   gpuPci = "10de:2b85";
   audioPci = "10de:22e8";
 
-  killNvidiaUsers = pkgs.writeShellScript "kill-nvidia-users" ''
-    set -euo pipefail
-    shopt -s nullglob
+  # Runs the container stop and holder termination stages required before suspend.
+  prepareNvidiaSuspend = pkgs.writeShellApplication {
+    name = "prepare-nvidia-suspend";
+    text = ''
+      if ${stopNvidiaContainers}/bin/stop-nvidia-containers; then
+        :
+      else
+        status=$?
+        echo "ERROR: failed to stop NVIDIA containers before suspend" 1>&2
+        exit "$status"
+      fi
 
-    nvidiaDevices=(/dev/nvidia*)
-    if (( ''${#nvidiaDevices[@]} == 0 )); then
-        exit 0
-    fi
+      if ${killNvidiaHolders}/bin/kill-nvidia-holders; then
+        :
+      else
+        status=$?
+        echo "ERROR: failed to kill NVIDIA device holders before suspend" 1>&2
+        exit "$status"
+      fi
+    '';
+  };
 
-    echo "Killing processes using /dev/nvidia*..."
-    remaining=""
-    errorFile=$(${pkgs.coreutils}/bin/mktemp)
-    trap '${pkgs.coreutils}/bin/rm -f "$errorFile"' EXIT
+  # Finds and terminates NVIDIA device holders across mount namespaces, then requires
+  # repeated scans to prove that no process has reopened a device.
+  killNvidiaHolders = pkgs.writeShellApplication {
+    name = "kill-nvidia-holders";
 
-    for ((attempt = 1; attempt <= 10; attempt++)); do
-        if [ "$attempt" -eq 1 ]; then
-            ${pkgs.psmisc}/bin/fuser -k "''${nvidiaDevices[@]}" 2>/dev/null || true
-        else
-            ${pkgs.psmisc}/bin/fuser -k -9 "''${nvidiaDevices[@]}" 2>/dev/null || true
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.findutils
+      pkgs.gnused
+      config.virtualisation.docker.package
+    ];
+
+    text = ''
+      deviceRoot=/dev
+      sysfsRoot=/sys
+      procRoot=/proc
+      dryRun=false
+      sleepCommand=${pkgs.coreutils}/bin/sleep
+      dockerCommand=${config.virtualisation.docker.package}/bin/docker
+      nvidiaDevices=()
+      nvidiaDeviceRdevs=()
+      holderPids=()
+      holderDevices=()
+      holderRdevs=()
+      holderCgroups=()
+      containerFile=""
+
+      # Build matching path and rdev arrays for NVIDIA character and DRM render devices.
+      refreshNvidiaDevices() {
+        local -a devices=()
+        local device drmDevice vendorFile statOutput major minor
+
+        nvidiaDevices=()
+        nvidiaDeviceRdevs=()
+
+        if [ -d "$deviceRoot" ]; then
+          mapfile -t devices < <(find "$deviceRoot" -xdev -type c -path "$deviceRoot/nvidia*" -print | sort -u)
         fi
-        ${pkgs.coreutils}/bin/sleep 2
 
-        : > "$errorFile"
-        if ! remaining=$(${pkgs.psmisc}/bin/fuser "''${nvidiaDevices[@]}" 2>"$errorFile"); then
-            if [ -s "$errorFile" ]; then
-                echo "ERROR: failed to check processes using /dev/nvidia*:" 1>&2
-                ${pkgs.coreutils}/bin/cat "$errorFile" 1>&2
-                exit 1
+        if [ -d "$deviceRoot/dri" ]; then
+          while IFS= read -r device; do
+            drmDevice=$(basename "$device")
+            vendorFile="$sysfsRoot/class/drm/$drmDevice/device/vendor"
+            if [ -r "$vendorFile" ] && [ "$(cat "$vendorFile")" = "0x10de" ]; then
+              devices+=("$device")
             fi
+          done < <(find "$deviceRoot/dri" -maxdepth 1 -type c -print)
         fi
-        if [ -z "$remaining" ]; then
-            echo "All processes using /dev/nvidia* killed"
-            exit 0
-        fi
-        echo "Attempt $attempt/10: processes still using nvidia devices: $remaining"
-    done
 
-    echo "ERROR: could not kill processes using /dev/nvidia* after 10 attempts: $remaining" 1>&2
-    exit 1
-  '';
+        if (( ''${#devices[@]} > 0 )); then
+          mapfile -t nvidiaDevices < <(printf '%s\n' "''${devices[@]}" | sort -u)
+        fi
+        for device in "''${nvidiaDevices[@]}"; do
+          # %t/%T are the hex major:minor of device files, blank otherwise
+          statOutput=$(stat -L -c '%t %T' "$device" 2>/dev/null) || statOutput=""
+          read -r major minor <<< "$statOutput"
+          if [[ "$major" =~ ^[0-9a-f]+$ && "$minor" =~ ^[0-9a-f]+$ ]]; then
+            nvidiaDeviceRdevs+=("$major $minor")
+          fi
+        done
+      }
+
+      loadContainerNames() {
+        containerFile=$(mktemp)
+        # Best-effort: the container name is only used for log attribution
+        "$dockerCommand" ps --no-trunc --format '{{.ID}} {{.Names}}' > "$containerFile" 2>/dev/null || : > "$containerFile"
+      }
+
+      containerNameForPid() {
+        # Maps a PID to its docker container name when its cgroup is a docker scope
+        local pid=$1 cgroup scope id line
+
+        [ -r "$procRoot/$pid/cgroup" ] || return 0
+        cgroup=$(tr '\n' ';' < "$procRoot/$pid/cgroup")
+        [[ "$cgroup" =~ (docker-[0-9a-f]+)\.scope ]] || return 0
+        scope="''${BASH_REMATCH[1]}"
+        id="''${scope#docker-}"
+        while IFS= read -r line; do
+          # the scope carries the short (12-char) id; docker ps lists the full one
+          [[ "$line" = "''${id}"* ]] && { printf '%s' "''${line#* }"; return 0; }
+        done < "$containerFile"
+        # Docker unavailable: fall back to the raw scope id
+        printf '%s' "$id"
+      }
+
+      scanNvidiaHolders() {
+        # Matches holder PIDs by device major:minor (rdev), so holders in other
+        # mount namespaces whose nodes have different inodes are still found.
+        # Returns 0 = holders found, 1 = no holders, >=2 = error.
+        local errorFile statError index device pid pidNum fd target targetStat
+        local major minor rdevLabel matchDevice cgroup
+
+        refreshNvidiaDevices
+
+        holderPids=()
+        holderDevices=()
+        holderRdevs=()
+        holderCgroups=()
+
+        if (( ''${#nvidiaDevices[@]} == 0 )); then
+          echo "No NVIDIA device nodes found under $deviceRoot"
+          return 1
+        fi
+
+        errorFile=$(mktemp)
+        statError=0
+
+        # Container device nodes can have different inodes than their host nodes, so
+        # inspect every process fd instead of relying on inode-based fuser/lsof matching.
+        for pid in "$procRoot"/[0-9]*; do
+          pidNum="''${pid##*/}"
+          [ -d "$procRoot/$pidNum/fd" ] || continue
+          for fd in "$procRoot/$pidNum/fd"/*; do
+            [ -L "$fd" ] || continue
+            target=$(readlink "$fd" 2>/dev/null) || continue
+            # Only device paths can correspond to the NVIDIA nodes collected above.
+            [[ "$target" = /dev/* ]] || continue
+
+            matchDevice=""
+            rdevLabel=""
+            # Character-device major:minor is shared across mount namespaces even when
+            # each namespace has a different device-node inode.
+            if targetStat=$(stat -L -c '%t %T' "$target" 2>"$errorFile"); then
+              read -r major minor <<< "$targetStat"
+              if [[ "$major" =~ ^[0-9a-f]+$ && "$minor" =~ ^[0-9a-f]+$ ]]; then
+                rdevLabel="$major $minor"
+                for index in "''${!nvidiaDeviceRdevs[@]}"; do
+                  if [ "''${nvidiaDeviceRdevs[$index]}" = "$rdevLabel" ]; then
+                    matchDevice="''${nvidiaDevices[$index]}"
+                    break
+                  fi
+                done
+              fi
+            else
+              statError=1
+              # stat can fail on nodes of vanished mounts; fall back to path matching
+              if [[ "$target" = /dev/nvidia* ]]; then
+                matchDevice="$target"
+              else
+                for device in "''${nvidiaDevices[@]}"; do
+                  if [ "$device" = "$target" ]; then
+                    matchDevice="$device"
+                    break
+                  fi
+                done
+              fi
+            fi
+            [ -n "$matchDevice" ] || continue
+
+            # Keep holder details in parallel arrays so each index describes one PID.
+            holderPids+=("$pidNum")
+            holderDevices+=("$matchDevice")
+            holderRdevs+=("$rdevLabel")
+            cgroup="unavailable"
+            [ -r "$procRoot/$pidNum/cgroup" ] && cgroup=$(tr '\n' ';' < "$procRoot/$pidNum/cgroup")
+            holderCgroups+=("$cgroup")
+            break
+          done
+        done
+
+        if (( statError > 0 )); then
+          sort -u "$errorFile" | head -3 >&2
+          rm -f "$errorFile"
+          if (( ''${#holderPids[@]} == 0 )); then
+            echo "ERROR: could not stat device paths while scanning for NVIDIA holders on: ''${nvidiaDevices[*]}" 1>&2
+            return 2
+          fi
+        else
+          rm -f "$errorFile"
+        fi
+
+        if (( ''${#holderPids[@]} > 0 )); then
+          return 0
+        fi
+
+        return 1
+      }
+
+      logNvidiaHolders() {
+        local index pid device state container
+
+        for index in "''${!holderPids[@]}"; do
+          pid="''${holderPids[$index]}"
+          device="''${holderDevices[$index]}"
+          state="unknown"
+          if [ -r "$procRoot/$pid/stat" ]; then
+            state=$(sed -E 's/^.*\) ([[:alnum:]]).*$/\1/' "$procRoot/$pid/stat")
+          fi
+          container=$(containerNameForPid "$pid")
+          if [ -n "$container" ]; then
+            echo "NVIDIA device holder: PID $pid device=$device rdev=''${holderRdevs[$index]} state=$state container=$container cgroup=''${holderCgroups[$index]}"
+          else
+            echo "NVIDIA device holder: PID $pid device=$device rdev=''${holderRdevs[$index]} state=$state cgroup=''${holderCgroups[$index]}"
+          fi
+        done
+      }
+
+      signalNvidiaHolders() {
+        local signal=$1 pid
+
+        for pid in "''${holderPids[@]}"; do
+          # Processes exiting between scan and signal are not an error; the re-scan verifies
+          kill "-$signal" "$pid" 2>/dev/null || true
+        done
+      }
+
+      # A single empty scan can race a process reopening the GPU, so require a
+      # continuous two-second interval with no holders before reporting success.
+      verifyStableZeroUsers() {
+        local status
+
+        if scanNvidiaHolders; then
+          echo "NVIDIA users reappeared while verifying holder termination on: ''${nvidiaDevices[*]}" 1>&2
+          logNvidiaHolders 1>&2
+          return 1
+        else
+          status=$?
+          if (( status > 1 )); then
+            return "$status"
+          fi
+        fi
+
+        for _ in {1..4}; do
+          "$sleepCommand" 0.5
+          if scanNvidiaHolders; then
+            echo "NVIDIA users appeared during the two-second stable-zero interval on: ''${nvidiaDevices[*]}" 1>&2
+            logNvidiaHolders 1>&2
+            return 1
+          else
+            status=$?
+            if (( status > 1 )); then
+              return "$status"
+            fi
+          fi
+        done
+
+        echo "NVIDIA devices have had no users for two seconds"
+        return 0
+      }
+
+      # Apply a graceful TERM → bounded wait → KILL ladder, then verify stable zero.
+      # Dry-run performs the same discovery but reports holders without signalling them.
+      killNvidiaHolders() {
+        local status attempt
+
+        loadContainerNames
+
+        if scanNvidiaHolders; then
+          logNvidiaHolders
+          if $dryRun; then
+            echo "Dry run: ''${#holderPids[@]} NVIDIA device holder(s) found, no signals sent"
+            return 3
+          fi
+          echo "Sending SIGTERM to NVIDIA device holders on: ''${nvidiaDevices[*]}"
+        else
+          status=$?
+          if (( status > 1 )); then
+            return "$status"
+          fi
+          verifyStableZeroUsers
+          return
+        fi
+
+        signalNvidiaHolders TERM
+
+        for attempt in {1..5}; do
+          echo "Waiting for NVIDIA users to exit ($attempt/5)"
+          "$sleepCommand" 1
+          if scanNvidiaHolders; then
+            continue
+          else
+            status=$?
+            if (( status > 1 )); then
+              return "$status"
+            fi
+          fi
+          verifyStableZeroUsers
+          return
+        done
+
+        echo "Sending SIGKILL to remaining NVIDIA device holders on: ''${nvidiaDevices[*]}"
+        logNvidiaHolders
+        signalNvidiaHolders KILL
+
+        # Reaped asynchronously under load; give dying processes a moment so the
+        # first verify scan does not mistake them for surviving holders
+        "$sleepCommand" 1
+
+        if verifyStableZeroUsers; then
+          return 0
+        else
+          status=$?
+          echo "ERROR: could not kill all NVIDIA device holders on: ''${nvidiaDevices[*]}" 1>&2
+          if scanNvidiaHolders; then
+            logNvidiaHolders 1>&2
+          else
+            status=$?
+            if (( status > 1 )); then
+              return "$status"
+            fi
+          fi
+          return "$status"
+        fi
+      }
+
+      for arg in "$@"; do
+        case $arg in
+          --dry-run)
+            dryRun=true
+            ;;
+          *)
+            echo "ERROR: unknown argument: $arg" 1>&2
+            exit 2
+            ;;
+        esac
+      done
+
+      killNvidiaHolders
+    '';
+  };
+
+  # Stops Docker workloads configured for NVIDIA access in two rounds. Any uncertain
+  # result is nonzero so the suspend orchestrator aborts sleep.
+  stopNvidiaContainers = pkgs.writeShellApplication {
+    name = "stop-nvidia-containers";
+    runtimeInputs = [
+      pkgs.coreutils
+      config.virtualisation.docker.package
+      pkgs.gnugrep
+      pkgs.jq
+    ];
+    text = ''
+      dockerCommand=${config.virtualisation.docker.package}/bin/docker
+      selectedContainers=()
+      selectedNames=()
+
+      # Docker can expose NVIDIA through CDI, runtime configuration, environment,
+      # devices, binds, or mounts; inspect every running container for all forms.
+      # Returns 0 when selected, 1 when none remain, and 2 on discovery errors.
+      discoverNvidiaContainers() {
+        local -a runningContainers=()
+        local runningFile inspectFile selectedFile recheckFile id name status
+
+        runningFile=$(mktemp)
+        if ! "$dockerCommand" ps --quiet > "$runningFile"; then
+          echo "ERROR: Docker failed to list running containers" 1>&2
+          rm -f "$runningFile"
+          return 2
+        fi
+        mapfile -t runningContainers < "$runningFile"
+        rm -f "$runningFile"
+        selectedContainers=()
+        selectedNames=()
+        if (( ''${#runningContainers[@]} == 0 )); then
+          return 1
+        fi
+
+        # Collect selected id/name pairs in a file so jq output stays outside shell state.
+        selectedFile=$(mktemp)
+        for id in "''${runningContainers[@]}"; do
+          # Inspect containers individually because one can exit while the scan is running.
+          inspectFile=$(mktemp)
+          if "$dockerCommand" inspect "$id" > "$inspectFile"; then
+            if ! jq -r '
+              # Direct NVIDIA device paths used by devices, binds, and mounts.
+              def nvidiaPath:
+                type == "string" and test("^/dev/nvidia");
+              # Empty, none, and void explicitly disable NVIDIA visibility.
+              def visibleNvidia:
+                if type == "string" and startswith("NVIDIA_VISIBLE_DEVICES=") then
+                  (ltrimstr("NVIDIA_VISIBLE_DEVICES=") | ascii_downcase) as $value |
+                  $value != "" and $value != "none" and $value != "void"
+                else
+                  false
+                end;
+              # DeviceRequests covers the NVIDIA runtime, CDI ids, and GPU capabilities.
+              def nvidiaRequest:
+                ((.Driver // "") | ascii_downcase) == "nvidia" or
+                ((.DeviceIDs // []) | any(.[]?; type == "string" and test("^nvidia\\.com/gpu(=|$)"))) or
+                ((.Capabilities // []) | flatten | any(. == "gpu"));
+              # Explicit Docker device mappings can name either side of the mapping.
+              def directNvidiaDevice:
+                ((.PathOnHost // "") | nvidiaPath) or
+                ((.PathInContainer // "") | nvidiaPath);
+              .[] |
+              # Select when any supported Docker GPU exposure mechanism is present.
+              select(
+                ((.HostConfig.DeviceRequests // []) | any(.[]?; nvidiaRequest)) or
+                ((.HostConfig.Runtime // "") | ascii_downcase) == "nvidia" or
+                ((.Config.Env // []) | any(.[]?; visibleNvidia)) or
+                ((.HostConfig.Devices // []) | any(.[]?; directNvidiaDevice)) or
+                ((.HostConfig.Binds // []) | any(.[]?; nvidiaPath)) or
+                ((.Mounts // []) | any(.[]?; ((.Source // "") | nvidiaPath) or ((.Destination // "") | nvidiaPath)))
+              ) |
+              [.Id, .Name] | @tsv
+            ' "$inspectFile" >> "$selectedFile"; then
+              echo "ERROR: could not select NVIDIA container from Docker inspection: $id" 1>&2
+              rm -f "$inspectFile" "$selectedFile"
+              return 2
+            fi
+            rm -f "$inspectFile"
+            continue
+          else
+            status=$?
+          fi
+
+          # Inspect can race a normal container exit; re-check whether it still runs
+          # before treating the failure as an unsafe Docker discovery error.
+          rm -f "$inspectFile"
+          if (( status != 1 )); then
+            echo "ERROR: Docker inspect failed for running container $id" 1>&2
+            rm -f "$selectedFile"
+            return 2
+          fi
+
+          recheckFile=$(mktemp)
+          if ! "$dockerCommand" ps --quiet > "$recheckFile"; then
+            echo "ERROR: Docker failed to recheck running containers after inspect failure for $id" 1>&2
+            rm -f "$recheckFile" "$selectedFile"
+            return 2
+          fi
+          if grep -Fxq "$id" "$recheckFile"; then
+            echo "ERROR: Docker inspect failed for running container $id" 1>&2
+            rm -f "$recheckFile" "$selectedFile"
+            return 2
+          fi
+          echo "NVIDIA container $id disappeared before inspection"
+          rm -f "$recheckFile"
+        done
+
+        while IFS=$'\t' read -r id name; do
+          [ -n "$id" ] || continue
+          selectedContainers+=("$id")
+          selectedNames+=("$name")
+        done < "$selectedFile"
+        rm -f "$selectedFile"
+
+        if (( ''${#selectedContainers[@]} == 0 )); then
+          return 1
+        fi
+      }
+
+      # Stop selected containers concurrently so one 30-second timeout bounds the round.
+      stopSelectedContainers() {
+        local -a waitPids=()
+        local -a outputFiles=()
+        local index id name status
+
+        for index in "''${!selectedContainers[@]}"; do
+          id="''${selectedContainers[$index]}"
+          name="''${selectedNames[$index]}"
+          echo "Selected NVIDIA container $id ($name)"
+          outputFiles+=("$(mktemp)")
+          "$dockerCommand" stop --time 30 "$id" > "''${outputFiles[$index]}" 2>&1 &
+          waitPids+=("$!")
+        done
+
+        for index in "''${!waitPids[@]}"; do
+          id="''${selectedContainers[$index]}"
+          name="''${selectedNames[$index]}"
+          if wait "''${waitPids[$index]}"; then
+            echo "Docker stop completed for $id ($name)"
+          else
+            status=$?
+            echo "Docker stop exited $status for $id ($name):" 1>&2
+            cat "''${outputFiles[$index]}" 1>&2
+          fi
+          rm -f "''${outputFiles[$index]}"
+        done
+      }
+
+      # Re-discovery, rather than docker-stop exit codes, decides whether stopping succeeded.
+      failForRunningNvidiaContainers() {
+        local index status
+
+        if discoverNvidiaContainers; then
+          echo "ERROR: NVIDIA containers remain running after Docker stop:" 1>&2
+          for index in "''${!selectedContainers[@]}"; do
+            echo "  ''${selectedContainers[$index]} (''${selectedNames[$index]}) is still running" 1>&2
+          done
+          return 1
+        else
+          status=$?
+          case $status in
+            1) return 0 ;;
+            *) return 2 ;;
+          esac
+        fi
+      }
+
+      # A second discovery/stop round catches containers that start or change while
+      # the first round is waiting. Survivors after both rounds abort suspend.
+      stopNvidiaContainers() {
+        local round status
+
+        for round in 1 2; do
+          echo "Scanning Docker for NVIDIA containers (pass $round/2)"
+          if discoverNvidiaContainers; then
+            stopSelectedContainers
+          else
+            status=$?
+            if (( status > 1 )); then
+              return "$status"
+            fi
+          fi
+
+          if failForRunningNvidiaContainers; then
+            return 0
+          else
+            status=$?
+            if (( status > 1 )); then
+              return "$status"
+            fi
+          fi
+        done
+
+        # NVIDIA containers survived two stop rounds
+        return 1
+      }
+
+      if stopNvidiaContainers; then
+        :
+      else
+        status=$?
+        echo "ERROR: stopping NVIDIA containers failed" 1>&2
+        exit "$status"
+      fi
+    '';
+  };
 
   # GPU switching script
   # Used in qemu hooks defined in `./virt/default.nix`
@@ -113,7 +624,8 @@ let
             sleep 5
         elif [ "$to_driver" == "vfio-pci" ]; then
             echo "Loading vfio drivers..."
-            ${killNvidiaUsers} || exit $?
+            # Re-check after PCI removal before unloading the NVIDIA modules.
+            ${killNvidiaHolders}/bin/kill-nvidia-holders || exit $?
             rmmod nvidia_drm # modprobe -r doesn't seem to always work... order is important
             rmmod nvidia_uvm
             rmmod nvidia_modeset
@@ -180,7 +692,8 @@ let
         systemctl stop docker.socket
         systemctl stop docker.service
 
-        ${killNvidiaUsers} || exit $?
+        # Release every device holder before switch_driver starts PCI unbinding.
+        ${killNvidiaHolders}/bin/kill-nvidia-holders || exit $?
 
         switch_driver "vfio-pci"
     }
@@ -217,8 +730,14 @@ in
     # https://forums.developer.nvidia.com/t/unbinding-isolating-a-card-is-difficult-post-470/223134
     modesetting.enable = false;
 
-    powerManagement.enable = false;
-    powerManagement.finegrained = false;
+    # Explicit suspend/resume services quiesce CUDA/UVM state and preserve VRAM.
+    # Disable kernel notifiers to select the explicit /proc/driver/nvidia/suspend path.
+    powerManagement = {
+      enable = true;
+      kernelSuspendNotifier = false;
+      # Runtime D3 is unrelated to suspend-state preservation.
+      finegrained = false;
+    };
 
     open = true;
 
@@ -233,7 +752,10 @@ in
   environment.systemPackages = with pkgs; [
     nvtopPackages.nvidia
     gpuSwitch
+    killNvidiaHolders
   ];
+
+  system.build.nvidia-suspend-prepare = prepareNvidiaSuspend;
 
   systemd.services.switch-gpu-boot = {
     description = "Switch GPU to NVIDIA on boot";
@@ -251,17 +773,27 @@ in
 
   systemd.services.nvidia-sleep-guard = {
     description = "Block sleep until NVIDIA users exit and restore the GPU on resume";
-    # Keep the cleanup oneshot active while sleeping; once sleep.target becomes unneeded after
-    # resume, systemd stops it and runs ExecStop.
-    before = [ "sleep.target" ];
+
+    # Keep the preparation oneshot active while sleeping; once sleep.target becomes unneeded
+    # after resume, systemd stops it and runs ExecStop.
+    # Container stopping and holder termination finish before NVIDIA snapshots driver state.
+    before = [
+      "nvidia-suspend.service"
+      "sleep.target"
+    ];
+
     unitConfig = {
       DefaultDependencies = false;
       StopWhenUnneeded = true;
     };
+
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
-      ExecStart = killNvidiaUsers;
+      # Two 30s container-stop rounds plus holder termination can take ~80s; give
+      # the scripts headroom so their own checks decide failure, not systemd.
+      TimeoutStartSec = "120s";
+      ExecStart = "${prepareNvidiaSuspend}/bin/prepare-nvidia-suspend";
       ExecStop = "${pkgs.writeShellScript "switch-gpu-after-resume" ''
         ${gpuSwitch}/bin/gpu-switch nvidia
       ''}";
