@@ -32,6 +32,17 @@
     };
   };
 
+  dotfiles.nono.profiles.machine.filesystem.allow = [
+    "$HOME/exomind"
+  ];
+  programs.direnv.config = {
+    whitelist = {
+      prefix = [
+        "/Users/appaquet/exomind"
+      ];
+    };
+  };
+
   home.username = "appaquet";
   home.homeDirectory = "/Users/appaquet";
   home.stateVersion = "25.11";
