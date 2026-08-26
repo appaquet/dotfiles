@@ -150,6 +150,10 @@ in
 
   home.file.".pi/agent/models.json".source = ./models.json;
   home.file.".pi/agent/extensions/scope-provider.ts".source = ./scope-provider.ts;
+  home.file.".pi/agent/extensions/herdr-agent-state.ts" = {
+    source = ./herdr-agent-state.ts;
+    force = true;
+  };
   home.file.".pi/agent/extensions/rpiv-herdr-bridge.ts".source = ./rpiv-herdr-bridge.ts;
 
   # pi-rules skips symlinked entries during rule discovery, so materialize the rendered rule files as regular files.
