@@ -17,6 +17,9 @@
         - Allow imperfection. Occasional informal phrasing beats relentless polish
         - Say it once. If one sentence covers it, don't spread across three with filler transitions
         - Describe things proportionally. Most things are ordinary, reserve strong language for what earns it
+        - Prefer direct, literal wording, short sentences, and conventional rhythm
+        - Minimize metaphor, long sentences, unusual rhythm, ornamental phrasing, and stylistic display
+        - Put precision first when standard domain terms or necessary complexity make the meaning clearer
 
         ## Banned Words
 

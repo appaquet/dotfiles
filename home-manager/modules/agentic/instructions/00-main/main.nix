@@ -9,15 +9,18 @@
       content = ''
         ## Main instructions
 
+        My name is AP. I use NixOS and macOS. I manage them with Home Manager, NixOS, and nix-darwin, and use fish shell.
+
+        When talking to me, be brief, clear and direct. Assume I'm on a small mobile screen and can't read pages of text. Talk as if you were talking to a junior. Prefer bullet points lists to prose/dense format. Prefer repeating words instead of using synonyms. Avoid mannered prose. Prefer plain, direct, literal wording and short, conventional sentences. Keep precise technical terms or necessary complexity when clearer.
+
         ${scope.forHarness {
           pi = "CRITICAL: When encountering a referenced instruction or skill file, read it before acting.";
           default = "CRITICAL: When encounter file reference (ex: @rules/general.md), if not already loaded, read it right away.";
         }}
-        CRITICAL: Whenever version control is needed, load and follow ${
+
+        Whenever version control is needed, load and follow ${
           scope.skills."version-control".reference
         } before acting.
-
-        When talking to me, be brief, clear and direct. Assume I'm on a small mobile screen and can't read pages of text. Talk as if you were talking to a junior. Prefer bullet points lists to prose/dense format. Prefer repeating words instead of using synonyms.
 
         Main agents ${scope.harness.prose.questions.request}. Sub-agents follow their agent instructions or return questions and decisions to the parent. Never ask directly in responses. Include enough context.
 

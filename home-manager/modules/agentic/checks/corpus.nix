@@ -62,7 +62,6 @@ let
   claudeRules = [
     "development"
     "orchestration"
-    "personal-context"
     "planning"
     "review-comments"
     "task-management"
@@ -71,7 +70,6 @@ let
   piRules = [
     "development"
     "orchestration"
-    "personal-context"
     "pi-prompts"
     "pi-questionnaire"
     "pi-workflows"
@@ -151,11 +149,6 @@ let
       test -d ${instructions.package}/pi/prompts
       test -d ${instructions.package}/pi/rules
       test -d ${instructions.package}/pi/skills
-
-      personal_context='My name is AP, using NixOS+MacOS (home manager+nixos+nix darwin) and fish shell'
-      grep -F "$personal_context" ${instructions.package}/claude/rules/personal-context.md
-      grep -F "$personal_context" ${instructions.package}/opencode/rules/personal-context.md
-      grep -F "$personal_context" ${instructions.package}/pi/rules/personal-context.md
 
       pi=${instructions.package}/pi
       grep -R -F '`Agent`' "$pi"
