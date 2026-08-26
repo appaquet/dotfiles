@@ -18,6 +18,7 @@ in
 {
   imports = [
     inputs.pi.homeManagerModules.default
+    ./models.nix
   ];
 
   sops.secrets.pi_exa_api_key.sopsFile = config.sops.secretsFiles.common;
@@ -28,13 +29,7 @@ in
       nodejs = pkgs.nodejs_26;
     };
 
-    #models = ./models.json; # This is not used here so that we use a symlinked version
-
     settings = {
-      defaultProvider = "scoped";
-      defaultModel = "main";
-      defaultThinkingLevel = "medium";
-
       theme = "catppuccin-mocha";
 
       powerline = {
@@ -67,60 +62,6 @@ in
         ];
       };
 
-      scopeProvider = {
-        local = {
-          main = {
-            model = "deskapp/qwen3.8-27b";
-            thinking = "medium";
-          };
-          remap = {
-            "scoped/junior" = {
-              model = "deskapp/qwen3.8-27b";
-              thinking = "off";
-            };
-            "scoped/mid" = {
-              model = "deskapp/qwen3.8-27b";
-              thinking = "low";
-            };
-            "scoped/senior" = {
-              model = "deskapp/qwen3.8-27b";
-              thinking = "medium";
-            };
-            "scoped/staff" = {
-              model = "deskapp/qwen3.8-27b";
-              thinking = "xhigh";
-            };
-            "scoped/principal" = {
-              model = "deskapp/qwen3.8-27b";
-              thinking = "xhigh";
-            };
-          };
-        };
-        codex = {
-          main = {
-            model = "openai-codex/gpt-5.6-sol";
-            thinking = "medium";
-          };
-          remap = {
-            "scoped/junior" = {
-              model = "openai-codex/gpt-5.6-luna";
-            };
-            "scoped/mid" = {
-              model = "openai-codex/gpt-5.6-luna";
-            };
-            "scoped/senior" = {
-              model = "openai-codex/gpt-5.6-terra";
-            };
-            "scoped/staff" = {
-              model = "openai-codex/gpt-5.6-sol";
-            };
-            "scoped/principal" = {
-              model = "openai-codex/gpt-5.6-sol";
-            };
-          };
-        };
-      };
-
       packages = [
         "npm:@tigorhutasuhut/pi-rules@0.5.4" # https://github.com/tigorlazuardi/pi-rules
         "npm:@quartermaster-labs/pi-on-demand-context@0.3.1" # https://github.com/Quartermaster-Labs/pi-on-demand-context
@@ -148,7 +89,6 @@ in
   home.file.".pi/agent/skills".source = "${instructions.package}/pi/skills";
   home.file.".pi/agent/agents".source = "${instructions.package}/pi/agents";
 
-  home.file.".pi/agent/models.json".source = ./models.json;
   home.file.".pi/agent/extensions/scope-provider.ts".source = ./scope-provider.ts;
   home.file.".pi/agent/extensions/herdr-agent-state.ts" = {
     source = ./herdr-agent-state.ts;
@@ -195,6 +135,10 @@ in
     meta.version = "1.0.0";
 
     extends = "coding-agent";
+
+    # pi-x-ide does a sig 0 on ide processes, which is blocked unfortunately...
+    # i'd rather have that leak than have the ide not work
+    security.signal_mode = "allow_all";
 
     filesystem.allow = [
       "$HOME/.pi"
