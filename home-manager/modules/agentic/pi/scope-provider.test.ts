@@ -3,7 +3,21 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-type ProviderConfig = { apiKey?: string; models?: Model[]; [key: string]: unknown };
+type ProviderConfig = {
+  apiKey?: string;
+  models?: Model[];
+  [key: string]: unknown;
+};
+type RequestAuth =
+  | {
+      ok: true;
+      apiKey?: string;
+      headers?: Record<string, string>;
+      baseUrl?: string;
+      env?: Record<string, string>;
+    }
+  | { ok: false; error: string };
+type SummaryHandler = (event: any, ctx: TestContext) => Promise<any>;
 type Model = {
   provider: string;
   id: string;
@@ -12,7 +26,12 @@ type Model = {
   baseUrl: string;
   reasoning: boolean;
   input: string[];
-  cost: { input: number; output: number; cacheRead: number; cacheWrite: number };
+  cost: {
+    input: number;
+    output: number;
+    cacheRead: number;
+    cacheWrite: number;
+  };
   contextWindow: number;
   maxTokens: number;
   samplingParams?: Record<string, number>;
@@ -31,6 +50,7 @@ type TestContext = {
   model: { provider: string; id: string };
   thinkingLevel: string;
   hasUI: boolean;
+  cwd: string;
   modelRegistry: TestRegistry;
   ui: {
     setStatus: (key: string, value: string) => void;
@@ -41,14 +61,25 @@ type TestContext = {
 class TestRegistry {
   readonly configs = new Map<string, ProviderConfig>();
   readonly models = new Map<string, Model>();
-  readonly apiKeys = new Map<string, string | undefined>();
+  readonly apiKeys = new Map<
+    string,
+    string | undefined | (() => Promise<string | undefined>)
+  >();
+  readonly requestAuth = new Map<string, () => Promise<RequestAuth>>();
 
   find(provider: string, id: string): Model | undefined {
     return this.models.get(`${provider}/${id}`);
   }
 
   async getApiKeyForProvider(provider: string): Promise<string | undefined> {
-    return this.apiKeys.get(provider);
+    const resolve = this.apiKeys.get(provider);
+    return typeof resolve === "function" ? resolve() : resolve;
+  }
+
+  async getApiKeyAndHeaders(model: Model): Promise<RequestAuth> {
+    const resolve = this.requestAuth.get(`${model.provider}/${model.id}`);
+    if (!resolve) return { ok: true, apiKey: `${model.provider}-summary-key` };
+    return resolve();
   }
 
   getRegisteredProviderConfig(provider: string): ProviderConfig | undefined {
@@ -71,7 +102,8 @@ class TestRegistry {
   }
 
   unregisterProvider(provider: string): void {
-    if (provider !== "scoped") throw new Error(`unexpected provider ${provider}`);
+    if (provider !== "scoped")
+      throw new Error(`unexpected provider ${provider}`);
     this.configs.delete(provider);
     for (const key of [...this.models.keys()]) {
       if (key.startsWith(`${provider}/`)) this.models.delete(key);
@@ -85,21 +117,53 @@ type Harness = {
   ctx: TestContext;
   command: ScopeCommand;
   commandDescription: string;
-  shortcuts: Array<{ key: string; description: string; handler: ScopeShortcut }>;
+  shortcuts: Array<{
+    key: string;
+    description: string;
+    handler: ScopeShortcut;
+  }>;
   beforeRequest: ScopeHandler;
+  summaryHandlers: Record<string, SummaryHandler[]>;
   messages: string[];
   statuses: StatusEvent[];
   selectCalls: Array<{ title: string; options: string[] }>;
   selection?: string;
+  sendMessageFailure?: Error;
   setStatusFailure?: Error;
   restoreFailure: boolean;
 };
 
 let agentDir = "";
 let testDir = "";
+let compactCalls: any[] = [];
+let treeCalls: any[] = [];
+let compactResult: any;
+let treeResult: any;
+let compactFailure: Error | undefined;
+let treeFailure: Error | undefined;
+let retrySettings = { enabled: true, maxRetries: 3, baseDelayMs: 2000 };
 
 mock.module("@earendil-works/pi-coding-agent", () => ({
   getAgentDir: () => agentDir,
+  SettingsManager: {
+    create: () => ({
+      getRetrySettings: () => ({ ...retrySettings }),
+      getBranchSummarySettings: () => ({
+        reserveTokens: 4321,
+        skipPrompt: false,
+      }),
+    }),
+  },
+  compact: async (...args: any[]) => {
+    compactCalls.push(args);
+    if (compactFailure) throw compactFailure;
+    return compactResult;
+  },
+  generateBranchSummary: async (...args: any[]) => {
+    treeCalls.push(args);
+    if (treeFailure) throw treeFailure;
+    return treeResult;
+  },
 }));
 
 beforeEach(() => {
@@ -111,6 +175,39 @@ beforeEach(() => {
   (globalThis as Record<string, unknown>).activePreset = "codex";
   (globalThis as Record<string, unknown>).upgradedPreset = undefined;
   (globalThis as Record<string, unknown>).rewriteDisabled = false;
+  compactCalls = [];
+  treeCalls = [];
+  compactResult = {
+    summary: "compacted summary",
+    firstKeptEntryId: "kept-1",
+    tokensBefore: 9876,
+    estimatedTokensAfter: 1234,
+    usage: {
+      input: 10,
+      output: 20,
+      cacheRead: 3,
+      cacheWrite: 4,
+      totalTokens: 37,
+      cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 },
+    },
+    details: { readFiles: ["read.ts"], modifiedFiles: ["changed.ts"] },
+  };
+  treeResult = {
+    summary: "branch summary",
+    usage: {
+      input: 7,
+      output: 8,
+      cacheRead: 1,
+      cacheWrite: 2,
+      totalTokens: 18,
+      cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 },
+    },
+    readFiles: ["branch-read.ts"],
+    modifiedFiles: ["branch-write.ts"],
+  };
+  compactFailure = undefined;
+  treeFailure = undefined;
+  retrySettings = { enabled: true, maxRetries: 3, baseDelayMs: 2000 };
 });
 
 afterEach(() => {
@@ -119,26 +216,50 @@ afterEach(() => {
 
 async function createHarness(
   config: ScopeConfig,
-  options: { apiKeys?: Record<string, string | undefined>; models?: Model[] } = {},
+  options: {
+    apiKeys?: Record<
+      string,
+      string | undefined | (() => Promise<string | undefined>)
+    >;
+    models?: Model[];
+    requestAuth?: Record<string, RequestAuth | (() => Promise<RequestAuth>)>;
+  } = {},
 ): Promise<Harness> {
-  writeFileSync(join(testDir, "settings.json"), JSON.stringify({ scopeProvider: config }));
+  writeFileSync(
+    join(testDir, "settings.json"),
+    JSON.stringify({ scopeProvider: config }),
+  );
 
   const registry = new TestRegistry();
-  for (const model of options.models ?? []) registry.models.set(`${model.provider}/${model.id}`, model);
-  for (const [provider, apiKey] of Object.entries(options.apiKeys ?? {})) registry.apiKeys.set(provider, apiKey);
+  for (const model of options.models ?? [])
+    registry.models.set(`${model.provider}/${model.id}`, model);
+  for (const [provider, apiKey] of Object.entries(options.apiKeys ?? {}))
+    registry.apiKeys.set(provider, apiKey);
+  for (const [key, auth] of Object.entries(options.requestAuth ?? {})) {
+    registry.requestAuth.set(
+      key,
+      typeof auth === "function" ? auth : async () => auth,
+    );
+  }
 
   const messages: string[] = [];
   const statuses: StatusEvent[] = [];
   const selectCalls: Array<{ title: string; options: string[] }> = [];
   let command: ScopeCommand | undefined;
   let beforeRequest: ScopeHandler | undefined;
-  const shortcuts: Array<{ key: string; description: string; handler: ScopeShortcut }> = [];
+  const shortcuts: Array<{
+    key: string;
+    description: string;
+    handler: ScopeShortcut;
+  }> = [];
+  const summaryHandlers: Record<string, SummaryHandler[]> = {};
   const harness: Harness = {
     registry,
     ctx: {
       model: { provider: "scoped", id: "main" },
       thinkingLevel: "medium",
       hasUI: true,
+      cwd: testDir,
       modelRegistry: registry,
       ui: {
         select: async (title, options) => {
@@ -159,6 +280,7 @@ async function createHarness(
     beforeRequest: () => {
       throw new Error("before_provider_request handler was not registered");
     },
+    summaryHandlers,
     messages,
     statuses,
     selectCalls,
@@ -166,23 +288,55 @@ async function createHarness(
   };
   const pi = {
     registerProvider: (provider: string, registration: ProviderConfig) => {
-      if (provider !== "scoped") throw new Error(`unexpected provider ${provider}`);
-      if (harness.restoreFailure && registration.apiKey === "old-key") throw new Error("restore unavailable");
+      if (provider !== "scoped")
+        throw new Error(`unexpected provider ${provider}`);
+      if (harness.restoreFailure && registration.apiKey === "old-key")
+        throw new Error("restore unavailable");
       registry.setScoped(registration);
     },
-    unregisterProvider: (provider: string) => registry.unregisterProvider(provider),
-    on: (event: string, handler: ScopeHandler | ((event: unknown, ctx: TestContext) => Promise<void>)) => {
-      if (event === "before_provider_request") beforeRequest = handler as ScopeHandler;
-      if (event === "session_start") (harness as Harness & { sessionStart?: (event: unknown, ctx: TestContext) => Promise<void> }).sessionStart = handler as (event: unknown, ctx: TestContext) => Promise<void>;
+    unregisterProvider: (provider: string) =>
+      registry.unregisterProvider(provider),
+    on: (
+      event: string,
+      handler:
+        | ScopeHandler
+        | ((event: unknown, ctx: TestContext) => Promise<void>),
+    ) => {
+      if (event === "before_provider_request")
+        beforeRequest = handler as ScopeHandler;
+      if (event === "session_start")
+        (
+          harness as Harness & {
+            sessionStart?: (event: unknown, ctx: TestContext) => Promise<void>;
+          }
+        ).sessionStart = handler as (
+          event: unknown,
+          ctx: TestContext,
+        ) => Promise<void>;
+      if (
+        event === "session_before_compact" ||
+        event === "session_before_tree"
+      ) {
+        (summaryHandlers[event] ??= []).push(handler as SummaryHandler);
+      }
     },
-    registerCommand: (_name: string, registration: { description: string; handler: ScopeCommand }) => {
+    registerCommand: (
+      _name: string,
+      registration: { description: string; handler: ScopeCommand },
+    ) => {
       command = registration.handler;
       harness.commandDescription = registration.description;
     },
-    registerShortcut: (key: string, registration: { description: string; handler: ScopeShortcut }) => {
+    registerShortcut: (
+      key: string,
+      registration: { description: string; handler: ScopeShortcut },
+    ) => {
       shortcuts.push({ key, ...registration });
     },
-    sendMessage: ({ content }: { content: string }) => messages.push(content),
+    sendMessage: ({ content }: { content: string }) => {
+      if (harness.sendMessageFailure) throw harness.sendMessageFailure;
+      messages.push(content);
+    },
     setThinkingLevel: (level: string) => {
       harness.ctx.thinkingLevel = level;
     },
@@ -190,9 +344,16 @@ async function createHarness(
 
   const module = await import(`./scope-provider.ts?${crypto.randomUUID()}`);
   module.default(pi);
-  harness.factoryConfig = structuredClone(registry.getRegisteredProviderConfig("scoped"));
-  const sessionStart = (harness as Harness & { sessionStart?: (event: unknown, ctx: TestContext) => Promise<void> }).sessionStart;
-  if (!sessionStart || !command || !beforeRequest) throw new Error("scope extension did not register its handlers");
+  harness.factoryConfig = structuredClone(
+    registry.getRegisteredProviderConfig("scoped"),
+  );
+  const sessionStart = (
+    harness as Harness & {
+      sessionStart?: (event: unknown, ctx: TestContext) => Promise<void>;
+    }
+  ).sessionStart;
+  if (!sessionStart || !command || !beforeRequest)
+    throw new Error("scope extension did not register its handlers");
   harness.command = command;
   harness.beforeRequest = beforeRequest;
   await sessionStart({}, harness.ctx);
@@ -235,14 +396,14 @@ const markerPresets: ScopeConfig = {
   codex: {
     main: { model: "old/old-main" },
     remap: {
-      "scoped/junior": { model: "old/old-junior" },
+      "scoped/junior": { model: "old/old-junior", thinking: "high" },
       "scoped/mid": { model: "old/old-main" },
     },
   },
   local: {
     main: { model: "next/next-main" },
     remap: {
-      "scoped/junior": { model: "next/next-junior" },
+      "scoped/junior": { model: "next/next-junior", thinking: "low" },
       "scoped/mid": { model: "next/next-main" },
     },
   },
@@ -259,7 +420,9 @@ function markerModels(): Model[] {
 
 function scopedNames(harness: Harness): Record<string, string> {
   return Object.fromEntries(
-    (harness.registry.getRegisteredProviderConfig("scoped")?.models ?? []).map((model) => [model.id, model.name]),
+    (harness.registry.getRegisteredProviderConfig("scoped")?.models ?? []).map(
+      (model) => [model.id, model.name],
+    ),
   );
 }
 
@@ -297,8 +460,12 @@ test("cycles scopes in configured order and wraps around", async () => {
 
   await cycle(harness.ctx);
 
-  expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe("next-key");
-  expect(harness.registry.find("scoped", "main")?.name).toBe("Local main model [S]");
+  expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe(
+    "next-key",
+  );
+  expect(harness.registry.find("scoped", "main")?.name).toBe(
+    "Local main model [S]",
+  );
   expect(harness.ctx.model).toEqual({ provider: "scoped", id: "main" });
   expect(harness.ctx.thinkingLevel).toBe("high");
   expect((globalThis as Record<string, unknown>).activePreset).toBe("local");
@@ -310,12 +477,19 @@ test("cycles scopes in configured order and wraps around", async () => {
   expect(harness.messages).toEqual([
     "scope preset: local\nscope preset: local\n  id         target\n  main       next/next-main (force thinking: high)",
   ]);
-  expect(rewrite(harness)).toEqual({ model: "next-main", reasoning_effort: "high" });
+  expect(rewrite(harness)).toEqual({
+    model: "next-main",
+    reasoning_effort: "high",
+  });
 
   await cycle(harness.ctx);
 
-  expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe("old-key");
-  expect(harness.registry.find("scoped", "main")?.name).toBe("Cloud main model [S]");
+  expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe(
+    "old-key",
+  );
+  expect(harness.registry.find("scoped", "main")?.name).toBe(
+    "Cloud main model [S]",
+  );
   expect(harness.ctx.model).toEqual({ provider: "scoped", id: "main" });
   expect(harness.ctx.thinkingLevel).toBe("medium");
   expect((globalThis as Record<string, unknown>).activePreset).toBe("codex");
@@ -329,7 +503,10 @@ test("cycles scopes in configured order and wraps around", async () => {
     "scope preset: local\nscope preset: local\n  id         target\n  main       next/next-main (force thinking: high)",
     "scope preset: codex\nscope preset: codex\n  id         target\n  main       old/old-main (force thinking: medium)",
   ]);
-  expect(rewrite(harness)).toEqual({ model: "old-main", reasoning_effort: "medium" });
+  expect(rewrite(harness)).toEqual({
+    model: "old-main",
+    reasoning_effort: "medium",
+  });
 });
 
 test("a failed next scope keeps the existing transaction rollback", async () => {
@@ -341,12 +518,18 @@ test("a failed next scope keeps the existing transaction rollback", async () => 
     ],
   });
   const cycle = harness.shortcuts[0].handler;
-  const previous = structuredClone(harness.registry.getRegisteredProviderConfig("scoped"));
+  const previous = structuredClone(
+    harness.registry.getRegisteredProviderConfig("scoped"),
+  );
 
   await cycle(harness.ctx);
 
-  expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(previous);
-  expect(harness.registry.find("scoped", "main")?.name).toBe("Cloud main model [S]");
+  expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(
+    previous,
+  );
+  expect(harness.registry.find("scoped", "main")?.name).toBe(
+    "Cloud main model [S]",
+  );
   expect(harness.ctx.model).toEqual({ provider: "scoped", id: "main" });
   expect(harness.ctx.thinkingLevel).toBe("medium");
   expect((globalThis as Record<string, unknown>).activePreset).toBe("codex");
@@ -419,11 +602,15 @@ test("a UI selection uses configured order and the transactional switch path", a
 
   await harness.command("", harness.ctx);
 
-  expect(harness.commandDescription).toBe("Select a preset with /scope, or switch directly with /scope <preset>");
-  expect(harness.selectCalls).toEqual([{
-    title: "Select scope:",
-    options: ["codex", "noauth", "unavailable", "local"],
-  }]);
+  expect(harness.commandDescription).toBe(
+    "Select a preset with /scope, or switch directly with /scope <preset>",
+  );
+  expect(harness.selectCalls).toEqual([
+    {
+      title: "Select scope:",
+      options: ["codex", "noauth", "unavailable", "local"],
+    },
+  ]);
   expect(harness.messages).toEqual([
     "scope preset: local\nscope preset: local\n  id         target\n  main       next/next-main (force thinking: high)",
   ]);
@@ -436,10 +623,20 @@ test("a UI selection uses configured order and the transactional switch path", a
   expect((globalThis as Record<string, unknown>).activePreset).toBe("local");
   expect((globalThis as Record<string, unknown>).upgradedPreset).toBe("local");
   expect((globalThis as Record<string, unknown>).rewriteDisabled).toBe(false);
-  expect(harness.registry.find("scoped", "main")).toMatchObject({ provider: "scoped", id: "main" });
-  expect(harness.registry.find("scoped", "main")?.name).toBe("Local main model [S]");
-  expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe("next-key");
-  expect(rewrite(harness)).toEqual({ model: "next-main", reasoning_effort: "high" });
+  expect(harness.registry.find("scoped", "main")).toMatchObject({
+    provider: "scoped",
+    id: "main",
+  });
+  expect(harness.registry.find("scoped", "main")?.name).toBe(
+    "Local main model [S]",
+  );
+  expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe(
+    "next-key",
+  );
+  expect(rewrite(harness)).toEqual({
+    model: "next-main",
+    reasoning_effort: "high",
+  });
 });
 
 test("cancelling the UI selector is a complete no-op", async () => {
@@ -450,7 +647,9 @@ test("cancelling the UI selector is a complete no-op", async () => {
       target("next", "next-main", "Local main model"),
     ],
   });
-  const beforeConfig = structuredClone(harness.registry.getRegisteredProviderConfig("scoped"));
+  const beforeConfig = structuredClone(
+    harness.registry.getRegisteredProviderConfig("scoped"),
+  );
   const beforeModel = { ...harness.ctx.model };
   const beforeThinking = harness.ctx.thinkingLevel;
   const beforeStatuses = [...harness.statuses];
@@ -464,11 +663,15 @@ test("cancelling the UI selector is a complete no-op", async () => {
 
   await harness.command("", harness.ctx);
 
-  expect(harness.selectCalls).toEqual([{
-    title: "Select scope:",
-    options: ["codex", "noauth", "unavailable", "local"],
-  }]);
-  expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(beforeConfig);
+  expect(harness.selectCalls).toEqual([
+    {
+      title: "Select scope:",
+      options: ["codex", "noauth", "unavailable", "local"],
+    },
+  ]);
+  expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(
+    beforeConfig,
+  );
   expect(harness.ctx.model).toEqual(beforeModel);
   expect(harness.ctx.thinkingLevel).toBe(beforeThinking);
   expect(harness.statuses).toEqual(beforeStatuses);
@@ -487,15 +690,21 @@ test("a selected current preset keeps direct same-preset behavior", async () => 
     models: [target("old", "old-main", "Cloud main model")],
   });
   harness.selection = "codex";
-  const beforeConfig = structuredClone(harness.registry.getRegisteredProviderConfig("scoped"));
+  const beforeConfig = structuredClone(
+    harness.registry.getRegisteredProviderConfig("scoped"),
+  );
 
   await harness.command("", harness.ctx);
 
-  expect(harness.selectCalls).toEqual([{
-    title: "Select scope:",
-    options: ["codex", "noauth", "unavailable", "local"],
-  }]);
-  expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(beforeConfig);
+  expect(harness.selectCalls).toEqual([
+    {
+      title: "Select scope:",
+      options: ["codex", "noauth", "unavailable", "local"],
+    },
+  ]);
+  expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(
+    beforeConfig,
+  );
   expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
   expect(harness.messages).toEqual([
     'already on preset "codex"\nscope preset: codex\n  id         target\n  main       old/old-main',
@@ -508,7 +717,9 @@ test("non-UI no-argument scope retains the table fallback", async () => {
     models: [target("old", "old-main", "Cloud main model")],
   });
   harness.ctx.hasUI = false;
-  const beforeConfig = structuredClone(harness.registry.getRegisteredProviderConfig("scoped"));
+  const beforeConfig = structuredClone(
+    harness.registry.getRegisteredProviderConfig("scoped"),
+  );
   const beforeModel = { ...harness.ctx.model };
   const beforeThinking = harness.ctx.thinkingLevel;
   const beforeStatuses = [...harness.statuses];
@@ -517,7 +728,9 @@ test("non-UI no-argument scope retains the table fallback", async () => {
   await harness.command("", harness.ctx);
 
   expect(harness.selectCalls).toEqual([]);
-  expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(beforeConfig);
+  expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(
+    beforeConfig,
+  );
   expect(harness.ctx.model).toEqual(beforeModel);
   expect(harness.ctx.thinkingLevel).toBe(beforeThinking);
   expect(harness.messages).toEqual([
@@ -535,16 +748,22 @@ test("a selected failed switch rolls back like a direct argument", async () => {
       target("noauth", "noauth-main", "Unauthenticated main model"),
     ],
   });
-  const previous = structuredClone(harness.registry.getRegisteredProviderConfig("scoped"));
+  const previous = structuredClone(
+    harness.registry.getRegisteredProviderConfig("scoped"),
+  );
   harness.selection = "noauth";
 
   await harness.command("", harness.ctx);
 
-  expect(harness.selectCalls).toEqual([{
-    title: "Select scope:",
-    options: ["codex", "noauth", "unavailable", "local"],
-  }]);
-  expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(previous);
+  expect(harness.selectCalls).toEqual([
+    {
+      title: "Select scope:",
+      options: ["codex", "noauth", "unavailable", "local"],
+    },
+  ]);
+  expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(
+    previous,
+  );
   expect(harness.ctx.model).toEqual({ provider: "scoped", id: "main" });
   expect(harness.ctx.thinkingLevel).toBe("medium");
   expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
@@ -567,8 +786,12 @@ test("missing target auth preserves the previous scoped provider and rewrite tab
 
   await harness.command("noauth", harness.ctx);
 
-  expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(previous);
-  expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe("old-key");
+  expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(
+    previous,
+  );
+  expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe(
+    "old-key",
+  );
   expect(rewrite(harness)).toEqual({ model: "old-main" });
   expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
   expect(harness.messages.at(-1)).toContain('previous preset "codex" restored');
@@ -585,7 +808,9 @@ test("an unresolvable target rolls back to the previous provider and rewrite tab
 
   await harness.command("unavailable", harness.ctx);
 
-  expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe("old-key");
+  expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe(
+    "old-key",
+  );
   expect(rewrite(harness)).toEqual({ model: "old-main" });
   expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
   expect(harness.messages.at(-1)).toContain('previous preset "codex" restored');
@@ -604,7 +829,9 @@ test("a failed registry rollback disables rewriting and requires a restart", asy
 
   await harness.command("local", harness.ctx);
 
-  expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe("next-key");
+  expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe(
+    "next-key",
+  );
   expect(rewrite(harness)).toEqual({ model: "main" });
   expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
   expect(harness.messages.at(-1)).toContain("restart the session");
@@ -619,8 +846,13 @@ test("repeated switches refresh scoped/main and preserve concrete selections", a
     ],
   });
 
-  expect(harness.registry.find("scoped", "main")).toMatchObject({ provider: "scoped", id: "main" });
-  expect(harness.registry.find("scoped", "main")?.name).toBe("Cloud main model [S]");
+  expect(harness.registry.find("scoped", "main")).toMatchObject({
+    provider: "scoped",
+    id: "main",
+  });
+  expect(harness.registry.find("scoped", "main")?.name).toBe(
+    "Cloud main model [S]",
+  );
 
   await harness.command("local", harness.ctx);
   expect(harness.statuses).toEqual([
@@ -628,9 +860,16 @@ test("repeated switches refresh scoped/main and preserve concrete selections", a
     { key: "scope", value: "scope:local" },
   ]);
   expect(harness.ctx.model).toEqual({ provider: "scoped", id: "main" });
-  expect(harness.registry.find("scoped", "main")).toMatchObject({ provider: "scoped", id: "main" });
-  expect(harness.registry.find("scoped", "main")?.name).toBe("Local main model [S]");
-  expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe("next-key");
+  expect(harness.registry.find("scoped", "main")).toMatchObject({
+    provider: "scoped",
+    id: "main",
+  });
+  expect(harness.registry.find("scoped", "main")?.name).toBe(
+    "Local main model [S]",
+  );
+  expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe(
+    "next-key",
+  );
   expect(rewrite(harness)).toEqual({ model: "next-main" });
 
   await harness.command("codex", harness.ctx);
@@ -640,13 +879,406 @@ test("repeated switches refresh scoped/main and preserve concrete selections", a
     { key: "scope", value: "scope:codex" },
   ]);
   expect(harness.ctx.model).toEqual({ provider: "scoped", id: "main" });
-  expect(harness.registry.find("scoped", "main")).toMatchObject({ provider: "scoped", id: "main" });
-  expect(harness.registry.find("scoped", "main")?.name).toBe("Cloud main model [S]");
-  expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe("old-key");
+  expect(harness.registry.find("scoped", "main")).toMatchObject({
+    provider: "scoped",
+    id: "main",
+  });
+  expect(harness.registry.find("scoped", "main")?.name).toBe(
+    "Cloud main model [S]",
+  );
+  expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe(
+    "old-key",
+  );
   expect(rewrite(harness)).toEqual({ model: "old-main" });
 
   harness.ctx.model = { provider: "old", id: "old-main" };
   await harness.command("local", harness.ctx);
   expect(harness.ctx.model).toEqual({ provider: "old", id: "old-main" });
-  expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe("next-key");
+  expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe(
+    "next-key",
+  );
+});
+
+test("rewrites scoped parent and child payloads to exact concrete model ids while leaving direct ids unchanged", async () => {
+  const harness = await createHarness(markerPresets, {
+    apiKeys: { old: "old-key" },
+    models: markerModels(),
+  });
+  const parent = { model: "main" };
+  const child = { model: "junior" };
+  const direct = { model: "old-main" };
+
+  harness.beforeRequest({ payload: parent });
+  harness.beforeRequest({ payload: child });
+  harness.beforeRequest({ payload: direct });
+
+  expect(parent).toEqual({ model: "old-main" });
+  expect(child).toEqual({ model: "old-junior", reasoning_effort: "high" });
+  expect(direct).toEqual({ model: "old-main" });
+});
+
+test("registers one native summary handler per event and declines direct models", async () => {
+  const harness = await createHarness(presets, {
+    apiKeys: { old: "old-key" },
+    models: [target("old", "old-main", "Cloud main model")],
+  });
+  expect(harness.summaryHandlers.session_before_compact).toHaveLength(1);
+  expect(harness.summaryHandlers.session_before_tree).toHaveLength(1);
+
+  harness.ctx.model = { provider: "old", id: "old-main" };
+  const signal = new AbortController().signal;
+  await expect(
+    harness.summaryHandlers.session_before_compact[0](
+      { preparation: {}, signal },
+      harness.ctx,
+    ),
+  ).resolves.toBeUndefined();
+  await expect(
+    harness.summaryHandlers.session_before_tree[0](
+      {
+        preparation: { userWantsSummary: true, entriesToSummarize: [{}] },
+        signal,
+      },
+      harness.ctx,
+    ),
+  ).resolves.toBeUndefined();
+  expect(compactCalls).toEqual([]);
+  expect(treeCalls).toEqual([]);
+});
+
+test("passes native compaction state and exact concrete request configuration through unchanged", async () => {
+  const concrete = {
+    ...target("old", "old-main", "Cloud main model"),
+    thinkingLevelMap: { high: "xhigh" },
+  };
+  const harness = await createHarness(
+    { codex: { main: { model: "old/old-main", thinking: "high" }, remap: {} } },
+    {
+      apiKeys: { old: "old-key" },
+      models: [concrete],
+      requestAuth: {
+        "old/old-main": {
+          ok: true,
+          apiKey: "resolved-key",
+          baseUrl: "https://resolved.test/v1",
+          headers: { "x-auth": "resolved" },
+          env: { AUTH_ENV: "resolved" },
+        },
+      },
+    },
+  );
+  const preparation = {
+    firstKeptEntryId: "kept-1",
+    messagesToSummarize: [{ role: "user", content: "old" }],
+    turnPrefixMessages: [{ role: "user", content: "split" }],
+    isSplitTurn: true,
+    tokensBefore: 9876,
+    previousSummary: "previous summary",
+    fileOps: { read: ["read.ts"], modified: ["changed.ts"] },
+    settings: { enabled: true, reserveTokens: 123, keepRecentTokens: 456 },
+  };
+  const controller = new AbortController();
+
+  const result = await harness.summaryHandlers.session_before_compact[0](
+    {
+      preparation,
+      customInstructions: "focus on decisions",
+      reason: "overflow",
+      willRetry: true,
+      signal: controller.signal,
+    },
+    harness.ctx,
+  );
+
+  expect(result).toEqual({ compaction: compactResult });
+  expect(compactCalls).toEqual([
+    [
+      preparation,
+      { ...concrete, baseUrl: "https://resolved.test/v1" },
+      "resolved-key",
+      { "x-auth": "resolved" },
+      "focus on decisions",
+      controller.signal,
+      "high",
+      undefined,
+      { AUTH_ENV: "resolved" },
+      { enabled: true, maxRetries: 3, baseDelayMs: 2000 },
+    ],
+  ]);
+});
+
+test("passes branch instructions, reserve, retry, usage and file details through native generation", async () => {
+  const concrete = target("old", "old-main", "Cloud main model");
+  const harness = await createHarness(presets, {
+    apiKeys: { old: "old-key" },
+    models: [concrete],
+    requestAuth: {
+      "old/old-main": {
+        ok: true,
+        apiKey: "tree-key",
+        headers: { "x-tree": "yes" },
+        env: { TREE_ENV: "yes" },
+      },
+    },
+  });
+  const entries = [{ type: "message", id: "entry-1" }];
+  const signal = new AbortController().signal;
+
+  const result = await harness.summaryHandlers.session_before_tree[0](
+    {
+      preparation: {
+        userWantsSummary: true,
+        entriesToSummarize: entries,
+        customInstructions: "tree focus",
+        replaceInstructions: true,
+      },
+      signal,
+    },
+    harness.ctx,
+  );
+
+  expect(treeCalls).toEqual([
+    [
+      entries,
+      {
+        model: concrete,
+        apiKey: "tree-key",
+        headers: { "x-tree": "yes" },
+        env: { TREE_ENV: "yes" },
+        signal,
+        customInstructions: "tree focus",
+        replaceInstructions: true,
+        reserveTokens: 4321,
+        retry: { enabled: true, maxRetries: 3, baseDelayMs: 2000 },
+      },
+    ],
+  ]);
+  expect(result).toEqual({
+    summary: {
+      summary: "branch summary",
+      usage: treeResult.usage,
+      details: {
+        readFiles: ["branch-read.ts"],
+        modifiedFiles: ["branch-write.ts"],
+      },
+    },
+  });
+});
+
+test("declines tree generation when no summary is requested or there are no entries", async () => {
+  const harness = await createHarness(presets, {
+    apiKeys: { old: "old-key" },
+    models: [target("old", "old-main", "Cloud main model")],
+  });
+  const signal = new AbortController().signal;
+
+  await expect(
+    harness.summaryHandlers.session_before_tree[0](
+      {
+        preparation: { userWantsSummary: false, entriesToSummarize: [{}] },
+        signal,
+      },
+      harness.ctx,
+    ),
+  ).resolves.toBeUndefined();
+  await expect(
+    harness.summaryHandlers.session_before_tree[0](
+      {
+        preparation: { userWantsSummary: true, entriesToSummarize: [] },
+        signal,
+      },
+      harness.ctx,
+    ),
+  ).resolves.toBeUndefined();
+  expect(treeCalls).toEqual([]);
+});
+
+test("summaries observe only committed targets across deferred failure and successful scope commit", async () => {
+  let rejectCredential!: (error: Error) => void;
+  let credentialStarted!: () => void;
+  const started = new Promise<void>((resolve) => {
+    credentialStarted = resolve;
+  });
+  const pendingCredential = new Promise<string | undefined>(
+    (_resolve, reject) => {
+      rejectCredential = reject;
+    },
+  );
+  const oldModel = target("old", "old-main", "Cloud main model");
+  const nextModel = target("next", "next-main", "Local main model");
+  const harness = await createHarness(selectorPresets, {
+    apiKeys: {
+      old: "old-key",
+      next: async () => {
+        credentialStarted();
+        return pendingCredential;
+      },
+    },
+    models: [oldModel, nextModel],
+    requestAuth: {
+      "old/old-main": { ok: true, apiKey: "old-summary-key" },
+      "next/next-main": { ok: true, apiKey: "next-summary-key" },
+    },
+  });
+  const event = {
+    preparation: { firstKeptEntryId: "kept" },
+    signal: new AbortController().signal,
+  };
+
+  const switching = harness.command("local", harness.ctx);
+  await started;
+  await harness.summaryHandlers.session_before_compact[0](event, harness.ctx);
+
+  expect(compactCalls).toHaveLength(1);
+  expect(compactCalls[0][1]).toEqual(oldModel);
+  expect(compactCalls[0][2]).toBe("old-summary-key");
+  rejectCredential(new Error("credential lookup failed"));
+  await switching;
+  expect(rewrite(harness)).toEqual({ model: "old-main" });
+
+  harness.registry.apiKeys.set("next", "next-key");
+  await harness.command("local", harness.ctx);
+  await harness.summaryHandlers.session_before_compact[0](event, harness.ctx);
+
+  expect(compactCalls).toHaveLength(2);
+  expect(compactCalls[1][1]).toEqual(nextModel);
+  expect(compactCalls[1][2]).toBe("next-summary-key");
+  expect(rewrite(harness)).toEqual({
+    model: "next-main",
+    reasoning_effort: "high",
+  });
+});
+
+test("snapshots the concrete summary target before deferred auth and a scope switch", async () => {
+  let releaseAuth!: (auth: RequestAuth) => void;
+  let authStarted!: () => void;
+  const started = new Promise<void>((resolve) => {
+    authStarted = resolve;
+  });
+  const pendingAuth = new Promise<RequestAuth>((resolve) => {
+    releaseAuth = resolve;
+  });
+  const oldModel = target("old", "old-main", "Cloud main model");
+  const nextModel = target("next", "next-main", "Local main model");
+  const harness = await createHarness(selectorPresets, {
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: [oldModel, nextModel],
+    requestAuth: {
+      "old/old-main": async () => {
+        authStarted();
+        return pendingAuth;
+      },
+      "next/next-main": { ok: true, apiKey: "next-summary-key" },
+    },
+  });
+  const event = {
+    preparation: { firstKeptEntryId: "kept" },
+    signal: new AbortController().signal,
+  };
+  const inFlight = harness.summaryHandlers.session_before_compact[0](
+    event,
+    harness.ctx,
+  );
+  await started;
+
+  await harness.command("local", harness.ctx);
+  releaseAuth({ ok: true, apiKey: "old-summary-key" });
+  await inFlight;
+
+  expect(compactCalls[0][1]).toEqual(oldModel);
+  expect(compactCalls[0][2]).toBe("old-summary-key");
+  expect(compactCalls[0][6]).toBe("medium");
+});
+
+test("reports auth and generation failures and cancels without alias fallback", async () => {
+  const concrete = target("old", "old-main", "Cloud main model");
+  const authHarness = await createHarness(presets, {
+    apiKeys: { old: "old-key" },
+    models: [concrete],
+    requestAuth: { "old/old-main": { ok: false, error: "credential expired" } },
+  });
+  const signal = new AbortController().signal;
+  await expect(
+    authHarness.summaryHandlers.session_before_compact[0](
+      { preparation: {}, signal },
+      authHarness.ctx,
+    ),
+  ).resolves.toEqual({ cancel: true });
+  expect(compactCalls).toEqual([]);
+  expect(authHarness.messages.at(-1)).toBe(
+    "scope: ERROR — compaction with old/old-main failed: credential expired. Check the target model and credentials, then retry.",
+  );
+
+  authHarness.sendMessageFailure = new Error("message sink unavailable");
+  await expect(
+    authHarness.summaryHandlers.session_before_compact[0](
+      { preparation: {}, signal },
+      authHarness.ctx,
+    ),
+  ).resolves.toEqual({ cancel: true });
+  expect(compactCalls).toEqual([]);
+
+  treeFailure = new Error("non-retryable invalid request");
+  const generationHarness = await createHarness(presets, {
+    apiKeys: { old: "old-key" },
+    models: [concrete],
+  });
+  await expect(
+    generationHarness.summaryHandlers.session_before_tree[0](
+      {
+        preparation: { userWantsSummary: true, entriesToSummarize: [{}] },
+        signal,
+      },
+      generationHarness.ctx,
+    ),
+  ).resolves.toEqual({ cancel: true });
+  expect(generationHarness.messages.at(-1)).toBe(
+    "scope: ERROR — branch summary with old/old-main failed: non-retryable invalid request. Check the target model and credentials, then retry.",
+  );
+});
+
+test("forwards configured retry policy and cancels retry exhaustion, disabled retry and abort outcomes", async () => {
+  const concrete = target("old", "old-main", "Cloud main model");
+  const harness = await createHarness(presets, {
+    apiKeys: { old: "old-key" },
+    models: [concrete],
+  });
+  const signal = new AbortController().signal;
+  compactFailure = new Error("retry attempts exhausted");
+  await expect(
+    harness.summaryHandlers.session_before_compact[0](
+      { preparation: {}, signal },
+      harness.ctx,
+    ),
+  ).resolves.toEqual({ cancel: true });
+  expect(compactCalls[0][9]).toEqual({
+    enabled: true,
+    maxRetries: 3,
+    baseDelayMs: 2000,
+  });
+
+  compactCalls = [];
+  compactFailure = new Error("retry disabled failure");
+  retrySettings = { enabled: false, maxRetries: 0, baseDelayMs: 5 };
+  await expect(
+    harness.summaryHandlers.session_before_compact[0](
+      { preparation: {}, signal },
+      harness.ctx,
+    ),
+  ).resolves.toEqual({ cancel: true });
+  expect(compactCalls[0][9]).toEqual({
+    enabled: false,
+    maxRetries: 0,
+    baseDelayMs: 5,
+  });
+
+  compactFailure = undefined;
+  const controller = new AbortController();
+  controller.abort();
+  await expect(
+    harness.summaryHandlers.session_before_compact[0](
+      { preparation: {}, signal: controller.signal },
+      harness.ctx,
+    ),
+  ).resolves.toEqual({ cancel: true });
 });
