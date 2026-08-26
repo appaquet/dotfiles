@@ -13,16 +13,48 @@
  */
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { getAgentDir } from "@earendil-works/pi-coding-agent";
+import {
+  compact,
+  generateBranchSummary,
+  getAgentDir,
+  SettingsManager,
+} from "@earendil-works/pi-coding-agent";
 
-type ScopeEntry = { model: string; thinking?: string };
+type SummaryThinkingLevel = NonNullable<Parameters<typeof compact>[6]>;
+type ScopeEntry = { model: string; thinking?: SummaryThinkingLevel };
 type ScopePreset = { main: ScopeEntry; remap: Record<string, ScopeEntry> };
-type ScopeRegistration = { count: number; mainAvailable: boolean; failure?: string };
+type ScopeMeta = Record<
+  string,
+  {
+    api: string;
+    thinkingFormat?: string;
+    thinkingLevelMap?: Record<string, string | null>;
+  }
+>;
+type ScopeMapping = {
+  preset: string;
+  entries: Record<string, ScopeEntry>;
+  targets: Record<string, { provider: string; id: string }>;
+};
+type ScopeRegistration = {
+  count: number;
+  mainAvailable: boolean;
+  failure?: string;
+  meta?: ScopeMeta;
+  providerConfig?: any;
+};
+type ScopedSummaryTarget = {
+  alias: string;
+  entry: ScopeEntry;
+  target: { provider: string; id: string };
+  model: any;
+  thinkingLevel: SummaryThinkingLevel;
+};
 type ScopeSnapshot = {
   preset: string;
   entries: Record<string, ScopeEntry>;
   targets: Record<string, { provider: string; id: string }>;
-  meta: Record<string, { api: string; thinkingFormat?: string; thinkingLevelMap?: Record<string, string | null> }>;
+  meta: ScopeMeta;
   activePreset?: string;
   upgradedPreset?: string;
   rewriteDisabled?: boolean;
@@ -40,33 +72,45 @@ const STUB_MODEL = {
   input: ["text"],
   contextWindow: 185000,
   maxTokens: 15000,
-  samplingParams: { temperature: 1.0, top_p: 0.95, top_k: 20, presence_penalty: 0.0, repetition_penalty: 1.0 },
-  thinkingLevelMap: { minimal: "low", low: "low", medium: "medium", high: "xhigh", xhigh: "xhigh", max: "xhigh" },
+  samplingParams: {
+    temperature: 1.0,
+    top_p: 0.95,
+    top_k: 20,
+    presence_penalty: 0.0,
+    repetition_penalty: 1.0,
+  },
+  thinkingLevelMap: {
+    minimal: "low",
+    low: "low",
+    medium: "medium",
+    high: "xhigh",
+    xhigh: "xhigh",
+    max: "xhigh",
+  },
   cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
 };
 
 // Session ordinal tag: each session loads its own ExtensionRunner (fresh module
 // state), so a child's post-rewrite payload is attributed even when the main
 // session never sees the child's request.
-let source;
-{
+const source = (() => {
   const g: any = globalThis;
   g.__PI_SCOPE_SEQ__ = (g.__PI_SCOPE_SEQ__ ?? 0) + 1;
-  source = `s${g.__PI_SCOPE_SEQ__}`;
-}
+  return `s${g.__PI_SCOPE_SEQ__}`;
+})();
 
 // Process-global active preset: every session re-imports this module (fresh
 // `state`), so a child resolves scoped/<id> against the parent's live preset,
 // not the env default.
-const scopeProcess: { activePreset?: string; upgradedPreset?: string; rewriteDisabled?: boolean } = globalThis as any;
-if (!scopeProcess.activePreset) scopeProcess.activePreset = process.env.PI_SCOPE ?? "codex";
+const scopeProcess: {
+  activePreset?: string;
+  upgradedPreset?: string;
+  rewriteDisabled?: boolean;
+} = globalThis as any;
+if (!scopeProcess.activePreset)
+  scopeProcess.activePreset = process.env.PI_SCOPE ?? "codex";
 
-const state: {
-  preset: string;
-  entries: Record<string, ScopeEntry>;
-  targets: Record<string, { provider: string; id: string }>;
-  meta: Record<string, { api: string; thinkingFormat?: string; thinkingLevelMap?: Record<string, string | null> }>;
-} = {
+const state: ScopeMapping & { meta: ScopeMeta } = {
   preset: process.env.PI_SCOPE ?? "codex",
   entries: {},
   targets: {},
@@ -80,39 +124,54 @@ function debug(msg: string): void {
 
 function readScopeConfig(): Record<string, ScopePreset> {
   const file = path.join(getAgentDir(), "settings.json");
-  const raw = JSON.parse(fs.readFileSync(file, "utf8")) as { scopeProvider?: Record<string, ScopePreset> };
+  const raw = JSON.parse(fs.readFileSync(file, "utf8")) as {
+    scopeProvider?: Record<string, ScopePreset>;
+  };
   return raw.scopeProvider ?? {};
 }
 
-/** Point the process-global state at a preset's main+remap table. */
-function applyPreset(name: string): boolean {
+/** Build a preset mapping without publishing it as committed scope state. */
+function buildPreset(name: string): ScopeMapping | undefined {
   const cfg = readScopeConfig();
   const preset = cfg[name];
   if (!preset) {
-    debug(`applyPreset: preset "${name}" not found in scopeProvider (available: ${Object.keys(cfg).join(", ")})`);
-    return false;
+    debug(
+      `buildPreset: preset "${name}" not found in scopeProvider (available: ${Object.keys(cfg).join(", ")})`,
+    );
+    return undefined;
   }
-  state.preset = name;
-  state.entries = {};
-  state.targets = {};
 
-  // Registry-derived meta is rebuilt only by registerScope and shared
-  // process-wide, so it must survive re-entry: child sessions re-run
-  // applyPreset, and wiping it would drop the cloned thinkingFormat before a
-  // child's first rewrite.
-
-  const table: Array<[string, ScopeEntry]> = [["scoped/main", preset.main], ...Object.entries(preset.remap)];
+  const mapping: ScopeMapping = { preset: name, entries: {}, targets: {} };
+  const table: Array<[string, ScopeEntry]> = [
+    ["scoped/main", preset.main],
+    ...Object.entries(preset.remap),
+  ];
   for (const [key, entry] of table) {
     const bare = key.split("/").pop() as string;
     const slash = entry.model.indexOf("/");
     if (!bare || slash < 0) {
-      debug(`applyPreset: bad entry "${key}" -> "${entry.model}"`);
+      debug(`buildPreset: bad entry "${key}" -> "${entry.model}"`);
       continue;
     }
-    state.entries[bare] = entry;
-    state.targets[bare] = { provider: entry.model.slice(0, slash), id: entry.model.slice(slash + 1) };
+    mapping.entries[bare] = entry;
+    mapping.targets[bare] = {
+      provider: entry.model.slice(0, slash),
+      id: entry.model.slice(slash + 1),
+    };
   }
-  debug(`applyPreset: active preset "${name}" (main -> ${preset.main.model})`);
+  debug(
+    `buildPreset: resolved preset "${name}" (main -> ${preset.main.model})`,
+  );
+  return mapping;
+}
+
+/** Point state at a preset during initial extension setup. */
+function applyPreset(name: string): boolean {
+  const mapping = buildPreset(name);
+  if (!mapping) return false;
+  state.preset = mapping.preset;
+  state.entries = mapping.entries;
+  state.targets = mapping.targets;
   return true;
 }
 
@@ -125,33 +184,44 @@ function registerScopeStubs(pi: any): void {
     apiKey: "local",
     models: SCOPE_IDS.map((id) => ({
       id,
-      name: scopedModelName(id, `scoped/${id} (preset stub, upgraded at session start)`),
+      name: scopedModelName(
+        id,
+        `scoped/${id} (preset stub, upgraded at session start)`,
+      ),
       ...STUB_MODEL,
     })),
   });
   debug("factory: registered scoped stubs");
 }
 
-/**
- * Clone each scoped id from its target model in the live registry and register
- * the `scoped` provider. Re-registering replaces the provider's model list.
- */
-async function registerScope(pi: any, ctx: any): Promise<ScopeRegistration> {
-  const meta: typeof state.meta = {};
+/** Prepare a provider replacement without changing committed scope state. */
+async function prepareScopeRegistration(
+  ctx: any,
+  mapping: ScopeMapping,
+): Promise<ScopeRegistration> {
+  const meta: ScopeMeta = {};
   const models: any[] = [];
   let mainAvailable = false;
   for (const id of SCOPE_IDS) {
-    const entry = state.entries[id];
-    const target = state.targets[id];
+    const entry = mapping.entries[id];
+    const target = mapping.targets[id];
     if (!entry || !target) continue;
     const m = ctx.modelRegistry.find(target.provider, target.id);
     if (!m) {
-      debug(`registerScope: target ${target.provider}/${target.id} not found in registry (skipping scoped/${id})`);
+      debug(
+        `prepareScopeRegistration: target ${target.provider}/${target.id} not found in registry (skipping scoped/${id})`,
+      );
       continue;
     }
     if (id === "main") mainAvailable = true;
-    meta[id] = { api: m.api, thinkingFormat: m.compat?.thinkingFormat, thinkingLevelMap: m.thinkingLevelMap };
-    debug(`registerScope: scoped/${id} <- ${m.provider}/${m.id} api=${m.api} thinkingFormat=${m.compat?.thinkingFormat ?? "<none>"} baseUrl=${m.baseUrl} tlm=${JSON.stringify(m.thinkingLevelMap ?? null)}`);
+    meta[id] = {
+      api: m.api,
+      thinkingFormat: m.compat?.thinkingFormat,
+      thinkingLevelMap: m.thinkingLevelMap,
+    };
+    debug(
+      `prepareScopeRegistration: scoped/${id} <- ${m.provider}/${m.id} api=${m.api} thinkingFormat=${m.compat?.thinkingFormat ?? "<none>"} baseUrl=${m.baseUrl} tlm=${JSON.stringify(m.thinkingLevelMap ?? null)}`,
+    );
 
     models.push({
       id,
@@ -169,14 +239,14 @@ async function registerScope(pi: any, ctx: any): Promise<ScopeRegistration> {
     });
   }
   if (models.length === 0) {
-    debug("registerScope: no resolvable targets, not registering");
+    debug("prepareScopeRegistration: no resolvable targets");
     return { count: 0, mainAvailable };
   }
   if (!mainAvailable) {
-    debug("registerScope: scoped/main target is not resolvable, not registering");
+    debug("prepareScopeRegistration: scoped/main target is not resolvable");
     return { count: 0, mainAvailable };
   }
-  const provider = state.targets.main;
+  const provider = mapping.targets.main;
   let apiKey: string | undefined;
   try {
     apiKey = await ctx.modelRegistry.getApiKeyForProvider(provider.provider);
@@ -196,12 +266,114 @@ async function registerScope(pi: any, ctx: any): Promise<ScopeRegistration> {
     };
   }
 
-  debug(`registerScope: preset="${state.preset}" models=[${models.map((x) => x.id).join(",")}] targetProvider=${provider.provider} apiKey=${apiKey.slice(0, 12)}...`);
+  debug(
+    `prepareScopeRegistration: preset="${mapping.preset}" models=[${models.map((x) => x.id).join(",")}] targetProvider=${provider.provider} apiKey=${apiKey.slice(0, 12)}...`,
+  );
+  return {
+    count: models.length,
+    mainAvailable,
+    meta,
+    providerConfig: { name: "Scoped", apiKey, models },
+  };
+}
 
-  pi.registerProvider("scoped", { name: "Scoped", apiKey, models });
-  state.meta = meta;
+/** Atomically publish a prepared provider and its matching scope mapping. */
+function commitScopeRegistration(
+  pi: any,
+  mapping: ScopeMapping,
+  registration: ScopeRegistration,
+): void {
+  if (!registration.providerConfig || !registration.meta)
+    throw new Error("scope registration was not prepared for commit");
+  pi.registerProvider("scoped", registration.providerConfig);
+  state.preset = mapping.preset;
+  state.entries = mapping.entries;
+  state.targets = mapping.targets;
+  state.meta = registration.meta;
+}
 
-  return { count: models.length, mainAvailable };
+/** Snapshot the complete scoped summary target before asynchronous resolution begins. */
+function snapshotSummaryTarget(ctx: any): ScopedSummaryTarget | undefined {
+  const aliasModel = ctx.model;
+  if (!aliasModel || aliasModel.provider !== "scoped") return undefined;
+
+  const alias = aliasModel.id;
+  const entry = state.entries[alias];
+  const target = state.targets[alias];
+  if (!entry || !target) {
+    throw new Error(`no concrete target is configured for scoped/${alias}`);
+  }
+
+  const model = ctx.modelRegistry.find(target.provider, target.id);
+  if (!model) {
+    throw new Error(
+      `concrete target ${target.provider}/${target.id} is unavailable`,
+    );
+  }
+
+  return {
+    alias,
+    entry: { ...entry },
+    target: { ...target },
+    model: { ...model },
+    thinkingLevel: (entry.thinking ??
+      ctx.thinkingLevel) as SummaryThinkingLevel,
+  };
+}
+
+async function resolveSummaryRequest(
+  target: ScopedSummaryTarget,
+  ctx: any,
+): Promise<{
+  model: any;
+  apiKey?: string;
+  headers?: Record<string, string>;
+  env?: Record<string, string>;
+  retry: { enabled: boolean; maxRetries: number; baseDelayMs: number };
+}> {
+  const retry = SettingsManager.create(
+    ctx.cwd,
+    getAgentDir(),
+  ).getRetrySettings();
+  const auth = await ctx.modelRegistry.getApiKeyAndHeaders(target.model);
+  if (!auth.ok) {
+    throw new Error(auth.error);
+  }
+
+  return {
+    model: auth.baseUrl
+      ? { ...target.model, baseUrl: auth.baseUrl }
+      : target.model,
+    apiKey: auth.apiKey,
+    headers: auth.headers,
+    env: auth.env,
+    retry,
+  };
+}
+
+function reportSummaryFailure(
+  pi: any,
+  operation: string,
+  target: ScopedSummaryTarget | undefined,
+  error: unknown,
+): void {
+  const concrete = target
+    ? `${target.target.provider}/${target.target.id}`
+    : "the configured scoped target";
+  const detail = error instanceof Error ? error.message : String(error);
+  try {
+    pi.sendMessage({
+      customType: "scoped",
+      content: `scope: ERROR — ${operation} with ${concrete} failed: ${detail}. Check the target model and credentials, then retry.`,
+      display: true,
+    });
+  } catch (reportError) {
+    const reportDetail =
+      reportError instanceof Error ? reportError.message : String(reportError);
+    debug(
+      `${operation}: could not report failure for ${concrete}: ${reportDetail}; original failure: ${detail}`,
+    );
+  }
 }
 
 /** Capture all mutable scope state before a provider replacement. */
@@ -217,10 +389,14 @@ function snapshotScope(ctx: any): ScopeSnapshot {
     upgradedPreset: scopeProcess.upgradedPreset,
     rewriteDisabled: scopeProcess.rewriteDisabled,
     providerConfig: ctx.modelRegistry.getRegisteredProviderConfig("scoped"),
-    selectedModel: model && typeof model.provider === "string" && typeof model.id === "string"
-      ? { provider: model.provider, id: model.id }
-      : undefined,
-    thinkingLevel: typeof ctx.thinkingLevel === "string" ? ctx.thinkingLevel : undefined,
+    selectedModel:
+      model &&
+      typeof model.provider === "string" &&
+      typeof model.id === "string"
+        ? { provider: model.provider, id: model.id }
+        : undefined,
+    thinkingLevel:
+      typeof ctx.thinkingLevel === "string" ? ctx.thinkingLevel : undefined,
   };
 }
 
@@ -233,7 +409,11 @@ function disableScopeRewrites(): void {
 }
 
 /** Restore the process and registry to a previously usable scope. */
-function restoreScope(pi: any, ctx: any, snapshot: ScopeSnapshot): string | undefined {
+function restoreScope(
+  pi: any,
+  ctx: any,
+  snapshot: ScopeSnapshot,
+): string | undefined {
   try {
     if (snapshot.providerConfig) {
       pi.registerProvider("scoped", snapshot.providerConfig);
@@ -243,15 +423,24 @@ function restoreScope(pi: any, ctx: any, snapshot: ScopeSnapshot): string | unde
 
     const restoredMain = ctx.modelRegistry.find("scoped", "main");
     if (snapshot.providerConfig ? !restoredMain : restoredMain) {
-      throw new Error("the previous scoped provider did not restore its expected scoped/main entry");
+      throw new Error(
+        "the previous scoped provider did not restore its expected scoped/main entry",
+      );
     }
     if (snapshot.selectedModel?.provider === "scoped") {
       const current = ctx.model;
-      if (!current || current.provider !== snapshot.selectedModel.provider || current.id !== snapshot.selectedModel.id) {
-        throw new Error(`the previous selected model ${snapshot.selectedModel.provider}/${snapshot.selectedModel.id} could not be restored`);
+      if (
+        !current ||
+        current.provider !== snapshot.selectedModel.provider ||
+        current.id !== snapshot.selectedModel.id
+      ) {
+        throw new Error(
+          `the previous selected model ${snapshot.selectedModel.provider}/${snapshot.selectedModel.id} could not be restored`,
+        );
       }
     }
-    if (snapshot.thinkingLevel !== undefined) pi.setThinkingLevel(snapshot.thinkingLevel);
+    if (snapshot.thinkingLevel !== undefined)
+      pi.setThinkingLevel(snapshot.thinkingLevel);
   } catch (error) {
     disableScopeRewrites();
     const detail = error instanceof Error ? error.message : String(error);
@@ -284,10 +473,22 @@ function forcedEffort(id: string, level: string): string {
 function forceEffort(id: string, payload: any, level: string): void {
   const meta = state.meta[id];
   const effort = forcedEffort(id, level);
-  debug(`forceEffort[${source}]: id=${id} level=${level} effort=${effort} meta=${JSON.stringify(meta ?? null)}`);
-  if (meta?.thinkingFormat === "chat-template" || meta?.thinkingFormat === "qwen-chat-template") {
-    payload.chat_template_kwargs = { ...payload.chat_template_kwargs, enable_thinking: true, reasoning_effort: effort };
-  } else if (meta?.api === "openai-codex-responses" || meta?.api === "openai-responses") {
+  debug(
+    `forceEffort[${source}]: id=${id} level=${level} effort=${effort} meta=${JSON.stringify(meta ?? null)}`,
+  );
+  if (
+    meta?.thinkingFormat === "chat-template" ||
+    meta?.thinkingFormat === "qwen-chat-template"
+  ) {
+    payload.chat_template_kwargs = {
+      ...payload.chat_template_kwargs,
+      enable_thinking: true,
+      reasoning_effort: effort,
+    };
+  } else if (
+    meta?.api === "openai-codex-responses" ||
+    meta?.api === "openai-responses"
+  ) {
     payload.reasoning = { ...payload.reasoning, effort };
   } else {
     payload.reasoning_effort = effort;
@@ -299,10 +500,17 @@ function forceEffort(id: string, payload: any, level: string): void {
  * entry, then apply the preset's configured thinking level. Concrete models
  * are intentionally not changed.
  */
-async function refreshMainIfScopedMain(pi: any, ctx: any, label: string, report = true): Promise<boolean> {
+function refreshMainIfScopedMain(
+  pi: any,
+  ctx: any,
+  label: string,
+  report = true,
+): boolean {
   const cur = ctx.model;
   if (!cur || cur.provider !== "scoped" || cur.id !== "main") {
-    debug(`${label}: session model ${cur ? cur.provider + "/" + cur.id : "none"} is not scoped/main, left untouched`);
+    debug(
+      `${label}: session model ${cur ? cur.provider + "/" + cur.id : "none"} is not scoped/main, left untouched`,
+    );
     return true;
   }
 
@@ -315,12 +523,15 @@ async function refreshMainIfScopedMain(pi: any, ctx: any, label: string, report 
   if (!refreshed) {
     const msg = `scope: ERROR — session is on scoped/main but the refreshed scoped/main entry is unavailable (target ${target ? `${target.provider}/${target.id}` : "<unset>"}); scoped/main requests will fail. Check the scopeProvider settings.`;
     debug(`${label}: ${msg}`);
-    if (report) pi.sendMessage({ customType: "scoped", content: msg, display: true });
+    if (report)
+      pi.sendMessage({ customType: "scoped", content: msg, display: true });
     return false;
   }
 
   if (entry?.thinking) pi.setThinkingLevel(entry.thinking);
-  debug(`${label}: refreshed scoped/main -> ${target ? `${target.provider}/${target.id}` : "<unset>"} thinking=${entry?.thinking ?? "unchanged"}`);
+  debug(
+    `${label}: refreshed scoped/main -> ${target ? `${target.provider}/${target.id}` : "<unset>"} thinking=${entry?.thinking ?? "unchanged"}`,
+  );
   return true;
 }
 
@@ -331,17 +542,24 @@ function publishScopeStatus(ctx: any): void {
 
 /** Show the active preset and its remap table as a session message. */
 function scopeTable(): string {
-  const lines = [`scope preset: ${state.preset}`, "  " + "id".padEnd(11) + "target"];
+  const lines = [
+    `scope preset: ${state.preset}`,
+    "  " + "id".padEnd(11) + "target",
+  ];
   for (const id of SCOPE_IDS) {
     const entry = state.entries[id];
     if (!entry) continue;
-    lines.push(`  ${id.padEnd(11)}${entry.model}${entry.thinking ? ` (force thinking: ${entry.thinking})` : ""}`);
+    lines.push(
+      `  ${id.padEnd(11)}${entry.model}${entry.thinking ? ` (force thinking: ${entry.thinking})` : ""}`,
+    );
   }
   return lines.join("\n");
 }
 
 export default function scopeProvider(pi: any): void {
-  debug(`load: preset=${state.preset} activePreset=${scopeProcess.activePreset} rewrite=${process.env.PI_SCOPE_REWRITE !== "0"} log=${process.env.PI_SCOPE_LOG ?? "off"}`);
+  debug(
+    `load: preset=${state.preset} activePreset=${scopeProcess.activePreset} rewrite=${process.env.PI_SCOPE_REWRITE !== "0"} log=${process.env.PI_SCOPE_LOG ?? "off"}`,
+  );
 
   // Re-imports start with an empty table: (re)apply the live process preset so
   // the rewrite table matches what the process serves, and a re-imported
@@ -349,7 +567,7 @@ export default function scopeProvider(pi: any): void {
   if (scopeProcess.rewriteDisabled) {
     disableScopeRewrites();
   } else if (Object.keys(state.entries).length === 0) {
-    applyPreset(scopeProcess.activePreset);
+    applyPreset(scopeProcess.activePreset ?? state.preset);
   }
 
   // Register stubs only until a session's upgrade has replaced them in the
@@ -362,7 +580,7 @@ export default function scopeProvider(pi: any): void {
   pi.on("session_start", async (_event: any, ctx: any) => {
     if (scopeProcess.rewriteDisabled) return;
 
-    const registration = await registerScope(pi, ctx);
+    const registration = await prepareScopeRegistration(ctx, state);
 
     if (registration.count === 0 || !registration.mainAvailable) {
       const available = Object.keys(readScopeConfig()).join(", ") || "<none>";
@@ -377,7 +595,8 @@ export default function scopeProvider(pi: any): void {
       return;
     }
 
-    if (!(await refreshMainIfScopedMain(pi, ctx, "session_start"))) return;
+    commitScopeRegistration(pi, state, registration);
+    if (!refreshMainIfScopedMain(pi, ctx, "session_start")) return;
     // Later re-imports must not re-register factory stubs over the refreshed
     // provider entries shared by this process.
     scopeProcess.upgradedPreset = state.preset;
@@ -387,10 +606,18 @@ export default function scopeProvider(pi: any): void {
   pi.on("before_provider_request", (event: any) => {
     const payload = event.payload as any;
 
-    if (payload && typeof payload === "object" && typeof payload.model === "string") {
+    if (
+      payload &&
+      typeof payload === "object" &&
+      typeof payload.model === "string"
+    ) {
       const entry = state.entries[payload.model];
 
-      if (entry && !scopeProcess.rewriteDisabled && process.env.PI_SCOPE_REWRITE !== "0") {
+      if (
+        entry &&
+        !scopeProcess.rewriteDisabled &&
+        process.env.PI_SCOPE_REWRITE !== "0"
+      ) {
         const target = state.targets[payload.model];
         const from = payload.model;
 
@@ -403,42 +630,137 @@ export default function scopeProvider(pi: any): void {
           forceEffort(from, payload, entry.thinking);
         }
 
-        debug(`rewrite[${source}]: scoped/${from} -> ${payload.model} (preset=${state.preset}${entry.thinking ? `, forced thinking=${entry.thinking} (effort=${appliedEffort})` : ""}) chat_template_kwargs=${JSON.stringify(payload.chat_template_kwargs ?? null)} reasoning=${JSON.stringify(payload.reasoning ?? null)} reasoning_effort=${JSON.stringify(payload.reasoning_effort ?? null)}`);
+        debug(
+          `rewrite[${source}]: scoped/${from} -> ${payload.model} (preset=${state.preset}${entry.thinking ? `, forced thinking=${entry.thinking} (effort=${appliedEffort})` : ""}) chat_template_kwargs=${JSON.stringify(payload.chat_template_kwargs ?? null)} reasoning=${JSON.stringify(payload.reasoning ?? null)} reasoning_effort=${JSON.stringify(payload.reasoning_effort ?? null)}`,
+        );
       } else if (entry) {
-        debug(`rewrite[${source}] disabled: leaving scoped/${payload.model} untouched`);
+        debug(
+          `rewrite[${source}] disabled: leaving scoped/${payload.model} untouched`,
+        );
       }
     }
 
     const logFile = process.env.PI_SCOPE_LOG;
 
     if (logFile && payload && typeof payload === "object") {
-      fs.appendFileSync(logFile, JSON.stringify({ ts: Date.now(), src: source, body: payload }) + "\n");
+      fs.appendFileSync(
+        logFile,
+        JSON.stringify({ ts: Date.now(), src: source, body: payload }) + "\n",
+      );
+    }
+  });
+
+  pi.on("session_before_compact", async (event: any, ctx: any) => {
+    let target: ScopedSummaryTarget | undefined;
+    try {
+      target = snapshotSummaryTarget(ctx);
+      if (!target) return;
+
+      const request = await resolveSummaryRequest(target, ctx);
+      const result = await compact(
+        event.preparation,
+        request.model,
+        request.apiKey,
+        request.headers,
+        event.customInstructions,
+        event.signal,
+        target.thinkingLevel,
+        undefined,
+        request.env,
+        request.retry,
+      );
+      if (event.signal.aborted) return { cancel: true };
+      return { compaction: result };
+    } catch (error) {
+      reportSummaryFailure(pi, "compaction", target, error);
+      return { cancel: true };
+    }
+  });
+
+  pi.on("session_before_tree", async (event: any, ctx: any) => {
+    if (
+      !event.preparation.userWantsSummary ||
+      event.preparation.entriesToSummarize.length === 0
+    )
+      return;
+
+    let target: ScopedSummaryTarget | undefined;
+    try {
+      target = snapshotSummaryTarget(ctx);
+      if (!target) return;
+
+      const settings = SettingsManager.create(ctx.cwd, getAgentDir());
+      const request = await resolveSummaryRequest(target, ctx);
+      const result = await generateBranchSummary(
+        event.preparation.entriesToSummarize,
+        {
+          model: request.model,
+          apiKey: request.apiKey,
+          headers: request.headers,
+          env: request.env,
+          signal: event.signal,
+          customInstructions: event.preparation.customInstructions,
+          replaceInstructions: event.preparation.replaceInstructions,
+          reserveTokens: settings.getBranchSummarySettings().reserveTokens,
+          retry: request.retry,
+        },
+      );
+      if (event.signal.aborted || result.aborted) return { cancel: true };
+      if (result.error) throw new Error(result.error);
+      if (result.summary === undefined)
+        throw new Error("the concrete target returned no branch summary");
+
+      return {
+        summary: {
+          summary: result.summary,
+          usage: result.usage,
+          details: {
+            readFiles: result.readFiles ?? [],
+            modifiedFiles: result.modifiedFiles ?? [],
+          },
+        },
+      };
+    } catch (error) {
+      reportSummaryFailure(pi, "branch summary", target, error);
+      return { cancel: true };
     }
   });
 
   const switchScope = async (name: string, ctx: any): Promise<void> => {
     if (scopeProcess.rewriteDisabled) {
-      pi.sendMessage({ customType: "scoped", content: "scope: ERROR — scoped request rewriting is disabled because provider rollback failed. Restart the session before switching presets.", display: true });
+      pi.sendMessage({
+        customType: "scoped",
+        content:
+          "scope: ERROR — scoped request rewriting is disabled because provider rollback failed. Restart the session before switching presets.",
+        display: true,
+      });
 
       return;
     }
 
     if (name === state.preset) {
-      pi.sendMessage({ customType: "scoped", content: `already on preset "${name}"\n${scopeTable()}`, display: true });
+      pi.sendMessage({
+        customType: "scoped",
+        content: `already on preset "${name}"\n${scopeTable()}`,
+        display: true,
+      });
 
       return;
     }
 
     const previous = snapshotScope(ctx);
+    const next = buildPreset(name);
+    if (!next) {
+      pi.sendMessage({
+        customType: "scoped",
+        content: `unknown preset "${name}" (available: ${Object.keys(readScopeConfig()).join(", ")})`,
+        display: true,
+      });
+      return;
+    }
 
     try {
-      if (!applyPreset(name)) {
-        pi.sendMessage({ customType: "scoped", content: `unknown preset "${name}" (available: ${Object.keys(readScopeConfig()).join(", ")})`, display: true });
-
-        return;
-      }
-
-      const registration = await registerScope(pi, ctx);
+      const registration = await prepareScopeRegistration(ctx, next);
 
       if (registration.count === 0 || !registration.mainAvailable) {
         const available = Object.keys(readScopeConfig()).join(", ") || "<none>";
@@ -450,8 +772,11 @@ export default function scopeProvider(pi: any): void {
         throw new Error(msg);
       }
 
-      if (!(await refreshMainIfScopedMain(pi, ctx, `/scope ${name}`, false))) {
-        throw new Error(`scope: ERROR — preset "${name}" could not refresh the selected scoped/main entry; scoped/main requests will fail. Check the scopeProvider settings and models.`);
+      commitScopeRegistration(pi, next, registration);
+      if (!refreshMainIfScopedMain(pi, ctx, `/scope ${name}`, false)) {
+        throw new Error(
+          `scope: ERROR — preset "${name}" could not refresh the selected scoped/main entry; scoped/main requests will fail. Check the scopeProvider settings and models.`,
+        );
       }
 
       // Publish process-wide after the alias refresh succeeds so re-importing
@@ -470,13 +795,22 @@ export default function scopeProvider(pi: any): void {
       return;
     }
 
-    pi.sendMessage({ customType: "scoped", content: `scope preset: ${name}\n${scopeTable()}`, display: true });
+    pi.sendMessage({
+      customType: "scoped",
+      content: `scope preset: ${name}\n${scopeTable()}`,
+      display: true,
+    });
   };
 
   const cycleScope = async (ctx: any): Promise<void> => {
     const names = Object.keys(readScopeConfig());
     if (names.length === 0) {
-      pi.sendMessage({ customType: "scoped", content: "scope: ERROR — no scope presets are configured; add scopeProvider settings before cycling.", display: true });
+      pi.sendMessage({
+        customType: "scoped",
+        content:
+          "scope: ERROR — no scope presets are configured; add scopeProvider settings before cycling.",
+        display: true,
+      });
       return;
     }
 
@@ -491,17 +825,25 @@ export default function scopeProvider(pi: any): void {
   });
 
   pi.registerCommand("scope", {
-    description: "Select a preset with /scope, or switch directly with /scope <preset>",
+    description:
+      "Select a preset with /scope, or switch directly with /scope <preset>",
     handler: async (args: string, ctx: any) => {
       const name = args.trim();
 
       if (!name) {
         if (!ctx.hasUI) {
-          pi.sendMessage({ customType: "scoped", content: scopeTable(), display: true });
+          pi.sendMessage({
+            customType: "scoped",
+            content: scopeTable(),
+            display: true,
+          });
           return;
         }
 
-        const selected = await ctx.ui.select("Select scope:", Object.keys(readScopeConfig()));
+        const selected = await ctx.ui.select(
+          "Select scope:",
+          Object.keys(readScopeConfig()),
+        );
         if (selected === undefined) return;
         await switchScope(selected, ctx);
         return;

@@ -1,0 +1,482 @@
+import { afterEach, beforeEach, expect, mock, test } from "bun:test";
+import { createServer, type Server } from "node:http";
+import {
+  mkdtempSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
+import { basename, dirname, join } from "node:path";
+
+const piPackageDir = process.env.PI_PACKAGE_DIR;
+if (!piPackageDir)
+  throw new Error("PI_PACKAGE_DIR must point to the packaged Pi runtime");
+const piSubagentsDir = process.env.PI_SUBAGENTS_DIR;
+if (!piSubagentsDir)
+  throw new Error("PI_SUBAGENTS_DIR must point to pi-subagents 0.17.1");
+
+const piDistDir =
+  basename(piPackageDir) === "dist" ? piPackageDir : join(piPackageDir, "dist");
+const packageScopeDir = dirname(dirname(piDistDir));
+const piAi = await import(`${join(packageScopeDir, "pi-ai", "dist")}/index.js`);
+const pi = await import(`${piDistDir}/index.js`);
+const piTui = await import(
+  `${join(packageScopeDir, "pi-tui", "dist")}/index.js`
+);
+mock.module("@earendil-works/pi-ai", () => piAi);
+mock.module("@earendil-works/pi-coding-agent", () => pi);
+mock.module("@earendil-works/pi-tui", () => piTui);
+const { InMemoryCredentialStore, InMemoryModelsStore } = piAi;
+const { ModelRegistry, ModelRuntime } = pi;
+const { runAgent } = await import(`${piSubagentsDir}/dist/agent-runner.js`);
+const { loadCustomAgents } = await import(
+  `${piSubagentsDir}/dist/custom-agents.js`
+);
+const { registerAgents } = await import(
+  `${piSubagentsDir}/dist/agent-types.js`
+);
+
+type RequestRecord = { model: string; messages: unknown[] };
+type ResponsePlan = { finishReason: string };
+type ChildSession = InstanceType<typeof pi.AgentSession>;
+
+let agentDir = "";
+let cwd = "";
+let server: Server;
+let baseUrl = "";
+let requests: RequestRecord[] = [];
+let responsePlans: ResponsePlan[] = [];
+let previousAgentDir: string | undefined;
+let previousScope: string | undefined;
+
+beforeEach(async () => {
+  agentDir = mkdtempSync(join(tmpdir(), "scope-child-agent-"));
+  cwd = mkdtempSync(join(tmpdir(), "scope-child-cwd-"));
+  previousAgentDir = process.env.PI_CODING_AGENT_DIR;
+  previousScope = process.env.PI_SCOPE;
+  process.env.PI_CODING_AGENT_DIR = agentDir;
+  process.env.PI_SCOPE = "first";
+  delete (globalThis as Record<string, unknown>).__PI_SCOPE_SEQ__;
+  delete (globalThis as Record<string, unknown>).activePreset;
+  delete (globalThis as Record<string, unknown>).upgradedPreset;
+  delete (globalThis as Record<string, unknown>).rewriteDisabled;
+  requests = [];
+  responsePlans = [];
+
+  server = createServer((request, response) => {
+    let raw = "";
+    request.setEncoding("utf8");
+    request.on("data", (chunk) => {
+      raw += chunk;
+    });
+    request.on("end", () => {
+      const body = JSON.parse(raw) as RequestRecord;
+      requests.push({ model: body.model, messages: body.messages });
+      const plan = responsePlans.shift();
+      if (plan) {
+        response.writeHead(200, {
+          "content-type": "text/event-stream",
+          "cache-control": "no-cache",
+          connection: "keep-alive",
+        });
+        response.write(
+          `data: ${JSON.stringify({ id: `response-${requests.length}`, object: "chat.completion.chunk", created: 1, model: body.model, choices: [{ index: 0, delta: {}, finish_reason: plan.finishReason }] })}\n\n`,
+        );
+        response.end("data: [DONE]\n\n");
+        return;
+      }
+      response.writeHead(200, {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache",
+        connection: "keep-alive",
+      });
+      response.write(
+        `data: ${JSON.stringify({ id: `response-${requests.length}`, object: "chat.completion.chunk", created: 1, model: body.model, choices: [{ index: 0, delta: { role: "assistant", content: `answer-${requests.length}` }, finish_reason: null }] })}\n\n`,
+      );
+      response.write(
+        `data: ${JSON.stringify({ id: `response-${requests.length}`, object: "chat.completion.chunk", created: 1, model: body.model, choices: [{ index: 0, delta: {}, finish_reason: "stop" }] })}\n\n`,
+      );
+      response.end("data: [DONE]\n\n");
+    });
+  });
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const address = server.address();
+  if (!address || typeof address === "string")
+    throw new Error("local SSE server did not bind a TCP port");
+  baseUrl = `http://127.0.0.1:${address.port}/v1`;
+
+  mkdirSync(join(agentDir, "extensions"), { recursive: true });
+  mkdirSync(join(agentDir, "agents"), { recursive: true });
+  const extension = readFileSync(
+    join(import.meta.dir, "scope-provider.ts"),
+    "utf8",
+  ).replaceAll('"@earendil-works/pi-coding-agent"', `"${piDistDir}/index.js"`);
+  writeFileSync(join(agentDir, "extensions", "scope-provider.ts"), extension);
+  writeSettings({ enabled: false, maxRetries: 0, baseDelayMs: 1 });
+  writeFileSync(
+    join(agentDir, "agents", "junior.md"),
+    `---\nname: junior\ndescription: Scoped runtime child\nmodel: scoped/junior\nextensions: true\nskills: false\ntools: read\n---\nReturn a short answer.`,
+  );
+  writeFileSync(
+    join(agentDir, "agents", "direct.md"),
+    `---\nname: direct\ndescription: Direct runtime child\nmodel: local/concrete-direct\nextensions: true\nskills: false\ntools: read\n---\nReturn a short answer.`,
+  );
+  registerAgents(loadCustomAgents(cwd, true));
+});
+
+afterEach(async () => {
+  await new Promise<void>((resolve) => server.close(() => resolve()));
+  if (previousAgentDir === undefined) delete process.env.PI_CODING_AGENT_DIR;
+  else process.env.PI_CODING_AGENT_DIR = previousAgentDir;
+  if (previousScope === undefined) delete process.env.PI_SCOPE;
+  else process.env.PI_SCOPE = previousScope;
+  rmSync(agentDir, { recursive: true, force: true });
+  rmSync(cwd, { recursive: true, force: true });
+});
+
+function writeSettings(retry: {
+  enabled: boolean;
+  maxRetries: number;
+  baseDelayMs: number;
+}): void {
+  writeFileSync(
+    join(agentDir, "settings.json"),
+    JSON.stringify({
+      compaction: { enabled: true, reserveTokens: 64, keepRecentTokens: 1 },
+      branchSummary: { reserveTokens: 64 },
+      retry,
+      scopeProvider: {
+        first: {
+          main: { model: "local/concrete-main" },
+          remap: {
+            "scoped/junior": {
+              model: "local/concrete-junior",
+              thinking: "high",
+            },
+          },
+        },
+        second: {
+          main: { model: "local/second-main" },
+          remap: {
+            "scoped/junior": { model: "local/second-junior", thinking: "low" },
+          },
+        },
+      },
+    }),
+  );
+}
+
+function concreteModel(id: string) {
+  return {
+    id,
+    name: id,
+    reasoning: true,
+    input: ["text"],
+    contextWindow: 4096,
+    maxTokens: 512,
+    cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
+  };
+}
+
+async function createParentRuntime() {
+  const runtime = await ModelRuntime.create({
+    credentials: new InMemoryCredentialStore(),
+    modelsStore: new InMemoryModelsStore(),
+    modelsPath: null,
+    allowModelNetwork: false,
+    refreshOnCreate: false,
+  });
+  const registry = new ModelRegistry(runtime);
+  registry.registerProvider("local", {
+    name: "Local SSE",
+    baseUrl,
+    api: "openai-completions",
+    apiKey: "test-key",
+    models: [
+      concreteModel("concrete-main"),
+      concreteModel("concrete-junior"),
+      concreteModel("concrete-direct"),
+      concreteModel("second-main"),
+      concreteModel("second-junior"),
+    ],
+  });
+  registry.registerProvider("scoped", {
+    name: "Scoped",
+    baseUrl,
+    api: "openai-completions",
+    apiKey: "local",
+    models: [{ ...concreteModel("junior"), name: "scoped/junior" }],
+  });
+  return { runtime, registry };
+}
+
+function parentContext(registry: InstanceType<typeof ModelRegistry>) {
+  return {
+    cwd,
+    model: registry.find("local", "concrete-main"),
+    modelRegistry: registry,
+    thinkingLevel: "medium",
+    sessionManager: pi.SessionManager.inMemory(cwd),
+    getSystemPrompt: () => "Parent system prompt",
+  } as any;
+}
+
+const extensionApi = {
+  exec: async () => ({ code: 1, stdout: "", stderr: "" }),
+} as any;
+
+async function runChild(type: "junior" | "direct") {
+  const { runtime, registry } = await createParentRuntime();
+  let child: ChildSession | undefined;
+  const result = await runAgent(
+    parentContext(registry),
+    type,
+    "initial request",
+    {
+      pi: extensionApi,
+      cwd,
+      configCwd: cwd,
+      onSessionCreated: (session: ChildSession) => {
+        child = session;
+      },
+    },
+  );
+  if (!child)
+    throw new Error("runAgent did not expose its real child AgentSession");
+  return { runtime, registry, child, result };
+}
+
+async function appendTurn(session: ChildSession, text: string): Promise<void> {
+  await session.prompt(text);
+}
+
+async function runAutoCompaction(
+  session: ChildSession,
+  reason: "threshold" | "overflow",
+): Promise<void> {
+  const before = session.sessionManager
+    .getEntries()
+    .filter((entry: any) => entry.type === "compaction").length;
+  const compacted = await (session as any)._runAutoCompaction(
+    reason,
+    reason === "overflow",
+  );
+  const compactions = session.sessionManager
+    .getEntries()
+    .filter((entry: any) => entry.type === "compaction");
+  expect(compactions).toHaveLength(before + 1);
+  expect(compactions.at(-1)).toMatchObject({
+    type: "compaction",
+    fromHook: true,
+  });
+  if (reason === "overflow") expect(compacted).toBe(true);
+}
+
+function requestModels(start = 0): string[] {
+  return requests.slice(start).map(({ model }) => model);
+}
+
+async function waitForRequestCount(count: number): Promise<void> {
+  const deadline = Date.now() + 2000;
+  while (requests.length < count) {
+    if (Date.now() >= deadline)
+      throw new Error(`timed out waiting for ${count} requests`);
+    await Bun.sleep(1);
+  }
+}
+
+test("runAgent scoped child routes normal, all compaction triggers and tree summaries to its concrete target", async () => {
+  const { child, result } = await runChild("junior");
+  expect(result.failure).toBeUndefined();
+  expect(child.model).toMatchObject({ provider: "scoped", id: "junior" });
+  expect(requestModels()).toEqual(["concrete-junior"]);
+
+  await appendTurn(child, "manual compaction material");
+  const beforeManual = requests.length;
+  await child.compact("manual focus");
+  expect(requestModels(beforeManual).length).toBeGreaterThan(0);
+  expect(
+    requestModels(beforeManual).every((model) => model === "concrete-junior"),
+  ).toBe(true);
+  expect(child.sessionManager.getBranch().at(-1)).toMatchObject({
+    type: "compaction",
+    fromHook: true,
+  });
+
+  await appendTurn(child, "threshold compaction material one");
+  await appendTurn(child, "threshold compaction material two");
+  const beforeThreshold = requests.length;
+  await runAutoCompaction(child, "threshold");
+  expect(requestModels(beforeThreshold).length).toBeGreaterThan(0);
+  expect(
+    requestModels(beforeThreshold).every(
+      (model) => model === "concrete-junior",
+    ),
+  ).toBe(true);
+
+  await appendTurn(child, "overflow compaction material one");
+  await appendTurn(child, "overflow compaction material two");
+  const beforeOverflow = requests.length;
+  await runAutoCompaction(child, "overflow");
+  expect(requestModels(beforeOverflow).length).toBeGreaterThan(0);
+  expect(
+    requestModels(beforeOverflow).every((model) => model === "concrete-junior"),
+  ).toBe(true);
+
+  await appendTurn(child, "branch root");
+  const branch = child.sessionManager.getBranch();
+  const target = branch.find(
+    (entry: any) => entry.type === "message" && entry.message.role === "user",
+  )?.id;
+  if (!target)
+    throw new Error("child session did not retain a navigable user entry");
+  await appendTurn(child, "abandoned branch with file facts");
+  const beforeTree = requests.length;
+  const navigation = await child.navigateTree(target, {
+    summarize: true,
+    customInstructions: "preserve branch details",
+  });
+  expect(navigation.cancelled).toBe(false);
+  expect(requestModels(beforeTree).length).toBeGreaterThan(0);
+  expect(
+    requestModels(beforeTree).every((model) => model === "concrete-junior"),
+  ).toBe(true);
+  const summaryEntry = child.sessionManager
+    .getBranch()
+    .find((entry: any) => entry.type === "branch_summary");
+  expect(summaryEntry).toMatchObject({
+    type: "branch_summary",
+    summary: `The user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nanswer-${requests.length}`,
+    details: { readFiles: [], modifiedFiles: [] },
+    usage: {
+      input: 0,
+      output: 0,
+      cacheRead: 0,
+      cacheWrite: 0,
+      totalTokens: 0,
+      cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 },
+    },
+    fromHook: true,
+  });
+  expect(child.model).toMatchObject({ provider: "scoped", id: "junior" });
+  expect(requests.map(({ model }) => model)).not.toContain("junior");
+});
+
+test("native retries preserve scoped compaction success and terminal outcomes without alias fallback", async () => {
+  writeSettings({ enabled: true, maxRetries: 2, baseDelayMs: 1 });
+  const retrySuccess = await runChild("junior");
+  await appendTurn(retrySuccess.child, "retry success material");
+  let before = requests.length;
+  responsePlans.push({ finishReason: "network_error" });
+  await retrySuccess.child.compact();
+  expect(requestModels(before)).toEqual([
+    "concrete-junior",
+    "concrete-junior",
+    "concrete-junior",
+  ]);
+  expect(retrySuccess.child.sessionManager.getBranch().at(-1)).toMatchObject({
+    type: "compaction",
+    fromHook: true,
+  });
+
+  const nonRetryable = await runChild("junior");
+  await appendTurn(nonRetryable.child, "non-retryable material");
+  before = requests.length;
+  responsePlans.push({ finishReason: "content_filter" });
+  await expect(nonRetryable.child.compact()).rejects.toThrow(
+    "Compaction cancelled",
+  );
+  expect(requestModels(before)).toEqual(["concrete-junior"]);
+  expect(
+    nonRetryable.child.sessionManager
+      .getEntries()
+      .filter((entry: any) => entry.type === "compaction"),
+  ).toEqual([]);
+
+  const exhausted = await runChild("junior");
+  await appendTurn(exhausted.child, "retry exhaustion material");
+  before = requests.length;
+  responsePlans.push(
+    { finishReason: "network_error" },
+    { finishReason: "network_error" },
+    { finishReason: "network_error" },
+  );
+  await expect(exhausted.child.compact()).rejects.toThrow(
+    "Compaction cancelled",
+  );
+  expect(requestModels(before)).toEqual([
+    "concrete-junior",
+    "concrete-junior",
+    "concrete-junior",
+  ]);
+  expect(requestModels(before)).not.toContain("junior");
+
+  writeSettings({ enabled: false, maxRetries: 2, baseDelayMs: 1 });
+  const disabled = await runChild("junior");
+  await appendTurn(disabled.child, "disabled retry material");
+  before = requests.length;
+  responsePlans.push({ finishReason: "network_error" });
+  await expect(disabled.child.compact()).rejects.toThrow(
+    "Compaction cancelled",
+  );
+  expect(requestModels(before)).toEqual(["concrete-junior"]);
+});
+
+test("aborting native scoped retry backoff cancels without another request", async () => {
+  writeSettings({ enabled: true, maxRetries: 2, baseDelayMs: 10_000 });
+  const { child } = await runChild("junior");
+  await appendTurn(child, "abort retry material");
+  const before = requests.length;
+  responsePlans.push({ finishReason: "network_error" });
+
+  const compacting = child.compact();
+  await waitForRequestCount(before + 1);
+  child.abortCompaction();
+
+  await expect(compacting).rejects.toThrow("Compaction cancelled");
+  expect(requestModels(before)).toEqual(["concrete-junior"]);
+  expect(
+    child.sessionManager
+      .getEntries()
+      .filter((entry: any) => entry.type === "compaction"),
+  ).toEqual([]);
+});
+
+test("runAgent direct child retains native dispatch and scoped switch affects only new children", async () => {
+  const direct = await runChild("direct");
+  expect(direct.child.model).toMatchObject({
+    provider: "local",
+    id: "concrete-direct",
+  });
+  expect(requestModels()).toEqual(["concrete-direct"]);
+  await appendTurn(direct.child, "direct compaction material");
+  const beforeDirectCompact = requests.length;
+  await direct.child.compact();
+  expect(requestModels(beforeDirectCompact).length).toBeGreaterThan(0);
+  expect(
+    requestModels(beforeDirectCompact).every(
+      (model) => model === "concrete-direct",
+    ),
+  ).toBe(true);
+  expect(direct.child.sessionManager.getBranch().at(-1)).toMatchObject({
+    type: "compaction",
+    fromHook: false,
+  });
+
+  requests = [];
+  const first = await runChild("junior");
+  const runner = (first.child as any)._extensionRunner;
+  const command = runner.getCommand("scope");
+  if (!command) throw new Error("real child did not bind the scope command");
+  await command.handler("second", runner.createCommandContext());
+  expect(first.child.model).toMatchObject({ provider: "scoped", id: "junior" });
+
+  const second = await runChild("junior");
+  expect(second.child.model).toMatchObject({
+    provider: "scoped",
+    id: "junior",
+  });
+  expect(requestModels()).toEqual(["concrete-junior", "second-junior"]);
+});
