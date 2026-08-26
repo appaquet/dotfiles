@@ -23,6 +23,7 @@
          If planning is required, note it and tell user about it. 
          NEVER FIX them directly, we are only collecting feedback and investigations.
          Collect all your questions for when I'll trigger a planning workflow. Don't ask them as we go.
+         Do NOT launch review agents for feedback. We're just collecting evidence, not reviewing anything yet.
 
       3. ${
         scope.blocks."engagement-gate".gate
