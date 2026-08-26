@@ -6,6 +6,7 @@
       effort = "medium";
       asSkill = {
         opencode = true;
+        pi = true;
       };
       content = ''
         Goal: Save project state for perfect resumption. Detail level should allow anyone, including a junior intern, to pick up where we left off. You may not be the one resuming it, be thorough and clear.

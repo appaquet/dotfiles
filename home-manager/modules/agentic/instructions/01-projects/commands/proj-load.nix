@@ -6,6 +6,7 @@
       effort = "medium";
       asSkill = {
         opencode = true;
+        pi = true;
       };
       content = ''
         Goal: load context about project / task from project docs.

@@ -87,6 +87,10 @@ let
     "proj-load"
     "proj-save"
   ];
+  piSkills = claudeSkills ++ [
+    "proj-load"
+    "proj-save"
+  ];
 
   filesIn =
     harness: directory: names:
@@ -116,7 +120,7 @@ let
       ++ filesIn "pi" "agents" piAgents
       ++ filesIn "pi" "prompts" commonCommandsForMode
       ++ filesIn "pi" "rules" piRules
-      ++ skillFiles "pi" claudeSkills
+      ++ skillFiles "pi" piSkills
     );
   mkAcceptanceCheck =
     name: instructions: expectedVcs: unexpectedVcs:
