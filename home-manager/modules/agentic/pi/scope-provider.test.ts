@@ -44,6 +44,10 @@ type ScopeConfig = Record<string, ScopePreset>;
 type ScopeCommand = (args: string, ctx: TestContext) => Promise<void>;
 type ScopeHandler = (event: { payload: Record<string, unknown> }) => void;
 type ScopeShortcut = (ctx: TestContext) => Promise<void>;
+type SessionStartHandler = (
+  event: unknown,
+  ctx: TestContext,
+) => Promise<void>;
 type StatusEvent = { key: string; value: string };
 
 type TestContext = {
@@ -114,6 +118,8 @@ class TestRegistry {
 type Harness = {
   registry: TestRegistry;
   factoryConfig?: ProviderConfig;
+  sessionStart: SessionStartHandler;
+  startSession: () => Promise<void>;
   ctx: TestContext;
   command: ScopeCommand;
   commandDescription: string;
@@ -223,6 +229,7 @@ async function createHarness(
     >;
     models?: Model[];
     requestAuth?: Record<string, RequestAuth | (() => Promise<RequestAuth>)>;
+    deferSessionStart?: boolean;
   } = {},
 ): Promise<Harness> {
   writeFileSync(
@@ -247,6 +254,7 @@ async function createHarness(
   const selectCalls: Array<{ title: string; options: string[] }> = [];
   let command: ScopeCommand | undefined;
   let beforeRequest: ScopeHandler | undefined;
+  let sessionStart: SessionStartHandler | undefined;
   const shortcuts: Array<{
     key: string;
     description: string;
@@ -255,6 +263,12 @@ async function createHarness(
   const summaryHandlers: Record<string, SummaryHandler[]> = {};
   const harness: Harness = {
     registry,
+    sessionStart: async () => {
+      throw new Error("scope session_start handler was not registered");
+    },
+    startSession: async () => {
+      throw new Error("scope session_start handler was not registered");
+    },
     ctx: {
       model: { provider: "scoped", id: "main" },
       thinkingLevel: "medium",
@@ -305,14 +319,7 @@ async function createHarness(
       if (event === "before_provider_request")
         beforeRequest = handler as ScopeHandler;
       if (event === "session_start")
-        (
-          harness as Harness & {
-            sessionStart?: (event: unknown, ctx: TestContext) => Promise<void>;
-          }
-        ).sessionStart = handler as (
-          event: unknown,
-          ctx: TestContext,
-        ) => Promise<void>;
+        sessionStart = handler as SessionStartHandler;
       if (
         event === "session_before_compact" ||
         event === "session_before_tree"
@@ -347,16 +354,13 @@ async function createHarness(
   harness.factoryConfig = structuredClone(
     registry.getRegisteredProviderConfig("scoped"),
   );
-  const sessionStart = (
-    harness as Harness & {
-      sessionStart?: (event: unknown, ctx: TestContext) => Promise<void>;
-    }
-  ).sessionStart;
   if (!sessionStart || !command || !beforeRequest)
     throw new Error("scope extension did not register its handlers");
+  harness.sessionStart = sessionStart;
+  harness.startSession = () => harness.sessionStart({}, harness.ctx);
   harness.command = command;
   harness.beforeRequest = beforeRequest;
-  await sessionStart({}, harness.ctx);
+  if (!options.deferSessionStart) await harness.startSession();
   return harness;
 }
 
@@ -430,6 +434,25 @@ function rewrite(harness: Harness): Record<string, unknown> {
   const payload: Record<string, unknown> = { model: "main" };
   harness.beforeRequest({ payload });
   return payload;
+}
+
+function processState(): Record<string, unknown> {
+  const globals = globalThis as Record<string, unknown>;
+  return {
+    activePreset: globals.activePreset,
+    upgradedPreset: globals.upgradedPreset,
+    rewriteDisabled: globals.rewriteDisabled,
+  };
+}
+
+function modelIdentity(model: Model | undefined):
+  | { provider: string; id: string; name: string }
+  | undefined {
+  return model && {
+    provider: model.provider,
+    id: model.id,
+    name: model.name,
+  };
 }
 
 test("registers the fixed scope cycling shortcut", async () => {
@@ -559,6 +582,93 @@ test("factory stubs mark only the scoped/main alias", async () => {
     staff: "scoped/staff (preset stub, upgraded at session start)",
     principal: "scoped/principal (preset stub, upgraded at session start)",
   });
+});
+
+test("resolves scoped/main in each fresh registry before session_start", async () => {
+  // These IDs, keys, and names are synthetic full-thinking fixtures. Production
+  // codex maps to openai-codex/gpt-5.6-sol (catalog name "GPT-5.6 Sol [S]")
+  // with medium effort; local maps to deskapp/qwen3.8-27b (catalog name
+  // "qwen3.8-27b (deskapp) [S]") with medium effort.
+  const cases = [
+    {
+      preset: "codex",
+      expected: {
+        name: "Cloud main model [S]",
+        key: "old-key",
+        rewrite: { model: "old-main", reasoning_effort: "medium" },
+        thinking: "medium",
+      },
+    },
+    {
+      preset: "local",
+      expected: {
+        name: "Local main model [S]",
+        key: "next-key",
+        rewrite: { model: "next-main", reasoning_effort: "high" },
+        thinking: "high",
+      },
+    },
+  ] as const;
+
+  for (const scenario of cases) {
+    const globals = globalThis as Record<string, unknown>;
+    globals.activePreset = "codex";
+    globals.upgradedPreset = undefined;
+    globals.rewriteDisabled = false;
+
+    const first = await createHarness(shortcutPresets, {
+      apiKeys: { old: "old-key", next: "next-key" },
+      models: [
+        target("old", "old-main", "Cloud main model"),
+        target("next", "next-main", "Local main model"),
+      ],
+    });
+    await first.command(scenario.preset, first.ctx);
+
+    expect(processState()).toEqual({
+      activePreset: scenario.preset,
+      upgradedPreset: scenario.preset,
+      rewriteDisabled: false,
+    });
+    expect(modelIdentity(first.registry.find("scoped", "main"))).toEqual({
+      provider: "scoped",
+      id: "main",
+      name: scenario.expected.name,
+    });
+
+    const second = await createHarness(shortcutPresets, {
+      apiKeys: { old: "old-key", next: "next-key" },
+      models: [
+        target("old", "old-main", "Cloud main model"),
+        target("next", "next-main", "Local main model"),
+      ],
+      deferSessionStart: true,
+    });
+
+    expect(modelIdentity(second.registry.find("scoped", "main"))).toEqual({
+      provider: "scoped",
+      id: "main",
+      name: "scoped/main (preset stub, upgraded at session start) [S]",
+    });
+
+    await second.startSession();
+
+    expect(modelIdentity(second.registry.find("scoped", "main"))).toEqual({
+      provider: "scoped",
+      id: "main",
+      name: scenario.expected.name,
+    });
+    expect(second.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe(
+      scenario.expected.key,
+    );
+    expect(rewrite(second)).toEqual(scenario.expected.rewrite);
+    expect(second.ctx.thinkingLevel).toBe(scenario.expected.thinking);
+    expect(processState()).toEqual({
+      activePreset: scenario.preset,
+      upgradedPreset: scenario.preset,
+      rewriteDisabled: false,
+    });
+  }
 });
 
 test("resolved aliases mark only scoped/main across preset refreshes", async () => {

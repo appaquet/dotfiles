@@ -1,8 +1,9 @@
 /**
  * Registers a `scoped` pseudo-provider whose ids resolve per active preset to
- * concrete models from the `scopeProvider` settings table. Factory registers
- * stub entries so `scoped/<id>` resolves at startup; `session_start` refreshes
- * them with entries cloned from the live registry; `before_provider_request`
+ * concrete models from the `scopeProvider` settings table. Extension
+ * initialization registers stub entries in each model registry so
+ * `scoped/<id>` resolves at startup; `session_start` refreshes them with
+ * entries cloned from the live registry; `before_provider_request`
  * rewrites outgoing bodies to the target's bare id (and forces effort when the
  * preset entry sets `thinking`).
  *
@@ -570,10 +571,12 @@ export default function scopeProvider(pi: any): void {
     applyPreset(scopeProcess.activePreset ?? state.preset);
   }
 
-  // Register stubs only until a session's upgrade has replaced them in the
-  // shared runtime; a later (child) session's factory must not clobber the
-  // upgraded entries (tracked process-wide; each re-import has fresh state).
-  if (!scopeProcess.rewriteDisabled && !scopeProcess.upgradedPreset) {
+  // Every extension initialization registers stubs because replacement
+  // runtimes need scoped/* entries before initial model resolution. A reused
+  // registry, such as /reload, has no initial resolution between this
+  // registration and its session_start upgrade; the process-wide upgraded
+  // marker is not registration state.
+  if (!scopeProcess.rewriteDisabled) {
     registerScopeStubs(pi);
   }
 
@@ -597,8 +600,8 @@ export default function scopeProvider(pi: any): void {
 
     commitScopeRegistration(pi, state, registration);
     if (!refreshMainIfScopedMain(pi, ctx, "session_start")) return;
-    // Later re-imports must not re-register factory stubs over the refreshed
-    // provider entries shared by this process.
+    // Record the usable preset for re-imported sessions after session_start
+    // upgrades the current registry, including a registry reused by /reload.
     scopeProcess.upgradedPreset = state.preset;
     publishScopeStatus(ctx);
   });
