@@ -5,7 +5,7 @@ Usage: maybe --profile <name> -- <cmd> [args...]
 Sources .nono/pre.sh if present, resolves the profile, conditionally adds the
 --allow-unix-socket grant when the maybe-portal approver is live and the
 default Jujutsu workspace root when it can be resolved, and execs
-  nono run -- maybe-in <cmd> ...
+  nono wrap -- maybe-in <cmd> ...
 EOF
 }
 
@@ -42,7 +42,10 @@ done
 }
 
 PROFILE=$(maybe-profile "$PROFILE")
-ARGS=(run --profile "$PROFILE" --allow-cwd --no-diagnostics)
+
+# wrap execs the agent directly so it stays herdr's foreground process;
+# run (supervised) would hide it behind a non-dumpable supervisor + inner PTY.
+ARGS=(wrap --profile "$PROFILE" --allow-cwd --no-diagnostics)
 
 if [ -S ".nono/socket" ]; then
   ARGS+=(--allow-unix-socket .nono/socket)
