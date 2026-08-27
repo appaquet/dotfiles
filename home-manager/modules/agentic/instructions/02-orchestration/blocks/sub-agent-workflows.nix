@@ -64,31 +64,30 @@
 
       tag = "sub-agents-workflows";
       taggedContent = ''
-        * Main agent: 
-          * Used primarily for high-level orchestration, project management, version control, decision orchestrator. 
-          * Main agent context window is VERY precious; Anything requiring exploring/reading code should be delegated to sub-agents. 
-          * It is CRITICAL for the main agent to understand the project, key decisions, design, architecture, etc. to properly orchestrate sub-agents.
+
+        * Two execution modes: orchestrator vs builder
+          * 🏭 Builder mode (default)
+            * Main agent implements work directly in the session
+            * Delegates only context-intensive exploration, research, and review
+
+          * 👑 Orchestrator mode
+            * No coding in the main session — delegate it, including the reads it requires
+            * Lead via project docs, version control, questions, and decisions
+
+          * Common
+            * Main agent leads the decision making with the user, owns project docs and version control
+
+          * In doubt
+            * Ask yourself if the action will cost the context window. Still in doubt, ask the user.
+          * May be switched at any moment mid-session via an explicit mode prompt.
+
 
         ${scope.blocks."sub-agent-selection".embed}
 
         * Sub-agents
-          * Delegation threshold:
-            * Project document read/work
-              * No matter the size, always main agent
-            * Writing code
-              * Orchestrator mode (no write access) -> delegate
-              * Trivial, single-location edits with no multi-steps testing (typo, fixture data) → main agent
-              * Multi-files changes, new logic, iterative test<>code → delegate
-            * Reading code
-              * bounded 1-2 files → main agent
-              * unbounded reading, exploration → delegate
-            * Web search
-              * Always on sub-agent as results can be long and require analysis
-            * In doubt -> delegate
+          * Grouping: group related work on the same sub-agent for focus and fewer conflicts; be careful with selection.
 
-          * Grouping: group related work to same sub-agent for more focused and less conflicts, but careful of selection.
-
-          * Parallelism: if multiple unrelated tasks, launch multiple sub-agents in parallel, but careful about potential file conflicts.
+          * Parallelism: if multiple unrelated tasks, launch multiple sub-agents in parallel, but be careful about potential file conflicts.
 
           * Prompt to sub-agent:
             * Reference relevant project/phase files; push to read them rather than copying their content.

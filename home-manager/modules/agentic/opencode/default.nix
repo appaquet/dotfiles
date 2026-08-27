@@ -41,7 +41,7 @@ let
 
       planner = exploration;
       orchestrator = exploration // development // review;
-      build = exploration // development;
+      build = exploration;
       buildLocal = general;
     };
 
@@ -328,7 +328,7 @@ let
 
       build = {
         color = "#f87171";
-        prompt = "You are in direct build mode, with orchestration off. You should not use sub-agents to do any development work. You can use the explore or general agent for code exploration and research.";
+        prompt = instructions.blocks.opencode."builder-prompt".body;
         permission = {
           task = permissions.mkTaskDenyDefault permissions.task.build;
         };

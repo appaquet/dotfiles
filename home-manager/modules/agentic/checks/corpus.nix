@@ -20,6 +20,7 @@ let
   piAgents = [ "Explore" ];
   claudeCommands = [
     "ask"
+    "builder"
     "continue"
     "ctx-check"
     "ctx-improve"
@@ -30,7 +31,7 @@ let
     "jj-absorb"
     "jj-resolve-conflicts"
     "mem-edit"
-    "orchestrator-on"
+    "orchestrator"
     "pr-desc"
     "pr-import-comments"
     "pr-reply-comments"
@@ -48,9 +49,11 @@ let
     command:
     !(builtins.elem command [
       "ctx-usage"
-      "orchestrator-on"
+      "orchestrator"
+      "builder"
     ])
   ) claudeCommands;
+  piCommands = builtins.filter (command: command != "ctx-usage") claudeCommands;
   gitClaudeCommands = builtins.filter (
     command:
     !(builtins.elem command [
@@ -59,6 +62,7 @@ let
     ])
   ) claudeCommands;
   gitCommands = builtins.filter (command: builtins.elem command gitClaudeCommands) commonCommands;
+  gitPiCommands = builtins.filter (command: builtins.elem command gitClaudeCommands) piCommands;
   claudeRules = [
     "development"
     "orchestration"
@@ -95,7 +99,7 @@ let
     map (name: "${harness}/${directory}/${name}.md") names;
   skillFiles = harness: names: map (name: "${harness}/skills/${name}/SKILL.md") names;
   expectedFiles =
-    claudeCommandsForMode: commonCommandsForMode:
+    claudeCommandsForMode: commonCommandsForMode: piCommandsForMode:
     builtins.sort builtins.lessThan (
       [
         "claude/BOM.md"
@@ -116,7 +120,7 @@ let
       ++ skillFiles "opencode" opencodeSkills
       ++ filesIn "pi" "agents" agents
       ++ filesIn "pi" "agents" piAgents
-      ++ filesIn "pi" "prompts" commonCommandsForMode
+      ++ filesIn "pi" "prompts" piCommandsForMode
       ++ filesIn "pi" "rules" piRules
       ++ skillFiles "pi" piSkills
     );
@@ -127,7 +131,13 @@ let
         if expectedVcs == "git branch --show-current" then gitCommands else commonCommands;
       claudeCommandsForMode =
         if expectedVcs == "git branch --show-current" then gitClaudeCommands else claudeCommands;
-      manifest = pkgs.writeText "${name}-manifest" "${builtins.concatStringsSep "\n" (expectedFiles claudeCommandsForMode commonCommandsForMode)}\n";
+      piCommandsForMode =
+        if expectedVcs == "git branch --show-current" then gitPiCommands else piCommands;
+      manifest = pkgs.writeText "${name}-manifest" "${
+        builtins.concatStringsSep "\n" (
+          expectedFiles claudeCommandsForMode commonCommandsForMode piCommandsForMode
+        )
+      }\n";
     in
     pkgs.runCommand name { } ''
       set -eu
