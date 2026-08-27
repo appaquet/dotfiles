@@ -107,6 +107,7 @@ let
           welcome = false;
           layout = {
             left = [
+              "custom:mode"
               "model"
               "thinking"
               "custom:scope"
@@ -122,6 +123,12 @@ let
             format = "percent";
           };
           customItems = [
+            {
+              id = "mode";
+              statusKey = "mode";
+              position = "left";
+              excludeFromExtensionStatuses = true;
+            }
             {
               id = "scope";
               statusKey = "scope";
@@ -151,6 +158,12 @@ let
     {
       files = {
         ".pi/agent/extensions/rpiv-herdr-bridge.ts".source = ./rpiv-herdr-bridge.ts;
+      };
+    }
+
+    {
+      files = {
+        ".pi/agent/extensions/mode-switch.ts".source = ./mode-switch.ts;
       };
     }
   ];
