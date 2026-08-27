@@ -64,7 +64,7 @@ type ScopeSnapshot = {
   thinkingLevel?: string;
 };
 
-const SCOPE_IDS = ["main", "junior", "mid", "senior", "staff", "principal"];
+const SCOPE_IDS = ["main", "junior", "mid", "senior", "staff", "principal", "reviewer"];
 
 // Stub entries so `scoped/<id>` resolves before session_start upgrades them
 // from the live registry; upgrade failure fails loud (see session_start).

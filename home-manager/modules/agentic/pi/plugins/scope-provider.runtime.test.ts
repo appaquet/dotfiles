@@ -480,3 +480,207 @@ test("runAgent direct child retains native dispatch and scoped switch affects on
   });
   expect(requestModels()).toEqual(["concrete-junior", "second-junior"]);
 });
+
+type CapturingServer = {
+  baseUrl: string;
+  bodies: Array<Record<string, unknown>>;
+  close: () => Promise<void>;
+};
+
+let capturingServer: CapturingServer | undefined;
+
+afterEach(async () => {
+  if (capturingServer) {
+    await capturingServer.close();
+    capturingServer = undefined;
+  }
+});
+
+// SSE server that records full request bodies so payload-level assertions can
+// inspect the wire values (model, forced effort) rather than aliases.
+async function startCapturingServer(): Promise<CapturingServer> {
+  const bodies: Array<Record<string, unknown>> = [];
+  const capturing = createServer((request, response) => {
+    let raw = "";
+    request.setEncoding("utf8");
+    request.on("data", (chunk) => {
+      raw += chunk;
+    });
+    request.on("end", () => {
+      const body = JSON.parse(raw) as Record<string, unknown>;
+      bodies.push(body);
+      response.writeHead(200, {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache",
+        connection: "keep-alive",
+      });
+      response.write(
+        `data: ${JSON.stringify({ id: `response-${bodies.length}`, object: "chat.completion.chunk", created: 1, model: body.model, choices: [{ index: 0, delta: { role: "assistant", content: `answer-${bodies.length}` }, finish_reason: null }] })}\n\n`,
+      );
+      response.write(
+        `data: ${JSON.stringify({ id: `response-${bodies.length}`, object: "chat.completion.chunk", created: 1, model: body.model, choices: [{ index: 0, delta: {}, finish_reason: "stop" }] })}\n\n`,
+      );
+      response.end("data: [DONE]\n\n");
+    });
+  });
+  await new Promise<void>((resolve) => capturing.listen(0, "127.0.0.1", resolve));
+  const address = capturing.address();
+  if (!address || typeof address === "string")
+    throw new Error("capturing SSE server did not bind a TCP port");
+  return {
+    baseUrl: `http://127.0.0.1:${address.port}/v1`,
+    bodies,
+    close: () => new Promise<void>((resolve) => capturing.close(() => resolve())),
+  };
+}
+
+// scopeProvider presets whose reviewer target varies across presets.
+function writeReviewerSettings(
+  presets: Record<string, { main: string; reviewer: { model: string; thinking?: string } }>,
+): void {
+  writeFileSync(
+    join(agentDir, "settings.json"),
+    JSON.stringify({
+      compaction: { enabled: true, reserveTokens: 64, keepRecentTokens: 1 },
+      branchSummary: { reserveTokens: 64 },
+      retry: { enabled: false, maxRetries: 0, baseDelayMs: 1 },
+      scopeProvider: Object.fromEntries(
+        Object.entries(presets).map(([name, preset]) => [
+          name,
+          {
+            main: { model: preset.main },
+            remap: { "scoped/reviewer": preset.reviewer },
+          },
+        ]),
+      ),
+    }),
+  );
+}
+
+function writeReviewerAgent(): void {
+  writeFileSync(
+    join(agentDir, "agents", "reviewer.md"),
+    `---\nname: reviewer\ndescription: Scoped reviewer runtime child\nmodel: scoped/reviewer\nextensions: true\nskills: false\ntools: read\n---\nReturn a short answer.`,
+  );
+  registerAgents(loadCustomAgents(cwd, true));
+}
+
+async function createReviewerRuntime(baseUrl: string, reviewerTargets: string[]) {
+  const runtime = await ModelRuntime.create({
+    credentials: new InMemoryCredentialStore(),
+    modelsStore: new InMemoryModelsStore(),
+    modelsPath: null,
+    allowModelNetwork: false,
+    refreshOnCreate: false,
+  });
+  const registry = new ModelRegistry(runtime);
+  registry.registerProvider("local", {
+    name: "Local SSE",
+    baseUrl,
+    api: "openai-completions",
+    apiKey: "test-key",
+    models: [
+      concreteModel("concrete-main"),
+      concreteModel("second-main"),
+      ...reviewerTargets.map(concreteModel),
+    ],
+  });
+  registry.registerProvider("scoped", {
+    name: "Scoped",
+    baseUrl,
+    api: "openai-completions",
+    apiKey: "local",
+    models: [{ ...concreteModel("reviewer"), name: "scoped/reviewer" }],
+  });
+  return { runtime, registry };
+}
+
+async function runReviewerChild(registry: InstanceType<typeof ModelRegistry>) {
+  let child: ChildSession | undefined;
+  const result = await runAgent(
+    parentContext(registry),
+    "reviewer",
+    "initial request",
+    {
+      pi: extensionApi,
+      cwd,
+      configCwd: cwd,
+      onSessionCreated: (session: ChildSession) => {
+        child = session;
+      },
+    },
+  );
+  if (!child)
+    throw new Error("runAgent did not expose its real child AgentSession");
+  return { child, result };
+}
+
+test("runAgent scoped reviewer child rewrites requests to the reviewer target and applies forced thinking", async () => {
+  writeReviewerSettings({
+    low: {
+      main: "local/concrete-main",
+      reviewer: { model: "local/reviewer-low", thinking: "xhigh" },
+    },
+  });
+  writeReviewerAgent();
+  process.env.PI_SCOPE = "low";
+  const capturing = await startCapturingServer();
+  capturingServer = capturing;
+  const { registry } = await createReviewerRuntime(capturing.baseUrl, [
+    "reviewer-low",
+  ]);
+  const { child, result } = await runReviewerChild(registry);
+  expect(result.failure).toBeUndefined();
+  expect(child.model).toMatchObject({ provider: "scoped", id: "reviewer" });
+  expect(capturing.bodies).toHaveLength(1);
+  expect(capturing.bodies[0].model).toBe("reviewer-low");
+  expect(capturing.bodies[0].reasoning_effort).toBe("xhigh");
+});
+
+test("runAgent scoped reviewer children rewrite to the switched preset's reviewer target after /scope", async () => {
+  writeReviewerSettings({
+    low: { main: "local/concrete-main", reviewer: { model: "local/reviewer-low" } },
+    high: {
+      main: "local/second-main",
+      reviewer: { model: "local/reviewer-high" },
+    },
+  });
+  writeReviewerAgent();
+  process.env.PI_SCOPE = "low";
+  const capturing = await startCapturingServer();
+  capturingServer = capturing;
+  const first = await runReviewerChild(
+    (
+      await createReviewerRuntime(capturing.baseUrl, [
+        "reviewer-low",
+        "reviewer-high",
+      ])
+    ).registry,
+  );
+  expect(first.result.failure).toBeUndefined();
+  expect(first.child.model).toMatchObject({ provider: "scoped", id: "reviewer" });
+  expect(capturing.bodies).toHaveLength(1);
+  expect(capturing.bodies[0].model).toBe("reviewer-low");
+  // no forced entry: the session's default thinking level is what reaches the wire
+  expect(capturing.bodies[0].reasoning_effort).toBe("medium");
+
+  const runner = (first.child as any)._extensionRunner;
+  const command = runner.getCommand("scope");
+  if (!command) throw new Error("real child did not bind the scope command");
+  await command.handler("high", runner.createCommandContext());
+  expect(first.child.model).toMatchObject({ provider: "scoped", id: "reviewer" });
+
+  const second = await runReviewerChild(
+    (
+      await createReviewerRuntime(capturing.baseUrl, [
+        "reviewer-low",
+        "reviewer-high",
+      ])
+    ).registry,
+  );
+  expect(second.result.failure).toBeUndefined();
+  expect(second.child.model).toMatchObject({ provider: "scoped", id: "reviewer" });
+  expect(capturing.bodies).toHaveLength(2);
+  expect(capturing.bodies[1].model).toBe("reviewer-high");
+  expect(capturing.bodies[1].reasoning_effort).toBe("medium");
+});

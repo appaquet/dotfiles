@@ -3,6 +3,13 @@
     { scope }:
     {
       description = "Reviews code changes against project requirements and specifications";
+
+      model = {
+        pi = {
+          model = "scoped/reviewer";
+        };
+      };
+
       permission = {
         opencode = {
           task = "deny";

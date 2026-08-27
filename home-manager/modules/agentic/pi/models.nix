@@ -100,9 +100,39 @@ in
             model = "deskapp/qwen3.8-27b";
             thinking = "xhigh";
           };
+          "scoped/reviewer" = {
+            model = "deskapp/qwen3.8-27b";
+            thinking = "xhigh";
+          };
         };
       };
       codex = {
+        main = {
+          model = "openai-codex/gpt-5.6-terra";
+          thinking = "medium";
+        };
+        remap = {
+          "scoped/junior" = {
+            model = "openai-codex/gpt-5.6-luna";
+          };
+          "scoped/mid" = {
+            model = "openai-codex/gpt-5.6-luna";
+          };
+          "scoped/senior" = {
+            model = "openai-codex/gpt-5.6-terra";
+          };
+          "scoped/staff" = {
+            model = "openai-codex/gpt-5.6-sol";
+          };
+          "scoped/principal" = {
+            model = "openai-codex/gpt-5.6-sol";
+          };
+          "scoped/reviewer" = {
+            model = "openai-codex/gpt-5.6-terra";
+          };
+        };
+      };
+      codex-high = {
         main = {
           model = "openai-codex/gpt-5.6-sol";
           thinking = "medium";
@@ -121,6 +151,9 @@ in
             model = "openai-codex/gpt-5.6-sol";
           };
           "scoped/principal" = {
+            model = "openai-codex/gpt-5.6-sol";
+          };
+          "scoped/reviewer" = {
             model = "openai-codex/gpt-5.6-sol";
           };
         };

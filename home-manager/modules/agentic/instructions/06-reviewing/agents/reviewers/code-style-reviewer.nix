@@ -3,6 +3,13 @@
     { scope }:
     {
       description = "Reviews code for style issues, formatting, syntax errors, and code quality problems";
+
+      model = {
+        pi = {
+          model = "scoped/reviewer";
+        };
+      };
+
       permission = {
         opencode = {
           task = "deny";

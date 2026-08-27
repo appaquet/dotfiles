@@ -3,6 +3,13 @@
     { scope }:
     {
       description = "Reviews code changes for architectural consistency, design patterns, and system design";
+
+      model = {
+        pi = {
+          model = "scoped/reviewer";
+        };
+      };
+
       permission = {
         opencode = {
           task = "deny";
