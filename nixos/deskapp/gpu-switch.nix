@@ -116,7 +116,7 @@ let
         # Matches holder PIDs by device major:minor (rdev), so holders in other
         # mount namespaces whose nodes have different inodes are still found.
         # Returns 0 = holders found, 1 = no holders, >=2 = error.
-        local errorFile statError index device pid pidNum fd target targetStat
+        local errorFile statError index pid pidNum fd target targetStat
         local major minor rdevLabel matchDevice cgroup
 
         refreshNvidiaDevices
@@ -147,9 +147,9 @@ let
 
             matchDevice=""
             rdevLabel=""
-            # Character-device major:minor is shared across mount namespaces even when
-            # each namespace has a different device-node inode.
-            if targetStat=$(stat -L -c '%t %T' "$target" 2>"$errorFile"); then
+            # Stat the open fd rather than its namespace-relative target path. The fd
+            # resolves to the actual device across mount namespaces.
+            if targetStat=$(stat -L -c '%t %T' "$fd" 2>>"$errorFile"); then
               read -r major minor <<< "$targetStat"
               if [[ "$major" =~ ^[0-9a-f]+$ && "$minor" =~ ^[0-9a-f]+$ ]]; then
                 rdevLabel="$major $minor"
@@ -161,18 +161,10 @@ let
                 done
               fi
             else
-              statError=1
-              # stat can fail on nodes of vanished mounts; fall back to path matching
-              if [[ "$target" = /dev/nvidia* ]]; then
-                matchDevice="$target"
-              else
-                for device in "''${nvidiaDevices[@]}"; do
-                  if [ "$device" = "$target" ]; then
-                    matchDevice="$device"
-                    break
-                  fi
-                done
-              fi
+              # A process can close an fd between readlink and stat. Only a persistent
+              # fd that cannot be inspected makes the scan unsafe.
+              [ -L "$fd" ] && statError=1
+              continue
             fi
             [ -n "$matchDevice" ] || continue
 
