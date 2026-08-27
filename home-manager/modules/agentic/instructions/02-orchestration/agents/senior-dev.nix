@@ -27,7 +27,6 @@
         };
         pi = {
           model = "scoped/senior";
-          effort = "high";
         };
       };
 

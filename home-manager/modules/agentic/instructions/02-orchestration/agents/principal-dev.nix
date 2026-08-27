@@ -24,7 +24,6 @@
         };
         pi = {
           model = "scoped/principal";
-          effort = "xhigh";
         };
       };
 

@@ -108,53 +108,65 @@ in
       };
       codex = {
         main = {
-          model = "openai-codex/gpt-5.6-terra";
-          thinking = "medium";
-        };
-        remap = {
-          "scoped/junior" = {
-            model = "openai-codex/gpt-5.6-luna";
-          };
-          "scoped/mid" = {
-            model = "openai-codex/gpt-5.6-luna";
-          };
-          "scoped/senior" = {
-            model = "openai-codex/gpt-5.6-terra";
-          };
-          "scoped/staff" = {
-            model = "openai-codex/gpt-5.6-sol";
-          };
-          "scoped/principal" = {
-            model = "openai-codex/gpt-5.6-sol";
-          };
-          "scoped/reviewer" = {
-            model = "openai-codex/gpt-5.6-terra";
-          };
-        };
-      };
-      codex-high = {
-        main = {
           model = "openai-codex/gpt-5.6-sol";
           thinking = "medium";
         };
         remap = {
           "scoped/junior" = {
             model = "openai-codex/gpt-5.6-luna";
+            thinking = "medium";
           };
           "scoped/mid" = {
             model = "openai-codex/gpt-5.6-luna";
+            thinking = "high";
           };
           "scoped/senior" = {
             model = "openai-codex/gpt-5.6-terra";
+            thinking = "high";
           };
           "scoped/staff" = {
             model = "openai-codex/gpt-5.6-sol";
+            thinking = "high";
           };
           "scoped/principal" = {
             model = "openai-codex/gpt-5.6-sol";
+            thinking = "xhigh";
+          };
+          "scoped/reviewer" = {
+            model = "openai-codex/gpt-5.6-terra";
+            thinking = "xhigh";
+          };
+        };
+      };
+      codex-high = {
+        main = {
+          model = "openai-codex/gpt-5.6-sol";
+          thinking = "high";
+        };
+        remap = {
+          "scoped/junior" = {
+            model = "openai-codex/gpt-5.6-luna";
+            thinking = "medium";
+          };
+          "scoped/mid" = {
+            model = "openai-codex/gpt-5.6-luna";
+            thinking = "high";
+          };
+          "scoped/senior" = {
+            model = "openai-codex/gpt-5.6-terra";
+            thinking = "xhigh";
+          };
+          "scoped/staff" = {
+            model = "openai-codex/gpt-5.6-sol";
+            thinking = "xhigh";
+          };
+          "scoped/principal" = {
+            model = "openai-codex/gpt-5.6-sol";
+            thinking = "max";
           };
           "scoped/reviewer" = {
             model = "openai-codex/gpt-5.6-sol";
+            thinking = "xhigh";
           };
         };
       };
