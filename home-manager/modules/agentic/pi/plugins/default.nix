@@ -108,12 +108,12 @@ let
           layout = {
             left = [
               "custom:mode"
+              "custom:scope"
               "model"
               "thinking"
-              "custom:scope"
-              "path"
             ];
             right = [
+              "path"
               "subagents"
               "context_pct"
               "cache_read"
