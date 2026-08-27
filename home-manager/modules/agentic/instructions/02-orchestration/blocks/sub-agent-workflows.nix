@@ -76,6 +76,7 @@
 
           * Common
             * Main agent leads the decision making with the user, owns project docs and version control
+            * You should NEVER delegate project files read/edits to sub-agents since you're the project manager
 
           * In doubt
             * Ask yourself if the action will cost the context window. Still in doubt, ask the user.
