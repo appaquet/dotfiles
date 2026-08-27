@@ -48,7 +48,7 @@ let
       models = [
         (mkLocalModel {
           id = "qwen3.8-27b";
-          name = "qwen3.8-27b (deskapp)";
+          name = "qwen3.8-27b";
           contextWindow = 185000;
           samplingParams = {
             temperature = 1.0;
@@ -60,7 +60,7 @@ let
         })
         (mkLocalModel {
           id = "ornith-1.5-35b";
-          name = "Ornith-1.5-35B (deskapp)";
+          name = "Ornith-1.5-35B";
           contextWindow = 262144;
         })
       ];

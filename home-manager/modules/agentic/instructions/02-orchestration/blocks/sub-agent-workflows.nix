@@ -66,7 +66,7 @@
       taggedContent = ''
 
         * Two execution modes: orchestrator vs builder
-          * 🏭 Builder mode (default)
+          * 🔨 Builder mode (default)
             * Main agent implements work directly in the session
             * Delegates only context-intensive exploration, research, and review
 

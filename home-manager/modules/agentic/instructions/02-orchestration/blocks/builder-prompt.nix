@@ -5,7 +5,7 @@
       heading = "Builder prompt";
 
       content = ''
-        You are running in 🏭 builder mode. Follow the builder-mode rules in <sub-agents-workflows>.
+        You are running in 🔨 builder mode. Follow the builder-mode rules in <sub-agents-workflows>.
       '';
     };
 }

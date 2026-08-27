@@ -180,7 +180,7 @@ test("parseModeArg: anything else is unknown with the trimmed argument", () => {
 });
 
 test("modeLabel: exact footer labels", () => {
-  expect(modeLabel("builder")).toBe("🏭");
+  expect(modeLabel("builder")).toBe("🔨");
   expect(modeLabel("orchestrator")).toBe("👑");
 });
 
@@ -371,7 +371,7 @@ test("session_start: fresh session shows the builder label and injects nothing",
   const h = createHarness();
   h.startSession();
 
-  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🏭" }]);
+  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
   expect(h.notifies).toEqual([]);
   expect(h.sends).toEqual([]);
   expect(h.appends).toEqual([]);
@@ -404,7 +404,7 @@ test("session_start: restore of a session with only malformed entries defaults t
   });
   h.startSession();
 
-  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🏭" }]);
+  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
 });
 
 test("toggle builder -> orchestrator while idle: submits /orchestrator, persists, relabels, notifies", async () => {
@@ -419,7 +419,7 @@ test("toggle builder -> orchestrator while idle: submits /orchestrator, persists
     { customType: "mode-switch", data: { mode: "orchestrator" } },
   ]);
   expect(h.statuses).toEqual([
-    { key: "mode", value: "[muted]🏭" },
+    { key: "mode", value: "[muted]🔨" },
     { key: "mode", value: "[accent]👑" },
   ]);
   expect(h.notifies).toEqual([
@@ -458,9 +458,9 @@ test("toggle orchestrator -> builder: submits /builder, persists, relabels, noti
     { customType: "mode-switch", data: { mode: "builder" } },
   ]);
   expect(h.statuses).toEqual([
-    { key: "mode", value: "[muted]🏭" },
+    { key: "mode", value: "[muted]🔨" },
     { key: "mode", value: "[accent]👑" },
-    { key: "mode", value: "[muted]🏭" },
+    { key: "mode", value: "[muted]🔨" },
   ]);
   expect(h.notifies).toEqual([
     { message: "mode-switch: orchestrator", type: "info" },
@@ -493,7 +493,7 @@ test("toggle to orchestrator without the template: warns and changes nothing", a
 
   expect(h.sends).toEqual([]);
   expect(h.appends).toEqual([]);
-  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🏭" }]);
+  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
   expect(h.notifies).toEqual([
     {
       message: "mode-switch: /orchestrator template not found; staying on builder",
@@ -511,7 +511,7 @@ test("toggle to orchestrator with a non-prompt orchestrator command: warns and c
 
   expect(h.sends).toEqual([]);
   expect(h.appends).toEqual([]);
-  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🏭" }]);
+  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
   expect(h.notifies).toEqual([
     {
       message: "mode-switch: /orchestrator template not found; staying on builder",
@@ -577,7 +577,7 @@ test("/mode with no argument toggles like the shortcut", async () => {
     { customType: "mode-switch", data: { mode: "orchestrator" } },
   ]);
   expect(h.statuses).toEqual([
-    { key: "mode", value: "[muted]🏭" },
+    { key: "mode", value: "[muted]🔨" },
     { key: "mode", value: "[accent]👑" },
   ]);
 });
@@ -594,7 +594,7 @@ test("/mode orchestrator sets explicitly from builder", async () => {
     { customType: "mode-switch", data: { mode: "orchestrator" } },
   ]);
   expect(h.statuses).toEqual([
-    { key: "mode", value: "[muted]🏭" },
+    { key: "mode", value: "[muted]🔨" },
     { key: "mode", value: "[accent]👑" },
   ]);
   expect(h.notifies).toEqual([
@@ -615,7 +615,7 @@ test("/mode orchestrator while orchestrator: notify only, no message or entry", 
     { customType: "mode-switch", data: { mode: "orchestrator" } },
   ]);
   expect(h.statuses).toEqual([
-    { key: "mode", value: "[muted]🏭" },
+    { key: "mode", value: "[muted]🔨" },
     { key: "mode", value: "[accent]👑" },
   ]);
   expect(h.notifies).toEqual([
@@ -631,7 +631,7 @@ test("/mode builder while builder: notify only, no message or entry", async () =
 
   expect(h.sends).toEqual([]);
   expect(h.appends).toEqual([]);
-  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🏭" }]);
+  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
   expect(h.notifies).toEqual([
     { message: "mode-switch: already on builder", type: "info" },
   ]);
@@ -652,9 +652,9 @@ test("/mode builder from orchestrator: submits /builder", async () => {
     { customType: "mode-switch", data: { mode: "builder" } },
   ]);
   expect(h.statuses).toEqual([
-    { key: "mode", value: "[muted]🏭" },
+    { key: "mode", value: "[muted]🔨" },
     { key: "mode", value: "[accent]👑" },
-    { key: "mode", value: "[muted]🏭" },
+    { key: "mode", value: "[muted]🔨" },
   ]);
   expect(h.notifies).toEqual([
     { message: "mode-switch: orchestrator", type: "info" },
@@ -669,7 +669,7 @@ test("/mode with an unknown argument: warns available modes, changes nothing", a
 
   expect(h.sends).toEqual([]);
   expect(h.appends).toEqual([]);
-  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🏭" }]);
+  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
   expect(h.notifies).toEqual([
     {
       message: 'mode-switch: unknown mode "wizard" (available: builder, orchestrator)',

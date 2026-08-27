@@ -23,7 +23,7 @@ export type SwitchDecision =
   | { action: "submit"; next: Mode; template: Mode };
 
 const MODE_LABELS: Record<Mode, string> = {
-  builder: "🏭",
+  builder: "🔨",
   orchestrator: "👑",
 };
 

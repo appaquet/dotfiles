@@ -13,7 +13,7 @@
       content = ''
         ${scope.blocks."builder-prompt".body}
 
-        🏭 Builder mode activated.
+        🔨 Builder mode activated.
 
         STOP. Wait for the next user message.
       '';
