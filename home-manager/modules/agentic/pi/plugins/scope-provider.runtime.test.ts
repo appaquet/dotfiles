@@ -38,6 +38,24 @@ const { registerAgents } = await import(
   `${piSubagentsDir}/dist/agent-types.js`
 );
 
+// A non-openai-completions api id that speaks the mock server's
+// openai-completions wire: a target provider can carry a real non-
+// openai-completions api yet still complete against the local SSE fixture.
+const { registerApiProvider } = await import(
+  `${join(packageScopeDir, "pi-ai", "dist")}/compat.js`
+);
+const oaiCompletionsApi = await import(
+  `${join(packageScopeDir, "pi-ai", "dist")}/api/openai-completions.js`
+);
+registerApiProvider(
+  {
+    api: "mock-responses",
+    stream: oaiCompletionsApi.stream,
+    streamSimple: oaiCompletionsApi.streamSimple,
+  },
+  "scope-runtime-test",
+);
+
 type RequestRecord = { model: string; messages: unknown[] };
 type ResponsePlan = { finishReason: string };
 type ChildSession = InstanceType<typeof pi.AgentSession>;
@@ -109,10 +127,13 @@ beforeEach(async () => {
 
   mkdirSync(join(agentDir, "extensions"), { recursive: true });
   mkdirSync(join(agentDir, "agents"), { recursive: true });
-  const extension = readFileSync(
-    join(import.meta.dir, "scope-provider.ts"),
-    "utf8",
-  ).replaceAll('"@earendil-works/pi-coding-agent"', `"${piDistDir}/index.js"`);
+  const extensionSourcePath =
+    process.env.PI_SCOPE_EXTENSION_SOURCE ??
+    join(import.meta.dir, "scope-provider.ts");
+  const extension = readFileSync(extensionSourcePath, "utf8").replaceAll(
+    '"@earendil-works/pi-coding-agent"',
+    `"${piDistDir}/index.js"`,
+  );
   writeFileSync(join(agentDir, "extensions", "scope-provider.ts"), extension);
   writeSettings({ enabled: false, maxRetries: 0, baseDelayMs: 1 });
   writeFileSync(
@@ -615,7 +636,7 @@ async function runReviewerChild(registry: InstanceType<typeof ModelRegistry>) {
   return { child, result };
 }
 
-test("runAgent scoped reviewer child rewrites requests to the reviewer target and applies forced thinking", async () => {
+test("runAgent scoped reviewer child rewrites requests to the reviewer target without forcing effort", async () => {
   writeReviewerSettings({
     low: {
       main: "local/concrete-main",
@@ -634,7 +655,11 @@ test("runAgent scoped reviewer child rewrites requests to the reviewer target an
   expect(child.model).toMatchObject({ provider: "scoped", id: "reviewer" });
   expect(capturing.bodies).toHaveLength(1);
   expect(capturing.bodies[0].model).toBe("reviewer-low");
-  expect(capturing.bodies[0].reasoning_effort).toBe("xhigh");
+  // The preset entry's "thinking" is not injected into the payload: a non-main
+  // scoped session gets no per-entry thinking override, so it runs at the
+  // session's inherited native thinking level and that default reaches the
+  // wire.
+  expect(capturing.bodies[0].reasoning_effort).toBe("medium");
 });
 
 test("runAgent scoped reviewer children rewrite to the switched preset's reviewer target after /scope", async () => {
@@ -683,4 +708,198 @@ test("runAgent scoped reviewer children rewrite to the switched preset's reviewe
   expect(capturing.bodies).toHaveLength(2);
   expect(capturing.bodies[1].model).toBe("reviewer-high");
   expect(capturing.bodies[1].reasoning_effort).toBe("medium");
+});
+
+// Scope preset whose main target lives on a non-openai-completions api.
+function writeCodexSettings(): void {
+  writeFileSync(
+    join(agentDir, "settings.json"),
+    JSON.stringify({
+      compaction: { enabled: true, reserveTokens: 64, keepRecentTokens: 1 },
+      branchSummary: { reserveTokens: 64 },
+      retry: { enabled: false, maxRetries: 0, baseDelayMs: 1 },
+      scopeProvider: {
+        codex: { main: { model: "codex/concrete-codex" }, remap: {} },
+      },
+    }),
+  );
+}
+
+function writeCodexAgent(): void {
+  writeFileSync(
+    join(agentDir, "agents", "codex.md"),
+    `---\nname: codex\ndescription: Scoped codex runtime child\nmodel: scoped/main\nextensions: true\nskills: false\ntools: read\n---\nReturn a short answer.`,
+  );
+  registerAgents(loadCustomAgents(cwd, true));
+}
+
+async function createCodexRuntime(baseUrl: string) {
+  const runtime = await ModelRuntime.create({
+    credentials: new InMemoryCredentialStore(),
+    modelsStore: new InMemoryModelsStore(),
+    modelsPath: null,
+    allowModelNetwork: false,
+    refreshOnCreate: false,
+  });
+  const registry = new ModelRegistry(runtime);
+  registry.registerProvider("local", {
+    name: "Local SSE",
+    baseUrl,
+    api: "openai-completions",
+    apiKey: "test-key",
+    models: [concreteModel("concrete-main")],
+  });
+  registry.registerProvider("codex", {
+    name: "Codex SSE",
+    baseUrl,
+    api: "mock-responses",
+    apiKey: "codex-key",
+    models: [concreteModel("concrete-codex")],
+  });
+  registry.registerProvider("scoped", {
+    name: "Scoped",
+    baseUrl,
+    api: "openai-completions",
+    apiKey: "local",
+    models: [{ ...concreteModel("main"), name: "scoped/main" }],
+  });
+  return { runtime, registry };
+}
+
+async function runCodexChild(registry: InstanceType<typeof ModelRegistry>) {
+  let child: ChildSession | undefined;
+  const result = await runAgent(
+    parentContext(registry),
+    "codex",
+    "initial request",
+    {
+      pi: extensionApi,
+      cwd,
+      configCwd: cwd,
+      onSessionCreated: (session: ChildSession) => {
+        child = session;
+      },
+    },
+  );
+  if (!child)
+    throw new Error("runAgent did not expose its real child AgentSession");
+  return { child, result };
+}
+
+test("runAgent scoped main child on a non-openai-completions target resolves to the concrete model", async () => {
+  writeCodexSettings();
+  writeCodexAgent();
+  process.env.PI_SCOPE = "codex";
+  const capturing = await startCapturingServer();
+  capturingServer = capturing;
+  const { registry } = await createCodexRuntime(capturing.baseUrl);
+  const { child, result } = await runCodexChild(registry);
+  expect(result.failure).toBeUndefined();
+  expect(child.model).toMatchObject({ provider: "scoped", id: "main" });
+  expect(capturing.bodies).toHaveLength(1);
+  // The target provider's api is not openai-completions: the scoped alias
+  // must still resolve through the provider hook and reach the wire as the
+  // concrete id.
+  expect(capturing.bodies[0].model).toBe("concrete-codex");
+});
+
+// A runtime whose local + scoped providers point at the capturing server so
+// raw-completion bodies can be inspected at the wire.
+async function createMainRuntime(baseUrl: string) {
+  const runtime = await ModelRuntime.create({
+    credentials: new InMemoryCredentialStore(),
+    modelsStore: new InMemoryModelsStore(),
+    modelsPath: null,
+    allowModelNetwork: false,
+    refreshOnCreate: false,
+  });
+  const registry = new ModelRegistry(runtime);
+  registry.registerProvider("local", {
+    name: "Local SSE",
+    baseUrl,
+    api: "openai-completions",
+    apiKey: "test-key",
+    models: [concreteModel("concrete-main"), concreteModel("concrete-junior")],
+  });
+  registry.registerProvider("scoped", {
+    name: "Scoped",
+    baseUrl,
+    api: "openai-completions",
+    apiKey: "local",
+    models: [
+      { ...concreteModel("main"), name: "scoped/main" },
+      { ...concreteModel("junior"), name: "scoped/junior" },
+    ],
+  });
+  return { runtime, registry };
+}
+
+// Fire the extension's session_start (commits the registration and binds the
+// process registry) without running a full agent turn.
+async function startScopedSession(registry: InstanceType<typeof ModelRegistry>) {
+  let child: ChildSession | undefined;
+  await runAgent(
+    parentContext(registry),
+    "junior",
+    "initial request",
+    {
+      pi: extensionApi,
+      cwd,
+      configCwd: cwd,
+      onSessionCreated: (session: ChildSession) => {
+        child = session;
+      },
+    },
+  );
+  if (!child)
+    throw new Error("runAgent did not expose its real child AgentSession");
+  return child;
+}
+
+function rawCompletionContext(): Record<string, unknown> {
+  return {
+    systemPrompt: "Answer concisely.",
+    messages: [
+      { role: "user", content: [{ type: "text", text: "Say ok" }], timestamp: Date.now() },
+    ],
+  };
+}
+
+test("raw modelRegistry.complete and streamSimple resolve scoped/main to the concrete target", async () => {
+  const capturing = await startCapturingServer();
+  capturingServer = capturing;
+  const { runtime, registry } = await createMainRuntime(capturing.baseUrl);
+  await startScopedSession(registry);
+
+  const mainModel = registry.find("scoped", "main");
+  expect(mainModel?.provider).toBe("scoped");
+  expect(mainModel?.id).toBe("main");
+
+  // Raw completion: ModelRegistry.complete must reach the wire as the concrete
+  // id, not the alias, and inherit no effort or chat-template injection.
+  const beforeComplete = capturing.bodies.length;
+  const completed = await registry.complete(mainModel, rawCompletionContext(), {
+    maxTokens: 64,
+  });
+  expect(completed.stopReason).not.toBe("error");
+  const completeBody = capturing.bodies[beforeComplete];
+  expect(completeBody.model).toBe("concrete-main");
+  expect(completeBody).not.toHaveProperty("reasoning_effort");
+  expect(completeBody).not.toHaveProperty("chat_template_kwargs");
+
+  // Direct streamSimple: the raw ModelRuntime stream path (the one pi-ai and
+  // web-access use) routes through the same provider-hook resolution.
+  const beforeStream = capturing.bodies.length;
+  const stream = runtime.streamSimple(mainModel, rawCompletionContext(), {});
+  const drained = await stream.result();
+  expect(drained.stopReason).not.toBe("error");
+  const streamBody = capturing.bodies[beforeStream];
+  expect(streamBody.model).toBe("concrete-main");
+  expect(streamBody).not.toHaveProperty("reasoning_effort");
+  expect(streamBody).not.toHaveProperty("chat_template_kwargs");
+
+  // No raw request ever carries the alias id.
+  expect(capturing.bodies.slice(beforeComplete).map((b) => b.model)).not.toContain(
+    "main",
+  );
 });

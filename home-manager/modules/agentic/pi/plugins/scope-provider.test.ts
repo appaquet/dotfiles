@@ -42,13 +42,18 @@ type ScopeEntry = { model: string; thinking?: string };
 type ScopePreset = { main: ScopeEntry; remap: Record<string, ScopeEntry> };
 type ScopeConfig = Record<string, ScopePreset>;
 type ScopeCommand = (args: string, ctx: TestContext) => Promise<void>;
-type ScopeHandler = (event: { payload: Record<string, unknown> }) => void;
 type ScopeShortcut = (ctx: TestContext) => Promise<void>;
 type SessionStartHandler = (
   event: unknown,
   ctx: TestContext,
 ) => Promise<void>;
 type StatusEvent = { key: string; value: string };
+type TargetStreamCall = {
+  provider: string;
+  model: Model;
+  context: unknown;
+  options: unknown;
+};
 
 type TestContext = {
   model: { provider: string; id: string };
@@ -70,9 +75,33 @@ class TestRegistry {
     string | undefined | (() => Promise<string | undefined>)
   >();
   readonly requestAuth = new Map<string, () => Promise<RequestAuth>>();
+  readonly providerStubs = new Map<string, any>();
+  readonly providerStreamCalls: TargetStreamCall[] = [];
 
   find(provider: string, id: string): Model | undefined {
     return this.models.get(`${provider}/${id}`);
+  }
+
+  // Target providers complete through their own streamSimple: record the
+  // delegated model and forward context/options untouched so alias
+  // resolution assertions can inspect the handoff.
+  getProvider(provider: string): any {
+    let stub = this.providerStubs.get(provider);
+    if (!stub) {
+      stub = {
+        streamSimple: (model: Model, context: unknown, options: unknown) => {
+          this.providerStreamCalls.push({
+            provider,
+            model,
+            context,
+            options,
+          });
+          return Promise.resolve(`${provider}-stream`);
+        },
+      };
+      this.providerStubs.set(provider, stub);
+    }
+    return stub;
   }
 
   async getApiKeyForProvider(provider: string): Promise<string | undefined> {
@@ -128,7 +157,6 @@ type Harness = {
     description: string;
     handler: ScopeShortcut;
   }>;
-  beforeRequest: ScopeHandler;
   summaryHandlers: Record<string, SummaryHandler[]>;
   messages: string[];
   statuses: StatusEvent[];
@@ -148,6 +176,20 @@ let treeResult: any;
 let compactFailure: Error | undefined;
 let treeFailure: Error | undefined;
 let retrySettings = { enabled: true, maxRetries: 3, baseDelayMs: 2000 };
+
+// Native stream fallback: the pass-through branch of the scoped streamSimple
+// hook reaches into the provider's own api provider, recorded here.
+let apiStreamCalls: Array<[any, unknown, unknown]> = [];
+const fakeApiProvider = {
+  streamSimple: (...args: Array<any>) => {
+    apiStreamCalls.push(args as [any, unknown, unknown]);
+    return Promise.resolve("native-stream");
+  },
+};
+
+mock.module("@earendil-works/pi-ai/compat", () => ({
+  getApiProvider: () => fakeApiProvider,
+}));
 
 mock.module("@earendil-works/pi-coding-agent", () => ({
   getAgentDir: () => agentDir,
@@ -183,6 +225,7 @@ beforeEach(() => {
   (globalThis as Record<string, unknown>).rewriteDisabled = false;
   compactCalls = [];
   treeCalls = [];
+  apiStreamCalls = [];
   compactResult = {
     summary: "compacted summary",
     firstKeptEntryId: "kept-1",
@@ -253,7 +296,6 @@ async function createHarness(
   const statuses: StatusEvent[] = [];
   const selectCalls: Array<{ title: string; options: string[] }> = [];
   let command: ScopeCommand | undefined;
-  let beforeRequest: ScopeHandler | undefined;
   let sessionStart: SessionStartHandler | undefined;
   const shortcuts: Array<{
     key: string;
@@ -291,9 +333,6 @@ async function createHarness(
     },
     commandDescription: "",
     shortcuts,
-    beforeRequest: () => {
-      throw new Error("before_provider_request handler was not registered");
-    },
     summaryHandlers,
     messages,
     statuses,
@@ -313,11 +352,9 @@ async function createHarness(
     on: (
       event: string,
       handler:
-        | ScopeHandler
-        | ((event: unknown, ctx: TestContext) => Promise<void>),
+        | ((event: unknown, ctx: TestContext) => Promise<void>)
+        | ((event: { payload: Record<string, unknown> }) => void),
     ) => {
-      if (event === "before_provider_request")
-        beforeRequest = handler as ScopeHandler;
       if (event === "session_start")
         sessionStart = handler as SessionStartHandler;
       if (
@@ -351,17 +388,50 @@ async function createHarness(
 
   const module = await import(`./scope-provider.ts?${crypto.randomUUID()}`);
   module.default(pi);
-  harness.factoryConfig = structuredClone(
+  harness.factoryConfig = cloneProviderConfig(
     registry.getRegisteredProviderConfig("scoped"),
   );
-  if (!sessionStart || !command || !beforeRequest)
+  if (!sessionStart || !command)
     throw new Error("scope extension did not register its handlers");
   harness.sessionStart = sessionStart;
   harness.startSession = () => harness.sessionStart({}, harness.ctx);
   harness.command = command;
-  harness.beforeRequest = beforeRequest;
   if (!options.deferSessionStart) await harness.startSession();
   return harness;
+}
+
+// Config snapshots keep function-valued registration hooks (streamSimple)
+// by reference: toEqual compares them by identity, so a rollback assertion
+// needs the same hook reference on both sides of the comparison.
+function cloneProviderConfig(
+  config: ProviderConfig | undefined,
+): ProviderConfig | undefined {
+  if (!config) return undefined;
+  const clone: ProviderConfig = {};
+  for (const [key, value] of Object.entries(config)) {
+    clone[key] = value;
+  }
+  return clone;
+}
+
+// Invoke the scoped provider's registered streamSimple hook the way the
+// composed provider does: the scoped model, the caller context, and the
+// caller options.
+async function scopedStream(
+  harness: Harness,
+  alias = "main",
+  options: any = {},
+): Promise<string> {
+  const config = harness.registry.getRegisteredProviderConfig("scoped");
+  if (!config?.streamSimple)
+    throw new Error("scoped provider registration has no streamSimple");
+  const model = harness.registry.find("scoped", alias);
+  if (!model) throw new Error(`scoped/${alias} is not registered`);
+  return await config.streamSimple(model, harness.ctx, options);
+}
+
+function lastTargetCall(harness: Harness): TargetStreamCall | undefined {
+  return harness.registry.providerStreamCalls.at(-1);
 }
 
 function target(provider: string, id: string, name: string): Model {
@@ -430,12 +500,6 @@ function scopedNames(harness: Harness): Record<string, string> {
   );
 }
 
-function rewrite(harness: Harness): Record<string, unknown> {
-  const payload: Record<string, unknown> = { model: "main" };
-  harness.beforeRequest({ payload });
-  return payload;
-}
-
 function processState(): Record<string, unknown> {
   const globals = globalThis as Record<string, unknown>;
   return {
@@ -500,9 +564,10 @@ test("cycles scopes in configured order and wraps around", async () => {
   expect(harness.messages).toEqual([
     "scope preset: local\nscope preset: local\n  id         target\n  main       next/next-main (force thinking: high)",
   ]);
-  expect(rewrite(harness)).toEqual({
-    model: "next-main",
-    reasoning_effort: "high",
+  await expect(scopedStream(harness)).resolves.toBe("next-stream");
+  expect(lastTargetCall(harness)).toMatchObject({
+    provider: "next",
+    model: { provider: "next", id: "next-main" },
   });
 
   await cycle(harness.ctx);
@@ -526,9 +591,10 @@ test("cycles scopes in configured order and wraps around", async () => {
     "scope preset: local\nscope preset: local\n  id         target\n  main       next/next-main (force thinking: high)",
     "scope preset: codex\nscope preset: codex\n  id         target\n  main       old/old-main (force thinking: medium)",
   ]);
-  expect(rewrite(harness)).toEqual({
-    model: "old-main",
-    reasoning_effort: "medium",
+  await expect(scopedStream(harness)).resolves.toBe("old-stream");
+  expect(lastTargetCall(harness)).toMatchObject({
+    provider: "old",
+    model: { provider: "old", id: "old-main" },
   });
 });
 
@@ -541,7 +607,7 @@ test("a failed next scope keeps the existing transaction rollback", async () => 
     ],
   });
   const cycle = harness.shortcuts[0].handler;
-  const previous = structuredClone(
+  const previous = cloneProviderConfig(
     harness.registry.getRegisteredProviderConfig("scoped"),
   );
 
@@ -558,9 +624,9 @@ test("a failed next scope keeps the existing transaction rollback", async () => 
   expect((globalThis as Record<string, unknown>).activePreset).toBe("codex");
   expect((globalThis as Record<string, unknown>).upgradedPreset).toBe("codex");
   expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
-  expect(rewrite(harness)).toEqual({ model: "old-main" });
+  await expect(scopedStream(harness)).resolves.toBe("old-stream");
   expect(harness.messages).toEqual([
-    'scope: ERROR — preset "noauth" no credentials resolved for noauth/noauth-main; scoped provider registration was not changed. Check the provider credentials.\nscope: previous preset "codex" restored; request rewriting remains on its targets.',
+    'scope: ERROR — preset "noauth" no credentials resolved for noauth/noauth-main; scoped provider registration was not changed. Check the provider credentials.\nscope: previous preset "codex" restored; alias resolution remains on its targets.',
   ]);
 });
 
@@ -581,6 +647,7 @@ test("factory stubs mark only the scoped/main alias", async () => {
     senior: "scoped/senior (preset stub, upgraded at session start)",
     staff: "scoped/staff (preset stub, upgraded at session start)",
     principal: "scoped/principal (preset stub, upgraded at session start)",
+    reviewer: "scoped/reviewer (preset stub, upgraded at session start)",
   });
 });
 
@@ -595,7 +662,8 @@ test("resolves scoped/main in each fresh registry before session_start", async (
       expected: {
         name: "Cloud main model [S]",
         key: "old-key",
-        rewrite: { model: "old-main", reasoning_effort: "medium" },
+        stream: "old-stream",
+        targetModel: { provider: "old", id: "old-main" },
         thinking: "medium",
       },
     },
@@ -604,7 +672,8 @@ test("resolves scoped/main in each fresh registry before session_start", async (
       expected: {
         name: "Local main model [S]",
         key: "next-key",
-        rewrite: { model: "next-main", reasoning_effort: "high" },
+        stream: "next-stream",
+        targetModel: { provider: "next", id: "next-main" },
         thinking: "high",
       },
     },
@@ -661,7 +730,13 @@ test("resolves scoped/main in each fresh registry before session_start", async (
     expect(second.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe(
       scenario.expected.key,
     );
-    expect(rewrite(second)).toEqual(scenario.expected.rewrite);
+    await expect(scopedStream(second)).resolves.toBe(
+      scenario.expected.stream,
+    );
+    expect(lastTargetCall(second)).toMatchObject({
+      provider: scenario.expected.targetModel.provider,
+      model: scenario.expected.targetModel,
+    });
     expect(second.ctx.thinkingLevel).toBe(scenario.expected.thinking);
     expect(processState()).toEqual({
       activePreset: scenario.preset,
@@ -743,9 +818,10 @@ test("a UI selection uses configured order and the transactional switch path", a
   expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe(
     "next-key",
   );
-  expect(rewrite(harness)).toEqual({
-    model: "next-main",
-    reasoning_effort: "high",
+  await expect(scopedStream(harness)).resolves.toBe("next-stream");
+  expect(lastTargetCall(harness)).toMatchObject({
+    provider: "next",
+    model: { provider: "next", id: "next-main" },
   });
 });
 
@@ -757,14 +833,14 @@ test("cancelling the UI selector is a complete no-op", async () => {
       target("next", "next-main", "Local main model"),
     ],
   });
-  const beforeConfig = structuredClone(
+  const beforeConfig = cloneProviderConfig(
     harness.registry.getRegisteredProviderConfig("scoped"),
   );
   const beforeModel = { ...harness.ctx.model };
   const beforeThinking = harness.ctx.thinkingLevel;
   const beforeStatuses = [...harness.statuses];
   const beforeMessages = [...harness.messages];
-  const beforeRewrite = rewrite(harness);
+  const beforeStream = await scopedStream(harness);
   const beforeProcess = {
     activePreset: (globalThis as Record<string, unknown>).activePreset,
     upgradedPreset: (globalThis as Record<string, unknown>).upgradedPreset,
@@ -786,7 +862,12 @@ test("cancelling the UI selector is a complete no-op", async () => {
   expect(harness.ctx.thinkingLevel).toBe(beforeThinking);
   expect(harness.statuses).toEqual(beforeStatuses);
   expect(harness.messages).toEqual(beforeMessages);
-  expect(rewrite(harness)).toEqual(beforeRewrite);
+  const afterStream = await scopedStream(harness);
+  expect(afterStream).toBe(beforeStream);
+  expect(lastTargetCall(harness)).toMatchObject({
+    provider: "old",
+    model: { provider: "old", id: "old-main" },
+  });
   expect({
     activePreset: (globalThis as Record<string, unknown>).activePreset,
     upgradedPreset: (globalThis as Record<string, unknown>).upgradedPreset,
@@ -800,7 +881,7 @@ test("a selected current preset keeps direct same-preset behavior", async () => 
     models: [target("old", "old-main", "Cloud main model")],
   });
   harness.selection = "codex";
-  const beforeConfig = structuredClone(
+  const beforeConfig = cloneProviderConfig(
     harness.registry.getRegisteredProviderConfig("scoped"),
   );
 
@@ -827,13 +908,13 @@ test("non-UI no-argument scope retains the table fallback", async () => {
     models: [target("old", "old-main", "Cloud main model")],
   });
   harness.ctx.hasUI = false;
-  const beforeConfig = structuredClone(
+  const beforeConfig = cloneProviderConfig(
     harness.registry.getRegisteredProviderConfig("scoped"),
   );
   const beforeModel = { ...harness.ctx.model };
   const beforeThinking = harness.ctx.thinkingLevel;
   const beforeStatuses = [...harness.statuses];
-  const beforeRewrite = rewrite(harness);
+  const beforeStream = await scopedStream(harness);
 
   await harness.command("", harness.ctx);
 
@@ -847,7 +928,8 @@ test("non-UI no-argument scope retains the table fallback", async () => {
     "scope preset: codex\n  id         target\n  main       old/old-main",
   ]);
   expect(harness.statuses).toEqual(beforeStatuses);
-  expect(rewrite(harness)).toEqual(beforeRewrite);
+  const afterStream = await scopedStream(harness);
+  expect(afterStream).toBe(beforeStream);
 });
 
 test("a selected failed switch rolls back like a direct argument", async () => {
@@ -858,7 +940,7 @@ test("a selected failed switch rolls back like a direct argument", async () => {
       target("noauth", "noauth-main", "Unauthenticated main model"),
     ],
   });
-  const previous = structuredClone(
+  const previous = cloneProviderConfig(
     harness.registry.getRegisteredProviderConfig("scoped"),
   );
   harness.selection = "noauth";
@@ -877,13 +959,13 @@ test("a selected failed switch rolls back like a direct argument", async () => {
   expect(harness.ctx.model).toEqual({ provider: "scoped", id: "main" });
   expect(harness.ctx.thinkingLevel).toBe("medium");
   expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
-  expect(rewrite(harness)).toEqual({ model: "old-main" });
+  await expect(scopedStream(harness)).resolves.toBe("old-stream");
   expect(harness.messages).toEqual([
-    'scope: ERROR — preset "noauth" no credentials resolved for noauth/noauth-main; scoped provider registration was not changed. Check the provider credentials.\nscope: previous preset "codex" restored; request rewriting remains on its targets.',
+    'scope: ERROR — preset "noauth" no credentials resolved for noauth/noauth-main; scoped provider registration was not changed. Check the provider credentials.\nscope: previous preset "codex" restored; alias resolution remains on its targets.',
   ]);
 });
 
-test("missing target auth preserves the previous scoped provider and rewrite table", async () => {
+test("missing target auth preserves the previous scoped provider and alias table", async () => {
   const harness = await createHarness(presets, {
     apiKeys: { old: "old-key", noauth: undefined, next: "next-key" },
     models: [
@@ -902,12 +984,12 @@ test("missing target auth preserves the previous scoped provider and rewrite tab
   expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe(
     "old-key",
   );
-  expect(rewrite(harness)).toEqual({ model: "old-main" });
+  await expect(scopedStream(harness)).resolves.toBe("old-stream");
   expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
   expect(harness.messages.at(-1)).toContain('previous preset "codex" restored');
 });
 
-test("an unresolvable target rolls back to the previous provider and rewrite table", async () => {
+test("an unresolvable target rolls back to the previous provider and alias table", async () => {
   const harness = await createHarness(presets, {
     apiKeys: { old: "old-key", next: "next-key" },
     models: [
@@ -921,12 +1003,12 @@ test("an unresolvable target rolls back to the previous provider and rewrite tab
   expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe(
     "old-key",
   );
-  expect(rewrite(harness)).toEqual({ model: "old-main" });
+  await expect(scopedStream(harness)).resolves.toBe("old-stream");
   expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
   expect(harness.messages.at(-1)).toContain('previous preset "codex" restored');
 });
 
-test("a failed registry rollback disables rewriting and requires a restart", async () => {
+test("a failed registry rollback disables alias resolution and requires a restart", async () => {
   const harness = await createHarness(presets, {
     apiKeys: { old: "old-key", next: "next-key" },
     models: [
@@ -942,7 +1024,9 @@ test("a failed registry rollback disables rewriting and requires a restart", asy
   expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe(
     "next-key",
   );
-  expect(rewrite(harness)).toEqual({ model: "main" });
+  // The cleared alias table makes completions pass through to native behavior.
+  await expect(scopedStream(harness)).resolves.toBe("native-stream");
+  expect(harness.registry.providerStreamCalls).toEqual([]);
   expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
   expect(harness.messages.at(-1)).toContain("restart the session");
 });
@@ -980,7 +1064,11 @@ test("repeated switches refresh scoped/main and preserve concrete selections", a
   expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe(
     "next-key",
   );
-  expect(rewrite(harness)).toEqual({ model: "next-main" });
+  await expect(scopedStream(harness)).resolves.toBe("next-stream");
+  expect(lastTargetCall(harness)).toMatchObject({
+    provider: "next",
+    model: { provider: "next", id: "next-main" },
+  });
 
   await harness.command("codex", harness.ctx);
   expect(harness.statuses).toEqual([
@@ -999,7 +1087,11 @@ test("repeated switches refresh scoped/main and preserve concrete selections", a
   expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe(
     "old-key",
   );
-  expect(rewrite(harness)).toEqual({ model: "old-main" });
+  await expect(scopedStream(harness)).resolves.toBe("old-stream");
+  expect(lastTargetCall(harness)).toMatchObject({
+    provider: "old",
+    model: { provider: "old", id: "old-main" },
+  });
 
   harness.ctx.model = { provider: "old", id: "old-main" };
   await harness.command("local", harness.ctx);
@@ -1009,22 +1101,74 @@ test("repeated switches refresh scoped/main and preserve concrete selections", a
   );
 });
 
-test("rewrites scoped parent and child payloads to exact concrete model ids while leaving direct ids unchanged", async () => {
+test("scoped streamSimple delegates parent and child aliases to exact concrete targets", async () => {
   const harness = await createHarness(markerPresets, {
     apiKeys: { old: "old-key" },
     models: markerModels(),
   });
-  const parent = { model: "main" };
-  const child = { model: "junior" };
-  const direct = { model: "old-main" };
+  const mainContext = {};
+  const mainOptions = { reasoning: "medium" };
 
-  harness.beforeRequest({ payload: parent });
-  harness.beforeRequest({ payload: child });
-  harness.beforeRequest({ payload: direct });
+  await expect(
+    scopedStream(harness, "main", mainOptions),
+  ).resolves.toBe("old-stream");
+  await expect(scopedStream(harness, "junior")).resolves.toBe("old-stream");
 
-  expect(parent).toEqual({ model: "old-main" });
-  expect(child).toEqual({ model: "old-junior", reasoning_effort: "high" });
-  expect(direct).toEqual({ model: "old-main" });
+  const [mainCall, juniorCall] = harness.registry.providerStreamCalls;
+  expect(mainCall?.model).toBe(harness.registry.find("old", "old-main"));
+  expect(juniorCall?.model).toBe(
+    harness.registry.find("old", "old-junior"),
+  );
+  // Context and options reach the target provider untouched: alias
+  // resolution only swaps the model, never the completion parameters.
+  expect(mainCall).toMatchObject({ provider: "old" });
+  expect(mainCall?.context).toBe(harness.ctx);
+  expect(mainCall?.options).toBe(mainOptions);
+});
+
+test("aliases without a target resolve pre-upgrade stubs natively", async () => {
+  const harness = await createHarness(markerPresets, {
+    apiKeys: { old: "old-key" },
+    models: markerModels(),
+    deferSessionStart: true,
+  });
+  const stub = harness.registry.find("scoped", "senior");
+  if (!stub) throw new Error("scoped/senior stub was not registered");
+  const options = { reasoning: "low" };
+
+  await expect(
+    harness.registry.getRegisteredProviderConfig("scoped")?.streamSimple?.(
+      stub,
+      harness.ctx,
+      options,
+    ),
+  ).resolves.toBe("native-stream");
+  expect(apiStreamCalls).toEqual([[stub, harness.ctx, options]]);
+});
+
+test("the PI_SCOPE_REWRITE kill switch forces native pass-through", async () => {
+  const harness = await createHarness(presets, {
+    apiKeys: { old: "old-key" },
+    models: [target("old", "old-main", "Cloud main model")],
+  });
+  process.env.PI_SCOPE_REWRITE = "0";
+
+  await expect(scopedStream(harness)).resolves.toBe("native-stream");
+  expect(harness.registry.providerStreamCalls).toEqual([]);
+  expect(apiStreamCalls).toHaveLength(1);
+});
+
+test("a target preset pointing at the scoped provider rejects as a cycle", async () => {
+  (globalThis as Record<string, unknown>).activePreset = "cyclic";
+  const harness = await createHarness(
+    { cyclic: { main: { model: "scoped/main" }, remap: {} } },
+    { apiKeys: { scoped: "scoped-key" } },
+  );
+
+  await expect(scopedStream(harness)).rejects.toThrow(
+    /scoped\/main targets scoped\/main: a scoped alias cannot resolve to another scoped alias/,
+  );
+  expect(harness.registry.providerStreamCalls).toEqual([]);
 });
 
 test("registers one native summary handler per event and declines direct models", async () => {
@@ -1244,7 +1388,11 @@ test("summaries observe only committed targets across deferred failure and succe
   expect(compactCalls[0][2]).toBe("old-summary-key");
   rejectCredential(new Error("credential lookup failed"));
   await switching;
-  expect(rewrite(harness)).toEqual({ model: "old-main" });
+  await expect(scopedStream(harness)).resolves.toBe("old-stream");
+  expect(lastTargetCall(harness)).toMatchObject({
+    provider: "old",
+    model: { provider: "old", id: "old-main" },
+  });
 
   harness.registry.apiKeys.set("next", "next-key");
   await harness.command("local", harness.ctx);
@@ -1253,9 +1401,10 @@ test("summaries observe only committed targets across deferred failure and succe
   expect(compactCalls).toHaveLength(2);
   expect(compactCalls[1][1]).toEqual(nextModel);
   expect(compactCalls[1][2]).toBe("next-summary-key");
-  expect(rewrite(harness)).toEqual({
-    model: "next-main",
-    reasoning_effort: "high",
+  await expect(scopedStream(harness)).resolves.toBe("next-stream");
+  expect(lastTargetCall(harness)).toMatchObject({
+    provider: "next",
+    model: { provider: "next", id: "next-main" },
   });
 });
 
