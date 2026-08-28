@@ -22,6 +22,7 @@
       # pkgs.antigravity-cli
 
       pkgs.ccusage
+      pkgs.squid-os
     ];
   };
 }

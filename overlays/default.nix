@@ -12,6 +12,8 @@ let
 
       mboxshell = final.callPackage ./mboxshell { };
 
+      squid-os = final.callPackage ./squid-os.nix { };
+
       nono = inputs.llm-agents.packages.${system}.nono;
 
       opencode = inputs.llm-agents.packages.${system}.opencode;
