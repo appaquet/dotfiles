@@ -117,6 +117,7 @@ let
               "subagents"
               "context_pct"
               "cache_read"
+              "custom:tps"
             ];
           };
           cache_read = {
@@ -135,9 +136,20 @@ let
               position = "right";
               color = "warning";
             }
+            {
+              id = "tps";
+              statusKey = "tps";
+              position = "right";
+              selfColorize = true; # preserve extension color
+            }
           ];
         };
       };
+    }
+
+    # https://github.com/arhen/pi-extensions
+    {
+      package = "npm:@arhen/pi-core-tps-stats@1.3.1";
     }
 
     {
