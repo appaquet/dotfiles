@@ -178,6 +178,16 @@ let
         ".pi/agent/extensions/mode-switch.ts".source = ./mode-switch.ts;
       };
     }
+
+    {
+      files = {
+        ".pi/agent/extensions/bash-timeout.ts".source = ./bash-timeout.ts;
+        ".pi/agent/bash-timeout.json".text = builtins.toJSON {
+          defaultTimeoutSeconds = 300; # 5m default
+          maxTimeoutSeconds = 1200; # 20m max explicit by agent
+        };
+      };
+    }
   ];
 
   # npm packages feed settings.packages; local extension entries have no package.
