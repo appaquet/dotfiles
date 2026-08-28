@@ -7,6 +7,26 @@ require("which-key").add({
 -- https://github.com/dlyongemallo/diffview-plus.nvim/blob/main/lua/diffview/config.lua
 -- `--imply-local` means it will use the local version of the file on the right side
 local diffview_lib = require("diffview.lib")
+
+-- Focus the main (rightmost) diffview window, inverse of the
+-- built-in <leader>e which focuses the file panel
+local function focus_diffview_view()
+	local view = diffview_lib.get_current_view()
+	local main = view and view.cur_layout and view.cur_layout:get_main_win()
+	if main and main.id then
+		vim.api.nvim_set_current_win(main.id)
+	elseif view then
+		-- No layout yet (no file selected): focus the first non-panel window
+		for _, win in ipairs(vim.api.nvim_tabpage_list_wins(vim.api.nvim_get_current_tabpage())) do
+			local name = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win))
+			if name ~= "diffview://files" then
+				vim.api.nvim_set_current_win(win)
+				return
+			end
+		end
+	end
+end
+
 require("diffview").setup({
 	preferred_adapter = "jj",
 
@@ -28,7 +48,22 @@ require("diffview").setup({
 		},
 		inline = { style = "overleaf" },
 	},
+	-- Bind <leader>E only while a diffview is open
+	hooks = {
+		view_enter = function()
+			vim.keymap.set("n", "<Leader>E", focus_diffview_view, { desc = "Diffview: focus diff view" })
+		end,
+		view_leave = function()
+			vim.keymap.del("n", "<Leader>E")
+		end,
+	},
 })
+
+-- Remove the plugin's default behavior of refreshing the whole view on FocusGained, which is quite
+-- annoying since switching terminal panes will trigger a refresh, losing focus and mode
+for _, au in ipairs(vim.api.nvim_get_autocmds({ group = "diffview_nvim", event = "FocusGained" })) do
+	vim.api.nvim_del_autocmd(au.id)
+end
 
 -- Close all open diffview instances across all tabs
 local function close_all_diffviews()
@@ -101,6 +136,7 @@ end
 require("which-key").add({
 	{ "<leader>gd", group = "Diff view" },
 })
+
 vim.keymap.set("n", "<Leader>gdh", open_diffview_head, { desc = "Git: open diff view against head" })
 vim.keymap.set("n", "<Leader>gdw", open_diffview_working, { desc = "Git: open diff view against current bookmark" })
 vim.keymap.set("n", "<Leader>gdm", open_diffview_main, { desc = "Git: open diff view against main branch" })
