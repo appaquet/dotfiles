@@ -18,7 +18,7 @@
           default = "CRITICAL: When encounter file reference (ex: @rules/general.md), if not already loaded, read it right away.";
         }}
 
-        Whenever version control is needed, load and follow ${
+        CRITICAL: Whenever version control is needed, or intent to modify code, load and follow ${
           scope.skills."version-control".reference
         } before acting.
 
