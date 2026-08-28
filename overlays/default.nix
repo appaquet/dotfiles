@@ -12,6 +12,8 @@ let
 
       #markdown-oxide = final.callPackage ./markdown-oxide { };
 
+      squid-os = final.callPackage ./squid-os.nix { };
+
       #nono = final.callPackage ./nono { };
       nono = inputs.llm-agents.packages.${system}.nono;
 
