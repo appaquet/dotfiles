@@ -8,7 +8,7 @@ let
   plugins = [
     # https://github.com/tigorlazuardi/pi-rules
     {
-      package = "npm:@tigorhutasuhut/pi-rules@0.5.4";
+      package = "npm:@tigorhutasuhut/pi-rules@0.6.0";
     }
 
     # https://github.com/Quartermaster-Labs/pi-on-demand-context
@@ -18,7 +18,7 @@ let
 
     # https://github.com/tintinweb/pi-subagents
     {
-      package = "npm:@tintinweb/pi-subagents@0.17.1";
+      package = "npm:@tintinweb/pi-subagents@0.18.2";
       files = {
         ".pi/agent/subagents.json".text = builtins.toJSON {
           disableDefaultAgents = true;
@@ -28,17 +28,17 @@ let
 
     # https://github.com/tintinweb/pi-tasks
     {
-      package = "npm:@tintinweb/pi-tasks@0.8.0";
+      package = "npm:@tintinweb/pi-tasks@0.9.0";
     }
 
     # https://github.com/juicesharp/rpiv-mono
     {
-      package = "npm:@juicesharp/rpiv-ask-user-question@2.6.2";
+      package = "npm:@juicesharp/rpiv-ask-user-question@2.7.1";
     }
 
     # https://github.com/nicobailon/pi-web-access
     {
-      package = "npm:pi-web-access@0.24.0";
+      package = "npm:pi-web-access@0.24.2";
       environment = {
         EXA_API_KEY.file = config.sops.secrets.pi_exa_api_key.path;
       };
@@ -53,7 +53,7 @@ let
 
     # https://github.com/nicobailon/pi-mcp-adapter
     {
-      package = "npm:pi-mcp-adapter@2.26.1";
+      package = "npm:pi-mcp-adapter@2.27.0";
       files = {
         ".pi/agent/mcp.json".text = builtins.toJSON {
           scriptMode = false;
@@ -73,7 +73,7 @@ let
 
     # https://github.com/balaenis/pi-x-ide
     {
-      package = "npm:pi-x-ide@1.19.4";
+      package = "npm:pi-x-ide@1.19.5";
       environment = {
         PI_X_IDE_AUTO_INSTALL.value = "0";
       };
