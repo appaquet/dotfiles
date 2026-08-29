@@ -172,6 +172,40 @@ in
           };
         };
       };
+
+      # See docs/features/2026/08/28-pi-opencode-scope for calculation
+      go = {
+        main = {
+          model = "opencode-go/qwen3.8-flash";
+          thinking = "medium";
+        };
+        remap = {
+          "scoped/junior" = {
+            model = "opencode-go/deepseek-v4-flash";
+            thinking = "low";
+          };
+          "scoped/mid" = {
+            model = "opencode-go/deepseek-v4-pro";
+            thinking = "max";
+          };
+          "scoped/senior" = {
+            model = "opencode-go/qwen3.8-flash";
+            thinking = "medium";
+          };
+          "scoped/staff" = {
+            model = "opencode-go/glm-5.3-flash";
+            thinking = "max";
+          };
+          "scoped/principal" = {
+            model = "opencode-go/glm-5.3";
+            thinking = "max";
+          };
+          "scoped/reviewer" = {
+            model = "opencode-go/qwen3.8-flash";
+            thinking = "high";
+          };
+        };
+      };
     };
   };
 
