@@ -2,6 +2,7 @@
 
 let
   thinkingLevelMap = {
+    off = "none";
     minimal = "low";
     low = "low";
     medium = "medium";
@@ -26,27 +27,47 @@ let
     }
     // model;
 
+  mkLocalNinferModel =
+    model:
+    mkLocalModel (
+      {
+        compat = {
+          supportsReasoningEffort = true;
+          thinkingFormat = "openai";
+        };
+      }
+      // model
+    );
+
+  mkLocalVllmModel =
+    model:
+    mkLocalModel (
+      {
+        compat = {
+          supportsReasoningEffort = false;
+          thinkingFormat = "chat-template";
+          chatTemplateKwargs = {
+            enable_thinking = {
+              "$var" = "thinking.enabled";
+            };
+            reasoning_effort = {
+              "$var" = "thinking.effort";
+            };
+            preserve_thinking = true;
+          };
+        };
+      }
+      // model
+    );
+
   models = {
     providers.deskapp = {
       baseUrl = "http://deskapp.n3x.net:15000/v1";
       api = "openai-completions";
       apiKey = "local";
-      compat = {
-        supportsDeveloperRole = false;
-        supportsReasoningEffort = false;
-        thinkingFormat = "chat-template";
-        chatTemplateKwargs = {
-          enable_thinking = {
-            "$var" = "thinking.enabled";
-          };
-          reasoning_effort = {
-            "$var" = "thinking.effort";
-          };
-          preserve_thinking = true;
-        };
-      };
+      compat.supportsDeveloperRole = false;
       models = [
-        (mkLocalModel {
+        (mkLocalNinferModel {
           id = "qwen3.8-27b";
           name = "qwen3.8-27b";
           contextWindow = 185000;
@@ -58,7 +79,22 @@ let
             repetition_penalty = 1.0;
           };
         })
-        (mkLocalModel {
+
+        # For a Qwen vLLM launcher, use this model expression instead:
+        # (mkLocalVllmModel {
+        #   id = "qwen3.8-27b";
+        #   name = "qwen3.8-27b";
+        #   contextWindow = 185000;
+        #   samplingParams = {
+        #     temperature = 1.0;
+        #     top_p = 0.95;
+        #     top_k = 20;
+        #     presence_penalty = 0.0;
+        #     repetition_penalty = 1.0;
+        #   };
+        # })
+
+        (mkLocalVllmModel {
           id = "ornith-1.5-35b";
           name = "Ornith-1.5-35B";
           contextWindow = 262144;
