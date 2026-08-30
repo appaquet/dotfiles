@@ -23,6 +23,7 @@ in
   ];
 
   sops.secrets.pi_exa_api_key.sopsFile = config.sops.secretsFiles.common;
+  sops.secrets.pi_opencode_api_key.sopsFile = config.sops.secretsFiles.common;
 
   programs.pi.coding-agent = {
     enable = true;
@@ -30,6 +31,7 @@ in
       nodejs = pkgs.nodejs_26;
     };
 
+    environment.OPENCODE_API_KEY.file = config.sops.secrets.pi_opencode_api_key.path;
     environment.JJ_EDITOR.value = "false"; # fail loud if a jj command tries to open an editor
   };
 
@@ -57,6 +59,7 @@ in
 
     filesystem.read_file = [
       "$HOME/.config/sops-nix/secrets/pi_exa_api_key"
+      "$HOME/.config/sops-nix/secrets/pi_opencode_api_key"
     ];
 
     # pi-x-ide does a sig 0 on ide processes, which is blocked unfortunately...
