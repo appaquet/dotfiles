@@ -43,10 +43,9 @@ require("diffview").setup({
 	diffopt = { algorithm = "histogram" },
 	keymaps = {},
 	view = {
-		cycle_layouts = {
-			default = { "diff2_horizontal", "diff1_inline" },
-		},
-		inline = { style = "overleaf" },
+		default = { layout = "diff1_inline" },
+		cycle_layouts = { default = { "diff1_inline", "diff2_horizontal" } },
+		inline = { style = "unified" }, -- modes: "unified" (classic +/- lines), "overleaf" (inline strikethrough deletions)
 	},
 	-- Bind <leader>E only while a diffview is open
 	hooks = {
