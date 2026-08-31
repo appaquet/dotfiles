@@ -145,7 +145,7 @@ in
 
       codex = {
         main = {
-          model = "openai-codex/gpt-5.6-terra";
+          model = "openai-codex/gpt-5.6-sol";
           thinking = "high";
         };
         remap = {
