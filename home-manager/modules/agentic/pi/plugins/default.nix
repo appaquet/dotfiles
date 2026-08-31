@@ -9,6 +9,32 @@ let
     # https://github.com/tigorlazuardi/pi-rules
     {
       package = "npm:@tigorhutasuhut/pi-rules@0.6.0";
+      files = {
+        # See https://github.com/tigorlazuardi/pi-rules#configure-source-priority
+        # Drop global user rules, other than pi
+        # But include repo rules for pi, agents, and claude.
+        ".pi/agent/rules.json".text = builtins.toJSON {
+          enabled = true;
+          sources = [
+            {
+              scope = "repo";
+              kind = "pi";
+            }
+            {
+              scope = "repo";
+              kind = "agents";
+            }
+            {
+              scope = "repo";
+              kind = "claude";
+            }
+            {
+              scope = "user";
+              kind = "pi";
+            }
+          ];
+        };
+      };
     }
 
     # https://github.com/Quartermaster-Labs/pi-on-demand-context
