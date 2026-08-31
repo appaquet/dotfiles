@@ -1,4 +1,3 @@
-mod nixantic 'nixantic/justfile'
 
 default:
     @just --list
@@ -29,3 +28,7 @@ darwin-check:
 
 darwin-build:
     ./x darwin build
+
+nixantic-clone:
+  git clone https://github.com/appaquet/nixantic
+  cd nixantic && jj git init --colocate && jj b track main@origin
