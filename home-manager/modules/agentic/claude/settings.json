@@ -117,72 +117,7 @@
   },
   "model": "sonnet",
   "hooks": {
-    "Notification": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "ccmon status"
-          }
-        ]
-      }
-    ],
-    "PermissionRequest": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "claude-tmux-indicator permission PermissionRequest"
-          },
-          {
-            "type": "command",
-            "command": "ccmon status"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "claude-tmux-indicator on PostToolUse"
-          },
-          {
-            "type": "command",
-            "command": "ccmon status"
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "claude-tmux-indicator off SessionEnd"
-          },
-          {
-            "type": "command",
-            "command": "ccmon status"
-          }
-        ]
-      }
-    ],
     "SessionStart": [
-      {
-        "matcher": "compact",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "ccmon status"
-          }
-        ]
-      },
       {
         "matcher": "*",
         "hooks": [
@@ -190,62 +125,6 @@
             "type": "command",
             "command": "bash ~/.claude/hooks/herdr-agent-state.sh session",
             "timeout": 10
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "claude-tmux-indicator off Stop"
-          },
-          {
-            "type": "command",
-            "command": "ccmon status"
-          }
-        ]
-      }
-    ],
-    "StopFailure": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "claude-tmux-indicator off StopFailure"
-          },
-          {
-            "type": "command",
-            "command": "ccmon status"
-          }
-        ]
-      }
-    ],
-    "SubagentStop": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "ccmon status"
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "claude-tmux-indicator on UserPromptSubmit"
-          },
-          {
-            "type": "command",
-            "command": "ccmon status"
           }
         ]
       }

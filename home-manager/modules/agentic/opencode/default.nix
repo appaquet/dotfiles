@@ -537,8 +537,6 @@ let
     ".config/opencode/opencode.json".source = opencodeJson;
     ".config/opencode/opencode-yolo.json".source = yoloOpencodeJson;
     ".config/opencode/tui.json".source = tuiJson;
-    ".config/opencode/plugins/ccmon.ts".source = "${inputs'.ccmon.packages.opencode-plugin}/ccmon.ts";
-    ".config/opencode/plugins/tmux-statusline.ts".source = fromPluginDir "tmux-statusline.ts";
     ".config/opencode/plugins/direnv.ts".source = fromPluginDir "direnv.ts";
     ".config/opencode/plugins/throughput.ts".source = fromPluginDir "throughput.ts";
     #".config/opencode/plugins/notify.ts".source = fromPluginDir "notify.ts"; # FIXME: doesn't work because ssh key unavailable in sandbox
@@ -569,7 +567,6 @@ in
         "$HOME/.local/share/opentui"
         "$HOME/.cache/opencode"
         "$HOME/.local/state/opencode"
-        "$HOME/.local/state/ccmon" # ccmon plugin writes status there
       ];
     };
 

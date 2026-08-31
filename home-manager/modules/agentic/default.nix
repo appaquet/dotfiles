@@ -9,7 +9,6 @@
     inputs.nixantic.homeManagerModules.default
     ./nixantic.nix
     ./tools.nix
-    ./tmux-statusline.nix
     ../nono
 
     ./claude

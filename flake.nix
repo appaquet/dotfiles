@@ -56,12 +56,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    ccmon = {
-      url = "github:appaquet/ccmon";
-      #url = "path:/home/appaquet/Projects/ccmon";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     nixvirt = {
       url = "github:AshleyYakeley/NixVirt";
       inputs.nixpkgs.follows = "nixos";
