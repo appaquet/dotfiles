@@ -4,13 +4,16 @@
     {
       description = "Reflect on an error or undesired behavior to propose instruction improvements";
 
-      argumentHint = "[description of issue]";
+      arguments = [
+        {
+          label = "Issue";
+          hint = "[description of issue]";
+        }
+      ];
 
       effort = "xhigh";
       content = ''
         Goal: reflect on what went wrong and propose instruction changes to prevent recurrence.
-
-        Issue: `$ARGUMENTS`
 
         ## Instructions
 

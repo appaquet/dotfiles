@@ -4,6 +4,8 @@
     {
       description = "Analyse and output uncertainty disclosure about current task understanding";
 
+      arguments = [ { label = "Focus"; } ];
+
       effort = "xhigh";
 
       content = ''

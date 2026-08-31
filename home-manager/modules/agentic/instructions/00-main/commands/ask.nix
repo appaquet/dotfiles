@@ -4,7 +4,7 @@
     {
       description = "Analyze without acting";
 
-      argumentHint = "[question]";
+      arguments = [ { label = "Question"; } ];
 
       content = ''
         Goal: provide thoughtful analysis on a given question or topic without taking further action

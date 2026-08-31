@@ -4,7 +4,12 @@
     {
       description = "Trigger deep thinking mode for complex problems";
 
-      argumentHint = "[problem or context]";
+      arguments = [
+        {
+          label = "Context";
+          hint = "[problem or context]";
+        }
+      ];
 
       effort = "xhigh";
 
@@ -12,8 +17,6 @@
         Goal: thorough, rigorous analysis for complex problems where shallow thinking isn't cutting it.
 
         **NEVER**: Never modify files, run side-effect commands, or start implementation
-
-        Context: `$ARGUMENTS`
 
         ## Instructions
 

@@ -4,6 +4,8 @@
     {
       description = "Research REVIEW comments and create a prioritized plan for addressing them";
 
+      arguments = [ { label = "Focus"; } ];
+
       effort = "xhigh";
 
       content = ''

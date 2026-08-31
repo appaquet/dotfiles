@@ -2,6 +2,8 @@
   nixantic.sources.context-management.commands."ctx-usage" = {
     description = "Analyze context window, breakdown messages by turns, tools, large items. Give optimization hints...";
 
+    arguments = [ { label = "Focus"; } ];
+
     harnesses = [ "claude" ];
 
     content = ''

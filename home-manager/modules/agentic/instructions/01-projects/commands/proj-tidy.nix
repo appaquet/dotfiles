@@ -4,6 +4,8 @@
     {
       description = "Validate and fix project doc consistency against standard structure";
 
+      arguments = [ { label = "Context"; } ];
+
       effort = "xhigh";
 
       content = ''

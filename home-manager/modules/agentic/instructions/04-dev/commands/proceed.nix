@@ -4,6 +4,8 @@
     {
       description = "Proceed with current workflow";
 
+      arguments = [ { label = "Context"; } ];
+
       content = ''
         Goal: proceed with the current workflow.
 

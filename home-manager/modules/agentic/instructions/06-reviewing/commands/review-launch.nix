@@ -18,6 +18,8 @@
     {
       description = "Launch review agents for code style, architecture and correctness.";
 
+      arguments = [ { label = "Focus"; } ];
+
       effort = "high";
 
       content = ''

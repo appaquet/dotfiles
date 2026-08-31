@@ -2,6 +2,8 @@
   nixantic.sources.main.commands."continue" = {
     description = "Continue working on the current task before being interrupted";
 
+    arguments = [ { label = "Context"; } ];
+
     onlyInjectBlockReferences = [ ];
 
     content = ''

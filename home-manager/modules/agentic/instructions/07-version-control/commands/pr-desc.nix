@@ -6,6 +6,7 @@
     in
     {
       description = "Generate PR-ready summary of branch changes with per-component analysis and Summary + Implementation Notes";
+      arguments = [ { label = "Focus"; } ];
       model = {
         claude = "sonnet";
         opencode = "anthropic/claude-sonnet-4.5";

@@ -343,11 +343,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1787769837,
-        "narHash": "sha256-tm69Oi8Y7v/Ns4jPU9DqlIk0HQqjN2QgcDxyGx5qd2k=",
+        "lastModified": 1788208943,
+        "narHash": "sha256-FaIVsSNtW8RSm3kMMzORCvnIh9CegeOWjsMQqLOCCqs=",
         "owner": "appaquet",
         "repo": "nixantic",
-        "rev": "6a94bfd2ab0f141d2aa2dcc28c895ff37354cc62",
+        "rev": "72f83a20fc79cc86612c793090fce2d2a49d66e0",
         "type": "github"
       },
       "original": {

@@ -3,6 +3,7 @@
     { scope }:
     {
       description = "Load project context from project / phases docs";
+      arguments = [ { label = "Context"; } ];
       effort = "medium";
       asSkill = {
         opencode = true;

@@ -4,12 +4,17 @@
     { scope }:
     {
       description = "Create high-level development plan and write to ad-hoc/temp project/phases docs";
-      argumentHint = "[task-description]";
+      arguments = [
+        {
+          label = "Task";
+          hint = "[task-description]";
+        }
+      ];
 
       effort = "xhigh";
 
       content = ''
-        Goal: build a full, ad hoc plan for the task at hand: $ARGUMENTS
+        Goal: build a full, ad hoc plan for the task at hand
 
         ## State
 

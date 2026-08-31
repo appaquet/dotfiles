@@ -4,6 +4,8 @@
     {
       description = "Implement tasks from the approved plan";
 
+      arguments = [ { label = "Task"; } ];
+
       effort = "xhigh";
 
       content = ''

@@ -5,15 +5,18 @@
       when = { scope }: scope.settings.versionControl.mode == "jj";
       description = "Distribute files from current change into their matching ancestor changes in the stack";
 
-      argumentHint = "[change-id]";
+      arguments = [
+        {
+          label = "Source";
+          hint = "[change-id]";
+        }
+      ];
 
       content = ''
         Goal: Distribute files from a change (default: `@`) into ancestor changes that last modified them.
 
         Only targets changes within the current stacked branch (from `jj-stacked-stats`).
         Useful after review fixes, bulk edits, or any work touching files across multiple stacked changes.
-
-        Source: `$ARGUMENTS` (change to absorb from, defaults to `@`)
 
         ## Instructions
 

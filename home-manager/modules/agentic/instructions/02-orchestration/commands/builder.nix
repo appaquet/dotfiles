@@ -3,6 +3,7 @@
     { scope }:
     {
       description = "Activate builder mode";
+      arguments = [ { label = "Task"; } ];
       harnesses = [
         "claude"
         "pi"

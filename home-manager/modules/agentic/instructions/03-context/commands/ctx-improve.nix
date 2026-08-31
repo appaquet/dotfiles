@@ -4,6 +4,8 @@
     {
       description = "Improve context by asking clarifying questions";
 
+      arguments = [ { label = "Focus"; } ];
+
       effort = "xhigh";
 
       content = ''

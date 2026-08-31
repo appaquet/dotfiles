@@ -4,12 +4,15 @@
     {
       description = "Entry point for instruction file changes - edits, fixes, optimization";
 
-      argumentHint = "[files or description]";
+      arguments = [
+        {
+          label = "Target";
+          hint = "[files or description]";
+        }
+      ];
 
       content = ''
         Goal: user-facing command for instruction file changes.
-
-        Target: `$ARGUMENTS`
 
         ## Instructions
 

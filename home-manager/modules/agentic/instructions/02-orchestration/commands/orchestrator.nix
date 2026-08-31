@@ -3,6 +3,7 @@
     { scope }:
     {
       description = "Activate orchestrator mode";
+      arguments = [ { label = "Task"; } ];
       harnesses = [
         "claude"
         "pi"

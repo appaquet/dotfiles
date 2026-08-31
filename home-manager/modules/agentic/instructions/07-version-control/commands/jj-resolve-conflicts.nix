@@ -3,6 +3,8 @@
     when = { scope }: scope.settings.versionControl.mode == "jj";
     description = "Resolve jj conflicts in the current change stack, oldest to newest";
 
+    arguments = [ { label = "Context"; } ];
+
     effort = "xhigh";
 
     content = ''

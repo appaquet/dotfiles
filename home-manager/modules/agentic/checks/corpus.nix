@@ -161,6 +161,24 @@ let
       test -d ${instructions.package}/pi/skills
 
       pi=${instructions.package}/pi
+
+      for dir in "$pi/prompts" "${instructions.package}/claude/commands" \
+        "${instructions.package}/opencode/commands"; do
+        missing=$(grep -L -F '$ARGUMENTS' "$dir"/*.md || true)
+        if [ -n "$missing" ]; then
+          echo "missing \$ARGUMENTS in: $missing" >&2
+          exit 1
+        fi
+      done
+
+      for harness in pi opencode; do
+        leaked=$(grep -l -F '$ARGUMENTS' \
+          "${instructions.package}/$harness"/skills/*/SKILL.md || true)
+        if [ -n "$leaked" ]; then
+          echo "unexpected \$ARGUMENTS in: $leaked" >&2
+          exit 1
+        fi
+      done
       grep -R -F '`Agent`' "$pi"
       grep -R -F '`get_subagent_result`' "$pi"
       grep -R -F '`steer_subagent`' "$pi"
@@ -178,7 +196,7 @@ let
       grep -F 'Agent Skill guidance' "$pi/prompts/pr-desc.md"
       ! grep -F 'using the `Skill` tool' "$pi/prompts/pr-desc.md"
       ! grep -F 'forked context' "$pi/prompts/pr-desc.md"
-      grep -F 'Context: `$ARGUMENTS`' "$pi/prompts/think.md"
+      grep -F 'Context: $ARGUMENTS' "$pi/prompts/think.md"
       grep -F 'argument-hint: "[problem or context]"' "$pi/prompts/think.md"
       ! grep -F -- "--replace='DB: \$1" "$pi/prompts/pr-reply-comments.md"
       grep -F '`AGENTS.md` is active context' "$pi/skills/mem-writing/SKILL.md"

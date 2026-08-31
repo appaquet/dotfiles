@@ -3,6 +3,7 @@
     { scope }:
     {
       description = "Update project and phase docs with current state and progress";
+      arguments = [ { label = "Context"; } ];
       effort = "medium";
       asSkill = {
         opencode = true;

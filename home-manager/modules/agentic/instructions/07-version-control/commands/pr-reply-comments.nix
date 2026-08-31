@@ -4,6 +4,8 @@
     {
       description = "Reply to imported PR review comments and clean up inline comments";
 
+      arguments = [ { label = "PR"; } ];
+
       content = ''
         Goal: Reply to imported PR review comments and clean up inline comments
 

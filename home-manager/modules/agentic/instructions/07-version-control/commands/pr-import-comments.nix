@@ -10,6 +10,8 @@
     {
       description = "Import unresolved PR review comments as inline code comments with metadata for replies";
 
+      arguments = [ { label = "PR"; } ];
+
       # Shared isolated execution intent; harnesses translate this to native frontmatter.
       context = "fork";
 
