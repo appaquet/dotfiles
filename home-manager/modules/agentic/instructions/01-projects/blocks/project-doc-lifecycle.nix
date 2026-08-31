@@ -3,9 +3,11 @@
     { scope }:
     {
       content = ''
-        ## Project-document lifecycle
+        ## Project documention files lifecycle
 
-        Project and feature documents span potentially multiple PRs and are the durable source of truth while context windows are ephemeral.
+        Project and phase documents are the durable source of truth for project state. They are created, updated, and maintained throughout the project lifecycle. 
+        Agent should be considered amnesic. Context is limited and compaction/reset may happen at any time, so project and phase documents are the only reliable source of truth.
+        They need to be well maintained, and be usable at any point in time for reloading context.
 
         ### Locations
 
@@ -24,6 +26,8 @@
           scope.commands."proj-save".reference
         } runs, and when significant information, uncertainties, decisions, insights, or outcomes arise.
         * If new work is unrelated to a phase document, ask the user whether to split it into a separate phase document.
+        * Never ask me at end of implementation if tasks/phases/requirements can be marked as complete. Instead, debrief on current what was done, and next step expectations.
+        * Completion should be determined by the user, but can be recommended when the user engage with a next step without marking previous tasks/phases/requirements as complete.
 
         ### Writing and history
 

@@ -64,9 +64,14 @@
            - If sub-agents did it, trust them
            - If not, ask them back instead of wasting your context
 
-        8. 🔳 Run ${scope.commands."proj-save".reference} to update project and phase docs
+        8. 🔳 Run ${
+          scope.commands."proj-save".reference
+        } to update project and phase docs, including version control commits.
 
-        9. 🔳 If this work is not yet saved, finalize it with the repository version-control workflow. Re-verify repository state first. Changes you don't recognize may be mine.
+        9. 🔳 Debrief me on
+           - What you did, learned and deviations from plan
+           - Any blockers
+           - Expected next steps
 
         ${scope.blocks."engagement-gate".release}
       '';
