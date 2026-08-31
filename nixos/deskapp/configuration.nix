@@ -17,6 +17,7 @@
     ./gpu-switch.nix
     ./ha-ctrl.nix
     ./hardware-configuration.nix
+    ./nvidia-power-cap.nix
     ./virt
   ];
 
