@@ -29,6 +29,7 @@ end
 
 require("diffview").setup({
 	preferred_adapter = "jj",
+	restore_session = false, -- don't auto restore diffview sessions on startup
 
 	-- Persist file selections & show marks even when no selection
 	file_panel = {
