@@ -145,8 +145,8 @@ in
 
       codex = {
         main = {
-          model = "openai-codex/gpt-5.6-sol";
-          thinking = "high";
+          model = "openai-codex/gpt-5.6-luna";
+          thinking = "xhigh";
         };
         remap = {
           "scoped/junior" = {
