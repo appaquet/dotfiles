@@ -30,5 +30,14 @@ darwin-build:
     ./x darwin build
 
 nixantic-clone:
-  git clone https://github.com/appaquet/nixantic
-  cd nixantic && jj git init --colocate && jj b track main@origin
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ -d nixantic/.jj ] || [ -d nixantic/.git ]; then
+        cd nixantic
+        jj git fetch
+    else
+        git clone git@github.com:appaquet/nixantic.git
+        cd nixantic
+        jj git init --colocate
+        jj b track main@origin
+    fi

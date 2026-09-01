@@ -20,8 +20,7 @@ This tree owns all production instruction sources, acceptance checks, and AP run
 `nixantic` (`github:appaquet/nixantic`) is a separate external repo, consumed as a flake input. The dotfiles `flake.nix` has a commented local `path:` override.
 
 To change nixantic:
-1. Clone the repo (e.g. into the gitignored `./nixantic` dir) + jj git colocate and make the changes there, as separate commits in that repo, alongside the dotfiles change. Don't use https remote, but git+ssh.
-   It may already exists, in that case, update to latest.
+1. Run `just nixantic-clone` from the dotfiles root: it clones the repo into the gitignored `./nixantic` dir (jj git colocate, `main` tracking `main@origin`), or fetches the latest if the clone already exists. Don't use an https remote, but git+ssh. Make the changes there, as separate commits in that repo, alongside the dotfiles change.
 2. Switch the dotfiles nixantic input to the `path:` override so dotfiles acts on the unpushed local changes.
 3. Never push to the nixantic repo: when a push is required, tell the user and let the user push. After the push, the user removes the `path:` override and updates the input back to `github:appaquet/nixantic` (`nix flake update nixantic`).
 
