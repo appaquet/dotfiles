@@ -12,8 +12,6 @@ let
 
       #markdown-oxide = final.callPackage ./markdown-oxide { };
 
-      codeburn = final.callPackage ./codeburn { };
-
       #nono = final.callPackage ./nono { };
       nono = inputs.llm-agents.packages.${system}.nono;
 

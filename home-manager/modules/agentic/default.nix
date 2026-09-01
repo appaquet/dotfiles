@@ -21,7 +21,6 @@
       # pkgs.codex
       # pkgs.antigravity-cli
 
-      pkgs.codeburn
       pkgs.ccusage
     ];
   };
