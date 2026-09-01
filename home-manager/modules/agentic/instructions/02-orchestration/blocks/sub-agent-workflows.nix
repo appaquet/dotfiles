@@ -69,6 +69,7 @@
           * 🔨 Builder mode (default)
             * Main agent implements work directly in the session
             * Delegates only context-intensive exploration, research, and review
+            * Planned tasks with assigned dev agents shouldn't be delegated. They were chosen at planning, without knowledge of mode.
 
           * 👑 Orchestrator mode
             * No coding in the main session — delegate it, including the reads it requires

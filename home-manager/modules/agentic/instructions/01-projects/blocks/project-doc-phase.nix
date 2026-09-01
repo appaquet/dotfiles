@@ -39,7 +39,7 @@
         * Reference applicable requirements.
         * Give every task acceptance-criteria sub-items with clear, verifiable conditions. Each acceptance criterion maps to an assertion; a task is complete only when all its acceptance criteria pass.
         * Mark a task `[~]` when starting it and mark the phase `🔄` when starting it. You may mark completed tasks `[x]` after completing them, but never mark the phase complete.
-        * Specify the selected agent when relevant; select it using ${scope.blocks.sub-agent-selection.reference}.
+        * Specify the selected agent when relevant. Select it using ${scope.blocks.sub-agent-selection.reference}. They are to be used if implementation is done in orchestration mode, even if planned in builder mode.
         * Example:
           ```markdown
           - [ ] Implement X (R1, R2.1)

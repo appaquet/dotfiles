@@ -32,16 +32,17 @@
              - Segment for better tracking
            - Create tasks for verification/testing each implementation step.
            - If user validation needed, task description should be clear about waiting for user input
-           - Decide whether each task can be delegated. If so, make the task description clear and select the dev agent using ${
-             scope.blocks."sub-agent-selection".reference
-           }.
+           - If in orchestrator mode, decide whether each task can be delegated, make the task
+             description clear and select the dev agent using ${
+               scope.blocks."sub-agent-selection".reference
+             }.
 
         4. Create version control commits for this implementation
            - Check active changes
            - Commit with proper message or change active commit message
 
-        5. 🔳 Implement tasks, using sub-agents delegation
-           - You need to follow ${scope.blocks."sub-agents-workflows".reference}
+        5. 🔳 Implement tasks
+           - Follow ${scope.blocks."sub-agents-workflows".reference}
            - Update documentation if existing:
              - Mark phase doc task `[~]` when starting, `[x]` when done
                Like task format dictates. Done = all ACs pass and tested working
