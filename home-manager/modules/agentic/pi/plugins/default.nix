@@ -44,7 +44,7 @@ let
 
     # https://github.com/tintinweb/pi-subagents
     {
-      package = "npm:@tintinweb/pi-subagents@0.18.2";
+      package = "npm:@tintinweb/pi-subagents@0.19.0";
       files = {
         ".pi/agent/subagents.json".text = builtins.toJSON {
           disableDefaultAgents = true;
@@ -64,7 +64,7 @@ let
 
     # https://github.com/nicobailon/pi-web-access
     {
-      package = "npm:pi-web-access@0.24.2";
+      package = "npm:pi-web-access@0.27.0";
       environment = {
         EXA_API_KEY.file = config.sops.secrets.pi_exa_api_key.path;
       };
@@ -79,7 +79,7 @@ let
 
     # https://github.com/nicobailon/pi-mcp-adapter
     {
-      package = "npm:pi-mcp-adapter@2.27.0";
+      package = "npm:pi-mcp-adapter@2.31.0";
       files = {
         ".pi/agent/mcp.json".text = builtins.toJSON {
           scriptMode = false;
@@ -125,7 +125,7 @@ let
 
     # https://github.com/nicobailon/pi-powerline-footer
     {
-      package = "npm:pi-powerline-footer@0.15.1";
+      package = "npm:pi-powerline-footer@0.16.0";
       settings = {
         powerline = {
           preset = "default";
