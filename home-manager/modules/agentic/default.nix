@@ -18,8 +18,9 @@
 
   config = {
     home.packages = [
-      pkgs.codex
-      pkgs.antigravity-cli
+      # pkgs.codex
+      # pkgs.antigravity-cli
+
       pkgs.codeburn
       pkgs.ccusage
     ];
