@@ -8,7 +8,8 @@
       content = ''
         Use `${scope.harness.tools.askUserQuestion}`.
 
-        Every question `header` MUST be 16 characters or fewer. Use a short label, not explanatory text.
+        Question `header` MUST be 16 characters or fewer, use `label` for explanation.
+        Question `label` MUST be 60 characters or fewer.
 
         Always give user enough context to answer every question. Keep simple, self-contained questions direct; when one or two short sentences suffice, include that context in the question. 
 
