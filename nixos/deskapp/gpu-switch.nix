@@ -5,10 +5,23 @@ let
   gpuPci = "10de:2b85";
   audioPci = "10de:22e8";
 
-  # Runs the container stop and holder termination stages required before suspend.
+  # Runs the container stop and holder termination stages required before suspend
   prepareNvidiaSuspend = pkgs.writeShellApplication {
     name = "prepare-nvidia-suspend";
     text = ''
+      # Skip if we're not on nvidia drivers. Nothing to stop.
+      gpuOnNvidia=false
+      for dev in /dev/nvidia*; do
+        if [[ -c $dev ]]; then
+          gpuOnNvidia=true
+          break
+        fi
+      done
+      if [[ $gpuOnNvidia == false ]]; then
+        echo "GPU not on nvidia driver, nothing to prepare for suspend"
+        exit 0
+      fi
+
       if ${stopNvidiaContainers}/bin/stop-nvidia-containers; then
         :
       else
