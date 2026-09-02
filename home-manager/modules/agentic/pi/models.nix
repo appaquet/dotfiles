@@ -146,7 +146,7 @@ in
       codex = {
         main = {
           model = "openai-codex/gpt-5.6-luna";
-          thinking = "xhigh";
+          thinking = "high";
         };
         remap = {
           "scoped/junior" = {
