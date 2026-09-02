@@ -13,11 +13,11 @@
 
         ## Instructions
 
-         1. If topic empty or unclear, ${scope.harness.prose.questions.request} to clarify
+        1. If topic empty or unclear, ${scope.harness.prose.questions.request} to clarify
 
-        2. 🔳 Research (code, web search, web fetch) if question requires or context is missing
+        2. Research (code, web search, web fetch) if question requires or context is missing
 
-        3. 🔳 Provide analysis, opinions, alternatives. Challenge assumptions
+        3. Provide analysis, opinions, alternatives. Challenge assumptions
 
         4. **STOP**: User will decide next steps
       '';
