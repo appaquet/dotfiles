@@ -15,7 +15,6 @@
 
       1. 🔳 Create a new phase in project documentation for this review session.
          Should be a sub-phase of latest phase that we worked on. E.g. phase 1 -> phase 1a.
-         Commit the project document files version control instructions.
 
       2. For each feedback/comment, launch a ${
         scope.agents."junior-dev".reference
@@ -27,7 +26,9 @@
          Collect all your questions for when I'll trigger a planning workflow. Don't ask them as we go.
          Do NOT launch review agents for feedback. We're just collecting evidence, not reviewing anything yet.
 
-      3. ${
+      3. After all feedback/comments are investigated and collected, review the combined project-document diff and commit it once following the project-document version-control instructions. If user calls a planning workflow, commit all collected questions and investigations first.
+
+      4. ${
         scope.blocks."engagement-gate".gate
       }. Only do review exploration & planning. No implementation/fix yet.
 

@@ -42,7 +42,7 @@
            - Commit with proper message or change active commit message
 
         5. 🔳 Implement tasks
-           - Follow ${scope.blocks."sub-agents-workflows".reference}
+           - You need to follow ${scope.blocks."sub-agents-workflows".reference}
            - Update documentation if existing:
              - Mark phase doc task `[~]` when starting, `[x]` when done
                Like task format dictates. Done = all ACs pass and tested working

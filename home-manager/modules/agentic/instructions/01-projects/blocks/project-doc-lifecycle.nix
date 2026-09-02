@@ -39,6 +39,7 @@
 
         * For a committed project, keep the `proj` symlink in its own commit named `private: proj - <project-name>`. That commit contains the symlink only; never mix document changes into it.
         * For a committed project, keep `00-*.md`, `01-*.md`, and other document-file changes in a dedicated document-only commit prefixed `private: agent: docs -`. Include no code or symlink, and follow the repository version-control rule for the exact workflow.
+        * When a user-invoked workflow requires committing project documents, batch all document updates made by that workflow. Review the combined document diff and commit it once after the final document-update step; do not commit individual tasks, findings, or intermediate updates separately.
         * Never commit `proj-adhoc`, its temporary target, or its project and phase documents.
       '';
     };
