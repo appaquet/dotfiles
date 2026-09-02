@@ -120,6 +120,10 @@ in
             model = "deskapp/qwen3.8-27b";
             thinking = "off";
           };
+          "scoped/summary" = {
+            model = "deskapp/qwen3.8-27b";
+            thinking = "off";
+          };
           "scoped/mid" = {
             model = "deskapp/qwen3.8-27b";
             thinking = "low";
@@ -150,6 +154,10 @@ in
         };
         remap = {
           "scoped/junior" = {
+            model = "openai-codex/gpt-5.6-luna";
+            thinking = "medium";
+          };
+          "scoped/summary" = {
             model = "openai-codex/gpt-5.6-luna";
             thinking = "medium";
           };
@@ -186,6 +194,10 @@ in
             model = "openai-codex/gpt-5.6-luna";
             thinking = "medium";
           };
+          "scoped/summary" = {
+            model = "openai-codex/gpt-5.6-luna";
+            thinking = "medium";
+          };
           "scoped/mid" = {
             model = "openai-codex/gpt-5.6-luna";
             thinking = "high";
@@ -217,6 +229,10 @@ in
         };
         remap = {
           "scoped/junior" = {
+            model = "opencode-go/deepseek-v4-flash";
+            thinking = "low";
+          };
+          "scoped/summary" = {
             model = "opencode-go/deepseek-v4-flash";
             thinking = "low";
           };

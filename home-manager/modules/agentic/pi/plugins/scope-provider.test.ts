@@ -1,4 +1,15 @@
-import { afterEach, beforeEach, expect, mock, test } from "bun:test";
+// Unit tests for the scope-provider extension's routing, selection, rollback,
+// and summary logic, run against a fake Pi registry and settings (mock.module).
+// End-to-end behavior inside a real Pi runtime — real-agent request dispatch
+// and cross-session preset inheritance — is out of scope for this suite.
+
+import {
+  afterEach,
+  beforeEach,
+  expect,
+  mock,
+  test,
+} from "bun:test";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -450,20 +461,43 @@ function target(provider: string, id: string, name: string): Model {
 }
 
 const presets: ScopeConfig = {
-  codex: { main: { model: "old/old-main" }, remap: {} },
-  noauth: { main: { model: "noauth/noauth-main" }, remap: {} },
-  unavailable: { main: { model: "missing/missing-main" }, remap: {} },
-  local: { main: { model: "next/next-main" }, remap: {} },
+  codex: {
+    main: { model: "old/old-main" },
+    remap: { "scoped/summary": { model: "old/old-main", thinking: "low" } },
+  },
+  noauth: {
+    main: { model: "noauth/noauth-main" },
+    remap: { "scoped/summary": { model: "noauth/noauth-main", thinking: "low" } },
+  },
+  unavailable: {
+    main: { model: "missing/missing-main" },
+    remap: {
+      "scoped/summary": { model: "missing/missing-main", thinking: "low" },
+    },
+  },
+  local: {
+    main: { model: "next/next-main" },
+    remap: { "scoped/summary": { model: "next/next-main", thinking: "low" } },
+  },
 };
 
 const selectorPresets: ScopeConfig = {
   ...presets,
-  local: { main: { model: "next/next-main", thinking: "high" }, remap: {} },
+  local: {
+    main: { model: "next/next-main", thinking: "high" },
+    remap: { "scoped/summary": { model: "next/next-main", thinking: "low" } },
+  },
 };
 
 const shortcutPresets: ScopeConfig = {
-  codex: { main: { model: "old/old-main", thinking: "medium" }, remap: {} },
-  local: { main: { model: "next/next-main", thinking: "high" }, remap: {} },
+  codex: {
+    main: { model: "old/old-main", thinking: "medium" },
+    remap: { "scoped/summary": { model: "old/old-main", thinking: "low" } },
+  },
+  local: {
+    main: { model: "next/next-main", thinking: "high" },
+    remap: { "scoped/summary": { model: "next/next-main", thinking: "low" } },
+  },
 };
 
 const markerPresets: ScopeConfig = {
@@ -472,6 +506,7 @@ const markerPresets: ScopeConfig = {
     remap: {
       "scoped/junior": { model: "old/old-junior", thinking: "high" },
       "scoped/mid": { model: "old/old-main" },
+      "scoped/summary": { model: "old/old-junior", thinking: "low" },
     },
   },
   local: {
@@ -479,6 +514,7 @@ const markerPresets: ScopeConfig = {
     remap: {
       "scoped/junior": { model: "next/next-junior", thinking: "low" },
       "scoped/mid": { model: "next/next-main" },
+      "scoped/summary": { model: "next/next-junior", thinking: "low" },
     },
   },
 };
@@ -744,6 +780,26 @@ test("resolves scoped/main in each fresh registry before session_start", async (
       rewriteDisabled: false,
     });
   }
+});
+
+test("resolves scoped/main when the concrete target uses a non-openai-completions api", async () => {
+  const globals = globalThis as Record<string, unknown>;
+  globals.activePreset = "local";
+  globals.upgradedPreset = undefined;
+  globals.rewriteDisabled = false;
+
+  const harness = await createHarness(shortcutPresets, {
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: [
+      target("old", "old-main", "Cloud main model"),
+      { ...target("next", "next-main", "Local main model"), api: "anthropic-messages" },
+    ],
+  });
+  await harness.command("local", harness.ctx);
+
+  expect(harness.registry.find("scoped", "main")?.name).toBe(
+    "Local main model [S]",
+  );
 });
 
 test("resolved aliases mark only scoped/main across preset refreshes", async () => {
@@ -1206,7 +1262,12 @@ test("passes native compaction state and exact concrete request configuration th
     thinkingLevelMap: { high: "xhigh" },
   };
   const harness = await createHarness(
-    { codex: { main: { model: "old/old-main", thinking: "high" }, remap: {} } },
+    {
+      codex: {
+        main: { model: "old/old-main", thinking: "high" },
+        remap: { "scoped/summary": { model: "old/old-main", thinking: "high" } },
+      },
+    },
     {
       apiKeys: { old: "old-key" },
       models: [concrete],
@@ -1347,6 +1408,128 @@ test("declines tree generation when no summary is requested or there are no entr
   expect(treeCalls).toEqual([]);
 });
 
+test("compaction and branch summaries use the dedicated summary target, not the active work alias", async () => {
+  const mainModel = target("old", "old-main", "Cloud main model");
+  const summaryModel = target("old", "old-junior", "Cloud junior model");
+  const harness = await createHarness(
+    {
+      codex: {
+        main: { model: "old/old-main", thinking: "xhigh" },
+        remap: {
+          "scoped/junior": { model: "old/old-junior", thinking: "off" },
+          "scoped/summary": { model: "old/old-junior", thinking: "low" },
+        },
+      },
+    },
+    {
+      apiKeys: { old: "old-key" },
+      models: [mainModel, summaryModel],
+      requestAuth: {
+        "old/old-main": { ok: true, apiKey: "main-key" },
+        "old/old-junior": { ok: true, apiKey: "summary-key" },
+      },
+    },
+  );
+  const signal = new AbortController().signal;
+
+  // Compaction routes to the dedicated summary model with its own thinking
+  // level, independent of the active scoped/main work alias.
+  await harness.summaryHandlers.session_before_compact[0](
+    { preparation: { firstKeptEntryId: "kept" }, signal },
+    harness.ctx,
+  );
+  expect(compactCalls).toHaveLength(1);
+  expect(compactCalls[0][1]).toEqual(summaryModel);
+  expect(compactCalls[0][2]).toBe("summary-key");
+  expect(compactCalls[0][6]).toBe("low");
+
+  // Branch summaries use the same dedicated summary model and credentials.
+  await harness.summaryHandlers.session_before_tree[0](
+    {
+      preparation: { userWantsSummary: true, entriesToSummarize: [{}] },
+      signal,
+    },
+    harness.ctx,
+  );
+  expect(treeCalls).toHaveLength(1);
+  expect(treeCalls[0][1].model).toEqual(summaryModel);
+  expect(treeCalls[0][1].apiKey).toBe("summary-key");
+});
+
+test("scoped/summary is validated but never exposed as a selectable work model", async () => {
+  const harness = await createHarness(markerPresets, {
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: markerModels(),
+  });
+  const names = scopedNames(harness);
+  expect(names.main).toBeDefined();
+  expect(names.junior).toBeDefined();
+  expect(names.summary).toBeUndefined();
+});
+
+test("a preset without a scoped/summary entry fails registration and keeps the stub", async () => {
+  const harness = await createHarness(
+    { codex: { main: { model: "old/old-main" }, remap: {} } },
+    {
+      apiKeys: { old: "old-key" },
+      models: [target("old", "old-main", "Cloud main model")],
+    },
+  );
+  expect(harness.messages.at(-1)).toContain(
+    'preset "codex" has no resolvable scoped/summary target',
+  );
+  expect(scopedNames(harness).main).toBe(
+    "scoped/main (preset stub, upgraded at session start) [S]",
+  );
+});
+
+test("a scoped/summary target absent from the registry fails registration clearly", async () => {
+  const harness = await createHarness(
+    {
+      codex: {
+        main: { model: "old/old-main" },
+        remap: { "scoped/summary": { model: "old/old-missing", thinking: "low" } },
+      },
+    },
+    {
+      apiKeys: { old: "old-key" },
+      models: [target("old", "old-main", "Cloud main model")],
+    },
+  );
+  expect(harness.messages.at(-1)).toContain(
+    'preset "codex" has no resolvable scoped/summary target',
+  );
+  expect(scopedNames(harness).main).toBe(
+    "scoped/main (preset stub, upgraded at session start) [S]",
+  );
+});
+
+test("a summary event cancels without native fallback when the dedicated target becomes unavailable", async () => {
+  const mainModel = target("old", "old-main", "Cloud main model");
+  const summaryModel = target("old", "old-junior", "Cloud junior model");
+  const harness = await createHarness(
+    {
+      codex: {
+        main: { model: "old/old-main" },
+        remap: { "scoped/summary": { model: "old/old-junior", thinking: "low" } },
+      },
+    },
+    { apiKeys: { old: "old-key" }, models: [mainModel, summaryModel] },
+  );
+  harness.registry.models.delete("old/old-junior");
+  const signal = new AbortController().signal;
+  await expect(
+    harness.summaryHandlers.session_before_compact[0](
+      { preparation: {}, signal },
+      harness.ctx,
+    ),
+  ).resolves.toEqual({ cancel: true });
+  expect(compactCalls).toEqual([]);
+  expect(harness.messages.at(-1)).toContain(
+    "concrete target old/old-junior is unavailable",
+  );
+});
+
 test("summaries observe only committed targets across deferred failure and successful scope commit", async () => {
   let rejectCredential!: (error: Error) => void;
   let credentialStarted!: () => void;
@@ -1419,17 +1602,29 @@ test("snapshots the concrete summary target before deferred auth and a scope swi
   });
   const oldModel = target("old", "old-main", "Cloud main model");
   const nextModel = target("next", "next-main", "Local main model");
-  const harness = await createHarness(selectorPresets, {
-    apiKeys: { old: "old-key", next: "next-key" },
-    models: [oldModel, nextModel],
-    requestAuth: {
-      "old/old-main": async () => {
-        authStarted();
-        return pendingAuth;
+  const harness = await createHarness(
+    {
+      codex: {
+        main: { model: "old/old-main" },
+        remap: { "scoped/summary": { model: "old/old-main" } },
       },
-      "next/next-main": { ok: true, apiKey: "next-summary-key" },
+      local: {
+        main: { model: "next/next-main" },
+        remap: { "scoped/summary": { model: "next/next-main" } },
+      },
     },
-  });
+    {
+      apiKeys: { old: "old-key", next: "next-key" },
+      models: [oldModel, nextModel],
+      requestAuth: {
+        "old/old-main": async () => {
+          authStarted();
+          return pendingAuth;
+        },
+        "next/next-main": { ok: true, apiKey: "next-summary-key" },
+      },
+    },
+  );
   const event = {
     preparation: { firstKeptEntryId: "kept" },
     signal: new AbortController().signal,

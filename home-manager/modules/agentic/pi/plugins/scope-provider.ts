@@ -8,6 +8,9 @@
  * completion (agent loop, raw `ModelRegistry.complete`, summaries) to the
  * concrete target provider, so no payload rewriting is needed.
  *
+ * Compaction and /tree branch summaries route to a dedicated per-preset
+ * target (`scoped/summary`), independent of the active work model.
+ *
  * Env:
  *  PI_SCOPE            active preset at launch (default "codex")
  *  PI_SCOPE_LOG        path to append debug lines
@@ -34,6 +37,7 @@ type ScopeMapping = {
 type ScopeRegistration = {
   count: number;
   mainAvailable: boolean;
+  summaryAvailable: boolean;
   failure?: string;
   concreteModels?: Record<string, any>;
   providerConfig?: any;
@@ -59,6 +63,13 @@ type ScopeSnapshot = {
 };
 
 const SCOPE_IDS = ["main", "junior", "mid", "senior", "staff", "principal", "reviewer"];
+
+// Reserved internal alias for context compaction and /tree branch summaries.
+// It is resolved and validated per preset like a work alias, but it is never
+// added to the selectable work-model list, so it stays hidden from normal
+// model selection. Summary events resolve this alias instead of the active
+// work alias, so summarization is independent of the selected scoped model.
+const SUMMARY_ALIAS = "summary";
 
 // Stub entries so `scoped/<id>` resolves before session_start upgrades them
 // from the live registry; upgrade failure fails loud (see session_start).
@@ -285,13 +296,41 @@ async function prepareScopeRegistration(
       compat: m.compat,
     });
   }
+  // The internal summary target is validated alongside the work aliases so a
+  // misconfigured preset fails registration clearly instead of silently
+  // routing compaction or branch summaries at summary time. It is never added
+  // to `models`, so scoped/summary stays out of normal model selection.
+  const summaryEntry = mapping.entries[SUMMARY_ALIAS];
+  const summaryTarget = mapping.targets[SUMMARY_ALIAS];
+  let summaryAvailable = false;
+  if (summaryEntry && summaryTarget) {
+    const summaryModel = ctx.modelRegistry.find(
+      summaryTarget.provider,
+      summaryTarget.id,
+    );
+    if (summaryModel) {
+      summaryAvailable = true;
+      debug(
+        `prepareScopeRegistration: scoped/${SUMMARY_ALIAS} <- ${summaryModel.provider}/${summaryModel.id} api=${summaryModel.api}`,
+      );
+    } else {
+      debug(
+        `prepareScopeRegistration: scoped/${SUMMARY_ALIAS} target ${summaryTarget.provider}/${summaryTarget.id} not found in registry`,
+      );
+    }
+  } else {
+    debug(
+      `prepareScopeRegistration: preset has no scoped/${SUMMARY_ALIAS} entry`,
+    );
+  }
+
   if (models.length === 0) {
     debug("prepareScopeRegistration: no resolvable targets");
-    return { count: 0, mainAvailable };
+    return { count: 0, mainAvailable, summaryAvailable };
   }
   if (!mainAvailable) {
     debug("prepareScopeRegistration: scoped/main target is not resolvable");
-    return { count: 0, mainAvailable };
+    return { count: 0, mainAvailable, summaryAvailable };
   }
   const provider = mapping.targets.main;
   let apiKey: string | undefined;
@@ -302,6 +341,7 @@ async function prepareScopeRegistration(
     return {
       count: 0,
       mainAvailable,
+      summaryAvailable,
       failure: `could not resolve credentials for ${provider.provider}/${provider.id}: ${detail}`,
     };
   }
@@ -309,16 +349,18 @@ async function prepareScopeRegistration(
     return {
       count: 0,
       mainAvailable,
+      summaryAvailable,
       failure: `no credentials resolved for ${provider.provider}/${provider.id}`,
     };
   }
 
   debug(
-    `prepareScopeRegistration: preset="${mapping.preset}" models=[${models.map((x) => x.id).join(",")}] targetProvider=${provider.provider} apiKey=${apiKey.slice(0, 12)}...`,
+    `prepareScopeRegistration: preset="${mapping.preset}" models=[${models.map((x) => x.id).join(",")}] summary=${summaryAvailable} targetProvider=${provider.provider} apiKey=${apiKey.slice(0, 12)}...`,
   );
   return {
     count: models.length,
     mainAvailable,
+    summaryAvailable,
     concreteModels,
     providerConfig: {
       name: "Scoped",
@@ -347,16 +389,23 @@ function commitScopeRegistration(
   state.concreteModels = registration.concreteModels ?? {};
 }
 
-/** Snapshot the complete scoped summary target before asynchronous resolution begins. */
+/** Snapshot the preset's dedicated summary target before asynchronous resolution begins. */
 function snapshotSummaryTarget(ctx: any): ScopedSummaryTarget | undefined {
   const aliasModel = ctx.model;
+  // Direct non-scoped sessions keep Pi's native summary behavior.
   if (!aliasModel || aliasModel.provider !== "scoped") return undefined;
 
-  const alias = aliasModel.id;
+  // Scoped sessions summarize through the preset's dedicated target, independent
+  // of the active work alias, so compaction never rides the selected work model.
+  // A missing or unavailable target fails the summary rather than falling back
+  // to the work model.
+  const alias = SUMMARY_ALIAS;
   const entry = state.entries[alias];
   const target = state.targets[alias];
   if (!entry || !target) {
-    throw new Error(`no concrete target is configured for scoped/${alias}`);
+    throw new Error(
+      `preset "${state.preset}" has no scoped/${alias} target; check the scopeProvider settings`,
+    );
   }
 
   const model = ctx.modelRegistry.find(target.provider, target.id);
@@ -606,13 +655,19 @@ export default function scopeProvider(pi: any): void {
 
     const registration = await prepareScopeRegistration(ctx, state);
 
-    if (registration.count === 0 || !registration.mainAvailable) {
+    if (
+      registration.count === 0 ||
+      !registration.mainAvailable ||
+      !registration.summaryAvailable
+    ) {
       const available = Object.keys(readScopeConfig()).join(", ") || "<none>";
       const msg = registration.failure
         ? `scope: ERROR — preset "${state.preset}" ${registration.failure}; scoped provider registration was not changed. Check the provider credentials and restart the session.`
         : !registration.mainAvailable
           ? `scope: ERROR — preset "${state.preset}" has no resolvable scoped/main target; scoped/main requests will fail. Check the scopeProvider settings and models.`
-          : `scope: ERROR — preset "${state.preset}" has no resolvable targets in the model registry (available presets: ${available}); scoped/* model requests will fail. Check the scopeProvider settings and models.`;
+          : !registration.summaryAvailable
+            ? `scope: ERROR — preset "${state.preset}" has no resolvable scoped/${SUMMARY_ALIAS} target; compaction and /tree branch summaries would be cancelled. Check the scopeProvider settings and models.`
+            : `scope: ERROR — preset "${state.preset}" has no resolvable targets in the model registry (available presets: ${available}); scoped/* model requests will fail. Check the scopeProvider settings and models.`;
       debug(`session_start: ${msg}`);
       pi.sendMessage({ customType: "scoped", content: msg, display: true });
 
@@ -739,13 +794,19 @@ export default function scopeProvider(pi: any): void {
     try {
       const registration = await prepareScopeRegistration(ctx, next);
 
-      if (registration.count === 0 || !registration.mainAvailable) {
+      if (
+        registration.count === 0 ||
+        !registration.mainAvailable ||
+        !registration.summaryAvailable
+      ) {
         const available = Object.keys(readScopeConfig()).join(", ") || "<none>";
         const msg = registration.failure
           ? `scope: ERROR — preset "${name}" ${registration.failure}; scoped provider registration was not changed. Check the provider credentials.`
           : !registration.mainAvailable
             ? `scope: ERROR — preset "${name}" has no resolvable scoped/main target; scoped/main requests will fail. Check the scopeProvider settings and models.`
-            : `scope: ERROR — preset "${name}" has no resolvable targets in the model registry (available presets: ${available}); scoped/* model requests will fail. Check the scopeProvider settings and models.`;
+            : !registration.summaryAvailable
+              ? `scope: ERROR — preset "${name}" has no resolvable scoped/${SUMMARY_ALIAS} target; compaction and /tree branch summaries would be cancelled. Check the scopeProvider settings and models.`
+              : `scope: ERROR — preset "${name}" has no resolvable targets in the model registry (available presets: ${available}); scoped/* model requests will fail. Check the scopeProvider settings and models.`;
         throw new Error(msg);
       }
 
