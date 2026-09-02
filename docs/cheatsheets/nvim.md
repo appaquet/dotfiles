@@ -195,6 +195,7 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>gdc` Open diff view against given rev/commit
 * `<leader>gdq` Close diff view
 * `<leader>gdf` Open file history
+* `]g` and `[g` Navigate to the next/previous hunk and center the view
 * `<leader>Tdw` Toggle whitespace visibility
 
 ### PR review

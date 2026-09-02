@@ -7,6 +7,14 @@ require("which-key").add({
 -- https://github.com/dlyongemallo/diffview-plus.nvim/blob/main/lua/diffview/config.lua
 -- `--imply-local` means it will use the local version of the file on the right side
 local diffview_lib = require("diffview.lib")
+local diffview_actions = require("diffview.actions")
+
+local function center_after(action)
+	return function()
+		action()
+		vim.cmd("normal! zz")
+	end
+end
 
 -- Focus the main (rightmost) diffview window, inverse of the
 -- built-in <leader>e which focuses the file panel
@@ -42,9 +50,22 @@ require("diffview").setup({
 	-- Better diffing
 	enhanced_diff_hl = true,
 	diffopt = { algorithm = "histogram" },
-	keymaps = {},
+	keymaps = {
+		diff1_inline = {
+			{ "n", "]g", center_after(diffview_actions.next_inline_hunk), { desc = "Git: next hunk" } },
+			{ "n", "[g", center_after(diffview_actions.prev_inline_hunk), { desc = "Git: previous hunk" } },
+		},
+		diff2 = {
+			{ "n", "]g", center_after(function()
+				vim.cmd("normal! ]c")
+			end), { desc = "Git: next hunk" } },
+			{ "n", "[g", center_after(function()
+				vim.cmd("normal! [c")
+			end), { desc = "Git: previous hunk" } },
+		},
+	},
 	view = {
-		default = { layout = "diff1_inline" },
+		default = { layout = "diff2_horizontal" },
 		cycle_layouts = { default = { "diff1_inline", "diff2_horizontal" } },
 		inline = { style = "unified" }, -- modes: "unified" (classic +/- lines), "overleaf" (inline strikethrough deletions)
 	},
@@ -165,8 +186,22 @@ require("which-key").add({
 })
 vim.keymap.set({ "n", "v" }, "<Leader>gu", ":Gitsigns reset_hunk<CR>", { silent = true, desc = "Git: revert hunk" })
 vim.keymap.set({ "n", "v" }, "<Leader>ga", ":Gitsigns stage_hunk<CR>", { silent = true, desc = "Git: stage hunk" })
-vim.keymap.set("n", "]g", ":Gitsigns nav_hunk next<CR>zz", { silent = true, desc = "Git: next hunk" })
-vim.keymap.set("n", "[g", ":Gitsigns nav_hunk prev<CR>zz", { silent = true, desc = "Git: previous hunk" })
+vim.keymap.set(
+	"n",
+	"]g",
+	center_after(function()
+		vim.cmd("Gitsigns nav_hunk next")
+	end),
+	{ silent = true, desc = "Git: next hunk" }
+)
+vim.keymap.set(
+	"n",
+	"[g",
+	center_after(function()
+		vim.cmd("Gitsigns nav_hunk prev")
+	end),
+	{ silent = true, desc = "Git: previous hunk" }
+)
 vim.keymap.set("n", "<Leader>gb", ":Gitsigns blame<CR>", { silent = true, desc = "Git: blame pane" })
 vim.keymap.set("n", "<Leader>gdb", function()
 	gitsigns.diffthis(nil, { vertical = true })
