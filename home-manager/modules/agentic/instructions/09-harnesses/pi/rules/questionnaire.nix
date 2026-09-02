@@ -8,9 +8,13 @@
       content = ''
         Use `${scope.harness.tools.askUserQuestion}`.
 
-        Give user enough context to answer every question. Keep simple, self-contained questions direct; when one or two short sentences suffice, include that context in the question. 
+        Every question `header` MUST be 16 characters or fewer. Use a short label, not explanatory text.
 
-        When more explanation is needed, give a brief bullet outline immediately before the tool call, then keep the questionnaire concise and focused on the decision and its choices.
+        Always give user enough context to answer every question. Keep simple, self-contained questions direct; when one or two short sentences suffice, include that context in the question. 
+
+        When more explanation is needed, give 1 page max bullet outline immediately before the tool call, then keep the questionnaire concise and focused on the decision and its choices.
+
+        Always assume user is context switching and need proper briefing before each questionaire.
       '';
     };
 }
