@@ -35,6 +35,10 @@ local function focus_diffview_view()
 	end
 end
 
+local function focus_diffview_keymap()
+	return { "n", "<Leader>E", focus_diffview_view, { desc = "Diffview: focus diff view" } }
+end
+
 require("diffview").setup({
 	preferred_adapter = "jj",
 	restore_session = false, -- don't auto restore diffview sessions on startup
@@ -51,6 +55,9 @@ require("diffview").setup({
 	enhanced_diff_hl = true,
 	diffopt = { algorithm = "histogram" },
 	keymaps = {
+		view = {
+			focus_diffview_keymap(),
+		},
 		diff1_inline = {
 			{ "n", "]g", center_after(diffview_actions.next_inline_hunk), { desc = "Git: next hunk" } },
 			{ "n", "[g", center_after(diffview_actions.prev_inline_hunk), { desc = "Git: previous hunk" } },
@@ -63,20 +70,26 @@ require("diffview").setup({
 				vim.cmd("normal! [c")
 			end), { desc = "Git: previous hunk" } },
 		},
+		file_panel = {
+			focus_diffview_keymap(),
+		},
+		file_history_panel = {
+			focus_diffview_keymap(),
+		},
+		option_panel = {
+			focus_diffview_keymap(),
+		},
+		help_panel = {
+			focus_diffview_keymap(),
+		},
+		commit_log_panel = {
+			focus_diffview_keymap(),
+		},
 	},
 	view = {
 		default = { layout = "diff2_horizontal" },
 		cycle_layouts = { default = { "diff1_inline", "diff2_horizontal" } },
 		inline = { style = "unified" }, -- modes: "unified" (classic +/- lines), "overleaf" (inline strikethrough deletions)
-	},
-	-- Bind <leader>E only while a diffview is open
-	hooks = {
-		view_enter = function()
-			vim.keymap.set("n", "<Leader>E", focus_diffview_view, { desc = "Diffview: focus diff view" })
-		end,
-		view_leave = function()
-			vim.keymap.del("n", "<Leader>E")
-		end,
 	},
 })
 
