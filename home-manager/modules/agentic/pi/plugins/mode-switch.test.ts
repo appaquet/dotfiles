@@ -11,6 +11,7 @@ import {
   readReminderInterval,
   restoreMode,
   shouldBlock,
+  startupPlan,
   submissionOptions,
   type Mode,
   type SwitchDecision,
@@ -63,15 +64,15 @@ test("decideSwitch: every mode change submits the target template", () => {
   });
 });
 
-test("restoreMode: defaults to builder without mode-switch entries", () => {
-  expect(restoreMode([])).toBe("builder");
+test("restoreMode: returns undefined without mode-switch entries", () => {
+  expect(restoreMode([])).toBeUndefined();
   expect(
     restoreMode([
       { type: "message", message: { role: "user" } },
       { type: "custom", customType: "preset-state", data: { name: "plan" } },
       { type: "compaction", summary: "old" },
     ]),
-  ).toBe("builder");
+  ).toBeUndefined();
 });
 
 test("restoreMode: latest mode-switch entry wins regardless of interleaving", () => {
@@ -106,12 +107,12 @@ test("restoreMode: ignores non-custom entries and entries without usable data", 
         data: { mode: "orchestrator" },
       },
     ]),
-  ).toBe("builder");
+  ).toBeUndefined();
   expect(
     restoreMode([
       { type: "custom", customType: "mode-switch", data: undefined },
     ]),
-  ).toBe("builder");
+  ).toBeUndefined();
   expect(
     restoreMode([
       {
@@ -142,7 +143,7 @@ test("restoreMode: tolerates malformed entries and keeps the latest valid one", 
     data: { mode: "orchestrator" },
   };
 
-  expect(restoreMode(malformed)).toBe("builder");
+  expect(restoreMode(malformed)).toBeUndefined();
   expect(
     restoreMode([
       ...malformed.slice(0, 5),
@@ -158,6 +159,82 @@ test("restoreMode: tolerates malformed entries and keeps the latest valid one", 
     ]),
   ).toBe("orchestrator");
 });
+
+test("startupPlan: persisted entry wins over any PI_MODE value", () => {
+  const builder = {
+    type: "custom",
+    customType: "mode-switch",
+    data: { mode: "builder" },
+  };
+  const orchestrator = {
+    type: "custom",
+    customType: "mode-switch",
+    data: { mode: "orchestrator" },
+  };
+
+  for (const env of [undefined, "", "builder", "orchestrator", "banana", 42]) {
+    expect(startupPlan([builder], env)).toEqual({
+      mode: "builder",
+      submit: false,
+      invalid: false,
+    });
+    expect(startupPlan([orchestrator], env)).toEqual({
+      mode: "orchestrator",
+      submit: false,
+      invalid: false,
+    });
+  }
+});
+
+test("startupPlan: without a persisted entry the PI_MODE value selects the mode", () => {
+  expect(startupPlan([], undefined)).toEqual({
+    mode: "builder",
+    submit: false,
+    invalid: false,
+  });
+  expect(startupPlan([], "")).toEqual({
+    mode: "builder",
+    submit: false,
+    invalid: false,
+  });
+  expect(startupPlan([], "   ")).toEqual({
+    mode: "builder",
+    submit: false,
+    invalid: false,
+  });
+  expect(startupPlan([], 42)).toEqual({
+    mode: "builder",
+    submit: false,
+    invalid: false,
+  });
+  expect(startupPlan([], "builder")).toEqual({
+    mode: "builder",
+    submit: false,
+    invalid: false,
+  });
+  expect(startupPlan([], "  orchestrator  ")).toEqual({
+    mode: "orchestrator",
+    submit: true,
+    invalid: false,
+  });
+});
+
+test("startupPlan: invalid PI_MODE without a persisted entry defaults to builder and warns", () => {
+  expect(startupPlan([], "wizard")).toEqual({
+    mode: "builder",
+    submit: false,
+    invalid: true,
+  });
+  expect(startupPlan([], " ORCHESTRATOR ")).toEqual({
+    mode: "builder",
+    submit: false,
+    invalid: true,
+  });
+});
+
+// ---------------------------------------------------------------------------
+// /mode argument parsing
+// ---------------------------------------------------------------------------
 
 test("parseModeArg: empty and whitespace-only arguments toggle", () => {
   expect(parseModeArg("")).toEqual({ kind: "toggle" });
@@ -467,6 +544,127 @@ test("session_start: restore of a session with only malformed entries defaults t
   h.startSession();
 
   expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
+});
+
+// ---------------------------------------------------------------------------
+// PI_MODE startup env var
+// ---------------------------------------------------------------------------
+
+function withPiMode(value: string | undefined, fn: () => void): void {
+  const previous = process.env.PI_MODE;
+  if (value === undefined) delete process.env.PI_MODE;
+  else process.env.PI_MODE = value;
+  try {
+    fn();
+  } finally {
+    if (previous === undefined) delete process.env.PI_MODE;
+    else process.env.PI_MODE = previous;
+  }
+}
+
+test("session_start: PI_MODE=orchestrator on a fresh session starts orchestrator like a manual switch", () => {
+  const h = createHarness();
+  withPiMode("orchestrator", () => h.startSession());
+
+  expect(h.sends).toEqual([
+    { content: "/orchestrator", options: { expandPromptTemplates: true } },
+  ]);
+  expect(h.appends).toEqual([
+    { customType: "mode-switch", data: { mode: "orchestrator" } },
+  ]);
+  expect(h.statuses).toEqual([{ key: "mode", value: "[accent]👑" }]);
+  expect(h.modeChanges).toEqual([
+    { event: "mode-switch:changed", data: { mode: "orchestrator" } },
+  ]);
+  expect(h.notifies).toEqual([
+    { message: "mode-switch: orchestrator", type: "info" },
+  ]);
+  expect(h.agentStart()).toEqual(REMINDER_MESSAGE); // armed on entry
+  expect(blocked(h.toolCall({ toolName: "read", input: { path: "src/app.ts" } }))).toBe(true);
+});
+
+test("session_start: PI_MODE=orchestrator while streaming queues the switch as a followUp", () => {
+  const h = createHarness({ idle: false });
+  withPiMode("orchestrator", () => h.startSession());
+
+  expect(h.sends).toEqual([
+    {
+      content: "/orchestrator",
+      options: { expandPromptTemplates: true, deliverAs: "followUp" },
+    },
+  ]);
+});
+
+test("session_start: PI_MODE=orchestrator without the template warns and stays builder", () => {
+  const h = createHarness({
+    commands: [{ name: "builder", source: "prompt" }],
+  });
+  withPiMode("orchestrator", () => h.startSession());
+
+  expect(h.sends).toEqual([]);
+  expect(h.appends).toEqual([]);
+  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
+  expect(h.notifies).toEqual([
+    {
+      message: "mode-switch: /orchestrator template not found; staying on builder",
+      type: "warning",
+    },
+  ]);
+  expect(h.toolCall({ toolName: "read", input: { path: "src/app.ts" } })).toBeUndefined();
+});
+
+test("session_start: PI_MODE=builder on a fresh session behaves like the default", () => {
+  const h = createHarness();
+  withPiMode("builder", () => h.startSession());
+
+  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
+  expect(h.notifies).toEqual([]);
+  expect(h.sends).toEqual([]);
+  expect(h.appends).toEqual([]);
+});
+
+test("session_start: invalid PI_MODE on a fresh session warns and stays builder", () => {
+  const h = createHarness();
+  withPiMode("banana", () => h.startSession());
+
+  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
+  expect(h.notifies).toEqual([
+    {
+      message:
+        'mode-switch: invalid PI_MODE "banana" (available: builder, orchestrator); defaulting to builder',
+      type: "warning",
+    },
+  ]);
+  expect(h.sends).toEqual([]);
+  expect(h.appends).toEqual([]);
+});
+
+test("session_start: persisted orchestrator entry wins over PI_MODE=builder", () => {
+  const h = createHarness({
+    entries: [
+      { type: "custom", customType: "mode-switch", data: { mode: "orchestrator" } },
+    ],
+  });
+  withPiMode("builder", () => h.startSession());
+
+  expect(h.statuses).toEqual([{ key: "mode", value: "[accent]👑" }]);
+  expect(h.sends).toEqual([]);
+  expect(h.appends).toEqual([]);
+  expect(blocked(h.toolCall({ toolName: "read", input: { path: "src/app.ts" } }))).toBe(true);
+});
+
+test("session_start: persisted builder entry wins over PI_MODE=orchestrator", () => {
+  const h = createHarness({
+    entries: [
+      { type: "custom", customType: "mode-switch", data: { mode: "builder" } },
+    ],
+  });
+  withPiMode("orchestrator", () => h.startSession());
+
+  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
+  expect(h.sends).toEqual([]);
+  expect(h.appends).toEqual([]);
+  expect(h.toolCall({ toolName: "read", input: { path: "src/app.ts" } })).toBeUndefined();
 });
 
 test("toggle builder -> orchestrator while idle: submits /orchestrator, persists, relabels, notifies", async () => {

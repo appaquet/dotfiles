@@ -2,7 +2,10 @@
  * Mode switch and orchestrator guard extension.
  *
  * The footer always shows the current session mode; `ctrl+shift+m` or `/mode`
- * toggles it, and `/mode <builder|orchestrator>` sets it explicitly. Every
+ * toggles it, and `/mode <builder|orchestrator>` sets it explicitly. At
+ * launch the `PI_MODE` env var (builder|orchestrator) selects the initial mode
+ * of a session with no persisted mode entry (analog of `PI_SCOPE` for scope
+ * presets); on resume/fork the persisted entry wins. Every
  * actual mode switch submits the target mode's prompt template (`/builder`
  * or `/orchestrator`) as a user message (queued as a followUp while the
  * agent is streaming); session start and same-mode sets send nothing. The
@@ -60,11 +63,11 @@ export function decideSwitch(current: Mode, target: Mode): SwitchDecision {
 
 /**
  * Restore the persisted mode from session entries: the latest custom
- * `mode-switch` entry with a valid mode wins; malformed entries are skipped
- * (default: builder).
+ * `mode-switch` entry with a valid mode wins; malformed entries are skipped.
+ * Returns `undefined` when the session has no persisted mode.
  */
-export function restoreMode(entries: unknown[]): Mode {
-  let restored: Mode = "builder";
+export function restoreMode(entries: unknown[]): Mode | undefined {
+  let restored: Mode | undefined;
   for (const entry of entries) {
     if (
       typeof entry !== "object" ||
@@ -81,6 +84,30 @@ export function restoreMode(entries: unknown[]): Mode {
     if (isMode(mode)) restored = mode;
   }
   return restored;
+}
+
+export type StartupPlan = {
+  mode: Mode;
+  submit: boolean;
+  invalid: boolean;
+};
+
+/**
+ * Decide the startup mode: a persisted mode-switch entry wins, otherwise the
+ * trimmed PI_MODE env value when valid, otherwise builder. `submit` is true
+ * only when the env var selects orchestrator on a session with no persisted
+ * mode — the caller then goes through the real switch path so the mode prompt
+ * is submitted like a manual switch. `invalid` flags an unusable env value.
+ */
+export function startupPlan(entries: unknown[], env: unknown): StartupPlan {
+  const persisted = restoreMode(entries);
+  if (persisted) return { mode: persisted, submit: false, invalid: false };
+
+  const value = typeof env === "string" ? env.trim() : "";
+  if (value === "") return { mode: "builder", submit: false, invalid: false };
+  if (isMode(value))
+    return { mode: value, submit: value === "orchestrator", invalid: false };
+  return { mode: "builder", submit: false, invalid: true };
 }
 
 export type ModeArg =
@@ -188,14 +215,38 @@ export default function modeSwitch(pi: ExtensionAPI): void {
   }
 
   function restore(ctx: ExtensionContext): void {
-    mode = restoreMode(ctx.sessionManager.getEntries());
-    // Compaction loses in-memory counter state; entries are the source of truth.
-    turns = 0;
-    remindOnNextTurn = false;
-    publishLabel(ctx);
+    const env = process.env.PI_MODE;
+    const plan = startupPlan(ctx.sessionManager.getEntries(), env);
+
+    if (plan.invalid) {
+      ctx.ui.notify(
+        `mode-switch: invalid PI_MODE "${env}" (available: ${MODES.join(
+          ", ",
+        )}); defaulting to builder`,
+        "warning",
+      );
+    }
+
+    if (!plan.submit) {
+      mode = plan.mode;
+      // Compaction loses in-memory counter state; entries are the source of truth.
+      turns = 0;
+      remindOnNextTurn = false;
+      publishLabel(ctx);
+      return;
+    }
+
+    // PI_MODE=orchestrator on a fresh session goes through the real switch
+    // path so the mode prompt is submitted like a manual switch.
+    const before = mode;
+    setMode(ctx, plan.mode);
+    if (mode === before) {
+      // setMode bailed (template missing) without publishing a label.
+      publishLabel(ctx);
+    }
   }
 
-  async function setMode(ctx: ExtensionContext, target: Mode): Promise<void> {
+  function setMode(ctx: ExtensionContext, target: Mode): void {
     const decision = decideSwitch(mode, target);
 
     if (decision.action === "noop") {
@@ -226,8 +277,8 @@ export default function modeSwitch(pi: ExtensionAPI): void {
     ctx.ui.notify(`mode-switch: ${mode}`, "info");
   }
 
-  async function toggleMode(ctx: ExtensionContext): Promise<void> {
-    await setMode(ctx, mode === "builder" ? "orchestrator" : "builder");
+  function toggleMode(ctx: ExtensionContext): void {
+    setMode(ctx, mode === "builder" ? "orchestrator" : "builder");
   }
 
   pi.on("session_start", (_event, ctx) => restore(ctx));
@@ -257,7 +308,7 @@ export default function modeSwitch(pi: ExtensionAPI): void {
   pi.registerShortcut("ctrl+shift+m", {
     description: "Toggle builder/orchestrator mode",
     handler: async (ctx) => {
-      await toggleMode(ctx);
+      toggleMode(ctx);
     },
   });
 
@@ -268,12 +319,12 @@ export default function modeSwitch(pi: ExtensionAPI): void {
       const parsed = parseModeArg(args);
 
       if (parsed.kind === "toggle") {
-        await toggleMode(ctx);
+        toggleMode(ctx);
         return;
       }
 
       if (parsed.kind === "set") {
-        await setMode(ctx, parsed.mode);
+        setMode(ctx, parsed.mode);
         return;
       }
 
