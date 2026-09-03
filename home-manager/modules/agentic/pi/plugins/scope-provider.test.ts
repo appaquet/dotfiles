@@ -10,7 +10,7 @@ import {
   mock,
   test,
 } from "bun:test";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -66,12 +66,20 @@ type TargetStreamCall = {
   options: unknown;
 };
 
+type SessionEntry = {
+  type?: string;
+  customType?: string;
+  data?: unknown;
+  [key: string]: unknown;
+};
+
 type TestContext = {
   model: { provider: string; id: string };
   thinkingLevel: string;
   hasUI: boolean;
   cwd: string;
   modelRegistry: TestRegistry;
+  sessionManager: { getEntries: () => SessionEntry[] };
   ui: {
     setStatus: (key: string, value: string) => void;
     select: (title: string, options: string[]) => Promise<string | undefined>;
@@ -156,6 +164,7 @@ class TestRegistry {
 }
 
 type ScopeEntryNotice = {
+  type: "custom";
   customType: string;
   data: { text: string; error?: boolean };
 };
@@ -176,6 +185,7 @@ type Harness = {
   summaryHandlers: Record<string, SummaryHandler[]>;
   messages: string[];
   entries: ScopeEntryNotice[];
+  sessionEntries: SessionEntry[];
   entryRenderers: Record<
     string,
     (entry: { data: { text: string; error?: boolean } }, options: any, theme: any) => any
@@ -250,6 +260,7 @@ beforeEach(() => {
   agentDir = testDir;
   process.env.PI_SCOPE = "codex";
   delete process.env.PI_SCOPE_REWRITE;
+  delete process.env.PI_SCOPE_LOG;
   delete (globalThis as Record<string, unknown>).__PI_SCOPE_SEQ__;
   (globalThis as Record<string, unknown>).activePreset = "codex";
   (globalThis as Record<string, unknown>).upgradedPreset = undefined;
@@ -303,6 +314,7 @@ async function createHarness(
     >;
     models?: Model[];
     requestAuth?: Record<string, RequestAuth | (() => Promise<RequestAuth>)>;
+    sessionEntries?: SessionEntry[];
     deferSessionStart?: boolean;
   } = {},
 ): Promise<Harness> {
@@ -325,6 +337,7 @@ async function createHarness(
 
   const messages: string[] = [];
   const entries: ScopeEntryNotice[] = [];
+  const sessionEntries = [...(options.sessionEntries ?? [])];
   const entryRenderers: Harness["entryRenderers"] = {};
   const statuses: StatusEvent[] = [];
   const selectCalls: Array<{ title: string; options: string[] }> = [];
@@ -350,6 +363,7 @@ async function createHarness(
       hasUI: true,
       cwd: testDir,
       modelRegistry: registry,
+      sessionManager: { getEntries: () => [...sessionEntries] },
       ui: {
         select: async (title, options) => {
           selectCalls.push({ title, options });
@@ -369,6 +383,7 @@ async function createHarness(
     summaryHandlers,
     messages,
     entries,
+    sessionEntries,
     entryRenderers,
     statuses,
     selectCalls,
@@ -416,9 +431,11 @@ async function createHarness(
     sendMessage: ({ content }: { content: string }) => {
       messages.push(content);
     },
-    appendEntry: (customType: string, data: ScopeEntryNotice["data"]) => {
+    appendEntry: (customType: string, data: unknown) => {
       if (harness.appendEntryFailure) throw harness.appendEntryFailure;
-      entries.push({ customType, data });
+      const entry = { type: "custom", customType, data };
+      sessionEntries.push(entry);
+      if (customType === "scoped") entries.push(entry as ScopeEntryNotice);
     },
     registerEntryRenderer: (
       customType: string,
@@ -632,7 +649,7 @@ test("cycles scopes in configured order and wraps around", async () => {
     { key: "scope", value: "scope:local" },
   ]);
   expect(harness.entries).toEqual([
-    { customType: "scoped", data: { text: "scope preset: local", error: false } },
+    { type: "custom", customType: "scoped", data: { text: "scope preset: local", error: false } },
   ]);
   expect(harness.messages).toEqual([]);
   await expect(scopedStream(harness)).resolves.toBe("next-stream");
@@ -659,8 +676,8 @@ test("cycles scopes in configured order and wraps around", async () => {
     { key: "scope", value: "scope:codex" },
   ]);
   expect(harness.entries).toEqual([
-    { customType: "scoped", data: { text: "scope preset: local", error: false } },
-    { customType: "scoped", data: { text: "scope preset: codex", error: false } },
+    { type: "custom", customType: "scoped", data: { text: "scope preset: local", error: false } },
+    { type: "custom", customType: "scoped", data: { text: "scope preset: codex", error: false } },
   ]);
   expect(harness.messages).toEqual([]);
   await expect(scopedStream(harness)).resolves.toBe("old-stream");
@@ -699,6 +716,7 @@ test("a failed next scope keeps the existing transaction rollback", async () => 
   await expect(scopedStream(harness)).resolves.toBe("old-stream");
   expect(harness.entries).toEqual([
     {
+      type: "custom",
       customType: "scoped",
       data: {
         text: 'scope: ERROR — preset "noauth" no credentials resolved for noauth/noauth-main; scoped provider registration was not changed. Check the provider credentials.\nscope: previous preset "codex" restored; alias resolution remains on its targets.',
@@ -707,6 +725,176 @@ test("a failed next scope keeps the existing transaction rollback", async () => 
     },
   ]);
   expect(harness.messages).toEqual([]);
+});
+
+test("a successful scope switch persists its structured preset state", async () => {
+  delete process.env.PI_SCOPE;
+  const harness = await createHarness(presets, {
+    apiKeys: { old: "old-key", next: "next-key", noauth: undefined },
+    models: [
+      target("old", "old-main", "Cloud main model"),
+      target("next", "next-main", "Local main model"),
+      target("noauth", "noauth-main", "Unauthenticated main model"),
+    ],
+  });
+
+  await harness.command("local", harness.ctx);
+  await harness.command("noauth", harness.ctx);
+
+  expect(harness.sessionEntries.filter((entry) => entry.customType === "scope-provider-state")).toEqual([
+    { type: "custom", customType: "scope-provider-state", data: { preset: "local" } },
+  ]);
+});
+
+test("persists an explicit launch scope and restores its concrete mappings", async () => {
+  const config: ScopeConfig = {
+    codex: {
+      main: { model: "old/old-main" },
+      remap: {
+        "scoped/mid": { model: "old/old-main" },
+        "scoped/summary": { model: "old/old-main", thinking: "low" },
+      },
+    },
+    go: {
+      main: { model: "golang/go-main" },
+      remap: {
+        "scoped/mid": { model: "golang/go-mid" },
+        "scoped/summary": { model: "golang/go-main", thinking: "low" },
+      },
+    },
+  };
+  const globals = globalThis as Record<string, unknown>;
+  process.env.PI_SCOPE = "go";
+  globals.activePreset = undefined;
+  globals.upgradedPreset = undefined;
+  const launched = await createHarness(config, {
+    apiKeys: { old: "old-key", golang: "go-key" },
+    models: [
+      target("old", "old-main", "Codex model"),
+      target("golang", "go-main", "Go main model"),
+      target("golang", "go-mid", "Go mid model"),
+    ],
+  });
+  const savedEntries = [...launched.sessionEntries];
+
+  expect(savedEntries).toEqual([
+    { type: "custom", customType: "scope-provider-state", data: { preset: "go" } },
+  ]);
+
+  delete process.env.PI_SCOPE;
+  globals.activePreset = undefined;
+  globals.upgradedPreset = undefined;
+  const restored = await createHarness(config, {
+    apiKeys: { old: "old-key", golang: "go-key" },
+    models: [
+      target("old", "old-main", "Codex model"),
+      target("golang", "go-main", "Go main model"),
+      target("golang", "go-mid", "Go mid model"),
+    ],
+    sessionEntries: savedEntries,
+  });
+
+  expect(restored.registry.find("scoped", "main")?.name).toBe(
+    "Go main model [S]",
+  );
+  expect(restored.registry.find("scoped", "mid")?.name).toBe("Go mid model");
+  expect(restored.sessionEntries).toEqual(savedEntries);
+});
+
+test("does not persist the implicit no-env Codex default", async () => {
+  delete process.env.PI_SCOPE;
+  const globals = globalThis as Record<string, unknown>;
+  globals.activePreset = undefined;
+  globals.upgradedPreset = undefined;
+  const harness = await createHarness(presets, {
+    apiKeys: { old: "old-key" },
+    models: [target("old", "old-main", "Cloud main model")],
+  });
+
+  expect(harness.sessionEntries).toEqual([]);
+});
+
+test("restores the latest valid persisted preset into concrete main and mid targets", async () => {
+  const config: ScopeConfig = {
+    codex: {
+      main: { model: "old/old-main" },
+      remap: {
+        "scoped/mid": { model: "old/old-main" },
+        "scoped/summary": { model: "old/old-main", thinking: "low" },
+      },
+    },
+    local: {
+      main: { model: "deskapp/qwen3.8-27b" },
+      remap: {
+        "scoped/mid": { model: "deskapp/qwen3.8-27b" },
+        "scoped/summary": { model: "deskapp/qwen3.8-27b", thinking: "low" },
+      },
+    },
+  };
+  const globals = globalThis as Record<string, unknown>;
+  globals.activePreset = "codex";
+  globals.upgradedPreset = undefined;
+  const logFile = join(testDir, "scope.log");
+  process.env.PI_SCOPE_LOG = logFile;
+  const harness = await createHarness(config, {
+    apiKeys: { old: "old-key", deskapp: "deskapp-key" },
+    models: [
+      target("old", "old-main", "Codex model"),
+      target("deskapp", "qwen3.8-27b", "qwen3.8-27b (deskapp)"),
+    ],
+    sessionEntries: [
+      { type: "custom", customType: "scoped", data: { text: "scope preset: codex" } },
+      { type: "custom", customType: "scope-provider-state", data: { preset: "codex" } },
+      { type: "custom", customType: "scope-provider-state", data: { preset: 42 } },
+      { type: "custom", customType: "scope-provider-state", data: { preset: "removed" } },
+      { type: "custom", customType: "scope-provider-state", data: { preset: "local" } },
+    ],
+  });
+
+  expect(harness.registry.find("scoped", "main")).toMatchObject({
+    provider: "scoped",
+    id: "main",
+    name: "qwen3.8-27b (deskapp) [S]",
+  });
+  await expect(scopedStream(harness, "main")).resolves.toBe("deskapp-stream");
+  await expect(scopedStream(harness, "mid")).resolves.toBe("deskapp-stream");
+  expect(harness.registry.providerStreamCalls).toEqual([
+    expect.objectContaining({
+      provider: "deskapp",
+      model: expect.objectContaining({ provider: "deskapp", id: "qwen3.8-27b" }),
+    }),
+    expect.objectContaining({
+      provider: "deskapp",
+      model: expect.objectContaining({ provider: "deskapp", id: "qwen3.8-27b" }),
+    }),
+  ]);
+  expect(readFileSync(logFile, "utf8")).toContain(
+    'session_start: restore source=session-state preset="local" scoped/main -> deskapp/qwen3.8-27b',
+  );
+});
+
+test("ignores malformed, unknown, and untyped persisted scope state and uses the launch preset", async () => {
+  const harness = await createHarness(presets, {
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: [
+      target("old", "old-main", "Cloud main model"),
+      target("next", "next-main", "Local main model"),
+    ],
+    sessionEntries: [
+      { type: "custom", customType: "scope-provider-state", data: undefined },
+      { type: "custom", customType: "scope-provider-state", data: { preset: 42 } },
+      { type: "custom", customType: "scope-provider-state", data: { preset: "removed" } },
+      { type: "custom", customType: "other-state", data: { preset: "local" } },
+      { customType: "scope-provider-state", data: { preset: "local" } },
+    ],
+  });
+
+  expect(harness.registry.find("scoped", "main")?.name).toBe("Cloud main model [S]");
+  await expect(scopedStream(harness)).resolves.toBe("old-stream");
+  expect(lastTargetCall(harness)).toMatchObject({
+    provider: "old",
+    model: { provider: "old", id: "old-main" },
+  });
 });
 
 test("factory stubs mark only the scoped/main alias", async () => {
@@ -896,7 +1084,7 @@ test("a UI selection uses configured order and the transactional switch path", a
     },
   ]);
   expect(harness.entries).toEqual([
-    { customType: "scoped", data: { text: "scope preset: local", error: false } },
+    { type: "custom", customType: "scoped", data: { text: "scope preset: local", error: false } },
   ]);
   expect(harness.messages).toEqual([]);
   expect(harness.statuses).toEqual([
@@ -999,6 +1187,7 @@ test("a selected current preset keeps direct same-preset behavior", async () => 
   expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
   expect(harness.entries).toEqual([
     {
+      type: "custom",
       customType: "scoped",
       data: { text: 'already on preset "codex"', error: false },
     },
@@ -1029,7 +1218,7 @@ test("non-UI no-argument scope falls back to the one-line notice", async () => {
   expect(harness.ctx.model).toEqual(beforeModel);
   expect(harness.ctx.thinkingLevel).toBe(beforeThinking);
   expect(harness.entries).toEqual([
-    { customType: "scoped", data: { text: "scope preset: codex", error: false } },
+    { type: "custom", customType: "scoped", data: { text: "scope preset: codex", error: false } },
   ]);
   expect(harness.messages).toEqual([]);
   expect(harness.statuses).toEqual(beforeStatuses);
@@ -1073,12 +1262,14 @@ test("scope notices render one line and never use LLM-context messages", async (
   await harness.command("nope", harness.ctx);
 
   expect(harness.entries).toEqual([
-    { customType: "scoped", data: { text: "scope preset: local", error: false } },
+    { type: "custom", customType: "scoped", data: { text: "scope preset: local", error: false } },
     {
+      type: "custom",
       customType: "scoped",
       data: { text: 'already on preset "local"', error: false },
     },
     {
+      type: "custom",
       customType: "scoped",
       data: {
         text: "unknown preset \"nope\" (available: codex, noauth, unavailable, local)",

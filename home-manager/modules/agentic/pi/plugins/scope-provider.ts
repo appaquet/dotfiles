@@ -71,6 +71,7 @@ const SCOPE_IDS = ["main", "junior", "mid", "senior", "staff", "principal", "rev
 // model selection. Summary events resolve this alias instead of the active
 // work alias, so summarization is independent of the selected scoped model.
 const SUMMARY_ALIAS = "summary";
+const SCOPE_STATE_ENTRY = "scope-provider-state";
 
 // Stub entries so `scoped/<id>` resolves before session_start upgrades them
 // from the live registry; upgrade failure fails loud (see session_start).
@@ -142,6 +143,24 @@ function readScopeConfig(): Record<string, ScopePreset> {
     scopeProvider?: Record<string, ScopePreset>;
   };
   return raw.scopeProvider ?? {};
+}
+
+/** Find the newest persisted scope preset that remains configured. */
+export function findSavedScopePreset(
+  entries: readonly unknown[],
+  presets: Record<string, ScopePreset>,
+): string | undefined {
+  for (let index = entries.length - 1; index >= 0; index -= 1) {
+    const entry = entries[index] as any;
+    if (
+      entry?.type === "custom" &&
+      entry.customType === SCOPE_STATE_ENTRY &&
+      typeof entry.data?.preset === "string" &&
+      presets[entry.data.preset]
+    )
+      return entry.data.preset;
+  }
+  return undefined;
 }
 
 /** Build a preset mapping without publishing it as committed scope state. */
@@ -615,6 +634,11 @@ function publishScopeNote(pi: any, text: string, error = false): void {
   pi.appendEntry("scoped", { text, error });
 }
 
+/** Store the selected preset without adding a visible transcript notice. */
+function persistScopePreset(pi: any, preset: string): void {
+  pi.appendEntry(SCOPE_STATE_ENTRY, { preset });
+}
+
 export default function scopeProvider(pi: any): void {
   // Scope notices are custom entries: they render in the transcript but never
   // enter LLM context, so the remap table is never sent to the model.
@@ -625,6 +649,7 @@ export default function scopeProvider(pi: any): void {
       : theme.fg("customMessageText", data.text);
     return new Text(styled);
   });
+  pi.registerEntryRenderer(SCOPE_STATE_ENTRY, () => new Text(""));
 
   debug(
     `load: preset=${state.preset} activePreset=${scopeProcess.activePreset} rewrite=${process.env.PI_SCOPE_REWRITE !== "0"} log=${process.env.PI_SCOPE_LOG ?? "off"}`,
@@ -652,7 +677,28 @@ export default function scopeProvider(pi: any): void {
     scopeRegistry = ctx.modelRegistry;
     if (scopeProcess.rewriteDisabled) return;
 
+    const presets = readScopeConfig();
+    const restoredPreset = findSavedScopePreset(
+      ctx.sessionManager.getEntries(),
+      presets,
+    );
+    const explicitLaunchPreset = process.env.PI_SCOPE;
+    const persistLaunchPreset =
+      !restoredPreset &&
+      typeof explicitLaunchPreset === "string" &&
+      Boolean(presets[explicitLaunchPreset]) &&
+      state.preset === explicitLaunchPreset;
+    const restoreSource = restoredPreset ? "session-state" : "launch";
+    if (restoredPreset) {
+      applyPreset(restoredPreset);
+      scopeProcess.activePreset = restoredPreset;
+    }
+
     const registration = await prepareScopeRegistration(ctx, state);
+    const mainTarget = registration.concreteModels?.main;
+    debug(
+      `session_start: restore source=${restoreSource} preset="${state.preset}" scoped/main -> ${mainTarget ? `${mainTarget.provider}/${mainTarget.id}` : "<unresolved>"}`,
+    );
 
     if (
       registration.count === 0 ||
@@ -675,6 +721,7 @@ export default function scopeProvider(pi: any): void {
 
     commitScopeRegistration(pi, state, registration);
     if (!refreshMainIfScopedMain(pi, ctx, "session_start")) return;
+    if (persistLaunchPreset) persistScopePreset(pi, state.preset);
     // Record the usable preset for re-imported sessions after session_start
     // upgrades the current registry, including a registry reused by /reload.
     scopeProcess.upgradedPreset = state.preset;
@@ -816,6 +863,7 @@ export default function scopeProvider(pi: any): void {
       scopeProcess.activePreset = name;
       scopeProcess.upgradedPreset = state.preset;
       publishScopeStatus(ctx);
+      persistScopePreset(pi, name);
     } catch (error) {
       const failure = error instanceof Error ? error.message : String(error);
       const rollbackFailure = restoreScope(pi, ctx, previous);
