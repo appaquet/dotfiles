@@ -1,11 +1,16 @@
 import { expect, test } from "bun:test";
+import { mkdtemp, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import {
   MODES,
   decideSwitch,
   hasPromptTemplate,
   modeLabel,
   parseModeArg,
+  readReminderInterval,
   restoreMode,
+  shouldBlock,
   submissionOptions,
   type Mode,
   type SwitchDecision,
@@ -231,6 +236,7 @@ type StatusSet = { key: string; value: string };
 type Notify = { message: string; type: string };
 type UserMessage = { content: string; options?: Record<string, unknown> };
 type EntryAppend = { customType: string; data?: unknown };
+type ModeChange = { event: string; data: unknown };
 
 type HarnessCtx = {
   ui: {
@@ -251,6 +257,7 @@ type Harness = {
   notifies: Notify[];
   sends: UserMessage[];
   appends: EntryAppend[];
+  modeChanges: ModeChange[];
   shortcuts: Array<{
     key: string;
     description: string;
@@ -259,13 +266,17 @@ type Harness = {
   command: (args: string) => Promise<void>;
   commandDescription: string;
   startSession: () => void;
+  compact: () => void;
   toggle: () => Promise<void>;
+  toolCall: (event: unknown) => unknown;
+  agentStart: () => unknown;
 };
 
 function createHarness(options: {
   entries?: unknown[];
   commands?: FakeCommand[];
   idle?: boolean;
+  agentDir?: string;
 } = {}): Harness {
   const harness: Harness = {
     idle: options.idle ?? true,
@@ -292,6 +303,7 @@ function createHarness(options: {
     notifies: [],
     sends: [],
     appends: [],
+    modeChanges: [],
     shortcuts: [],
     command: async () => {
       throw new Error("mode command was not registered");
@@ -300,18 +312,47 @@ function createHarness(options: {
     startSession: () => {
       throw new Error("session_start handler was not registered");
     },
+    compact: () => {
+      throw new Error("session_compact handler was not registered");
+    },
     toggle: async () => {
       throw new Error("shortcut handler was not registered");
+    },
+    toolCall: () => {
+      throw new Error("tool_call handler was not registered");
+    },
+    agentStart: () => {
+      throw new Error("before_agent_start handler was not registered");
     },
   };
   const ctx = harness.ctx;
 
   let sessionStart: ((event: unknown, ctx: unknown) => void) | undefined;
+  let sessionCompact: ((event: unknown, ctx: unknown) => void) | undefined;
+  let toolCall: ((event: unknown, ctx: unknown) => unknown) | undefined;
+  let beforeAgentStart: ((event: unknown, ctx: unknown) => unknown) | undefined;
   const pi = {
-    on: (event: string, handler: unknown) => {
-      if (event !== "session_start")
-        throw new Error(`unexpected event registration: ${event}`);
-      sessionStart = handler as typeof sessionStart;
+    on: (event: string, handler: (event: unknown, ctx: unknown) => unknown) => {
+      switch (event) {
+        case "session_start":
+          sessionStart = handler;
+          break;
+        case "session_compact":
+          sessionCompact = handler;
+          break;
+        case "tool_call":
+          toolCall = handler;
+          break;
+        case "before_agent_start":
+          beforeAgentStart = handler;
+          break;
+        default:
+          throw new Error(`unexpected event registration: ${event}`);
+      }
+    },
+    events: {
+      emit: (event: string, data: unknown) =>
+        harness.modeChanges.push({ event, data }),
     },
     registerShortcut: (
       key: string,
@@ -345,17 +386,38 @@ function createHarness(options: {
       harness.sends.push({ content, options }),
   };
 
+  // Point the extension's config read at a scratch agent dir when given.
+  const previousAgentDir = process.env.PI_CODING_AGENT_DIR;
+  if (options.agentDir !== undefined)
+    process.env.PI_CODING_AGENT_DIR = options.agentDir;
   modeSwitch(pi as never);
+  if (previousAgentDir === undefined)
+    delete process.env.PI_CODING_AGENT_DIR;
+  else process.env.PI_CODING_AGENT_DIR = previousAgentDir;
   harness.toggle = () => harness.shortcuts[0].handler(ctx);
   harness.startSession = () => {
     if (!sessionStart)
       throw new Error("session_start handler was not registered");
     sessionStart({}, ctx);
   };
+  harness.compact = () => {
+    if (!sessionCompact)
+      throw new Error("session_compact handler was not registered");
+    sessionCompact({}, ctx);
+  };
+  harness.toolCall = (event: unknown) => {
+    if (!toolCall) throw new Error("tool_call handler was not registered");
+    return toolCall(event, ctx);
+  };
+  harness.agentStart = () => {
+    if (!beforeAgentStart)
+      throw new Error("before_agent_start handler was not registered");
+    return beforeAgentStart({}, ctx);
+  };
   return harness;
 }
 
-test("factory: registers only session_start, the shortcut and the /mode command", () => {
+test("factory: registers only session events, the shortcut and the /mode command", () => {
   const h = createHarness();
 
   expect(h.shortcuts).toHaveLength(1);
@@ -424,6 +486,16 @@ test("toggle builder -> orchestrator while idle: submits /orchestrator, persists
   ]);
   expect(h.notifies).toEqual([
     { message: "mode-switch: orchestrator", type: "info" },
+  ]);
+});
+
+test("toggle builder -> orchestrator emits the changed mode", async () => {
+  const h = createHarness();
+  h.startSession();
+  await h.toggle();
+
+  expect(h.modeChanges).toEqual([
+    { event: "mode-switch:changed", data: { mode: "orchestrator" } },
   ]);
 });
 
@@ -696,4 +768,142 @@ test("persisted switches restore in a fresh session over the same entries", asyn
     { key: "mode", value: "[accent]👑" },
   ]);
   expect(resumed.sends).toEqual([]);
+});
+
+// ---------------------------------------------------------------------------
+// Orchestrator guard
+// ---------------------------------------------------------------------------
+
+const REMINDER_MESSAGE = {
+  message: {
+    customType: "orchestrator-guard-reminder",
+    content:
+      "👑 Orchestrator mode: the main session may only read/write project docs (*.md) — delegate all code/file work to a sub-agent via the Agent tool.",
+    display: true,
+  },
+};
+
+function blocked(result: unknown): boolean {
+  return (
+    typeof result === "object" &&
+    result !== null &&
+    (result as { block?: unknown }).block === true
+  );
+}
+
+test("shouldBlock: gates non-md file tools only in orchestrator mode", () => {
+  expect(
+    shouldBlock("orchestrator", { toolName: "read", input: { path: "src/app.ts" } }),
+  ).toBe(true);
+  expect(
+    shouldBlock("orchestrator", { toolName: "write", input: { path: "src/app.ts" } }),
+  ).toBe(true);
+  expect(
+    shouldBlock("orchestrator", { toolName: "read", input: { path: "docs/x/notes.md" } }),
+  ).toBe(false);
+  expect(
+    shouldBlock("builder", { toolName: "read", input: { path: "src/app.ts" } }),
+  ).toBe(false);
+  expect(
+    shouldBlock("builder", { toolName: "write", input: { path: "src/app.ts" } }),
+  ).toBe(false);
+  expect(
+    shouldBlock("orchestrator", { toolName: "bash", input: { command: "cat src/app.ts" } }),
+  ).toBe(false);
+});
+
+test("shouldBlock: passes unknown tools and malformed paths", () => {
+  expect(shouldBlock("orchestrator", { toolName: "grep", input: {} })).toBe(false);
+  expect(shouldBlock("orchestrator", { toolName: "read" })).toBe(false);
+  expect(shouldBlock("orchestrator", { toolName: "read", input: { path: 42 } })).toBe(false);
+  expect(shouldBlock("orchestrator", { toolName: "read", input: { path: "" } })).toBe(false);
+});
+
+test("factory: session_start restores the orchestrator gate over persisted entries", () => {
+  const h = createHarness({
+    entries: [
+      { type: "custom", customType: "mode-switch", data: { mode: "orchestrator" } },
+    ],
+  });
+  h.startSession();
+
+  const result = h.toolCall({ toolName: "read", input: { path: "src/app.ts" } });
+  expect(blocked(result)).toBe(true);
+  expect((result as { reason: string }).reason).toContain("Orchestrator mode");
+  expect((result as { reason: string }).reason).toContain("sub-agent");
+  expect(h.toolCall({ toolName: "write", input: { path: "docs/notes.md" } })).toBeUndefined();
+});
+
+test("factory: unknown tools and missing paths never block in orchestrator mode", () => {
+  const h = createHarness({
+    entries: [
+      { type: "custom", customType: "mode-switch", data: { mode: "orchestrator" } },
+    ],
+  });
+  h.startSession();
+
+  expect(h.toolCall({ toolName: "bash", input: { command: "ls" } })).toBeUndefined();
+  expect(h.toolCall({ toolName: "read" })).toBeUndefined();
+  expect(h.toolCall({ toolName: "read", input: {} })).toBeUndefined();
+});
+
+test("factory: live toggle arms the gate and toggling back disarms it", async () => {
+  const h = createHarness();
+  h.startSession();
+  expect(h.toolCall({ toolName: "edit", input: { path: "x.ts" } })).toBeUndefined();
+  await h.toggle();
+  expect(blocked(h.toolCall({ toolName: "edit", input: { path: "x.ts" } }))).toBe(true);
+  await h.toggle();
+  expect(h.toolCall({ toolName: "edit", input: { path: "x.ts" } })).toBeUndefined();
+});
+
+test("factory: reminder fires on turn ten and never in builder mode", async () => {
+  const h = createHarness();
+  h.startSession();
+  expect(h.agentStart()).toBeUndefined();
+  await h.toggle();
+  // Entering orchestrator consumes its immediate reminder before the interval counts.
+  expect(h.agentStart()).toEqual(REMINDER_MESSAGE);
+  for (let i = 0; i < 9; i++) expect(h.agentStart()).toBeUndefined();
+  expect(h.agentStart()).toEqual(REMINDER_MESSAGE);
+  expect(h.agentStart()).toBeUndefined();
+  await h.toggle();
+  expect(h.agentStart()).toBeUndefined();
+});
+
+test("factory: reminder is immediate when switching into orchestrator", async () => {
+  const h = createHarness();
+  h.startSession();
+  await h.toggle();
+
+  expect(h.agentStart()).toEqual(REMINDER_MESSAGE);
+  expect(h.agentStart()).toBeUndefined();
+});
+
+test("factory: session_compact resets the mode and the reminder counter", () => {
+  const h = createHarness({
+    entries: [
+      { type: "custom", customType: "mode-switch", data: { mode: "orchestrator" } },
+    ],
+  });
+  h.startSession();
+  h.compact();
+  // The restored orchestrator does not carry an immediate reminder; the interval restarts.
+  expect(h.agentStart()).toBeUndefined();
+});
+
+test("readReminderInterval: honors mode-switch.json and falls back on malformed config", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "mode-switch-config-"));
+  await writeFile(join(dir, "mode-switch.json"), JSON.stringify({ reminderInterval: 2 }));
+  expect(readReminderInterval(dir)).toBe(2);
+
+  const h = createHarness({ agentDir: dir });
+  h.startSession();
+  await h.toggle();
+  expect(h.agentStart()).toEqual(REMINDER_MESSAGE); // immediate on switch
+  expect(h.agentStart()).toBeUndefined();
+  expect(h.agentStart()).toEqual(REMINDER_MESSAGE); // custom interval of 2
+
+  await writeFile(join(dir, "mode-switch.json"), "not json");
+  expect(readReminderInterval(dir)).toBe(10);
 });

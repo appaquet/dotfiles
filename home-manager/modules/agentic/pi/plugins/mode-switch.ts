@@ -1,5 +1,5 @@
 /**
- * Mode switch extension.
+ * Mode switch and orchestrator guard extension.
  *
  * The footer always shows the current session mode; `ctrl+shift+m` or `/mode`
  * toggles it, and `/mode <builder|orchestrator>` sets it explicitly. Every
@@ -8,7 +8,16 @@
  * agent is streaming); session start and same-mode sets send nothing. The
  * mode is persisted per session in a `mode-switch` custom entry and restored
  * on `session_start` (default: builder).
+ *
+ * In orchestrator mode the main session is restricted to project docs:
+ * `read`/`write`/`edit` on any non-`*.md` path are blocked with a reason that
+ * teaches sub-agent delegation, and a reminder message is injected on entering
+ * the mode and then every N turns (N from `mode-switch.json` in the agent dir,
+ * default 10).
  */
+import { readFileSync } from "node:fs";
+import { homedir } from "node:os";
+import { join, normalize } from "node:path";
 import type {
   ExtensionAPI,
   ExtensionContext,
@@ -17,6 +26,13 @@ import type {
 export type Mode = "builder" | "orchestrator";
 
 export const MODES: readonly Mode[] = ["builder", "orchestrator"];
+
+const DEFAULT_REMINDER_INTERVAL = 10;
+const REMINDER =
+  "👑 Orchestrator mode: the main session may only read/write project docs (*.md) — delegate all code/file work to a sub-agent via the Agent tool.";
+const GUARDED_TOOLS = new Set(["read", "write", "edit"]);
+
+type ToolCallEvent = { toolName?: unknown; input?: unknown };
 
 export type SwitchDecision =
   | { action: "noop"; next: Mode }
@@ -107,18 +123,76 @@ export function hasPromptTemplate(
   );
 }
 
+/** Extracts a path only from the supported file tools and string inputs. */
+export function extractFilePath(event: ToolCallEvent): string | undefined {
+  if (!GUARDED_TOOLS.has(event.toolName as string)) return undefined;
+  if (typeof event.input !== "object" || event.input === null) return undefined;
+  const path = (event.input as { path?: unknown }).path;
+  if (typeof path !== "string" || path.trim() === "") return undefined;
+  return path;
+}
+
+/** Returns whether a tool call violates the orchestrator file policy. */
+export function shouldBlock(mode: Mode, event: ToolCallEvent): boolean {
+  if (mode !== "orchestrator") return false;
+  const path = extractFilePath(event);
+  if (path === undefined) return false;
+  return !normalize(path.trim()).endsWith(".md");
+}
+
+/** Reads a positive integer reminder interval, falling back on malformed config. */
+export function readReminderInterval(
+  agentDir = process.env.PI_CODING_AGENT_DIR ?? join(homedir(), ".pi", "agent"),
+): number {
+  try {
+    const parsed: unknown = JSON.parse(
+      readFileSync(join(agentDir, "mode-switch.json"), "utf8"),
+    );
+    const interval =
+      typeof parsed === "object" && parsed !== null
+        ? (parsed as { reminderInterval?: unknown }).reminderInterval
+        : undefined;
+    return typeof interval === "number" && Number.isInteger(interval) && interval > 0
+      ? interval
+      : DEFAULT_REMINDER_INTERVAL;
+  } catch {
+    return DEFAULT_REMINDER_INTERVAL;
+  }
+}
+
 function isMode(value: unknown): value is Mode {
   return value === "builder" || value === "orchestrator";
 }
 
 export default function modeSwitch(pi: ExtensionAPI): void {
   let mode: Mode = "builder";
+  let turns = 0;
+  let remindOnNextTurn = false;
+  const reminderInterval = readReminderInterval();
 
   function publishLabel(ctx: ExtensionContext): void {
     ctx.ui.setStatus(
       "mode",
       ctx.ui.theme.fg(MODE_COLORS[mode], modeLabel(mode)),
     );
+  }
+
+  function reminderMessage() {
+    return {
+      message: {
+        customType: "orchestrator-guard-reminder",
+        content: REMINDER,
+        display: true,
+      },
+    };
+  }
+
+  function restore(ctx: ExtensionContext): void {
+    mode = restoreMode(ctx.sessionManager.getEntries());
+    // Compaction loses in-memory counter state; entries are the source of truth.
+    turns = 0;
+    remindOnNextTurn = false;
+    publishLabel(ctx);
   }
 
   async function setMode(ctx: ExtensionContext, target: Mode): Promise<void> {
@@ -143,7 +217,11 @@ export default function modeSwitch(pi: ExtensionAPI): void {
     );
 
     mode = decision.next;
+    turns = 0;
+    // Entering orchestrator reminds on the very next turn; later switches wait for the interval.
+    remindOnNextTurn = mode === "orchestrator";
     pi.appendEntry("mode-switch", { mode });
+    pi.events.emit("mode-switch:changed", { mode });
     publishLabel(ctx);
     ctx.ui.notify(`mode-switch: ${mode}`, "info");
   }
@@ -152,9 +230,28 @@ export default function modeSwitch(pi: ExtensionAPI): void {
     await setMode(ctx, mode === "builder" ? "orchestrator" : "builder");
   }
 
-  pi.on("session_start", (_event, ctx) => {
-    mode = restoreMode(ctx.sessionManager.getEntries());
-    publishLabel(ctx);
+  pi.on("session_start", (_event, ctx) => restore(ctx));
+  pi.on("session_compact", (_event, ctx) => restore(ctx));
+
+  pi.on("tool_call", (event) => {
+    try {
+      if (shouldBlock(mode, event as ToolCallEvent))
+        return { block: true, reason: REMINDER };
+    } catch {
+      // A policy-check failure must not accidentally block normal work.
+    }
+    return undefined;
+  });
+
+  pi.on("before_agent_start", () => {
+    if (mode !== "orchestrator") return undefined;
+    if (remindOnNextTurn) {
+      remindOnNextTurn = false;
+      return reminderMessage();
+    }
+    turns += 1;
+    if (turns % reminderInterval === 0) return reminderMessage();
+    return undefined;
   });
 
   pi.registerShortcut("ctrl+shift+m", {

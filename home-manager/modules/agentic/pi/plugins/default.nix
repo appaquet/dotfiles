@@ -202,6 +202,9 @@ let
     {
       files = {
         ".pi/agent/extensions/mode-switch.ts".source = ./mode-switch.ts;
+        ".pi/agent/mode-switch.json".text = builtins.toJSON {
+          reminderInterval = 10; # reminder cadence (turns) in orchestrator mode
+        };
       };
     }
 
