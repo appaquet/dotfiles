@@ -16,6 +16,7 @@
         * [ ] Code is spaced, with empty lines separating logical blocks of code
         * [ ] Code is strictly adhering to KISS
         * [ ] Reuse surrounding/utils before writing new code
+        * [ ] Code uses the right visibility (pub/private/etc.), consistent with rest
       '';
     };
 }
