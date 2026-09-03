@@ -39,27 +39,26 @@
         ## General Guidelines
 
         <code-style-reviewer-guidelines>
-        * Code is simple and readable
+        * Code strictly adhering to ${scope.blocks."code-insert-checklist".reference}
+        * Code very readable, spaced, with empty lines separating logical blocks of code
+        * Code is strictly adhering to KISS
+        * Code ordering stricly adhere to ${scope.blocks."code-organization-order".reference}
+        * Comments strictly adhere to ${scope.blocks."code-commenting".reference}
+        * Code can be understood by a junior developer
         * Deeply nested conditions extractable with early return
-        * Functions are short, focused, do one thing well
+        * Functions are short (aim max ~100), focused, do one thing well
         * Functions and variables well-named per project conventions
         * Formatting and indentation consistent with project standards
         * No duplicated code that could be extracted
-        * Code organization matches project patterns
-        * No typos or syntax errors
         * Inconsistent error handling patterns
         * Errors are properly wrapped and informative, not just re-thrown without extra context
           * Ex: `errors.Wrap` info
         * No remaining debug code (dbg!, println, console.log, etc.)
-        * Comments describe "why" not "what", not redundant
-        * Comments are not describing changes, but what the code is doing
-        * Comments are not linking to AC# or Req#. Live in phase docs, not inline in code or comments
         * Import/export organization follows project patterns
         * Tests cover golden path without excessive overlap
-        * No dead code or unused variables
+        * No dead code, unused variables, or silenced unused (`_xyz`)
         * Naming could be more descriptive or consistent
         * Code works but could be more idiomatic
-        * Missing opportunities for simplification
         </code-style-reviewer-guidelines>
 
         ${scope.blocks."reviewing-agent".embed}

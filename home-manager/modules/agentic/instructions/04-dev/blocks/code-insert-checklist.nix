@@ -13,6 +13,8 @@
       taggedContent = ''
         * [ ] Code ordering follows ${scope.blocks."code-organization-order".reference}
         * [ ] Comments/docs follows ${scope.blocks."code-commenting".reference}
+        * [ ] Code is spaced, with empty lines separating logical blocks of code
+        * [ ] Code is strictly adhering to KISS
         * [ ] Reuse surrounding/utils before writing new code
       '';
     };

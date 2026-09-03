@@ -8,20 +8,17 @@
 
     taggedContent = ''
       * Comments are non-temporal. Describe current state, not evolution
-        * git history is the source of truth for evolution, not comments
-        * no references to bugs, tickets, investigations, etc.
+        * Evolution = git history
+        * No references to bugs, tickets, investigations, etc.
 
       * Doc comments (on struct/function/class/module)
         * Non-temporal
-        * Describe WHAT. 
-        * Capability, not specific use cases
-        * Skipped when not adding value when code simple
+        * Describe WHAT they are, not how they evolved
+        * 2-3 sentences, should be understanble by juniors
 
       * Inline comments (within bodies)
-        * Skip if obvious
         * Should explain WHY - non-obvious rationale, constraints, gotchas
-
-      * Don't mark sections with comments. If markers seem needed, split the file
+        * Can be used to explain WHAT on non-obvious chunk of code, single line length
 
       * Test comments: brief behavior labels, not internal mechanics walkthroughs
     '';
