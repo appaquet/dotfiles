@@ -70,7 +70,11 @@ let
         (mkLocalNinferModel {
           id = "qwen3.8-27b";
           name = "qwen3.8-27b";
-          contextWindow = 185000;
+          input = [
+            "text"
+            "image"
+          ];
+          contextWindow = 200000;
           samplingParams = {
             temperature = 1.0;
             top_p = 0.95;
