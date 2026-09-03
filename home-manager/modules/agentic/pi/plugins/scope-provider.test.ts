@@ -155,6 +155,11 @@ class TestRegistry {
   }
 }
 
+type ScopeEntryNotice = {
+  customType: string;
+  data: { text: string; error?: boolean };
+};
+
 type Harness = {
   registry: TestRegistry;
   factoryConfig?: ProviderConfig;
@@ -170,10 +175,15 @@ type Harness = {
   }>;
   summaryHandlers: Record<string, SummaryHandler[]>;
   messages: string[];
+  entries: ScopeEntryNotice[];
+  entryRenderers: Record<
+    string,
+    (entry: { data: { text: string; error?: boolean } }, options: any, theme: any) => any
+  >;
   statuses: StatusEvent[];
   selectCalls: Array<{ title: string; options: string[] }>;
   selection?: string;
-  sendMessageFailure?: Error;
+  appendEntryFailure?: Error;
   setStatusFailure?: Error;
   restoreFailure: boolean;
 };
@@ -200,6 +210,16 @@ const fakeApiProvider = {
 
 mock.module("@earendil-works/pi-ai/compat", () => ({
   getApiProvider: () => fakeApiProvider,
+}));
+
+// Capture entry-rendered output so the scoped entry renderer can be asserted
+// with deterministic styling instead of the real terminal theme.
+class FakeText {
+  constructor(public readonly rendered: string) {}
+}
+
+mock.module("@earendil-works/pi-tui", () => ({
+  Text: FakeText,
 }));
 
 mock.module("@earendil-works/pi-coding-agent", () => ({
@@ -304,6 +324,8 @@ async function createHarness(
   }
 
   const messages: string[] = [];
+  const entries: ScopeEntryNotice[] = [];
+  const entryRenderers: Harness["entryRenderers"] = {};
   const statuses: StatusEvent[] = [];
   const selectCalls: Array<{ title: string; options: string[] }> = [];
   let command: ScopeCommand | undefined;
@@ -346,6 +368,8 @@ async function createHarness(
     shortcuts,
     summaryHandlers,
     messages,
+    entries,
+    entryRenderers,
     statuses,
     selectCalls,
     restoreFailure: false,
@@ -388,9 +412,19 @@ async function createHarness(
     ) => {
       shortcuts.push({ key, ...registration });
     },
+    // Kept so tests can assert R1: scope must not send LLM-context messages.
     sendMessage: ({ content }: { content: string }) => {
-      if (harness.sendMessageFailure) throw harness.sendMessageFailure;
       messages.push(content);
+    },
+    appendEntry: (customType: string, data: ScopeEntryNotice["data"]) => {
+      if (harness.appendEntryFailure) throw harness.appendEntryFailure;
+      entries.push({ customType, data });
+    },
+    registerEntryRenderer: (
+      customType: string,
+      renderer: Harness["entryRenderers"][string],
+    ) => {
+      entryRenderers[customType] = renderer;
     },
     setThinkingLevel: (level: string) => {
       harness.ctx.thinkingLevel = level;
@@ -597,9 +631,10 @@ test("cycles scopes in configured order and wraps around", async () => {
     { key: "scope", value: "scope:codex" },
     { key: "scope", value: "scope:local" },
   ]);
-  expect(harness.messages).toEqual([
-    "scope preset: local\nscope preset: local\n  id         target\n  main       next/next-main (force thinking: high)",
+  expect(harness.entries).toEqual([
+    { customType: "scoped", data: { text: "scope preset: local", error: false } },
   ]);
+  expect(harness.messages).toEqual([]);
   await expect(scopedStream(harness)).resolves.toBe("next-stream");
   expect(lastTargetCall(harness)).toMatchObject({
     provider: "next",
@@ -623,10 +658,11 @@ test("cycles scopes in configured order and wraps around", async () => {
     { key: "scope", value: "scope:local" },
     { key: "scope", value: "scope:codex" },
   ]);
-  expect(harness.messages).toEqual([
-    "scope preset: local\nscope preset: local\n  id         target\n  main       next/next-main (force thinking: high)",
-    "scope preset: codex\nscope preset: codex\n  id         target\n  main       old/old-main (force thinking: medium)",
+  expect(harness.entries).toEqual([
+    { customType: "scoped", data: { text: "scope preset: local", error: false } },
+    { customType: "scoped", data: { text: "scope preset: codex", error: false } },
   ]);
+  expect(harness.messages).toEqual([]);
   await expect(scopedStream(harness)).resolves.toBe("old-stream");
   expect(lastTargetCall(harness)).toMatchObject({
     provider: "old",
@@ -661,9 +697,16 @@ test("a failed next scope keeps the existing transaction rollback", async () => 
   expect((globalThis as Record<string, unknown>).upgradedPreset).toBe("codex");
   expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
   await expect(scopedStream(harness)).resolves.toBe("old-stream");
-  expect(harness.messages).toEqual([
-    'scope: ERROR — preset "noauth" no credentials resolved for noauth/noauth-main; scoped provider registration was not changed. Check the provider credentials.\nscope: previous preset "codex" restored; alias resolution remains on its targets.',
+  expect(harness.entries).toEqual([
+    {
+      customType: "scoped",
+      data: {
+        text: 'scope: ERROR — preset "noauth" no credentials resolved for noauth/noauth-main; scoped provider registration was not changed. Check the provider credentials.\nscope: previous preset "codex" restored; alias resolution remains on its targets.',
+        error: true,
+      },
+    },
   ]);
+  expect(harness.messages).toEqual([]);
 });
 
 test("factory stubs mark only the scoped/main alias", async () => {
@@ -852,9 +895,10 @@ test("a UI selection uses configured order and the transactional switch path", a
       options: ["codex", "noauth", "unavailable", "local"],
     },
   ]);
-  expect(harness.messages).toEqual([
-    "scope preset: local\nscope preset: local\n  id         target\n  main       next/next-main (force thinking: high)",
+  expect(harness.entries).toEqual([
+    { customType: "scoped", data: { text: "scope preset: local", error: false } },
   ]);
+  expect(harness.messages).toEqual([]);
   expect(harness.statuses).toEqual([
     { key: "scope", value: "scope:codex" },
     { key: "scope", value: "scope:local" },
@@ -895,7 +939,7 @@ test("cancelling the UI selector is a complete no-op", async () => {
   const beforeModel = { ...harness.ctx.model };
   const beforeThinking = harness.ctx.thinkingLevel;
   const beforeStatuses = [...harness.statuses];
-  const beforeMessages = [...harness.messages];
+  const beforeEntries = [...harness.entries];
   const beforeStream = await scopedStream(harness);
   const beforeProcess = {
     activePreset: (globalThis as Record<string, unknown>).activePreset,
@@ -917,7 +961,7 @@ test("cancelling the UI selector is a complete no-op", async () => {
   expect(harness.ctx.model).toEqual(beforeModel);
   expect(harness.ctx.thinkingLevel).toBe(beforeThinking);
   expect(harness.statuses).toEqual(beforeStatuses);
-  expect(harness.messages).toEqual(beforeMessages);
+  expect(harness.entries).toEqual(beforeEntries);
   const afterStream = await scopedStream(harness);
   expect(afterStream).toBe(beforeStream);
   expect(lastTargetCall(harness)).toMatchObject({
@@ -953,12 +997,16 @@ test("a selected current preset keeps direct same-preset behavior", async () => 
     beforeConfig,
   );
   expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
-  expect(harness.messages).toEqual([
-    'already on preset "codex"\nscope preset: codex\n  id         target\n  main       old/old-main',
+  expect(harness.entries).toEqual([
+    {
+      customType: "scoped",
+      data: { text: 'already on preset "codex"', error: false },
+    },
   ]);
+  expect(harness.messages).toEqual([]);
 });
 
-test("non-UI no-argument scope retains the table fallback", async () => {
+test("non-UI no-argument scope falls back to the one-line notice", async () => {
   const harness = await createHarness(presets, {
     apiKeys: { old: "old-key" },
     models: [target("old", "old-main", "Cloud main model")],
@@ -980,12 +1028,66 @@ test("non-UI no-argument scope retains the table fallback", async () => {
   );
   expect(harness.ctx.model).toEqual(beforeModel);
   expect(harness.ctx.thinkingLevel).toBe(beforeThinking);
-  expect(harness.messages).toEqual([
-    "scope preset: codex\n  id         target\n  main       old/old-main",
+  expect(harness.entries).toEqual([
+    { customType: "scoped", data: { text: "scope preset: codex", error: false } },
   ]);
+  expect(harness.messages).toEqual([]);
   expect(harness.statuses).toEqual(beforeStatuses);
   const afterStream = await scopedStream(harness);
   expect(afterStream).toBe(beforeStream);
+});
+
+test("scope notices render one line and never use LLM-context messages", async () => {
+  const harness = await createHarness(presets, {
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: [
+      target("old", "old-main", "Cloud main model"),
+      target("next", "next-main", "Local main model"),
+    ],
+  });
+
+  const renderer = harness.entryRenderers["scoped"];
+  expect(renderer).toBeDefined();
+
+  // Deterministic style stub: records the theme token instead of ANSI codes.
+  const fg = (token: string, text: string) => `[${token}]${text}`;
+  const switchNotice = renderer(
+    { data: { text: "scope preset: local", error: false } },
+    { expanded: false },
+    { fg },
+  );
+  expect((switchNotice as FakeText).rendered).toBe(
+    "[customMessageText]scope preset: local",
+  );
+  const errorNotice = renderer(
+    { data: { text: "scope: ERROR — preset exploded", error: true } },
+    { expanded: false },
+    { fg },
+  );
+  expect((errorNotice as FakeText).rendered).toBe(
+    "[error]scope: ERROR — preset exploded",
+  );
+
+  await harness.command("local", harness.ctx);
+  await harness.command("local", harness.ctx);
+  await harness.command("nope", harness.ctx);
+
+  expect(harness.entries).toEqual([
+    { customType: "scoped", data: { text: "scope preset: local", error: false } },
+    {
+      customType: "scoped",
+      data: { text: 'already on preset "local"', error: false },
+    },
+    {
+      customType: "scoped",
+      data: {
+        text: "unknown preset \"nope\" (available: codex, noauth, unavailable, local)",
+        error: true,
+      },
+    },
+  ]);
+  // R1: no scope notice may reach LLM context as a session message.
+  expect(harness.messages).toEqual([]);
 });
 
 test("a selected failed switch rolls back like a direct argument", async () => {
@@ -1016,9 +1118,10 @@ test("a selected failed switch rolls back like a direct argument", async () => {
   expect(harness.ctx.thinkingLevel).toBe("medium");
   expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
   await expect(scopedStream(harness)).resolves.toBe("old-stream");
-  expect(harness.messages).toEqual([
-    'scope: ERROR — preset "noauth" no credentials resolved for noauth/noauth-main; scoped provider registration was not changed. Check the provider credentials.\nscope: previous preset "codex" restored; alias resolution remains on its targets.',
-  ]);
+  expect(harness.entries.at(-1)?.data).toEqual({
+    text: 'scope: ERROR — preset "noauth" no credentials resolved for noauth/noauth-main; scoped provider registration was not changed. Check the provider credentials.\nscope: previous preset "codex" restored; alias resolution remains on its targets.',
+    error: true,
+  });
 });
 
 test("missing target auth preserves the previous scoped provider and alias table", async () => {
@@ -1042,7 +1145,9 @@ test("missing target auth preserves the previous scoped provider and alias table
   );
   await expect(scopedStream(harness)).resolves.toBe("old-stream");
   expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
-  expect(harness.messages.at(-1)).toContain('previous preset "codex" restored');
+  expect(harness.entries.at(-1)?.data.text).toContain(
+    'previous preset "codex" restored',
+  );
 });
 
 test("an unresolvable target rolls back to the previous provider and alias table", async () => {
@@ -1061,7 +1166,9 @@ test("an unresolvable target rolls back to the previous provider and alias table
   );
   await expect(scopedStream(harness)).resolves.toBe("old-stream");
   expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
-  expect(harness.messages.at(-1)).toContain('previous preset "codex" restored');
+  expect(harness.entries.at(-1)?.data.text).toContain(
+    'previous preset "codex" restored',
+  );
 });
 
 test("a failed registry rollback disables alias resolution and requires a restart", async () => {
@@ -1084,7 +1191,7 @@ test("a failed registry rollback disables alias resolution and requires a restar
   await expect(scopedStream(harness)).resolves.toBe("native-stream");
   expect(harness.registry.providerStreamCalls).toEqual([]);
   expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
-  expect(harness.messages.at(-1)).toContain("restart the session");
+  expect(harness.entries.at(-1)?.data.text).toContain("restart the session");
 });
 
 test("repeated switches refresh scoped/main and preserve concrete selections", async () => {
@@ -1475,9 +1582,11 @@ test("a preset without a scoped/summary entry fails registration and keeps the s
       models: [target("old", "old-main", "Cloud main model")],
     },
   );
-  expect(harness.messages.at(-1)).toContain(
-    'preset "codex" has no resolvable scoped/summary target',
-  );
+  expect(harness.entries.at(-1)?.data).toEqual({
+    text: 'scope: ERROR — preset "codex" has no resolvable scoped/summary target; compaction and /tree branch summaries would be cancelled. Check the scopeProvider settings and models.',
+    error: true,
+  });
+  expect(harness.messages).toEqual([]);
   expect(scopedNames(harness).main).toBe(
     "scoped/main (preset stub, upgraded at session start) [S]",
   );
@@ -1496,9 +1605,11 @@ test("a scoped/summary target absent from the registry fails registration clearl
       models: [target("old", "old-main", "Cloud main model")],
     },
   );
-  expect(harness.messages.at(-1)).toContain(
-    'preset "codex" has no resolvable scoped/summary target',
-  );
+  expect(harness.entries.at(-1)?.data).toEqual({
+    text: 'scope: ERROR — preset "codex" has no resolvable scoped/summary target; compaction and /tree branch summaries would be cancelled. Check the scopeProvider settings and models.',
+    error: true,
+  });
+  expect(harness.messages).toEqual([]);
   expect(scopedNames(harness).main).toBe(
     "scoped/main (preset stub, upgraded at session start) [S]",
   );
@@ -1525,9 +1636,10 @@ test("a summary event cancels without native fallback when the dedicated target 
     ),
   ).resolves.toEqual({ cancel: true });
   expect(compactCalls).toEqual([]);
-  expect(harness.messages.at(-1)).toContain(
+  expect(harness.entries.at(-1)?.data.text).toContain(
     "concrete target old/old-junior is unavailable",
   );
+  expect(harness.entries.at(-1)?.data.error).toBe(true);
 });
 
 test("summaries observe only committed targets across deferred failure and successful scope commit", async () => {
@@ -1659,11 +1771,12 @@ test("reports auth and generation failures and cancels without alias fallback", 
     ),
   ).resolves.toEqual({ cancel: true });
   expect(compactCalls).toEqual([]);
-  expect(authHarness.messages.at(-1)).toBe(
-    "scope: ERROR — compaction with old/old-main failed: credential expired. Check the target model and credentials, then retry.",
-  );
+  expect(authHarness.entries.at(-1)?.data).toEqual({
+    text: "scope: ERROR — compaction with old/old-main failed: credential expired. Check the target model and credentials, then retry.",
+    error: true,
+  });
 
-  authHarness.sendMessageFailure = new Error("message sink unavailable");
+  authHarness.appendEntryFailure = new Error("entry sink unavailable");
   await expect(
     authHarness.summaryHandlers.session_before_compact[0](
       { preparation: {}, signal },
@@ -1671,6 +1784,8 @@ test("reports auth and generation failures and cancels without alias fallback", 
     ),
   ).resolves.toEqual({ cancel: true });
   expect(compactCalls).toEqual([]);
+  // The entry sink failure is swallowed: no second notice is recorded.
+  expect(authHarness.entries).toHaveLength(1);
 
   treeFailure = new Error("non-retryable invalid request");
   const generationHarness = await createHarness(presets, {
@@ -1686,9 +1801,10 @@ test("reports auth and generation failures and cancels without alias fallback", 
       generationHarness.ctx,
     ),
   ).resolves.toEqual({ cancel: true });
-  expect(generationHarness.messages.at(-1)).toBe(
-    "scope: ERROR — branch summary with old/old-main failed: non-retryable invalid request. Check the target model and credentials, then retry.",
-  );
+  expect(generationHarness.entries.at(-1)?.data).toEqual({
+    text: "scope: ERROR — branch summary with old/old-main failed: non-retryable invalid request. Check the target model and credentials, then retry.",
+    error: true,
+  });
 });
 
 test("forwards configured retry policy and cancels retry exhaustion, disabled retry and abort outcomes", async () => {

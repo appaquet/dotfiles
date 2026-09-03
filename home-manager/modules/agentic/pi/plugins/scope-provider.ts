@@ -25,6 +25,7 @@ import {
   SettingsManager,
 } from "@earendil-works/pi-coding-agent";
 import { getApiProvider } from "@earendil-works/pi-ai/compat";
+import { Text } from "@earendil-works/pi-tui";
 
 type SummaryThinkingLevel = NonNullable<Parameters<typeof compact>[6]>;
 type ScopeEntry = { model: string; thinking?: SummaryThinkingLevel };
@@ -466,11 +467,11 @@ function reportSummaryFailure(
     : "the configured scoped target";
   const detail = error instanceof Error ? error.message : String(error);
   try {
-    pi.sendMessage({
-      customType: "scoped",
-      content: `scope: ERROR — ${operation} with ${concrete} failed: ${detail}. Check the target model and credentials, then retry.`,
-      display: true,
-    });
+    publishScopeNote(
+      pi,
+      `scope: ERROR — ${operation} with ${concrete} failed: ${detail}. Check the target model and credentials, then retry.`,
+      true,
+    );
   } catch (reportError) {
     const reportDetail =
       reportError instanceof Error ? reportError.message : String(reportError);
@@ -593,8 +594,7 @@ function refreshMainIfScopedMain(
   if (!refreshed) {
     const msg = `scope: ERROR — session is on scoped/main but the refreshed scoped/main entry is unavailable (target ${target ? `${target.provider}/${target.id}` : "<unset>"}); scoped/main requests will fail. Check the scopeProvider settings.`;
     debug(`${label}: ${msg}`);
-    if (report)
-      pi.sendMessage({ customType: "scoped", content: msg, display: true });
+    if (report) publishScopeNote(pi, msg, true);
     return false;
   }
 
@@ -610,23 +610,22 @@ function publishScopeStatus(ctx: any): void {
   ctx.ui.setStatus("scope", `scope:${state.preset}`);
 }
 
-/** Show the active preset and its remap table as a session message. */
-function scopeTable(): string {
-  const lines = [
-    `scope preset: ${state.preset}`,
-    "  " + "id".padEnd(11) + "target",
-  ];
-  for (const id of SCOPE_IDS) {
-    const entry = state.entries[id];
-    if (!entry) continue;
-    lines.push(
-      `  ${id.padEnd(11)}${entry.model}${entry.thinking ? ` (force thinking: ${entry.thinking})` : ""}`,
-    );
-  }
-  return lines.join("\n");
+/** Publish a one-line scope notice as a TUI-only session entry. */
+function publishScopeNote(pi: any, text: string, error = false): void {
+  pi.appendEntry("scoped", { text, error });
 }
 
 export default function scopeProvider(pi: any): void {
+  // Scope notices are custom entries: they render in the transcript but never
+  // enter LLM context, so the remap table is never sent to the model.
+  pi.registerEntryRenderer("scoped", (entry: any, _options: any, theme: any) => {
+    const data = entry.data as { text: string; error?: boolean };
+    const styled = data.error
+      ? theme.fg("error", data.text)
+      : theme.fg("customMessageText", data.text);
+    return new Text(styled);
+  });
+
   debug(
     `load: preset=${state.preset} activePreset=${scopeProcess.activePreset} rewrite=${process.env.PI_SCOPE_REWRITE !== "0"} log=${process.env.PI_SCOPE_LOG ?? "off"}`,
   );
@@ -669,7 +668,7 @@ export default function scopeProvider(pi: any): void {
             ? `scope: ERROR — preset "${state.preset}" has no resolvable scoped/${SUMMARY_ALIAS} target; compaction and /tree branch summaries would be cancelled. Check the scopeProvider settings and models.`
             : `scope: ERROR — preset "${state.preset}" has no resolvable targets in the model registry (available presets: ${available}); scoped/* model requests will fail. Check the scopeProvider settings and models.`;
       debug(`session_start: ${msg}`);
-      pi.sendMessage({ customType: "scoped", content: msg, display: true });
+      publishScopeNote(pi, msg, true);
 
       return;
     }
@@ -760,22 +759,17 @@ export default function scopeProvider(pi: any): void {
 
   const switchScope = async (name: string, ctx: any): Promise<void> => {
     if (scopeProcess.rewriteDisabled) {
-      pi.sendMessage({
-        customType: "scoped",
-        content:
-          `scope: ERROR — scoped alias resolution is disabled because provider rollback failed. Restart the session before switching presets.`,
-        display: true,
-      });
+      publishScopeNote(
+        pi,
+        "scope: ERROR — scoped alias resolution is disabled because provider rollback failed. Restart the session before switching presets.",
+        true,
+      );
 
       return;
     }
 
     if (name === state.preset) {
-      pi.sendMessage({
-        customType: "scoped",
-        content: `already on preset "${name}"\n${scopeTable()}`,
-        display: true,
-      });
+      publishScopeNote(pi, `already on preset "${name}"`);
 
       return;
     }
@@ -783,11 +777,11 @@ export default function scopeProvider(pi: any): void {
     const previous = snapshotScope(ctx);
     const next = buildPreset(name);
     if (!next) {
-      pi.sendMessage({
-        customType: "scoped",
-        content: `unknown preset "${name}" (available: ${Object.keys(readScopeConfig()).join(", ")})`,
-        display: true,
-      });
+      publishScopeNote(
+        pi,
+        `unknown preset "${name}" (available: ${Object.keys(readScopeConfig()).join(", ")})`,
+        true,
+      );
       return;
     }
 
@@ -829,26 +823,21 @@ export default function scopeProvider(pi: any): void {
         ? `scope: ERROR — switching to preset "${name}" failed: ${failure}; rollback failed: ${rollbackFailure}. Check the scopeProvider settings and restart the session.`
         : `${failure}\nscope: previous preset "${previous.preset}" restored; alias resolution remains on its targets.`;
       debug(`/scope ${name}: ${content}`);
-      pi.sendMessage({ customType: "scoped", content, display: true });
+      publishScopeNote(pi, content, true);
       return;
     }
 
-    pi.sendMessage({
-      customType: "scoped",
-      content: `scope preset: ${name}\n${scopeTable()}`,
-      display: true,
-    });
+    publishScopeNote(pi, `scope preset: ${name}`);
   };
 
   const cycleScope = async (ctx: any): Promise<void> => {
     const names = Object.keys(readScopeConfig());
     if (names.length === 0) {
-      pi.sendMessage({
-        customType: "scoped",
-        content:
-          "scope: ERROR — no scope presets are configured; add scopeProvider settings before cycling.",
-        display: true,
-      });
+      publishScopeNote(
+        pi,
+        "scope: ERROR — no scope presets are configured; add scopeProvider settings before cycling.",
+        true,
+      );
       return;
     }
 
@@ -870,11 +859,7 @@ export default function scopeProvider(pi: any): void {
 
       if (!name) {
         if (!ctx.hasUI) {
-          pi.sendMessage({
-            customType: "scoped",
-            content: scopeTable(),
-            display: true,
-          });
+          publishScopeNote(pi, `scope preset: ${state.preset}`);
           return;
         }
 
