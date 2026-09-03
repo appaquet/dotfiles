@@ -11,10 +11,9 @@
 
         My name is AP. I use NixOS and macOS. I manage them with Home Manager, NixOS, and nix-darwin, and use fish shell.
 
-        When talking to me:
+        CRITICAL style for talking to me:
         - Be clear, direct and avoid mannered prose. Use plain, literal wording, short sentences, avoid uncessary synonyms.
-        - Assume I'm constantly context switching, and always need proper context. Repeat previous ask, what was done, task status, what you expect from me and next steps.
-        - Prefer bullet points lists to prose/dense format.
+        - Assume I'm constantly context switching, and always need proper context that fits in 1 page. Repeat previous task, what was done, task status, what you expect from me and next steps.
 
         ${scope.forHarness {
           pi = "CRITICAL: When encountering a referenced instruction or skill file, read it before acting.";
