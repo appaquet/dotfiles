@@ -24,6 +24,8 @@ To change nixantic:
 2. Switch the dotfiles nixantic input to the `path:` override so dotfiles acts on the unpushed local changes.
 3. Never push to the nixantic repo: when a push is required, tell the user and let the user push. After the push, the user removes the `path:` override and updates the input back to `github:appaquet/nixantic` (`nix flake update nixantic`).
 
+`./nixantic` is gitignored and workspace-relative: the dotfiles root and each jj workspace may each hold a separate clone, and `just nixantic-clone` only maintains the root's. Identify which checkout is canonical for the current work before touching a clone (project docs may name one).
+
 Validate the standalone framework with `nix flake check --show-trace` inside a nixantic clone.
 
 ## Editing Production Instructions
