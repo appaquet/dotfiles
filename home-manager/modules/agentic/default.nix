@@ -18,7 +18,7 @@
 
   config = {
     home.packages = [
-      # pkgs.codex
+      pkgs.codex
       # pkgs.antigravity-cli
 
       pkgs.ccusage
