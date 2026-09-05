@@ -178,8 +178,8 @@ in
             thinking = "high";
           };
           "scoped/principal" = {
-            model = "openai-codex/gpt-5.6-sol";
-            thinking = "xhigh";
+            model = "openai-codex/gpt-6-astra";
+            thinking = "high";
           };
           "scoped/reviewer" = {
             model = "openai-codex/gpt-5.6-terra";
@@ -215,12 +215,12 @@ in
             thinking = "xhigh";
           };
           "scoped/principal" = {
-            model = "openai-codex/gpt-5.6-sol";
-            thinking = "max";
+            model = "openai-codex/gpt-6-astra";
+            thinking = "high";
           };
           "scoped/reviewer" = {
-            model = "openai-codex/gpt-5.6-sol";
-            thinking = "xhigh";
+            model = "openai-codex/gpt-6-astra";
+            thinking = "medium";
           };
         };
       };
