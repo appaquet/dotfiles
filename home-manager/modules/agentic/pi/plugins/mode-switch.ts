@@ -1,12 +1,12 @@
 /**
  * Mode switch and orchestrator guard extension.
  *
- * The footer always shows the current session mode; `ctrl+shift+m` or `/mode`
- * toggles it, and `/mode <builder|orchestrator>` sets it explicitly. At
- * launch the `PI_MODE` env var (builder|orchestrator) selects the initial mode
- * of a session with no persisted mode entry (analog of `PI_SCOPE` for scope
- * presets); on resume/fork the persisted entry wins. Every
- * actual mode switch submits the target mode's prompt template (`/builder`
+ * The footer always shows the current session mode. `ctrl+shift+m` toggles it;
+ * `/mode` opens a fuzzy selector, and `/mode <builder|orchestrator>` sets it
+ * explicitly. At launch the `PI_MODE` env var (builder|orchestrator) selects
+ * the initial mode of a session with no persisted mode entry (analog of
+ * `PI_SCOPE` for scope presets); on resume/fork the persisted entry wins.
+ * Every actual mode switch submits the target mode's prompt template (`/builder`
  * or `/orchestrator`) as a user message (queued as a followUp while the
  * agent is streaming); session start and same-mode sets send nothing. The
  * mode is persisted per session in a `mode-switch` custom entry and restored
@@ -25,6 +25,11 @@ import type {
   ExtensionAPI,
   ExtensionContext,
 } from "@earendil-works/pi-coding-agent";
+import {
+  filterFuzzyItems,
+  selectFuzzyItem,
+  type FuzzySelectorItem,
+} from "../lib/fuzzy-selector.ts";
 
 export type Mode = "builder" | "orchestrator";
 
@@ -111,16 +116,14 @@ export function startupPlan(entries: unknown[], env: unknown): StartupPlan {
 }
 
 export type ModeArg =
-  | { kind: "toggle" }
   | { kind: "set"; mode: Mode }
-  | { kind: "unknown"; arg: string };
+  | { kind: "select"; query: string };
 
-/** Parse a `/mode` argument: empty toggles, a mode name sets it, anything else is unknown. */
+/** Parse a `/mode` argument into an exact set or a selector search query. */
 export function parseModeArg(arg: string): ModeArg {
   const name = arg.trim();
-  if (name === "") return { kind: "toggle" };
   if (isMode(name)) return { kind: "set", mode: name };
-  return { kind: "unknown", arg: name };
+  return { kind: "select", query: name };
 }
 
 /** Submission options for a mode template: followUp delivery only while streaming (never steer). */
@@ -312,26 +315,46 @@ export default function modeSwitch(pi: ExtensionAPI): void {
     },
   });
 
+  const modeSelectorItems: readonly FuzzySelectorItem[] = MODES.map(
+    (value) => ({ value, label: value }),
+  );
+
   pi.registerCommand("mode", {
     description:
-      "Toggle the session mode, or set it with /mode <builder|orchestrator>",
+      "Select the session mode, or set it with /mode <builder|orchestrator>",
+    getArgumentCompletions: (prefix) => {
+      const matches = filterFuzzyItems(modeSelectorItems, prefix);
+      if (matches.length === 0) return null;
+
+      return matches.map(({ value, label, description }) => ({
+        value,
+        label: label ?? value,
+        description,
+      }));
+    },
     handler: async (args, ctx) => {
       const parsed = parseModeArg(args);
-
-      if (parsed.kind === "toggle") {
-        toggleMode(ctx);
-        return;
-      }
 
       if (parsed.kind === "set") {
         setMode(ctx, parsed.mode);
         return;
       }
 
-      ctx.ui.notify(
-        `mode-switch: unknown mode "${parsed.arg}" (available: ${MODES.join(", ")})`,
-        "warning",
+      if (!ctx.hasUI) {
+        throw new Error(
+          "/mode requires interactive UI when no exact mode is provided",
+        );
+      }
+
+      const selected = await selectFuzzyItem(
+        ctx,
+        "Select mode:",
+        modeSelectorItems,
+        parsed.query,
       );
+      if (selected === undefined) return;
+
+      await setMode(ctx, selected as Mode);
     },
   });
 }

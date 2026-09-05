@@ -1,8 +1,50 @@
-import { expect, test } from "bun:test";
+import { expect, mock, test } from "bun:test";
 import { mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import {
+import type { Mode, SwitchDecision } from "./mode-switch.ts";
+
+mock.module("../lib/fuzzy-selector.ts", () => ({
+  filterFuzzyItems: (
+    items: Array<{ value: string; label?: string; description?: string }>,
+    query: string,
+  ) => {
+    if (!query) return [...items];
+
+    const normalized = query.toLowerCase();
+    return items.filter((item) => {
+      const text = [item.value, item.label ?? "", item.description ?? ""]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      let position = 0;
+
+      for (const character of normalized) {
+        position = text.indexOf(character, position);
+        if (position < 0) return false;
+        position += 1;
+      }
+
+      return true;
+    });
+  },
+  selectFuzzyItem: async (
+    ctx: HarnessCtx,
+    title: string,
+    items: Array<{ value: string }>,
+    initialSearchInput = "",
+  ) => {
+    const selectorCalls = (ctx as any).__selectorCalls as Harness["selectorCalls"];
+    selectorCalls.push({
+      title,
+      values: items.map((item) => item.value),
+      initialSearchInput,
+    });
+    return ctx.ui.custom<string>(() => undefined);
+  },
+}));
+
+const {
   MODES,
   decideSwitch,
   hasPromptTemplate,
@@ -13,10 +55,8 @@ import {
   shouldBlock,
   startupPlan,
   submissionOptions,
-  type Mode,
-  type SwitchDecision,
-} from "./mode-switch.ts";
-import { default as modeSwitch } from "./mode-switch.ts";
+  default: modeSwitch,
+} = await import("./mode-switch.ts");
 
 // ---------------------------------------------------------------------------
 // Pure decision logic
@@ -236,9 +276,9 @@ test("startupPlan: invalid PI_MODE without a persisted entry defaults to builder
 // /mode argument parsing
 // ---------------------------------------------------------------------------
 
-test("parseModeArg: empty and whitespace-only arguments toggle", () => {
-  expect(parseModeArg("")).toEqual({ kind: "toggle" });
-  expect(parseModeArg("   ")).toEqual({ kind: "toggle" });
+test("parseModeArg: empty and whitespace-only arguments select with an empty query", () => {
+  expect(parseModeArg("")).toEqual({ kind: "select", query: "" });
+  expect(parseModeArg("   ")).toEqual({ kind: "select", query: "" });
 });
 
 test("parseModeArg: trims explicit mode names", () => {
@@ -249,15 +289,15 @@ test("parseModeArg: trims explicit mode names", () => {
   });
 });
 
-test("parseModeArg: anything else is unknown with the trimmed argument", () => {
-  expect(parseModeArg("wizard")).toEqual({ kind: "unknown", arg: "wizard" });
+test("parseModeArg: non-exact values select with the trimmed query", () => {
+  expect(parseModeArg("wizard")).toEqual({ kind: "select", query: "wizard" });
   expect(parseModeArg("  BUILDER  ")).toEqual({
-    kind: "unknown",
-    arg: "BUILDER",
+    kind: "select",
+    query: "BUILDER",
   });
   expect(parseModeArg("builder extra")).toEqual({
-    kind: "unknown",
-    arg: "builder extra",
+    kind: "select",
+    query: "builder extra",
   });
 });
 
@@ -316,10 +356,12 @@ type EntryAppend = { customType: string; data?: unknown };
 type ModeChange = { event: string; data: unknown };
 
 type HarnessCtx = {
+  hasUI: boolean;
   ui: {
     theme: { fg: (color: string, text: string) => string };
     setStatus: (key: string, value: string | undefined) => void;
     notify: (message: string, type?: "info" | "warning" | "error") => void;
+    custom: <T>(factory: (...args: any[]) => unknown) => Promise<T>;
   };
   isIdle: () => boolean;
   sessionManager: { getEntries: () => unknown[] };
@@ -341,7 +383,18 @@ type Harness = {
     handler: (ctx: HarnessCtx) => Promise<void>;
   }>;
   command: (args: string) => Promise<void>;
+  completions: (prefix: string) => Array<{
+    value: string;
+    label: string;
+    description?: string;
+  }> | null;
   commandDescription: string;
+  selectorCalls: Array<{
+    title: string;
+    values: string[];
+    initialSearchInput: string;
+  }>;
+  selection?: Mode;
   startSession: () => void;
   compact: () => void;
   toggle: () => Promise<void>;
@@ -365,6 +418,7 @@ function createHarness(options: {
       ],
     entries: options.entries ?? [],
     ctx: {
+      hasUI: true,
       ui: {
         theme: { fg: (color, text) => `[${color}]${text}` },
         setStatus: (key, value) => {
@@ -372,6 +426,7 @@ function createHarness(options: {
         },
         notify: (message, type = "info") =>
           harness.notifies.push({ message, type }),
+        custom: async <T>() => harness.selection as T,
       },
       isIdle: () => harness.idle,
       sessionManager: { getEntries: () => harness.entries },
@@ -385,7 +440,11 @@ function createHarness(options: {
     command: async () => {
       throw new Error("mode command was not registered");
     },
+    completions: () => {
+      throw new Error("mode completions were not registered");
+    },
     commandDescription: "",
+    selectorCalls: [],
     startSession: () => {
       throw new Error("session_start handler was not registered");
     },
@@ -403,6 +462,7 @@ function createHarness(options: {
     },
   };
   const ctx = harness.ctx;
+  (ctx as any).__selectorCalls = harness.selectorCalls;
 
   let sessionStart: ((event: unknown, ctx: unknown) => void) | undefined;
   let sessionCompact: ((event: unknown, ctx: unknown) => void) | undefined;
@@ -449,12 +509,14 @@ function createHarness(options: {
       options: {
         description?: string;
         handler: (args: string, ctx: unknown) => Promise<void>;
+        getArgumentCompletions: Harness["completions"];
       },
     ) => {
       if (name !== "mode")
         throw new Error(`unexpected command registration: ${name}`);
       harness.commandDescription = options.description ?? "";
       harness.command = (args: string) => options.handler(args, ctx);
+      harness.completions = options.getArgumentCompletions;
     },
     appendEntry: (customType: string, data?: unknown) =>
       harness.appends.push({ customType, data }),
@@ -502,8 +564,21 @@ test("factory: registers only session events, the shortcut and the /mode command
   expect(h.shortcuts[0].description).toBe("Toggle builder/orchestrator mode");
   expect(typeof h.shortcuts[0].handler).toBe("function");
   expect(h.commandDescription).toBe(
-    "Toggle the session mode, or set it with /mode <builder|orchestrator>",
+    "Select the session mode, or set it with /mode <builder|orchestrator>",
   );
+});
+
+test("/mode completions preserve mode order and fuzzy-match values", () => {
+  const h = createHarness();
+
+  expect(h.completions("")).toEqual([
+    { value: "builder", label: "builder" },
+    { value: "orchestrator", label: "orchestrator" },
+  ]);
+  expect(h.completions("RCH")).toEqual([
+    { value: "orchestrator", label: "orchestrator" },
+  ]);
+  expect(h.completions("zzz")).toBeNull();
 });
 
 test("session_start: fresh session shows the builder label and injects nothing", () => {
@@ -835,20 +910,43 @@ test("toggle to builder with a non-prompt builder command: warns and changes not
   ]);
 });
 
-test("/mode with no argument toggles like the shortcut", async () => {
+test("/mode with no argument opens the selector without toggling", async () => {
   const h = createHarness();
   h.startSession();
+
   await h.command(" ");
 
+  expect(h.selectorCalls).toEqual([
+    {
+      title: "Select mode:",
+      values: ["builder", "orchestrator"],
+      initialSearchInput: "",
+    },
+  ]);
+  expect(h.sends).toEqual([]);
+  expect(h.appends).toEqual([]);
+  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
+});
+
+test("/mode partial input opens a prefilled selector and confirms through setMode", async () => {
+  const h = createHarness();
+  h.selection = "orchestrator";
+  h.startSession();
+
+  await h.command("  rch  ");
+
+  expect(h.selectorCalls).toEqual([
+    {
+      title: "Select mode:",
+      values: ["builder", "orchestrator"],
+      initialSearchInput: "rch",
+    },
+  ]);
   expect(h.sends).toEqual([
     { content: "/orchestrator", options: { expandPromptTemplates: true } },
   ]);
   expect(h.appends).toEqual([
     { customType: "mode-switch", data: { mode: "orchestrator" } },
-  ]);
-  expect(h.statuses).toEqual([
-    { key: "mode", value: "[muted]🔨" },
-    { key: "mode", value: "[accent]👑" },
   ]);
 });
 
@@ -932,19 +1030,45 @@ test("/mode builder from orchestrator: submits /builder", async () => {
   ]);
 });
 
-test("/mode with an unknown argument: warns available modes, changes nothing", async () => {
+test("/mode unmatched input opens a prefilled selector and cancellation is a no-op", async () => {
   const h = createHarness();
   h.startSession();
+
   await h.command("wizard");
 
+  expect(h.selectorCalls).toEqual([
+    {
+      title: "Select mode:",
+      values: ["builder", "orchestrator"],
+      initialSearchInput: "wizard",
+    },
+  ]);
   expect(h.sends).toEqual([]);
   expect(h.appends).toEqual([]);
   expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
-  expect(h.notifies).toEqual([
-    {
-      message: 'mode-switch: unknown mode "wizard" (available: builder, orchestrator)',
-      type: "warning",
-    },
+  expect(h.notifies).toEqual([]);
+});
+
+test("non-UI /mode rejects selector input but accepts an exact mode", async () => {
+  const h = createHarness();
+  h.ctx.hasUI = false;
+  h.startSession();
+
+  await expect(h.command("")).rejects.toThrow(
+    "/mode requires interactive UI when no exact mode is provided",
+  );
+  await expect(h.command("rch")).rejects.toThrow(
+    "/mode requires interactive UI when no exact mode is provided",
+  );
+  expect(h.selectorCalls).toEqual([]);
+
+  await h.command("orchestrator");
+
+  expect(h.sends).toEqual([
+    { content: "/orchestrator", options: { expandPromptTemplates: true } },
+  ]);
+  expect(h.appends).toEqual([
+    { customType: "mode-switch", data: { mode: "orchestrator" } },
   ]);
 });
 

@@ -26,6 +26,11 @@ import {
 } from "@earendil-works/pi-coding-agent";
 import { getApiProvider } from "@earendil-works/pi-ai/compat";
 import { Text } from "@earendil-works/pi-tui";
+import {
+  filterFuzzyItems,
+  selectFuzzyItem,
+  type FuzzySelectorItem,
+} from "../lib/fuzzy-selector.ts";
 
 type SummaryThinkingLevel = NonNullable<Parameters<typeof compact>[6]>;
 type ScopeEntry = { model: string; thinking?: SummaryThinkingLevel };
@@ -899,28 +904,46 @@ export default function scopeProvider(pi: any): void {
     handler: cycleScope,
   });
 
+  const scopeSelectorItems = (): FuzzySelectorItem[] =>
+    Object.keys(readScopeConfig()).map((value) => ({ value, label: value }));
+
   pi.registerCommand("scope", {
     description:
       "Select a preset with /scope, or switch directly with /scope <preset>",
+    getArgumentCompletions: (prefix: string) => {
+      const matches = filterFuzzyItems(scopeSelectorItems(), prefix);
+      if (matches.length === 0) return null;
+
+      return matches.map(({ value, label, description }) => ({
+        value,
+        label: label ?? value,
+        description,
+      }));
+    },
     handler: async (args: string, ctx: any) => {
       const name = args.trim();
+      const items = scopeSelectorItems();
 
-      if (!name) {
-        if (!ctx.hasUI) {
-          publishScopeNote(pi, `scope preset: ${state.preset}`);
-          return;
-        }
-
-        const selected = await ctx.ui.select(
-          "Select scope:",
-          Object.keys(readScopeConfig()),
-        );
-        if (selected === undefined) return;
-        await switchScope(selected, ctx);
+      if (items.some((item) => item.value === name)) {
+        await switchScope(name, ctx);
         return;
       }
 
-      await switchScope(name, ctx);
+      if (!ctx.hasUI) {
+        throw new Error(
+          "/scope requires interactive UI when no exact preset is provided",
+        );
+      }
+
+      const selected = await selectFuzzyItem(
+        ctx,
+        "Select scope:",
+        items,
+        name,
+      );
+      if (selected === undefined) return;
+
+      await switchScope(selected, ctx);
     },
   });
 }

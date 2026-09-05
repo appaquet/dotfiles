@@ -180,6 +180,12 @@ let
 
     {
       files = {
+        ".pi/agent/lib/fuzzy-selector.ts".source = ../lib/fuzzy-selector.ts;
+      };
+    }
+
+    {
+      files = {
         ".pi/agent/extensions/scope-provider.ts".source = ./scope-provider.ts;
       };
     }

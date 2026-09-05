@@ -8,6 +8,12 @@ fmt:
 check:
     ./x check
 
+pi-test:
+    cd home-manager/modules/agentic/pi && bun test --isolate plugins/*.test.ts lib/*.test.ts
+
+pi-test-one test:
+    cd home-manager/modules/agentic/pi && bun test "{{test}}"
+
 agent-build:
     ./x agent build
 

@@ -53,6 +53,11 @@ type ScopeEntry = { model: string; thinking?: string };
 type ScopePreset = { main: ScopeEntry; remap: Record<string, ScopeEntry> };
 type ScopeConfig = Record<string, ScopePreset>;
 type ScopeCommand = (args: string, ctx: TestContext) => Promise<void>;
+type ScopeCompletion = (prefix: string) => Array<{
+  value: string;
+  label: string;
+  description?: string;
+}> | null;
 type ScopeShortcut = (ctx: TestContext) => Promise<void>;
 type SessionStartHandler = (
   event: unknown,
@@ -82,7 +87,7 @@ type TestContext = {
   sessionManager: { getEntries: () => SessionEntry[] };
   ui: {
     setStatus: (key: string, value: string) => void;
-    select: (title: string, options: string[]) => Promise<string | undefined>;
+    custom: <T>(factory: (...args: any[]) => unknown) => Promise<T>;
   };
 };
 
@@ -176,6 +181,7 @@ type Harness = {
   startSession: () => Promise<void>;
   ctx: TestContext;
   command: ScopeCommand;
+  completions: ScopeCompletion;
   commandDescription: string;
   shortcuts: Array<{
     key: string;
@@ -191,7 +197,11 @@ type Harness = {
     (entry: { data: { text: string; error?: boolean } }, options: any, theme: any) => any
   >;
   statuses: StatusEvent[];
-  selectCalls: Array<{ title: string; options: string[] }>;
+  selectorCalls: Array<{
+    title: string;
+    values: string[];
+    initialSearchInput: string;
+  }>;
   selection?: string;
   appendEntryFailure?: Error;
   setStatusFailure?: Error;
@@ -230,6 +240,40 @@ class FakeText {
 
 mock.module("@earendil-works/pi-tui", () => ({
   Text: FakeText,
+}));
+
+const nodePath = process.env.NODE_PATH?.split(":")[0];
+if (!nodePath) throw new Error("NODE_PATH is required to load Pi's TUI package");
+const { fuzzyFilter: nativeFuzzyFilter } = await import(
+  join(nodePath, "@earendil-works/pi-tui/dist/fuzzy.js"),
+);
+
+mock.module("../lib/fuzzy-selector.ts", () => ({
+  filterFuzzyItems: (
+    items: Array<{ value: string; label?: string; description?: string }>,
+    query: string,
+  ) =>
+    query
+      ? nativeFuzzyFilter(items, query, (item) =>
+          [item.value, item.label ?? "", item.description ?? ""]
+            .filter(Boolean)
+            .join(" "),
+        )
+      : [...items],
+  selectFuzzyItem: async (
+    ctx: TestContext,
+    title: string,
+    items: Array<{ value: string }>,
+    initialSearchInput = "",
+  ) => {
+    const selectorCalls = (ctx as any).__selectorCalls as Harness["selectorCalls"];
+    selectorCalls.push({
+      title,
+      values: items.map((item) => item.value),
+      initialSearchInput,
+    });
+    return ctx.ui.custom<string>(() => undefined);
+  },
 }));
 
 mock.module("@earendil-works/pi-coding-agent", () => ({
@@ -340,8 +384,9 @@ async function createHarness(
   const sessionEntries = [...(options.sessionEntries ?? [])];
   const entryRenderers: Harness["entryRenderers"] = {};
   const statuses: StatusEvent[] = [];
-  const selectCalls: Array<{ title: string; options: string[] }> = [];
+  const selectorCalls: Harness["selectorCalls"] = [];
   let command: ScopeCommand | undefined;
+  let completions: ScopeCompletion | undefined;
   let sessionStart: SessionStartHandler | undefined;
   const shortcuts: Array<{
     key: string;
@@ -365,10 +410,7 @@ async function createHarness(
       modelRegistry: registry,
       sessionManager: { getEntries: () => [...sessionEntries] },
       ui: {
-        select: async (title, options) => {
-          selectCalls.push({ title, options });
-          return harness.selection;
-        },
+        custom: async <T>() => harness.selection as T,
         setStatus: (key, value) => {
           if (harness.setStatusFailure) throw harness.setStatusFailure;
           statuses.push({ key, value });
@@ -378,6 +420,9 @@ async function createHarness(
     command: async () => {
       throw new Error("scope command was not registered");
     },
+    completions: () => {
+      throw new Error("scope completions were not registered");
+    },
     commandDescription: "",
     shortcuts,
     summaryHandlers,
@@ -386,7 +431,7 @@ async function createHarness(
     sessionEntries,
     entryRenderers,
     statuses,
-    selectCalls,
+    selectorCalls,
     restoreFailure: false,
   };
   const pi = {
@@ -416,9 +461,14 @@ async function createHarness(
     },
     registerCommand: (
       _name: string,
-      registration: { description: string; handler: ScopeCommand },
+      registration: {
+        description: string;
+        handler: ScopeCommand;
+        getArgumentCompletions: ScopeCompletion;
+      },
     ) => {
       command = registration.handler;
+      completions = registration.getArgumentCompletions;
       harness.commandDescription = registration.description;
     },
     registerShortcut: (
@@ -448,16 +498,19 @@ async function createHarness(
     },
   };
 
+  (harness.ctx as any).__selectorCalls = selectorCalls;
+
   const module = await import(`./scope-provider.ts?${crypto.randomUUID()}`);
   module.default(pi);
   harness.factoryConfig = cloneProviderConfig(
     registry.getRegisteredProviderConfig("scoped"),
   );
-  if (!sessionStart || !command)
+  if (!sessionStart || !command || !completions)
     throw new Error("scope extension did not register its handlers");
   harness.sessionStart = sessionStart;
   harness.startSession = () => harness.sessionStart({}, harness.ctx);
   harness.command = command;
+  harness.completions = completions;
   if (!options.deferSessionStart) await harness.startSession();
   return harness;
 }
@@ -1062,6 +1115,24 @@ test("resolved aliases mark only scoped/main across preset refreshes", async () 
   });
 });
 
+test("scope completions use configured order and native fuzzy ranking", async () => {
+  const harness = await createHarness(selectorPresets, {
+    apiKeys: { old: "old-key" },
+    models: [target("old", "old-main", "Cloud main model")],
+  });
+
+  expect(harness.completions("")).toEqual([
+    { value: "codex", label: "codex" },
+    { value: "noauth", label: "noauth" },
+    { value: "unavailable", label: "unavailable" },
+    { value: "local", label: "local" },
+  ]);
+  expect(harness.completions("LC")).toEqual([
+    { value: "local", label: "local" },
+  ]);
+  expect(harness.completions("zzz")).toBeNull();
+});
+
 test("a UI selection uses configured order and the transactional switch path", async () => {
   const harness = await createHarness(selectorPresets, {
     apiKeys: { old: "old-key", next: "next-key" },
@@ -1077,10 +1148,11 @@ test("a UI selection uses configured order and the transactional switch path", a
   expect(harness.commandDescription).toBe(
     "Select a preset with /scope, or switch directly with /scope <preset>",
   );
-  expect(harness.selectCalls).toEqual([
+  expect(harness.selectorCalls).toEqual([
     {
       title: "Select scope:",
-      options: ["codex", "noauth", "unavailable", "local"],
+      values: ["codex", "noauth", "unavailable", "local"],
+      initialSearchInput: "",
     },
   ]);
   expect(harness.entries).toEqual([
@@ -1113,6 +1185,40 @@ test("a UI selection uses configured order and the transactional switch path", a
   });
 });
 
+test("partial and unmatched scope arguments open a prefilled selector", async () => {
+  const harness = await createHarness(presets, {
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: [
+      target("old", "old-main", "Cloud main model"),
+      target("next", "next-main", "Local main model"),
+    ],
+  });
+  harness.selection = "local";
+
+  await harness.command("  ocl  ", harness.ctx);
+
+  expect(harness.selectorCalls).toEqual([
+    {
+      title: "Select scope:",
+      values: ["codex", "noauth", "unavailable", "local"],
+      initialSearchInput: "ocl",
+    },
+  ]);
+  expect(harness.entries).toEqual([
+    { type: "custom", customType: "scoped", data: { text: "scope preset: local", error: false } },
+  ]);
+
+  harness.selection = undefined;
+  await harness.command("zzz", harness.ctx);
+
+  expect(harness.selectorCalls.at(-1)).toEqual({
+    title: "Select scope:",
+    values: ["codex", "noauth", "unavailable", "local"],
+    initialSearchInput: "zzz",
+  });
+  expect(harness.entries).toHaveLength(1);
+});
+
 test("cancelling the UI selector is a complete no-op", async () => {
   const harness = await createHarness(presets, {
     apiKeys: { old: "old-key", next: "next-key" },
@@ -1137,10 +1243,11 @@ test("cancelling the UI selector is a complete no-op", async () => {
 
   await harness.command("", harness.ctx);
 
-  expect(harness.selectCalls).toEqual([
+  expect(harness.selectorCalls).toEqual([
     {
       title: "Select scope:",
-      options: ["codex", "noauth", "unavailable", "local"],
+      values: ["codex", "noauth", "unavailable", "local"],
+      initialSearchInput: "",
     },
   ]);
   expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(
@@ -1175,10 +1282,11 @@ test("a selected current preset keeps direct same-preset behavior", async () => 
 
   await harness.command("", harness.ctx);
 
-  expect(harness.selectCalls).toEqual([
+  expect(harness.selectorCalls).toEqual([
     {
       title: "Select scope:",
-      options: ["codex", "noauth", "unavailable", "local"],
+      values: ["codex", "noauth", "unavailable", "local"],
+      initialSearchInput: "",
     },
   ]);
   expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(
@@ -1195,35 +1303,30 @@ test("a selected current preset keeps direct same-preset behavior", async () => 
   expect(harness.messages).toEqual([]);
 });
 
-test("non-UI no-argument scope falls back to the one-line notice", async () => {
+test("non-UI scope rejects selector-requiring input but accepts exact input", async () => {
   const harness = await createHarness(presets, {
-    apiKeys: { old: "old-key" },
-    models: [target("old", "old-main", "Cloud main model")],
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: [
+      target("old", "old-main", "Cloud main model"),
+      target("next", "next-main", "Local main model"),
+    ],
   });
   harness.ctx.hasUI = false;
-  const beforeConfig = cloneProviderConfig(
-    harness.registry.getRegisteredProviderConfig("scoped"),
-  );
-  const beforeModel = { ...harness.ctx.model };
-  const beforeThinking = harness.ctx.thinkingLevel;
-  const beforeStatuses = [...harness.statuses];
-  const beforeStream = await scopedStream(harness);
 
-  await harness.command("", harness.ctx);
-
-  expect(harness.selectCalls).toEqual([]);
-  expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(
-    beforeConfig,
+  await expect(harness.command("", harness.ctx)).rejects.toThrow(
+    "/scope requires interactive UI when no exact preset is provided",
   );
-  expect(harness.ctx.model).toEqual(beforeModel);
-  expect(harness.ctx.thinkingLevel).toBe(beforeThinking);
+  await expect(harness.command("loc", harness.ctx)).rejects.toThrow(
+    "/scope requires interactive UI when no exact preset is provided",
+  );
+  expect(harness.selectorCalls).toEqual([]);
+
+  await harness.command("local", harness.ctx);
+
   expect(harness.entries).toEqual([
-    { type: "custom", customType: "scoped", data: { text: "scope preset: codex", error: false } },
+    { type: "custom", customType: "scoped", data: { text: "scope preset: local", error: false } },
   ]);
-  expect(harness.messages).toEqual([]);
-  expect(harness.statuses).toEqual(beforeStatuses);
-  const afterStream = await scopedStream(harness);
-  expect(afterStream).toBe(beforeStream);
+  expect(harness.ctx.thinkingLevel).toBe("medium");
 });
 
 test("scope notices render one line and never use LLM-context messages", async () => {
@@ -1259,7 +1362,6 @@ test("scope notices render one line and never use LLM-context messages", async (
 
   await harness.command("local", harness.ctx);
   await harness.command("local", harness.ctx);
-  await harness.command("nope", harness.ctx);
 
   expect(harness.entries).toEqual([
     { type: "custom", customType: "scoped", data: { text: "scope preset: local", error: false } },
@@ -1267,14 +1369,6 @@ test("scope notices render one line and never use LLM-context messages", async (
       type: "custom",
       customType: "scoped",
       data: { text: 'already on preset "local"', error: false },
-    },
-    {
-      type: "custom",
-      customType: "scoped",
-      data: {
-        text: "unknown preset \"nope\" (available: codex, noauth, unavailable, local)",
-        error: true,
-      },
     },
   ]);
   // R1: no scope notice may reach LLM context as a session message.
@@ -1296,10 +1390,11 @@ test("a selected failed switch rolls back like a direct argument", async () => {
 
   await harness.command("", harness.ctx);
 
-  expect(harness.selectCalls).toEqual([
+  expect(harness.selectorCalls).toEqual([
     {
       title: "Select scope:",
-      options: ["codex", "noauth", "unavailable", "local"],
+      values: ["codex", "noauth", "unavailable", "local"],
+      initialSearchInput: "",
     },
   ]);
   expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(
