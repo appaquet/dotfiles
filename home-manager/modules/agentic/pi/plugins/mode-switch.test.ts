@@ -32,13 +32,17 @@ mock.module("../lib/fuzzy-selector.ts", () => ({
     ctx: HarnessCtx,
     title: string,
     items: Array<{ value: string }>,
-    initialSearchInput = "",
+    options: {
+      initialSearchInput?: string;
+      initialSelectedValue?: string;
+    } = {},
   ) => {
     const selectorCalls = (ctx as any).__selectorCalls as Harness["selectorCalls"];
     selectorCalls.push({
       title,
       values: items.map((item) => item.value),
-      initialSearchInput,
+      initialSearchInput: options.initialSearchInput ?? "",
+      initialSelectedValue: options.initialSelectedValue,
     });
     return ctx.ui.custom<string>(() => undefined);
   },
@@ -393,11 +397,12 @@ type Harness = {
     title: string;
     values: string[];
     initialSearchInput: string;
+    initialSelectedValue?: string;
   }>;
   selection?: Mode;
   startSession: () => void;
   compact: () => void;
-  toggle: () => Promise<void>;
+  shortcut: (selection?: Mode) => Promise<void>;
   toolCall: (event: unknown) => unknown;
   agentStart: () => unknown;
 };
@@ -451,7 +456,7 @@ function createHarness(options: {
     compact: () => {
       throw new Error("session_compact handler was not registered");
     },
-    toggle: async () => {
+    shortcut: async () => {
       throw new Error("shortcut handler was not registered");
     },
     toolCall: () => {
@@ -533,7 +538,10 @@ function createHarness(options: {
   if (previousAgentDir === undefined)
     delete process.env.PI_CODING_AGENT_DIR;
   else process.env.PI_CODING_AGENT_DIR = previousAgentDir;
-  harness.toggle = () => harness.shortcuts[0].handler(ctx);
+  harness.shortcut = async (selection) => {
+    harness.selection = selection;
+    await harness.shortcuts[0].handler(ctx);
+  };
   harness.startSession = () => {
     if (!sessionStart)
       throw new Error("session_start handler was not registered");
@@ -561,7 +569,7 @@ test("factory: registers only session events, the shortcut and the /mode command
 
   expect(h.shortcuts).toHaveLength(1);
   expect(h.shortcuts[0].key).toBe("ctrl+shift+m");
-  expect(h.shortcuts[0].description).toBe("Toggle builder/orchestrator mode");
+  expect(h.shortcuts[0].description).toBe("Select mode");
   expect(typeof h.shortcuts[0].handler).toBe("function");
   expect(h.commandDescription).toBe(
     "Select the session mode, or set it with /mode <builder|orchestrator>",
@@ -742,10 +750,75 @@ test("session_start: persisted builder entry wins over PI_MODE=orchestrator", ()
   expect(h.toolCall({ toolName: "read", input: { path: "src/app.ts" } })).toBeUndefined();
 });
 
-test("toggle builder -> orchestrator while idle: submits /orchestrator, persists, relabels, notifies", async () => {
+test("mode shortcut opens the current-mode picker and cancellation changes no state", async () => {
+  const h = createHarness();
+  h.startSession();
+
+  await h.shortcut();
+
+  expect(h.selectorCalls).toEqual([
+    {
+      title: "Select mode:",
+      values: ["builder", "orchestrator"],
+      initialSearchInput: "",
+      initialSelectedValue: "builder",
+    },
+  ]);
+  expect(h.sends).toEqual([]);
+  expect(h.appends).toEqual([]);
+  expect(h.modeChanges).toEqual([]);
+  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
+  expect(h.notifies).toEqual([]);
+});
+
+test("mode shortcut highlights a restored orchestrator mode", async () => {
+  const h = createHarness({
+    entries: [
+      {
+        type: "custom",
+        customType: "mode-switch",
+        data: { mode: "orchestrator" },
+      },
+    ],
+  });
+  h.startSession();
+
+  await h.shortcut();
+
+  expect(h.selectorCalls).toEqual([
+    {
+      title: "Select mode:",
+      values: ["builder", "orchestrator"],
+      initialSearchInput: "",
+      initialSelectedValue: "orchestrator",
+    },
+  ]);
+  expect(h.sends).toEqual([]);
+  expect(h.appends).toEqual([]);
+  expect(h.modeChanges).toEqual([]);
+  expect(h.statuses).toEqual([{ key: "mode", value: "[accent]👑" }]);
+  expect(h.notifies).toEqual([]);
+});
+
+test("mode shortcut selecting the current mode preserves no-op feedback", async () => {
+  const h = createHarness();
+  h.startSession();
+
+  await h.shortcut("builder");
+
+  expect(h.sends).toEqual([]);
+  expect(h.appends).toEqual([]);
+  expect(h.modeChanges).toEqual([]);
+  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
+  expect(h.notifies).toEqual([
+    { message: "mode-switch: already on builder", type: "info" },
+  ]);
+});
+
+test("mode shortcut selects orchestrator while idle: submits, persists, relabels, and notifies", async () => {
   const h = createHarness({ idle: true });
   h.startSession();
-  await h.toggle();
+  await h.shortcut("orchestrator");
 
   expect(h.sends).toEqual([
     { content: "/orchestrator", options: { expandPromptTemplates: true } },
@@ -762,20 +835,20 @@ test("toggle builder -> orchestrator while idle: submits /orchestrator, persists
   ]);
 });
 
-test("toggle builder -> orchestrator emits the changed mode", async () => {
+test("mode shortcut emits the selected mode", async () => {
   const h = createHarness();
   h.startSession();
-  await h.toggle();
+  await h.shortcut("orchestrator");
 
   expect(h.modeChanges).toEqual([
     { event: "mode-switch:changed", data: { mode: "orchestrator" } },
   ]);
 });
 
-test("toggle builder -> orchestrator while streaming: queues the message as a followUp", async () => {
+test("mode shortcut while streaming queues the selected mode as a followUp", async () => {
   const h = createHarness({ idle: false });
   h.startSession();
-  await h.toggle();
+  await h.shortcut("orchestrator");
 
   expect(h.sends).toEqual([
     {
@@ -788,11 +861,11 @@ test("toggle builder -> orchestrator while streaming: queues the message as a fo
   ]);
 });
 
-test("toggle orchestrator -> builder: submits /builder, persists, relabels, notifies", async () => {
+test("mode shortcut selects builder from orchestrator", async () => {
   const h = createHarness();
   h.startSession();
-  await h.toggle();
-  await h.toggle();
+  await h.shortcut("orchestrator");
+  await h.shortcut("builder");
 
   expect(h.sends).toEqual([
     { content: "/orchestrator", options: { expandPromptTemplates: true } },
@@ -813,11 +886,11 @@ test("toggle orchestrator -> builder: submits /builder, persists, relabels, noti
   ]);
 });
 
-test("toggle orchestrator -> builder while streaming: queues the message as a followUp", async () => {
+test("mode shortcut selects builder while streaming as a followUp", async () => {
   const h = createHarness({ idle: false });
   h.startSession();
-  await h.toggle();
-  await h.toggle();
+  await h.shortcut("orchestrator");
+  await h.shortcut("builder");
 
   expect(h.sends).toEqual([
     {
@@ -831,10 +904,10 @@ test("toggle orchestrator -> builder while streaming: queues the message as a fo
   ]);
 });
 
-test("toggle to orchestrator without the template: warns and changes nothing", async () => {
+test("mode shortcut selecting orchestrator without the template warns and changes nothing", async () => {
   const h = createHarness({ commands: [] });
   h.startSession();
-  await h.toggle();
+  await h.shortcut("orchestrator");
 
   expect(h.sends).toEqual([]);
   expect(h.appends).toEqual([]);
@@ -847,12 +920,12 @@ test("toggle to orchestrator without the template: warns and changes nothing", a
   ]);
 });
 
-test("toggle to orchestrator with a non-prompt orchestrator command: warns and changes nothing", async () => {
+test("mode shortcut selecting a non-prompt orchestrator command warns and changes nothing", async () => {
   const h = createHarness({
     commands: [{ name: "orchestrator", source: "extension" }],
   });
   h.startSession();
-  await h.toggle();
+  await h.shortcut("orchestrator");
 
   expect(h.sends).toEqual([]);
   expect(h.appends).toEqual([]);
@@ -865,7 +938,7 @@ test("toggle to orchestrator with a non-prompt orchestrator command: warns and c
   ]);
 });
 
-test("toggle to builder without the template: warns and changes nothing", async () => {
+test("mode shortcut selecting builder without the template warns and changes nothing", async () => {
   const h = createHarness({
     entries: [
       { type: "custom", customType: "mode-switch", data: { mode: "orchestrator" } },
@@ -873,7 +946,7 @@ test("toggle to builder without the template: warns and changes nothing", async 
     commands: [{ name: "orchestrator", source: "prompt" }],
   });
   h.startSession();
-  await h.toggle();
+  await h.shortcut("builder");
 
   expect(h.sends).toEqual([]);
   expect(h.appends).toEqual([]);
@@ -886,7 +959,7 @@ test("toggle to builder without the template: warns and changes nothing", async 
   ]);
 });
 
-test("toggle to builder with a non-prompt builder command: warns and changes nothing", async () => {
+test("mode shortcut selecting a non-prompt builder command warns and changes nothing", async () => {
   const h = createHarness({
     entries: [
       { type: "custom", customType: "mode-switch", data: { mode: "orchestrator" } },
@@ -897,7 +970,7 @@ test("toggle to builder with a non-prompt builder command: warns and changes not
     ],
   });
   h.startSession();
-  await h.toggle();
+  await h.shortcut("builder");
 
   expect(h.sends).toEqual([]);
   expect(h.appends).toEqual([]);
@@ -921,6 +994,7 @@ test("/mode with no argument opens the selector without toggling", async () => {
       title: "Select mode:",
       values: ["builder", "orchestrator"],
       initialSearchInput: "",
+      initialSelectedValue: "builder",
     },
   ]);
   expect(h.sends).toEqual([]);
@@ -940,6 +1014,7 @@ test("/mode partial input opens a prefilled selector and confirms through setMod
       title: "Select mode:",
       values: ["builder", "orchestrator"],
       initialSearchInput: "rch",
+      initialSelectedValue: "builder",
     },
   ]);
   expect(h.sends).toEqual([
@@ -1041,6 +1116,7 @@ test("/mode unmatched input opens a prefilled selector and cancellation is a no-
       title: "Select mode:",
       values: ["builder", "orchestrator"],
       initialSearchInput: "wizard",
+      initialSelectedValue: "builder",
     },
   ]);
   expect(h.sends).toEqual([]);
@@ -1075,7 +1151,7 @@ test("non-UI /mode rejects selector input but accepts an exact mode", async () =
 test("persisted switches restore in a fresh session over the same entries", async () => {
   const first = createHarness();
   first.startSession();
-  await first.toggle();
+  await first.shortcut("orchestrator");
 
   const resumed = createHarness({
     entries: first.appends.map((a) => ({
@@ -1169,13 +1245,13 @@ test("factory: unknown tools and missing paths never block in orchestrator mode"
   expect(h.toolCall({ toolName: "read", input: {} })).toBeUndefined();
 });
 
-test("factory: live toggle arms the gate and toggling back disarms it", async () => {
+test("factory: shortcut mode selection arms and disarms the gate", async () => {
   const h = createHarness();
   h.startSession();
   expect(h.toolCall({ toolName: "edit", input: { path: "x.ts" } })).toBeUndefined();
-  await h.toggle();
+  await h.shortcut("orchestrator");
   expect(blocked(h.toolCall({ toolName: "edit", input: { path: "x.ts" } }))).toBe(true);
-  await h.toggle();
+  await h.shortcut("builder");
   expect(h.toolCall({ toolName: "edit", input: { path: "x.ts" } })).toBeUndefined();
 });
 
@@ -1183,20 +1259,20 @@ test("factory: reminder fires on turn ten and never in builder mode", async () =
   const h = createHarness();
   h.startSession();
   expect(h.agentStart()).toBeUndefined();
-  await h.toggle();
+  await h.shortcut("orchestrator");
   // Entering orchestrator consumes its immediate reminder before the interval counts.
   expect(h.agentStart()).toEqual(REMINDER_MESSAGE);
   for (let i = 0; i < 9; i++) expect(h.agentStart()).toBeUndefined();
   expect(h.agentStart()).toEqual(REMINDER_MESSAGE);
   expect(h.agentStart()).toBeUndefined();
-  await h.toggle();
+  await h.shortcut("builder");
   expect(h.agentStart()).toBeUndefined();
 });
 
 test("factory: reminder is immediate when switching into orchestrator", async () => {
   const h = createHarness();
   h.startSession();
-  await h.toggle();
+  await h.shortcut("orchestrator");
 
   expect(h.agentStart()).toEqual(REMINDER_MESSAGE);
   expect(h.agentStart()).toBeUndefined();
@@ -1221,7 +1297,7 @@ test("readReminderInterval: honors mode-switch.json and falls back on malformed 
 
   const h = createHarness({ agentDir: dir });
   h.startSession();
-  await h.toggle();
+  await h.shortcut("orchestrator");
   expect(h.agentStart()).toEqual(REMINDER_MESSAGE); // immediate on switch
   expect(h.agentStart()).toBeUndefined();
   expect(h.agentStart()).toEqual(REMINDER_MESSAGE); // custom interval of 2

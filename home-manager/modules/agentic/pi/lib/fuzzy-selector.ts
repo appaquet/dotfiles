@@ -18,6 +18,11 @@ export type FuzzySelectorItem = {
   description?: string;
 };
 
+export type FuzzySelectorOptions = {
+  initialSearchInput?: string;
+  initialSelectedValue?: string;
+};
+
 /**
  * Interactive fuzzy selector for small extension-owned value lists. It keeps
  * matching generic while exposing only the selected value to command handlers.
@@ -50,7 +55,7 @@ export class FuzzySelectorComponent extends Container {
     keybindings: KeybindingsManager,
     title: string,
     items: readonly FuzzySelectorItem[],
-    initialSearchInput: string,
+    options: FuzzySelectorOptions,
     done: (value: string | undefined) => void,
   ) {
     super();
@@ -59,7 +64,13 @@ export class FuzzySelectorComponent extends Container {
     this.keybindings = keybindings;
     this.items = items;
     this.done = done;
+
+    const { initialSearchInput = "", initialSelectedValue } = options;
     this.filteredItems = filterFuzzyItems(items, initialSearchInput);
+    const initialSelectedIndex = this.filteredItems.findIndex(
+      (item) => item.value === initialSelectedValue,
+    );
+    if (initialSelectedIndex >= 0) this.selectedIndex = initialSelectedIndex;
 
     this.addChild(new Text(theme.bold(title), 0, 0));
     this.addChild(new Spacer(1));
@@ -222,7 +233,7 @@ export function selectFuzzyItem(
   ctx: Pick<ExtensionContext, "ui">,
   title: string,
   items: readonly FuzzySelectorItem[],
-  initialSearchInput = "",
+  options: FuzzySelectorOptions = {},
 ): Promise<string | undefined> {
   return ctx.ui.custom<string | undefined>((tui, theme, keybindings, done) =>
     new FuzzySelectorComponent(
@@ -231,7 +242,7 @@ export function selectFuzzyItem(
       keybindings,
       title,
       items,
-      initialSearchInput,
+      options,
       done,
     ),
   );

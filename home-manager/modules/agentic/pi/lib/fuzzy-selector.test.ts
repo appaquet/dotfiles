@@ -1,6 +1,9 @@
 import { expect, mock, test } from "bun:test";
 import { join } from "node:path";
-import type { FuzzySelectorItem } from "./fuzzy-selector.ts";
+import type {
+  FuzzySelectorItem,
+  FuzzySelectorOptions,
+} from "./fuzzy-selector.ts";
 
 const nodePath = process.env.NODE_PATH?.split(":")[0];
 if (!nodePath) throw new Error("NODE_PATH is required to load Pi's TUI package");
@@ -69,7 +72,7 @@ const ITEMS: readonly FuzzySelectorItem[] = [
 ];
 
 function createComponent(
-  initialSearchInput = "",
+  options: FuzzySelectorOptions = {},
   done: (value: string | undefined) => void = () => {},
 ): InstanceType<typeof FuzzySelectorComponent> {
   const tui = { requestRender: () => {} };
@@ -87,7 +90,7 @@ function createComponent(
     keybindings as any,
     "Select mode:",
     ITEMS,
-    initialSearchInput,
+    options,
     done,
   );
 }
@@ -108,16 +111,53 @@ test("filterFuzzyItems uses native case-insensitive non-prefix ranking", () => {
 
 test("initial search input filters before confirmation", () => {
   const completed: Array<string | undefined> = [];
-  const component = createComponent("RCH", (value) => completed.push(value));
+  const component = createComponent(
+    { initialSearchInput: "RCH" },
+    (value) => completed.push(value),
+  );
 
   component.handleInput("tui.select.confirm");
 
   expect(completed).toEqual(["orchestrator"]);
 });
 
+test("initial selected value is highlighted without reordering items", () => {
+  const completed: Array<string | undefined> = [];
+  const component = createComponent(
+    { initialSelectedValue: "orchestrator" },
+    (value) => completed.push(value),
+  );
+
+  component.handleInput("tui.select.confirm");
+
+  expect(completed).toEqual(["orchestrator"]);
+});
+
+test("missing or filtered initial selected value falls back to the best match", () => {
+  const missing: Array<string | undefined> = [];
+  const missingComponent = createComponent(
+    { initialSelectedValue: "missing" },
+    (value) => missing.push(value),
+  );
+  const filtered: Array<string | undefined> = [];
+  const filteredComponent = createComponent(
+    {
+      initialSearchInput: "RCH",
+      initialSelectedValue: "builder",
+    },
+    (value) => filtered.push(value),
+  );
+
+  missingComponent.handleInput("tui.select.confirm");
+  filteredComponent.handleInput("tui.select.confirm");
+
+  expect(missing).toEqual(["builder"]);
+  expect(filtered).toEqual(["orchestrator"]);
+});
+
 test("input edits update filtering and select the best current match", () => {
   const completed: Array<string | undefined> = [];
-  const component = createComponent("", (value) => completed.push(value));
+  const component = createComponent({}, (value) => completed.push(value));
 
   component.handleInput("v");
   component.handleInput("w");
@@ -128,7 +168,10 @@ test("input edits update filtering and select the best current match", () => {
 
 test("arrow input changes the selected fuzzy result", () => {
   const completed: Array<string | undefined> = [];
-  const component = createComponent("d", (value) => completed.push(value));
+  const component = createComponent(
+    { initialSearchInput: "d" },
+    (value) => completed.push(value),
+  );
 
   component.handleInput("tui.select.down");
   component.handleInput("tui.select.confirm");
@@ -138,7 +181,10 @@ test("arrow input changes the selected fuzzy result", () => {
 
 test("Enter with no matches keeps the selector unresolved", () => {
   const completed: Array<string | undefined> = [];
-  const component = createComponent("zzz", (value) => completed.push(value));
+  const component = createComponent(
+    { initialSearchInput: "zzz" },
+    (value) => completed.push(value),
+  );
 
   component.handleInput("tui.select.confirm");
 
@@ -147,34 +193,44 @@ test("Enter with no matches keeps the selector unresolved", () => {
 
 test("cancel resolves undefined", () => {
   const completed: Array<string | undefined> = [];
-  const component = createComponent("", (value) => completed.push(value));
+  const component = createComponent({}, (value) => completed.push(value));
 
   component.handleInput("tui.select.cancel");
 
   expect(completed).toEqual([undefined]);
 });
 
-test("selectFuzzyItem forwards the selector contract to custom UI", async () => {
-  let factoryResult: unknown;
+test("selectFuzzyItem forwards named selector options to custom UI", async () => {
+  let factoryResult: InstanceType<typeof FuzzySelectorComponent> | undefined;
   const ctx = {
     ui: {
-      custom: async (factory: (...args: any[]) => unknown) => {
+      custom: async (
+        factory: (...args: any[]) => InstanceType<typeof FuzzySelectorComponent>,
+      ) => {
+        let selected: string | undefined;
         factoryResult = factory(
           { requestRender: () => {} },
           {
             fg: (_color: string, text: string) => text,
             bold: (text: string) => text,
           },
-          { matches: () => false },
-          () => {},
+          {
+            matches: (input: string, action: string) => input === action,
+          },
+          (value: string | undefined) => {
+            selected = value;
+          },
         );
-        return "builder";
+        factoryResult.handleInput("tui.select.confirm");
+        return selected;
       },
     },
   };
 
   await expect(
-    selectFuzzyItem(ctx as any, "Select mode:", ITEMS, "bld"),
-  ).resolves.toBe("builder");
+    selectFuzzyItem(ctx as any, "Select mode:", ITEMS, {
+      initialSelectedValue: "orchestrator",
+    }),
+  ).resolves.toBe("orchestrator");
   expect(factoryResult).toBeInstanceOf(FuzzySelectorComponent);
 });

@@ -201,6 +201,7 @@ type Harness = {
     title: string;
     values: string[];
     initialSearchInput: string;
+    initialSelectedValue?: string;
   }>;
   selection?: string;
   appendEntryFailure?: Error;
@@ -264,13 +265,17 @@ mock.module("../lib/fuzzy-selector.ts", () => ({
     ctx: TestContext,
     title: string,
     items: Array<{ value: string }>,
-    initialSearchInput = "",
+    options: {
+      initialSearchInput?: string;
+      initialSelectedValue?: string;
+    } = {},
   ) => {
     const selectorCalls = (ctx as any).__selectorCalls as Harness["selectorCalls"];
     selectorCalls.push({
       title,
       values: items.map((item) => item.value),
-      initialSearchInput,
+      initialSearchInput: options.initialSearchInput ?? "",
+      initialSelectedValue: options.initialSelectedValue,
     });
     return ctx.ui.custom<string>(() => undefined);
   },
@@ -659,7 +664,7 @@ function modelIdentity(model: Model | undefined):
   };
 }
 
-test("registers the fixed scope cycling shortcut", async () => {
+test("registers the fixed scope selection shortcut", async () => {
   const harness = await createHarness(shortcutPresets, {
     apiKeys: { old: "old-key", next: "next-key" },
     models: [
@@ -671,11 +676,11 @@ test("registers the fixed scope cycling shortcut", async () => {
   expect(harness.shortcuts).toHaveLength(1);
   expect(harness.shortcuts[0]).toMatchObject({
     key: "ctrl+shift+z",
-    description: "Cycle scope preset",
+    description: "Select scope",
   });
 });
 
-test("cycles scopes in configured order and wraps around", async () => {
+test("scope shortcut cancellation keeps the current scope unchanged", async () => {
   const harness = await createHarness(shortcutPresets, {
     apiKeys: { old: "old-key", next: "next-key" },
     models: [
@@ -683,9 +688,112 @@ test("cycles scopes in configured order and wraps around", async () => {
       target("next", "next-main", "Local main model"),
     ],
   });
-  const cycle = harness.shortcuts[0].handler;
+  const previous = cloneProviderConfig(
+    harness.registry.getRegisteredProviderConfig("scoped"),
+  );
 
-  await cycle(harness.ctx);
+  await harness.shortcuts[0].handler(harness.ctx);
+
+  expect(harness.selectorCalls).toEqual([
+    {
+      title: "Select scope:",
+      values: ["codex", "local"],
+      initialSearchInput: "",
+      initialSelectedValue: "codex",
+    },
+  ]);
+  expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(
+    previous,
+  );
+  expect(harness.ctx.model).toEqual({ provider: "scoped", id: "main" });
+  expect(harness.ctx.thinkingLevel).toBe("medium");
+  expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
+  expect(harness.entries).toEqual([]);
+  expect(harness.messages).toEqual([]);
+  expect((globalThis as Record<string, unknown>).activePreset).toBe("codex");
+});
+
+test("scope shortcut selecting the current preset preserves no-op feedback", async () => {
+  const harness = await createHarness(shortcutPresets, {
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: [
+      target("old", "old-main", "Cloud main model"),
+      target("next", "next-main", "Local main model"),
+    ],
+  });
+  harness.selection = "codex";
+  const previous = cloneProviderConfig(
+    harness.registry.getRegisteredProviderConfig("scoped"),
+  );
+
+  await harness.shortcuts[0].handler(harness.ctx);
+
+  expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(
+    previous,
+  );
+  expect(harness.statuses).toEqual([{ key: "scope", value: "scope:codex" }]);
+  expect(harness.entries).toEqual([
+    {
+      type: "custom",
+      customType: "scoped",
+      data: { text: 'already on preset "codex"', error: false },
+    },
+  ]);
+  expect(harness.messages).toEqual([]);
+});
+
+test("empty scope configuration reports an error for shortcut and command", async () => {
+  const harness = await createHarness({});
+  const beforeStatuses = [...harness.statuses];
+  const beforeEntries = [...harness.entries];
+
+  await harness.shortcuts[0].handler(harness.ctx);
+  await harness.command("", harness.ctx);
+
+  expect(harness.selectorCalls).toEqual([]);
+  expect(harness.statuses).toEqual(beforeStatuses);
+  expect(harness.entries.slice(beforeEntries.length)).toEqual([
+    {
+      type: "custom",
+      customType: "scoped",
+      data: {
+        text: "scope: ERROR — no scope presets are configured; add scopeProvider settings before selecting a scope.",
+        error: true,
+      },
+    },
+    {
+      type: "custom",
+      customType: "scoped",
+      data: {
+        text: "scope: ERROR — no scope presets are configured; add scopeProvider settings before selecting a scope.",
+        error: true,
+      },
+    },
+  ]);
+  expect(harness.messages).toEqual([]);
+});
+
+test("scope shortcut opens configured order and switches only after selection", async () => {
+  const harness = await createHarness(shortcutPresets, {
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: [
+      target("old", "old-main", "Cloud main model"),
+      target("next", "next-main", "Local main model"),
+    ],
+  });
+  const selectScope = harness.shortcuts[0].handler;
+  harness.selection = "local";
+
+  await selectScope(harness.ctx);
+
+  expect(harness.selectorCalls).toEqual([
+    {
+      title: "Select scope:",
+      values: ["codex", "local"],
+      initialSearchInput: "",
+      initialSelectedValue: "codex",
+    },
+  ]);
 
   expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe(
     "next-key",
@@ -711,8 +819,15 @@ test("cycles scopes in configured order and wraps around", async () => {
     model: { provider: "next", id: "next-main" },
   });
 
-  await cycle(harness.ctx);
+  harness.selection = "codex";
+  await selectScope(harness.ctx);
 
+  expect(harness.selectorCalls.at(-1)).toEqual({
+    title: "Select scope:",
+    values: ["codex", "local"],
+    initialSearchInput: "",
+    initialSelectedValue: "local",
+  });
   expect(harness.registry.getRegisteredProviderConfig("scoped")?.apiKey).toBe(
     "old-key",
   );
@@ -740,7 +855,7 @@ test("cycles scopes in configured order and wraps around", async () => {
   });
 });
 
-test("a failed next scope keeps the existing transaction rollback", async () => {
+test("a failed shortcut scope selection keeps the existing transaction rollback", async () => {
   const harness = await createHarness(presets, {
     apiKeys: { old: "old-key", noauth: undefined },
     models: [
@@ -748,13 +863,22 @@ test("a failed next scope keeps the existing transaction rollback", async () => 
       target("noauth", "noauth-main", "Unauthenticated main model"),
     ],
   });
-  const cycle = harness.shortcuts[0].handler;
+  const selectScope = harness.shortcuts[0].handler;
+  harness.selection = "noauth";
   const previous = cloneProviderConfig(
     harness.registry.getRegisteredProviderConfig("scoped"),
   );
 
-  await cycle(harness.ctx);
+  await selectScope(harness.ctx);
 
+  expect(harness.selectorCalls).toEqual([
+    {
+      title: "Select scope:",
+      values: ["codex", "noauth", "unavailable", "local"],
+      initialSearchInput: "",
+      initialSelectedValue: "codex",
+    },
+  ]);
   expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(
     previous,
   );
@@ -1153,6 +1277,7 @@ test("a UI selection uses configured order and the transactional switch path", a
       title: "Select scope:",
       values: ["codex", "noauth", "unavailable", "local"],
       initialSearchInput: "",
+      initialSelectedValue: "codex",
     },
   ]);
   expect(harness.entries).toEqual([
@@ -1202,6 +1327,7 @@ test("partial and unmatched scope arguments open a prefilled selector", async ()
       title: "Select scope:",
       values: ["codex", "noauth", "unavailable", "local"],
       initialSearchInput: "ocl",
+      initialSelectedValue: "codex",
     },
   ]);
   expect(harness.entries).toEqual([
@@ -1215,6 +1341,7 @@ test("partial and unmatched scope arguments open a prefilled selector", async ()
     title: "Select scope:",
     values: ["codex", "noauth", "unavailable", "local"],
     initialSearchInput: "zzz",
+    initialSelectedValue: "local",
   });
   expect(harness.entries).toHaveLength(1);
 });
@@ -1248,6 +1375,7 @@ test("cancelling the UI selector is a complete no-op", async () => {
       title: "Select scope:",
       values: ["codex", "noauth", "unavailable", "local"],
       initialSearchInput: "",
+      initialSelectedValue: "codex",
     },
   ]);
   expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(
@@ -1287,6 +1415,7 @@ test("a selected current preset keeps direct same-preset behavior", async () => 
       title: "Select scope:",
       values: ["codex", "noauth", "unavailable", "local"],
       initialSearchInput: "",
+      initialSelectedValue: "codex",
     },
   ]);
   expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(
@@ -1395,6 +1524,7 @@ test("a selected failed switch rolls back like a direct argument", async () => {
       title: "Select scope:",
       values: ["codex", "noauth", "unavailable", "local"],
       initialSearchInput: "",
+      initialSelectedValue: "codex",
     },
   ]);
   expect(harness.registry.getRegisteredProviderConfig("scoped")).toEqual(

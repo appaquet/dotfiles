@@ -1,8 +1,8 @@
 /**
  * Mode switch and orchestrator guard extension.
  *
- * The footer always shows the current session mode. `ctrl+shift+m` toggles it;
- * `/mode` opens a fuzzy selector, and `/mode <builder|orchestrator>` sets it
+ * The footer always shows the current session mode. `ctrl+shift+m` and `/mode`
+ * open a fuzzy selector, and `/mode <builder|orchestrator>` sets it
  * explicitly. At launch the `PI_MODE` env var (builder|orchestrator) selects
  * the initial mode of a session with no persisted mode entry (analog of
  * `PI_SCOPE` for scope presets); on resume/fork the persisted entry wins.
@@ -280,8 +280,23 @@ export default function modeSwitch(pi: ExtensionAPI): void {
     ctx.ui.notify(`mode-switch: ${mode}`, "info");
   }
 
-  function toggleMode(ctx: ExtensionContext): void {
-    setMode(ctx, mode === "builder" ? "orchestrator" : "builder");
+  const modeSelectorItems: readonly FuzzySelectorItem[] = MODES.map(
+    (value) => ({ value, label: value }),
+  );
+
+  async function selectMode(
+    ctx: ExtensionContext,
+    initialSearchInput = "",
+  ): Promise<void> {
+    const selected = await selectFuzzyItem(
+      ctx,
+      "Select mode:",
+      modeSelectorItems,
+      { initialSearchInput, initialSelectedValue: mode },
+    );
+    if (selected === undefined) return;
+
+    setMode(ctx, selected as Mode);
   }
 
   pi.on("session_start", (_event, ctx) => restore(ctx));
@@ -309,15 +324,9 @@ export default function modeSwitch(pi: ExtensionAPI): void {
   });
 
   pi.registerShortcut("ctrl+shift+m", {
-    description: "Toggle builder/orchestrator mode",
-    handler: async (ctx) => {
-      toggleMode(ctx);
-    },
+    description: "Select mode",
+    handler: selectMode,
   });
-
-  const modeSelectorItems: readonly FuzzySelectorItem[] = MODES.map(
-    (value) => ({ value, label: value }),
-  );
 
   pi.registerCommand("mode", {
     description:
@@ -346,15 +355,7 @@ export default function modeSwitch(pi: ExtensionAPI): void {
         );
       }
 
-      const selected = await selectFuzzyItem(
-        ctx,
-        "Select mode:",
-        modeSelectorItems,
-        parsed.query,
-      );
-      if (selected === undefined) return;
-
-      await setMode(ctx, selected as Mode);
+      await selectMode(ctx, parsed.query);
     },
   });
 }

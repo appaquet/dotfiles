@@ -883,29 +883,36 @@ export default function scopeProvider(pi: any): void {
     publishScopeNote(pi, `scope preset: ${name}`);
   };
 
-  const cycleScope = async (ctx: any): Promise<void> => {
-    const names = Object.keys(readScopeConfig());
-    if (names.length === 0) {
+  const scopeSelectorItems = (): FuzzySelectorItem[] =>
+    Object.keys(readScopeConfig()).map((value) => ({ value, label: value }));
+
+  const selectScope = async (
+    ctx: any,
+    initialSearchInput = "",
+  ): Promise<void> => {
+    const items = scopeSelectorItems();
+    if (items.length === 0) {
       publishScopeNote(
         pi,
-        "scope: ERROR — no scope presets are configured; add scopeProvider settings before cycling.",
+        "scope: ERROR — no scope presets are configured; add scopeProvider settings before selecting a scope.",
         true,
       );
       return;
     }
 
-    const currentIndex = names.indexOf(state.preset);
-    const next = names[(currentIndex + 1) % names.length];
-    await switchScope(next, ctx);
+    const selected = await selectFuzzyItem(ctx, "Select scope:", items, {
+      initialSearchInput,
+      initialSelectedValue: state.preset,
+    });
+    if (selected === undefined) return;
+
+    await switchScope(selected, ctx);
   };
 
   pi.registerShortcut("ctrl+shift+z", {
-    description: "Cycle scope preset",
-    handler: cycleScope,
+    description: "Select scope",
+    handler: selectScope,
   });
-
-  const scopeSelectorItems = (): FuzzySelectorItem[] =>
-    Object.keys(readScopeConfig()).map((value) => ({ value, label: value }));
 
   pi.registerCommand("scope", {
     description:
@@ -935,15 +942,7 @@ export default function scopeProvider(pi: any): void {
         );
       }
 
-      const selected = await selectFuzzyItem(
-        ctx,
-        "Select scope:",
-        items,
-        name,
-      );
-      if (selected === undefined) return;
-
-      await switchScope(selected, ctx);
+      await selectScope(ctx, name);
     },
   });
 }
