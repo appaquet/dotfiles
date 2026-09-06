@@ -59,7 +59,7 @@ let
 
     # https://github.com/juicesharp/rpiv-mono
     {
-      package = "npm:@juicesharp/rpiv-ask-user-question@2.7.1";
+      package = "npm:@juicesharp/rpiv-ask-user-question@2.9.0";
     }
 
     # https://github.com/nicobailon/pi-web-access
@@ -79,7 +79,7 @@ let
 
     # https://github.com/nicobailon/pi-mcp-adapter
     {
-      package = "npm:pi-mcp-adapter@2.31.0";
+      package = "npm:pi-mcp-adapter@2.32.1";
       files = {
         ".pi/agent/mcp.json".text = builtins.toJSON {
           scriptMode = false;
