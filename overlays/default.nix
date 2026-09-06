@@ -10,9 +10,6 @@ let
 
       jujutsu = final.callPackage ./jj { };
 
-      #markdown-oxide = final.callPackage ./markdown-oxide { };
-
-      #nono = final.callPackage ./nono { };
       nono = inputs.llm-agents.packages.${system}.nono;
 
       opencode = inputs.llm-agents.packages.${system}.opencode;
@@ -21,7 +18,6 @@ let
       codex = inputs.llm-agents.packages.${system}.codex;
       ccusage = inputs.llm-agents.packages.${system}.ccusage;
 
-      # claude-code = final.callPackage ./claude-code/package.nix { };
       claude-code = inputs.llm-agents.packages.${system}.claude-code;
     };
 

@@ -455,18 +455,6 @@ cmd_update() {
     nix-channel --update
     with_local_flake_note nix flake update "$(local_flake_ref)"
 
-    read -r -p "Do you want to update all shells? (y/n): " confirm
-    if [[ "$confirm" == [yY] ]]; then
-      echo "Updating all shells..."
-      for shell in shells/*; do
-        pushd "${shell}" >/dev/null
-        nix flake update .
-        popd >/dev/null
-      done
-    else
-      echo "Skipping shell updates"
-    fi
-
     echo -e "\n\n!! Don't forget to update explicit package fetches !!"
   else
     with_local_flake_note nix flake lock "$(local_flake_ref)" --update-input "$package"
