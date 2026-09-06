@@ -14,10 +14,9 @@
     ../modules/network-bridge.nix
     ../modules/restic/backup.nix
     ../modules/ups/client.nix
-    ./gpu-switch.nix
+    ./gpu
     ./ha-ctrl.nix
     ./hardware-configuration.nix
-    ./nvidia-power-cap.nix
     ./virt
   ];
 

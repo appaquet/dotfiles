@@ -43,7 +43,7 @@
     };
   };
 
-  # Keep in sync with ./gpu-switch.nix
+  # Keep in sync with ./gpu/scripts.nix
   # Automatically switch to vfio driver when starting a VM
   # !Warning! You need to restart libvirtd if this script or gpu-switch changes
   systemd.services.libvirtd.preStart =

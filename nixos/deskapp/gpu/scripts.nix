@@ -1,10 +1,12 @@
-{ pkgs, config, ... }:
+{ pkgs, docker }:
 
 let
-  # Keep in sync with ./virt/default.nix
+  # Keep in sync with ../virt/default.nix
   gpuPci = "10de:2b85";
   audioPci = "10de:22e8";
 
+in
+rec {
   # Runs the container stop and holder termination stages required before suspend
   prepareNvidiaSuspend = pkgs.writeShellApplication {
     name = "prepare-nvidia-suspend";
@@ -49,7 +51,7 @@ let
       pkgs.coreutils
       pkgs.findutils
       pkgs.gnused
-      config.virtualisation.docker.package
+      docker
     ];
 
     text = ''
@@ -58,7 +60,7 @@ let
       procRoot=/proc
       dryRun=false
       sleepCommand=${pkgs.coreutils}/bin/sleep
-      dockerCommand=${config.virtualisation.docker.package}/bin/docker
+      dockerCommand=${docker}/bin/docker
       nvidiaDevices=()
       nvidiaDeviceRdevs=()
       holderPids=()
@@ -359,12 +361,12 @@ let
     name = "stop-nvidia-containers";
     runtimeInputs = [
       pkgs.coreutils
-      config.virtualisation.docker.package
+      docker
       pkgs.gnugrep
       pkgs.jq
     ];
     text = ''
-      dockerCommand=${config.virtualisation.docker.package}/bin/docker
+      dockerCommand=${docker}/bin/docker
       selectedContainers=()
       selectedNames=()
 
@@ -713,96 +715,4 @@ let
     shift
     $CMD "$@"
   '';
-in
-{
-  # Enable both nvidia & amd drivers, even if nvidia won't be used for display. This allow
-  # installing drivers.
-  services.xserver.videoDrivers = [
-    "nvidia"
-    "amdgpu"
-  ];
-
-  # Prevent X from automatically binding the nvidia card. This allows the gpu-switch script to
-  # manage it without fighting with X.
-  services.xserver.serverFlagsSection = ''
-    Option "AutoAddGPU" "false"
-    Option "AutoBindGPU" "false"
-  '';
-
-  # From https://nixos.wiki/wiki/Nvidia
-  hardware.nvidia = {
-    # Hinders with dynamic switching since it manages the card using KMS
-    # https://forums.developer.nvidia.com/t/unbinding-isolating-a-card-is-difficult-post-470/223134
-    modesetting.enable = false;
-
-    # Explicit suspend/resume services quiesce CUDA/UVM state and preserve VRAM.
-    # Disable kernel notifiers to select the explicit /proc/driver/nvidia/suspend path.
-    powerManagement = {
-      enable = true;
-      kernelSuspendNotifier = false;
-      # Runtime D3 is unrelated to suspend-state preservation.
-      finegrained = false;
-    };
-
-    open = true;
-
-    nvidiaSettings = false; # no need for settings menu
-
-    package = config.boot.kernelPackages.nvidiaPackages.production;
-  };
-
-  # To test: docker run --rm -it --device=nvidia.com/gpu=all ubuntu:latest nvidia-smi
-  hardware.nvidia-container-toolkit.enable = true;
-
-  environment.systemPackages = with pkgs; [
-    nvtopPackages.nvidia
-    gpuSwitch
-    killNvidiaHolders
-  ];
-
-  system.build.nvidia-suspend-prepare = prepareNvidiaSuspend;
-
-  systemd.services.switch-gpu-boot = {
-    description = "Switch GPU to NVIDIA on boot";
-    after = [
-      "libvirtd.service"
-      "display-manager.service" # prevent X from grabbing dGPU
-    ];
-    requires = [ "libvirtd.service" ];
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${gpuSwitch}/bin/gpu-switch nvidia";
-    };
-    wantedBy = [ "multi-user.target" ];
-  };
-
-  systemd.services.nvidia-sleep-guard = {
-    description = "Block sleep until NVIDIA users exit and restore the GPU on resume";
-
-    # Keep the preparation oneshot active while sleeping; once sleep.target becomes unneeded
-    # after resume, systemd stops it and runs ExecStop.
-    # Container stopping and holder termination finish before NVIDIA snapshots driver state.
-    before = [
-      "nvidia-suspend.service"
-      "sleep.target"
-    ];
-
-    unitConfig = {
-      DefaultDependencies = false;
-      StopWhenUnneeded = true;
-    };
-
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      # Two 30s container-stop rounds plus holder termination can take ~80s; give
-      # the scripts headroom so their own checks decide failure, not systemd.
-      TimeoutStartSec = "120s";
-      ExecStart = "${prepareNvidiaSuspend}/bin/prepare-nvidia-suspend";
-      ExecStop = "${pkgs.writeShellScript "switch-gpu-after-resume" ''
-        ${gpuSwitch}/bin/gpu-switch nvidia
-      ''}";
-    };
-    requiredBy = [ "sleep.target" ];
-  };
 }

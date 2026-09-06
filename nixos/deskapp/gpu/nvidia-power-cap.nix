@@ -74,7 +74,7 @@ in
   };
 
   # Re-apply the cap after suspend/hibernate resume. nvidia-resume exists because
-  # gpu-switch.nix sets powerManagement.enable = true with kernelSuspendNotifier = false.
+  # gpu/nixos.nix sets powerManagement.enable = true with kernelSuspendNotifier = false.
   systemd.services.nvidia-resume.serviceConfig.ExecStartPost =
     "${applyPowerCap}/bin/apply-nvidia-power-cap";
 }
