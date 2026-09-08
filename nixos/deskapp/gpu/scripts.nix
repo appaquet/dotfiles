@@ -7,21 +7,20 @@ let
 
 in
 rec {
-  # Runs the container stop and holder termination stages required before suspend
+  # Pre-suspend GPU preparation: ensure the nvidia driver is bound, stop
+  # NVIDIA-using containers, then terminate remaining device holders.
   prepareNvidiaSuspend = pkgs.writeShellApplication {
     name = "prepare-nvidia-suspend";
     text = ''
-      # Skip if we're not on nvidia drivers. Nothing to stop.
-      gpuOnNvidia=false
-      for dev in /dev/nvidia*; do
-        if [[ -c $dev ]]; then
-          gpuOnNvidia=true
-          break
-        fi
-      done
-      if [[ $gpuOnNvidia == false ]]; then
-        echo "GPU not on nvidia driver, nothing to prepare for suspend"
-        exit 0
+      # Ensure the GPU is on the nvidia driver before suspend. gpu-switch nvidia is
+      # idempotent: it early-exits when the GPU is already bound to nvidia, and
+      # restarts docker (socket + service) when it performs a switch.
+      if ${gpuSwitch}/bin/gpu-switch nvidia; then
+        :
+      else
+        status=$?
+        echo "ERROR: failed to switch GPU to nvidia driver before suspend" 1>&2
+        exit "$status"
       fi
 
       if ${stopNvidiaContainers}/bin/stop-nvidia-containers; then
@@ -355,8 +354,9 @@ rec {
     '';
   };
 
-  # Stops Docker workloads configured for NVIDIA access in two rounds. Any uncertain
-  # result is nonzero so the suspend orchestrator aborts sleep.
+  # Stops Docker workloads configured for NVIDIA access in two rounds. A Docker daemon
+  # that is unreachable is skipped (the holder-kill stage is the safety gate); any
+  # other failure is nonzero so the suspend orchestrator aborts sleep.
   stopNvidiaContainers = pkgs.writeShellApplication {
     name = "stop-nvidia-containers";
     runtimeInputs = [
@@ -370,6 +370,20 @@ rec {
       selectedContainers=()
       selectedNames=()
 
+      # The daemon is unreachable only when the CLI cannot connect to it: the socket
+      # file can linger after stop (stale), and a cold but socket-activating daemon
+      # blocks the probe until ready and then succeeds, so it is never misclassified.
+      # The timeout keeps the probe from hanging; a timed-out probe or an API error
+      # from a reachable daemon does not match and stays fatal.
+      dockerUnavailable() {
+        local err
+        # Success means the daemon answered (or activated in time): reachable
+        if err=$(timeout 15 "$dockerCommand" ps --quiet 2>&1 >/dev/null); then
+          return 1
+        fi
+        [[ "$err" == *"Cannot connect to the Docker daemon"* ]]
+      }
+
       # Docker can expose NVIDIA through CDI, runtime configuration, environment,
       # devices, binds, or mounts; inspect every running container for all forms.
       # Returns 0 when selected, 1 when none remain, and 2 on discovery errors.
@@ -379,6 +393,12 @@ rec {
 
         runningFile=$(mktemp)
         if ! "$dockerCommand" ps --quiet > "$runningFile"; then
+          # The daemon can die between entry check and scan; skip to the holder stage
+          if dockerUnavailable; then
+            echo "WARNING: Docker became unreachable while listing containers; holder stage is the safety gate" 1>&2
+            rm -f "$runningFile"
+            return 1
+          fi
           echo "ERROR: Docker failed to list running containers" 1>&2
           rm -f "$runningFile"
           return 2
@@ -444,6 +464,11 @@ rec {
           # before treating the failure as an unsafe Docker discovery error.
           rm -f "$inspectFile"
           if (( status != 1 )); then
+            if dockerUnavailable; then
+              echo "WARNING: Docker became unreachable during container scan; holder stage is the safety gate" 1>&2
+              rm -f "$selectedFile"
+              return 1
+            fi
             echo "ERROR: Docker inspect failed for running container $id" 1>&2
             rm -f "$selectedFile"
             return 2
@@ -451,6 +476,11 @@ rec {
 
           recheckFile=$(mktemp)
           if ! "$dockerCommand" ps --quiet > "$recheckFile"; then
+            if dockerUnavailable; then
+              echo "WARNING: Docker became unreachable while rechecking container $id; holder stage is the safety gate" 1>&2
+              rm -f "$recheckFile" "$selectedFile"
+              return 1
+            fi
             echo "ERROR: Docker failed to recheck running containers after inspect failure for $id" 1>&2
             rm -f "$recheckFile" "$selectedFile"
             return 2
@@ -528,6 +558,14 @@ rec {
       # the first round is waiting. Survivors after both rounds abort suspend.
       stopNvidiaContainers() {
         local round status
+
+        # With the daemon unreachable the API cannot enumerate or stop containers;
+        # containers may still hold the GPU (live-restore), so the rdev-based
+        # holder-kill stage is the safety gate.
+        if dockerUnavailable; then
+          echo "WARNING: Docker is unreachable; skipping container stop, holder stage is the safety gate" 1>&2
+          return 0
+        fi
 
         for round in 1 2; do
           echo "Scanning Docker for NVIDIA containers (pass $round/2)"

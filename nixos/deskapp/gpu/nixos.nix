@@ -79,6 +79,11 @@ in
       "sleep.target"
     ];
 
+    # Pre-sleep ordering: this unit's stage 0 rebinds the passthrough GPU to
+    # nvidia (PCI remove/rescan), which fails if a VM still has it passed
+    # through — so the VM shutdown hook must complete first.
+    after = [ "virt-pre-sleep-hook.service" ];
+
     unitConfig = {
       DefaultDependencies = false;
       StopWhenUnneeded = true;
@@ -87,9 +92,10 @@ in
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
-      # Two 30s container-stop rounds plus holder termination can take ~80s; give
-      # the scripts headroom so their own checks decide failure, not systemd.
-      TimeoutStartSec = "120s";
+      # Worst case is the driver switch (~45s) plus docker restart, two 30s
+      # container-stop rounds, and holder termination; give the scripts headroom so
+      # their own checks decide failure, not systemd.
+      TimeoutStartSec = "240s";
       ExecStart = "${scripts.prepareNvidiaSuspend}/bin/prepare-nvidia-suspend";
       ExecStop = "${pkgs.writeShellScript "switch-gpu-after-resume" ''
         ${scripts.gpuSwitch}/bin/gpu-switch nvidia
