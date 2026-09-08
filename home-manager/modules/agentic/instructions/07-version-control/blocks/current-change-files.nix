@@ -9,10 +9,10 @@
               jj = "jj-diff-branch --stat";
               git = "git diff --stat $(git merge-base HEAD origin/HEAD)..HEAD";
             }
-          }` with the shell tool, then use its stdout as changed files in the current branch.
+          }` with the shell tool, then use its stdout as changed files in the current work.
         '';
         default = ''
-          Changed files in current branch:
+          Changed files in current work:
           ```
           !`${
             scope.forSetting "versionControl.mode" {

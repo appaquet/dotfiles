@@ -34,6 +34,8 @@
             }
           ];
         }).config.nixantic;
+      vcsContext = import ./tools/vcs-context.nix { inherit pkgs; };
+      vcsContextCheck = import ./checks/vcs-context.nix { inherit pkgs vcsContext; };
       versionControlDefaultCheck = pkgs.runCommand "agentic-version-control-default-check" { } ''
         test "${sharedDefault.versionControl.mode}" = jj
         test "${homeManagerDefault.versionControl.mode}" = jj
@@ -53,6 +55,7 @@
         pkgs.runCommand name { } ''
           : ${instructions.check}
           : ${acceptanceCheck}
+          : ${vcsContextCheck}
           ln -s ${instructions.package} "$out"
         '';
     in
@@ -64,6 +67,7 @@
             acceptanceChecks.git;
       };
       checks = {
+        agentic-vcs-context = vcsContextCheck;
         agentic-version-control-default = versionControlDefaultCheck;
         agent-instructions = acceptanceChecks.jj;
         agent-instructions-git = acceptanceChecks.git;

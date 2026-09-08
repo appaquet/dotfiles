@@ -116,6 +116,7 @@ let
           "jj describe *"
           "jj-main-branch *"
           "jj-current-branch *"
+          "agentic-vcs-context *"
           "jj-prev-branch *"
           "jj-stacked-branches *"
           "jj-diff-working *"

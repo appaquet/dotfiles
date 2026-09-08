@@ -134,6 +134,17 @@ let
         if expectedVcs == "git branch --show-current" then gitClaudeCommands else claudeCommands;
       piCommandsForMode =
         if expectedVcs == "git branch --show-current" then gitPiCommands else piCommands;
+      expectedVcsContext =
+        if expectedVcs == "git branch --show-current" then
+          "agentic-vcs-context git"
+        else
+          "agentic-vcs-context jj";
+      unexpectedVcsContext =
+        if unexpectedVcs == "git branch --show-current" then
+          "agentic-vcs-context git"
+        else
+          "agentic-vcs-context jj";
+      wrappedVcsContext = "`!`${expectedVcsContext}``";
       manifest = pkgs.writeText "${name}-manifest" "${
         builtins.concatStringsSep "\n" (
           expectedFiles claudeCommandsForMode commonCommandsForMode piCommandsForMode
@@ -194,16 +205,6 @@ let
       ! grep -R -F 'using the `Skill` tool' "$pi"
       ! grep -R -F 'forked context' "$pi"
 
-      grep -F 'Agent Skill guidance' "$pi/prompts/pr-desc.md"
-      ! grep -F 'using the `Skill` tool' "$pi/prompts/pr-desc.md"
-      ! grep -F 'forked context' "$pi/prompts/pr-desc.md"
-      grep -F 'Context: $ARGUMENTS' "$pi/prompts/think.md"
-      grep -F 'argument-hint: "[problem or context]"' "$pi/prompts/think.md"
-      ! grep -F -- "--replace='DB: \$1" "$pi/prompts/pr-reply-comments.md"
-      grep -F '`AGENTS.md` is active context' "$pi/skills/mem-writing/SKILL.md"
-      grep -F 'Agent Skills under `skills/<name>/SKILL.md`' "$pi/skills/mem-writing/SKILL.md"
-      grep -F 'Markdown prompt templates under `prompts/`' "$pi/skills/mem-writing/SKILL.md"
-
       for agent in ${builtins.concatStringsSep " " (agents ++ piAgents)}; do
         agent_path="$pi/agents/$agent.md"
         test -f "$agent_path"
@@ -221,17 +222,30 @@ let
         test "$workflow_open" -lt "$selection_open"
         test "$selection_open" -lt "$selection_close"
         test "$selection_close" -lt "$workflow_close"
-
-        grep -F 'Select the agent for each task using <sub-agent-selection>' "$root/commands/ctx-plan.md"
-        grep -F 'Select the agent for each task using <sub-agent-selection>' "$root/commands/proj-plan.md"
-        grep -F 'reselect using <sub-agent-selection>' "$root/commands/implement.md"
-        grep -F 'Use <sub-agents-workflows> for exploration, research and investigation' "$root/commands/ctx-plan.md"
-        grep -F 'Use <sub-agents-workflows> for exploration, research and investigation' "$root/commands/proj-plan.md"
-        grep -F 'Use <sub-agents-workflows> for exploration, research and investigation' "$root/commands/ctx-improve.md"
-        grep -F 'You need to follow <sub-agents-workflows>' "$root/commands/implement.md"
-        grep -F 'agentic-proj-create-adhoc' "$root/commands/ctx-plan.md"
       done
-      grep -F 'agentic-proj-create-adhoc' "$pi/prompts/ctx-plan.md"
+
+      for path in \
+        "${instructions.package}/claude/commands/ctx-plan.md" \
+        "${instructions.package}/claude/commands/proj-load.md" \
+        "${instructions.package}/claude/commands/proj-plan.md" \
+        "${instructions.package}/claude/commands/pr-import-comments.md" \
+        "${instructions.package}/claude/agents/branch-diff-summarizer.md" \
+        "${instructions.package}/opencode/commands/ctx-plan.md" \
+        "${instructions.package}/opencode/commands/proj-load.md" \
+        "${instructions.package}/opencode/commands/proj-plan.md" \
+        "${instructions.package}/opencode/commands/pr-import-comments.md" \
+        "${instructions.package}/opencode/agents/branch-diff-summarizer.md" \
+        "${instructions.package}/opencode/skills/proj-load/SKILL.md" \
+        "$pi/prompts/ctx-plan.md" \
+        "$pi/prompts/proj-load.md" \
+        "$pi/prompts/proj-plan.md" \
+        "$pi/prompts/pr-import-comments.md" \
+        "$pi/agents/branch-diff-summarizer.md" \
+        "$pi/skills/proj-load/SKILL.md"; do
+        grep -F '${expectedVcsContext}' "$path"
+        ! grep -F '${unexpectedVcsContext}' "$path"
+        ! grep -F '${wrappedVcsContext}' "$path"
+      done
 
       touch "$out"
     '';

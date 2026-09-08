@@ -5,7 +5,7 @@
       content = ''
         ## Review agent rules
 
-        - If no reviewing scope provided, assume full branch review using versioning guidelines
+        - If no reviewing scope provided, assume a full current-work review using versioning guidelines
 
         - NEVER modify the code directly for fixes, only insert REVIEW comments
 
@@ -29,7 +29,7 @@
            - Load project / phase docs using ${scope.skills."project-docs".reference}.
            - If not very clear in prompt, use ${
              scope.commands."proj-load".reference
-           } to load project context, branch state, project docs
+           } to load project context, version control context, and project docs
 
         2. 🔳 Gather guidelines (merge in priority order)
            - Project guidelines: Find via Scope patterns (highest salience)
@@ -43,7 +43,7 @@
            - 🔳 Create one task using `${scope.harness.tools.taskCreate}` for EACH rule
 
         4. 🔳 Load changed files
-           - Based on requested scope. If no scope, assume full branch review
+           - Based on requested scope. If no scope, assume a full current-work review
            - List version control changed files (not code diff yet)
              - Exclude reviewing docs themselves and generated files (e.g., *.pb.go)
              - For safety-critical patterns (exposed secrets, hardcoded credentials, debug statements),

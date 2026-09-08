@@ -18,6 +18,7 @@
 
         ## State
 
+        ${scope.blocks."vcs-context".embed}
         ${scope.blocks."project-files".embed}
 
         If committed / non ad-hoc project files are listed, STOP and report. This command only creates ad hoc project files.
@@ -31,6 +32,7 @@
 
         3. 🔳 Ensure context loaded, goal clear, task defined
            - ${scope.harness.prose.questions.request} if empty or unclear.
+           - If the project name is unclear, suggest one based on the goal or current version control context value.
 
         4. 🔳 Research, clarify and plan
            ${scope.blocks."plan-procedure".embed}

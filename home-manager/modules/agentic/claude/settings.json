@@ -45,6 +45,7 @@
       "Bash(gh pr review:*)",
       "Bash(agentic-proj-docs:*)",
       "Bash(agentic-proj-create-adhoc:*)",
+      "Bash(agentic-vcs-context:*)",
       "Bash(nix eval:*)",
       "Bash(nix build:*)",
       "Bash(nix flake:*)",

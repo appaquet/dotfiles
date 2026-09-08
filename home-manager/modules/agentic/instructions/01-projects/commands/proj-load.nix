@@ -16,7 +16,7 @@
 
         ## State
 
-        ${scope.blocks."current-branch".embed}
+        ${scope.blocks."vcs-context".embed}
         ${scope.blocks."project-files".embed}
 
         ## Instructions
@@ -24,7 +24,7 @@
         1. Ensure ${scope.skills."project-docs".reference} loaded.
 
         2. Read project doc
-           * Use current branch / change state above, don't re-discover
+           * Use current version control context above, don't re-discover
            * If project files found:
              * Read FULLY main project doc context, checkpoint, requirements, progress
              * Don't re-read project symlink. Already in state above.

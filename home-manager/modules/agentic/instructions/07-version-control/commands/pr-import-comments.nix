@@ -24,7 +24,7 @@
         Goal: fetch unresolved GitHub PR review comments and import them into the codebase as inline comments with metadata. This allows review comments to be addressed directly in the code and then replied to programmatically.
 
         ## State
-        ${scope.blocks."current-branch".embed}
+        ${scope.blocks."vcs-context".embed}
 
         ## Instructions
 

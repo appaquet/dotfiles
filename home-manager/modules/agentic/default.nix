@@ -8,7 +8,7 @@
   imports = [
     inputs.nixantic.homeManagerModules.default
     ./nixantic.nix
-    ./tools.nix
+    ./tools
     ../nono
 
     ./claude

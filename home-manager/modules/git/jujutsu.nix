@@ -1,4 +1,43 @@
 { pkgs, ... }:
+let
+  resolveJjDiffBase = ''
+    resolve_jj_diff_base() {
+      local preferred_revset="$1"
+      local preferred_label="$2"
+      local base=""
+
+      if [ -n "$preferred_revset" ]; then
+        if ! base=$(jj --ignore-working-copy log --no-graph \
+          -r "($preferred_revset) & ::@" -T 'commit_id ++ "\n"'); then
+          echo "Unable to resolve $preferred_label as a diff base." >&2
+          return 1
+        fi
+      fi
+
+      if [ -z "$base" ]; then
+        if ! base=$(jj --ignore-working-copy log --no-graph \
+          -r 'trunk() & ::@' -T 'commit_id ++ "\n"'); then
+          echo "Unable to resolve trunk() as a diff base." >&2
+          return 1
+        fi
+      fi
+
+      if [ -z "$base" ]; then
+        echo "No safe diff base exists: neither $preferred_label nor trunk() is an ancestor of @. Rebase onto trunk or run jj diff --from <revision> --to @ explicitly." >&2
+        return 1
+      fi
+
+      case "$base" in
+        *$'\n'*)
+          echo "Unable to select a single diff base from $preferred_label or trunk()." >&2
+          return 1
+          ;;
+      esac
+
+      printf '%s\n' "$base"
+    }
+  '';
+in
 {
   programs.jujutsu = {
     enable = true;
@@ -120,10 +159,21 @@
       jj-stacked-branches | head -n 2 | tail -n 1
     '')
     (writeShellScriptBin "jj-diff-working" ''
-      jj diff -r "$(jj-current-branch)..@" "$@"
+      set -euo pipefail
+      ${resolveJjDiffBase}
+
+      base=$(resolve_jj_diff_base 'closest_bookmark(@)' 'a closest bookmark')
+      jj diff --from "$base" --to @ "$@"
     '')
     (writeShellScriptBin "jj-diff-branch" ''
-      jj diff -r "$(jj-prev-branch)..@" "$@"
+      set -euo pipefail
+      ${resolveJjDiffBase}
+
+      previous=$(jj --ignore-working-copy log --no-graph \
+        -r '(trunk()..@ | trunk()) & bookmarks()' \
+        -T 'commit_id ++ "\n"' | head -n 2 | tail -n 1)
+      base=$(resolve_jj_diff_base "$previous" 'the previous stacked bookmark')
+      jj diff --from "$base" --to @ "$@"
     '')
     (writeShellScriptBin "jj-stacked-branches" ''
       jj log --no-graph -r '(trunk()..@ | trunk()) & bookmarks()' -T 'coalesce(local_bookmarks) ++ "\n"' | sed 's/ *\*$//'
