@@ -110,11 +110,6 @@ let
       };
     }
 
-    # https://github.com/MasuRii/pi-tool-display
-    {
-      package = "npm:pi-tool-display@0.5.0";
-    }
-
     # https://github.com/ifiokjr/oh-pi
     {
       package = "npm:@ifi/oh-pi-themes@0.5.1";
