@@ -341,11 +341,11 @@
     },
     "nixos": {
       "locked": {
-        "lastModified": 1788405554,
-        "narHash": "sha256-r2f1oUwixlgq9zOdYLqJLfS/lWBT60/IITjhTKI59JU=",
+        "lastModified": 1788921488,
+        "narHash": "sha256-8+xWRxEkD6l217cIUdRxfeUGS9lQX0hVtUuNVsBaDzk=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "a5cc6f2c37bf518436dc8d1c288ccd0c43c2f4c4",
+        "rev": "6aefcda9401be8acc2b74244fb3b37520ea1f0a8",
         "type": "github"
       },
       "original": {
@@ -519,11 +519,11 @@
         "sops-nix": "sops-nix"
       },
       "locked": {
-        "lastModified": 1788635633,
-        "narHash": "sha256-9vFIIScI88HhYmTAHiFVygAfIJbgncI/tBC6eXK9uZ0=",
+        "lastModified": 1788985336,
+        "narHash": "sha256-2FOlXYpPDekrfFbaKj1LqjFISy7HBsJlWIjsT8BLSxs=",
         "owner": "appaquet",
         "repo": "dotfiles-secrets",
-        "rev": "f0f980f363c1c81a424ff9f4fd129ec4ff045bd1",
+        "rev": "40800728fef48f7d5a80625f1783044af9ae7153",
         "type": "github"
       },
       "original": {
