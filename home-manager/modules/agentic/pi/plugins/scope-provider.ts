@@ -128,6 +128,10 @@ if (!scopeProcess.activePreset)
 // its own session serves.
 let scopeRegistry: any = undefined;
 
+// Per-session manager used by the provider hook, which receives no
+// ExtensionContext. session_start binds each extension runtime to its session.
+let scopeSessionManager: any = undefined;
+
 const state: ScopeMapping & {
   concreteModels: Record<string, any>;
 } = {
@@ -140,6 +144,23 @@ const state: ScopeMapping & {
 function debug(msg: string): void {
   const file = process.env.PI_SCOPE_LOG;
   if (file) fs.appendFileSync(file, `[${new Date().toISOString()}] ${msg}\n`);
+}
+
+/** The live conversation's session id, or undefined before session startup. */
+function conversationSessionId(): string | undefined {
+  return scopeSessionManager?.getSessionId?.() ?? undefined;
+}
+
+/**
+ * Add semantic session identity to a delegated scoped request.
+ *
+ * Provider adapters own any wire representation. Caller identity remains
+ * authoritative, and request options are copied only when an id is added.
+ */
+function withConversationSessionId(options: any): any {
+  if (options?.sessionId !== undefined) return options;
+  const sessionId = conversationSessionId();
+  return sessionId ? { ...options, sessionId } : options;
 }
 
 function readScopeConfig(): Record<string, ScopePreset> {
@@ -237,7 +258,11 @@ function streamScopedModel(
     debug(
       `streamSimple[${source}]: scoped/${alias} unresolved (kill=${killSwitch} target=${target ? `${target.provider}/${target.id}` : "none"} concrete=${concrete ? "yes" : "no"} registry=${scopeRegistry ? "yes" : "no"}), passing through to native behavior`,
     );
-    return getApiProvider(model.api).streamSimple(model, context, options);
+    return getApiProvider(model.api).streamSimple(
+      model,
+      context,
+      withConversationSessionId(options),
+    );
   }
   if (target.provider === "scoped") {
     throw new Error(
@@ -253,7 +278,11 @@ function streamScopedModel(
   debug(
     `streamSimple[${source}]: scoped/${alias} -> ${target.provider}/${target.id} (preset=${state.preset})`,
   );
-  return provider.streamSimple(concrete, context, options);
+  return provider.streamSimple(
+    concrete,
+    context,
+    withConversationSessionId(options),
+  );
 }
 
 /** Register the stub entries so `scoped/<id>` resolves at startup. */
@@ -680,6 +709,7 @@ export default function scopeProvider(pi: any): void {
 
   pi.on("session_start", async (_event: any, ctx: any) => {
     scopeRegistry = ctx.modelRegistry;
+    scopeSessionManager = ctx.sessionManager;
     if (scopeProcess.rewriteDisabled) return;
 
     const presets = readScopeConfig();

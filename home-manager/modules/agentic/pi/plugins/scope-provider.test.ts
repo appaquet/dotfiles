@@ -84,7 +84,10 @@ type TestContext = {
   hasUI: boolean;
   cwd: string;
   modelRegistry: TestRegistry;
-  sessionManager: { getEntries: () => SessionEntry[] };
+  sessionManager: {
+    getEntries: () => SessionEntry[];
+    getSessionId: () => string | undefined;
+  };
   ui: {
     setStatus: (key: string, value: string) => void;
     custom: <T>(factory: (...args: any[]) => unknown) => Promise<T>;
@@ -413,7 +416,10 @@ async function createHarness(
       hasUI: true,
       cwd: testDir,
       modelRegistry: registry,
-      sessionManager: { getEntries: () => [...sessionEntries] },
+      sessionManager: {
+        getEntries: () => [...sessionEntries],
+        getSessionId: () => "session-abc",
+      },
       ui: {
         custom: async <T>() => harness.selection as T,
         setStatus: (key, value) => {
@@ -1685,7 +1691,6 @@ test("scoped streamSimple delegates parent and child aliases to exact concrete t
     apiKeys: { old: "old-key" },
     models: markerModels(),
   });
-  const mainContext = {};
   const mainOptions = { reasoning: "medium" };
 
   await expect(
@@ -1698,11 +1703,15 @@ test("scoped streamSimple delegates parent and child aliases to exact concrete t
   expect(juniorCall?.model).toBe(
     harness.registry.find("old", "old-junior"),
   );
-  // Context and options reach the target provider untouched: alias
-  // resolution only swaps the model, never the completion parameters.
   expect(mainCall).toMatchObject({ provider: "old" });
   expect(mainCall?.context).toBe(harness.ctx);
-  expect(mainCall?.options).toBe(mainOptions);
+  expect(mainCall?.options).not.toBe(mainOptions);
+  expect(mainCall?.options).toEqual({
+    reasoning: "medium",
+    sessionId: "session-abc",
+  });
+  expect(juniorCall?.options).toEqual({ sessionId: "session-abc" });
+  expect(mainOptions).toEqual({ reasoning: "medium" });
 });
 
 test("aliases without a target resolve pre-upgrade stubs natively", async () => {
@@ -2267,4 +2276,147 @@ test("forwards configured retry policy and cancels retry exhaustion, disabled re
       harness.ctx,
     ),
   ).resolves.toEqual({ cancel: true });
+});
+
+// --- OpenCode session identity ---------------------------------------------
+
+// OpenCode Go target as pi reports it. Scoped aliases inherit the target's base
+// URL, so the same routing gate applies to resolved and pass-through requests.
+function goTarget(id: string): Model {
+  return {
+    ...target("opencode-go", id, `Go ${id}`),
+    baseUrl: "https://opencode.ai/zen/go/v1",
+  };
+}
+
+const goPresets: ScopeConfig = {
+  go: {
+    main: { model: "opencode-go/go-main" },
+    remap: {
+      "scoped/summary": { model: "opencode-go/go-summary", thinking: "low" },
+    },
+  },
+};
+
+async function goHarness(summaryAuth?: RequestAuth) {
+  (globalThis as Record<string, unknown>).activePreset = "go";
+  return createHarness(
+    goPresets,
+    {
+      apiKeys: { "opencode-go": "go-key" },
+      models: [goTarget("go-main"), goTarget("go-summary")],
+      requestAuth: summaryAuth
+        ? { "opencode-go/go-summary": summaryAuth }
+        : undefined,
+    },
+  );
+}
+
+test("scoped OpenCode completions carry the conversation session id", async () => {
+  const harness = await goHarness();
+  const concrete = harness.registry.find("opencode-go", "go-main");
+  const options = { reasoning: "medium" };
+
+  await scopedStream(harness, "main", options);
+
+  const call = lastTargetCall(harness);
+  expect(call?.model).toBe(concrete);
+  expect(call?.options).not.toBe(options);
+  expect(call?.options).toEqual({
+    reasoning: "medium",
+    sessionId: "session-abc",
+  });
+  expect(options).toEqual({ reasoning: "medium" });
+});
+
+test("every scoped target receives semantic session identity", async () => {
+  (globalThis as Record<string, unknown>).activePreset = "codex";
+  const mainModel = target("old", "old-main", "Cloud main model");
+  const harness = await createHarness(presets, {
+    apiKeys: { old: "old-key" },
+    models: [mainModel],
+  });
+  const options = { headers: { "x-callers": "keep" } };
+
+  await scopedStream(harness, "main", options);
+
+  expect(lastTargetCall(harness)?.options).not.toBe(options);
+  expect(lastTargetCall(harness)?.options).toEqual({
+    headers: { "x-callers": "keep" },
+    sessionId: "session-abc",
+  });
+  expect(options).toEqual({ headers: { "x-callers": "keep" } });
+});
+
+test("the scoped pass-through branch carries the conversation session id", async () => {
+  const harness = await goHarness();
+  process.env.PI_SCOPE_REWRITE = "0";
+  const options = { reasoning: "low" };
+
+  await scopedStream(harness, "main", options);
+
+  expect(apiStreamCalls).toHaveLength(1);
+  const [, , dispatched] = apiStreamCalls[0];
+  expect(dispatched).toEqual({ reasoning: "low", sessionId: "session-abc" });
+  expect(options).toEqual({ reasoning: "low" });
+});
+
+test("a caller-provided session id remains authoritative", async () => {
+  const harness = await goHarness();
+
+  for (const sessionId of ["caller-session", ""]) {
+    const options = { reasoning: "medium", sessionId };
+
+    await scopedStream(harness, "main", options);
+
+    expect(lastTargetCall(harness)?.options).toBe(options);
+    expect(lastTargetCall(harness)?.options).toEqual({
+      reasoning: "medium",
+      sessionId,
+    });
+  }
+});
+
+test("no session id is fabricated when the session reports none", async () => {
+  const harness = await goHarness();
+  harness.ctx.sessionManager.getSessionId = () => undefined;
+  const options = { reasoning: "medium" };
+
+  await scopedStream(harness, "main", options);
+
+  expect(lastTargetCall(harness)?.options).toBe(options);
+  expect(lastTargetCall(harness)?.options).toEqual({ reasoning: "medium" });
+});
+
+test("summary requests leave identity and headers to Pi", async () => {
+  const harness = await goHarness({
+    ok: true,
+    apiKey: "summary-key",
+    headers: { "x-auth": "resolved" },
+  });
+  const signal = new AbortController().signal;
+
+  await harness.summaryHandlers.session_before_compact[0](
+    { preparation: { firstKeptEntryId: "kept" }, signal },
+    harness.ctx,
+  );
+  await harness.summaryHandlers.session_before_tree[0](
+    {
+      preparation: {
+        userWantsSummary: true,
+        entriesToSummarize: [{ type: "message", id: "entry-1" }],
+        customInstructions: undefined,
+        replaceInstructions: false,
+      },
+      signal,
+    },
+    harness.ctx,
+  );
+
+  expect(compactCalls).toHaveLength(1);
+  expect(compactCalls[0]).toHaveLength(10);
+  expect(compactCalls[0][3]).toEqual({ "x-auth": "resolved" });
+  expect(treeCalls).toHaveLength(1);
+  expect(treeCalls[0][1].headers).toEqual({ "x-auth": "resolved" });
+  expect(treeCalls[0][1]).not.toHaveProperty("sessionId");
 });
