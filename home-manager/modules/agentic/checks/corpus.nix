@@ -82,6 +82,7 @@ let
     "task-management"
   ];
   claudeSkills = [
+    "frontend"
     "human-writer"
     "mem-writing"
     "version-control"

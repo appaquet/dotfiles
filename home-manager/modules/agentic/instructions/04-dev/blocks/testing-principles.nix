@@ -19,7 +19,9 @@
 
         * Failures: when test fails, use ${scope.blocks.problem-solving.reference} to investigate root cause. Don't modify test to make it pass, unless it's genuinely wrong.
 
-        * Browser testing: any modifications to web applications should be tested in browser.
+        * Browser testing: any modifications to web applications must be validated in the browser. Use ${
+          scope.skills."frontend".reference
+        } for any frontend development flow.
 
         * Infra / environment testing: prioritize external harness to test.
 
