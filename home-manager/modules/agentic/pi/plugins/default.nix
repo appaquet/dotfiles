@@ -64,7 +64,7 @@ let
 
     # https://github.com/nicobailon/pi-web-access
     {
-      package = "npm:pi-web-access@0.27.0";
+      package = "npm:pi-web-access@0.28.0";
       environment = {
         EXA_API_KEY.file = config.sops.secrets.pi_exa_api_key.path;
       };
@@ -120,7 +120,7 @@ let
 
     # https://github.com/nicobailon/pi-powerline-footer
     {
-      package = "npm:pi-powerline-footer@0.16.0";
+      package = "npm:pi-powerline-footer@0.17.0";
       settings = {
         powerline = {
           preset = "default";
@@ -170,7 +170,7 @@ let
 
     # https://github.com/arhen/pi-extensions
     {
-      package = "npm:@arhen/pi-core-tps-stats@1.3.1";
+      package = "npm:@arhen/pi-core-tps-stats@1.3.2";
     }
 
     {
