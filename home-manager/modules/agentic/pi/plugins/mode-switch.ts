@@ -5,18 +5,27 @@
  * open a fuzzy selector, and `/mode <builder|orchestrator>` sets it
  * explicitly. At launch the `PI_MODE` env var (builder|orchestrator) selects
  * the initial mode of a session with no persisted mode entry (analog of
- * `PI_SCOPE` for scope presets); on resume/fork the persisted entry wins.
- * Every actual mode switch submits the target mode's prompt template (`/builder`
- * or `/orchestrator`) as a user message (queued as a followUp while the
- * agent is streaming); session start and same-mode sets send nothing. The
- * mode is persisted per session in a `mode-switch` custom entry and restored
- * on `session_start` (default: builder).
+ * `PI_SCOPE` for scope presets); an explicit valid value is persisted so a
+ * later resume environment cannot change the selection. On resume/fork the
+ * persisted entry wins. On `/new` the outgoing instance hands the current
+ * mode to the replacement instance through Pi's session lifecycle events and
+ * persists it in the new session; the transfer wins over `PI_MODE`.
+ *
+ * The model is reminded of the active mode by an injected reminder message on
+ * the next agent turn after every session start (startup, reload, resume,
+ * fork, new), every successful compaction (manual, threshold, overflow), and
+ * every actual mode switch. The full builder/orchestrator rules live in the
+ * persistent context; the reminder only selects which rule set applies.
+ * Orchestrator mode additionally repeats its reminder every N turns (N from
+ * `mode-switch.json` in the agent dir, default 10).
+ *
+ * The mode is persisted per session in a `mode-switch` custom entry and
+ * restored on `session_start` (default: builder).
  *
  * In orchestrator mode the main session is restricted to project docs:
  * `read`/`write`/`edit` on any non-`*.md` path are blocked with a reason that
- * teaches sub-agent delegation, and a reminder message is injected on entering
- * the mode and then every N turns (N from `mode-switch.json` in the agent dir,
- * default 10).
+ * teaches sub-agent delegation, and a reminder message is injected every
+ * N turns.
  */
 import { readFileSync } from "node:fs";
 import { homedir } from "node:os";
@@ -35,16 +44,23 @@ export type Mode = "builder" | "orchestrator";
 
 export const MODES: readonly Mode[] = ["builder", "orchestrator"];
 
+/**
+ * Process-lifetime key of the `/new` handoff slot. The outgoing extension
+ * instance is torn down before the replacement instance starts, so the mode
+ * has to survive on a both-visible slot rather than module state.
+ */
+export const MODE_HANDOFF_KEY = Symbol("mode-switch-handoff");
+
+type NewSessionHandoff = { mode: Mode; sourceSessionFile?: string };
+
 const DEFAULT_REMINDER_INTERVAL = 10;
 const REMINDER =
   "👑 Orchestrator mode: the main session may only read/write project docs (*.md) — delegate all code/file work to a sub-agent via the Agent tool.";
+const BUILDER_REMINDER =
+  "You are running in 🔨 builder mode. Follow the builder-mode rules in <sub-agents-workflows>.";
 const GUARDED_TOOLS = new Set(["read", "write", "edit"]);
 
 type ToolCallEvent = { toolName?: unknown; input?: unknown };
-
-export type SwitchDecision =
-  | { action: "noop"; next: Mode }
-  | { action: "submit"; next: Mode; template: Mode };
 
 const MODE_LABELS: Record<Mode, string> = {
   builder: "🔨",
@@ -55,16 +71,6 @@ const MODE_COLORS: Record<Mode, "muted" | "accent"> = {
   builder: "muted",
   orchestrator: "accent",
 };
-
-/**
- * Decide what switching `current` -> `target` does: every actual mode change
- * submits the target mode's prompt template; staying on the same mode is a
- * no-op (the caller only notifies).
- */
-export function decideSwitch(current: Mode, target: Mode): SwitchDecision {
-  if (target === current) return { action: "noop", next: target };
-  return { action: "submit", next: target, template: target };
-}
 
 /**
  * Restore the persisted mode from session entries: the latest custom
@@ -91,28 +97,29 @@ export function restoreMode(entries: unknown[]): Mode | undefined {
   return restored;
 }
 
-export type StartupPlan = {
+export type ResolvedMode = {
   mode: Mode;
-  submit: boolean;
   invalid: boolean;
 };
 
 /**
- * Decide the startup mode: a persisted mode-switch entry wins, otherwise the
- * trimmed PI_MODE env value when valid, otherwise builder. `submit` is true
- * only when the env var selects orchestrator on a session with no persisted
- * mode — the caller then goes through the real switch path so the mode prompt
- * is submitted like a manual switch. `invalid` flags an unusable env value.
+ * Decide the startup mode: a mode transferred across `/new` wins, then the
+ * latest persisted mode-switch entry, then the trimmed PI_MODE env value when
+ * valid, then builder. `invalid` flags an unusable env value.
  */
-export function startupPlan(entries: unknown[], env: unknown): StartupPlan {
+export function resolveMode(
+  entries: unknown[],
+  env: unknown,
+  transferred?: Mode,
+): ResolvedMode {
+  if (transferred) return { mode: transferred, invalid: false };
   const persisted = restoreMode(entries);
-  if (persisted) return { mode: persisted, submit: false, invalid: false };
+  if (persisted) return { mode: persisted, invalid: false };
 
   const value = typeof env === "string" ? env.trim() : "";
-  if (value === "") return { mode: "builder", submit: false, invalid: false };
-  if (isMode(value))
-    return { mode: value, submit: value === "orchestrator", invalid: false };
-  return { mode: "builder", submit: false, invalid: true };
+  if (value === "") return { mode: "builder", invalid: false };
+  if (isMode(value)) return { mode: value, invalid: false };
+  return { mode: "builder", invalid: true };
 }
 
 export type ModeArg =
@@ -126,31 +133,8 @@ export function parseModeArg(arg: string): ModeArg {
   return { kind: "select", query: name };
 }
 
-/** Submission options for a mode template: followUp delivery only while streaming (never steer). */
-export function submissionOptions(isIdle: boolean): {
-  expandPromptTemplates: true;
-  deliverAs?: "followUp";
-} {
-  return isIdle
-    ? { expandPromptTemplates: true }
-    : { expandPromptTemplates: true, deliverAs: "followUp" };
-}
-
 export function modeLabel(mode: Mode): string {
   return MODE_LABELS[mode];
-}
-
-/**
- * The named mode template is available when a prompt-source command with that
- * name is registered; hosts without rendered prompts lack it.
- */
-export function hasPromptTemplate(
-  commands: readonly { name: string; source: string }[],
-  name: string,
-): boolean {
-  return commands.some(
-    (command) => command.name === name && command.source === "prompt",
-  );
 }
 
 /** Extracts a path only from the supported file tools and string inputs. */
@@ -207,21 +191,65 @@ export default function modeSwitch(pi: ExtensionAPI): void {
     );
   }
 
-  function reminderMessage() {
-    return {
-      message: {
-        customType: "orchestrator-guard-reminder",
-        content: REMINDER,
-        display: true,
-      },
-    };
+  function reminderMessage(target: Mode) {
+    return target === "orchestrator"
+      ? {
+          message: {
+            customType: "orchestrator-guard-reminder",
+            content: REMINDER,
+            display: true,
+          },
+        }
+      : {
+          message: {
+            customType: "mode-switch-reminder",
+            content: BUILDER_REMINDER,
+            display: true,
+          },
+        };
   }
 
-  function restore(ctx: ExtensionContext): void {
-    const env = process.env.PI_MODE;
-    const plan = startupPlan(ctx.sessionManager.getEntries(), env);
+  function setMode(ctx: ExtensionContext, target: Mode): void {
+    if (target === mode) {
+      ctx.ui.notify(`mode-switch: already on ${mode}`, "info");
+      return;
+    }
 
-    if (plan.invalid) {
+    mode = target;
+    turns = 0;
+    remindOnNextTurn = true;
+    pi.appendEntry("mode-switch", { mode });
+    pi.events.emit("mode-switch:changed", { mode });
+    publishLabel(ctx);
+    ctx.ui.notify(`mode-switch: ${mode}`, "info");
+  }
+
+  function restore(
+    ctx: ExtensionContext,
+    event: { reason?: unknown; previousSessionFile?: unknown } = {},
+  ): void {
+    // Consume the handoff slot unconditionally: it only applies to a `new`
+    // start whose previous session file matches the one the outgoing
+    // instance reported (both absent for in-memory sessions); any other
+    // start drops a stale slot.
+    const slot = (
+      globalThis as Record<symbol, NewSessionHandoff | undefined>
+    )[MODE_HANDOFF_KEY];
+    (globalThis as Record<symbol, NewSessionHandoff | undefined>)[
+      MODE_HANDOFF_KEY
+    ] = undefined;
+    const handoff =
+      event.reason === "new" &&
+      slot !== undefined &&
+      slot.sourceSessionFile === event.previousSessionFile
+        ? slot
+        : undefined;
+
+    const entries = ctx.sessionManager.getEntries();
+    const env = process.env.PI_MODE;
+    const resolved = resolveMode(entries, env, handoff?.mode);
+
+    if (resolved.invalid) {
       ctx.ui.notify(
         `mode-switch: invalid PI_MODE "${env}" (available: ${MODES.join(
           ", ",
@@ -230,54 +258,18 @@ export default function modeSwitch(pi: ExtensionAPI): void {
       );
     }
 
-    if (!plan.submit) {
-      mode = plan.mode;
-      // Compaction loses in-memory counter state; entries are the source of truth.
-      turns = 0;
-      remindOnNextTurn = false;
-      publishLabel(ctx);
-      return;
-    }
+    // Persist only choices that came from outside this session's entries:
+    // a `/new` transfer or an explicit PI_MODE selection.
+    const explicitEnv = typeof env === "string" ? env.trim() : "";
+    if (handoff || (restoreMode(entries) === undefined && isMode(explicitEnv)))
+      pi.appendEntry("mode-switch", { mode: resolved.mode });
 
-    // PI_MODE=orchestrator on a fresh session goes through the real switch
-    // path so the mode prompt is submitted like a manual switch.
-    const before = mode;
-    setMode(ctx, plan.mode);
-    if (mode === before) {
-      // setMode bailed (template missing) without publishing a label.
-      publishLabel(ctx);
-    }
-  }
-
-  function setMode(ctx: ExtensionContext, target: Mode): void {
-    const decision = decideSwitch(mode, target);
-
-    if (decision.action === "noop") {
-      ctx.ui.notify(`mode-switch: already on ${mode}`, "info");
-      return;
-    }
-
-    if (!hasPromptTemplate(pi.getCommands(), decision.template)) {
-      ctx.ui.notify(
-        `mode-switch: /${decision.template} template not found; staying on ${mode}`,
-        "warning",
-      );
-      return;
-    }
-
-    pi.sendUserMessage(
-      `/${decision.template}`,
-      submissionOptions(ctx.isIdle()),
-    );
-
-    mode = decision.next;
+    mode = resolved.mode;
+    // Every start loses in-memory counter state; the reminder re-teaches the
+    // active mode from the (possibly new or summarized) context.
     turns = 0;
-    // Entering orchestrator reminds on the very next turn; later switches wait for the interval.
-    remindOnNextTurn = mode === "orchestrator";
-    pi.appendEntry("mode-switch", { mode });
-    pi.events.emit("mode-switch:changed", { mode });
+    remindOnNextTurn = true;
     publishLabel(ctx);
-    ctx.ui.notify(`mode-switch: ${mode}`, "info");
   }
 
   const modeSelectorItems: readonly FuzzySelectorItem[] = MODES.map(
@@ -299,8 +291,27 @@ export default function modeSwitch(pi: ExtensionAPI): void {
     setMode(ctx, selected as Mode);
   }
 
-  pi.on("session_start", (_event, ctx) => restore(ctx));
-  pi.on("session_compact", (_event, ctx) => restore(ctx));
+  pi.on("session_start", (event: any, ctx: any) =>
+    restore(ctx, { reason: event?.reason, previousSessionFile: event?.previousSessionFile }),
+  );
+
+  pi.on("session_before_switch", (event: any, ctx: any) => {
+    if (event?.reason !== "new") return;
+    (globalThis as Record<symbol, NewSessionHandoff | undefined>)[
+      MODE_HANDOFF_KEY
+    ] = {
+      mode,
+      sourceSessionFile: ctx?.sessionManager?.getSessionFile?.() ?? undefined,
+    };
+  });
+
+  pi.on("session_compact", () => {
+    // Compaction keeps the closure mode and the persisted entry; it only
+    // resets the interval and re-arms the reminder because the summarized
+    // context no longer contains the mode instruction.
+    turns = 0;
+    remindOnNextTurn = true;
+  });
 
   pi.on("tool_call", (event) => {
     try {
@@ -313,13 +324,13 @@ export default function modeSwitch(pi: ExtensionAPI): void {
   });
 
   pi.on("before_agent_start", () => {
-    if (mode !== "orchestrator") return undefined;
     if (remindOnNextTurn) {
       remindOnNextTurn = false;
-      return reminderMessage();
+      return reminderMessage(mode);
     }
+    if (mode !== "orchestrator") return undefined;
     turns += 1;
-    if (turns % reminderInterval === 0) return reminderMessage();
+    if (turns % reminderInterval === 0) return reminderMessage("orchestrator");
     return undefined;
   });
 

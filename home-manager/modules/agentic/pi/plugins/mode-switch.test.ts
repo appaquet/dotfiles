@@ -2,7 +2,7 @@ import { expect, mock, test } from "bun:test";
 import { mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { Mode, SwitchDecision } from "./mode-switch.ts";
+import type { Mode } from "./mode-switch.ts";
 
 mock.module("../lib/fuzzy-selector.ts", () => ({
   filterFuzzyItems: (
@@ -50,63 +50,19 @@ mock.module("../lib/fuzzy-selector.ts", () => ({
 
 const {
   MODES,
-  decideSwitch,
-  hasPromptTemplate,
+  MODE_HANDOFF_KEY: HANDOFF_SYMBOL,
   modeLabel,
   parseModeArg,
   readReminderInterval,
   restoreMode,
+  resolveMode,
   shouldBlock,
-  startupPlan,
-  submissionOptions,
   default: modeSwitch,
 } = await import("./mode-switch.ts");
 
 // ---------------------------------------------------------------------------
 // Pure decision logic
 // ---------------------------------------------------------------------------
-
-test("decideSwitch: full decision table with exact action, next mode and template", () => {
-  const table: Record<Mode, Record<Mode, SwitchDecision>> = {
-    builder: {
-      builder: { action: "noop", next: "builder" },
-      orchestrator: {
-        action: "submit",
-        next: "orchestrator",
-        template: "orchestrator",
-      },
-    },
-    orchestrator: {
-      builder: { action: "submit", next: "builder", template: "builder" },
-      orchestrator: { action: "noop", next: "orchestrator" },
-    },
-  };
-
-  for (const current of MODES)
-    for (const target of MODES)
-      expect(decideSwitch(current, target)).toEqual(table[current][target]);
-});
-
-test("decideSwitch: every mode change submits the target template", () => {
-  expect(decideSwitch("builder", "orchestrator")).toEqual({
-    action: "submit",
-    next: "orchestrator",
-    template: "orchestrator",
-  });
-  expect(decideSwitch("orchestrator", "builder")).toEqual({
-    action: "submit",
-    next: "builder",
-    template: "builder",
-  });
-  expect(decideSwitch("builder", "builder")).toEqual({
-    action: "noop",
-    next: "builder",
-  });
-  expect(decideSwitch("orchestrator", "orchestrator")).toEqual({
-    action: "noop",
-    next: "orchestrator",
-  });
-});
 
 test("restoreMode: returns undefined without mode-switch entries", () => {
   expect(restoreMode([])).toBeUndefined();
@@ -204,7 +160,26 @@ test("restoreMode: tolerates malformed entries and keeps the latest valid one", 
   ).toBe("orchestrator");
 });
 
-test("startupPlan: persisted entry wins over any PI_MODE value", () => {
+test("resolveMode: transferred mode beats any persisted entry and PI_MODE value", () => {
+  const persisted = (mode: Mode) => ({
+    type: "custom",
+    customType: "mode-switch",
+    data: { mode },
+  });
+
+  for (const env of [undefined, "", "builder", "orchestrator", "banana", 42]) {
+    expect(resolveMode([persisted("builder")], env, "orchestrator")).toEqual({
+      mode: "orchestrator",
+      invalid: false,
+    });
+    expect(resolveMode([persisted("orchestrator")], env, "builder")).toEqual({
+      mode: "builder",
+      invalid: false,
+    });
+  }
+});
+
+test("resolveMode: persisted entry wins over any PI_MODE value", () => {
   const builder = {
     type: "custom",
     customType: "mode-switch",
@@ -217,61 +192,51 @@ test("startupPlan: persisted entry wins over any PI_MODE value", () => {
   };
 
   for (const env of [undefined, "", "builder", "orchestrator", "banana", 42]) {
-    expect(startupPlan([builder], env)).toEqual({
+    expect(resolveMode([builder], env, undefined)).toEqual({
       mode: "builder",
-      submit: false,
       invalid: false,
     });
-    expect(startupPlan([orchestrator], env)).toEqual({
+    expect(resolveMode([orchestrator], env, undefined)).toEqual({
       mode: "orchestrator",
-      submit: false,
       invalid: false,
     });
   }
 });
 
-test("startupPlan: without a persisted entry the PI_MODE value selects the mode", () => {
-  expect(startupPlan([], undefined)).toEqual({
+test("resolveMode: without transferred or persisted state the PI_MODE value selects the mode", () => {
+  expect(resolveMode([], undefined, undefined)).toEqual({
     mode: "builder",
-    submit: false,
     invalid: false,
   });
-  expect(startupPlan([], "")).toEqual({
+  expect(resolveMode([], "", undefined)).toEqual({
     mode: "builder",
-    submit: false,
     invalid: false,
   });
-  expect(startupPlan([], "   ")).toEqual({
+  expect(resolveMode([], "   ", undefined)).toEqual({
     mode: "builder",
-    submit: false,
     invalid: false,
   });
-  expect(startupPlan([], 42)).toEqual({
+  expect(resolveMode([], 42, undefined)).toEqual({
     mode: "builder",
-    submit: false,
     invalid: false,
   });
-  expect(startupPlan([], "builder")).toEqual({
+  expect(resolveMode([], "builder", undefined)).toEqual({
     mode: "builder",
-    submit: false,
     invalid: false,
   });
-  expect(startupPlan([], "  orchestrator  ")).toEqual({
+  expect(resolveMode([], "  orchestrator  ", undefined)).toEqual({
     mode: "orchestrator",
-    submit: true,
     invalid: false,
   });
 });
 
-test("startupPlan: invalid PI_MODE without a persisted entry defaults to builder and warns", () => {
-  expect(startupPlan([], "wizard")).toEqual({
+test("resolveMode: invalid PI_MODE without other state defaults to builder and flags invalid", () => {
+  expect(resolveMode([], "wizard", undefined)).toEqual({
     mode: "builder",
-    submit: false,
     invalid: true,
   });
-  expect(startupPlan([], " ORCHESTRATOR ")).toEqual({
+  expect(resolveMode([], " ORCHESTRATOR ", undefined)).toEqual({
     mode: "builder",
-    submit: false,
     invalid: true,
   });
 });
@@ -310,54 +275,35 @@ test("modeLabel: exact footer labels", () => {
   expect(modeLabel("orchestrator")).toBe("👑");
 });
 
-test("submissionOptions: queues as followUp only while streaming", () => {
-  expect(submissionOptions(true)).toEqual({
-    expandPromptTemplates: true,
-  });
-  expect(submissionOptions(false)).toEqual({
-    expandPromptTemplates: true,
-    deliverAs: "followUp",
-  });
-});
-
-test("hasPromptTemplate: requires a prompt-source command with the given name", () => {
-  expect(hasPromptTemplate([], "orchestrator")).toBe(false);
-  expect(
-    hasPromptTemplate([{ name: "orchestrator", source: "extension" }], "orchestrator"),
-  ).toBe(false);
-  expect(
-    hasPromptTemplate([{ name: "orchestrator", source: "skill" }], "orchestrator"),
-  ).toBe(false);
-  expect(
-    hasPromptTemplate([{ name: "orchestratorx", source: "prompt" }], "orchestrator"),
-  ).toBe(false);
-  expect(
-    hasPromptTemplate(
-      [
-        { name: "mode", source: "extension" },
-        { name: "orchestrator", source: "prompt" },
-      ],
-      "orchestrator",
-    ),
-  ).toBe(true);
-  expect(hasPromptTemplate([{ name: "builder", source: "prompt" }], "builder")).toBe(
-    true,
-  );
-  expect(hasPromptTemplate([{ name: "builder", source: "prompt" }], "orchestrator")).toBe(
-    false,
-  );
-});
-
 // ---------------------------------------------------------------------------
 // Factory behavior against a fake ExtensionAPI
 // ---------------------------------------------------------------------------
 
-type FakeCommand = { name: string; source: string };
+const REMINDER_MESSAGE = {
+  message: {
+    customType: "orchestrator-guard-reminder",
+    content:
+      "👑 Orchestrator mode: the main session may only read/write project docs (*.md) — delegate all code/file work to a sub-agent via the Agent tool.",
+    display: true,
+  },
+};
+
+const BUILDER_REMINDER_MESSAGE = {
+  message: {
+    customType: "mode-switch-reminder",
+    content:
+      "You are running in 🔨 builder mode. Follow the builder-mode rules in <sub-agents-workflows>.",
+    display: true,
+  },
+};
+
 type StatusSet = { key: string; value: string };
 type Notify = { message: string; type: string };
 type UserMessage = { content: string; options?: Record<string, unknown> };
 type EntryAppend = { customType: string; data?: unknown };
 type ModeChange = { event: string; data: unknown };
+
+type SessionStartReason = "startup" | "reload" | "new" | "resume" | "fork";
 
 type HarnessCtx = {
   hasUI: boolean;
@@ -368,12 +314,15 @@ type HarnessCtx = {
     custom: <T>(factory: (...args: any[]) => unknown) => Promise<T>;
   };
   isIdle: () => boolean;
-  sessionManager: { getEntries: () => unknown[] };
+  sessionManager: {
+    getEntries: () => unknown[];
+    getSessionFile: () => string | undefined;
+  };
 };
 
 type Harness = {
   idle: boolean;
-  commands: FakeCommand[];
+  sessionFile: string | undefined;
   entries: unknown[];
   ctx: HarnessCtx;
   statuses: StatusSet[];
@@ -400,8 +349,9 @@ type Harness = {
     initialSelectedValue?: string;
   }>;
   selection?: Mode;
-  startSession: () => void;
-  compact: () => void;
+  startSession: (reason?: SessionStartReason, previousSessionFile?: string) => void;
+  beforeSwitch: (reason: "new" | "resume") => void;
+  compact: (reason?: "manual" | "threshold" | "overflow") => void;
   shortcut: (selection?: Mode) => Promise<void>;
   toolCall: (event: unknown) => unknown;
   agentStart: () => unknown;
@@ -409,18 +359,18 @@ type Harness = {
 
 function createHarness(options: {
   entries?: unknown[];
-  commands?: FakeCommand[];
   idle?: boolean;
+  sessionFile?: string;
+  resetHandoff?: boolean;
   agentDir?: string;
 } = {}): Harness {
+  // The extension's /new handoff outlives a single factory instance; reset it
+  // by default so each test starts from a clean handoff slot.
+  if ((options.resetHandoff ?? true) && HANDOFF_SYMBOL !== undefined)
+    (globalThis as Record<symbol, unknown>)[HANDOFF_SYMBOL] = undefined;
   const harness: Harness = {
     idle: options.idle ?? true,
-    commands:
-      options.commands ??
-      [
-        { name: "builder", source: "prompt" },
-        { name: "orchestrator", source: "prompt" },
-      ],
+    sessionFile: options.sessionFile,
     entries: options.entries ?? [],
     ctx: {
       hasUI: true,
@@ -434,7 +384,10 @@ function createHarness(options: {
         custom: async <T>() => harness.selection as T,
       },
       isIdle: () => harness.idle,
-      sessionManager: { getEntries: () => harness.entries },
+      sessionManager: {
+        getEntries: () => harness.entries,
+        getSessionFile: () => harness.sessionFile,
+      },
     },
     statuses: [],
     notifies: [],
@@ -470,6 +423,7 @@ function createHarness(options: {
   (ctx as any).__selectorCalls = harness.selectorCalls;
 
   let sessionStart: ((event: unknown, ctx: unknown) => void) | undefined;
+  let sessionBeforeSwitch: ((event: unknown, ctx: unknown) => unknown) | undefined;
   let sessionCompact: ((event: unknown, ctx: unknown) => void) | undefined;
   let toolCall: ((event: unknown, ctx: unknown) => unknown) | undefined;
   let beforeAgentStart: ((event: unknown, ctx: unknown) => unknown) | undefined;
@@ -478,6 +432,9 @@ function createHarness(options: {
       switch (event) {
         case "session_start":
           sessionStart = handler;
+          break;
+        case "session_before_switch":
+          sessionBeforeSwitch = handler;
           break;
         case "session_compact":
           sessionCompact = handler;
@@ -525,7 +482,6 @@ function createHarness(options: {
     },
     appendEntry: (customType: string, data?: unknown) =>
       harness.appends.push({ customType, data }),
-    getCommands: () => harness.commands,
     sendUserMessage: (content: string, options?: Record<string, unknown>) =>
       harness.sends.push({ content, options }),
   };
@@ -542,15 +498,26 @@ function createHarness(options: {
     harness.selection = selection;
     await harness.shortcuts[0].handler(ctx);
   };
-  harness.startSession = () => {
+  harness.startSession = (reason = "startup", previousSessionFile) => {
     if (!sessionStart)
       throw new Error("session_start handler was not registered");
-    sessionStart({}, ctx);
+    const event: Record<string, unknown> = { type: "session_start", reason };
+    if (previousSessionFile !== undefined)
+      event.previousSessionFile = previousSessionFile;
+    sessionStart(event, ctx);
   };
-  harness.compact = () => {
+  harness.beforeSwitch = (reason) => {
+    if (!sessionBeforeSwitch)
+      throw new Error("session_before_switch handler was not registered");
+    return sessionBeforeSwitch(
+      { type: "session_before_switch", reason },
+      ctx,
+    );
+  };
+  harness.compact = (reason = "manual") => {
     if (!sessionCompact)
       throw new Error("session_compact handler was not registered");
-    sessionCompact({}, ctx);
+    sessionCompact({ type: "session_compact", reason }, ctx);
   };
   harness.toolCall = (event: unknown) => {
     if (!toolCall) throw new Error("tool_call handler was not registered");
@@ -589,7 +556,7 @@ test("/mode completions preserve mode order and fuzzy-match values", () => {
   expect(h.completions("zzz")).toBeNull();
 });
 
-test("session_start: fresh session shows the builder label and injects nothing", () => {
+test("session_start: fresh startup shows the builder label and arms the builder reminder", () => {
   const h = createHarness();
   h.startSession();
 
@@ -597,9 +564,11 @@ test("session_start: fresh session shows the builder label and injects nothing",
   expect(h.notifies).toEqual([]);
   expect(h.sends).toEqual([]);
   expect(h.appends).toEqual([]);
+  expect(h.agentStart()).toEqual(BUILDER_REMINDER_MESSAGE);
+  expect(h.agentStart()).toBeUndefined();
 });
 
-test("session_start: restores the persisted mode and its label", () => {
+test("session_start: restores the persisted mode, its label and its reminder", () => {
   const h = createHarness({
     entries: [
       { type: "custom", customType: "mode-switch", data: { mode: "builder" } },
@@ -616,9 +585,11 @@ test("session_start: restores the persisted mode and its label", () => {
   expect(h.notifies).toEqual([]);
   expect(h.sends).toEqual([]);
   expect(h.appends).toEqual([]);
+  expect(h.agentStart()).toEqual(REMINDER_MESSAGE);
+  expect(h.agentStart()).toBeUndefined();
 });
 
-test("session_start: restore of a session with only malformed entries defaults to builder", () => {
+test("session_start: restore of a session with only malformed entries defaults to builder and arms its reminder", () => {
   const h = createHarness({
     entries: [
       { type: "custom", customType: "mode-switch", data: { mode: "wizard" } },
@@ -627,6 +598,8 @@ test("session_start: restore of a session with only malformed entries defaults t
   h.startSession();
 
   expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
+  expect(h.appends).toEqual([]);
+  expect(h.agentStart()).toEqual(BUILDER_REMINDER_MESSAGE);
 });
 
 // ---------------------------------------------------------------------------
@@ -645,68 +618,37 @@ function withPiMode(value: string | undefined, fn: () => void): void {
   }
 }
 
-test("session_start: PI_MODE=orchestrator on a fresh session starts orchestrator like a manual switch", () => {
+test("session_start: PI_MODE=orchestrator on a fresh session selects, persists and arms orchestrator", () => {
   const h = createHarness();
   withPiMode("orchestrator", () => h.startSession());
 
-  expect(h.sends).toEqual([
-    { content: "/orchestrator", options: { expandPromptTemplates: true } },
-  ]);
   expect(h.appends).toEqual([
     { customType: "mode-switch", data: { mode: "orchestrator" } },
   ]);
+  expect(h.sends).toEqual([]);
   expect(h.statuses).toEqual([{ key: "mode", value: "[accent]👑" }]);
-  expect(h.modeChanges).toEqual([
-    { event: "mode-switch:changed", data: { mode: "orchestrator" } },
-  ]);
-  expect(h.notifies).toEqual([
-    { message: "mode-switch: orchestrator", type: "info" },
-  ]);
+  expect(h.modeChanges).toEqual([]);
+  expect(h.notifies).toEqual([]);
   expect(h.agentStart()).toEqual(REMINDER_MESSAGE); // armed on entry
+  expect(h.agentStart()).toBeUndefined();
   expect(blocked(h.toolCall({ toolName: "read", input: { path: "src/app.ts" } }))).toBe(true);
 });
 
-test("session_start: PI_MODE=orchestrator while streaming queues the switch as a followUp", () => {
-  const h = createHarness({ idle: false });
-  withPiMode("orchestrator", () => h.startSession());
-
-  expect(h.sends).toEqual([
-    {
-      content: "/orchestrator",
-      options: { expandPromptTemplates: true, deliverAs: "followUp" },
-    },
-  ]);
-});
-
-test("session_start: PI_MODE=orchestrator without the template warns and stays builder", () => {
-  const h = createHarness({
-    commands: [{ name: "builder", source: "prompt" }],
-  });
-  withPiMode("orchestrator", () => h.startSession());
-
-  expect(h.sends).toEqual([]);
-  expect(h.appends).toEqual([]);
-  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
-  expect(h.notifies).toEqual([
-    {
-      message: "mode-switch: /orchestrator template not found; staying on builder",
-      type: "warning",
-    },
-  ]);
-  expect(h.toolCall({ toolName: "read", input: { path: "src/app.ts" } })).toBeUndefined();
-});
-
-test("session_start: PI_MODE=builder on a fresh session behaves like the default", () => {
+test("session_start: PI_MODE=builder on a fresh session persists the choice and arms the builder reminder", () => {
   const h = createHarness();
   withPiMode("builder", () => h.startSession());
 
   expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
   expect(h.notifies).toEqual([]);
   expect(h.sends).toEqual([]);
-  expect(h.appends).toEqual([]);
+  expect(h.appends).toEqual([
+    { customType: "mode-switch", data: { mode: "builder" } },
+  ]);
+  expect(h.agentStart()).toEqual(BUILDER_REMINDER_MESSAGE);
+  expect(h.agentStart()).toBeUndefined();
 });
 
-test("session_start: invalid PI_MODE on a fresh session warns and stays builder", () => {
+test("session_start: invalid PI_MODE on a fresh session warns, stays builder and arms its reminder", () => {
   const h = createHarness();
   withPiMode("banana", () => h.startSession());
 
@@ -720,6 +662,7 @@ test("session_start: invalid PI_MODE on a fresh session warns and stays builder"
   ]);
   expect(h.sends).toEqual([]);
   expect(h.appends).toEqual([]);
+  expect(h.agentStart()).toEqual(BUILDER_REMINDER_MESSAGE);
 });
 
 test("session_start: persisted orchestrator entry wins over PI_MODE=builder", () => {
@@ -733,6 +676,7 @@ test("session_start: persisted orchestrator entry wins over PI_MODE=builder", ()
   expect(h.statuses).toEqual([{ key: "mode", value: "[accent]👑" }]);
   expect(h.sends).toEqual([]);
   expect(h.appends).toEqual([]);
+  expect(h.agentStart()).toEqual(REMINDER_MESSAGE);
   expect(blocked(h.toolCall({ toolName: "read", input: { path: "src/app.ts" } }))).toBe(true);
 });
 
@@ -747,6 +691,7 @@ test("session_start: persisted builder entry wins over PI_MODE=orchestrator", ()
   expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
   expect(h.sends).toEqual([]);
   expect(h.appends).toEqual([]);
+  expect(h.agentStart()).toEqual(BUILDER_REMINDER_MESSAGE);
   expect(h.toolCall({ toolName: "read", input: { path: "src/app.ts" } })).toBeUndefined();
 });
 
@@ -815,14 +760,12 @@ test("mode shortcut selecting the current mode preserves no-op feedback", async 
   ]);
 });
 
-test("mode shortcut selects orchestrator while idle: submits, persists, relabels, and notifies", async () => {
+test("mode shortcut selects orchestrator: persists, relabels, notifies and arms the reminder", async () => {
   const h = createHarness({ idle: true });
   h.startSession();
   await h.shortcut("orchestrator");
 
-  expect(h.sends).toEqual([
-    { content: "/orchestrator", options: { expandPromptTemplates: true } },
-  ]);
+  expect(h.sends).toEqual([]);
   expect(h.appends).toEqual([
     { customType: "mode-switch", data: { mode: "orchestrator" } },
   ]);
@@ -833,6 +776,7 @@ test("mode shortcut selects orchestrator while idle: submits, persists, relabels
   expect(h.notifies).toEqual([
     { message: "mode-switch: orchestrator", type: "info" },
   ]);
+  expect(h.agentStart()).toEqual(REMINDER_MESSAGE);
 });
 
 test("mode shortcut emits the selected mode", async () => {
@@ -845,20 +789,16 @@ test("mode shortcut emits the selected mode", async () => {
   ]);
 });
 
-test("mode shortcut while streaming queues the selected mode as a followUp", async () => {
+test("mode shortcut while streaming switches modes without submitting a prompt", async () => {
   const h = createHarness({ idle: false });
   h.startSession();
   await h.shortcut("orchestrator");
 
-  expect(h.sends).toEqual([
-    {
-      content: "/orchestrator",
-      options: { expandPromptTemplates: true, deliverAs: "followUp" },
-    },
-  ]);
+  expect(h.sends).toEqual([]);
   expect(h.appends).toEqual([
     { customType: "mode-switch", data: { mode: "orchestrator" } },
   ]);
+  expect(h.agentStart()).toEqual(REMINDER_MESSAGE);
 });
 
 test("mode shortcut selects builder from orchestrator", async () => {
@@ -867,10 +807,7 @@ test("mode shortcut selects builder from orchestrator", async () => {
   await h.shortcut("orchestrator");
   await h.shortcut("builder");
 
-  expect(h.sends).toEqual([
-    { content: "/orchestrator", options: { expandPromptTemplates: true } },
-    { content: "/builder", options: { expandPromptTemplates: true } },
-  ]);
+  expect(h.sends).toEqual([]);
   expect(h.appends).toEqual([
     { customType: "mode-switch", data: { mode: "orchestrator" } },
     { customType: "mode-switch", data: { mode: "builder" } },
@@ -884,103 +821,7 @@ test("mode shortcut selects builder from orchestrator", async () => {
     { message: "mode-switch: orchestrator", type: "info" },
     { message: "mode-switch: builder", type: "info" },
   ]);
-});
-
-test("mode shortcut selects builder while streaming as a followUp", async () => {
-  const h = createHarness({ idle: false });
-  h.startSession();
-  await h.shortcut("orchestrator");
-  await h.shortcut("builder");
-
-  expect(h.sends).toEqual([
-    {
-      content: "/orchestrator",
-      options: { expandPromptTemplates: true, deliverAs: "followUp" },
-    },
-    {
-      content: "/builder",
-      options: { expandPromptTemplates: true, deliverAs: "followUp" },
-    },
-  ]);
-});
-
-test("mode shortcut selecting orchestrator without the template warns and changes nothing", async () => {
-  const h = createHarness({ commands: [] });
-  h.startSession();
-  await h.shortcut("orchestrator");
-
-  expect(h.sends).toEqual([]);
-  expect(h.appends).toEqual([]);
-  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
-  expect(h.notifies).toEqual([
-    {
-      message: "mode-switch: /orchestrator template not found; staying on builder",
-      type: "warning",
-    },
-  ]);
-});
-
-test("mode shortcut selecting a non-prompt orchestrator command warns and changes nothing", async () => {
-  const h = createHarness({
-    commands: [{ name: "orchestrator", source: "extension" }],
-  });
-  h.startSession();
-  await h.shortcut("orchestrator");
-
-  expect(h.sends).toEqual([]);
-  expect(h.appends).toEqual([]);
-  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
-  expect(h.notifies).toEqual([
-    {
-      message: "mode-switch: /orchestrator template not found; staying on builder",
-      type: "warning",
-    },
-  ]);
-});
-
-test("mode shortcut selecting builder without the template warns and changes nothing", async () => {
-  const h = createHarness({
-    entries: [
-      { type: "custom", customType: "mode-switch", data: { mode: "orchestrator" } },
-    ],
-    commands: [{ name: "orchestrator", source: "prompt" }],
-  });
-  h.startSession();
-  await h.shortcut("builder");
-
-  expect(h.sends).toEqual([]);
-  expect(h.appends).toEqual([]);
-  expect(h.statuses).toEqual([{ key: "mode", value: "[accent]👑" }]);
-  expect(h.notifies).toEqual([
-    {
-      message: "mode-switch: /builder template not found; staying on orchestrator",
-      type: "warning",
-    },
-  ]);
-});
-
-test("mode shortcut selecting a non-prompt builder command warns and changes nothing", async () => {
-  const h = createHarness({
-    entries: [
-      { type: "custom", customType: "mode-switch", data: { mode: "orchestrator" } },
-    ],
-    commands: [
-      { name: "builder", source: "extension" },
-      { name: "orchestrator", source: "prompt" },
-    ],
-  });
-  h.startSession();
-  await h.shortcut("builder");
-
-  expect(h.sends).toEqual([]);
-  expect(h.appends).toEqual([]);
-  expect(h.statuses).toEqual([{ key: "mode", value: "[accent]👑" }]);
-  expect(h.notifies).toEqual([
-    {
-      message: "mode-switch: /builder template not found; staying on orchestrator",
-      type: "warning",
-    },
-  ]);
+  expect(h.agentStart()).toEqual(BUILDER_REMINDER_MESSAGE);
 });
 
 test("/mode with no argument opens the selector without toggling", async () => {
@@ -1017,9 +858,7 @@ test("/mode partial input opens a prefilled selector and confirms through setMod
       initialSelectedValue: "builder",
     },
   ]);
-  expect(h.sends).toEqual([
-    { content: "/orchestrator", options: { expandPromptTemplates: true } },
-  ]);
+  expect(h.sends).toEqual([]);
   expect(h.appends).toEqual([
     { customType: "mode-switch", data: { mode: "orchestrator" } },
   ]);
@@ -1030,9 +869,7 @@ test("/mode orchestrator sets explicitly from builder", async () => {
   h.startSession();
   await h.command("orchestrator");
 
-  expect(h.sends).toEqual([
-    { content: "/orchestrator", options: { expandPromptTemplates: true } },
-  ]);
+  expect(h.sends).toEqual([]);
   expect(h.appends).toEqual([
     { customType: "mode-switch", data: { mode: "orchestrator" } },
   ]);
@@ -1043,17 +880,16 @@ test("/mode orchestrator sets explicitly from builder", async () => {
   expect(h.notifies).toEqual([
     { message: "mode-switch: orchestrator", type: "info" },
   ]);
+  expect(h.agentStart()).toEqual(REMINDER_MESSAGE);
 });
 
-test("/mode orchestrator while orchestrator: notify only, no message or entry", async () => {
+test("/mode orchestrator while orchestrator: notify only, no message, entry or rearm", async () => {
   const h = createHarness();
   h.startSession();
   await h.command("orchestrator");
   await h.command("orchestrator");
 
-  expect(h.sends).toEqual([
-    { content: "/orchestrator", options: { expandPromptTemplates: true } },
-  ]);
+  expect(h.sends).toEqual([]);
   expect(h.appends).toEqual([
     { customType: "mode-switch", data: { mode: "orchestrator" } },
   ]);
@@ -1065,9 +901,11 @@ test("/mode orchestrator while orchestrator: notify only, no message or entry", 
     { message: "mode-switch: orchestrator", type: "info" },
     { message: "mode-switch: already on orchestrator", type: "info" },
   ]);
+  expect(h.agentStart()).toEqual(REMINDER_MESSAGE); // the switch one-shot, not a rearm
+  expect(h.agentStart()).toBeUndefined();
 });
 
-test("/mode builder while builder: notify only, no message or entry", async () => {
+test("/mode builder while builder: notify only, no message, entry or rearm", async () => {
   const h = createHarness();
   h.startSession();
   await h.command("builder");
@@ -1078,18 +916,17 @@ test("/mode builder while builder: notify only, no message or entry", async () =
   expect(h.notifies).toEqual([
     { message: "mode-switch: already on builder", type: "info" },
   ]);
+  expect(h.agentStart()).toEqual(BUILDER_REMINDER_MESSAGE); // the startup one-shot
+  expect(h.agentStart()).toBeUndefined();
 });
 
-test("/mode builder from orchestrator: submits /builder", async () => {
+test("/mode builder from orchestrator: switches without submitting a prompt", async () => {
   const h = createHarness();
   h.startSession();
   await h.command("orchestrator");
   await h.command("builder");
 
-  expect(h.sends).toEqual([
-    { content: "/orchestrator", options: { expandPromptTemplates: true } },
-    { content: "/builder", options: { expandPromptTemplates: true } },
-  ]);
+  expect(h.sends).toEqual([]);
   expect(h.appends).toEqual([
     { customType: "mode-switch", data: { mode: "orchestrator" } },
     { customType: "mode-switch", data: { mode: "builder" } },
@@ -1103,6 +940,7 @@ test("/mode builder from orchestrator: submits /builder", async () => {
     { message: "mode-switch: orchestrator", type: "info" },
     { message: "mode-switch: builder", type: "info" },
   ]);
+  expect(h.agentStart()).toEqual(BUILDER_REMINDER_MESSAGE);
 });
 
 test("/mode unmatched input opens a prefilled selector and cancellation is a no-op", async () => {
@@ -1140,9 +978,7 @@ test("non-UI /mode rejects selector input but accepts an exact mode", async () =
 
   await h.command("orchestrator");
 
-  expect(h.sends).toEqual([
-    { content: "/orchestrator", options: { expandPromptTemplates: true } },
-  ]);
+  expect(h.sends).toEqual([]);
   expect(h.appends).toEqual([
     { customType: "mode-switch", data: { mode: "orchestrator" } },
   ]);
@@ -1160,26 +996,18 @@ test("persisted switches restore in a fresh session over the same entries", asyn
       data: a.data,
     })),
   });
-  resumed.startSession();
+  resumed.startSession("resume");
 
   expect(resumed.statuses).toEqual([
     { key: "mode", value: "[accent]👑" },
   ]);
   expect(resumed.sends).toEqual([]);
+  expect(resumed.agentStart()).toEqual(REMINDER_MESSAGE);
 });
 
 // ---------------------------------------------------------------------------
 // Orchestrator guard
 // ---------------------------------------------------------------------------
-
-const REMINDER_MESSAGE = {
-  message: {
-    customType: "orchestrator-guard-reminder",
-    content:
-      "👑 Orchestrator mode: the main session may only read/write project docs (*.md) — delegate all code/file work to a sub-agent via the Agent tool.",
-    display: true,
-  },
-};
 
 function blocked(result: unknown): boolean {
   return (
@@ -1251,42 +1079,306 @@ test("factory: shortcut mode selection arms and disarms the gate", async () => {
   expect(h.toolCall({ toolName: "edit", input: { path: "x.ts" } })).toBeUndefined();
   await h.shortcut("orchestrator");
   expect(blocked(h.toolCall({ toolName: "edit", input: { path: "x.ts" } }))).toBe(true);
+  expect(h.agentStart()).toEqual(REMINDER_MESSAGE);
   await h.shortcut("builder");
   expect(h.toolCall({ toolName: "edit", input: { path: "x.ts" } })).toBeUndefined();
+  expect(h.agentStart()).toEqual(BUILDER_REMINDER_MESSAGE);
 });
 
 test("factory: reminder fires on turn ten and never in builder mode", async () => {
   const h = createHarness();
   h.startSession();
-  expect(h.agentStart()).toBeUndefined();
+  expect(h.agentStart()).toEqual(BUILDER_REMINDER_MESSAGE); // startup one-shot
   await h.shortcut("orchestrator");
-  // Entering orchestrator consumes its immediate reminder before the interval counts.
+  // Entering orchestrator consumes its one-shot reminder before the interval counts.
   expect(h.agentStart()).toEqual(REMINDER_MESSAGE);
   for (let i = 0; i < 9; i++) expect(h.agentStart()).toBeUndefined();
   expect(h.agentStart()).toEqual(REMINDER_MESSAGE);
   expect(h.agentStart()).toBeUndefined();
   await h.shortcut("builder");
-  expect(h.agentStart()).toBeUndefined();
+  expect(h.agentStart()).toEqual(BUILDER_REMINDER_MESSAGE);
 });
 
 test("factory: reminder is immediate when switching into orchestrator", async () => {
   const h = createHarness();
   h.startSession();
+  expect(h.agentStart()).toEqual(BUILDER_REMINDER_MESSAGE); // startup one-shot
   await h.shortcut("orchestrator");
 
   expect(h.agentStart()).toEqual(REMINDER_MESSAGE);
   expect(h.agentStart()).toBeUndefined();
 });
 
-test("factory: session_compact resets the mode and the reminder counter", () => {
+// ---------------------------------------------------------------------------
+// Session reminders and /new lifecycle handoff
+// ---------------------------------------------------------------------------
+
+test("session_start: every start reason restores the mode and arms exactly one reminder", () => {
+  for (const reason of ["startup", "reload", "resume", "fork"] as const) {
+    const h = createHarness({
+      entries: [
+        { type: "custom", customType: "mode-switch", data: { mode: "orchestrator" } },
+      ],
+    });
+    h.startSession(reason);
+
+    expect(h.statuses).toEqual([{ key: "mode", value: "[accent]👑" }]);
+    expect(h.appends).toEqual([]);
+    expect(h.agentStart()).toEqual(REMINDER_MESSAGE);
+    expect(h.agentStart()).toBeUndefined();
+  }
+});
+
+test("session_start: fresh builder starts arm the builder one-shot reminder", () => {
+  for (const reason of ["startup", "reload"] as const) {
+    const h = createHarness();
+    h.startSession(reason);
+
+    expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
+    expect(h.appends).toEqual([]);
+    expect(h.agentStart()).toEqual(BUILDER_REMINDER_MESSAGE);
+    expect(h.agentStart()).toBeUndefined();
+  }
+});
+
+test("builder: the one-shot reminder fires once and never periodically", () => {
+  const h = createHarness();
+  h.startSession();
+  expect(h.agentStart()).toEqual(BUILDER_REMINDER_MESSAGE);
+  for (let i = 0; i < 30; i++) expect(h.agentStart()).toBeUndefined();
+});
+
+test("orchestrator: the periodic interval resumes after the one-shot reminder", () => {
   const h = createHarness({
     entries: [
       { type: "custom", customType: "mode-switch", data: { mode: "orchestrator" } },
     ],
   });
   h.startSession();
-  h.compact();
-  // The restored orchestrator does not carry an immediate reminder; the interval restarts.
+  expect(h.agentStart()).toEqual(REMINDER_MESSAGE); // one-shot consumed
+  for (let i = 0; i < 9; i++) expect(h.agentStart()).toBeUndefined();
+  expect(h.agentStart()).toEqual(REMINDER_MESSAGE); // default interval of 10
+});
+
+test("live switch: each change arms exactly one matching one-shot reminder", async () => {
+  const h = createHarness();
+  h.startSession();
+  expect(h.agentStart()).toEqual(BUILDER_REMINDER_MESSAGE);
+
+  await h.shortcut("orchestrator");
+  expect(h.sends).toEqual([]);
+  expect(h.appends).toEqual([
+    { customType: "mode-switch", data: { mode: "orchestrator" } },
+  ]);
+  expect(h.modeChanges).toEqual([
+    { event: "mode-switch:changed", data: { mode: "orchestrator" } },
+  ]);
+  expect(h.agentStart()).toEqual(REMINDER_MESSAGE);
+
+  await h.shortcut("builder");
+  expect(h.sends).toEqual([]);
+  expect(h.appends).toEqual([
+    { customType: "mode-switch", data: { mode: "orchestrator" } },
+    { customType: "mode-switch", data: { mode: "builder" } },
+  ]);
+  expect(h.agentStart()).toEqual(BUILDER_REMINDER_MESSAGE);
+});
+
+test("live switch: selecting the current mode does not rearm the reminder", async () => {
+  const h = createHarness();
+  h.startSession();
+  await h.shortcut("builder");
+
+  expect(h.appends).toEqual([]);
+  expect(h.modeChanges).toEqual([]);
+  expect(h.agentStart()).toEqual(BUILDER_REMINDER_MESSAGE); // still the startup one-shot
+  expect(h.agentStart()).toBeUndefined();
+});
+
+test("session_compact: every reason preserves the mode and arms the one-shot reminder", () => {
+  for (const reason of ["manual", "threshold", "overflow"] as const) {
+    for (const mode of MODES) {
+      const h = createHarness({
+        entries: [
+          { type: "custom", customType: "mode-switch", data: { mode } },
+        ],
+      });
+      h.startSession();
+      const expected =
+        mode === "orchestrator" ? REMINDER_MESSAGE : BUILDER_REMINDER_MESSAGE;
+      expect(h.agentStart()).toEqual(expected); // startup one-shot consumed
+
+      h.compact(reason);
+
+      expect(h.statuses).toEqual([
+        {
+          key: "mode",
+          value: mode === "orchestrator" ? "[accent]👑" : "[muted]🔨",
+        },
+      ]);
+      expect(h.appends).toEqual([]);
+      expect(h.modeChanges).toEqual([]);
+      expect(h.agentStart()).toEqual(expected);
+      expect(h.agentStart()).toBeUndefined();
+    }
+  }
+});
+
+test("/new: the outgoing orchestrator mode transfers into the replacement session", async () => {
+  const outgoing = createHarness({ sessionFile: "/tmp/old.jsonl" });
+  outgoing.startSession("startup");
+  await outgoing.shortcut("orchestrator");
+  outgoing.beforeSwitch("new");
+
+  const replacement = createHarness({
+    sessionFile: "/tmp/new.jsonl",
+    resetHandoff: false,
+  });
+  replacement.startSession("new", "/tmp/old.jsonl");
+
+  expect(replacement.statuses).toEqual([{ key: "mode", value: "[accent]👑" }]);
+  expect(replacement.appends).toEqual([
+    { customType: "mode-switch", data: { mode: "orchestrator" } },
+  ]);
+  expect(replacement.agentStart()).toEqual(REMINDER_MESSAGE);
+});
+
+test("/new: the outgoing builder mode transfers and persists into the replacement session", async () => {
+  const outgoing = createHarness({ sessionFile: "/tmp/old.jsonl" });
+  outgoing.startSession("startup");
+  outgoing.beforeSwitch("new");
+
+  const replacement = createHarness({
+    sessionFile: "/tmp/new.jsonl",
+    resetHandoff: false,
+  });
+  replacement.startSession("new", "/tmp/old.jsonl");
+
+  expect(replacement.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
+  expect(replacement.appends).toEqual([
+    { customType: "mode-switch", data: { mode: "builder" } },
+  ]);
+  expect(replacement.agentStart()).toEqual(BUILDER_REMINDER_MESSAGE);
+});
+
+test("/new: the transferred mode beats a conflicting PI_MODE", async () => {
+  const outgoing = createHarness({ sessionFile: "/tmp/old.jsonl" });
+  outgoing.startSession("startup");
+  outgoing.beforeSwitch("new");
+
+  const replacement = createHarness({
+    sessionFile: "/tmp/new.jsonl",
+    resetHandoff: false,
+  });
+  withPiMode("orchestrator", () =>
+    replacement.startSession("new", "/tmp/old.jsonl"),
+  );
+
+  expect(replacement.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
+  expect(replacement.appends).toEqual([
+    { customType: "mode-switch", data: { mode: "builder" } },
+  ]);
+});
+
+test("/new: in-memory sessions transfer without session files", async () => {
+  const outgoing = createHarness();
+  outgoing.startSession("startup");
+  await outgoing.shortcut("orchestrator");
+  outgoing.beforeSwitch("new");
+
+  const replacement = createHarness({ resetHandoff: false });
+  replacement.startSession("new");
+
+  expect(replacement.statuses).toEqual([{ key: "mode", value: "[accent]👑" }]);
+  expect(replacement.appends).toEqual([
+    { customType: "mode-switch", data: { mode: "orchestrator" } },
+  ]);
+});
+
+test("/new: a later capture supersedes a stale handoff", async () => {
+  const first = createHarness({
+    sessionFile: "/tmp/first.jsonl",
+    resetHandoff: false,
+  });
+  first.startSession("startup");
+  first.beforeSwitch("new");
+
+  const second = createHarness({
+    sessionFile: "/tmp/second.jsonl",
+    resetHandoff: false,
+  });
+  second.startSession("startup");
+  await second.shortcut("orchestrator");
+  second.beforeSwitch("new");
+
+  const replacement = createHarness({
+    sessionFile: "/tmp/new.jsonl",
+    resetHandoff: false,
+  });
+  replacement.startSession("new", "/tmp/second.jsonl");
+
+  expect(replacement.statuses).toEqual([{ key: "mode", value: "[accent]👑" }]);
+});
+
+test("/new: a non-new start clears a stale handoff", async () => {
+  const outgoing = createHarness({ sessionFile: "/tmp/old.jsonl" });
+  outgoing.startSession("startup");
+  await outgoing.shortcut("orchestrator");
+  outgoing.beforeSwitch("new");
+
+  const next = createHarness({ sessionFile: "/tmp/new.jsonl", resetHandoff: false });
+  next.startSession("resume");
+
+  expect(next.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
+  expect(next.appends).toEqual([]);
+});
+
+test("/new: a mismatched previous session file discards the handoff", async () => {
+  const outgoing = createHarness({ sessionFile: "/tmp/old.jsonl" });
+  outgoing.startSession("startup");
+  await outgoing.shortcut("orchestrator");
+  outgoing.beforeSwitch("new");
+
+  const replacement = createHarness({
+    sessionFile: "/tmp/other.jsonl",
+    resetHandoff: false,
+  });
+  replacement.startSession("new", "/tmp/other.jsonl");
+
+  expect(replacement.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
+  expect(replacement.appends).toEqual([]);
+});
+
+test("/new: a resume switch never captures a handoff", async () => {
+  const outgoing = createHarness({ sessionFile: "/tmp/old.jsonl" });
+  outgoing.startSession("startup");
+  await outgoing.shortcut("orchestrator");
+  outgoing.beforeSwitch("resume");
+
+  const replacement = createHarness({
+    sessionFile: "/tmp/new.jsonl",
+    resetHandoff: false,
+  });
+  replacement.startSession("new");
+
+  expect(replacement.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
+  expect(replacement.appends).toEqual([]);
+  expect(replacement.agentStart()).toEqual(BUILDER_REMINDER_MESSAGE);
+});
+
+test("factory: session_compact preserves the mode and arms the one-shot reminder", () => {
+  const h = createHarness({
+    entries: [
+      { type: "custom", customType: "mode-switch", data: { mode: "orchestrator" } },
+    ],
+  });
+  h.startSession();
+  expect(h.agentStart()).toEqual(REMINDER_MESSAGE); // startup one-shot consumed
+  h.compact("manual");
+  // Compaction appends no state; it only resets the interval and re-arms the reminder.
+  expect(h.appends).toEqual([]);
+  expect(h.modeChanges).toEqual([]);
+  expect(h.agentStart()).toEqual(REMINDER_MESSAGE);
   expect(h.agentStart()).toBeUndefined();
 });
 
