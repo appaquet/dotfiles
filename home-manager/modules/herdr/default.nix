@@ -74,6 +74,9 @@ in
 
       ui = {
         window_title = "{hostname}: {workspace}";
+        sidebar_width = 30;
+        sidebar_min_width = 22;
+        sidebar_max_width = 44;
         mobile_width_threshold = 100;
         toast = {
           delivery = "terminal"; # OSC 9/777 via attached terminal; works local + herdr --remote
