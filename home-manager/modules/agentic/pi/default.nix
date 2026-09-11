@@ -21,6 +21,13 @@ in
     enable = true;
     environment.OPENCODE_API_KEY.file = config.sops.secrets.pi_opencode_api_key.path;
     environment.JJ_EDITOR.value = "false"; # fail loud if a jj command tries to open an editor
+
+    settings = {
+      doubleEscapeAction = "tree";
+      enableInstallTelemetry = false;
+      hideThinkingBlock = false;
+      showCacheMissNotices = true;
+    };
   };
 
   home.file.".pi/agent/AGENTS.md".source = "${instructions.package}/pi/AGENTS.md";

@@ -171,6 +171,11 @@ let
     # https://github.com/arhen/pi-extensions
     {
       package = "npm:@arhen/pi-core-tps-stats@1.3.2";
+      settings = {
+        tokenSpeed = {
+          slidingWindow = 1000;
+        };
+      };
     }
 
     {
@@ -216,6 +221,12 @@ let
           defaultTimeoutSeconds = 300; # 5m default
           maxTimeoutSeconds = 1200; # 20m max explicit by agent
         };
+      };
+    }
+
+    {
+      files = {
+        ".pi/agent/extensions/settings-drift.ts".source = ./settings-drift.ts;
       };
     }
   ];

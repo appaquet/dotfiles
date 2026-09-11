@@ -170,6 +170,10 @@ in
 
   config = lib.mkIf cfg.enable {
     assertions = environmentAssertions;
+
+    # Used by settings-drift extension to detect nix vs runtime settings drift
+    dotfiles.pi.environment.PI_NIX_SETTINGS_FILE.value = toString settings;
+
     home.packages = [
       piWrapper
       nonoPi
