@@ -228,20 +228,20 @@ in
       # See docs/features/2026/08/28-pi-opencode-scope for calculation
       go = {
         main = {
-          model = "opencode-go/deepseek-flash";
+          model = "opencode-go/deepseek-v4.1-flash";
           thinking = "high";
         };
         remap = {
           "scoped/junior" = {
-            model = "opencode-go/deepseek-flash";
+            model = "opencode-go/deepseek-v4.1-flash";
             thinking = "low";
           };
           "scoped/summary" = {
-            model = "opencode-go/deepseek-flash";
+            model = "opencode-go/deepseek-v4.1-flash";
             thinking = "low";
           };
           "scoped/mid" = {
-            model = "opencode-go/deepseek-flash";
+            model = "opencode-go/deepseek-v4.1-flash";
             thinking = "high";
           };
           "scoped/senior" = {
