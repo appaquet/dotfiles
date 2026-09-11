@@ -1,12 +1,12 @@
 # Pi runtime
 
-Pi and its plugins run on **node** in production. Plugin tests run on **bun** (`bun:test`).
+Pi and its plugins run through the Node variant of the `llm-agents` Pi package in production because configured extensions use Node built-ins such as `node:sqlite`. Plugin unit tests run on **bun** (`bun:test`).
 
 ## Tests
 
 Local Pi tests live beside their source under `plugins/*.test.ts` or `lib/*.test.ts` and use bun:
 
-- Each source file has at most one colocated `<name>.test.ts`. Tests are unit-focused — verify extension and library logic against fakes (`mock.module`) with no heavy harness (no `node_modules`, no external Pi runtime, no SSE server, no `pi-subagents`). End-to-end behavior inside a real Pi runtime is out of scope for the suite.
+- Each source file has at most one colocated `<name>.test.ts`. Tests are unit-focused — verify extension and library logic against fakes (`mock.module`) with no heavy harness (no `node_modules`, no external Pi runtime, no SSE server, no `pi-subagents`). Real Pi and nono smoke coverage belongs in the agentic flake checks, not this colocated suite.
 - `import { test, ... } from "bun:test"`.
 - Bun ships in the default flake development shell. Use `just pi-test-one lib/fuzzy-selector.test.ts` for one file and `just pi-test` for the full suite. The full recipe uses `--isolate`: bun shares module and `mock.module` state across files within one invocation (unlike `node --test`, which isolates per process), so one file's mocks would otherwise leak into another.
 - The Pi package only resolves from the nix-store, which bun does not see from this repo. Keep Pi imports type-only (`import type`), or stub the `@earendil-works/*` specifiers with `mock.module`; inline trivial Pi runtime helpers (agent dir, event guards) instead of importing them.

@@ -108,7 +108,7 @@ let
   };
 in
 {
-  programs.pi.coding-agent.settings = {
+  dotfiles.pi.settings = {
     defaultProvider = "scoped";
     defaultModel = "main";
     defaultThinkingLevel = "medium";

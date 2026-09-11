@@ -229,11 +229,11 @@ let
     key: lib.foldl (acc: p: if builtins.hasAttr key p then acc // p.${key} else acc) { } plugins;
 in
 {
-  programs.pi.coding-agent.settings = (merge "settings") // {
+  dotfiles.pi.settings = (merge "settings") // {
     packages = lib.map (p: p.package) npmPlugins;
   };
 
-  programs.pi.coding-agent.environment = merge "environment";
+  dotfiles.pi.environment = merge "environment";
 
   home.file = merge "files";
 }

@@ -19,11 +19,6 @@
       inputs.home-manager.follows = "home-manager";
     };
 
-    pi = {
-      url = "github:lukasl-dev/pi.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     secrets = {
       url = "github:appaquet/dotfiles-secrets";
       #url = "path:/home/appaquet/dotfiles/secrets";

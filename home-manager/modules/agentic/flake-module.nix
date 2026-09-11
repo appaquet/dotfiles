@@ -14,6 +14,7 @@
           ]
           ++ modules;
         };
+
       sharedDefault = (evalInstructions [ ]).config.nixantic;
       jjInstructions =
         (evalInstructions [ { nixantic.versionControl.mode = "jj"; } ]).config.nixantic.instructions;
@@ -22,6 +23,7 @@
       homeManagerDefault =
         (inputs.home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
+
           modules = [
             inputs.nixantic.homeManagerModules.default
             ./nixantic.nix
@@ -34,8 +36,33 @@
             }
           ];
         }).config.nixantic;
+
       vcsContext = import ./tools/vcs-context.nix { inherit pkgs; };
       vcsContextCheck = import ./checks/vcs-context.nix { inherit pkgs vcsContext; };
+
+      llmAgentPackages = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
+      piModuleCheck = import ./pi/checks/module.nix {
+        inherit lib pkgs;
+        home-manager = inputs.home-manager;
+        upstreamPi = llmAgentPackages.pi;
+      };
+
+      piRuntimeChecks = import ./pi/checks/runtime.nix {
+        inherit lib pkgs;
+        home-manager = inputs.home-manager;
+        nono = llmAgentPackages.nono;
+        upstreamPi = llmAgentPackages.pi;
+      };
+
+      # Keep one public flake check while retaining separate internal failures
+      # for the wrapper contract and real Node runtime seam.
+      piCheck = pkgs.runCommand "pi-check" {
+        nativeBuildInputs = [
+          piModuleCheck
+          piRuntimeChecks.runtimeSmoke
+        ];
+      } "touch $out";
+
       versionControlDefaultCheck = pkgs.runCommand "agentic-version-control-default-check" { } ''
         test "${sharedDefault.versionControl.mode}" = jj
         test "${homeManagerDefault.versionControl.mode}" = jj
@@ -43,6 +70,7 @@
         test "${homeManagerDefault.instructions.package}" = "${jjInstructions.package}"
         touch $out
       '';
+
       acceptanceChecks = import ./checks/corpus.nix {
         inherit
           pkgs
@@ -50,6 +78,7 @@
           gitInstructions
           ;
       };
+
       validatedPackage =
         name: instructions: acceptanceCheck:
         pkgs.runCommand name { } ''
@@ -65,10 +94,15 @@
         agent-instructions-git =
           validatedPackage "agent-instructions-git" gitInstructions
             acceptanceChecks.git;
+
+        pi-nono-smoke = piRuntimeChecks.nonoSmoke;
       };
       checks = {
         agentic-vcs-context = vcsContextCheck;
         agentic-version-control-default = versionControlDefaultCheck;
+
+        pi = piCheck;
+
         agent-instructions = acceptanceChecks.jj;
         agent-instructions-git = acceptanceChecks.git;
       };
