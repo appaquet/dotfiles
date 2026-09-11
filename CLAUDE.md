@@ -39,7 +39,7 @@ This means:
 - Project docs (`proj/` → `~dotfiles/secrets/docs/features/.../00-*.md`) are NOT in this repo
 - Changes to project docs are tracked in the secrets repo, not here
 - `jj status` in dotfiles will NOT show project doc changes
-- Only commit dotfiles changes (commands, skills, etc.) in this repo, don't need to commit secrets, I'll do it.
+- Commit dotfiles changes (commands, skills, etc.) in this repo. Also commit project doc changes in the secrets repo with the `private: agent: docs -` prefix
 
 ## Nix Conventions
 
