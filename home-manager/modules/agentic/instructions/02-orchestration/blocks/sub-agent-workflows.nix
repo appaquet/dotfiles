@@ -21,6 +21,7 @@
   #   - Implementation and decisions: Cross-system architecture/implementation and technical decisions within supplied product direction.
   #   - Diagnosis: Systemic failures.
   #   - Risk and ownership: Own critical/high-blast-radius technical work; return product direction or user-requested advisory review.
+  #   - Frontend: Owns design-level frontend UI/UX work (create + change); small mechanical UI tweaks within the established design are below that tier.
   # - Principal
   #   - Exploration: User-requested review only.
   #   - Implementation and decisions: Options, risks, evidence, and recommendations; no execution decisions or ownership.

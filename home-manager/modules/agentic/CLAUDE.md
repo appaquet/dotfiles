@@ -37,6 +37,7 @@ Nixantic sources compose prompt text at build time. They do not define runtime w
 - Framework fields affect rendering; extra block attributes are text fragments until interpolated.
 - Main instructions become persistent context.
 - Commands become complete prompts when invoked.
+- Commands always declare an argument (`arguments = [ { label = "..."; } ]`): nixantic renders the `<label>: $ARGUMENTS` line only from a declaration, and a pi prompt without `$ARGUMENTS` drops text passed at invocation (Claude and OpenCode append it). The corpus check enforces the placeholder.
 - Source position controls text placement, not execution timing.
 - The model sees rendered text, not Nix attributes, block provenance, or AP's external workflow.
 

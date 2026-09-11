@@ -2,7 +2,12 @@
   nixantic.sources.review-workflow.commands."review-interactive" = { scope }: {
     description = "Interactive review flow, investigating each feedback/comment with sub-agent and collecting into phase documentation";
 
-    arguments = [ ];
+    arguments = [
+      {
+        label = "Feedback";
+        hint = "[review feedback/comments]";
+      }
+    ];
 
     content = ''
       Goal: Interactively review feedback/comments, investigate each with sub-agent, and collect into phase documentation. 
