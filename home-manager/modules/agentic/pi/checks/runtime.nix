@@ -68,7 +68,9 @@ let
   # validates the real profile, helper commands, wrapper, and secret boundary.
   fakeSecret = pkgs.writeText "pi-nono-smoke-secret" "expected-secret";
   fakePi = pkgs.writeShellScriptBin "pi" ''
-    printf 'secret=%s\narg=%s\n' "''${SMOKE_SECRET-}" "$1" >"$HOME/.pi/agent/nono-invocation"
+    printf 'secret=%s\nnpm-version=%s\narg=%s\n' \
+      "''${SMOKE_SECRET-}" "$(npm --version)" "$1" \
+      >"$HOME/.pi/agent/nono-invocation"
   '';
   smokePkgs = pkgs.extend (_: _: { inherit nono; });
   smokeHome = home-manager.lib.homeManagerConfiguration {
@@ -132,7 +134,11 @@ let
 
       HOME="$home" ${nonoPi}/bin/nono-pi smoke-argument
       jq -e '.smoke == "generated"' "$home/.pi/agent/settings.json"
-      printf '%s\n' 'secret=expected-secret' 'arg=smoke-argument' >"$home/expected"
+      printf '%s\n' \
+        'secret=expected-secret' \
+        "npm-version=$(${pkgs.nodejs}/bin/npm --version)" \
+        'arg=smoke-argument' \
+        >"$home/expected"
       diff -u "$home/expected" "$home/.pi/agent/nono-invocation"
     '';
   };

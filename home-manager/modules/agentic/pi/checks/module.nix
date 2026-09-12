@@ -11,6 +11,7 @@ let
   fakePi = pkgs.writeShellScriptBin "pi" ''
     {
       printf 'secret=%s\n' "''${PI_TEST_SECRET-}"
+      printf 'npm-version=%s\n' "$(npm --version)"
       printf 'argc=%s\n' "$#"
       printf 'arg=%s\n' "$@"
     } >>"$HOME/pi-invocations"
@@ -105,8 +106,9 @@ pkgs.runCommand "pi-module-check"
         "runtimeOnly": true
       }
     ' "$HOME/.pi/agent/settings.json"
-    cat >"$TMPDIR/expected-invocation" <<'EOF'
+    cat >"$TMPDIR/expected-invocation" <<EOF
     secret=secret value
+    npm-version=$(${pkgs.nodejs}/bin/npm --version)
     argc=3
     arg=--flag
     arg=--

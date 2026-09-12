@@ -71,6 +71,7 @@ let
       pkgs.coreutils
       pkgs.flock
       pkgs.jq
+      pkgs.nodejs
     ];
     text = ''
       ${environmentScript}
