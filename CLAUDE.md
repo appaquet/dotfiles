@@ -32,7 +32,12 @@ touching it (`home-manager/modules/agentic/CLAUDE.md`, Nixantic section).
 
 ## Documentation
 
-IMPORTANT: project files should be stored into `~dotfiles/secrets/docs/features`
+IMPORTANT: this repository's docs root is `~/dotfiles/secrets/docs/features`, so project docs live at
+`~/dotfiles/secrets/docs/features/<yyyy>/<mm>/<dd>-<project-name>/`. Always use that absolute path:
+`docs/features/` is not a docs location in this repo and nothing links it to the docs root.
+
+Link the docs folder with `agentic-proj-create <absolute docs path>`, so the committed `proj` link is
+absolute like the other dotfiles workspaces.
 
 This means:
 

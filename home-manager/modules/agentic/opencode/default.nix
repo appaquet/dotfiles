@@ -151,8 +151,7 @@ let
         // bash.vcs.ghRead
         // mkAllow [
           "agentic-proj-create-adhoc *"
-          "ln * proj"
-          "ln * proj-adhoc"
+          "agentic-proj-create *"
           "rm proj"
           "rm proj-adhoc"
         ];
