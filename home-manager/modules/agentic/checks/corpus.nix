@@ -85,6 +85,7 @@ let
     "frontend"
     "human-writer"
     "mem-writing"
+    "pi-nix-config"
     "version-control"
   ];
   opencodeSkills = claudeSkills ++ [

@@ -27,6 +27,7 @@ in
       enableInstallTelemetry = false;
       hideThinkingBlock = false;
       showCacheMissNotices = true;
+      tuiMode = "fullscreen";
     };
   };
 
