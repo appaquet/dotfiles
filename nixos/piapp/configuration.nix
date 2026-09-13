@@ -28,6 +28,8 @@
     enable = true;
   };
 
+  hardware.bluetooth.enable = true;
+
   hardware.raspberry-pi.config.all.base-dt-params = {
     pciex1 = {
       enable = true;
