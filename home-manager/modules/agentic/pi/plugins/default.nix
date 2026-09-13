@@ -121,6 +121,9 @@ let
     # https://github.com/nicobailon/pi-powerline-footer
     {
       package = "npm:pi-powerline-footer@0.17.0";
+      environment = {
+        POWERLINE_NERD_FONTS.value = "1";
+      };
       settings = {
         powerline = {
           preset = "default";
