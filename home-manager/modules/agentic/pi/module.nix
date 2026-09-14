@@ -7,8 +7,7 @@
 }:
 
 let
-  # This module owns the two user-facing commands and the mutable settings
-  # handoff. Home Manager continues to own models, extensions, and other files.
+  # Owns the pi/nono-pi commands and the mutable settings handoff.
   cfg = config.dotfiles.pi;
   jsonFormat = pkgs.formats.json { };
 
@@ -38,8 +37,7 @@ let
       message = "dotfiles.pi.environment.${name} must define exactly one of value or file.";
     }) cfg.environment;
 
-  # File-backed values are read by the wrapper so secret contents never enter
-  # the Nix store or evaluation result.
+  # File-backed values are read by the wrapper, keeping secrets out of the Nix store.
   environmentScript = lib.concatStringsSep "\n" (
     lib.mapAttrsToList (
       name: source:
@@ -63,8 +61,101 @@ let
 
   settings = jsonFormat.generate "pi-settings.json" cfg.settings;
 
-  # Pi owns runtime preferences in settings.json. Each launch preserves those
-  # preferences while applying Nix-owned values with recursive precedence.
+  # Merges Nix-owned settings over the live settings.json (Nix wins; pi
+  # preferences preserved) under the wrapper lock.
+  settingsMergeScript = ''
+    if [ -e "$settings_file" ] && [ ! -f "$settings_file" ] && [ ! -L "$settings_file" ]; then
+      printf 'pi: settings path is not a regular file: %s\n' "$settings_file" >&2
+      exit 1
+    fi
+
+    if [ -f "$settings_file" ] && [ ! -L "$settings_file" ]; then
+      if [ ! -r "$settings_file" ]; then
+        printf 'pi: settings file is not readable: %s\n' "$settings_file" >&2
+        exit 1
+      fi
+      if ! jq -s -e '(length == 1) and (.[0] | type == "object")' "$settings_file" >/dev/null; then
+        printf 'pi: settings file must contain exactly one JSON object: %s\n' "$settings_file" >&2
+        exit 1
+      fi
+    fi
+
+    tmp_file="$(mktemp "$agent_dir/.settings.json.tmp.XXXXXX")"
+    if [ -f "$settings_file" ] && [ ! -L "$settings_file" ]; then
+      jq -s '.[0] * .[1]' "$settings_file" ${settings} >"$tmp_file"
+    else
+      printf '%s\n' '{}' | jq -s '.[0] * .[1]' - ${settings} >"$tmp_file"
+    fi
+    chmod 0600 "$tmp_file"
+
+    if [ -L "$settings_file" ] || [ ! -f "$settings_file" ] || ! cmp -s "$tmp_file" "$settings_file"; then
+      mv -T "$tmp_file" "$settings_file"
+      tmp_file=""
+    else
+      chmod 0600 "$settings_file"
+      rm -f "$tmp_file"
+      tmp_file=""
+    fi
+  '';
+
+  # Merges the sops auth.json fragment into the live auth.json at launch
+  # (secrets stay out of the process env); managed providers win over pi-managed.
+  authMergeScript =
+    if cfg.authFile == null then
+      ""
+    else
+      let
+        fragment = lib.escapeShellArg cfg.authFile;
+      in
+      ''
+        auth_file="$agent_dir/auth.json"
+        auth_fragment_file=${fragment}
+
+        if [ ! -r "$auth_fragment_file" ]; then
+          printf 'pi: cannot read auth fragment file: %s\n' "$auth_fragment_file" >&2
+          exit 1
+        fi
+        if ! jq -e 'type == "object"' "$auth_fragment_file" >/dev/null; then
+          printf 'pi: auth fragment must be a JSON object: %s\n' "$auth_fragment_file" >&2
+          exit 1
+        fi
+
+        if [ -e "$auth_file" ] && [ ! -f "$auth_file" ] && [ ! -L "$auth_file" ]; then
+          printf 'pi: auth path is not a regular file: %s\n' "$auth_file" >&2
+          exit 1
+        fi
+
+        if [ -f "$auth_file" ] && [ ! -L "$auth_file" ]; then
+          if [ ! -r "$auth_file" ]; then
+            printf 'pi: auth file is not readable: %s\n' "$auth_file" >&2
+            exit 1
+          fi
+          if ! jq -s -e '(length == 1) and (.[0] | type == "object")' "$auth_file" >/dev/null; then
+            printf 'pi: auth file must contain exactly one JSON object: %s\n' "$auth_file" >&2
+            exit 1
+          fi
+        fi
+
+        auth_tmp_file="$(mktemp "$agent_dir/.auth.json.tmp.XXXXXX")"
+        if [ -f "$auth_file" ] && [ ! -L "$auth_file" ]; then
+          jq -s '.[0] * .[1]' "$auth_file" "$auth_fragment_file" >"$auth_tmp_file"
+        else
+          printf '%s\n' '{}' | jq -s '.[0] * .[1]' - "$auth_fragment_file" >"$auth_tmp_file"
+        fi
+        chmod 0600 "$auth_tmp_file"
+
+        if [ -L "$auth_file" ] || [ ! -f "$auth_file" ] || ! cmp -s "$auth_tmp_file" "$auth_file"; then
+          mv -T "$auth_tmp_file" "$auth_file"
+          auth_tmp_file=""
+        else
+          chmod 0600 "$auth_file"
+          rm -f "$auth_tmp_file"
+          auth_tmp_file=""
+        fi
+      '';
+
+  # Wraps pi: applies the environment, merges the settings and auth fragments
+  # under one lock, then execs pi without holding the lock.
   piWrapper = pkgs.writeShellApplication {
     name = "pi";
     runtimeInputs = [
@@ -80,10 +171,14 @@ let
       settings_file="$agent_dir/settings.json"
       lock_file="$agent_dir/.settings.json.lock"
       tmp_file=""
+      auth_tmp_file=""
 
       cleanup() {
         if [ -n "$tmp_file" ]; then
           rm -f "$tmp_file"
+        fi
+        if [ -n "$auth_tmp_file" ]; then
+          rm -f "$auth_tmp_file"
         fi
       }
       trap cleanup EXIT HUP INT TERM
@@ -95,41 +190,11 @@ let
       exec {settings_lock_fd}>"$lock_file"
       flock "$settings_lock_fd"
 
-      if [ -e "$settings_file" ] && [ ! -f "$settings_file" ] && [ ! -L "$settings_file" ]; then
-        printf 'pi: settings path is not a regular file: %s\n' "$settings_file" >&2
-        exit 1
-      fi
+      ${settingsMergeScript}
 
-      if [ -f "$settings_file" ] && [ ! -L "$settings_file" ]; then
-        if [ ! -r "$settings_file" ]; then
-          printf 'pi: settings file is not readable: %s\n' "$settings_file" >&2
-          exit 1
-        fi
-        if ! jq -s -e '(length == 1) and (.[0] | type == "object")' "$settings_file" >/dev/null; then
-          printf 'pi: settings file must contain exactly one JSON object: %s\n' "$settings_file" >&2
-          exit 1
-        fi
-      fi
+      ${authMergeScript}
 
-      tmp_file="$(mktemp "$agent_dir/.settings.json.tmp.XXXXXX")"
-      if [ -f "$settings_file" ] && [ ! -L "$settings_file" ]; then
-        jq -s '.[0] * .[1]' "$settings_file" ${settings} >"$tmp_file"
-      else
-        printf '%s\n' '{}' | jq -s '.[0] * .[1]' - ${settings} >"$tmp_file"
-      fi
-      chmod 0600 "$tmp_file"
-
-      if [ -L "$settings_file" ] || [ ! -f "$settings_file" ] || ! cmp -s "$tmp_file" "$settings_file"; then
-        mv -T "$tmp_file" "$settings_file"
-        tmp_file=""
-      else
-        chmod 0600 "$settings_file"
-        rm -f "$tmp_file"
-        tmp_file=""
-      fi
-
-      # The lock protects wrapper merges only. Pi must run without holding it
-      # because the upstream process manages its own mutable state.
+      # Release the lock before exec: pi manages its own mutable state.
       flock -u "$settings_lock_fd"
       exec {settings_lock_fd}>&-
       trap - EXIT HUP INT TERM
@@ -160,6 +225,12 @@ in
       };
       default = { };
       description = "Nix-owned Pi settings recursively merged into mutable runtime settings.";
+    };
+
+    authFile = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = "Sops-decrypted auth.json fragment merged into the live auth.json at launch; null disables the merge.";
     };
 
     environment = lib.mkOption {

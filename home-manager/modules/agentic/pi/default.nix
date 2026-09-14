@@ -14,12 +14,9 @@ in
     ./plugins
   ];
 
-  sops.secrets.pi_exa_api_key.sopsFile = config.sops.secretsFiles.common;
-  sops.secrets.pi_opencode_api_key.sopsFile = config.sops.secretsFiles.common;
-
   dotfiles.pi = {
     enable = true;
-    environment.OPENCODE_API_KEY.file = config.sops.secrets.pi_opencode_api_key.path;
+    authFile = config.sops.secrets.pi_auth_json.path;
     environment.JJ_EDITOR.value = "false"; # fail loud if a jj command tries to open an editor
 
     settings = {
@@ -41,6 +38,12 @@ in
     preferLocalBuild = true;
   } "cp -rL ${instructions.package}/pi/rules $out";
 
+  # pi secrets
+  sops.secrets.pi_exa_api_key.sopsFile = config.sops.secretsFiles.work;
+  sops.secrets.pi_exa_api_key.key = "pi/exa_api_key";
+  sops.secrets.pi_auth_json.sopsFile = config.sops.secretsFiles.work;
+  sops.secrets.pi_auth_json.key = "pi/auth_json";
+
   dotfiles.nono.profiles.pi = {
     meta.version = "1.0.0";
 
@@ -53,7 +56,7 @@ in
 
     filesystem.read_file = [
       "$HOME/.config/sops-nix/secrets/pi_exa_api_key"
-      "$HOME/.config/sops-nix/secrets/pi_opencode_api_key"
+      "$HOME/.config/sops-nix/secrets/pi_auth_json"
     ];
 
     # pi-x-ide does a sig 0 on ide processes, which is blocked unfortunately...

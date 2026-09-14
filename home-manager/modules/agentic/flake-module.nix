@@ -60,6 +60,7 @@
         nativeBuildInputs = [
           piModuleCheck
           piRuntimeChecks.runtimeSmoke
+          piRuntimeChecks.authMergeSmoke
         ];
       } "touch $out";
 

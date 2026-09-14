@@ -142,11 +142,80 @@ let
       diff -u "$home/expected" "$home/.pi/agent/nono-invocation"
     '';
   };
+
+  # --- auth.json merge smoke ---
+  # The wrapper merges the sops-managed fragment into the live auth.json at
+  # launch (managed providers win, pi-managed entries preserved) and must not
+  # leak managed keys into the process environment.
+  goodAuthFragment = pkgs.writeText "pi-auth-good-fragment" ''
+    {"opencode-go":{"type":"api_key","key":"managed-opencode"},"cerebras":{"type":"api_key","key":"managed-cerebras"}}
+  '';
+  badAuthFragment = pkgs.writeText "pi-auth-bad-fragment" "not-a-json-object";
+
+  # Stand-in pi that records the environment the wrapper passes on.
+  authProbePi = pkgs.writeShellScriptBin "pi" ''
+    printf 'OPENCODE_API_KEY=%s\n' "''${OPENCODE_API_KEY-}" >"$HOME/.pi/agent/auth-probe"
+  '';
+
+  mkAuthHome =
+    fragment:
+    home-manager.lib.homeManagerConfiguration {
+      inherit pkgs;
+      extraSpecialArgs.inputs'.llm-agents.packages.pi = upstreamPi;
+      modules = [
+        ../module.nix
+        {
+          home = {
+            username = "pi-auth";
+            homeDirectory = "/home/pi-auth";
+            stateVersion = "24.11";
+          };
+          dotfiles.pi = {
+            enable = true;
+            package = authProbePi;
+            authFile = toString fragment;
+          };
+        }
+      ];
+    };
+  authWrapper =
+    fragment: lib.findFirst (p: lib.getName p == "pi") null (mkAuthHome fragment).config.home.packages;
+
+  authMergeSmoke = pkgs.runCommand "pi-auth-merge-smoke" { nativeBuildInputs = [ pkgs.jq ]; } ''
+    set -e
+    export HOME="$TMPDIR/home"
+    mkdir -p "$HOME/.pi/agent"
+
+    # Seed a pi-managed OAuth entry plus a stale managed key the fragment must
+    # override.
+    printf '%s\n' \
+      '{"openai-codex":{"type":"oauth","access":"codex-at","refresh":"codex-rt","expires":1},"opencode-go":{"type":"api_key","key":"stale"}}' \
+      >"$HOME/.pi/agent/auth.json"
+
+    ${authWrapper goodAuthFragment}/bin/pi
+
+    jq -e 'type == "object"' "$HOME/.pi/agent/auth.json"
+    jq -e '.["opencode-go"].key == "managed-opencode"' "$HOME/.pi/agent/auth.json"
+    jq -e '.cerebras.key == "managed-cerebras"' "$HOME/.pi/agent/auth.json"
+    jq -e '.["openai-codex"].access == "codex-at"' "$HOME/.pi/agent/auth.json"
+    test "$(cat "$HOME/.pi/agent/auth-probe")" = "OPENCODE_API_KEY="
+
+    # A non-object fragment must fail loudly and leave auth.json untouched.
+    home2="$TMPDIR/home2"
+    mkdir -p "$home2/.pi/agent"
+    printf '%s\n' '{"openai-codex":{"type":"oauth","access":"codex-at"}}' >"$home2/.pi/agent/auth.json"
+    if HOME="$home2" ${authWrapper badAuthFragment}/bin/pi; then
+      echo "pi: non-object auth fragment was accepted (expected failure)" >&2
+      exit 1
+    fi
+    test "$(jq -r 'has("cerebras")' "$home2/.pi/agent/auth.json")" = "false"
+    touch "$out"
+  '';
 in
 
 assert selectedPi == upstreamPi.override { useBun = false; };
 assert nonoPi != null;
 
 {
-  inherit nonoSmoke runtimeSmoke;
+  inherit authMergeSmoke nonoSmoke runtimeSmoke;
 }

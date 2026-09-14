@@ -65,14 +65,12 @@ let
     # https://github.com/nicobailon/pi-web-access
     {
       package = "npm:pi-web-access@0.28.0";
-      environment = {
-        EXA_API_KEY.file = config.sops.secrets.pi_exa_api_key.path;
-      };
       files = {
         ".pi/web-search.json".text = builtins.toJSON {
           provider = "exa";
           workflow = "none";
           autoOpenBrowser = false;
+          exaApiKey = "!cat ${config.sops.secrets.pi_exa_api_key.path}";
         };
       };
     }
