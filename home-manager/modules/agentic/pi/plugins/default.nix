@@ -55,6 +55,14 @@ let
     # https://github.com/tintinweb/pi-tasks
     {
       package = "npm:@tintinweb/pi-tasks@0.9.0";
+      files = {
+        # The /tasks settings UI only writes per-project overrides, never this file,
+        # so nix can own it without clobbering runtime state.
+        ".pi/agent/tasks-config.json".text = builtins.toJSON {
+          maxVisible = 5;
+          collapseCompleted = true;
+        };
+      };
     }
 
     # https://github.com/juicesharp/rpiv-mono

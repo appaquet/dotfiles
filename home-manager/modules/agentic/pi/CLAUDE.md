@@ -15,7 +15,7 @@ Local Pi tests live beside their source under `plugins/*.test.ts` or `lib/*.test
 
 ## Extension loading and Home Manager wiring
 
-- `plugins/default.nix` `files` entries install into the live agent dir `~/.pi/agent/` after `./x home build` + switch.
+- `plugins/default.nix` `files` entries install into the live agent dir `~/.pi/agent/` after `./x home build` + switch. Extension global config/state files live in the owning plugin's `files` attr there, not in the top-level `default.nix`.
 - Only files placed under `.pi/agent/extensions/` are discovered as extensions. Everything else (config JSONs, etc.) is inert data that extensions read.
 - Discovery: every `.ts`/`.js` file directly in `extensions/` loads; subdirectories load only their `index.ts`/`index.js` or paths declared in a `package.json` `pi.extensions` manifest. Scanning recurses at most one level.
 - Every discovered file must `export default function (pi) {}`. A file without a factory logs a non-fatal startup error (`Extension does not export a valid factory function: <path>`), not a crash.
