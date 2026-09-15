@@ -10,6 +10,8 @@ let
 
       jujutsu = final.callPackage ./jj { };
 
+      mboxshell = final.callPackage ./mboxshell { };
+
       nono = inputs.llm-agents.packages.${system}.nono;
 
       opencode = inputs.llm-agents.packages.${system}.opencode;
