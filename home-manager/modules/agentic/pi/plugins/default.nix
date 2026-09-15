@@ -72,7 +72,7 @@ let
 
     # https://github.com/nicobailon/pi-web-access
     {
-      package = "npm:pi-web-access@0.28.0";
+      package = "npm:pi-web-access@0.29.0";
       files = {
         ".pi/web-search.json".text = builtins.toJSON {
           provider = "exa";
@@ -85,7 +85,7 @@ let
 
     # https://github.com/nicobailon/pi-mcp-adapter
     {
-      package = "npm:pi-mcp-adapter@2.32.1";
+      package = "npm:pi-mcp-adapter@2.33.0";
       files = {
         ".pi/agent/mcp.json".text = builtins.toJSON {
           scriptMode = false;
@@ -105,7 +105,7 @@ let
 
     # https://github.com/balaenis/pi-x-ide
     {
-      package = "npm:pi-x-ide@1.19.5";
+      package = "npm:pi-x-ide@1.20.0";
       environment = {
         PI_X_IDE_AUTO_INSTALL.value = "0";
       };
@@ -126,7 +126,7 @@ let
 
     # https://github.com/nicobailon/pi-powerline-footer
     {
-      package = "npm:pi-powerline-footer@0.17.0";
+      package = "npm:pi-powerline-footer@0.17.1";
       environment = {
         POWERLINE_NERD_FONTS.value = "1";
       };
