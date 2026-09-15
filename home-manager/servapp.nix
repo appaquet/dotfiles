@@ -7,6 +7,7 @@
     ./modules/agentic
     ./modules/dev.nix
     ./modules/docker.nix
+    ./modules/mboxshell.nix
     ./modules/media.nix
     ./modules/vms.nix
     ./modules/vpn.nix
