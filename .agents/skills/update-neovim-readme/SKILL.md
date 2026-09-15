@@ -1,3 +1,8 @@
+---
+name: update-neovim-readme
+description: Regenerate the neovim keybinding cheat sheet from the home-manager/modules/neovim config so it stays accurate. Use when the neovim config changed or the cheat sheet is stale.
+---
+
 # Update Neovim Cheat Sheet
 
 Update my neovim cheat sheet file to ensure all keybindings are documented and accurate.
