@@ -39,6 +39,10 @@ local function focus_diffview_keymap()
 	return { "n", "<Leader>E", focus_diffview_view, { desc = "Diffview: focus diff view" } }
 end
 
+local function refresh_diffview_keymap()
+	return { "n", "<Leader>gdr", "<cmd>DiffviewRefresh<CR>", { desc = "Diffview: refresh" } }
+end
+
 require("diffview").setup({
 	preferred_adapter = "jj",
 	restore_session = false, -- don't auto restore diffview sessions on startup
@@ -57,12 +61,15 @@ require("diffview").setup({
 	keymaps = {
 		view = {
 			focus_diffview_keymap(),
+			refresh_diffview_keymap(),
 		},
 		diff1_inline = {
+			refresh_diffview_keymap(),
 			{ "n", "]g", center_after(diffview_actions.next_inline_hunk), { desc = "Git: next hunk" } },
 			{ "n", "[g", center_after(diffview_actions.prev_inline_hunk), { desc = "Git: previous hunk" } },
 		},
 		diff2 = {
+			refresh_diffview_keymap(),
 			{ "n", "]g", center_after(function()
 				vim.cmd("normal! ]c")
 			end), { desc = "Git: next hunk" } },
@@ -72,18 +79,23 @@ require("diffview").setup({
 		},
 		file_panel = {
 			focus_diffview_keymap(),
+			refresh_diffview_keymap(),
 		},
 		file_history_panel = {
 			focus_diffview_keymap(),
+			refresh_diffview_keymap(),
 		},
 		option_panel = {
 			focus_diffview_keymap(),
+			refresh_diffview_keymap(),
 		},
 		help_panel = {
 			focus_diffview_keymap(),
+			refresh_diffview_keymap(),
 		},
 		commit_log_panel = {
 			focus_diffview_keymap(),
+			refresh_diffview_keymap(),
 		},
 	},
 	view = {
