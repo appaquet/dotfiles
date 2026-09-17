@@ -431,6 +431,118 @@ class InspectionTests(unittest.TestCase):
         self.assertEqual({"path": "/work/file.txt"}, entry["records"][2]["arguments"])
 
 
+class StatsTests(unittest.TestCase):
+    """Verify corpus-wide reviewer metrics from persisted session fixtures."""
+
+    def setUp(self):
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        self.session_dir = pathlib.Path(self.directory.name)
+
+    def test_stats_reports_counts_weekly_series_cohorts_and_targets(self):
+        orchestrator_cwd = "/work/orchestrated"
+        solo_cwd = "/work/solo"
+        excluded_cwd = "/work/dotcore/repository"
+        reviewer_only_cwd = "/work/reviewer-only"
+        sessions = (
+            ("orch-top-1", orchestrator_cwd, "2026-09-01T00:00:00.000Z", "", True),
+            ("orch-top-2", orchestrator_cwd, "2026-09-02T00:00:00.000Z", "Named top-level session", False),
+            ("orch-review-1", orchestrator_cwd, "2026-09-03T00:00:00.000Z", "architecture-reviewer#a", False),
+            ("orch-review-2", orchestrator_cwd, "2026-09-04T00:00:00.000Z", "code-style-reviewer#b", False),
+            ("orch-review-3", orchestrator_cwd, "2026-09-05T00:00:00.000Z", "architecture-reviewer#c", False),
+            ("orch-other", orchestrator_cwd, "2026-09-06T00:00:00.000Z", "mid-dev#d", False),
+            ("solo-top-1", solo_cwd, "2026-09-08T00:00:00.000Z", "", False),
+            ("solo-top-2", solo_cwd, "2026-09-09T00:00:00.000Z", "", False),
+            ("solo-review", solo_cwd, "2026-09-10T00:00:00.000Z", "requirements-reviewer#e", False),
+            ("solo-other", solo_cwd, "2026-09-11T00:00:00.000Z", "senior-dev#f", False),
+            ("reviewer-without-top", reviewer_only_cwd, "2026-09-11T12:00:00.000Z", "code-correctness-reviewer#i", False),
+            ("excluded-top", excluded_cwd, "2026-09-12T00:00:00.000Z", "", False),
+            ("excluded-review", excluded_cwd, "2026-09-13T00:00:00.000Z", "code-style-reviewer#g", False),
+            ("orch-before-window", orchestrator_cwd, "2026-08-30T00:00:00.000Z", "", False),
+            ("outside-window", solo_cwd, "2026-08-31T00:00:00.000Z", "code-style-reviewer#h", False),
+        )
+        for session_id, cwd, timestamp, name, orchestrator in sessions:
+            entries = []
+            if name:
+                entries.append({"type": "session_info", "name": name})
+            if orchestrator:
+                entries.append({"type": "custom", "customType": "mode-switch", "data": {"mode": "orchestrator"}})
+            if session_id != "orch-review-3":
+                prompt = "Review the technical plan" if session_id == "orch-review-1" else "Review source changes"
+                entries.append(message_entry(f"{session_id}-user", {"role": "user", "content": prompt}))
+            write_session(
+                self.session_dir / cwd.removeprefix("/") / f"{session_id}.jsonl",
+                header(session_id, timestamp=timestamp, cwd=cwd),
+                *entries,
+            )
+
+        output = io.StringIO()
+        with redirect_stdout(output):
+            status = query.main(
+                [
+                    "stats",
+                    "--session-dir",
+                    str(self.session_dir),
+                    "--since",
+                    "2026-09-01",
+                    "--until",
+                    "2026-09-30",
+                    "--exclude-cwd-prefix",
+                    "/work/dotcore",
+                    "--classify-targets",
+                    "--format",
+                    "jsonl",
+                ]
+            )
+
+        document = json.loads(output.getvalue())
+        self.assertEqual(0, status)
+        self.assertEqual(11, document["sessions"])
+        self.assertEqual(4, document["top_level_sessions"])
+        self.assertEqual(7, document["subagent_spawns"])
+        self.assertEqual(5, document["reviewer_spawns"])
+        self.assertEqual(1.25, document["reviewer_spawns_per_top_level_session"])
+        self.assertEqual(71.43, document["reviewer_share_percent"])
+        self.assertEqual(
+            {
+                "architecture-reviewer": 2,
+                "code-correctness-reviewer": 1,
+                "code-style-reviewer": 1,
+                "requirements-reviewer": 1,
+            },
+            document["reviewer_spawns_by_agent"],
+        )
+        self.assertEqual(
+            {"ad_hoc_reviewer_spawns": 5, "markdown_or_plan_review": 1},
+            document["target_classification"],
+        )
+        self.assertEqual(
+            {
+                "orchestrator_ever": {"top_level_sessions": 2, "reviewer_spawns": 3, "spawns_per_session": 1.5},
+                "never": {"top_level_sessions": 2, "reviewer_spawns": 1, "spawns_per_session": 0.5},
+                "rate_ratio": 3.0,
+            },
+            document["orchestrator_cohort"],
+        )
+        self.assertEqual(
+            {
+                "2026-W36": {
+                    "top_level_sessions": 2,
+                    "subagent_spawns": 4,
+                    "reviewer_spawns": 3,
+                    "reviewer_spawns_per_top_level_session": 1.5,
+                },
+                "2026-W37": {
+                    "top_level_sessions": 2,
+                    "subagent_spawns": 3,
+                    "reviewer_spawns": 2,
+                    "reviewer_spawns_per_top_level_session": 1.0,
+                },
+            },
+            document["weekly"],
+        )
+
+
 class CommandTests(unittest.TestCase):
     """Verify the packaged command contract that the smoke check also covers."""
 

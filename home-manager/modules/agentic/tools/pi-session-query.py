@@ -42,6 +42,19 @@ MAX_PAYLOAD_DEPTH = 20
 MAX_COUNT_KEYS = 50
 MAX_RELATED_SESSIONS = 50
 
+REVIEWER_AGENT_NAMES = frozenset(
+    (
+        "architecture-reviewer",
+        "code-correctness-reviewer",
+        "code-style-reviewer",
+        "requirements-reviewer",
+    )
+)
+MARKDOWN_OR_PLAN_PATTERN = re.compile(
+    r"(?:\b(?:plan|planning)\b|(?:^|[\s`])proj/[^\s`]+\.md\b|\b(?:across\s+(?:the\s+)?|read\s+all\s+)phase documents?\b)",
+    re.IGNORECASE,
+)
+
 HELP_GUIDANCE = """\
 Session directory precedence: --session-dir, then PI_CODING_AGENT_SESSION_DIR,
 then ${PI_CODING_AGENT_DIR:-~/.pi/agent}/sessions. An absolute JSONL path bypasses
@@ -73,6 +86,7 @@ Examples:
   pi-session-query inspect '<session-ref>'
   pi-session-query inspect '<session-ref>' --entry-id '<entry-id>'
   pi-session-query inspect '<session-ref>' --related
+  pi-session-query stats --since 2026-09-01 --until 2026-09-30 --exclude-cwd-prefix /work/dotcore
 """
 
 
@@ -412,6 +426,39 @@ def build_parser() -> argparse.ArgumentParser:
         help="Output format (default: text)",
     )
 
+    stats = subcommands.add_parser(
+        "stats",
+        help="Aggregate reviewer and sub-agent spawn metrics across the session corpus",
+    )
+    add_session_dir_argument(stats)
+    stats.add_argument(
+        "--since",
+        metavar="DATE",
+        help="Only include sessions created on or after this date (YYYY-MM-DD or ISO 8601)",
+    )
+    stats.add_argument(
+        "--until",
+        metavar="DATE",
+        help="Only include sessions created on or before this date (YYYY-MM-DD or ISO 8601)",
+    )
+    stats.add_argument(
+        "--exclude-cwd-prefix",
+        action="append",
+        metavar="PATH",
+        help="Exclude sessions in this canonical CWD or a descendant; repeat for multiple paths",
+    )
+    stats.add_argument(
+        "--classify-targets",
+        action="store_true",
+        help="Count reviewer prompts explicitly targeting planning or phase documents",
+    )
+    stats.add_argument(
+        "--format",
+        choices=("text", "jsonl"),
+        default="text",
+        help="Output format (default: text)",
+    )
+
     parser.epilog = "\n\n".join(
         (
             "Command reference:",
@@ -419,6 +466,7 @@ def build_parser() -> argparse.ArgumentParser:
             resolve.format_help().rstrip(),
             query.format_help().rstrip(),
             inspect.format_help().rstrip(),
+            stats.format_help().rstrip(),
             HELP_GUIDANCE.rstrip(),
         )
     )
@@ -1558,6 +1606,242 @@ def run_inspect(arguments: argparse.Namespace) -> str:
     return output
 
 
+def run_stats(arguments: argparse.Namespace) -> str:
+    """Aggregate reviewer and sub-agent spawn metrics across persisted sessions."""
+
+    session_dir = default_session_dir(arguments.session_dir)
+    if not session_dir.is_dir():
+        raise QueryError(f"Session directory not found: {session_dir}")
+
+    since = parse_date_bound(arguments.since, end_of_day=False) if arguments.since else None
+    until = parse_date_bound(arguments.until, end_of_day=True) if arguments.until else None
+    if since is not None and until is not None and since > until:
+        raise QueryError("--since must be before or equal to --until")
+    excluded = tuple(canonical_path(value) for value in arguments.exclude_cwd_prefix or ())
+
+    sessions = 0
+    top_level_sessions = 0
+    subagent_spawns = 0
+    reviewer_spawns = 0
+    ad_hoc_reviewer_spawns = 0
+    markdown_or_plan_review = 0
+    reviewer_spawns_by_agent: dict[str, int] = {}
+    weekly: dict[str, dict[str, int]] = {}
+    workspaces: dict[str, dict[str, int | bool]] = {}
+
+    for path in sorted(session_dir.rglob("*.jsonl")):
+        session = read_session_info(path)
+        if session is None:
+            continue
+        cwd = canonical_path(session.cwd) if session.cwd else ""
+        if any(path_has_prefix(cwd, prefix) for prefix in excluded):
+            continue
+        bare_agent_name, separator, agent_hash = session.name.partition("#")
+        is_subagent = bool(bare_agent_name and separator and agent_hash)
+        is_reviewer = is_subagent and bare_agent_name in REVIEWER_AGENT_NAMES
+
+        created = parse_timestamp(session.timestamp) or parse_timestamp(session.modified)
+        if not timestamp_in_window(created, since, until):
+            continue
+
+        sessions += 1
+        week = iso_week(created)
+        week_counts = weekly.setdefault(
+            week,
+            {"top_level_sessions": 0, "subagent_spawns": 0, "reviewer_spawns": 0},
+        )
+        workspace = workspaces.setdefault(
+            cwd,
+            {"top_level_sessions": 0, "reviewer_spawns": 0, "orchestrator_ever": False},
+        )
+
+        if is_subagent:
+            subagent_spawns += 1
+            week_counts["subagent_spawns"] += 1
+            if is_reviewer:
+                reviewer_spawns += 1
+                week_counts["reviewer_spawns"] += 1
+                workspace["reviewer_spawns"] += 1
+                reviewer_spawns_by_agent[bare_agent_name] = reviewer_spawns_by_agent.get(bare_agent_name, 0) + 1
+                if arguments.classify_targets and not session.first_message.startswith("<system-reminder>"):
+                    ad_hoc_reviewer_spawns += 1
+                    if MARKDOWN_OR_PLAN_PATTERN.search(session.first_message):
+                        markdown_or_plan_review += 1
+        else:
+            top_level_sessions += 1
+            week_counts["top_level_sessions"] += 1
+            workspace["top_level_sessions"] += 1
+            if transcript_has_mode(path, "orchestrator"):
+                workspace["orchestrator_ever"] = True
+
+    for week_counts in weekly.values():
+        week_counts["reviewer_spawns_per_top_level_session"] = safe_ratio(
+            week_counts["reviewer_spawns"],
+            week_counts["top_level_sessions"],
+        )
+
+    cohort = orchestrator_cohort(workspaces)
+    document: dict[str, object] = {
+        "type": "stats",
+        "window": {"since": arguments.since, "until": arguments.until},
+        "excluded_cwd_prefixes": list(excluded),
+        "sessions": sessions,
+        "top_level_sessions": top_level_sessions,
+        "subagent_spawns": subagent_spawns,
+        "reviewer_spawns": reviewer_spawns,
+        "reviewer_spawns_by_agent": dict(sorted(reviewer_spawns_by_agent.items())),
+        "reviewer_spawns_per_top_level_session": safe_ratio(reviewer_spawns, top_level_sessions),
+        "reviewer_share_percent": safe_ratio(reviewer_spawns * 100, subagent_spawns, digits=2),
+        "orchestrator_cohort": cohort,
+        "weekly": dict(sorted(weekly.items())),
+    }
+    if arguments.classify_targets:
+        document["target_classification"] = {
+            "ad_hoc_reviewer_spawns": ad_hoc_reviewer_spawns,
+            "markdown_or_plan_review": markdown_or_plan_review,
+        }
+
+    return json.dumps(document, ensure_ascii=False, separators=(",", ":")) if arguments.format == "jsonl" else text_stats(document)
+
+
+def parse_date_bound(value: str, end_of_day: bool) -> datetime:
+    """Parse one inclusive command-line date bound as an aware UTC datetime."""
+
+    raw = value.strip()
+    try:
+        parsed = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    except ValueError as error:
+        raise QueryError(f"Invalid date '{value}'; expected YYYY-MM-DD or ISO 8601") from error
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    if end_of_day and len(raw) == 10:
+        parsed = parsed.replace(hour=23, minute=59, second=59, microsecond=999999)
+    return parsed.astimezone(timezone.utc)
+
+
+def parse_timestamp(value: str) -> datetime | None:
+    """Parse one persisted ISO timestamp as an aware UTC datetime."""
+
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def timestamp_in_window(created: datetime | None, since: datetime | None, until: datetime | None) -> bool:
+    """Return whether a timestamp falls inside the requested inclusive window."""
+
+    if created is None:
+        return since is None and until is None
+    return (since is None or created >= since) and (until is None or created <= until)
+
+
+def path_has_prefix(path: str, prefix: str) -> bool:
+    """Return whether one canonical path equals or descends from another."""
+
+    try:
+        Path(path).relative_to(prefix)
+    except ValueError:
+        return False
+    return True
+
+
+def iso_week(created: datetime | None) -> str:
+    """Return a stable ISO year-week label for a persisted timestamp."""
+
+    if created is None:
+        return "unknown"
+    year, week, _ = created.isocalendar()
+    return f"{year}-W{week:02d}"
+
+
+def transcript_has_mode(path: Path, mode: str) -> bool:
+    """Detect one persisted Pi mode-switch entry in a transcript."""
+
+    try:
+        for _, entry in iter_entries(path):
+            data = entry.get("data")
+            if (
+                entry.get("type") == "custom"
+                and entry.get("customType") == "mode-switch"
+                and isinstance(data, dict)
+                and data.get("mode") == mode
+            ):
+                return True
+    except QueryError:
+        return False
+    return False
+
+
+def orchestrator_cohort(workspaces: dict[str, dict[str, int | bool]]) -> dict[str, object]:
+    """Compare reviewer spawn rates for orchestrator-ever and never workspaces."""
+
+    cohorts = {
+        "orchestrator_ever": {"top_level_sessions": 0, "reviewer_spawns": 0},
+        "never": {"top_level_sessions": 0, "reviewer_spawns": 0},
+    }
+    for workspace in workspaces.values():
+        if not workspace["top_level_sessions"]:
+            continue
+        name = "orchestrator_ever" if workspace["orchestrator_ever"] else "never"
+        cohorts[name]["top_level_sessions"] += int(workspace["top_level_sessions"])
+        cohorts[name]["reviewer_spawns"] += int(workspace["reviewer_spawns"])
+
+    for values in cohorts.values():
+        values["spawns_per_session"] = safe_ratio(values["reviewer_spawns"], values["top_level_sessions"])
+    orchestrator_rate = cohorts["orchestrator_ever"]["spawns_per_session"]
+    never_rate = cohorts["never"]["spawns_per_session"]
+    return {
+        **cohorts,
+        "rate_ratio": safe_ratio(orchestrator_rate, never_rate) if orchestrator_rate is not None and never_rate is not None else None,
+    }
+
+
+def safe_ratio(numerator: int | float, denominator: int | float, digits: int = 3) -> float | None:
+    """Return one rounded ratio, or None when its denominator is zero."""
+
+    return round(numerator / denominator, digits) if denominator else None
+
+
+def text_stats(document: dict[str, object]) -> str:
+    """Render one corpus-wide statistics document as readable text."""
+
+    lines = [
+        f"sessions: {document['sessions']}",
+        f"top_level_sessions: {document['top_level_sessions']}",
+        f"subagent_spawns: {document['subagent_spawns']}",
+        f"reviewer_spawns: {document['reviewer_spawns']}",
+        f"reviewer_spawns_per_top_level_session: {document['reviewer_spawns_per_top_level_session']}",
+        f"reviewer_share_percent: {document['reviewer_share_percent']}",
+    ]
+    for name, count in document["reviewer_spawns_by_agent"].items():
+        lines.append(f"reviewer.{name}: {count}")
+    target_classification = document.get("target_classification")
+    if isinstance(target_classification, dict):
+        lines.append(f"ad_hoc_reviewer_spawns: {target_classification['ad_hoc_reviewer_spawns']}")
+        lines.append(f"markdown_or_plan_review: {target_classification['markdown_or_plan_review']}")
+    cohort = document["orchestrator_cohort"]
+    for name in ("orchestrator_ever", "never"):
+        values = cohort[name]
+        lines.append(
+            f"cohort.{name}: top_level_sessions={values['top_level_sessions']} "
+            f"reviewer_spawns={values['reviewer_spawns']} spawns_per_session={values['spawns_per_session']}"
+        )
+    lines.append(f"cohort.rate_ratio: {cohort['rate_ratio']}")
+    for week, values in document["weekly"].items():
+        lines.append(
+            f"week.{week}: top_level_sessions={values['top_level_sessions']} "
+            f"subagent_spawns={values['subagent_spawns']} reviewer_spawns={values['reviewer_spawns']} "
+            f"reviewer_spawns_per_top_level_session={values['reviewer_spawns_per_top_level_session']}"
+        )
+    return "\n".join(lines)
+
+
 def main(arguments: Sequence[str] | None = None) -> int:
     """Run the command and report actionable failures without a traceback."""
 
@@ -1574,8 +1858,10 @@ def main(arguments: Sequence[str] | None = None) -> int:
             if parsed.include_payload and parsed.format != "jsonl":
                 raise QueryError("--include-payload requires --format jsonl")
             output = run_query(parsed)
-        else:
+        elif parsed.command == "inspect":
             output = run_inspect(parsed)
+        else:
+            output = run_stats(parsed)
         if output:
             print(output)
     except QueryError as error:

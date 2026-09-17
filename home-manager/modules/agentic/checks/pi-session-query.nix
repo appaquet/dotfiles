@@ -30,7 +30,8 @@ pkgs.runCommand "pi-session-query-check"
 
     cat >"$child" <<EOF
     {"type":"session","version":3,"id":"smoke-child","timestamp":"2026-09-15T12:01:00.000Z","cwd":"/work/project-a","parentSession":"$primary"}
-    {"type":"message","id":"child-user","timestamp":"2026-09-15T12:01:01.000Z","message":{"role":"user","content":"Child session"}}
+    {"type":"session_info","name":"architecture-reviewer#smoke"}
+    {"type":"message","id":"child-user","timestamp":"2026-09-15T12:01:01.000Z","message":{"role":"user","content":"Review the technical plan in README.md"}}
     EOF
 
     assert_contains() {
@@ -54,7 +55,7 @@ pkgs.runCommand "pi-session-query-check"
     }
 
     COLUMNS=80 pi-session-query --help >help.out
-    assert_contains "usage: pi-session-query [-h] {list,resolve,query,inspect} ..." help.out
+    assert_contains "usage: pi-session-query [-h] {list,resolve,query,inspect,stats} ..." help.out
     assert_contains "Privacy: assistant thinking is returned only by an explicit --kind thinking" help.out
 
     pi-session-query query "$primary" --session-dir "$session_dir" --kind assistant-tool-call --kind tool-result --include-payload --format jsonl >payload.out
@@ -69,6 +70,13 @@ pkgs.runCommand "pi-session-query-check"
     pi-session-query inspect "$primary" --session-dir "$session_dir" >inspect.out
     assert_contains "id: aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" inspect.out
     assert_contains "entries: 3" inspect.out
+
+    pi-session-query stats --session-dir "$session_dir" --since 2026-09-15 --until 2026-09-15 --classify-targets --format jsonl >stats.out
+    assert_contains '"top_level_sessions":1' stats.out
+    assert_contains '"subagent_spawns":1' stats.out
+    assert_contains '"reviewer_spawns":1' stats.out
+    assert_contains '"ad_hoc_reviewer_spawns":1' stats.out
+    assert_contains '"markdown_or_plan_review":1' stats.out
 
     pi-session-query inspect "$primary" --session-dir "$session_dir" --entry-id assistant-turn --related --format jsonl >entry.out
     test "$(wc -l <entry.out)" = 2
