@@ -11,6 +11,8 @@
         Question `header` MUST be 16 characters or fewer, use `label` for explanation.
         Question `label` MUST be 60 characters or fewer.
 
+        WARNING: The tool uses CHARACTER count, while you may count in TOKENS. Give yourself some buffer to avoid exceeding the limit.
+
         Always give user enough context to answer every question. Keep simple, self-contained questions direct; when one or two short sentences suffice, include that context in the question. 
 
         When more explanation is needed, give 1 page max bullet outline immediately before the tool call, then keep the questionnaire concise and focused on the decision and its choices.
