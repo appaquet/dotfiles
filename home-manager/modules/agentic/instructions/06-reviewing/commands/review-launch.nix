@@ -2,18 +2,10 @@
   nixantic.sources.review-workflow.commands."review-launch" =
     { scope }:
     let
-      reviewCheckpoint = scope.forSetting "versionControl.mode" {
-        jj = ''
-          1. Prepare a dedicated `jj` review change named `private: agent: review - <topic>` using the repository version-control rule
-             - Keep reviewer follow-up isolated from unrelated edits
-        '';
-
-        git = ''
-          1. Prepare an isolated Git review checkpoint using the repository version-control rule
-             - Start from a clean or review-only working tree before launching reviewers
-             - Reserve `private: agent: review - <topic>` as the commit message for any review-driven follow-up edits
-        '';
-      };
+      reviewCheckpoint = ''
+        1. Prepare a dedicated `jj` review change named `private: agent: review - <topic>` using the repository version-control rule
+           - Keep reviewer follow-up isolated from unrelated edits
+      '';
     in
     {
       description = "Launch review agents for code style, architecture and correctness.";

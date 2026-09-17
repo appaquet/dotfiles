@@ -18,8 +18,6 @@
       sharedDefault = (evalInstructions [ ]).config.nixantic;
       jjInstructions =
         (evalInstructions [ { nixantic.versionControl.mode = "jj"; } ]).config.nixantic.instructions;
-      gitInstructions =
-        (evalInstructions [ { nixantic.versionControl.mode = "git"; } ]).config.nixantic.instructions;
       homeManagerDefault =
         (inputs.home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
@@ -84,7 +82,6 @@
         inherit
           pkgs
           jjInstructions
-          gitInstructions
           ;
       };
 
@@ -100,9 +97,6 @@
     {
       packages = {
         agent-instructions = validatedPackage "agent-instructions" jjInstructions acceptanceChecks.jj;
-        agent-instructions-git =
-          validatedPackage "agent-instructions-git" gitInstructions
-            acceptanceChecks.git;
 
         pi-nono-smoke = piRuntimeChecks.nonoSmoke;
       };
@@ -116,7 +110,6 @@
         pi = piCheck;
 
         agent-instructions = acceptanceChecks.jj;
-        agent-instructions-git = acceptanceChecks.git;
       };
     };
 }

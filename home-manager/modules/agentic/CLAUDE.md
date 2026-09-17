@@ -35,6 +35,7 @@ Before editing anything under `instructions/`, load and follow the `mem-writing`
 Nixantic sources compose prompt text at build time. They do not define runtime workflow or control flow.
 
 - Framework fields affect rendering; extra block attributes are text fragments until interpolated.
+- Point at rules with real references, not prose names: when instruction text refers to a skill, command, or block, interpolate its reference (e.g. `scope.skills."version-control".reference`) so the model gets a concrete pointer instead of a vague rule name.
 - Main instructions become persistent context.
 - Commands become complete prompts when invoked.
 - Commands always declare an argument (`arguments = [ { label = "..."; } ]`): nixantic renders the `<label>: $ARGUMENTS` line only from a declaration, and a pi prompt without `$ARGUMENTS` drops text passed at invocation (Claude and OpenCode append it). The corpus check enforces the placeholder.

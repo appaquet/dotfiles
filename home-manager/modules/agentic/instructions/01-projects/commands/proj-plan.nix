@@ -38,7 +38,9 @@
            - If no committed project files, confirm with user that a new project should be created and suggest a name based on the goal or current version control context value. On confirmation, create the initial project doc structure and the project link following project files rules.
            - If committed project files exist, check if goal aligned with project and can be added as phase. Otherwise, confirm with user and propose new project to be created.
            - If committed project files exist and goal is aligned, confirm phase name with user.
-           - If new project, follow version control rules for symlink commit & doc commits.
+           - If new project, follow the document version control rules in ${
+             scope.skills."project-docs".reference
+           }: the proj symlink joins the working change and documents stay uncommitted.
 
         4. 🔳 Research, clarify and plan
             ${scope.blocks."plan-procedure".embed}

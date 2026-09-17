@@ -41,23 +41,12 @@ test-list:
     system=$(nix eval --impure --raw --expr builtins.currentSystem)
     nix eval --json ".#checks.${system}" --apply builtins.attrNames | tr -d '[]"' | tr ',' '\n'
 
-# Build the nixantic instruction package to ./result. Set NIXANTIC_VCS_MODE=jj|git to pick the rendered VCS mode.
+# Build the nixantic instruction package to ./result.
 agent-build:
     #!/usr/bin/env bash
     set -euo pipefail
 
-    vcs_mode="${NIXANTIC_VCS_MODE:-jj}"
-    if [[ "$vcs_mode" != "jj" && "$vcs_mode" != "git" ]]; then
-      echo "NIXANTIC_VCS_MODE must be 'jj' or 'git'" >&2
-      exit 1
-    fi
-
-    package="agent-instructions"
-    if [[ "$vcs_mode" == "git" ]]; then
-      package+="-git"
-    fi
-
-    nix build --out-link result ".#${package}"
+    nix build --out-link result ".#agent-instructions"
     echo "result -> $(readlink result)"
 
 home-check:

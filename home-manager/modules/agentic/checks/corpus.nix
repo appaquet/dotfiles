@@ -1,7 +1,6 @@
 {
   pkgs,
   jjInstructions,
-  gitInstructions,
 }:
 
 let
@@ -54,15 +53,6 @@ let
     ])
   ) claudeCommands;
   piCommands = builtins.filter (command: command != "ctx-usage") claudeCommands;
-  gitClaudeCommands = builtins.filter (
-    command:
-    !(builtins.elem command [
-      "jj-absorb"
-      "jj-resolve-conflicts"
-    ])
-  ) claudeCommands;
-  gitCommands = builtins.filter (command: builtins.elem command gitClaudeCommands) commonCommands;
-  gitPiCommands = builtins.filter (command: builtins.elem command gitClaudeCommands) piCommands;
   claudeRules = [
     "development"
     "orchestration"
@@ -104,57 +94,37 @@ let
     harness: directory: names:
     map (name: "${harness}/${directory}/${name}.md") names;
   skillFiles = harness: names: map (name: "${harness}/skills/${name}/SKILL.md") names;
-  expectedFiles =
-    claudeCommandsForMode: commonCommandsForMode: piCommandsForMode:
-    builtins.sort builtins.lessThan (
-      [
-        "claude/BOM.md"
-        "claude/CLAUDE.md"
-        "opencode/.gitignore"
-        "opencode/AGENTS.md"
-        "opencode/BOM.md"
-        "pi/AGENTS.md"
-        "pi/BOM.md"
-      ]
-      ++ filesIn "claude" "agents" agents
-      ++ filesIn "claude" "commands" claudeCommandsForMode
-      ++ filesIn "claude" "rules" claudeRules
-      ++ skillFiles "claude" claudeSkills
-      ++ filesIn "opencode" "agents" agents
-      ++ filesIn "opencode" "commands" commonCommandsForMode
-      ++ filesIn "opencode" "rules" opencodeRules
-      ++ skillFiles "opencode" opencodeSkills
-      ++ filesIn "pi" "agents" agents
-      ++ filesIn "pi" "agents" piAgents
-      ++ filesIn "pi" "prompts" piCommandsForMode
-      ++ filesIn "pi" "rules" piRules
-      ++ skillFiles "pi" piSkills
-    );
+  expectedFiles = builtins.sort builtins.lessThan (
+    [
+      "claude/BOM.md"
+      "claude/CLAUDE.md"
+      "opencode/.gitignore"
+      "opencode/AGENTS.md"
+      "opencode/BOM.md"
+      "pi/AGENTS.md"
+      "pi/BOM.md"
+    ]
+    ++ filesIn "claude" "agents" agents
+    ++ filesIn "claude" "commands" claudeCommands
+    ++ filesIn "claude" "rules" claudeRules
+    ++ skillFiles "claude" claudeSkills
+    ++ filesIn "opencode" "agents" agents
+    ++ filesIn "opencode" "commands" commonCommands
+    ++ filesIn "opencode" "rules" opencodeRules
+    ++ skillFiles "opencode" opencodeSkills
+    ++ filesIn "pi" "agents" agents
+    ++ filesIn "pi" "agents" piAgents
+    ++ filesIn "pi" "prompts" piCommands
+    ++ filesIn "pi" "rules" piRules
+    ++ skillFiles "pi" piSkills
+  );
   mkAcceptanceCheck =
-    name: instructions: expectedVcs: unexpectedVcs:
+    name: instructions:
     let
-      commonCommandsForMode =
-        if expectedVcs == "git branch --show-current" then gitCommands else commonCommands;
-      claudeCommandsForMode =
-        if expectedVcs == "git branch --show-current" then gitClaudeCommands else claudeCommands;
-      piCommandsForMode =
-        if expectedVcs == "git branch --show-current" then gitPiCommands else piCommands;
-      expectedVcsContext =
-        if expectedVcs == "git branch --show-current" then
-          "agentic-vcs-context git"
-        else
-          "agentic-vcs-context jj";
-      unexpectedVcsContext =
-        if unexpectedVcs == "git branch --show-current" then
-          "agentic-vcs-context git"
-        else
-          "agentic-vcs-context jj";
+      expectedVcsContext = "agentic-vcs-context";
+      unexpectedVcsContext = "agentic-vcs-context git";
       wrappedVcsContext = "`!`${expectedVcsContext}``";
-      manifest = pkgs.writeText "${name}-manifest" "${
-        builtins.concatStringsSep "\n" (
-          expectedFiles claudeCommandsForMode commonCommandsForMode piCommandsForMode
-        )
-      }\n";
+      manifest = pkgs.writeText "${name}-manifest" "${builtins.concatStringsSep "\n" expectedFiles}\n";
     in
     pkgs.runCommand name { } ''
       set -eu
@@ -256,10 +226,5 @@ let
     '';
 in
 {
-  jj =
-    mkAcceptanceCheck "agent-instructions-check" jjInstructions "jj-current-branch"
-      "git branch --show-current";
-  git =
-    mkAcceptanceCheck "agent-instructions-git-check" gitInstructions "git branch --show-current"
-      "jj-current-branch";
+  jj = mkAcceptanceCheck "agent-instructions-check" jjInstructions;
 }

@@ -61,8 +61,10 @@
              * Update next step if decided/obvious
              * Keep short like project docs mention
 
-        6. 🔳 Commit doc changes
-           * Follow the project doc version control guidelines: commit doc changes only for committed `proj`; never commit `proj-adhoc`, its temporary target, or its documents.
+        6. 🔳 Leave doc changes uncommitted
+           * Per the document version control rules in ${
+             scope.skills."project-docs".reference
+           }: document changes remain as working-copy changes; never commit `proj-adhoc`, its temporary target, or its documents.
       '';
     };
 }

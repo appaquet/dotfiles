@@ -63,9 +63,7 @@
            - If sub-agents did it, trust them
            - If not, ask them back instead of wasting your context
 
-        8. 🔳 Run ${
-          scope.commands."proj-save".reference
-        } to update project and phase docs, including version control commits.
+        8. 🔳 Run ${scope.commands."proj-save".reference} to update project and phase docs.
 
         9. 🔳 Debrief me on
            - What you did, learned and deviations from plan

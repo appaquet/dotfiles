@@ -4,7 +4,6 @@ pkgs.runCommand "agentic-vcs-context-check"
   {
     nativeBuildInputs = [
       vcsContext
-      pkgs.git
       pkgs.jujutsu
     ];
   }
@@ -17,9 +16,8 @@ pkgs.runCommand "agentic-vcs-context-check"
 
     assert_context() {
       expected="$1"
-      mode="$2"
-      directory="$3"
-      actual=$(cd "$directory" && agentic-vcs-context "$mode")
+      directory="$2"
+      actual=$(cd "$directory" && agentic-vcs-context)
 
       if [ "$actual" != "$expected" ]; then
         echo "Expected '$expected', got '$actual' in $directory" >&2
@@ -38,7 +36,7 @@ pkgs.runCommand "agentic-vcs-context-check"
       jj bookmark create stable -r @ >/dev/null
     )
 
-    assert_context "JJ workspace: default" jj "$jj_repo"
+    assert_context "JJ workspace: default" "$jj_repo"
 
     (
       cd "$jj_repo"
@@ -50,53 +48,14 @@ pkgs.runCommand "agentic-vcs-context-check"
         "Branch: feature-context"
         "JJ workspace: default"
       ]
-    }" jj "$jj_repo"
+    }" "$jj_repo"
 
     jj_workspace="$TMPDIR/jj named context"
     (
       cd "$jj_repo"
       jj workspace add --name task-context -r 'root()' "$jj_workspace" >/dev/null
     )
-    assert_context "JJ workspace: task-context" jj "$jj_workspace"
-
-    git_repo="$TMPDIR/git main context"
-    git init --initial-branch=stable "$git_repo" >/dev/null
-    (
-      cd "$git_repo"
-      git config user.name Test
-      git config user.email test@example.com
-      touch tracked
-      git add tracked
-      git commit -m initial >/dev/null
-      git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/stable
-    )
-
-    assert_context "Git worktree: git main context" git "$git_repo"
-
-    (
-      cd "$git_repo"
-      git switch -c feature-context >/dev/null
-    )
-    assert_context "${
-      builtins.concatStringsSep "\n" [
-        "Branch: feature-context"
-        "Git worktree: git main context"
-      ]
-    }" git "$git_repo"
-
-    git_worktree="$TMPDIR/git-context-worktree"
-    (
-      cd "$git_repo"
-      git switch stable >/dev/null
-      git worktree add --detach "$git_worktree" stable >/dev/null
-    )
-    assert_context "Git worktree: git-context-worktree" git "$git_worktree"
-
-    if agentic-vcs-context invalid >invalid.out 2>invalid.err; then
-      echo "Invalid VCS mode unexpectedly succeeded" >&2
-      exit 1
-    fi
-    grep -F "Expected one of: jj, git" invalid.err
+    assert_context "JJ workspace: task-context" "$jj_workspace"
 
     touch "$out"
   ''

@@ -15,7 +15,7 @@ Checks, tests, and local builds (no host needed):
 - `just test <name>...` - Build only the named checks, e.g. `just test pi-session-query-unit`
 - `just test-list` - List the check names `just test` accepts
 - `just fmt` - Format tracked and untracked nix files; `just fmt --check` verifies without writing
-- `just agent-build` - Build the nixantic instruction package to `./result` (`NIXANTIC_VCS_MODE=git` for Git mode)
+- `just agent-build` - Build the nixantic instruction package to `./result`
 
 Use `./x` script for building and evaluating nix configurations:
 
@@ -57,7 +57,7 @@ This means:
 - Project docs (`proj/` → `~dotfiles/secrets/docs/features/.../00-*.md`) are NOT in this repo
 - Changes to project docs are tracked in the secrets repo, not here
 - `jj status` in dotfiles will NOT show project doc changes
-- Commit dotfiles changes (commands, skills, etc.) in this repo. Also commit project doc changes in the secrets repo with the `private: agent: docs -` prefix
+- Commit dotfiles changes (commands, skills, etc.) in this repo. Project doc changes stay as uncommitted working-copy changes in the secrets repo; do not commit them
 
 ## Nix Conventions
 

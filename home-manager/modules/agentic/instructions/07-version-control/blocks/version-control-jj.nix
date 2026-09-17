@@ -46,7 +46,7 @@
       * `@` is empty → `jj describe -m "..."` (avoid `jj new` which creates an orphaned empty intermediate)
       * `@` has changes → `jj new -m "..."`
 
-      When to create changes:
+      When to create changes (create liberally - these are rollback points):
 
       * Before starting implementation (after planning)
       * After tests pass
@@ -55,12 +55,20 @@
       * When switching to different area of codebase
       * Skip for: read-only ops, iteration within same logical step
 
-      Default to more changes - easier to squash than split
-      Never clean up commit history (squash, abandon empty changes, reorder). User handles that
+      Default to more changes while working - easier to squash than split
+
+      Clean up at completion:
+      When a work unit is done (work finished, verification passed), consolidate your session's `private: agent:` changes into clean mergeable changes:
+
+      * Ad-hoc work: one change
+      * Phased work: one change per phase; split into coherent sub-changes only if one change would be too big
+      * Give the consolidated change a ≤10-word description
+      * Only touch `private: agent:` changes you created in this session; never squash, abandon, or reorder the user's or other agents' changes
 
       ## Commit Messages
 
       Prefix commits with `"private: agent: "` so they can be easily identified and squashed before PR
+      Keep the description after the prefix to a target of ≤10 words; details belong in project/phase docs, not the message
       Always use `-m "message"` for commands that expect a message since they could open editor:
         `jj commit -m ...`
         `jj new -m ...`

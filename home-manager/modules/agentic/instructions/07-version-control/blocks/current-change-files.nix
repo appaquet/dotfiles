@@ -4,22 +4,12 @@
     {
       content = scope.forHarness {
         pi = ''
-          Run `${
-            scope.forSetting "versionControl.mode" {
-              jj = "jj-diff-branch --stat";
-              git = "git diff --stat $(git merge-base HEAD origin/HEAD)..HEAD";
-            }
-          }` with the shell tool, then use its stdout as changed files in the current work.
+          Run `jj-diff-branch --stat` with the shell tool, then use its stdout as changed files in the current work.
         '';
         default = ''
           Changed files in current work:
           ```
-          !`${
-            scope.forSetting "versionControl.mode" {
-              jj = "jj-diff-branch --stat";
-              git = "git diff --stat $(git merge-base HEAD origin/HEAD)..HEAD";
-            }
-          }`
+          !`jj-diff-branch --stat`
           ```
         '';
       };

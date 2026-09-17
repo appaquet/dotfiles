@@ -1,12 +1,6 @@
 {
   nixantic.sources.version-control.commands."pr-import-comments" =
     { scope }:
-    let
-      currentBranchCommand = scope.forSetting "versionControl.mode" {
-        jj = "jj-current-branch";
-        git = "git branch --show-current";
-      };
-    in
     {
       description = "Import unresolved PR review comments as inline code comments with metadata for replies";
 

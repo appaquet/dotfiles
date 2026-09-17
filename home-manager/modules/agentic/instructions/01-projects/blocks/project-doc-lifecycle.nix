@@ -57,9 +57,9 @@
 
           ### Document version control
 
-          * For a committed project, keep the `proj` symlink in its own commit named `private: proj - <project-name>`. That commit contains the symlink only; never mix document changes into it.
-          * For a committed project, keep `00-*.md`, `01-*.md`, and other document-file changes in a dedicated document-only commit prefixed `private: agent: docs -`. Include no code or symlink, and follow the repository version-control rule for the exact workflow.
-          * When a user-invoked workflow requires committing project documents, batch all document updates made by that workflow. Review the combined document diff and commit it once after the final document-update step; do not commit individual tasks, findings, or intermediate updates separately.
+          * Project and phase document changes remain as uncommitted working-copy changes. Never create a dedicated document commit. In a separate docs repository the user commits them when they choose; in the same repository they are part of the working change and ship with the work.
+          * Add the `proj` symlink to the working change of the repository it lives in, together with the work's code changes.
+          * Review document changes as working-copy diffs (e.g. `jj diff` in the docs repo) before relying on them.
           * Never commit `proj-adhoc`, its temporary target, or its project and phase documents.
       '';
     };
