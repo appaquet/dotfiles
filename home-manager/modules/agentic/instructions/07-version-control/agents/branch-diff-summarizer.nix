@@ -2,7 +2,7 @@
   nixantic.sources.version-control.agents."branch-diff-summarizer" =
     { scope }:
     {
-      description = "Analyzes current-work diffs file by file. Not to be used for reviewing, but for summarizing changes in a technical way.";
+      description = "User-invoked only. Summarizes current-work diffs file by file into a Files section for AP to read on a PR or project doc. Not a review, verification, or quality-checking instrument. Never launch it as an automated step.";
 
       model = {
         claude = "haiku";

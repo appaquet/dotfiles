@@ -2,7 +2,7 @@
   nixantic.sources.review-workflow.agents."code-correctness-reviewer" =
     { scope }:
     {
-      description = "Reviews code for logic correctness, potential bugs, and runtime issues";
+      description = "End-of-work review of code for logic correctness, potential bugs, and runtime issues. Not for routine or per-change checking.";
 
       model = {
         pi = {

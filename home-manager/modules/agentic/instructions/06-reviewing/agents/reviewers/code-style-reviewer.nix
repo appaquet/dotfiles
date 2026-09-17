@@ -2,7 +2,7 @@
   nixantic.sources.review-workflow.agents."code-style-reviewer" =
     { scope }:
     {
-      description = "Reviews code for style issues, formatting, syntax errors, and code quality problems";
+      description = "End-of-work review of code for style issues, formatting, syntax errors, and code quality problems. Not for routine or per-change checking.";
 
       model = {
         pi = {

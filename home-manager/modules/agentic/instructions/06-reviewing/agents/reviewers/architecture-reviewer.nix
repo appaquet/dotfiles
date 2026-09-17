@@ -2,7 +2,7 @@
   nixantic.sources.review-workflow.agents."architecture-reviewer" =
     { scope }:
     {
-      description = "Reviews code changes for architectural consistency, design patterns, and system design";
+      description = "End-of-work review of code changes for architectural consistency, design patterns, and system design. Not for routine or per-change checking.";
 
       model = {
         pi = {

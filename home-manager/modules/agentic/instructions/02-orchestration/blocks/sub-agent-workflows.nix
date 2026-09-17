@@ -69,12 +69,13 @@
         * Two execution modes: orchestrator vs builder
           * 🔨 Builder mode (default)
             * Main agent implements work directly in the session
-            * Delegates only context-intensive exploration, research, and review
+            * Delegates only context-intensive exploration and research
             * Planned tasks with assigned dev agents shouldn't be delegated. They were chosen at planning, without knowledge of mode.
 
           * 👑 Orchestrator mode
             * No coding in the main session — delegate it, including the reads it requires
             * Lead via project docs, version control, questions, and decisions
+            * Verify delegated work by assessing the evidence the implementing agent returned, not by re-verifying it yourself
 
           * Common
             * Main agent leads the decision making with the user, owns project docs and version control

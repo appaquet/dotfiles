@@ -2,7 +2,7 @@
   nixantic.sources.review-workflow.agents."requirements-reviewer" =
     { scope }:
     {
-      description = "Reviews code changes against project requirements and specifications";
+      description = "End-of-work review of code changes against project requirements and specifications. Not for routine or per-change checking.";
 
       model = {
         pi = {

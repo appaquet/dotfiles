@@ -30,7 +30,7 @@
         3. 🔳 Load tasks from project/phase docs
            - For each task, create 1..n `${scope.harness.tools.taskCreate}`
              - Segment for better tracking
-           - Create tasks for verification/testing each implementation step.
+           - Create tasks for verification/testing each implementation step. Verification means running tests and checking ACs, not launching a reviewer.
            - If user validation needed, task description should be clear about waiting for user input
            - If in orchestrator mode, decide whether each task can be delegated, make the task
              description clear and select the dev agent using ${
@@ -51,11 +51,7 @@
              - Before marking task done: verify each AC sub-item passes
            - If deviating or overcomplicating, STOP and update user
            - If any decisions or discoveries, update project/phase doc
-           - Review agents can be used on uncertain steps.
-             - They are expensive, they should be used mindfully. 
-             - Prefer 1-2 review towards then end, and prevent repeated back-and-forth. If that happens, stop, update user.
-             - Be very specific on which files @ commits/changes to review
-             - Be critical on their findings and focus on real issues. They may be overzealous; let's stick to our plan.
+           - Reviewers can be used, but needs to follow ${scope.blocks."reviewer-budget".reference}
            - If an agent is stuck, review the evidence it returned. Resolve the blocker and resume it, or reselect using ${
              scope.blocks."sub-agent-selection".reference
            } when the task needs a different agent

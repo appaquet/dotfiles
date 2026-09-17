@@ -68,6 +68,7 @@ let
     "orchestration"
     "planning"
     "review-comments"
+    "reviewer-usage"
     "task-management"
   ];
   opencodeRules = builtins.filter (rule: rule != "planning") claudeRules;
@@ -79,6 +80,7 @@ let
     "pi-questionnaire"
     "pi-workflows"
     "review-comments"
+    "reviewer-usage"
     "task-management"
   ];
   claudeSkills = [
