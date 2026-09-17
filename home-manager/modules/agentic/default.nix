@@ -1,5 +1,6 @@
 {
   inputs,
+  inputs',
   pkgs,
   ...
 }:
@@ -18,10 +19,9 @@
 
   config = {
     home.packages = [
-      pkgs.codex
-      # pkgs.antigravity-cli
-
-      pkgs.ccusage
+      inputs'.llm-agents.packages.codex
+      inputs'.llm-agents.packages.tokscale
+      inputs'.llm-agents.packages.ccusage
     ];
   };
 }

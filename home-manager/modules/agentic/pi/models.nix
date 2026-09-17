@@ -170,8 +170,8 @@ in
             thinking = "high";
           };
           "scoped/senior" = {
-            model = "openai-codex/gpt-5.6-terra";
-            thinking = "high";
+            model = "openai-codex/gpt-5.6-sol";
+            thinking = "medium";
           };
           "scoped/staff" = {
             model = "openai-codex/gpt-5.6-sol";
@@ -220,7 +220,7 @@ in
           };
           "scoped/reviewer" = {
             model = "openai-codex/gpt-6-astra";
-            thinking = "medium";
+            thinking = "low";
           };
         };
       };

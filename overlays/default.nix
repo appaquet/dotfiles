@@ -7,20 +7,8 @@ let
     in
     {
       macpow = final.callPackage ./macpow { };
-
       jujutsu = final.callPackage ./jj { };
-
       mboxshell = final.callPackage ./mboxshell { };
-
-      nono = inputs.llm-agents.packages.${system}.nono;
-
-      opencode = inputs.llm-agents.packages.${system}.opencode;
-      herdr = inputs.llm-agents.packages.${system}.herdr;
-      antigravity-cli = inputs.llm-agents.packages.${system}.antigravity-cli;
-      codex = inputs.llm-agents.packages.${system}.codex;
-      ccusage = inputs.llm-agents.packages.${system}.ccusage;
-
-      claude-code = inputs.llm-agents.packages.${system}.claude-code;
     };
 
   neovimPluginsOverlay = import ../home-manager/modules/neovim/plugins-overlay.nix;

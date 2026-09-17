@@ -31,7 +31,7 @@ let
       }) paths
     );
 
-  claude-code = pkgs.claude-code;
+  claude-code = inputs'.llm-agents.packages.claude-code;
 
   claude-wrapped = pkgs.writeShellScriptBin "claude" ''
     if [ ! -d ".git" ] && [ ! -d ".jj" ]; then

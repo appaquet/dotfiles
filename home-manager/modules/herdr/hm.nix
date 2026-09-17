@@ -2,10 +2,12 @@
   config,
   lib,
   pkgs,
+  inputs',
   ...
 }:
 let
   managedPlugins = config.programs.herdr.managedPlugins;
+  hedrPkg = inputs'.llm-agents.packages.herdr;
 in
 {
   options.programs.herdr.managedPlugins = lib.mkOption {
@@ -33,7 +35,7 @@ in
     home.packages = [ pkgs.python3 ];
 
     home.activation.herdrPlugins = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      herdr="${lib.getExe pkgs.herdr}"
+      herdr="${lib.getExe hedrPkg}"
       jq="${lib.getExe pkgs.jq}"
       export declaredIdsJson='${builtins.toJSON (lib.attrNames managedPlugins)}'
 

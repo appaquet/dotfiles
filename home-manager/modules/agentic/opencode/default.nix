@@ -476,9 +476,10 @@ let
     export JJ_EDITOR=false # fail loud if a jj command tries to open an editor
   '';
 
+  opencodePkg = inputs'.llm-agents.packages.opencode;
   opencode = pkgs.writeShellScriptBin "opencode" ''
     ${commonExports}
-    exec ${pkgs.opencode}/bin/opencode "$@"
+    exec ${opencodePkg}/bin/opencode "$@"
   '';
 
   nono-opencode = pkgs.writeShellScriptBin "nono-opencode" ''

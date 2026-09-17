@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  inputs',
   ...
 }:
 
@@ -35,7 +36,7 @@ in
     ) cfg.profiles;
 
     home.packages = [
-      pkgs.nono
+      inputs'.llm-agents.packages.nono
     ];
 
     # Per machine profile
