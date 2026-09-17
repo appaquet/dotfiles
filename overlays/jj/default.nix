@@ -13,18 +13,18 @@
 rustPlatform.buildRustPackage rec {
   pname = "jujutsu";
 
-  version = "0.43.0-colocated-workspaces-cli";
+  version = "0.43.0-git-worktree-adopt";
 
-  # Points to https://github.com/jj-vcs/jj/pull/8834
-  # Support for git colocated workspaces
+  # Points to https://github.com/jj-vcs/jj/pull/9943
+  # Support for adopting existing git worktrees
   src = fetchFromGitHub {
     owner = "jj-vcs";
     repo = "jj";
-    rev = "a0e7ebe7b037e822c506fcf6308055f8eecfb48a";
-    hash = "sha256-y7yBZlFcBkWU8rLKTv4BoU4ld16fH6dFZ6EVGdNV0Tw=";
+    rev = "69374e4e1b9d149985fd8b35ee44255b5e624754";
+    hash = "sha256-ikwa1/PHq/or11JjGJADbGNCOaylM3wVL3fboT92Vic=";
   };
 
-  cargoHash = "sha256-0yD9WuIPIuYA9vk2qG0ycauuaRBFsakIJ8Rkf2p4Ayo=";
+  cargoHash = "sha256-x3fffc8P15LwKkq3M2j3wA3YRxUYTCL69qfD6SkI/j0=";
 
   nativeBuildInputs = [
     installShellFiles

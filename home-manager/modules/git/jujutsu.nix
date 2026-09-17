@@ -254,24 +254,23 @@ in
         exit 1
       fi
 
-      jj workspace forget "$name"
-
-      # Best-effort herdr cleanup if opened (the remove also closes the workspace).
+      # Resolve the Herdr workspace before removing its worktree from disk.
+      wsid=""
       if wt_json=$(herdr worktree list --json 2>/dev/null); then
         wsid=$(printf '%s' "$wt_json" \
           | jq -r --arg path "$ws_root" '[.result.worktrees[] | select(.path == $path) | .open_workspace_id] | .[0] // empty' \
           2>/dev/null || true)
-        if [ -n "$wsid" ] && [ "$wsid" != "null" ]; then
-          herdr worktree remove --workspace "$wsid" --force >/dev/null 2>&1 || true
-        fi
       fi
 
-      if [ -d "$ws_root" ]; then
-        rm -rf "$ws_root"
-      fi
+      # Run from the default workspace so deleting the caller's workspace does
+      # not leave this process in a removed working directory.
+      cd "$root"
+      jj -R "$root" workspace remove "$name"
 
-      # Prune any stale git worktrees
-      git -C "$root" worktree prune >/dev/null 2>&1 || true
+      # Herdr may close the active shell, so this must remain the final step.
+      if [ -n "$wsid" ] && [ "$wsid" != "null" ]; then
+        herdr worktree remove --workspace "$wsid" --force >/dev/null 2>&1 || true
+      fi
     '')
 
     (writeShellScriptBin "jj-workspace-path" ''

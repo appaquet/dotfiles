@@ -76,6 +76,7 @@ let
   smokeHome = home-manager.lib.homeManagerConfiguration {
     pkgs = smokePkgs;
     extraSpecialArgs.inputs'.llm-agents.packages.pi = upstreamPi;
+    extraSpecialArgs.inputs'.llm-agents.packages.nono = nono;
     modules = [
       ../../../nono/default.nix
       ../module.nix
