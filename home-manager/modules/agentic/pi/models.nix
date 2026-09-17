@@ -154,7 +154,7 @@ in
       codex = {
         main = {
           model = "openai-codex/gpt-5.6-sol";
-          thinking = "low";
+          thinking = "medium";
         };
         remap = {
           "scoped/junior" = {
@@ -175,7 +175,7 @@ in
           };
           "scoped/staff" = {
             model = "openai-codex/gpt-5.6-sol";
-            thinking = "high";
+            thinking = "xhigh";
           };
           "scoped/principal" = {
             model = "openai-codex/gpt-6-astra";
