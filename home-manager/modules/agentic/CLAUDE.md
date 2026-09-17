@@ -58,6 +58,6 @@ source `.nix` files and regenerate them with the validation commands.
 
 - Use `checks/corpus.nix` only for quick smoke and deterministic structural/configuration checks. Contributors must never add assertions for exact instruction text, policy wording, or production content; inspect generated output directly instead.
 - Build production instruction packages and inspect their generated output directly:
-  - `./x agent build`: build the rendered production instruction package to `./result`.
-  - `NIXANTIC_VCS_MODE=git ./x agent build`: build the Git-mode package.
+  - `just agent-build`: build the rendered production instruction package to `./result`.
+  - `NIXANTIC_VCS_MODE=git just agent-build`: build the Git-mode package.
 - `HOST=deskapp ./x home check`: evaluate the current Home Manager configuration.

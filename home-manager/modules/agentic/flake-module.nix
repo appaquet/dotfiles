@@ -39,6 +39,9 @@
 
       vcsContext = import ./tools/vcs-context.nix { inherit pkgs; };
       vcsContextCheck = import ./checks/vcs-context.nix { inherit pkgs vcsContext; };
+      piSessionQuery = import ./tools/pi-session-query.nix { inherit pkgs; };
+      piSessionQueryCheck = import ./checks/pi-session-query.nix { inherit pkgs piSessionQuery; };
+      piSessionQueryUnitCheck = import ./checks/pi-session-query-unit.nix { inherit pkgs; };
 
       llmAgentPackages = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
       piModuleCheck = import ./pi/checks/module.nix {
@@ -52,6 +55,11 @@
         home-manager = inputs.home-manager;
         nono = llmAgentPackages.nono;
         upstreamPi = llmAgentPackages.pi;
+      };
+
+      piPluginsUnitCheck = import ./pi/checks/tests.nix {
+        inherit pkgs;
+        piNode = llmAgentPackages.pi.override { useBun = false; };
       };
 
       # Keep one public flake check while retaining separate internal failures
@@ -101,6 +109,9 @@
       checks = {
         agentic-vcs-context = vcsContextCheck;
         agentic-version-control-default = versionControlDefaultCheck;
+        pi-session-query = piSessionQueryCheck;
+        pi-session-query-unit = piSessionQueryUnitCheck;
+        pi-plugins-unit = piPluginsUnitCheck;
 
         pi = piCheck;
 

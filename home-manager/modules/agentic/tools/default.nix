@@ -6,6 +6,7 @@ let
   agentic-proj-docs = import ./proj-docs.nix { inherit pkgs; };
   agentic-proj-create-adhoc = import ./proj-create-adhoc.nix { inherit pkgs; };
   agentic-proj-create = import ./proj-create.nix { inherit pkgs; };
+  pi-session-query = import ./pi-session-query.nix { inherit pkgs; };
 in
 {
   home.packages = [
@@ -14,5 +15,6 @@ in
     agentic-proj-docs
     agentic-proj-create-adhoc
     agentic-proj-create
+    pi-session-query
   ];
 }

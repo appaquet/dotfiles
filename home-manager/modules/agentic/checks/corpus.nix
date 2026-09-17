@@ -93,6 +93,7 @@ let
     "proj-save"
   ];
   piSkills = claudeSkills ++ [
+    "pi-recaller"
     "proj-load"
     "proj-save"
   ];
