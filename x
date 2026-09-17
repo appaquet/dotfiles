@@ -480,14 +480,6 @@ cmd_gc() {
   sudo "${ncg}" --delete-older-than "7d"
 }
 
-cmd_fmt() {
-  git ls-files -z --cached --others --exclude-standard -- '*.nix' |
-    while IFS= read -r -d '' path; do
-      [[ -e "$path" ]] && printf '%s\0' "$path"
-    done |
-    xargs -0 -r nixfmt "$@"
-}
-
 cmd_optimize() {
   echo "Optimizing store..."
   nix store optimise
@@ -547,34 +539,6 @@ cmd_copy() {
   fi
 }
 
-cmd_agent_build() {
-  local vcs_mode="${NIXANTIC_VCS_MODE:-jj}"
-  if [[ "$vcs_mode" != "jj" && "$vcs_mode" != "git" ]]; then
-    echo "NIXANTIC_VCS_MODE must be 'jj' or 'git'" >&2
-    exit 1
-  fi
-
-  local package_name="agent-instructions"
-  if [[ "$vcs_mode" == "git" ]]; then
-    package_name+="-git"
-  fi
-
-  with_local_flake_note \
-    ${NIX_BUILDER} build --out-link result "$(local_flake_attr_ref "$package_name")"
-  echo "result -> $(readlink result)"
-}
-
-cmd_agent_help() {
-  cat >&2 <<EOF
-agent commands:
-  build     Build nixantic instruction package to result. Set NIXANTIC_VCS_MODE=jj|git to switch rendered VCS mode.
-
-Examples:
-  ./x agent build
-  NIXANTIC_VCS_MODE=git ./x agent build
-EOF
-}
-
 cmd_help() {
   cat >&2 <<EOF
 usage: $0 <command> [args]
@@ -591,9 +555,7 @@ Unified:
   copy (cp)         Copy result to remote host
 
 Utilities:
-  fmt          Format nix files
   update (u)   Update flake inputs
-  agent (a)    build for nixantic instruction package
   gc           Garbage collect
   optimize     Optimize nix store
 
@@ -728,17 +690,6 @@ n | nixos)
   esac
   ;;
 
-a | agent)
-  shift
-  case $1 in
-  b | build)
-    shift
-    cmd_agent_build "$@"
-    ;;
-  *) cmd_agent_help ;;
-  esac
-  ;;
-
 c | check)
   shift
   cmd_check_all "$@"
@@ -750,10 +701,6 @@ u | update)
 gc)
   shift
   cmd_gc "$@"
-  ;;
-fmt)
-  shift
-  cmd_fmt "$@"
   ;;
 optimize)
   shift

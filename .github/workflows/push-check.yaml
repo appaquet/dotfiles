@@ -21,8 +21,8 @@ jobs:
         nix-channel --update nixpkgs
     - name: Install formatter & format
       run: |
-        nix profile install nixpkgs#nixfmt-rfc-style
-        HOST=deskapp ./x fmt --check
+        nix profile install nixpkgs#nixfmt-rfc-style nixpkgs#just
+        just fmt --check
 
   home_check:
     runs-on: ubuntu-latest

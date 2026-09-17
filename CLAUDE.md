@@ -2,6 +2,21 @@
 
 ## Building & Testing
 
+`./x` drives host and system lifecycle: it resolves hosts, evaluates/builds/switches/activates
+configurations, ships results to remote hosts, and runs store operations (gc, optimize, update).
+
+`just` drives repo-local developer tasks that need no host: tests, formatting, helper clones. A
+`just` recipe that mirrors an `x` subcommand is only an alias — the implementation stays in `x`, and
+new test or tooling commands belong in `just`.
+
+Checks, tests, and local builds (no host needed):
+
+- `just test` - Build every flake check for this system
+- `just test <name>...` - Build only the named checks, e.g. `just test pi-session-query-unit`
+- `just test-list` - List the check names `just test` accepts
+- `just fmt` - Format tracked and untracked nix files; `just fmt --check` verifies without writing
+- `just agent-build` - Build the nixantic instruction package to `./result` (`NIXANTIC_VCS_MODE=git` for Git mode)
+
 Use `./x` script for building and evaluating nix configurations:
 
 - `./x nixos check` - Eval nixos config for current host
@@ -11,8 +26,6 @@ Use `./x` script for building and evaluating nix configurations:
 - `./x darwin check` - Eval darwin config
 - `./x darwin build` - Build darwin config
 - `HOST=deskapp ./x nixos check` - Check specific host
-- `./x agent build` - Build nixantic instruction package to `./result`
-- `./x fmt` - Format nix files (nixfmt)
 - `./x check` - Eval all nixos/home/darwin configs for all hosts. Heavy, only use if you think a change could affect other hosts.
 
 For quick iteration, use `check` first (fast eval) before `build`.
@@ -48,7 +61,7 @@ This means:
 
 ## Nix Conventions
 
-- Format with `./x fmt` (nixfmt) before committing
+- Format with `just fmt` (nixfmt) before committing
 - Eval first (`./x <home|nixos|...> check`), then build — builds are expensive
 - Missing hash: build instead of eval (builds surface hash mismatch errors)
 - Agent guidance: most nix changes are fine for mid dev. Use senior dev for complex nix structures,
