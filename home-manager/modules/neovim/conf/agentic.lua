@@ -42,12 +42,11 @@ require("codecompanion").setup({
 					content = function(context)
 						return string.format(
 							[[
-You are continuing prose in a %s buffer. Output will be inserted on a new line directly after the user's current line.
+You are continuing prose in a %s buffer. Your result is inserted on a new line directly after the user's current line.
 
-Rules:
 - Match the tone, voice, vocabulary, and sentence length of the surrounding text.
 - Paraphrase and expand the user's brief into 1-3 sentences. Do not quote it verbatim.
-- Output ONLY the sentence(s) to insert. No preamble, no quotes, no markdown fences, no explanation.
+- Put ONLY the sentence(s) to insert in the "code" field of the JSON response. No preamble, no explanation, no markdown fences, no wrapping quotes.
 ]],
 							context.filetype
 						)
@@ -83,7 +82,7 @@ vim.keymap.set(
 vim.keymap.set(
 	"v",
 	"gC",
-	":'<,'>CodeCompanion Add documentation to the selected text if it's missing. If it's a whole function, add proper function documentation. If it already exist, improve it. If it's code, add inline comments explaining it. If there are existing documentation, just improve it if needed. @insert_edit_into_file #buffer<CR>",
+	":'<,'>CodeCompanion Add documentation to the selected text if it's missing. If it's a whole function, add proper function documentation. If it already exist, improve it. If it's code, add inline comments explaining it. If there are existing documentation, just improve it if needed.<CR>",
 	{ silent = true, desc = "CodeCompanion: Comment code" }
 )
 vim.keymap.set("n", "gA", "<cmd>CodeCompanion /prose<cr>", { silent = true, desc = "CodeCompanion: Inline prose completion" })
@@ -92,10 +91,14 @@ vim.keymap.set({ "n", "v" }, "<leader>aa", ":'<,'>CodeCompanionActions<CR>", { s
 local function codecompanion_inline_edit()
 	vim.ui.input({ prompt = "Describe what needs to be done:" }, function(input)
 		if input and input ~= "" then
-			local system_prompt = "Use @insert_edit_into_file and #buffer for tool use."
-			local input_escaped = vim.fn.escape(input, '"')
-			local cmd = string.format(":'<,'>CodeCompanion %s %s<CR>", input_escaped, system_prompt)
-			vim.cmd(cmd)
+			-- Pass the description as data to the inline interaction rather than
+			-- building an ex command, so special characters in the input are never
+			-- re-parsed by the command line. range = 1 only selects the visual
+			-- (last selection) context; the real range is read from '< '> marks.
+			require("codecompanion").inline({
+				range = 1,
+				args = input,
+			})
 		end
 	end)
 end
