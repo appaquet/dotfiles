@@ -74,7 +74,7 @@ let
     {
       package = "npm:pi-web-access@0.29.0";
       files = {
-        ".pi/web-search.json".text = builtins.toJSON {
+        ".pi/agent/web-search.json".text = builtins.toJSON {
           provider = "exa";
           workflow = "none";
           autoOpenBrowser = false;
