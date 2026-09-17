@@ -40,12 +40,20 @@ type ScopeMapping = {
   entries: Record<string, ScopeEntry>;
   targets: Record<string, { provider: string; id: string }>;
 };
+/** Request credentials resolved for one concrete target provider. */
+type TargetAuth = {
+  apiKey?: string;
+  headers?: Record<string, string>;
+  baseUrl?: string;
+  env?: Record<string, string>;
+};
 type ScopeRegistration = {
   count: number;
   mainAvailable: boolean;
   summaryAvailable: boolean;
   failure?: string;
   concreteModels?: Record<string, any>;
+  targetAuth?: Record<string, TargetAuth>;
   providerConfig?: any;
 };
 type ScopedSummaryTarget = {
@@ -60,6 +68,7 @@ type ScopeSnapshot = {
   entries: Record<string, ScopeEntry>;
   targets: Record<string, { provider: string; id: string }>;
   concreteModels: Record<string, any>;
+  targetAuth: Record<string, TargetAuth>;
   activePreset?: string;
   upgradedPreset?: string;
   rewriteDisabled?: boolean;
@@ -134,11 +143,13 @@ let scopeSessionManager: any = undefined;
 
 const state: ScopeMapping & {
   concreteModels: Record<string, any>;
+  targetAuth: Record<string, TargetAuth>;
 } = {
   preset: process.env.PI_SCOPE ?? "codex",
   entries: {},
   targets: {},
   concreteModels: {},
+  targetAuth: {},
 };
 
 function debug(msg: string): void {
@@ -278,11 +289,38 @@ function streamScopedModel(
   debug(
     `streamSimple[${source}]: scoped/${alias} -> ${target.provider}/${target.id} (preset=${state.preset})`,
   );
-  return provider.streamSimple(
+  const { options: delegatedOptions, model: delegatedModel } = withTargetAuth(
+    options,
     concrete,
-    context,
-    withConversationSessionId(options),
+    target,
   );
+  return provider.streamSimple(delegatedModel, context, delegatedOptions);
+}
+
+/**
+ * Replace the scoped provider's credentials with the target provider's own
+ * request auth: provider adapters take options.apiKey verbatim and never
+ * resolve credentials, so forwarding the scoped options would send the main
+ * provider's key to a different provider's endpoint. When no target auth is
+ * resolved (pre-upgrade stubs), the scoped options pass through unchanged.
+ */
+function withTargetAuth(
+  options: any,
+  model: any,
+  target: { provider: string; id: string } | undefined,
+): { options: any; model: any } {
+  const base = withConversationSessionId(options);
+  const auth = target ? state.targetAuth[target.provider] : undefined;
+  if (!auth) return { options: base, model };
+  const next: any = { ...base };
+  if (auth.apiKey) next.apiKey = auth.apiKey;
+  else delete next.apiKey;
+  if (auth.headers) next.headers = auth.headers;
+  if (auth.env) next.env = auth.env;
+  return {
+    options: next,
+    model: auth.baseUrl ? { ...model, baseUrl: auth.baseUrl } : model,
+  };
 }
 
 /** Register the stub entries so `scoped/<id>` resolves at startup. */
@@ -408,14 +446,58 @@ async function prepareScopeRegistration(
     };
   }
 
+  // Resolve request auth per distinct target provider so delegated requests
+  // carry the target's own credentials, not the main provider's key.
+  const targetAuth: Record<string, TargetAuth> = {};
+  const unresolved = new Set<string>();
+  for (const providerId of new Set(Object.values(concreteModels).map((m) => m.provider))) {
+    const representative = Object.values(concreteModels).find(
+      (m) => m.provider === providerId,
+    );
+    if (!representative) continue;
+    let auth: any;
+    try {
+      auth = await ctx.modelRegistry.getApiKeyAndHeaders(representative);
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : String(error);
+      debug(
+        `prepareScopeRegistration: credentials for ${providerId} failed: ${detail}`,
+      );
+      unresolved.add(`${providerId} (${detail})`);
+      continue;
+    }
+    if (!auth.ok) {
+      debug(
+        `prepareScopeRegistration: credentials for ${providerId} unavailable: ${auth.error}`,
+      );
+      unresolved.add(`${providerId} (${auth.error})`);
+      continue;
+    }
+    targetAuth[providerId] = {
+      apiKey: auth.apiKey,
+      headers: auth.headers,
+      baseUrl: auth.baseUrl,
+      env: auth.env,
+    };
+  }
+  if (unresolved.size > 0) {
+    return {
+      count: 0,
+      mainAvailable,
+      summaryAvailable,
+      failure: `could not resolve target credentials: ${[...unresolved].join(", ")}`,
+    };
+  }
+
   debug(
-    `prepareScopeRegistration: preset="${mapping.preset}" models=[${models.map((x) => x.id).join(",")}] summary=${summaryAvailable} targetProvider=${provider.provider} apiKey=${apiKey.slice(0, 12)}...`,
+    `prepareScopeRegistration: preset="${mapping.preset}" models=[${models.map((x) => x.id).join(",")}] summary=${summaryAvailable} targetProvider=${provider.provider} apiKey=${apiKey.slice(0, 12)}... targets=${Object.keys(targetAuth).join(",")}`,
   );
   return {
     count: models.length,
     mainAvailable,
     summaryAvailable,
     concreteModels,
+    targetAuth,
     providerConfig: {
       name: "Scoped",
       // The composed scoped provider only dispatches to the hook while the
@@ -441,6 +523,7 @@ function commitScopeRegistration(
   state.entries = mapping.entries;
   state.targets = mapping.targets;
   state.concreteModels = registration.concreteModels ?? {};
+  state.targetAuth = registration.targetAuth ?? {};
 }
 
 /** Snapshot the preset's dedicated summary target before asynchronous resolution begins. */
@@ -543,6 +626,7 @@ function snapshotScope(ctx: any): ScopeSnapshot {
     entries: { ...state.entries },
     targets: { ...state.targets },
     concreteModels: { ...state.concreteModels },
+    targetAuth: { ...state.targetAuth },
     activePreset: scopeProcess.activePreset,
     upgradedPreset: scopeProcess.upgradedPreset,
     rewriteDisabled: scopeProcess.rewriteDisabled,
@@ -567,6 +651,7 @@ function disableScopeRewrites(): void {
   state.entries = {};
   state.targets = {};
   state.concreteModels = {};
+  state.targetAuth = {};
   scopeProcess.rewriteDisabled = true;
 }
 
@@ -613,6 +698,7 @@ function restoreScope(
   state.entries = snapshot.entries;
   state.targets = snapshot.targets;
   state.concreteModels = snapshot.concreteModels;
+  state.targetAuth = snapshot.targetAuth;
   scopeProcess.activePreset = snapshot.activePreset;
   scopeProcess.upgradedPreset = snapshot.upgradedPreset;
   scopeProcess.rewriteDisabled = snapshot.rewriteDisabled;

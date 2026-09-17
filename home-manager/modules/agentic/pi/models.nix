@@ -158,8 +158,8 @@ in
         };
         remap = {
           "scoped/junior" = {
-            model = "openai-codex/gpt-5.6-luna";
-            thinking = "medium";
+            model = "opencode-go/deepseek-v4.1-flash";
+            thinking = "low";
           };
           "scoped/summary" = {
             model = "openai-codex/gpt-5.6-luna";

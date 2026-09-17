@@ -110,8 +110,8 @@ class TestRegistry {
   }
 
   // Target providers complete through their own streamSimple: record the
-  // delegated model and forward context/options untouched so alias
-  // resolution assertions can inspect the handoff.
+  // delegated model and forward context/options so alias resolution and
+  // credential handoff assertions can inspect them.
   getProvider(provider: string): any {
     let stub = this.providerStubs.get(provider);
     if (!stub) {
@@ -1709,9 +1709,105 @@ test("scoped streamSimple delegates parent and child aliases to exact concrete t
   expect(mainCall?.options).toEqual({
     reasoning: "medium",
     sessionId: "session-abc",
+    apiKey: "old-summary-key",
   });
-  expect(juniorCall?.options).toEqual({ sessionId: "session-abc" });
+  expect(juniorCall?.options).toEqual({
+    sessionId: "session-abc",
+    apiKey: "old-summary-key",
+  });
   expect(mainOptions).toEqual({ reasoning: "medium" });
+});
+
+test("delegated requests carry the target provider's own credentials, not the main provider's key", async () => {
+  const config: ScopeConfig = {
+    codex: {
+      main: { model: "old/old-main" },
+      remap: {
+        "scoped/junior": { model: "golang/go-junior" },
+        "scoped/summary": { model: "old/old-main", thinking: "low" },
+      },
+    },
+  };
+  const harness = await createHarness(config, {
+    apiKeys: { old: "old-key", golang: "go-key" },
+    models: [
+      target("old", "old-main", "Cloud main model"),
+      target("golang", "go-junior", "Go junior model"),
+    ],
+    requestAuth: {
+      "golang/go-junior": {
+        ok: true,
+        apiKey: "go-resolved-key",
+        headers: { "x-go": "auth" },
+        baseUrl: "https://go.test/v2",
+        env: { OPENCODE_API_KEY: "go-env-key" },
+      },
+    },
+  });
+
+  // The composed scoped provider hands the hook the main provider's key.
+  const juniorOptions = { reasoning: "low", apiKey: "old-key" };
+  await expect(scopedStream(harness, "junior", juniorOptions)).resolves.toBe(
+    "golang-stream",
+  );
+
+  const juniorCall = harness.registry.providerStreamCalls[0];
+  expect(juniorCall).toMatchObject({ provider: "golang" });
+  expect(juniorCall?.model).toEqual(
+    expect.objectContaining({
+      provider: "golang",
+      id: "go-junior",
+      baseUrl: "https://go.test/v2",
+    }),
+  );
+  expect(juniorCall?.options).toEqual({
+    reasoning: "low",
+    sessionId: "session-abc",
+    apiKey: "go-resolved-key",
+    headers: { "x-go": "auth" },
+    env: { OPENCODE_API_KEY: "go-env-key" },
+  });
+  expect(juniorOptions).toEqual({ reasoning: "low", apiKey: "old-key" });
+
+  // The main alias still delegates with its own provider's key.
+  await expect(scopedStream(harness, "main")).resolves.toBe("old-stream");
+  const mainCall = harness.registry.providerStreamCalls[1];
+  expect(mainCall).toMatchObject({ provider: "old" });
+  expect(mainCall?.options).toEqual({
+    sessionId: "session-abc",
+    apiKey: "old-summary-key",
+  });
+});
+
+test("a remap-only target without credentials fails registration with a clear error", async () => {
+  const config: ScopeConfig = {
+    codex: {
+      main: { model: "old/old-main" },
+      remap: {
+        "scoped/junior": { model: "golang/go-junior" },
+        "scoped/summary": { model: "old/old-main", thinking: "low" },
+      },
+    },
+  };
+  const harness = await createHarness(config, {
+    apiKeys: { old: "old-key", golang: "go-key" },
+    models: [
+      target("old", "old-main", "Cloud main model"),
+      target("golang", "go-junior", "Go junior model"),
+    ],
+    requestAuth: { "golang/go-junior": { ok: false, error: "no key" } },
+  });
+
+  expect(harness.registry.getRegisteredProviderConfig("scoped")?.models).toEqual(
+    expect.arrayContaining([expect.objectContaining({ id: "main" })]),
+  );
+  expect(harness.entries.at(-1)?.data).toMatchObject({
+    text: expect.stringContaining(
+      'could not resolve target credentials: golang (no key)',
+    ),
+    error: true,
+  });
+  expect(harness.statuses).toEqual([]);
 });
 
 test("aliases without a target resolve pre-upgrade stubs natively", async () => {
@@ -2128,14 +2224,14 @@ test("summaries observe only committed targets across deferred failure and succe
   });
 });
 
-test("snapshots the concrete summary target before deferred auth and a scope switch", async () => {
-  let releaseAuth!: (auth: RequestAuth) => void;
-  let authStarted!: () => void;
-  const started = new Promise<void>((resolve) => {
-    authStarted = resolve;
+test("snapshots the concrete summary target before an in-flight scope switch", async () => {
+  let releaseSwitchAuth!: (auth: RequestAuth) => void;
+  let switchAuthStarted!: () => void;
+  const switchAuthStartedPromise = new Promise<void>((resolve) => {
+    switchAuthStarted = resolve;
   });
-  const pendingAuth = new Promise<RequestAuth>((resolve) => {
-    releaseAuth = resolve;
+  const pendingSwitchAuth = new Promise<RequestAuth>((resolve) => {
+    releaseSwitchAuth = resolve;
   });
   const oldModel = target("old", "old-main", "Cloud main model");
   const nextModel = target("next", "next-main", "Local main model");
@@ -2153,12 +2249,14 @@ test("snapshots the concrete summary target before deferred auth and a scope swi
     {
       apiKeys: { old: "old-key", next: "next-key" },
       models: [oldModel, nextModel],
+      // The switch's target credentials stay deferred so the switch cannot
+      // commit before the in-flight summary has snapshotted its target.
       requestAuth: {
-        "old/old-main": async () => {
-          authStarted();
-          return pendingAuth;
+        "old/old-main": { ok: true, apiKey: "old-summary-key" },
+        "next/next-main": async () => {
+          switchAuthStarted();
+          return pendingSwitchAuth;
         },
-        "next/next-main": { ok: true, apiKey: "next-summary-key" },
       },
     },
   );
@@ -2170,11 +2268,11 @@ test("snapshots the concrete summary target before deferred auth and a scope swi
     event,
     harness.ctx,
   );
-  await started;
-
-  await harness.command("local", harness.ctx);
-  releaseAuth({ ok: true, apiKey: "old-summary-key" });
+  const switching = harness.command("local", harness.ctx);
+  await switchAuthStartedPromise;
   await inFlight;
+  releaseSwitchAuth({ ok: true, apiKey: "next-summary-key" });
+  await switching;
 
   expect(compactCalls[0][1]).toEqual(oldModel);
   expect(compactCalls[0][2]).toBe("old-summary-key");
@@ -2188,6 +2286,10 @@ test("reports auth and generation failures and cancels without alias fallback", 
     models: [concrete],
     requestAuth: { "old/old-main": { ok: false, error: "credential expired" } },
   });
+  // Registration fails loud on the expired target credential before any request.
+  expect(authHarness.entries.at(0)?.data.text).toContain(
+    "could not resolve target credentials: old (credential expired)",
+  );
   const signal = new AbortController().signal;
   await expect(
     authHarness.summaryHandlers.session_before_compact[0](
@@ -2209,8 +2311,9 @@ test("reports auth and generation failures and cancels without alias fallback", 
     ),
   ).resolves.toEqual({ cancel: true });
   expect(compactCalls).toEqual([]);
-  // The entry sink failure is swallowed: no second notice is recorded.
-  expect(authHarness.entries).toHaveLength(1);
+  // The entry sink failure is swallowed: no second compaction notice is
+  // recorded on top of the session and first-attempt entries.
+  expect(authHarness.entries).toHaveLength(2);
 
   treeFailure = new Error("non-retryable invalid request");
   const generationHarness = await createHarness(presets, {
@@ -2325,6 +2428,7 @@ test("scoped OpenCode completions carry the conversation session id", async () =
   expect(call?.options).toEqual({
     reasoning: "medium",
     sessionId: "session-abc",
+    apiKey: "opencode-go-summary-key",
   });
   expect(options).toEqual({ reasoning: "medium" });
 });
@@ -2344,6 +2448,7 @@ test("every scoped target receives semantic session identity", async () => {
   expect(lastTargetCall(harness)?.options).toEqual({
     headers: { "x-callers": "keep" },
     sessionId: "session-abc",
+    apiKey: "old-summary-key",
   });
   expect(options).toEqual({ headers: { "x-callers": "keep" } });
 });
@@ -2369,10 +2474,11 @@ test("a caller-provided session id remains authoritative", async () => {
 
     await scopedStream(harness, "main", options);
 
-    expect(lastTargetCall(harness)?.options).toBe(options);
+    expect(lastTargetCall(harness)?.options).not.toBe(options);
     expect(lastTargetCall(harness)?.options).toEqual({
       reasoning: "medium",
       sessionId,
+      apiKey: "opencode-go-summary-key",
     });
   }
 });
@@ -2384,8 +2490,11 @@ test("no session id is fabricated when the session reports none", async () => {
 
   await scopedStream(harness, "main", options);
 
-  expect(lastTargetCall(harness)?.options).toBe(options);
-  expect(lastTargetCall(harness)?.options).toEqual({ reasoning: "medium" });
+  expect(lastTargetCall(harness)?.options).not.toBe(options);
+  expect(lastTargetCall(harness)?.options).toEqual({
+    reasoning: "medium",
+    apiKey: "opencode-go-summary-key",
+  });
 });
 
 test("summary requests leave identity and headers to Pi", async () => {
