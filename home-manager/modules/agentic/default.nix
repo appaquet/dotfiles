@@ -19,6 +19,7 @@
 
   config = {
     home.packages = [
+      pkgs.simple-http-server
       inputs'.llm-agents.packages.codex
       inputs'.llm-agents.packages.tokscale
       inputs'.llm-agents.packages.ccusage

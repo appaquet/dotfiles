@@ -55,6 +55,16 @@ Before planning an instruction change:
 Generated outputs under `result/` and downstream configuration trees are never edited. Change the
 source `.nix` files and regenerate them with the validation commands.
 
+## Check Policy
+
+Add checks deliberately. Every new check must protect repository-owned logic, a Nix evaluation or rendering boundary, or a runtime behavior whose failure has meaningful risk.
+
+Before adding a check, state the regression it catches and why an existing evaluation, build, or check does not catch it.
+
+Do not add checks that only restate declarative configuration, confirm that a listed package or file was installed, or assert an exact value copied from the same Nix source. Home Manager evaluation and builds cover ordinary wiring.
+
+Use smoke tests for risky integration behavior such as process cleanup, lifecycle handling, permissions, secret boundaries, runtime compatibility, and interactions between extensions. For third-party packages, test only the behavior this repository relies on across those boundaries, not the package's ordinary upstream behavior.
+
 ## Validation
 
 - Use `checks/corpus.nix` only for quick smoke and deterministic structural/configuration checks. Contributors must never add assertions for exact instruction text, policy wording, or production content; inspect generated output directly instead.

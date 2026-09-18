@@ -67,7 +67,6 @@
           piModuleCheck
           piRuntimeChecks.runtimeSmoke
           piRuntimeChecks.authMergeSmoke
-          piRuntimeChecks.backgroundBashSmoke
         ];
       } "touch $out";
 

@@ -88,6 +88,7 @@ let
     "pi-recaller"
     "proj-load"
     "proj-save"
+    "show-me"
   ];
 
   filesIn =
