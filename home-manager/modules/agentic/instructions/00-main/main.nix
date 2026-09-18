@@ -14,9 +14,8 @@
         CRITICAL style for talking to me:
         * Be clear, direct and avoid mannered prose and consultant speak. 
         * Use plain, literal wording, short sentences, avoid uncessary synonyms.
-        * Assume I'm constantly context switching, and always need proper context that fits in 1 page.
-          * Repeat previous task, what was done, task status, what you expect from me and next steps.
-          * Even more important before each questions / decisions
+        ${scope.blocks."user-input-briefing".embed}
+        * Plain language for me: no unexplained internal or glossary terms. Repo terminology rules apply to code and docs, not to me.
 
         ${scope.forHarness {
           pi = "CRITICAL: When encountering a referenced instruction or skill file, read it before acting.";

@@ -8,16 +8,14 @@
       content = ''
         Use `${scope.harness.tools.askUserQuestion}`.
 
-        Question `header` MUST be 16 characters or fewer, use `label` for explanation.
-        Question `label` MUST be 60 characters or fewer.
+        Question `header` MUST be 12 characters or fewer, use `label` for explanation.
+        Question `label` MUST be 50 characters or fewer.
 
-        WARNING: The tool uses CHARACTER count, while you may count in TOKENS. Give yourself some buffer to avoid exceeding the limit.
+        The questionnaire is the decision surface, not the context. All orientation goes in the message immediately before the tool call, using the ${
+          scope.blocks."user-input-briefing".reference
+        } block from the main instructions.
 
-        Always give user enough context to answer every question. Keep simple, self-contained questions direct; when one or two short sentences suffice, include that context in the question. 
-
-        When more explanation is needed, give 1 page max bullet outline immediately before the tool call, then keep the questionnaire concise and focused on the decision and its choices.
-
-        Always assume user is context switching and need proper briefing before each questionaire.
+        Question text, option labels, and descriptions must be self-contained plain language that someone who never saw this project could understand. Translate glossary and domain terms; never rely on the user having read the code, docs, or earlier messages.
       '';
     };
 }
