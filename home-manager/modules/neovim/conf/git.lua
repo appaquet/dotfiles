@@ -78,10 +78,12 @@ require("diffview").setup({
 			end), { desc = "Git: previous hunk" } },
 		},
 		file_panel = {
+			{ "n", "<CR>", diffview_actions.focus_entry, { desc = "Diffview: open diff for entry and focus it" } },
 			focus_diffview_keymap(),
 			refresh_diffview_keymap(),
 		},
 		file_history_panel = {
+			{ "n", "<CR>", diffview_actions.focus_entry, { desc = "Diffview: open diff for entry and focus it" } },
 			focus_diffview_keymap(),
 			refresh_diffview_keymap(),
 		},
