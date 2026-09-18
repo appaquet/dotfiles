@@ -70,6 +70,16 @@ let
       };
     }
 
+    # https://github.com/HaphazardDev/pi-extensions/tree/main/extensions/pi-background-bash
+    {
+      package = "npm:@haphazarddev/pi-background-bash@0.1.0";
+      files = {
+        ".pi/agent/extensions/pi-background-bash/config.json".text = builtins.toJSON {
+          shortcut = "ctrl+shift+b";
+        };
+      };
+    }
+
     # https://github.com/juicesharp/rpiv-mono
     {
       package = "npm:@juicesharp/rpiv-ask-user-question@2.9.0";
