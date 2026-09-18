@@ -27,7 +27,7 @@
         ## Scope
 
         Search for project guidelines (may not exist)
-        - `**/*security*.md`, `**/*testing*.md`
+        * `**/*security*.md`, `**/*testing*.md`
 
         ## Comment Format
 

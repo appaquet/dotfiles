@@ -29,20 +29,20 @@
         Before interpreting project or phase docs, load ${scope.skills."project-docs".reference}.
 
         Extract project guidelines from project docs:
-        - Main project doc (`00-*.md`) loaded by proj-load
-        - Context and Requirements sections from the main project doc
-        - Tasks sections and task acceptance criteria from phase docs (`NN-*.md`)
-        - Constraints, acceptance criteria, scope boundaries
+        * Main project doc (`00-*.md`) loaded by proj-load
+        * Context and Requirements sections from the main project doc
+        * Tasks sections and task acceptance criteria from phase docs (`NN-*.md`)
+        * Constraints, acceptance criteria, scope boundaries
 
         If no project doc exists, report "No project requirements found" and skip review.
 
-        - For EACH requirement (R1, R2, etc.), create a task with `${scope.harness.tools.taskCreate}`
-          - Make sure that each requirement is checked against guidelines
+        * For EACH requirement (R1, R2, etc.), create a task with `${scope.harness.tools.taskCreate}`
+          * Make sure that each requirement is checked against guidelines
 
-        - Cross-check completeness
-          - Verify each completed phase task (`[x]`) in phase docs has corresponding implementation
-          - Verify requirement status markers (⬜/🔄/✅) match phase status
-          - Flag scope creep (features added beyond requirements)
+        * Cross-check completeness
+          * Verify each completed phase task (`[x]`) in phase docs has corresponding implementation
+          * Verify requirement status markers (⬜/🔄/✅) match phase status
+          * Flag scope creep (features added beyond requirements)
 
         ## Comment Format
 

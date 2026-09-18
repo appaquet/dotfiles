@@ -16,9 +16,9 @@
         2. 🔳 Execute tasks one by one
 
         3. 🔳 Debrief me on
-           - What you did, learned and deviations from plan
-           - Any blockers
-           - Expected next steps
+           * What you did, learned and deviations from plan
+           * Any blockers
+           * Expected next steps
 
         ${scope.blocks."engagement-gate".release}
       '';

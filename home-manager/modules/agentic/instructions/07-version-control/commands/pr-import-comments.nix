@@ -25,20 +25,20 @@
         1. 🔳 Get PR info
          ${scope.forHarness {
            pi = ''
-             - Run `gh pr view the-branch-name --json number --jq '.number'` with the shell tool for the current PR number.
-             - Run `gh repo view --json owner --jq '.owner.login'` with the shell tool for the repo owner.
-             - Run `gh repo view --json name --jq '.name'` with the shell tool for the repo name.
+             * Run `gh pr view the-branch-name --json number --jq '.number'` with the shell tool for the current PR number.
+             * Run `gh repo view --json owner --jq '.owner.login'` with the shell tool for the repo owner.
+             * Run `gh repo view --json name --jq '.name'` with the shell tool for the repo name.
            '';
            default = ''
-             - Current PR number: !`gh pr view the-branch-name --json number --jq '.number'`
-             - Repo owner: !`gh repo view --json owner --jq '.owner.login'`
-             - Repo name: !`gh repo view --json name --jq '.name'`
+             * Current PR number: !`gh pr view the-branch-name --json number --jq '.number'`
+             * Repo owner: !`gh repo view --json owner --jq '.owner.login'`
+             * Repo name: !`gh repo view --json name --jq '.name'`
            '';
          }}
 
         2. 🔳 Fetch comments
-           - Use GitHub GraphQL API to fetch all unresolved review threads
-           - Command:
+           * Use GitHub GraphQL API to fetch all unresolved review threads
+           * Command:
 
              ```bash
              gh api graphql -f query="
@@ -68,9 +68,9 @@
              ```
 
         3. 🔳 Import comments
-           - For each unresolved comment, add sub-task "Import: [path:line]"
-           - Read the file at the specified path
-           - Insert inline comment at the specified line number using this format:
+           * For each unresolved comment, add sub-task "Import: [path:line]"
+           * Read the file at the specified path
+           * Insert inline comment at the specified line number using this format:
 
              ```
              // REVIEW: pr-import-comments (DB: <databaseId>, Node: <nodeId>, PR: <prNumber>) - <author> @ <createdAt>
@@ -81,22 +81,22 @@
              // ... (continue for all lines in the comment body)
              ```
 
-           - Handle multi-line comment bodies by prefixing each line with `//`
-           - Preserve proper indentation matching the surrounding code
+           * Handle multi-line comment bodies by prefixing each line with `//`
+           * Preserve proper indentation matching the surrounding code
 
         4. 🔳 Report results
-           - Count of comments imported
-           - List of files modified
-           - Any errors encountered during import
+           * Count of comments imported
+           * List of files modified
+           * Any errors encountered during import
 
         5. **STOP** - Do not fix, address, or respond to imported comments; this command imports only.
 
         ## Important Notes
 
-        - Only import unresolved comments (isResolved == false)
-        - Preserve exact line numbers from the API response
-        - Handle edge cases like files that don't exist or invalid line numbers gracefully
-        - Don't modify existing code, only add review comments
+        * Only import unresolved comments (isResolved == false)
+        * Preserve exact line numbers from the API response
+        * Handle edge cases like files that don't exist or invalid line numbers gracefully
+        * Don't modify existing code, only add review comments
       '';
     };
 }

@@ -22,53 +22,53 @@
         } loaded before reading or updating project or phase documents.
 
         2. 🔳 Verify 10/10 understanding, if not already done
-           - Skip if we just planned and understanding is already in context
-           - Read ALL requirements in project doc
-           - If unclear, ask user to use ${scope.commands."ctx-improve".reference}
-           - Clarify if task contradicts or overlaps
+           * Skip if we just planned and understanding is already in context
+           * Read ALL requirements in project doc
+           * If unclear, ask user to use ${scope.commands."ctx-improve".reference}
+           * Clarify if task contradicts or overlaps
 
         3. 🔳 Load tasks from project/phase docs
-           - For each task, create 1..n `${scope.harness.tools.taskCreate}`
-             - Segment for better tracking
-           - Create tasks for verification/testing each implementation step. Verification means running tests and checking ACs, not launching a reviewer.
-           - If user validation needed, task description should be clear about waiting for user input
-           - If in orchestrator mode, decide whether each task can be delegated, make the task
+           * For each task, create 1..n `${scope.harness.tools.taskCreate}`
+             * Segment for better tracking
+           * Create tasks for verification/testing each implementation step. Verification means running tests and checking ACs, not launching a reviewer.
+           * If user validation needed, task description should be clear about waiting for user input
+           * If in orchestrator mode, decide whether each task can be delegated, make the task
              description clear and select the dev agent using ${
                scope.blocks."sub-agent-selection".reference
              }.
 
         4. Create version control commits for this implementation
-           - Check active changes
-           - Commit with proper message or change active commit message
+           * Check active changes
+           * Commit with proper message or change active commit message
 
         5. 🔳 Implement tasks
-           - You need to follow ${scope.blocks."sub-agents-workflows".reference}
-           - Update documentation if existing:
-             - Mark phase doc task `[~]` when starting, `[x]` when done
+           * You need to follow ${scope.blocks."sub-agents-workflows".reference}
+           * Update documentation if existing:
+             * Mark phase doc task `[~]` when starting, `[x]` when done
                Like task format dictates. Done = all ACs pass and tested working
-             - Add new tasks discovered to phase doc
-             - Note critical decisions
-             - Before marking task done: verify each AC sub-item passes
-           - If deviating or overcomplicating, STOP and update user
-           - If any decisions or discoveries, update project/phase doc
-           - Reviewers can be used, but needs to follow ${scope.blocks."reviewer-budget".reference}
-           - If an agent is stuck, review the evidence it returned. Resolve the blocker and resume it, or reselect using ${
+             * Add new tasks discovered to phase doc
+             * Note critical decisions
+             * Before marking task done: verify each AC sub-item passes
+           * If deviating or overcomplicating, STOP and update user
+           * If any decisions or discoveries, update project/phase doc
+           * Reviewers can be used, but needs to follow ${scope.blocks."reviewer-budget".reference}
+           * If an agent is stuck, review the evidence it returned. Resolve the blocker and resume it, or reselect using ${
              scope.blocks."sub-agent-selection".reference
            } when the task needs a different agent
 
         6. 🔳 Validate via ${scope.blocks."development-completion-checklist".reference}
-           - State each item aloud, confirm compliance
+           * State each item aloud, confirm compliance
 
         7. 🔳 Validate formatting, linting, tests done
-           - If sub-agents did it, trust them
-           - If not, ask them back instead of wasting your context
+           * If sub-agents did it, trust them
+           * If not, ask them back instead of wasting your context
 
         8. 🔳 Run ${scope.commands."proj-save".reference} to update project and phase docs.
 
         9. 🔳 Debrief me on
-           - What you did, learned and deviations from plan
-           - Any blockers
-           - Expected next steps
+           * What you did, learned and deviations from plan
+           * Any blockers
+           * Expected next steps
 
         ${scope.blocks."engagement-gate".release}
       '';

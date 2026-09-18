@@ -28,7 +28,7 @@
         ## Scope
 
         Search for project guidelines / design (may not exist)
-        - `**/architecture.md`
+        * `**/architecture.md`
 
         ## Comment Format
          

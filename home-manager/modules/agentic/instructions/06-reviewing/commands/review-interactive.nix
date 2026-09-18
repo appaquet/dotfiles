@@ -20,11 +20,11 @@
       ## Instructions
 
       1. 🔳 Prepare the review phase
-         - If no committed project files exist, confirm with the user and create the project
+         * If no committed project files exist, confirm with the user and create the project
            (docs + link) following the project files rules.
-         - Create a new phase in project documentation for this review session.
+         * Create a new phase in project documentation for this review session.
            Should be a sub-phase of latest phase that we worked on. E.g. phase 1 -> phase 1a.
-         - If no review feedback/comments were provided: STOP and tell the user the review phase is
+         * If no review feedback/comments were provided: STOP and tell the user the review phase is
            ready and you are awaiting for reviews.
 
       2. For each feedback/comment, launch a ${

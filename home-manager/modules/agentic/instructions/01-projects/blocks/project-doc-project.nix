@@ -58,7 +58,7 @@
 
           ### Questions & Investigations (optional)
 
-          Maintain a checklist of questions, decisions, and investigation records. Capture uncertainties when encountered and outcomes when discovered. Record every question asked during planning or implementation with its answer, and update this section continuously.
+          Maintain a checklist of questions, decisions, and investigation records. Capture uncertainties when encountered and outcomes when discovered. Record every question asked during planning or implementation with its answer. Follow the creation and updates timing policy.
 
           Format:
           ```markdown

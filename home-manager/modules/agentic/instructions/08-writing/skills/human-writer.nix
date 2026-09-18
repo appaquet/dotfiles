@@ -12,14 +12,14 @@
 
         ## Core Principles
 
-        - Be concrete and specific. "Reduced latency by 40ms" not "improved performance"
-        - Have opinions when relevant. Pick a side instead of hedging everything
-        - Allow imperfection. Occasional informal phrasing beats relentless polish
-        - Say it once. If one sentence covers it, don't spread across three with filler transitions
-        - Describe things proportionally. Most things are ordinary, reserve strong language for what earns it
-        - Prefer direct, literal wording, short sentences, and conventional rhythm
-        - Minimize metaphor, long sentences, unusual rhythm, ornamental phrasing, and stylistic display
-        - Put precision first when standard domain terms or necessary complexity make the meaning clearer
+        * Be concrete and specific. "Reduced latency by 40ms" not "improved performance"
+        * Have opinions when relevant. Pick a side instead of hedging everything
+        * Allow imperfection. Occasional informal phrasing beats relentless polish
+        * Say it once. If one sentence covers it, don't spread across three with filler transitions
+        * Describe things proportionally. Most things are ordinary, reserve strong language for what earns it
+        * Prefer direct, literal wording, short sentences, and conventional rhythm
+        * Minimize metaphor, long sentences, unusual rhythm, ornamental phrasing, and stylistic display
+        * Put precision first when standard domain terms or necessary complexity make the meaning clearer
 
         ## Banned Words
 
@@ -61,30 +61,30 @@
 
         These appear orders of magnitude more often in AI text than human text:
 
-        - "complex and multifaceted" (700x overuse vs human baseline)
-        - "intricate interplay" (100x overuse)
-        - "played a crucial role" (70x overuse)
-        - "not only... but also..."
-        - "It's not just X, it's Y"
-        - "a testament to"
-        - "the move underscores a broader shift"
-        - "in an era of"
-        - "serves as a reminder that"
-        - "stands as a testament"
-        - "offers a glimpse into"
-        - "a rich tapestry of"
+        * "complex and multifaceted" (700x overuse vs human baseline)
+        * "intricate interplay" (100x overuse)
+        * "played a crucial role" (70x overuse)
+        * "not only... but also..."
+        * "It's not just X, it's Y"
+        * "a testament to"
+        * "the move underscores a broader shift"
+        * "in an era of"
+        * "serves as a reminder that"
+        * "stands as a testament"
+        * "offers a glimpse into"
+        * "a rich tapestry of"
 
         ## Banned Openers and Transitions
 
         Never open a sentence or paragraph with:
 
-        - "It's worth noting" / "It's important to note" / "It bears mentioning"
-        - "Interestingly" / "Notably" / "Crucially" / "Significantly"
-        - "Indeed" / "Moreover" / "Furthermore" / "Additionally" / "Subsequently"
-        - "In today's [anything]" / "In the world of [anything]"
-        - "In conclusion" / "In summary" / "Overall" (as paragraph openers)
-        - "Whether you're a [X], a [Y], or a [Z]..."
-        - "That's a great question" or any sycophantic opener
+        * "It's worth noting" / "It's important to note" / "It bears mentioning"
+        * "Interestingly" / "Notably" / "Crucially" / "Significantly"
+        * "Indeed" / "Moreover" / "Furthermore" / "Additionally" / "Subsequently"
+        * "In today's [anything]" / "In the world of [anything]"
+        * "In conclusion" / "In summary" / "Overall" (as paragraph openers)
+        * "Whether you're a [X], a [Y], or a [Z]..."
+        * "That's a great question" or any sycophantic opener
 
         ## Structural Rules
 
@@ -106,10 +106,10 @@
 
         ## Tone
 
-        - No promotional language: "new feature" not "powerful new feature"
-        - No flattery or sycophancy
-        - Concrete over vague: numbers, names, specifics over "improved", "enhanced", "optimized"
-        - Plain words over fancy ones: "use" not "utilize", "improve" not "enhance", "show" not "showcase"
+        * No promotional language: "new feature" not "powerful new feature"
+        * No flattery or sycophancy
+        * Concrete over vague: numbers, names, specifics over "improved", "enhanced", "optimized"
+        * Plain words over fancy ones: "use" not "utilize", "improve" not "enhance", "show" not "showcase"
       '';
     };
     files = { };

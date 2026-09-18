@@ -18,34 +18,34 @@
         ## Instructions
 
         1. 🔳 Ensure REVIEW comments found
-           - Use searching procedure
+           * Use searching procedure
 
         2. 🔳 Research for each comment
-           - Read surrounding code to understand the issue
-           - Check related files if change has broader impact
-           - Identify dependencies between review items
-           - Identify if any comment is invalid or debatable
+           * Read surrounding code to understand the issue
+           * Check related files if change has broader impact
+           * Identify dependencies between review items
+           * Identify if any comment is invalid or debatable
 
         3. 🔳 Check requirements
-           - Verify fixes don't contradict existing requirements
-           - Update existing requirements if needed (don't create new ones)
-           - Use the project file listing above to locate the relevant docs
+           * Verify fixes don't contradict existing requirements
+           * Update existing requirements if needed (don't create new ones)
+           * Use the project file listing above to locate the relevant docs
 
         4. 🔳 Categorize and prioritize
-           - **Priority**: High (critical/security), Medium (important), Low (minor/stylistic)
-           - **Effort**: Quick Win, Moderate, Extensive
-           - **Dependencies**: Note order requirements
-           - **Validity**: If you believe a comment is invalid or debatable, explain why and let user decide
-           - **Agent**: If we're in orchestrator mode, which agent could be best to address the issue
+           * **Priority**: High (critical/security), Medium (important), Low (minor/stylistic)
+           * **Effort**: Quick Win, Moderate, Extensive
+           * **Dependencies**: Note order requirements
+           * **Validity**: If you believe a comment is invalid or debatable, explain why and let user decide
+           * **Agent**: If we're in orchestrator mode, which agent could be best to address the issue
 
         5. 🔳 Present plan
-           - Show prioritized list with research findings, formatted as table
-           - Should address each comment using the addressing rule of review flow
+           * Show prioritized list with research findings, formatted as table
+           * Should address each comment using the addressing rule of review flow
 
         6. 🔳 Update project docs
-           - Add fixes to the Tasks section of the best matching phase document, with priorities
-           - Never add review tasks to the main project document
-           - Update as user give further feedback
+           * Add fixes to the Tasks section of the best matching phase document, with priorities
+           * Never add review tasks to the main project document
+           * Update as user give further feedback
            
         7. ${scope.blocks."engagement-gate".gate}
       '';

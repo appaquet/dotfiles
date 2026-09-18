@@ -33,47 +33,47 @@
         1. Ensure ${scope.skills."project-docs".reference} loaded before reading project documents.
 
         2. 🔳 Analyze changes
-           - Start from the changed-file list above
-           - Read per-file diff, one by one
-           - If user specified a focus area, prioritize those components
-           - Code remain source of truth. You can check project docs, but may have drifted.
+           * Start from the changed-file list above
+           * Read per-file diff, one by one
+           * If user specified a focus area, prioritize those components
+           * Code remain source of truth. You can check project docs, but may have drifted.
 
         3. 🔳 Generate report in one message, without any following messages:
-            - ${
+            * ${
               scope.forHarness {
                 pi = "Load the `${humanWriter}` Agent Skill guidance for tone (no AI filler, no superlatives).";
                 default = "Load the `${humanWriter}` skill using the `Skill` tool for tone (no AI filler, no superlatives)";
               }
             }
-           - Wrap identifiers (types, functions, files, fields) in backticks
+           * Wrap identifiers (types, functions, files, fields) in backticks
 
            Emit two sections in order:
 
            Per-component breakdown — analysis scaffolding, not the final PR text:
-           - Group changes by logical component (directory, module, or feature area)
-           - For each component, list changes by category (skip empty):
-             - Added: New files, features, capabilities
-             - Changed: Modified behavior, refactored code
-             - Fixed: Bug fixes, corrections
-             - Removed: Deleted files, deprecated features
+           * Group changes by logical component (directory, module, or feature area)
+           * For each component, list changes by category (skip empty):
+             * Added: New files, features, capabilities
+             * Changed: Modified behavior, refactored code
+             * Fixed: Bug fixes, corrections
+             * Removed: Deleted files, deprecated features
 
            PR-ready markdown — what the user copies into the PR description. Wrap in a ```markdown
            fenced block so it's trivial to select:
 
                ## Summary
 
-               - [Observable/user-facing change — behavior, API surface, error responses, bug fixes]
-               - [One bullet per distinct change, 1-3 lines, with concrete identifiers]
+               * [Observable/user-facing change — behavior, API surface, error responses, bug fixes]
+               * [One bullet per distinct change, 1-3 lines, with concrete identifiers]
 
                ### Implementation Notes
 
-               - **[Component or pattern]**: [How it is built — named types, algorithm, data flow]
-               - **[Another component]**: [Detail]
+               * **[Component or pattern]**: [How it is built — named types, algorithm, data flow]
+               * **[Another component]**: [Detail]
 
            Split rule:
-           - Summary: WHAT changed for a consumer (behavior, API, errors, fixes). Avoid internal
+           * Summary: WHAT changed for a consumer (behavior, API, errors, fixes). Avoid internal
              identifiers unless consumer-visible
-           - Implementation Notes: HOW it was built (types, refactors, algorithms, structural changes)
+           * Implementation Notes: HOW it was built (types, refactors, algorithms, structural changes)
       '';
     };
 }

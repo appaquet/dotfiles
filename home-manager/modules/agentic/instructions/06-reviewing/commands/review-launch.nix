@@ -4,7 +4,7 @@
     let
       reviewCheckpoint = ''
         1. Prepare a dedicated `jj` review change named `private: agent: review - <topic>` using the repository version-control rule
-           - Keep reviewer follow-up isolated from unrelated edits
+           * Keep reviewer follow-up isolated from unrelated edits
       '';
     in
     {
@@ -29,16 +29,16 @@
         ${reviewCheckpoint}
 
         2. Launch 4 specialized agents in BACKGROUND PARALLEL:
-           - Agent 1: launch the "code-style-reviewer" agent
-           - Agent 2: launch the "code-correctness-reviewer" agent
-           - Agent 3: launch the "architecture-reviewer" agent
-           - Agent 4: launch the "requirements-reviewer" agent
+           * Agent 1: launch the "code-style-reviewer" agent
+           * Agent 2: launch the "code-correctness-reviewer" agent
+           * Agent 3: launch the "architecture-reviewer" agent
+           * Agent 4: launch the "requirements-reviewer" agent
 
-           - Again, they already have internal instructions. Don't provide them any extra prompt, unless the user explicitly asks you to (e.g. review something specific).
-           - By default, they will compute their own changed file list and use their built-in per-file diff. Do not override that unless the user explicitly asks for something specific.
-           - Tell them to process with the review by following their internal instructions to the letter, without biasing them with any extra instructions.
+           * Again, they already have internal instructions. Don't provide them any extra prompt, unless the user explicitly asks you to (e.g. review something specific).
+           * By default, they will compute their own changed file list and use their built-in per-file diff. Do not override that unless the user explicitly asks for something specific.
+           * Tell them to process with the review by following their internal instructions to the letter, without biasing them with any extra instructions.
 
-           - Note: If an agent doesn't return any results but has finished, don't assume that it failed and
+           * Note: If an agent doesn't return any results but has finished, don't assume that it failed and
              just consider it as "no issues found". Don't restart the agents as they consume many tokens.
 
          3. ${

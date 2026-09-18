@@ -23,9 +23,11 @@
 
           * Create project and phase files only when an active user-invoked workflow explicitly directs their creation. Otherwise, stop and ask the user to invoke an appropriate project workflow.
           * Use the active project link (`proj` or `proj-adhoc`) reported by project state; permissions may allow only that location.
-          * Update documents continuously during planning, development, review, and other work: on task completion, when ${
+          * Outside multi-question interviews, update documents continuously during planning, development, review, and other work: on task completion, when ${
             scope.commands."proj-save".reference
           } runs, and when significant information, uncertainties, decisions, insights, or outcomes arise.
+          * During a multi-question interview, accumulate related questions, answers, decisions, uncertainties, and investigation outcomes in working context. Update the affected project and phase sections together at meaningful checkpoints: when a coherent topic or design branch resolves; before changing topic or phase, delegation, an approval or engagement gate, a planned stop, or a known context-loss boundary; and when the interview ends.
+          * Do not update documents merely because an interview answer arrived. A checkpoint can follow one answer when it resolves a key branch. At an interruption checkpoint, persist unresolved questions and the next step. Skip the update when nothing accumulated. This does not change the timing of one-off decisions, explicit saves, task completion, implementation investigations, or SR&ED records.
           * If new work is unrelated to a phase document, ask the user whether to split it into a separate phase document.
           * Never ask me at end of implementation if tasks/phases/requirements can be marked as complete. Instead, debrief on current what was done, and next step expectations.
           * Completion should be determined by the user, but can be recommended when the user engage with a next step without marking previous tasks/phases/requirements as complete.

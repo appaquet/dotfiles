@@ -16,7 +16,7 @@
         ## Instructions
 
         1. 🔳 Find imported comments
-           - Search for REVIEW: pr-import-comments pattern:
+           * Search for REVIEW: pr-import-comments pattern:
              ```bash
               ${scope.forHarness {
                 pi = "rg \"REVIEW: pr-import-comments \\(DB: (\\d+), Node: ([^,]+), PR: (\\d+)\\)\" -o";
@@ -25,13 +25,13 @@
              ```
 
         2. 🔳 Reply to comments
-           - For each imported comment, add sub-task "Reply: [DB_ID]"
-           - Extract comment info:
+           * For each imported comment, add sub-task "Reply: [DB_ID]"
+           * Extract comment info:
              ```bash
              DATABASE_ID=1234567890    # From "DB: 1234567890"
              PR_NUMBER=1234           # From "PR: 1234"
              ```
-           - Craft reply (must start with robot emoji):
+           * Craft reply (must start with robot emoji):
              ```bash
              REPLY_BODY="🤖 Generated via coding agent 🤖 
 
@@ -45,19 +45,19 @@
 
              Thanks for catching this!"
              ```
-           - Send reply via correct endpoint with PR number:
+           * Send reply via correct endpoint with PR number:
              ```bash
              gh api repos/<OWNER>/<REPO>/pulls/''${PR_NUMBER}/comments/''${DATABASE_ID}/replies \
                -X POST \
                -f body="''${REPLY_BODY}"
              ```
-           - Verify response includes:
-             - `"in_reply_to_id": 1234567890` (matches your DATABASE_ID)
-             - Reply appears in PR conversation thread
-           - Clean up by removing inline comment after successful reply
+           * Verify response includes:
+             * `"in_reply_to_id": 1234567890` (matches your DATABASE_ID)
+             * Reply appears in PR conversation thread
+           * Clean up by removing inline comment after successful reply
 
         3. 🔳 Report
-           - List all replies sent
+           * List all replies sent
 
         ## Troubleshooting
 

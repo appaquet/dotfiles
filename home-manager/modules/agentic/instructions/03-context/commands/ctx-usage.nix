@@ -12,8 +12,8 @@
       ## Instructions
 
       1. 🔳 Verify `/context` was run
-         - Look in conversation history for `/context` output (local-command-stdout with token breakdown)
-         - If not found: **STOP** - tell user to run `/context` first, then re-run `/ctx-usage`
+         * Look in conversation history for `/context` output (local-command-stdout with token breakdown)
+         * If not found: **STOP** - tell user to run `/context` first, then re-run `/ctx-usage`
 
       2. 🔳 Analyze messages and report breakdown
          Scan the full conversation history. Estimate tokens as chars ÷ 4.
@@ -38,11 +38,11 @@
 
       3. 🔳 Optimization hints
          Give specific, actionable suggestions based on the breakdown:
-         - Large Task agent results
-         - Many Read results
-         - Repeated system reminder injections
-         - Long assistant messages with thinking
-         - Messages > ~60k tokens
+         * Large Task agent results
+         * Many Read results
+         * Repeated system reminder injections
+         * Long assistant messages with thinking
+         * Messages > ~60k tokens
     '';
   };
 }

@@ -28,7 +28,7 @@
         ## Scope
 
         Search for project guidelines (may not exist)
-        - `**/*style*.md`, `**/*guide*.md`
+        * `**/*style*.md`, `**/*guide*.md`
 
         ## Comment Format
 

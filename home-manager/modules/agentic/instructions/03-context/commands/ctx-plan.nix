@@ -27,12 +27,12 @@
         1. Ensure ${scope.skills."project-docs".reference} loaded.
 
         2. 🔳 Create the ad hoc folder
-           - From the workspace root, run `agentic-proj-create-adhoc` with no arguments.
-           - Create normal `00-<project>.md` and `01-<phase>.md` files in the directory reported by `agentic-proj-docs`.
+           * From the workspace root, run `agentic-proj-create-adhoc` with no arguments.
+           * Create normal `00-<project>.md` and `01-<phase>.md` files in the directory reported by `agentic-proj-docs`.
 
         3. 🔳 Ensure context loaded, goal clear, task defined
-           - ${scope.harness.prose.questions.request} if empty or unclear.
-           - If the project name is unclear, suggest one based on the goal or current version control context value.
+           * ${scope.harness.prose.questions.request} if empty or unclear.
+           * If the project name is unclear, suggest one based on the goal or current version control context value.
 
         4. 🔳 Research, clarify and plan
            ${scope.blocks."plan-procedure".embed}
@@ -42,7 +42,7 @@
         }
 
         6. 🔳 Write plan to docs
-           - Using ${scope.skills."project-docs".reference}, use project & phase docs rules and structure
+           * Using ${scope.skills."project-docs".reference}, use project & phase docs rules and structure
 
         7. ${scope.blocks."engagement-gate".gate}
 
