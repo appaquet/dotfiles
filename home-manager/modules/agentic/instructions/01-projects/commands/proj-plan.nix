@@ -40,7 +40,7 @@
            - If committed project files exist and goal is aligned, confirm phase name with user.
            - If new project, follow the document version control rules in ${
              scope.skills."project-docs".reference
-           }: the proj symlink joins the working change and documents stay uncommitted.
+           }: the proj symlink gets its own commit and documents stay uncommitted.
 
         4. 🔳 Research, clarify and plan
             ${scope.blocks."plan-procedure".embed}

@@ -58,7 +58,7 @@
           ### Document version control
 
           * Project and phase document changes remain as uncommitted working-copy changes. Never create a dedicated document commit. In a separate docs repository the user commits them when they choose; in the same repository they are part of the working change and ship with the work.
-          * Add the `proj` symlink to the working change of the repository it lives in, together with the work's code changes.
+          * For a committed project, keep the `proj` symlink in its own commit named `private: proj - <project-name>`. That commit contains the symlink only; never mix document changes into it.
           * Review document changes as working-copy diffs (e.g. `jj diff` in the docs repo) before relying on them.
           * Never commit `proj-adhoc`, its temporary target, or its project and phase documents.
       '';
