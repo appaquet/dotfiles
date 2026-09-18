@@ -524,6 +524,7 @@ class StatsTests(unittest.TestCase):
             },
             document["orchestrator_cohort"],
         )
+        self.assertEqual("week", document["group_by"])
         self.assertEqual(
             {
                 "2026-W36": {
@@ -539,7 +540,73 @@ class StatsTests(unittest.TestCase):
                     "reviewer_spawns_per_top_level_session": 1.0,
                 },
             },
-            document["weekly"],
+            document["series"],
+        )
+
+    def test_stats_groups_series_by_day_in_json_and_text(self):
+        sessions = (
+            ("top-1", "2026-09-01T01:00:00.000Z", ""),
+            ("review-1", "2026-09-01T23:00:00.000Z", "code-style-reviewer#a"),
+            ("top-2", "2026-09-02T12:00:00.000Z", ""),
+            ("other-1", "2026-09-02T13:00:00.000Z", "mid-dev#b"),
+        )
+        for session_id, timestamp, name in sessions:
+            entries = [message_entry(f"{session_id}-user", {"role": "user", "content": "Work"})]
+            if name:
+                entries.insert(0, {"type": "session_info", "name": name})
+            write_session(
+                self.session_dir / f"{session_id}.jsonl",
+                header(session_id, timestamp=timestamp),
+                *entries,
+            )
+
+        json_output = io.StringIO()
+        with redirect_stdout(json_output):
+            json_status = query.main(
+                [
+                    "stats",
+                    "--session-dir",
+                    str(self.session_dir),
+                    "--group-by",
+                    "day",
+                    "--format",
+                    "jsonl",
+                ]
+            )
+
+        document = json.loads(json_output.getvalue())
+        self.assertEqual(0, json_status)
+        self.assertEqual("day", document["group_by"])
+        self.assertEqual(
+            {
+                "2026-09-01": {
+                    "top_level_sessions": 1,
+                    "subagent_spawns": 1,
+                    "reviewer_spawns": 1,
+                    "reviewer_spawns_per_top_level_session": 1.0,
+                },
+                "2026-09-02": {
+                    "top_level_sessions": 1,
+                    "subagent_spawns": 1,
+                    "reviewer_spawns": 0,
+                    "reviewer_spawns_per_top_level_session": 0.0,
+                },
+            },
+            document["series"],
+        )
+
+        text_output = io.StringIO()
+        with redirect_stdout(text_output):
+            text_status = query.main(
+                ["stats", "--session-dir", str(self.session_dir), "--group-by", "day"]
+            )
+
+        self.assertEqual(0, text_status)
+        self.assertIn("group_by: day", text_output.getvalue())
+        self.assertIn(
+            "day.2026-09-01: top_level_sessions=1 subagent_spawns=1 reviewer_spawns=1 "
+            "reviewer_spawns_per_top_level_session=1.0",
+            text_output.getvalue(),
         )
 
 

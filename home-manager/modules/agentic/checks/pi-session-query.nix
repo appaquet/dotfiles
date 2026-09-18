@@ -71,10 +71,12 @@ pkgs.runCommand "pi-session-query-check"
     assert_contains "id: aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" inspect.out
     assert_contains "entries: 3" inspect.out
 
-    pi-session-query stats --session-dir "$session_dir" --since 2026-09-15 --until 2026-09-15 --classify-targets --format jsonl >stats.out
+    pi-session-query stats --session-dir "$session_dir" --since 2026-09-15 --until 2026-09-15 --classify-targets --group-by day --format jsonl >stats.out
     assert_contains '"top_level_sessions":1' stats.out
     assert_contains '"subagent_spawns":1' stats.out
     assert_contains '"reviewer_spawns":1' stats.out
+    assert_contains '"group_by":"day"' stats.out
+    assert_contains '"series":{"2026-09-15":{"top_level_sessions":1,"subagent_spawns":1,"reviewer_spawns":1,"reviewer_spawns_per_top_level_session":1.0}}' stats.out
     assert_contains '"ad_hoc_reviewer_spawns":1' stats.out
     assert_contains '"markdown_or_plan_review":1' stats.out
 

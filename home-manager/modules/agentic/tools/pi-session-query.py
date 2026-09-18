@@ -453,6 +453,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Count reviewer prompts explicitly targeting planning or phase documents",
     )
     stats.add_argument(
+        "--group-by",
+        choices=("day", "week"),
+        default="week",
+        help="Group the trend series by day or ISO week (default: week)",
+    )
+    stats.add_argument(
         "--format",
         choices=("text", "jsonl"),
         default="text",
@@ -1626,7 +1632,7 @@ def run_stats(arguments: argparse.Namespace) -> str:
     ad_hoc_reviewer_spawns = 0
     markdown_or_plan_review = 0
     reviewer_spawns_by_agent: dict[str, int] = {}
-    weekly: dict[str, dict[str, int]] = {}
+    series: dict[str, dict[str, int]] = {}
     workspaces: dict[str, dict[str, int | bool]] = {}
 
     for path in sorted(session_dir.rglob("*.jsonl")):
@@ -1645,9 +1651,9 @@ def run_stats(arguments: argparse.Namespace) -> str:
             continue
 
         sessions += 1
-        week = iso_week(created)
-        week_counts = weekly.setdefault(
-            week,
+        bucket = time_bucket(created, arguments.group_by)
+        bucket_counts = series.setdefault(
+            bucket,
             {"top_level_sessions": 0, "subagent_spawns": 0, "reviewer_spawns": 0},
         )
         workspace = workspaces.setdefault(
@@ -1657,10 +1663,10 @@ def run_stats(arguments: argparse.Namespace) -> str:
 
         if is_subagent:
             subagent_spawns += 1
-            week_counts["subagent_spawns"] += 1
+            bucket_counts["subagent_spawns"] += 1
             if is_reviewer:
                 reviewer_spawns += 1
-                week_counts["reviewer_spawns"] += 1
+                bucket_counts["reviewer_spawns"] += 1
                 workspace["reviewer_spawns"] += 1
                 reviewer_spawns_by_agent[bare_agent_name] = reviewer_spawns_by_agent.get(bare_agent_name, 0) + 1
                 if arguments.classify_targets and not session.first_message.startswith("<system-reminder>"):
@@ -1669,15 +1675,15 @@ def run_stats(arguments: argparse.Namespace) -> str:
                         markdown_or_plan_review += 1
         else:
             top_level_sessions += 1
-            week_counts["top_level_sessions"] += 1
+            bucket_counts["top_level_sessions"] += 1
             workspace["top_level_sessions"] += 1
             if transcript_has_mode(path, "orchestrator"):
                 workspace["orchestrator_ever"] = True
 
-    for week_counts in weekly.values():
-        week_counts["reviewer_spawns_per_top_level_session"] = safe_ratio(
-            week_counts["reviewer_spawns"],
-            week_counts["top_level_sessions"],
+    for bucket_counts in series.values():
+        bucket_counts["reviewer_spawns_per_top_level_session"] = safe_ratio(
+            bucket_counts["reviewer_spawns"],
+            bucket_counts["top_level_sessions"],
         )
 
     cohort = orchestrator_cohort(workspaces)
@@ -1693,7 +1699,8 @@ def run_stats(arguments: argparse.Namespace) -> str:
         "reviewer_spawns_per_top_level_session": safe_ratio(reviewer_spawns, top_level_sessions),
         "reviewer_share_percent": safe_ratio(reviewer_spawns * 100, subagent_spawns, digits=2),
         "orchestrator_cohort": cohort,
-        "weekly": dict(sorted(weekly.items())),
+        "group_by": arguments.group_by,
+        "series": dict(sorted(series.items())),
     }
     if arguments.classify_targets:
         document["target_classification"] = {
@@ -1751,11 +1758,13 @@ def path_has_prefix(path: str, prefix: str) -> bool:
     return True
 
 
-def iso_week(created: datetime | None) -> str:
-    """Return a stable ISO year-week label for a persisted timestamp."""
+def time_bucket(created: datetime | None, group_by: str) -> str:
+    """Return a stable daily or ISO weekly label for a persisted timestamp."""
 
     if created is None:
         return "unknown"
+    if group_by == "day":
+        return created.date().isoformat()
     year, week, _ = created.isocalendar()
     return f"{year}-W{week:02d}"
 
@@ -1833,9 +1842,11 @@ def text_stats(document: dict[str, object]) -> str:
             f"reviewer_spawns={values['reviewer_spawns']} spawns_per_session={values['spawns_per_session']}"
         )
     lines.append(f"cohort.rate_ratio: {cohort['rate_ratio']}")
-    for week, values in document["weekly"].items():
+    group_by = document["group_by"]
+    lines.append(f"group_by: {group_by}")
+    for bucket, values in document["series"].items():
         lines.append(
-            f"week.{week}: top_level_sessions={values['top_level_sessions']} "
+            f"{group_by}.{bucket}: top_level_sessions={values['top_level_sessions']} "
             f"subagent_spawns={values['subagent_spawns']} reviewer_spawns={values['reviewer_spawns']} "
             f"reviewer_spawns_per_top_level_session={values['reviewer_spawns_per_top_level_session']}"
         )
