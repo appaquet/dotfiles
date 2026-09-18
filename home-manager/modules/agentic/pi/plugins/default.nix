@@ -42,6 +42,11 @@ let
       package = "npm:@quartermaster-labs/pi-on-demand-context@0.3.1";
     }
 
+    # https://github.com/YuGiMob/pi-hashline-edit-pro
+    {
+      package = "npm:pi-hashline-edit-pro@4.3.2";
+    }
+
     # https://github.com/tintinweb/pi-subagents
     {
       package = "npm:@tintinweb/pi-subagents@0.19.0";
