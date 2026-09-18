@@ -1,4 +1,9 @@
-{ lib, pkgs, ... }:
+{
+  lib,
+  pkgs,
+  inputs',
+  ...
+}:
 let
   worktreeHooks = {
     path = pkgs.stdenvNoCC.mkDerivation {
@@ -36,6 +41,7 @@ in
 
   programs.herdr = {
     enable = true;
+    package = inputs'.llm-agents.packages.herdr;
 
     settings = {
       onboarding = false;
