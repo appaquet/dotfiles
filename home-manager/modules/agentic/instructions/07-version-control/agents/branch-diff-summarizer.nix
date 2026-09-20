@@ -6,7 +6,7 @@
 
       model = {
         claude = "haiku";
-        opencode = "opencode-go/deepseek-v4-flash";
+        opencode = "opencode-go/deepseek-v4.1-flash";
       };
 
       permission = {

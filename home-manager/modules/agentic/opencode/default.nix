@@ -323,7 +323,7 @@ let
       };
 
       explore = {
-        model = "opencode-go/deepseek-v4-flash";
+        model = "opencode-go/deepseek-v4.1-flash";
       };
 
       build = {
