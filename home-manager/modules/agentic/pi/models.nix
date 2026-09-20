@@ -33,6 +33,7 @@ let
       {
         compat = {
           supportsReasoningEffort = true;
+          supportsStrictMode = false;
           thinkingFormat = "openai";
         };
       }
