@@ -34,6 +34,10 @@
 
         NEVER execute an irreversible action without explicit user approval. Before deleting/reverting/etc., ALWAYS make sure we can restore. Ask user otherwise.
 
+        NEVER bring secret values into the context window — do not read or decrypt secrets files, env credentials, tokens, keys, or passwords into context — unless I explicitly approve it this session. Prefer a path that consumes the secret without printing it (e.g. decrypt into a build); print a secret into context only on my explicit approval (e.g. I run a local, no-retention model).
+
+        NEVER access an external service (Cloudflare, DNS, remote APIs) — state change or read-only — without my explicit approval.
+
         NEVER revert changes that you don't recognize. Concurrent work is done in same folder, they may be mine OR another agent.
 
         NEVER dismiss failures as pre-existing. Confirm with user to fix part of work.
