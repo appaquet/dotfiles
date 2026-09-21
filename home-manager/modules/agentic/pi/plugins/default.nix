@@ -44,7 +44,7 @@ let
 
     # https://github.com/YuGiMob/pi-hashline-edit-pro
     {
-      package = "npm:pi-hashline-edit-pro@4.3.2";
+      package = "npm:pi-hashline-edit-pro@4.3.5";
     }
 
     # https://github.com/tintinweb/pi-subagents
@@ -83,7 +83,7 @@ let
 
     # https://github.com/juicesharp/rpiv-mono
     {
-      package = "npm:@juicesharp/rpiv-ask-user-question@2.9.0";
+      package = "npm:@juicesharp/rpiv-ask-user-question@2.10.1";
     }
 
     # https://github.com/nicobailon/pi-web-access
@@ -101,7 +101,7 @@ let
 
     # https://github.com/nicobailon/pi-mcp-adapter
     {
-      package = "npm:pi-mcp-adapter@2.33.0";
+      package = "npm:pi-mcp-adapter@2.34.0";
       files = {
         ".pi/agent/mcp.json".text = builtins.toJSON {
           scriptMode = false;
