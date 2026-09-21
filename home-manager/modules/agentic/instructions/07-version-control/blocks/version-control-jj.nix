@@ -18,6 +18,7 @@
 
         HARD GATE: Before every write (`commit`, `new`, `describe`, `squash`, `split`, `edit`, `abandon`, `restore`, `rebase`, or resolving files), run `jj ls` in a separate tool call. Read all output; never pipe it through `head` or another truncating command.
 
+        The workspace shown for `@` must match any `JJ workspace: <name>` in the current version control context. A mismatch is Unexpected: STOP and ask.
         `jj ls` is AP's alias for `jj log --limit 5` followed by `jj status`. It verifies the nearby graph and working-copy state, not complete history.
 
         * Expected: clean working copy or only changes made in this session
