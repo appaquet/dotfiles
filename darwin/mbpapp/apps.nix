@@ -80,10 +80,6 @@
       }
 
       {
-        name = "notion";
-      }
-
-      {
         name = "chatgpt";
       }
       {
@@ -92,9 +88,6 @@
 
       {
         name = "docker-desktop";
-      }
-      {
-        name = "visual-studio-code";
       }
       {
         name = "wireshark-app";
