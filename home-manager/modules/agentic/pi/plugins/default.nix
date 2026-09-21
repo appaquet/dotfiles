@@ -53,6 +53,7 @@ let
       files = {
         ".pi/agent/subagents.json".text = builtins.toJSON {
           disableDefaultAgents = true;
+          workflowsEnabled = false; # interesting, but huge token cost
         };
       };
     }
