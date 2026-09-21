@@ -3,11 +3,11 @@
     kind = "directory";
     main = {
       harnesses = [ "pi" ];
-      description = "Use when a user asks to find, list, recall, query, filter, inspect, or measure persisted Pi sessions or session transcripts.";
+      description = "Use when a user asks to find, list, recall, query, filter, inspect, or measure persisted Pi sessions or session transcripts, or when project documentation's Sessions entries point at the only source for context your session lacks.";
       content = ''
         # Pi Session Recall
 
-        Use `pi-session-query` immediately when the user asks to find, list, filter, recall, or measure persisted Pi sessions, or names a Pi session, session ID, or session JSONL path. It reads persisted transcripts without resuming, switching, or changing the session.
+        Use `pi-session-query` immediately when the user asks to find, list, filter, recall, or measure persisted Pi sessions, names a Pi session, session ID, or session JSONL path, or when a project or phase document's Sessions entry is the source for context your session lacks. It reads persisted transcripts without resuming, switching, or changing the session.
 
         ## Method
 

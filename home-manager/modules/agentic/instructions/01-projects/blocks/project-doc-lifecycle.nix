@@ -47,7 +47,9 @@
             * Record no entry when the session has no session ID.
             * Keep one entry per session; a resumed session keeps its ID, so amend the existing entry instead of duplicating it.
             * Obtain the exact current values with `printf '%s\n' "$PI_SESSION_ID" "$PI_SESSION_FILE"`; never use a broad `env | grep PI_` dump.
-            * Project and phase documents remain authoritative; linked transcripts are private and may be inspected or delegated when useful.
+            * Project and phase documents remain authoritative; linked transcripts hold details the documents may omit or summarize.
+            * When loaded documents reference a session and your context lacks what that entry's purpose covers (fresh or compacted session), recover it from the referenced session ID or transcript path using ${scope.skills."pi-recaller".reference}. Broad transcript scans go to an Explore agent; keep bounded queries in-session.
+            * Fold durable recovered facts into the document section they belong to, so later sessions do not depend on the transcript.
             * Example entries:
               ```markdown
               * <full-session-id> /abs/path/to/transcript.jsonl: Planned phase 01 scope
