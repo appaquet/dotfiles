@@ -92,6 +92,22 @@
         ];
       };
 
+      "sparkbud1.n3x.net" = {
+        ForwardAgent = true;
+        IdentityFile = [
+          "~/.ssh/ssh_1pw.pub"
+          config.sops.secrets."ssh/ssh_breakglass".path
+        ];
+      };
+
+      "sparkbud2.n3x.net" = {
+        ForwardAgent = true;
+        IdentityFile = [
+          "~/.ssh/ssh_1pw.pub"
+          config.sops.secrets."ssh/ssh_breakglass".path
+        ];
+      };
+
       "pihole.n3x.net" = {
         User = "root";
       };
