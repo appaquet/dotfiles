@@ -36,7 +36,13 @@
 
         - Use the user's filename when supplied. Otherwise choose a concise descriptive kebab-case `.html` filename.
         - Keep the artifact inside the selected root. Reject path traversal or an absolute destination outside that root.
-        - Write a complete directly loadable document. Default to self-contained HTML, CSS, and JavaScript; use a pinned CDN dependency only when it materially improves the requested result.
+        - Start from `template.html` in this skill's directory. Preserve its document structure, pinned dependency notes, focus treatment, and reduced-motion guard; drop every unused dependency and sample section.
+        - Treat the template's dark expressive theme as a high-quality fallback, not a mandatory layout. Establish a visual thesis suited to the subject, then adapt the accent palette, composition, and content-specific components instead of mechanically filling placeholder sections.
+        - Use hierarchy, depth, and restrained semantic color to explain relationships, status, or emphasis. Avoid a generic grayscale document or a repetitive grid of interchangeable cards when a diagram, timeline, comparison, annotated system view, or focused data display communicates better.
+        - Add lightweight interaction when it materially improves understanding or exploration, such as filters, toggles, expandable detail, hover or focus inspection, or controlled animation. Keep the artifact useful without interaction; make controls keyboard-operable, show the current state, and provide a predictable initial or reset state.
+        - Use a further pinned CDN dependency only when it materially improves the requested result.
+        - When the user gives explicit design direction, replace or remove the template defaults instead of layering around them.
+
         - Use semantic markup, responsive layout, keyboard-accessible interaction, visible focus, adequate contrast, and reduced-motion handling.
 
         ## Manage a show-me server
@@ -75,6 +81,11 @@
         - Report the public URL, managed task ID, and that `background_bash_stop` stops the server. Do not report a localhost URL or open the browser.
       '';
     };
-    files = { };
+    files = {
+      "template.html" = {
+        kind = "md";
+        content = builtins.readFile ./show-me.template.html;
+      };
+    };
   };
 }

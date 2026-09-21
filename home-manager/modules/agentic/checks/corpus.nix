@@ -118,6 +118,7 @@ let
     ++ filesIn "pi" "prompts" piCommands
     ++ filesIn "pi" "rules" piRules
     ++ skillFiles "pi" piSkills
+    ++ [ "pi/skills/show-me/template.html" ]
   );
   mkAcceptanceCheck =
     name: instructions:
