@@ -14,14 +14,15 @@
         - Act only on explicit visual intent, direct skill invocation, or an explicit show-me server request.
         - Keep generated artifacts uncommitted unless the user separately asks to commit them.
         - Do not include unrequested secrets or sensitive repository content.
-        - Use `background_bash_start` for the server. Never use shell `&` or another unmanaged process.
-        - Preserve `simple-http-server`'s default all-interface binding. There is no application authentication.
+        - Use `background_bash_start` to run `agentic-show-me-serve`. Never use shell `&` or another unmanaged process.
+        - `agentic-show-me-serve` serves the root on all interfaces with no authentication. It opens an anonymous cloudflared quick tunnel only when `--public` is passed, and that tunnel's random `trycloudflare.com` hostname is then the only access control.
         - Do not open a browser.
 
         ## Route the request
 
-        - For a visual artifact request, select the serving root, create the artifact, ensure that root has a live show-me server, and return the artifact URL.
-        - For a server-only request such as `start a show me server`, select the serving root, skip artifact creation, start or reuse its server, and return the root URL.
+        - Serve privately by default. Pass `--public` only when the user asks to make the artifact public or share the link, and drop it again when the user asks to stop sharing.
+        - For a visual artifact request, select the serving root, create the artifact, ensure that root has a live show-me server, and return its URL.
+        - For a server-only request such as `start a show me server`, select the serving root, skip artifact creation, start or reuse its server, and return its root URL.
 
         ## Select the serving root
 
@@ -51,21 +52,21 @@
 
         ### Reuse a live server
 
-        - Remember the canonical root, background task ID, and concrete port for servers started in the current Pi session.
+        - Remember the canonical root, background task ID, whether it was started with `--public`, and the URLs it printed, for servers started in the current Pi session.
         - For the same root, call `background_bash_status`. Reuse only a task that is still running and whose loopback URL passes a bounded readiness probe.
+        - The mode is fixed at start. To turn public mode on, stop the running task and start a new one with `--public`; to turn it off, stop it and start a new one without the flag. Either switch restarts the command, so the port and both URLs change.
         - If the task is absent, ended, or uncertain after context loss, start a new managed server. Do not scan for or attach to unmanaged processes.
 
         ### Start a server
 
-        - Select a concrete free high port. A short Node `net.Server` bound to port `0` may select and print a candidate before closing; do not pass port `0` to `simple-http-server`.
-        - Call `background_bash_start` with `cwd` set to the canonical root, a clear label, `timeoutSeconds: 86400`, and a command shaped as `simple-http-server -i --port PORT .`.
-        - Preserve the default bind address. Do not pass `--ip`, `--open`, authentication, upload, or redirect options.
+        - Call `background_bash_start` with `cwd` set to the canonical root, a clear label, `timeoutSeconds: 86400`, and the command `agentic-show-me-serve .`, or `agentic-show-me-serve --public .` when the user asked for a public link.
+        - The command picks a free port and serves the root with `simple-http-server`. Do not select a port or start a server yourself.
+        - Read the URL sentences from the background job log. A private server prints the internal URL; a public one prints the public URL a few seconds later, so read the log again if it has not appeared.
 
         ### Verify readiness
 
-        - Probe the requested loopback path through `127.0.0.1` for at most five seconds. Startup text alone is not readiness evidence.
-        - If readiness fails, inspect it with `background_bash_status` and `background_bash_logs`.
-        - Retry allocation and launch once only when the failure is a confirmed bind collision. Otherwise report the actionable failure.
+        - The command prints the internal URL only after the server accepts connections, so a printed internal URL is readiness evidence. It prints the public URL as soon as cloudflared reports it, which may take a moment to become reachable.
+        - If no URL appears, or the command exits, inspect it with `background_bash_status` and `background_bash_logs` and report the actionable failure.
 
         ## Validate the served artifact
 
@@ -73,12 +74,12 @@
         - Also emulate a ~375px mobile viewport and re-check for clipping or unexpected scroll.
         - Chrome MCP validation runs headless; it does not open a browser on the user's machine.
 
-        ## Return the public URL
+        ## Return the URLs
 
-        - Build the public hostname from the current Tailscale `Self.DNSName`: strip its trailing dot, take the first label as the machine name, and use `<machine>.n3x.net`. Use that FQDN directly; do not substitute localhost or another hostname.
-        - A server-only request returns `http://<machine>.n3x.net:<port>/`.
-        - An artifact request percent-encodes the artifact path relative to the serving root and returns `http://<machine>.n3x.net:<port>/<encoded-path>`.
-        - Report the public URL, managed task ID, and that `background_bash_stop` stops the server. Do not report a localhost URL or open the browser.
+        - Always report the internal `http://<host>.n3x.net:<port>/` URL, which works from the user's own devices.
+        - Report the public `https://<random>.trycloudflare.com/` URL only when the server was started with `--public`. It changes on every start and is not reachable from devices whose DNS blocks `trycloudflare.com`.
+        - A server-only request returns the root URL. An artifact request percent-encodes the artifact path relative to the serving root and appends it.
+        - Report the managed task ID and that `background_bash_stop` stops the server. Do not report a localhost URL or open the browser.
       '';
     };
     files = {

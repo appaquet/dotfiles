@@ -40,6 +40,7 @@
       piSessionQuery = import ./tools/pi-session-query.nix { inherit pkgs; };
       piSessionQueryCheck = import ./checks/pi-session-query.nix { inherit pkgs piSessionQuery; };
       piSessionQueryUnitCheck = import ./checks/pi-session-query-unit.nix { inherit pkgs; };
+      showMeServeCheck = import ./checks/show-me-serve.nix { inherit pkgs; };
 
       llmAgentPackages = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
       piModuleCheck = import ./pi/checks/module.nix {
@@ -101,6 +102,7 @@
         pi-nono-smoke = piRuntimeChecks.nonoSmoke;
       };
       checks = {
+        agentic-show-me-serve = showMeServeCheck;
         agentic-vcs-context = vcsContextCheck;
         agentic-version-control-default = versionControlDefaultCheck;
         pi-session-query = piSessionQueryCheck;
