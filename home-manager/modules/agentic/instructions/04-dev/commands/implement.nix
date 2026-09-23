@@ -30,7 +30,7 @@
         3. 🔳 Load tasks from project/phase docs
            * For each task, create 1..n `${scope.harness.tools.taskCreate}`
              * Segment for better tracking
-           * Create tasks for verification/testing each implementation step. Verification means running tests and checking ACs, not launching a reviewer.
+           * Create validation tasks using ${scope.blocks.testing-principles.reference}, grouping related checks. Verification is not a reviewer pass.
            * If user validation needed, task description should be clear about waiting for user input
            * If in orchestrator mode, decide whether each task can be delegated, make the task
              description clear and select the dev agent using ${
@@ -45,7 +45,7 @@
            * You need to follow ${scope.blocks."sub-agents-workflows".reference}
            * Update documentation if existing:
              * Mark phase doc task `[~]` when starting, `[x]` when done
-               Like task format dictates. Done = all ACs pass and tested working
+               Like task format dictates. Done = all ACs verified passing
              * Add new tasks discovered to phase doc
              * Note critical decisions
              * Before marking task done: verify each AC sub-item passes

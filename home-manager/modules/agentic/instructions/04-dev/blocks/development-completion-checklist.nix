@@ -12,7 +12,7 @@
 
       taggedContent = ''
         * [ ] Initial plan/requirements/ACs/TODOs addressed
-        * [ ] Tests are added/updated and passing using ${scope.blocks.testing-principles.reference}
+        * [ ] Validation completed using ${scope.blocks.testing-principles.reference}
         * [ ] Strictly follow ordering in ${scope.blocks.code-organization-order.reference}
         * [ ] All task ACs verified passing
         * [ ] Changes diff examined

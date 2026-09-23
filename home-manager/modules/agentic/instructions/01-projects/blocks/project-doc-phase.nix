@@ -49,7 +49,7 @@
           * Use status markers: `[ ]` Not started, `[~]` In progress, `[x]` Complete.
           * Make each task actionable and precise, with a clear expected outcome, code pointers, and enough relevant context that another engineer can complete it without reading the code first.
           * Reference applicable requirements.
-          * Give every task acceptance-criteria sub-items with clear, verifiable conditions. Each acceptance criterion maps to an assertion; a task is complete only when all its acceptance criteria pass.
+          * Give every task acceptance-criteria sub-items with clear, verifiable conditions. A task is complete only when all its acceptance criteria pass, verified using ${scope.blocks.testing-principles.reference}.
           * Mark a task `[~]` when starting it and mark the phase `🔄` when starting it. You may mark completed tasks `[x]` after completing them, but never mark the phase complete.
         ${scope.forHarness {
           pi = ''

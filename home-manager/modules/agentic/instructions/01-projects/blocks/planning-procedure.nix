@@ -23,7 +23,7 @@
 
         * Breakdown in tasks, with ACs, dependencies, defined enough for any engineers to pick up and understand context/decisions/scope. You will NOT be the one implementing the tasks, so you must provide enough context and information for any engineer to pick up and implement them.
         * Select the agent for each task using ${scope.blocks.sub-agent-selection.reference}
-        * Include testing as tasks for autonomous iteration using ${scope.blocks.testing-principles.reference}
+        * Include validation in tasks for autonomous iteration using ${scope.blocks.testing-principles.reference}
       '';
     };
 }
