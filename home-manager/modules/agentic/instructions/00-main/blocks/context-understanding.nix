@@ -5,11 +5,7 @@
       heading = "Context understanding";
 
       content = ''
-        Always ensure 10/10 understanding checklist and report it to user, before and after improving it.
-        ${scope.forHarness {
-          pi = "Use explore code and web search. ${scope.harness.prose.questions.request} to fill gaps in understanding until 10/10.";
-          default = "Use explore code + web search + use `AskUserQuestion` to fill gaps in understanding until 10/10.";
-        }}
+        Use the checklist to report understanding before and after improving it. 10/10 means ready for the next planned step, with no unresolved decisions blocking it, not exhaustive knowledge.
         Prioritize web search for tool/library/framework usage since may have changed since cutoff.
       '';
 

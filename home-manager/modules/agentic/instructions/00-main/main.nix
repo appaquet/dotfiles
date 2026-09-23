@@ -28,7 +28,7 @@
 
         Main agents ${scope.harness.prose.questions.request}. Sub-agents follow their agent instructions or return questions and decisions to the parent. Never ask directly in responses. Include enough context.
 
-        Trust explicit user input. Don't reconfirm clearly stated information or decisions. Ask only when something is missing, ambiguous, conflicting, or requires separate approval.
+        ${scope.blocks."clarification-procedure".embed}
 
         Planning is mandatory for ALL implementations, no matter how trivial. When agreed on a plan, ALWAYS follow it. If you deviate or the plan fails, stop and ask the user.
 
