@@ -16,7 +16,7 @@ let
     {
       reasoning = true;
       input = [ "text" ];
-      maxTokens = 15000;
+      maxTokens = 32000;
       inherit thinkingLevelMap;
       cost = {
         input = 0;
@@ -75,7 +75,7 @@ let
             "text"
             "image"
           ];
-          contextWindow = 200000;
+          contextWindow = 250000;
           samplingParams = {
             temperature = 1.0;
             top_p = 0.95;
