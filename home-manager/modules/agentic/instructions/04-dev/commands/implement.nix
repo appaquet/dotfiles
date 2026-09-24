@@ -57,7 +57,7 @@
            } when the task needs a different agent
 
         6. 🔳 Validate via ${scope.blocks."development-completion-checklist".reference}
-           * State each item aloud, confirm compliance
+           * Check every item; report validation results, failures, and deviations rather than reciting the checklist.
 
         7. 🔳 Validate formatting, linting, tests done
            * If sub-agents did it, trust them

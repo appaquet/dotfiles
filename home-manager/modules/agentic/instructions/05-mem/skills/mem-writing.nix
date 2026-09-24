@@ -38,7 +38,9 @@
             default = "Project/directory specific instructions: CLAUDE.md, AGENTS.md, .opencode/AGENTS.md";
           }}
 
-          User instructions / commands / agents:
+          Determine whether the target is generated or directly authored. Edit direct Markdown instructions in place; for generated instructions, edit their source.
+
+          AP's generated personal instructions / commands / agents:
           ${scope.forHarness {
             pi = "* Do not edit rendered Pi artifacts directly; edit the Nix instruction source.";
             default = "* Don't try to edit ~/.claude or ~/.config/opencode directly, as they are rendered versions of instruction source files.";
@@ -54,15 +56,12 @@
           * When steering, prefer mentioning what to do and reason to do so, instead of what not to do. What not to do can help on repeated failures.
           * Instructions must be clear, unambiguous, complete and imperative.
           * Reason from the instructions delivered to the model, not from their authoring or storage structure.
-          * For style, follow the global telegraphic-style rule.
+          * Write compact, direct, imperative instructions. Remove redundant prose without dropping conditions, scope, or exceptions.
           * Use `*` for ordinary unordered lists; keep `-` only in fenced or literal output templates. Never mix ordinary marker styles in one rendered file.
           * When editing instructions: preserve local syntax/style, change only requested wording; no surrounding fluency rewrites.
           * One authoritative location per policy; reference/embed elsewhere. Do reconnaissance first, propose or use reusable blocks.
           * Checklists should be block rendered as xml tag for higher recall salience.
-          * Empty lines are automatically removed by renderer, so you can use them for readability in source files. Avoid multi-lines wrapping as they consume unnecessary tokens on indented lines.
-          * When writing procedures with step by steps, push LLM to use ${
-            scope.blocks."task-management".reference
-          } methodology.
+          * Nixantic removes empty lines from rendered output. Use them for source readability; avoid wrapping instruction prose across indented source lines.
 
           ## Instructions writing
 
@@ -76,8 +75,14 @@
             default = "* If you spent too much time finding information about nixantic or dotfiles setup, propose changes to dotfiles CLAUDE.md's.";
           }}
           * If user agrees, proceed with edits.
-          * After edit: diff-review added prose, duplicated policy, unnecessary rewording, scope expansion; remove before finish.
-          * Regenerate instructions after edits using repo's check&build commands.
+
+          ## Completion review
+
+          1. Review the full task diff against the requirements and this skill.
+          2. For generated instructions, regenerate affected output using the project's commands. For directly authored instructions, inspect the files as loaded; no rebuild is required.
+          3. Read the complete affected model-visible context, including relevant references. Check policy placement, duplication, scope, clarity, and instruction-versus-output ambiguity.
+          4. Fix in-scope findings and repeat affected checks. Report issues requiring a scope decision; do not silently expand the work.
+          5. Report build/render checks, when applicable, separately from instruction-quality review. A passing build does not establish clear instructions.
         '';
       };
   };

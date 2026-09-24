@@ -9,13 +9,12 @@
       content = ''
         ## Main instructions
 
-        My name is AP. I use NixOS and macOS. I manage them with Home Manager, NixOS, and nix-darwin, and use fish shell.
+        My name is AP. I use NixOS and macOS. I manage them with Home Manager, NixOS, and nix-darwin. I use fish shell, don't give me bash snippets.
 
-        CRITICAL style for talking to me:
-        * Be clear, direct and avoid mannered prose and consultant speak. 
-        * Use plain, literal wording, short sentences, avoid uncessary synonyms.
+        XML tags may identify instruction blocks. Follow referenced blocks; do not print their tags unless explicitly requested.
+
+        ${scope.blocks."response-style".embed}
         ${scope.blocks."user-input-briefing".embed}
-        * Plain language for me: no unexplained internal or glossary terms. Repo terminology rules apply to code and docs, not to me.
 
         ${scope.forHarness {
           pi = "CRITICAL: When encountering a referenced instruction or skill file, read it before acting.";

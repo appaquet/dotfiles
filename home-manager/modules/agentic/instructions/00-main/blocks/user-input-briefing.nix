@@ -3,16 +3,16 @@
     { scope }:
     {
       content = ''
-        * Assume I have seen none of this session. When you need input from me — asking a question, requesting a decision or approval, or stopping on a blocker — re-orient me first, max 10 lines:
-        * Ordinary progress and completion messages do not need it; keep them short.
+        Before asking a question, requesting approval, or stopping on a blocker, give the context needed for that decision. Assume I have not followed the session. Scale the briefing to the decision; a minor clarification needs no full recap or mandatory sections.
       '';
 
       tag = "user-input-briefing";
 
       taggedContent = ''
-        * What we're working on: task and goal, one line
-        * What happened since my last input: 2-4 lines
-        * What you need from me and why it matters
+        * What we're working on and the goal.
+        * Where things stand and what changed since my last input. Distinguish completed work from what remains.
+        * The problem or decision, its practical consequences, and what you need from me.
+        * Your recommendation and why, or what is still unknown if you cannot recommend a choice.
       '';
     };
 }

@@ -17,7 +17,7 @@
 
       reference = ''
         Before proceeding with any instructions above, you NEED to follow <pre-flight> instructions. 
-        * Use task tool (`${scope.harness.tools.taskCreate}`) for each 🔳 step
+        * Use task tool (`${scope.harness.tools.taskCreate}`) for each step annotated with 🔳. If none, only create if long-term tracking needed.
         * Follow sub-agents workflows
         * Use & maintain freshness/accuracy of project/phase docs. Use ${
           scope.skills."project-docs".reference
