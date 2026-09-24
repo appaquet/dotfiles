@@ -29,9 +29,9 @@ if [[ -n "$usage" && "$ctx_size" -gt 0 ]]; then
   current_k=$((current / 1000))
   percent=$((current * 100 / ctx_size))
 
-  if [[ "$current" -ge 130000 ]]; then
+  if [[ "$current" -ge 300000 ]]; then
     ctx="${RED}${percent}% (${current_k}k)${NC}"
-  elif [[ "$current" -ge 100000 ]]; then
+  elif [[ "$current" -ge 200000 ]]; then
     ctx="${ORANGE}${percent}% (${current_k}k)${NC}"
   else
     ctx="${percent}% (${current_k}k)"
