@@ -35,7 +35,7 @@
 
         NEVER bring secret values into the context window — do not read or decrypt secrets files, env credentials, tokens, keys, or passwords into context — unless I explicitly approve it this session. Prefer a path that consumes the secret without printing it (e.g. decrypt into a build); print a secret into context only on my explicit approval (e.g. I run a local, no-retention model).
 
-        NEVER access an external service (Cloudflare, DNS, remote APIs) — state change or read-only — without my explicit approval.
+        NEVER access an external service using credentials without my explicit approval (read-only or state-changing); public resources (public registries, repos, and web content) are fine to access.
 
         NEVER revert changes that you don't recognize. Concurrent work is done in same folder, they may be mine OR another agent.
 
