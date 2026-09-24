@@ -44,14 +44,16 @@ let
     "review-plan"
     "think"
   ];
-  commonCommands = builtins.filter (
-    command:
-    !(builtins.elem command [
-      "ctx-usage"
-      "orchestrator"
-      "builder"
-    ])
-  ) claudeCommands;
+  commonCommands =
+    builtins.filter (
+      command:
+      !(builtins.elem command [
+        "ctx-usage"
+        "orchestrator"
+        "builder"
+      ])
+    ) claudeCommands
+    ++ [ "show-me" ];
   piCommands = builtins.filter (command: command != "ctx-usage") claudeCommands;
   claudeRules = [
     "development"
@@ -78,6 +80,7 @@ let
     "human-writer"
     "mem-writing"
     "pi-nix-config"
+    "show-me"
     "version-control"
   ];
   opencodeSkills = claudeSkills ++ [
@@ -88,7 +91,6 @@ let
     "pi-recaller"
     "proj-load"
     "proj-save"
-    "show-me"
   ];
 
   filesIn =
@@ -119,6 +121,10 @@ let
     ++ filesIn "pi" "rules" piRules
     ++ skillFiles "pi" piSkills
     ++ [ "pi/skills/show-me/template.html" ]
+    ++ [
+      "claude/skills/show-me/template.html"
+      "opencode/skills/show-me/template.html"
+    ]
   );
   mkAcceptanceCheck =
     name: instructions:

@@ -2,19 +2,22 @@
   nixantic.sources.harnesses.skills."show-me" = {
     kind = "directory";
     main = {
-      harnesses = [ "pi" ];
       description = "Use when the user explicitly asks to show, visualize, explain visually, mock, or design something, or asks to start or reuse a show-me server.";
+      asCommand = {
+        opencode = true;
+      };
+      arguments = [ { label = "request"; } ];
       content = ''
         # Show Me
 
-        Create and serve a visual HTML artifact, or manage a show-me server without creating an artifact. Use Pi's managed background Bash tools for the server lifecycle.
+        Create and serve a visual HTML artifact, or manage a show-me server without creating an artifact. Run the server lifecycle through this harness's background-process mechanism.
 
         ## Boundaries
 
         - Act only on explicit visual intent, direct skill invocation, or an explicit show-me server request.
         - Keep generated artifacts uncommitted unless the user separately asks to commit them.
         - Do not include unrequested secrets or sensitive repository content.
-        - Use `background_bash_start` to run `agentic-show-me-serve`. Never use shell `&` or another unmanaged process.
+        - Run `agentic-show-me-serve` as a background process through this harness's background-process tools. Never use shell `&` or another unmanaged process.
         - `agentic-show-me-serve` serves the root on all interfaces with no authentication. It opens an anonymous cloudflared quick tunnel only when `--public` is passed, and that tunnel's random `trycloudflare.com` hostname is then the only access control.
         - Do not open a browser.
 
@@ -28,7 +31,7 @@
 
         - Prefer the canonical target of `proj/` when it exists.
         - Otherwise use the canonical target of `proj-adhoc/` when it exists.
-        - Otherwise create and remember a dedicated directory under `/tmp/`. Use `PI_SESSION_ID` in its name when available; use `mktemp -d` when it is unavailable.
+        - Otherwise create and remember a dedicated directory under `/tmp/`. Name it with the current UTC timestamp, for example `show-me-20260924-184529`; use `mktemp -d` when a timestamp cannot be determined.
         - Canonicalize the root before comparing it with a remembered server root.
 
         ## Create a visual artifact
@@ -52,34 +55,34 @@
 
         ### Reuse a live server
 
-        - Remember the canonical root, background task ID, whether it was started with `--public`, and the URLs it printed, for servers started in the current Pi session.
-        - For the same root, call `background_bash_status`. Reuse only a task that is still running and whose loopback URL passes a bounded readiness probe.
+        - Remember the canonical root, background job ID, whether it was started with `--public`, and the URLs it printed, for servers started in the current session.
+        - For the same root, check the background job status through the harness's mechanism. Reuse only a job that is still running and whose loopback URL passes a bounded readiness probe.
         - The mode is fixed at start. To turn public mode on, stop the running task and start a new one with `--public`; to turn it off, stop it and start a new one without the flag. Either switch restarts the command, so the port and both URLs change.
         - If the task is absent, ended, or uncertain after context loss, start a new managed server. Do not scan for or attach to unmanaged processes.
 
         ### Start a server
 
-        - Call `background_bash_start` with `cwd` set to the canonical root, a clear label, `timeoutSeconds: 86400`, and the command `agentic-show-me-serve .`, or `agentic-show-me-serve --public .` when the user asked for a public link.
+        - Start a background job with `cwd` set to the canonical root, a clear label, a 24-hour timeout when the harness supports one, and the command `agentic-show-me-serve .`, or `agentic-show-me-serve --public .` when the user asked for a public link.
         - The command picks a free port and serves the root with `simple-http-server`. Do not select a port or start a server yourself.
         - Read the URL sentences from the background job log. A private server prints the internal URL; a public one prints the public URL a few seconds later, so read the log again if it has not appeared.
 
         ### Verify readiness
 
         - The command prints the internal URL only after the server accepts connections, so a printed internal URL is readiness evidence. It prints the public URL as soon as cloudflared reports it, which may take a moment to become reachable.
-        - If no URL appears, or the command exits, inspect it with `background_bash_status` and `background_bash_logs` and report the actionable failure.
+        - If no URL appears, or the command exits, inspect the job status and logs through the harness's mechanism and report the actionable failure.
 
         ## Validate the served artifact
 
-        - When a chrome MCP server is available, validate the served artifact before reporting the URL: check for console errors and failed requests, then check for horizontal page overflow.
+        - Only validate when the user explicitly requests it (for example `validate in a browser` or `check the rendering`) and a browser tool is available: check for console errors and failed requests, then check for horizontal page overflow.
         - Also emulate a ~375px mobile viewport and re-check for clipping or unexpected scroll.
-        - Chrome MCP validation runs headless; it does not open a browser on the user's machine.
+        - Browser validation runs headless; it does not open a browser on the user's machine.
 
         ## Return the URLs
 
         - Always report the internal `http://<host>.n3x.net:<port>/` URL, which works from the user's own devices.
         - Report the public `https://<random>.trycloudflare.com/` URL only when the server was started with `--public`. It changes on every start and is not reachable from devices whose DNS blocks `trycloudflare.com`.
         - A server-only request returns the root URL. An artifact request percent-encodes the artifact path relative to the serving root and appends it.
-        - Report the managed task ID and that `background_bash_stop` stops the server. Do not report a localhost URL or open the browser.
+        - Report the background job ID and that stopping the job through the same mechanism stops the server. Do not report a localhost URL or open the browser.
       '';
     };
     files = {

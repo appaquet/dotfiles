@@ -108,7 +108,8 @@
       "Skill(proj-load)",
       "Skill(proj-save)",
       "Skill(mem-writing)",
-      "Skill(project-docs)"
+      "Skill(project-docs)",
+      "Skill(show-me)"
     ],
     "deny": [],
     "defaultMode": "auto",
