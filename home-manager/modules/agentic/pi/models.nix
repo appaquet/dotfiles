@@ -114,11 +114,18 @@ in
     defaultModel = "main";
     defaultThinkingLevel = "medium";
 
+    # Optional per-preset prompt pair: `enable` is injected into the model
+    # context on the next turn while the preset is active, `disable` when the
+    # scope switches away from it. Presets without a pair inject nothing.
     scopeProvider = {
       local = {
         main = {
           model = "deskapp/qwen3.8-27b";
           thinking = "medium";
+        };
+        prompt = {
+          enable = "Local scope: do not run sub-agents in parallel. At most one at a time.";
+          disable = "Local scope ended: sub-agents may run in parallel again.";
         };
         remap = {
           "scoped/junior" = {

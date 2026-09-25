@@ -50,7 +50,12 @@ type Model = {
   thinkingLevelMap?: Record<string, string | null>;
 };
 type ScopeEntry = { model: string; thinking?: string };
-type ScopePreset = { main: ScopeEntry; remap: Record<string, ScopeEntry> };
+type ScopePrompt = { enable?: string; disable?: string };
+type ScopePreset = {
+  main: ScopeEntry;
+  remap: Record<string, ScopeEntry>;
+  prompt?: ScopePrompt;
+};
 type ScopeConfig = Record<string, ScopePreset>;
 type ScopeCommand = (args: string, ctx: TestContext) => Promise<void>;
 type ScopeCompletion = (prefix: string) => Array<{
@@ -87,6 +92,7 @@ type TestContext = {
   sessionManager: {
     getEntries: () => SessionEntry[];
     getSessionId: () => string | undefined;
+    getHeader: () => { parentSession?: string };
   };
   ui: {
     setStatus: (key: string, value: string) => void;
@@ -210,6 +216,8 @@ type Harness = {
   appendEntryFailure?: Error;
   setStatusFailure?: Error;
   restoreFailure: boolean;
+  beforeAgentStart: () => any;
+  compact: () => void;
 };
 
 let agentDir = "";
@@ -368,6 +376,7 @@ async function createHarness(
     requestAuth?: Record<string, RequestAuth | (() => Promise<RequestAuth>)>;
     sessionEntries?: SessionEntry[];
     deferSessionStart?: boolean;
+    parentSession?: string;
   } = {},
 ): Promise<Harness> {
   writeFileSync(
@@ -396,6 +405,10 @@ async function createHarness(
   let command: ScopeCommand | undefined;
   let completions: ScopeCompletion | undefined;
   let sessionStart: SessionStartHandler | undefined;
+  let beforeAgentStart:
+    | ((event: unknown, ctx: TestContext) => any)
+    | undefined;
+  let compact: (() => void) | undefined;
   const shortcuts: Array<{
     key: string;
     description: string;
@@ -406,6 +419,12 @@ async function createHarness(
     registry,
     sessionStart: async () => {
       throw new Error("scope session_start handler was not registered");
+    },
+    beforeAgentStart: () => {
+      throw new Error("scope before_agent_start handler was not registered");
+    },
+    compact: () => {
+      throw new Error("scope session_compact handler was not registered");
     },
     startSession: async () => {
       throw new Error("scope session_start handler was not registered");
@@ -419,6 +438,7 @@ async function createHarness(
       sessionManager: {
         getEntries: () => [...sessionEntries],
         getSessionId: () => "session-abc",
+        getHeader: () => ({ parentSession: options.parentSession }),
       },
       ui: {
         custom: async <T>() => harness.selection as T,
@@ -463,6 +483,9 @@ async function createHarness(
     ) => {
       if (event === "session_start")
         sessionStart = handler as SessionStartHandler;
+      if (event === "before_agent_start")
+        beforeAgentStart = handler as (event: unknown, ctx: TestContext) => any;
+      if (event === "session_compact") compact = handler as () => void;
       if (
         event === "session_before_compact" ||
         event === "session_before_tree"
@@ -516,10 +539,12 @@ async function createHarness(
   harness.factoryConfig = cloneProviderConfig(
     registry.getRegisteredProviderConfig("scoped"),
   );
-  if (!sessionStart || !command || !completions)
+  if (!sessionStart || !beforeAgentStart || !compact || !command || !completions)
     throw new Error("scope extension did not register its handlers");
   harness.sessionStart = sessionStart;
   harness.startSession = () => harness.sessionStart({}, harness.ctx);
+  harness.beforeAgentStart = () => beforeAgentStart?.(undefined, harness.ctx);
+  harness.compact = compact;
   harness.command = command;
   harness.completions = completions;
   if (!options.deferSessionStart) await harness.startSession();
@@ -2528,4 +2553,234 @@ test("summary requests leave identity and headers to Pi", async () => {
   expect(treeCalls).toHaveLength(1);
   expect(treeCalls[0][1].headers).toEqual({ "x-auth": "resolved" });
   expect(treeCalls[0][1]).not.toHaveProperty("sessionId");
+});
+
+// ---------------------------------------------------------------------------
+// Scope prompt injection
+// ---------------------------------------------------------------------------
+
+const PROMPT_ENABLE =
+  "Local scope: do not run sub-agents in parallel. At most one at a time.";
+const PROMPT_DISABLE = "Local scope ended: sub-agents may run in parallel again.";
+const OTHER_ENABLE = "Go scope: prefer the repository's own tooling.";
+const OTHER_DISABLE = "Go scope constraints lifted.";
+
+const promptPresets: ScopeConfig = {
+  codex: {
+    main: { model: "old/old-main" },
+    remap: { "scoped/summary": { model: "old/old-main", thinking: "low" } },
+  },
+  local: {
+    main: { model: "next/next-main" },
+    remap: { "scoped/summary": { model: "next/next-main", thinking: "low" } },
+    prompt: { enable: PROMPT_ENABLE, disable: PROMPT_DISABLE },
+  },
+  go: {
+    main: { model: "golang/go-main" },
+    remap: { "scoped/summary": { model: "golang/go-main", thinking: "low" } },
+  },
+};
+
+type PromptHarnessOptions = {
+  models?: Model[];
+  apiKeys?: Record<string, string>;
+  parentSession?: string;
+};
+
+async function createPromptHarness(
+  options: PromptHarnessOptions = {},
+  config: ScopeConfig = promptPresets,
+): Promise<Harness> {
+  return createHarness(config, {
+    apiKeys: options.apiKeys ?? {
+      old: "old-key",
+      next: "next-key",
+      golang: "go-key",
+    },
+    models: options.models ?? [
+      target("old", "old-main", "Cloud main model"),
+      target("next", "next-main", "Local main model"),
+      target("golang", "go-main", "Go main model"),
+    ],
+    parentSession: options.parentSession,
+  });
+}
+
+// Launch the session directly on the `local` preset so the prompt is armed by
+// session start rather than by a switch.
+function launchOnLocal(): void {
+  const globals = globalThis as Record<string, unknown>;
+  process.env.PI_SCOPE = "local";
+  globals.activePreset = undefined;
+  globals.upgradedPreset = undefined;
+}
+
+function promptMessage(content: string) {
+  return {
+    message: { customType: "scope-prompt", content, display: true },
+  };
+}
+
+test("injects the entering preset's enable prompt once on the next turn", async () => {
+  const harness = await createPromptHarness();
+  expect(harness.beforeAgentStart()).toBeUndefined();
+
+  await harness.command("local", harness.ctx);
+  expect(harness.beforeAgentStart()).toEqual(promptMessage(PROMPT_ENABLE));
+  expect(harness.beforeAgentStart()).toBeUndefined();
+  // The prompt reaches context through the hook, never as an LLM message.
+  expect(harness.messages).toEqual([]);
+});
+
+test("injects the leaving preset's disable prompt when switching away", async () => {
+  const harness = await createPromptHarness();
+  await harness.command("local", harness.ctx);
+  harness.beforeAgentStart();
+
+  await harness.command("codex", harness.ctx);
+  expect(harness.beforeAgentStart()).toEqual(promptMessage(PROMPT_DISABLE));
+  expect(harness.beforeAgentStart()).toBeUndefined();
+});
+
+test("combines the leaving disable and entering enable into one message", async () => {
+  const harness = await createPromptHarness({}, {
+    ...promptPresets,
+    codex: {
+      ...promptPresets.codex,
+      prompt: { enable: OTHER_ENABLE, disable: OTHER_DISABLE },
+    },
+  });
+
+  expect(harness.beforeAgentStart()).toEqual(promptMessage(OTHER_ENABLE));
+  await harness.command("local", harness.ctx);
+  expect(harness.beforeAgentStart()).toEqual(
+    promptMessage(`${OTHER_DISABLE}\n\n${PROMPT_ENABLE}`),
+  );
+});
+
+test("keeps the injected preset's disable text across two switches without a turn", async () => {
+  const harness = await createPromptHarness();
+  await harness.command("local", harness.ctx);
+  harness.beforeAgentStart();
+
+  await harness.command("codex", harness.ctx);
+  await harness.command("go", harness.ctx);
+  expect(harness.beforeAgentStart()).toEqual(promptMessage(PROMPT_DISABLE));
+});
+
+test("arms nothing for prompt-less presets and for no-op or failed switches", async () => {
+  const harness = await createPromptHarness({}, {
+    ...promptPresets,
+    unavailable: {
+      main: { model: "missing/missing-main" },
+      remap: {
+        "scoped/summary": { model: "missing/missing-main", thinking: "low" },
+      },
+    },
+  });
+
+  await harness.command("codex", harness.ctx);
+  expect(harness.beforeAgentStart()).toBeUndefined();
+
+  await harness.command("go", harness.ctx);
+  expect(harness.beforeAgentStart()).toBeUndefined();
+
+  await harness.command("unavailable", harness.ctx);
+  expect(harness.beforeAgentStart()).toBeUndefined();
+  expect(harness.registry.find("scoped", "main")?.name).toBe(
+    "Go main model [S]",
+  );
+});
+
+test("ignores empty, missing and non-string prompt text", async () => {
+  const harness = await createPromptHarness({}, {
+    ...promptPresets,
+    local: {
+      ...promptPresets.local,
+      prompt: { enable: "", disable: 42 } as any,
+    },
+    go: { ...promptPresets.go, prompt: {} as any },
+  });
+
+  await harness.command("local", harness.ctx);
+  expect(harness.beforeAgentStart()).toBeUndefined();
+
+  await harness.command("go", harness.ctx);
+  expect(harness.beforeAgentStart()).toBeUndefined();
+  expect(harness.entries.filter((entry) => entry.data.error)).toEqual([]);
+});
+
+test("injects only the enable text when a preset defines no disable text", async () => {
+  const harness = await createPromptHarness({}, {
+    ...promptPresets,
+    local: {
+      ...promptPresets.local,
+      prompt: { enable: PROMPT_ENABLE },
+    },
+  });
+
+  await harness.command("local", harness.ctx);
+  expect(harness.beforeAgentStart()).toEqual(promptMessage(PROMPT_ENABLE));
+
+  await harness.command("codex", harness.ctx);
+  expect(harness.beforeAgentStart()).toBeUndefined();
+});
+
+test("arms the active preset's enable prompt on session start", async () => {
+  launchOnLocal();
+  const harness = await createPromptHarness();
+
+  expect(harness.beforeAgentStart()).toEqual(promptMessage(PROMPT_ENABLE));
+  expect(harness.beforeAgentStart()).toBeUndefined();
+});
+
+test("never arms the prompt in a sub-agent session", async () => {
+  launchOnLocal();
+  const harness = await createPromptHarness({
+    parentSession: "/tmp/parent-session.jsonl",
+  });
+
+  expect(harness.beforeAgentStart()).toBeUndefined();
+  await harness.command("codex", harness.ctx);
+  expect(harness.beforeAgentStart()).toBeUndefined();
+});
+
+test("re-arms the active preset's prompt after compaction", async () => {
+  const harness = await createPromptHarness();
+  await harness.command("local", harness.ctx);
+  harness.beforeAgentStart();
+
+  harness.compact();
+  expect(harness.beforeAgentStart()).toEqual(promptMessage(PROMPT_ENABLE));
+});
+
+test("injects the disable text when the session started on the prompt preset", async () => {
+  launchOnLocal();
+  const harness = await createPromptHarness();
+  harness.beforeAgentStart();
+
+  await harness.command("codex", harness.ctx);
+  expect(harness.beforeAgentStart()).toEqual(promptMessage(PROMPT_DISABLE));
+});
+
+test("arms nothing when the scope configuration is empty", async () => {
+  const harness = await createHarness({}, {});
+
+  expect(harness.beforeAgentStart()).toBeUndefined();
+});
+
+test("starts a session whose active preset has a malformed prompt", async () => {
+  launchOnLocal();
+  const harness = await createPromptHarness({}, {
+    ...promptPresets,
+    local: {
+      ...promptPresets.local,
+      prompt: { enable: 7 } as any,
+    },
+  });
+
+  expect(harness.registry.find("scoped", "main")?.name).toBe(
+    "Local main model [S]",
+  );
+  expect(harness.beforeAgentStart()).toBeUndefined();
 });

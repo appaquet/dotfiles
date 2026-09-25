@@ -34,7 +34,13 @@ import {
 
 type SummaryThinkingLevel = NonNullable<Parameters<typeof compact>[6]>;
 type ScopeEntry = { model: string; thinking?: SummaryThinkingLevel };
-type ScopePreset = { main: ScopeEntry; remap: Record<string, ScopeEntry> };
+/** Optional instruction prompt pair injected into the model context for a preset. */
+type ScopePrompt = { enable?: string; disable?: string };
+type ScopePreset = {
+  main: ScopeEntry;
+  remap: Record<string, ScopeEntry>;
+  prompt?: ScopePrompt;
+};
 type ScopeMapping = {
   preset: string;
   entries: Record<string, ScopeEntry>;
@@ -86,6 +92,7 @@ const SCOPE_IDS = ["main", "junior", "mid", "senior", "staff", "principal", "rev
 // work alias, so summarization is independent of the selected scoped model.
 const SUMMARY_ALIAS = "summary";
 const SCOPE_STATE_ENTRY = "scope-provider-state";
+const SCOPE_PROMPT_ENTRY = "scope-prompt";
 
 // Stub entries so `scoped/<id>` resolves before session_start upgrades them
 // from the live registry; upgrade failure fails loud (see session_start).
@@ -152,6 +159,14 @@ const state: ScopeMapping & {
   targetAuth: {},
 };
 
+// Prompt injection state for this session: the preset whose enable text the
+// transcript holds, and the prompt armed for the next agent turn.
+let activeEnablePreset: string | undefined;
+let pendingScopePrompt:
+  | { kind: "transition"; leaving: string; entering: string }
+  | { kind: "active" }
+  | undefined;
+
 function debug(msg: string): void {
   const file = process.env.PI_SCOPE_LOG;
   if (file) fs.appendFileSync(file, `[${new Date().toISOString()}] ${msg}\n`);
@@ -180,6 +195,15 @@ function readScopeConfig(): Record<string, ScopePreset> {
     scopeProvider?: Record<string, ScopePreset>;
   };
   return raw.scopeProvider ?? {};
+}
+
+/** Trimmed prompt text configured for a preset, or undefined when unusable. */
+function scopePromptText(
+  preset: string,
+  kind: keyof ScopePrompt,
+): string | undefined {
+  const value = readScopeConfig()[preset]?.prompt?.[kind];
+  return typeof value === "string" && value.trim() !== "" ? value.trim() : undefined;
 }
 
 /** Find the newest persisted scope preset that remains configured. */
@@ -759,6 +783,48 @@ function persistScopePreset(pi: any, preset: string): void {
   pi.appendEntry(SCOPE_STATE_ENTRY, { preset });
 }
 
+/** Whether the session is the top-level one; sub-agent sessions carry a parent session file. */
+function isTopLevelSession(ctx: any): boolean {
+  return !ctx?.sessionManager?.getHeader?.()?.parentSession;
+}
+
+/** Arm the leaving/entering prompt pair for the next agent turn after a switch. */
+function armScopePromptTransition(previous: string, entering: string): void {
+  pendingScopePrompt = {
+    kind: "transition",
+    leaving: activeEnablePreset ?? previous,
+    entering,
+  };
+}
+
+/** Arm a re-inject of the active preset's enable prompt for the next agent turn. */
+function armScopePromptReinject(): void {
+  pendingScopePrompt = { kind: "active" };
+}
+
+/**
+ * Consume the armed prompt and return the text to inject, or undefined when the
+ * armed transition has nothing to say. Records the preset whose enable text the
+ * transcript now holds so a later switch to another preset emits its disable text.
+ */
+function takeScopePrompt(): string | undefined {
+  const pending = pendingScopePrompt;
+  pendingScopePrompt = undefined;
+  if (!pending) return undefined;
+
+  const active = pending.kind === "transition" ? pending.entering : state.preset;
+  const parts: string[] = [];
+  if (pending.kind === "transition" && pending.leaving !== pending.entering) {
+    const disable = scopePromptText(pending.leaving, "disable");
+    if (disable) parts.push(disable);
+  }
+  const enable = scopePromptText(active, "enable");
+  if (enable) parts.push(enable);
+  activeEnablePreset = enable ? active : undefined;
+
+  return parts.length > 0 ? parts.join("\n\n") : undefined;
+}
+
 export default function scopeProvider(pi: any): void {
   // Scope notices are custom entries: they render in the transcript but never
   // enter LLM context, so the remap table is never sent to the model.
@@ -842,11 +908,26 @@ export default function scopeProvider(pi: any): void {
 
     commitScopeRegistration(pi, state, registration);
     if (!refreshMainIfScopedMain(pi, ctx, "session_start")) return;
+    if (isTopLevelSession(ctx)) armScopePromptReinject();
     if (persistLaunchPreset) persistScopePreset(pi, state.preset);
     // Record the usable preset for re-imported sessions after session_start
     // upgrades the current registry, including a registry reused by /reload.
     scopeProcess.upgradedPreset = state.preset;
     publishScopeStatus(ctx);
+  });
+
+  pi.on("session_compact", () => {
+    armScopePromptReinject();
+  });
+
+  // The prompt is injected through the hook rather than sendMessage so it lands
+  // ahead of the next user turn instead of as an eager LLM message.
+  pi.on("before_agent_start", (_event: any, ctx: any) => {
+    const content = takeScopePrompt();
+    if (!content || !isTopLevelSession(ctx)) return undefined;
+    return {
+      message: { customType: SCOPE_PROMPT_ENTRY, content, display: true },
+    };
   });
 
   pi.on("session_before_compact", async (event: any, ctx: any) => {
@@ -985,6 +1066,7 @@ export default function scopeProvider(pi: any): void {
       scopeProcess.upgradedPreset = state.preset;
       publishScopeStatus(ctx);
       persistScopePreset(pi, name);
+      armScopePromptTransition(previous.preset, name);
     } catch (error) {
       const failure = error instanceof Error ? error.message : String(error);
       const rollbackFailure = restoreScope(pi, ctx, previous);
