@@ -51,6 +51,7 @@
           * senior-dev: ${scope.agents."senior-dev".description}
           * staff-dev: ${scope.agents."staff-dev".description}
           * principal-dev: ${scope.agents."principal-dev".description}
+        * Unless requested, do not try to override the model used for the sub-agent. 
       '';
     };
 
