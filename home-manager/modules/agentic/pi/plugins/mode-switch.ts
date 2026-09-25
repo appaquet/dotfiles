@@ -22,10 +22,14 @@
  * The mode is persisted per session in a `mode-switch` custom entry and
  * restored on `session_start` (default: builder).
  *
- * In orchestrator mode the main session is restricted to project docs:
- * `read`/`write`/`edit` on any non-`*.md` path are blocked with a reason that
- * teaches sub-agent delegation, and a reminder message is injected every
- * N turns.
+ * In orchestrator mode the main session is restricted to project docs. The
+ * `hard` orchestrator policy blocks `read`/`write`/`edit` on any non-`*.md`
+ * path with a reason that teaches sub-agent delegation. The default `soft`
+ * policy lets those calls run and appends the same reminder to the tool result
+ * instead, so the model reads it in that same turn. The policy is harness
+ * state: the model is only ever told which mode it is in. `orchestratorPolicy`
+ * in `mode-switch.json` selects it, overridden at launch by the
+ * `PI_ORCHESTRATOR_POLICY` env var (hard|soft).
  */
 import { readFileSync } from "node:fs";
 import { homedir } from "node:os";
@@ -44,6 +48,15 @@ export type Mode = "builder" | "orchestrator";
 
 export const MODES: readonly Mode[] = ["builder", "orchestrator"];
 
+export type OrchestratorPolicy = "hard" | "soft";
+
+export const ORCHESTRATOR_POLICIES: readonly OrchestratorPolicy[] = [
+  "hard",
+  "soft",
+];
+
+const DEFAULT_ORCHESTRATOR_POLICY: OrchestratorPolicy = "soft";
+
 /**
  * Process-lifetime key of the `/new` handoff slot. The outgoing extension
  * instance is torn down before the replacement instance starts, so the mode
@@ -61,6 +74,7 @@ const BUILDER_REMINDER =
 const GUARDED_TOOLS = new Set(["read", "write", "edit"]);
 
 type ToolCallEvent = { toolName?: unknown; input?: unknown };
+type ToolResultEvent = ToolCallEvent & { isError?: unknown };
 
 const MODE_LABELS: Record<Mode, string> = {
   builder: "🔨",
@@ -147,42 +161,112 @@ export function extractFilePath(event: ToolCallEvent): string | undefined {
 }
 
 /** Returns whether a tool call violates the orchestrator file policy. */
-export function shouldBlock(mode: Mode, event: ToolCallEvent): boolean {
-  if (mode !== "orchestrator") return false;
+export function shouldBlock(
+  mode: Mode,
+  policy: OrchestratorPolicy,
+  event: ToolCallEvent,
+): boolean {
+  if (mode !== "orchestrator" || policy !== "hard") return false;
   const path = extractFilePath(event);
   if (path === undefined) return false;
   return !normalize(path.trim()).endsWith(".md");
 }
 
-/** Reads a positive integer reminder interval, falling back on malformed config. */
-export function readReminderInterval(
-  agentDir = process.env.PI_CODING_AGENT_DIR ?? join(homedir(), ".pi", "agent"),
-): number {
+/**
+ * Returns whether a completed tool call should carry the soft-policy nudge:
+ * only non-markdown `read`/`write`/`edit` results that did not fail.
+ */
+export function shouldNudge(
+  mode: Mode,
+  policy: OrchestratorPolicy,
+  event: ToolResultEvent,
+): boolean {
+  if (mode !== "orchestrator" || policy !== "soft") return false;
+  if (event.isError === true) return false;
+  const path = extractFilePath(event);
+  if (path === undefined) return false;
+  return !normalize(path.trim()).endsWith(".md");
+}
+
+/**
+ * Soft-policy nudge cadence: the first non-markdown touch after entering the
+ * mode always nudges, then absolute multiples of `interval` (1, N, 2N, ...).
+ */
+export function shouldNudgeOnTouch(touches: number, interval: number): boolean {
+  return touches === 1 || touches % interval === 0;
+}
+
+/** Reads and parses mode-switch.json, returning undefined on any failure. */
+function readModeSwitchConfig(
+  agentDir: string,
+): Record<string, unknown> | undefined {
   try {
     const parsed: unknown = JSON.parse(
       readFileSync(join(agentDir, "mode-switch.json"), "utf8"),
     );
-    const interval =
-      typeof parsed === "object" && parsed !== null
-        ? (parsed as { reminderInterval?: unknown }).reminderInterval
-        : undefined;
-    return typeof interval === "number" && Number.isInteger(interval) && interval > 0
-      ? interval
-      : DEFAULT_REMINDER_INTERVAL;
+    return typeof parsed === "object" && parsed !== null
+      ? (parsed as Record<string, unknown>)
+      : undefined;
   } catch {
-    return DEFAULT_REMINDER_INTERVAL;
+    return undefined;
   }
+}
+
+/** Reads a positive integer reminder interval, falling back on malformed config. */
+export function readReminderInterval(agentDir = defaultAgentDir()): number {
+  const interval = readModeSwitchConfig(agentDir)?.reminderInterval;
+  return typeof interval === "number" && Number.isInteger(interval) && interval > 0
+    ? interval
+    : DEFAULT_REMINDER_INTERVAL;
+}
+
+export type ResolvedPolicy = {
+  policy: OrchestratorPolicy;
+  invalid: boolean;
+};
+
+/**
+ * Decide the orchestrator enforcement policy: the trimmed PI_ORCHESTRATOR_POLICY
+ * env value wins, then `orchestratorPolicy` in mode-switch.json, then soft.
+ * `invalid` flags an unusable env value.
+ */
+export function resolveOrchestratorPolicy(
+  agentDir = defaultAgentDir(),
+  env = process.env.PI_ORCHESTRATOR_POLICY,
+): ResolvedPolicy {
+  const configured = readModeSwitchConfig(agentDir)?.orchestratorPolicy;
+  const fallback = isOrchestratorPolicy(configured)
+    ? configured
+    : DEFAULT_ORCHESTRATOR_POLICY;
+  const value = typeof env === "string" ? env.trim() : "";
+
+  if (value === "") return { policy: fallback, invalid: false };
+  if (isOrchestratorPolicy(value)) return { policy: value, invalid: false };
+  return { policy: fallback, invalid: true };
+}
+
+function defaultAgentDir(): string {
+  return process.env.PI_CODING_AGENT_DIR ?? join(homedir(), ".pi", "agent");
 }
 
 function isMode(value: unknown): value is Mode {
   return value === "builder" || value === "orchestrator";
 }
 
+function isOrchestratorPolicy(value: unknown): value is OrchestratorPolicy {
+  return value === "hard" || value === "soft";
+}
+
 export default function modeSwitch(pi: ExtensionAPI): void {
   let mode: Mode = "builder";
   let turns = 0;
+  // Non-markdown file touches since entering the mode, for the soft cadence.
+  let touches = 0;
   let remindOnNextTurn = false;
   const reminderInterval = readReminderInterval();
+  const policyEnv = process.env.PI_ORCHESTRATOR_POLICY;
+  const { policy: orchestratorPolicy, invalid: invalidPolicy } =
+    resolveOrchestratorPolicy();
 
   function publishLabel(ctx: ExtensionContext): void {
     ctx.ui.setStatus(
@@ -217,6 +301,7 @@ export default function modeSwitch(pi: ExtensionAPI): void {
 
     mode = target;
     turns = 0;
+    touches = 0;
     remindOnNextTurn = true;
     pi.appendEntry("mode-switch", { mode });
     pi.events.emit("mode-switch:changed", { mode });
@@ -258,6 +343,15 @@ export default function modeSwitch(pi: ExtensionAPI): void {
       );
     }
 
+    if (invalidPolicy) {
+      const available = ORCHESTRATOR_POLICIES.join(" | ");
+      ctx.ui.notify(
+        `mode-switch: invalid PI_ORCHESTRATOR_POLICY "${policyEnv}" ` +
+          `(available: ${available}); using ${orchestratorPolicy}`,
+        "warning",
+      );
+    }
+
     // Persist only choices that came from outside this session's entries:
     // a `/new` transfer or an explicit PI_MODE selection.
     const explicitEnv = typeof env === "string" ? env.trim() : "";
@@ -268,6 +362,7 @@ export default function modeSwitch(pi: ExtensionAPI): void {
     // Every start loses in-memory counter state; the reminder re-teaches the
     // active mode from the (possibly new or summarized) context.
     turns = 0;
+    touches = 0;
     remindOnNextTurn = true;
     publishLabel(ctx);
   }
@@ -310,17 +405,38 @@ export default function modeSwitch(pi: ExtensionAPI): void {
     // resets the interval and re-arms the reminder because the summarized
     // context no longer contains the mode instruction.
     turns = 0;
+    touches = 0;
     remindOnNextTurn = true;
   });
 
   pi.on("tool_call", (event) => {
     try {
-      if (shouldBlock(mode, event as ToolCallEvent))
+      if (shouldBlock(mode, orchestratorPolicy, event as ToolCallEvent))
         return { block: true, reason: REMINDER };
     } catch {
       // A policy-check failure must not accidentally block normal work.
     }
     return undefined;
+  });
+
+  pi.on("tool_result", (event) => {
+    try {
+      if (!shouldNudge(mode, orchestratorPolicy, event as ToolResultEvent))
+        return undefined;
+      // A tool reporting a non-array result cannot carry the reminder; skip it
+      // before the touch counter moves so the cadence cannot drift.
+      if (!Array.isArray(event.content)) return undefined;
+
+      touches += 1;
+      if (!shouldNudgeOnTouch(touches, reminderInterval)) return undefined;
+
+      return {
+        content: [...event.content, { type: "text", text: REMINDER }],
+      };
+    } catch {
+      // A policy-check failure must not alter a tool result.
+      return undefined;
+    }
   });
 
   pi.on("before_agent_start", () => {

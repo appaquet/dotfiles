@@ -2,7 +2,7 @@ import { expect, mock, test } from "bun:test";
 import { mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { Mode } from "./mode-switch.ts";
+import type { Mode, OrchestratorPolicy } from "./mode-switch.ts";
 
 mock.module("../lib/fuzzy-selector.ts", () => ({
   filterFuzzyItems: (
@@ -57,6 +57,9 @@ const {
   restoreMode,
   resolveMode,
   shouldBlock,
+  resolveOrchestratorPolicy,
+  shouldNudge,
+  shouldNudgeOnTouch,
   default: modeSwitch,
 } = await import("./mode-switch.ts");
 
@@ -354,6 +357,7 @@ type Harness = {
   compact: (reason?: "manual" | "threshold" | "overflow") => void;
   shortcut: (selection?: Mode) => Promise<void>;
   toolCall: (event: unknown) => unknown;
+  toolResult: (event: unknown) => unknown;
   agentStart: () => unknown;
 };
 
@@ -363,6 +367,7 @@ function createHarness(options: {
   sessionFile?: string;
   resetHandoff?: boolean;
   agentDir?: string;
+  policy?: OrchestratorPolicy;
 } = {}): Harness {
   // The extension's /new handoff outlives a single factory instance; reset it
   // by default so each test starts from a clean handoff slot.
@@ -415,6 +420,9 @@ function createHarness(options: {
     toolCall: () => {
       throw new Error("tool_call handler was not registered");
     },
+    toolResult: () => {
+      throw new Error("tool_result handler was not registered");
+    },
     agentStart: () => {
       throw new Error("before_agent_start handler was not registered");
     },
@@ -426,6 +434,7 @@ function createHarness(options: {
   let sessionBeforeSwitch: ((event: unknown, ctx: unknown) => unknown) | undefined;
   let sessionCompact: ((event: unknown, ctx: unknown) => void) | undefined;
   let toolCall: ((event: unknown, ctx: unknown) => unknown) | undefined;
+  let toolResult: ((event: unknown, ctx: unknown) => unknown) | undefined;
   let beforeAgentStart: ((event: unknown, ctx: unknown) => unknown) | undefined;
   const pi = {
     on: (event: string, handler: (event: unknown, ctx: unknown) => unknown) => {
@@ -441,6 +450,9 @@ function createHarness(options: {
           break;
         case "tool_call":
           toolCall = handler;
+          break;
+        case "tool_result":
+          toolResult = handler;
           break;
         case "before_agent_start":
           beforeAgentStart = handler;
@@ -486,14 +498,19 @@ function createHarness(options: {
       harness.sends.push({ content, options }),
   };
 
-  // Point the extension's config read at a scratch agent dir when given.
+  // Point the extension's config and policy reads at the test inputs.
   const previousAgentDir = process.env.PI_CODING_AGENT_DIR;
+  const previousPolicy = process.env.PI_ORCHESTRATOR_POLICY;
   if (options.agentDir !== undefined)
     process.env.PI_CODING_AGENT_DIR = options.agentDir;
+  if (options.policy !== undefined)
+    process.env.PI_ORCHESTRATOR_POLICY = options.policy;
   modeSwitch(pi as never);
   if (previousAgentDir === undefined)
     delete process.env.PI_CODING_AGENT_DIR;
   else process.env.PI_CODING_AGENT_DIR = previousAgentDir;
+  if (previousPolicy === undefined) delete process.env.PI_ORCHESTRATOR_POLICY;
+  else process.env.PI_ORCHESTRATOR_POLICY = previousPolicy;
   harness.shortcut = async (selection) => {
     harness.selection = selection;
     await harness.shortcuts[0].handler(ctx);
@@ -522,6 +539,10 @@ function createHarness(options: {
   harness.toolCall = (event: unknown) => {
     if (!toolCall) throw new Error("tool_call handler was not registered");
     return toolCall(event, ctx);
+  };
+  harness.toolResult = (event: unknown) => {
+    if (!toolResult) throw new Error("tool_result handler was not registered");
+    return toolResult(event, ctx);
   };
   harness.agentStart = () => {
     if (!beforeAgentStart)
@@ -619,7 +640,7 @@ function withPiMode(value: string | undefined, fn: () => void): void {
 }
 
 test("session_start: PI_MODE=orchestrator on a fresh session selects, persists and arms orchestrator", () => {
-  const h = createHarness();
+  const h = createHarness({ policy: "hard" });
   withPiMode("orchestrator", () => h.startSession());
 
   expect(h.appends).toEqual([
@@ -667,6 +688,7 @@ test("session_start: invalid PI_MODE on a fresh session warns, stays builder and
 
 test("session_start: persisted orchestrator entry wins over PI_MODE=builder", () => {
   const h = createHarness({
+    policy: "hard",
     entries: [
       { type: "custom", customType: "mode-switch", data: { mode: "orchestrator" } },
     ],
@@ -1017,36 +1039,39 @@ function blocked(result: unknown): boolean {
   );
 }
 
-test("shouldBlock: gates non-md file tools only in orchestrator mode", () => {
+test("shouldBlock: gates non-md file tools only under orchestrator with the hard policy", () => {
+  for (const toolName of ["read", "write", "edit"]) {
+    expect(
+      shouldBlock("orchestrator", "hard", { toolName, input: { path: "src/app.ts" } }),
+    ).toBe(true);
+  }
   expect(
-    shouldBlock("orchestrator", { toolName: "read", input: { path: "src/app.ts" } }),
-  ).toBe(true);
-  expect(
-    shouldBlock("orchestrator", { toolName: "write", input: { path: "src/app.ts" } }),
-  ).toBe(true);
-  expect(
-    shouldBlock("orchestrator", { toolName: "read", input: { path: "docs/x/notes.md" } }),
+    shouldBlock("orchestrator", "hard", { toolName: "read", input: { path: "docs/x/notes.md" } }),
   ).toBe(false);
   expect(
-    shouldBlock("builder", { toolName: "read", input: { path: "src/app.ts" } }),
+    shouldBlock("orchestrator", "soft", { toolName: "read", input: { path: "src/app.ts" } }),
   ).toBe(false);
   expect(
-    shouldBlock("builder", { toolName: "write", input: { path: "src/app.ts" } }),
+    shouldBlock("builder", "hard", { toolName: "read", input: { path: "src/app.ts" } }),
   ).toBe(false);
   expect(
-    shouldBlock("orchestrator", { toolName: "bash", input: { command: "cat src/app.ts" } }),
+    shouldBlock("builder", "hard", { toolName: "write", input: { path: "src/app.ts" } }),
+  ).toBe(false);
+  expect(
+    shouldBlock("orchestrator", "hard", { toolName: "bash", input: { command: "cat src/app.ts" } }),
   ).toBe(false);
 });
 
 test("shouldBlock: passes unknown tools and malformed paths", () => {
-  expect(shouldBlock("orchestrator", { toolName: "grep", input: {} })).toBe(false);
-  expect(shouldBlock("orchestrator", { toolName: "read" })).toBe(false);
-  expect(shouldBlock("orchestrator", { toolName: "read", input: { path: 42 } })).toBe(false);
-  expect(shouldBlock("orchestrator", { toolName: "read", input: { path: "" } })).toBe(false);
+  expect(shouldBlock("orchestrator", "hard", { toolName: "grep", input: {} })).toBe(false);
+  expect(shouldBlock("orchestrator", "hard", { toolName: "read" })).toBe(false);
+  expect(shouldBlock("orchestrator", "hard", { toolName: "read", input: { path: 42 } })).toBe(false);
+  expect(shouldBlock("orchestrator", "hard", { toolName: "read", input: { path: "" } })).toBe(false);
 });
 
 test("factory: session_start restores the orchestrator gate over persisted entries", () => {
   const h = createHarness({
+    policy: "hard",
     entries: [
       { type: "custom", customType: "mode-switch", data: { mode: "orchestrator" } },
     ],
@@ -1062,6 +1087,7 @@ test("factory: session_start restores the orchestrator gate over persisted entri
 
 test("factory: unknown tools and missing paths never block in orchestrator mode", () => {
   const h = createHarness({
+    policy: "hard",
     entries: [
       { type: "custom", customType: "mode-switch", data: { mode: "orchestrator" } },
     ],
@@ -1074,7 +1100,7 @@ test("factory: unknown tools and missing paths never block in orchestrator mode"
 });
 
 test("factory: shortcut mode selection arms and disarms the gate", async () => {
-  const h = createHarness();
+  const h = createHarness({ policy: "hard" });
   h.startSession();
   expect(h.toolCall({ toolName: "edit", input: { path: "x.ts" } })).toBeUndefined();
   await h.shortcut("orchestrator");
@@ -1396,4 +1422,178 @@ test("readReminderInterval: honors mode-switch.json and falls back on malformed 
 
   await writeFile(join(dir, "mode-switch.json"), "not json");
   expect(readReminderInterval(dir)).toBe(10);
+});
+
+// ---------------------------------------------------------------------------
+// Orchestrator enforcement policy
+// ---------------------------------------------------------------------------
+
+const REMINDER_TEXT = REMINDER_MESSAGE.message.content;
+const POLICY_READ = { toolName: "read", input: { path: "src/app.ts" } };
+
+test("resolveOrchestratorPolicy: env wins over config, config over the soft default", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "mode-switch-policy-"));
+  const writeConfig = (value: unknown) =>
+    writeFile(join(dir, "mode-switch.json"), JSON.stringify({ orchestratorPolicy: value }));
+
+  await writeConfig("hard");
+  expect(resolveOrchestratorPolicy(dir, "")).toEqual({ policy: "hard", invalid: false });
+  expect(resolveOrchestratorPolicy(dir, "soft")).toEqual({ policy: "soft", invalid: false });
+  expect(resolveOrchestratorPolicy(dir, "  ")).toEqual({ policy: "hard", invalid: false });
+  expect(resolveOrchestratorPolicy(dir, " wizard ")).toEqual({ policy: "hard", invalid: true });
+
+  await writeFile(join(dir, "mode-switch.json"), "not json");
+  expect(resolveOrchestratorPolicy(dir, "")).toEqual({ policy: "soft", invalid: false });
+
+  await writeConfig("wizard");
+  expect(resolveOrchestratorPolicy(dir, "")).toEqual({ policy: "soft", invalid: false });
+});
+
+test("resolveOrchestratorPolicy: a missing config file falls back to soft", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "mode-switch-policy-"));
+
+  expect(resolveOrchestratorPolicy(dir, "")).toEqual({ policy: "soft", invalid: false });
+  expect(resolveOrchestratorPolicy(dir, "hard")).toEqual({ policy: "hard", invalid: false });
+  expect(resolveOrchestratorPolicy(dir, "nonsense")).toEqual({ policy: "soft", invalid: true });
+});
+
+test("shouldNudge: the soft policy nudges only non-md results that did not fail", () => {
+  const result = (overrides: Record<string, unknown>) => ({
+    toolName: "read",
+    input: { path: "src/app.ts" },
+    ...overrides,
+  });
+
+  expect(shouldNudge("orchestrator", "soft", result({}))).toBe(true);
+  expect(shouldNudge("orchestrator", "soft", result({ toolName: "write" }))).toBe(true);
+  expect(shouldNudge("orchestrator", "soft", result({ toolName: "edit" }))).toBe(true);
+  expect(shouldNudge("orchestrator", "soft", result({ isError: true }))).toBe(false);
+  expect(
+    shouldNudge("orchestrator", "soft", result({ input: { path: "docs/notes.md" } })),
+  ).toBe(false);
+  expect(shouldNudge("orchestrator", "soft", result({ toolName: "bash" }))).toBe(false);
+  expect(shouldNudge("orchestrator", "soft", result({ toolName: "grep" }))).toBe(false);
+  expect(shouldNudge("orchestrator", "hard", result({}))).toBe(false);
+  expect(shouldNudge("builder", "soft", result({}))).toBe(false);
+});
+
+test("shouldNudgeOnTouch: nudges on the first touch and every interval after", () => {
+  const touched = Array.from({ length: 21 }, (_, index) =>
+    shouldNudgeOnTouch(index + 1, 10),
+  );
+  expect(touched.flatMap((nudge, index) => (nudge ? [index + 1] : []))).toEqual([1, 10, 20]);
+
+  expect(shouldNudgeOnTouch(1, 2)).toBe(true);
+  expect(shouldNudgeOnTouch(2, 2)).toBe(true);
+  expect(shouldNudgeOnTouch(3, 2)).toBe(false);
+});
+
+test("factory: soft policy appends the reminder to the first and tenth non-md result", async () => {
+  const h = createHarness({ policy: "soft" });
+  h.startSession();
+  await h.shortcut("orchestrator");
+  h.agentStart(); // consume the switch one-shot
+
+  const result = (content: unknown[]) =>
+    h.toolResult({ ...POLICY_READ, content, isError: false });
+
+  // The reminder is appended after the original content, in order.
+  expect(result([{ type: "text", text: "file body" }])).toEqual({
+    content: [
+      { type: "text", text: "file body" },
+      { type: "text", text: REMINDER_TEXT },
+    ],
+  });
+  for (let i = 0; i < 8; i++) expect(result([])).toBeUndefined();
+  expect(result([])).toEqual({ content: [{ type: "text", text: REMINDER_TEXT }] });
+  expect(result([])).toBeUndefined();
+});
+
+test("factory: soft policy leaves md, failed, unrelated and builder results untouched", async () => {
+  const h = createHarness({ policy: "soft" });
+  h.startSession();
+  await h.shortcut("orchestrator");
+  h.agentStart(); // consume the switch one-shot
+
+  const result = (event: Record<string, unknown>) => h.toolResult({ content: [], ...event });
+
+  expect(result({ ...POLICY_READ, isError: true })).toBeUndefined();
+  expect(result({ ...POLICY_READ, input: { path: "docs/notes.md" }, isError: false })).toBeUndefined();
+  expect(result({ toolName: "bash", input: { command: "ls" }, isError: false })).toBeUndefined();
+
+  await h.shortcut("builder");
+  h.agentStart();
+  expect(result({ ...POLICY_READ, isError: false })).toBeUndefined();
+});
+
+test("factory: the hard policy blocks instead of nudging", async () => {
+  const h = createHarness({ policy: "hard" });
+  h.startSession();
+  await h.shortcut("orchestrator");
+  h.agentStart(); // consume the switch one-shot
+
+  expect(h.toolResult({ ...POLICY_READ, content: [], isError: false })).toBeUndefined();
+  expect(blocked(h.toolCall({ toolName: "read", input: { path: "src/app.ts" } }))).toBe(true);
+});
+
+test("factory: the soft policy passes the orchestrator gate", async () => {
+  const h = createHarness({ policy: "soft" });
+  h.startSession();
+  await h.shortcut("orchestrator");
+
+  expect(h.toolCall({ toolName: "read", input: { path: "src/app.ts" } })).toBeUndefined();
+  expect(blocked(h.toolCall({ toolName: "write", input: { path: "src/app.ts" } }))).toBe(false);
+});
+
+test("factory: the soft touch counter resets on mode switch and compact", async () => {
+  const h = createHarness({ policy: "soft" });
+  h.startSession();
+  await h.shortcut("orchestrator");
+  h.agentStart(); // consume the switch one-shot
+
+  const touch = () => h.toolResult({ ...POLICY_READ, content: [], isError: false });
+  const nudge = { content: [{ type: "text", text: REMINDER_TEXT }] };
+
+  expect(touch()).toEqual(nudge); // touches == 1
+  expect(touch()).toBeUndefined(); // touches == 2
+
+  await h.shortcut("builder");
+  await h.shortcut("orchestrator");
+  h.agentStart(); // consume the switch one-shot
+  expect(touch()).toEqual(nudge); // the first touch after re-entering the mode
+
+  h.compact("manual");
+  expect(touch()).toEqual(nudge); // the first touch after compaction
+});
+
+test("factory: an invalid PI_ORCHESTRATOR_POLICY warns and keeps the configured policy", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "mode-switch-policy-"));
+  await writeFile(join(dir, "mode-switch.json"), JSON.stringify({ orchestratorPolicy: "hard" }));
+  const h = createHarness({ agentDir: dir, policy: "wizard" as OrchestratorPolicy });
+  h.startSession();
+
+  expect(h.notifies).toEqual([
+    {
+      message:
+        'mode-switch: invalid PI_ORCHESTRATOR_POLICY "wizard" (available: hard | soft); using hard',
+      type: "warning",
+    },
+  ]);
+  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
+
+  await h.shortcut("orchestrator");
+  expect(blocked(h.toolCall({ toolName: "read", input: { path: "src/app.ts" } }))).toBe(true);
+});
+
+test("factory: a malformed tool result consumes no soft touch", async () => {
+  const h = createHarness({ policy: "soft" });
+  h.startSession();
+  await h.shortcut("orchestrator");
+  h.agentStart(); // consume the switch one-shot
+
+  expect(h.toolResult({ ...POLICY_READ, content: "not-an-array", isError: false })).toBeUndefined();
+  // The skipped result must not advance the cadence: this is still touch 1.
+  expect(h.toolResult({ ...POLICY_READ, content: [], isError: false })).toEqual({
+    content: [{ type: "text", text: REMINDER_TEXT }],
+  });
 });
