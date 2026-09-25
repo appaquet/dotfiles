@@ -191,11 +191,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790225410,
-        "narHash": "sha256-BOyZoliWfm/beS4m3FxFKlu5at6npZen1PsWtvzzihk=",
+        "lastModified": 1790292277,
+        "narHash": "sha256-z+knvdMItRrMonmG4RIsqKYIa/hwYUzKjotDTfC5DDc=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "4900baf1e219645e4a2acba35723852b2091bc20",
+        "rev": "4b9add8645d5e2b0f7de18f7a442d08fe2bdcc91",
         "type": "github"
       },
       "original": {
@@ -215,11 +215,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1790241846,
-        "narHash": "sha256-rmHQtarWvZxm3/dVuIkUWe0HjWfVGX8+OyaJoHIR8Jo=",
+        "lastModified": 1790330085,
+        "narHash": "sha256-24n3/yPQBO8octZaiJMtRqqeJOI3RHzerUZNIZp9Nk4=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "8bec0ce1cbb0a39f8f08dc97a7635af847779f99",
+        "rev": "65270b324e9a42aa10be157ca20e8f3db8839048",
         "type": "github"
       },
       "original": {
@@ -430,11 +430,11 @@
         "sops-nix": "sops-nix"
       },
       "locked": {
-        "lastModified": 1789729851,
-        "narHash": "sha256-Kfhh57IyWKDWnzulMaUZS+LX//IB7AZWGFYlq277OHs=",
+        "lastModified": 1790275516,
+        "narHash": "sha256-Fg8qSKEWKrJ3A6Ww7LnuuFu6MODQZSEnV37TWq2jLLg=",
         "owner": "appaquet",
         "repo": "dotfiles-secrets",
-        "rev": "eb2bae48c1d570c60a278f9357d1545ed82ffd5f",
+        "rev": "0cbb955c448fc741a78a832ba35aed0082fb2998",
         "type": "github"
       },
       "original": {
