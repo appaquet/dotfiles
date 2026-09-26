@@ -2,88 +2,91 @@
   nixantic.sources.instruction-authoring.skills."mem-writing" = {
     kind = "directory";
 
-    main =
-      { scope }:
-      {
-        description = "Guidelines for writing agentic coding instructions: CLAUDE.md/AGENTS.md, command, skill or agent files.";
-        content = ''
-          # Agentic Instruction Writing
+    main = {
+      description = "Guidelines for writing agentic coding instructions: CLAUDE.md/AGENTS.md, command, skill or agent files.";
+      content = ''
+        # Agentic Instruction Writing
 
-          Lingua: harness = agentic coding = claude code / opencode / pi
+        ## Context
 
-          ## Instructions kinds
+        These guidelines cover skills, main and directory instructions, commands/prompts, agents, and reusable blocks. In AP's setup, harness means an agentic coding tool: Claude Code, OpenCode, or Pi.
+        Personal instruction sources are Nix files, typically under **~/dotfiles/**; harness artifacts are rendered from them. Some instruction files are directly authored Markdown and are edited in place. Read the applicable repository authoring guidance to tell them apart and to find the validation commands. Ask AP if the authoritative source cannot be located.
+        Source folders organize fragments and are not reflected in rendered output. The model sees delivered text, not Nix attributes, source folders, or block provenance. Judge structure and behavior in that delivered context.
 
-          ${scope.forHarness {
-            pi = "* Main instruction files: `AGENTS.md` is active context; aggregated rules belong in it.";
-            default = "* Main instruction files (CLAUDE.md, AGENTS.md, rules/*, etc.): automatically loaded by agentic harnesses, at start or directory based. Expect in opencode config, should always be CLAUDE.md to make sure all harnesses load them.";
-          }}
-          ${scope.forHarness {
-            pi = "* Prompts: user-invoked Markdown prompt templates under `prompts/`.";
-            default = "* Commands: invoked by user. Claude can also invoke them.";
-          }}
-          ${scope.forHarness {
-            pi = "* Skills: Agent Skills under `skills/<name>/SKILL.md`, loaded on demand from their descriptions.";
-            default = "* Skills: loaded by LLMs based on user instructions or when think that they could be useful for their task. In Claude, skills=commands. Opencode, skills are distinct.";
-          }}
-          ${scope.forHarness {
-            pi = "* Agents: adapter-defined files under `agents/`; consumers map them to configured Pi agent locations.";
-            default = "* Agents: instructions for sub-agents that can be spawned by harnesses. In opencode, can also describe instructions for main agents.";
-          }}
-          * Blocks: own nixantic construct. Allow reusable instruction snippets and references. Can be embedded, but also referenced. Can be rendered as XML blocks, and then referred to with those (see tag)
+        ## Instructions
 
-          ## Instructions locations
+        * Give the agent enough context to understand the task and know where to look, then clear instructions about what to accomplish and which boundaries to respect. Leave execution choices to the agent unless a specific procedure is necessary.
+        * Write compact, direct, imperative instructions. Prefer what to do and why; use prohibitions for safety boundaries and concrete recurring failures. Specify ordered steps only when order matters. Remove redundant prose without dropping conditions, scope, or exceptions.
+        * Keep structure simple and related guidance together. Use the relevant artifact section below; do not turn every concern into a separate top-level section or force every artifact into the same template.
+        * Use `*` for ordinary unordered lists; keep `-` only in fenced or literal output templates. Never mix ordinary marker styles in one rendered file.
+        * Use bullets for distinct points. Never lay out instructions as a table: binding column headers to values is harder for a model than reading a labelled bullet, so write each row as its own bullet with its labels inline.
+        * Steer and route rather than duplicate facts owned by code or other documentation. Code is the source of truth, while instructions rot because nothing compiles or refactors them. Keep one authoritative location per policy, reference or embed it where needed, and check for repetition in delivered text, including when a command, skill, or sub-directory instruction file restates what a more global file owns.
+        * Keep shared guidance model-neutral. Scope harness- or model-specific behavior explicitly; preserve AP's planning, safety, testing, and approval requirements.
+        * Nixantic removes empty lines from rendered output. Use them for source readability; avoid wrapping instruction prose across indented source lines.
 
-          ${scope.forHarness {
-            pi = "Project/directory specific instructions: `AGENTS.md`; skill directories use `SKILL.md`.";
-            default = "Project/directory specific instructions: CLAUDE.md, AGENTS.md, .opencode/AGENTS.md";
-          }}
+        ### Editing and reviewing instructions
 
-          Determine whether the target is generated or directly authored. Edit direct Markdown instructions in place; for generated instructions, edit their source.
+        * Before editing, read surrounding instructions, identify the authoritative source and the intended behavioral change, and propose the smallest sufficient edit for approval. If it is unclear what or where to edit, STOP and ask.
+        * Load similar or surrounding instruction files for patterns. Do reconnaissance to find edit locations before proposing a plan.
+        * Preserve unrelated wording and local syntax/style.
+        * If Nixantic or the dotfiles setup takes too long to locate, propose improving the authoritative `AGENTS.md` or `CLAUDE.md` guidance.
+        * Edit authoritative sources, not rendered artifacts. If access prevents editing, report the limitation and describe the required changes.
+        * After editing, regenerate with the repository's checks and build commands, then review the full task diff against the requirements and this skill. Read the complete affected model-visible context, including relevant references: check policy placement, duplication, scope, clarity, and instruction-versus-output ambiguity.
+        * Fix in-scope findings and repeat the affected checks. Report issues that require a scope decision instead of silently expanding the work.
+        * Report build and render checks separately from instruction-quality review. A passing build does not establish clear instructions.
 
-          AP's generated personal instructions / commands / agents:
-          ${scope.forHarness {
-            pi = "* Do not edit rendered Pi artifacts directly; edit the Nix instruction source.";
-            default = "* Don't try to edit ~/.claude or ~/.config/opencode directly, as they are rendered versions of instruction source files.";
-          }}
-          * Instruction sources are `.nix` files, typically under **~/dotfiles/**.
-          * If you cannot locate them, **ask the user** where their instruction source files are.
-          * Folders are an organization feature, not directly reflected in rendered output. Nix files define fragments.
-          * Commands/skills or sub-directory instruction files should not needlessly repeat information in more global instruction files.
+        ### Harness surfaces
 
-          ## Instructions principles
+        * Repo-level content is the only authoring surface that differs by harness. Everything of AP's own is authored once as Nix sources under **~/dotfiles** and rendered for every harness, so never send an author to a rendered artifact path.
+        * Repo instruction files are concatenated, never merged, and a file in a parent directory applies to every repo beneath it.
+        * Prefer `CLAUDE.md` for a repo that serves several harnesses: Claude Code reads it directly, while OpenCode and Pi reach it only as a fallback behind `AGENTS.md`. Claude Code's `AGENTS.md` support is recent and unreliable without telemetry, so treat `AGENTS.md` as an alternative rather than the shared default.
 
-          * Instructions should be for steering and routing, no duplication information from code. Code is source of truth, while instructions/docs can easily rot as they aren't compiled/refactored as easily.
-          * When steering, prefer mentioning what to do and reason to do so, instead of what not to do. What not to do can help on repeated failures.
-          * Instructions must be clear, unambiguous, complete and imperative.
-          * Reason from the instructions delivered to the model, not from their authoring or storage structure.
-          * Write compact, direct, imperative instructions. Remove redundant prose without dropping conditions, scope, or exceptions.
-          * Use `*` for ordinary unordered lists; keep `-` only in fenced or literal output templates. Never mix ordinary marker styles in one rendered file.
-          * When editing instructions: preserve local syntax/style, change only requested wording; no surrounding fluency rewrites.
-          * One authoritative location per policy; reference/embed elsewhere. Do reconnaissance first, propose or use reusable blocks.
-          * Checklists should be block rendered as xml tag for higher recall salience.
-          * Nixantic removes empty lines from rendered output. Use them for source readability; avoid wrapping instruction prose across indented source lines.
+        #### Claude Code
 
-          ## Instructions writing
+        * Repo instruction files: `CLAUDE.md` or `.claude/CLAUDE.md` for team content, `CLAUDE.local.md` for personal gitignored content, and `.claude/rules/*.md` with optional `paths:` scoping. `AGENTS.md` loads only when no `CLAUDE.md` exists in the working directory or any parent.
+        * Repo artifacts: `.claude/commands/*.md` (legacy; prefer skills), `.claude/skills/<name>/SKILL.md`, `.claude/agents/*.md`.
 
-          * Before edit: identify authoritative source and smallest sufficient diff.
-          * Which instruction to edit should be based on context. If not clear what/where to edit, STOP and ask user.
-          * You may not be able to edit them directly either if you're in a sandbox. If that's the case, tell the user and give a detailed description of changes that need to be done.
-          * Load similar/surrounding instruction files for patterns.
-          * Do reconnaissance, find edit locations and then propose edit plan to user.
-          ${scope.forHarness {
-            pi = "* If Nixantic or dotfiles setup takes too long to locate, propose improving the authoritative `AGENTS.md` guidance.";
-            default = "* If you spent too much time finding information about nixantic or dotfiles setup, propose changes to dotfiles CLAUDE.md's.";
-          }}
-          * If user agrees, proceed with edits.
+        #### OpenCode
 
-          ## Completion review
+        * Repo instruction files: `AGENTS.md` in every directory from the working directory up to the worktree root, nearest first. A project `AGENTS.md` suppresses every `CLAUDE.md` in the tree.
+        * Repo artifacts: `.opencode/commands/*.md` (a nested path becomes `/team/name`), `.opencode/skills/<name>/SKILL.md` (also reads `.claude/skills/` and `.agents/skills/`), `.opencode/agents/*.md`.
 
-          1. Review the full task diff against the requirements and this skill.
-          2. For generated instructions, regenerate affected output using the project's commands. For directly authored instructions, inspect the files as loaded; no rebuild is required.
-          3. Read the complete affected model-visible context, including relevant references. Check policy placement, duplication, scope, clarity, and instruction-versus-output ambiguity.
-          4. Fix in-scope findings and repeat affected checks. Report issues requiring a scope decision; do not silently expand the work.
-          5. Report build/render checks, when applicable, separately from instruction-quality review. A passing build does not establish clear instructions.
-        '';
-      };
+        #### Pi
+
+        * Repo instruction files: one per directory, first match wins: `AGENTS.override.md`, `AGENTS.md`, `CLAUDE.md`. Every directory from the repo up to the filesystem root is read.
+        * Repo artifacts: `.pi/prompts/*.md`, `.pi/skills/**/SKILL.md` plus `.agents/skills/`, and, from AP's extensions, `.pi/agents/*.md` and `.pi/rules/*.md`.
+
+        ### Skills
+
+        * Give each skill one coherent area of guidance and a concise description that makes its activation conditions clear. Skills generally explain how to work, rather than request a particular operation.
+        * Use **Context → Instructions** as the default body structure. Context explains the purpose, relevant background, and where to look. Instructions give principles, constraints, and guidance grouped by topic. Include procedures only where needed; not every skill needs a start-to-finish workflow or a single execution outcome.
+        * When a skill requests a specific operation, use the command structure below. Commands exported as skills retain their command structure; packaging alone does not determine structure.
+        * Add subsections only when they help navigation. For skills covering several artifact types or independent cases, put shared guidance first and the relevant case-specific sections beneath it.
+        * Keep related guidance together. Move independently relevant detail into supporting references only when useful, and state when to read them; do not split a skill merely to shorten it.
+
+        ### Main and directory instructions
+
+        * Put persistent policies and broadly relevant context here. Keep global rules global; directory instructions should add only local guidance, source boundaries, and relevant commands.
+        * Route to task-specific skills or documentation rather than loading their full procedures unconditionally.
+
+        ### Commands / prompts
+
+        * Use **Goal → State (optional) → Instructions** as the default body structure. Start with a `Goal:` statement naming the requested operation and expected result. Use `## State` for relevant supplied or gathered context when needed, then `## Instructions` for the actions or stages.
+        * Make inputs clear and reference applicable skills for how to perform the work rather than repeating their guidance.
+        * Describe what each stage must achieve, not every tool call. Number stages when their order matters, and make required decision points, approval gates, and the stopping point explicit. Follow the shared task-management rules for task-tracked procedures.
+
+        ### Agents
+
+        * Define the role, responsibilities, scope, decision boundaries, and expected handoff. Make clear which work the agent may perform and when it should return a question to its caller.
+        * Reference shared policies rather than repeating them. Include only role-specific context and instructions needed to perform the assignment.
+        * Agents hold instructions for sub-agents that harnesses can spawn, and some harnesses also use them for main agents.
+
+        ### Reusable blocks
+
+        * Keep each block focused on one coherent policy or reusable instruction fragment. Reuse existing policy blocks before creating another owner for the same guidance.
+        * Use XML-tagged blocks for reusable checklists and named references. Check that references resolve in the delivered context and that embedding does not introduce needless repetition.
+        * Treat blocks as text composition, not runtime control flow. Source placement determines text placement, not execution timing.
+      '';
+    };
   };
 }

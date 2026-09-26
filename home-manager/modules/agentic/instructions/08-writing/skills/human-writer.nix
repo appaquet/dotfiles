@@ -34,28 +34,26 @@
 
         Use sparingly (max once per response). Prefer the plain alternative.
 
-        | AI-flagged | Plain alternative |
-        |---|---|
-        | crucial, pivotal, vital | important, matters, key |
-        | leverage (verb) | use |
-        | utilize | use |
-        | robust | strong, solid |
-        | seamless | smooth |
-        | comprehensive | full, complete, thorough |
-        | nuanced | subtle, specific |
-        | foster | build, encourage, grow |
-        | underscore, highlight, showcase | show, point to, reveal |
-        | navigate (metaphorical) | deal with, handle, work through |
-        | landscape (metaphorical) | space, field, area |
-        | realm | area, domain |
-        | testament to | shows, proves |
-        | enhance | improve |
-        | streamline | simplify |
-        | empower | let, enable, help |
-        | innovative | new |
-        | optimal | best |
-        | facilitate | help, allow |
-        | encompasses | includes, covers |
+        * crucial, pivotal, vital -> important, matters, key
+        * leverage (verb) -> use
+        * utilize -> use
+        * robust -> strong, solid
+        * seamless -> smooth
+        * comprehensive -> full, complete, thorough
+        * nuanced -> subtle, specific
+        * foster -> build, encourage, grow
+        * underscore, highlight, showcase -> show, point to, reveal
+        * navigate (metaphorical) -> deal with, handle, work through
+        * landscape (metaphorical) -> space, field, area
+        * realm -> area, domain
+        * testament to -> shows, proves
+        * enhance -> improve
+        * streamline -> simplify
+        * empower -> let, enable, help
+        * innovative -> new
+        * optimal -> best
+        * facilitate -> help, allow
+        * encompasses -> includes, covers
 
         ## Banned Phrases
 

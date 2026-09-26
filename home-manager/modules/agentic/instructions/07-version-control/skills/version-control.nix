@@ -32,16 +32,14 @@
 
           Use these read-only forms when `jj ls` is not enough:
 
-          | Purpose | Command |
-          |---------|---------|
-          | Working-copy status | `jj status` |
-          | Current ancestry | `jj log -r '::@'` |
-          | Complete graph | `jj log -r 'all()'` |
-          | One change | `jj show <rev>` |
-          | Change evolution | `jj evolog -r <rev>` |
-          | Current diff | `jj diff --git` (`--stat`, `--summary`, or `--name-only` when appropriate) |
-          | Two endpoints | `jj diff --from <A> --to <B> --git <paths...>` |
-          | File at a revision | `jj file show -r <rev> <path>` |
+          * Working-copy status: `jj status`
+          * Current ancestry: `jj log -r '::@'`
+          * Complete graph: `jj log -r 'all()'`
+          * One change: `jj show <rev>`
+          * Change evolution: `jj evolog -r <rev>`
+          * Current diff: `jj diff --git` (`--stat`, `--summary`, or `--name-only` when appropriate)
+          * Two endpoints: `jj diff --from <A> --to <B> --git <paths...>`
+          * File at a revision: `jj file show -r <rev> <path>`
 
           ## Revisions, revsets, and templates
 
@@ -70,15 +68,13 @@
 
           ## Shape changes
 
-          | Purpose | Command |
-          |---------|---------|
-          | Finalize current changes and create a new empty `@` | `jj commit -m "private: agent: <type>(<area>): description"` |
-          | Finalize selected files; remaining files move to the new `@` | `jj commit -m "private: agent: <type>(<area>): description" <files...>` |
-          | Create a child of the current or named revision | `jj new [<rev>] -m "private: agent: <type>(<area>): description"` |
-          | Describe the current change | `jj describe -m "private: agent: <type>(<area>): description"` |
-          | Move current content into its parent, keeping the parent's message | `jj squash -u [<files...>]` |
-          | Move current content into its parent and replace the parent's message | `jj squash -m "private: agent: <type>(<area>): description" [<files...>]` |
-          | Split selected files into the original change | `jj split -m "private: agent: <type>(<area>): description" <files...>` |
+          * Finalize current changes and create a new empty `@`: `jj commit -m "private: agent: <type>(<area>): description"`
+          * Finalize selected files; the remaining files move to the new `@`: `jj commit -m "private: agent: <type>(<area>): description" <files...>`
+          * Create a child of the current or named revision: `jj new [<rev>] -m "private: agent: <type>(<area>): description"`
+          * Describe the current change: `jj describe -m "private: agent: <type>(<area>): description"`
+          * Move current content into its parent, keeping the parent's message: `jj squash -u [<files...>]`
+          * Move current content into its parent and replace the parent's message: `jj squash -m "private: agent: <type>(<area>): description" [<files...>]`
+          * Split selected files into the original change: `jj split -m "private: agent: <type>(<area>): description" <files...>`
 
           For `jj split`, selected files remain in the original change and `-m` describes that selected/original side. Never run bare `jj split`, `-i`, or an unspecified merge tool in an agent shell; they are interactive.
 
@@ -106,11 +102,9 @@
 
           These are standalone shell commands, not `jj` subcommands; never write `jj diff-working`:
 
-          | Purpose | Command |
-          |---------|---------|
-          | Work since closest bookmark or trunk, including private changes | `jj-diff-working --git` (`--stat` for files) |
-          | Current branch against the previous stacked bookmark | `jj-diff-branch --git` |
-          | Current, main, or previous branch name | `jj-current-branch`, `jj-main-branch`, `jj-prev-branch` |
+          * Work since closest bookmark or trunk, including private changes: `jj-diff-working --git` (`--stat` for files)
+          * Current branch against the previous stacked bookmark: `jj-diff-branch --git`
+          * Current, main, or previous branch name: `jj-current-branch`, `jj-main-branch`, `jj-prev-branch`
 
           For `gh`, use `$(jj-current-branch)` because Git is detached.
 

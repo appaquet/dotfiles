@@ -40,15 +40,13 @@
 
         ## Task Tracking
 
-        **FIRST**: Create one `${scope.harness.tools.taskCreate}` per row below BEFORE any other work:
+        **FIRST**: Create one `${scope.harness.tools.taskCreate}` per item below BEFORE any other work:
 
-        | # | Subject | Description |
-        | --- | --- | --- |
-        | 1 | Check version control context | Reuse current version control context and changed-file list |
-        | 2 | Read project doc | Check for existing Files section, note if update needed |
-        | 3 | Create file tasks | **FIRST**: Reuse the changed-file list above. **THEN**: For each code file (skip docs/generated), create `${scope.harness.tools.taskCreate}` with subject "Summarize: [filename]" |
-        | 4 | Summarize files | For each Summarize task: read diff, understand changes, write technical summary, mark complete |
-        | 5 | Format and return | Compile summaries into Files section format, return result |
+        * Check version control context: reuse the current version control context and changed-file list
+        * Read project doc: check for an existing Files section and note whether an update is needed
+        * Create file tasks: **FIRST**: reuse the changed-file list above. **THEN**: for each code file (skip docs and generated files), create `${scope.harness.tools.taskCreate}` with subject "Summarize: [filename]"
+        * Summarize files: for each Summarize task, read the diff, understand the changes, write the technical summary, and mark the task complete
+        * Format and return: compile the summaries into the Files section format and return the result
 
         ## Instructions
 
