@@ -18,8 +18,7 @@
 
       model = {
         claude = {
-          model = "sonnet";
-          effort = "high";
+          model = "opus";
         };
         opencode = {
           model = "openai/gpt-5.6-terra";

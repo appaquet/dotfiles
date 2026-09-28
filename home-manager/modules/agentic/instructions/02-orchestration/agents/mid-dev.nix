@@ -17,7 +17,10 @@
       };
 
       model = {
-        claude = "sonnet";
+        claude = {
+          model = "sonnet";
+          effort = "high";
+        };
         opencode = {
           model = "openai/gpt-5.6-luna";
           effort = "high";

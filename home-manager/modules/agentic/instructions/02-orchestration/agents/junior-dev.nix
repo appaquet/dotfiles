@@ -17,7 +17,10 @@
       };
 
       model = {
-        claude = "haiku";
+        claude = {
+          model = "sonnet";
+          effort = "medium";
+        };
         opencode = "openai/gpt-5.6-luna";
         pi = "scoped/junior";
       };

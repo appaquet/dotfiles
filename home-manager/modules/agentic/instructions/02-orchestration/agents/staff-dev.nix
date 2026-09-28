@@ -17,7 +17,10 @@
       };
 
       model = {
-        claude = "opus";
+        claude = {
+          model = "opus";
+          effort = "high";
+        };
         opencode = "openai/gpt-5.6-sol";
         pi = "scoped/staff";
       };
