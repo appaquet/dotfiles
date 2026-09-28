@@ -23,6 +23,10 @@
       ];
     };
     optimise.automatic = true;
+    gc = {
+      automatic = true;
+      options = "--delete-older-than 14d";
+    };
   };
 
   security.pam.services.sudo_local = {
