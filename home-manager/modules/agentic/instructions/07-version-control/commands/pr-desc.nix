@@ -19,6 +19,7 @@
         Goal: generate a detailed changelog-style summary of branch changes for reference. Uses project context and branch diff to create multi-level breakdown. ${
           scope.forHarness {
             pi = "Do not use sub-agents for this task; work in the current session.";
+            codex = "Do not use sub-agents for this task; work in the current session.";
             default = "Don't use sub-agents to do the work, since you're already a forked context.";
           }
         }
@@ -42,6 +43,7 @@
             * ${
               scope.forHarness {
                 pi = "Load the `${humanWriter}` Agent Skill guidance for tone (no AI filler, no superlatives).";
+                codex = "Load the `${humanWriter}` Agent Skill guidance for tone (no AI filler, no superlatives).";
                 default = "Load the `${humanWriter}` skill using the `Skill` tool for tone (no AI filler, no superlatives)";
               }
             }

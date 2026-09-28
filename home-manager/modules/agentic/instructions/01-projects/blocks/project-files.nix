@@ -6,6 +6,9 @@
         pi = ''
           Project files: run `agentic-proj-docs` with the shell tool, then use its output as the project-file state.
         '';
+        codex = ''
+          Project files: run `agentic-proj-docs` with the shell tool, then use its output as the project-file state.
+        '';
         default = ''
           Project files:
           ```

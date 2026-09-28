@@ -92,6 +92,8 @@ let
     "proj-load"
     "proj-save"
   ];
+  codexCommands = builtins.filter (command: command != "show-me") commonCommands;
+  codexSkills = claudeSkills ++ codexCommands;
 
   filesIn =
     harness: directory: names:
@@ -101,6 +103,8 @@ let
     [
       "claude/BOM.md"
       "claude/CLAUDE.md"
+      "codex/AGENTS.md"
+      "codex/BOM.md"
       "opencode/.gitignore"
       "opencode/AGENTS.md"
       "opencode/BOM.md"
@@ -111,6 +115,8 @@ let
     ++ filesIn "claude" "commands" claudeCommands
     ++ filesIn "claude" "rules" claudeRules
     ++ skillFiles "claude" claudeSkills
+    ++ map (name: "codex/agents/${name}.toml") agents
+    ++ skillFiles "codex" codexSkills
     ++ filesIn "opencode" "agents" agents
     ++ filesIn "opencode" "commands" commonCommands
     ++ filesIn "opencode" "rules" opencodeRules
@@ -123,6 +129,7 @@ let
     ++ [ "pi/skills/show-me/template.html" ]
     ++ [
       "claude/skills/show-me/template.html"
+      "codex/skills/show-me/template.html"
       "opencode/skills/show-me/template.html"
     ]
   );
@@ -131,6 +138,7 @@ let
     let
       expectedVcsContext = "agentic-vcs-context";
       unexpectedVcsContext = "agentic-vcs-context git";
+      unresolvedInterpolation = "\${scope.";
       wrappedVcsContext = "`!`${expectedVcsContext}``";
       manifest = pkgs.writeText "${name}-manifest" "${builtins.concatStringsSep "\n" expectedFiles}\n";
     in
@@ -140,11 +148,11 @@ let
       : ${instructions.package}
 
       find -L ${instructions.package} -type f -printf '%P\n' \
-        | grep -v -E '^(claude|opencode|pi)/(rules/project-doc[.]md|skills/(proj-writing|project-docs)/SKILL[.]md)$' \
+        | grep -v -E '^(claude|opencode|pi|codex)/(rules/project-doc[.]md|skills/(proj-writing|project-docs)/SKILL[.]md)$' \
         | sort > actual-manifest
       diff -u ${manifest} actual-manifest
 
-      for harness in claude opencode pi; do
+      for harness in claude opencode pi codex; do
         test -n "$(find -L ${instructions.package}/$harness/agents -mindepth 1 -maxdepth 1 -type f -print -quit)"
       done
       test -d ${instructions.package}/claude/commands
@@ -154,6 +162,8 @@ let
       test -d ${instructions.package}/pi/prompts
       test -d ${instructions.package}/pi/rules
       test -d ${instructions.package}/pi/skills
+      test -d ${instructions.package}/codex/agents
+      test -d ${instructions.package}/codex/skills
 
       pi=${instructions.package}/pi
 
@@ -187,6 +197,17 @@ let
       ! grep -R -F '@rules/' "$pi"
       ! grep -R -F 'using the `Skill` tool' "$pi"
       ! grep -R -F 'forked context' "$pi"
+
+      codex=${instructions.package}/codex
+
+      grep -R -F 'update_plan' "$codex"
+      grep -R -F 'experimental_request_user_input' "$codex"
+      ! grep -R -F 'TaskOutput' "$codex"
+      ! grep -R -F 'EnterPlanMode' "$codex"
+      ! grep -R -F 'AskUserQuestion' "$codex"
+      ! grep -R -F 'forked context' "$codex"
+      ! grep -R -F '!`' "$codex"
+      ! grep -R -F '${unresolvedInterpolation}' "$codex"
 
       for agent in ${builtins.concatStringsSep " " (agents ++ piAgents)}; do
         agent_path="$pi/agents/$agent.md"
@@ -224,7 +245,10 @@ let
         "$pi/prompts/proj-plan.md" \
         "$pi/prompts/pr-import-comments.md" \
         "$pi/agents/branch-diff-summarizer.md" \
-        "$pi/skills/proj-load/SKILL.md"; do
+        "$pi/skills/proj-load/SKILL.md" \
+        "$codex/skills/proj-plan/SKILL.md" \
+        "$codex/skills/pr-import-comments/SKILL.md" \
+        "$codex/agents/branch-diff-summarizer.toml"; do
         grep -F '${expectedVcsContext}' "$path"
         ! grep -F '${unexpectedVcsContext}' "$path"
         ! grep -F '${wrappedVcsContext}' "$path"

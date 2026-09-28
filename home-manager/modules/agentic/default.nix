@@ -1,7 +1,6 @@
 {
   inputs,
   inputs',
-  pkgs,
   ...
 }:
 
@@ -13,13 +12,13 @@
     ../nono
 
     ./claude
+    ./codex
     ./opencode
     ./pi
   ];
 
   config = {
     home.packages = [
-      inputs'.llm-agents.packages.codex
       inputs'.llm-agents.packages.tokscale
       inputs'.llm-agents.packages.ccusage
     ];

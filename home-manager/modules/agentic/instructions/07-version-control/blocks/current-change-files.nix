@@ -6,6 +6,9 @@
         pi = ''
           Run `jj-diff-branch --stat` with the shell tool, then use its stdout as changed files in the current work.
         '';
+        codex = ''
+          Run `jj-diff-branch --stat` with the shell tool, then use its stdout as changed files in the current work.
+        '';
         default = ''
           Changed files in current work:
           ```

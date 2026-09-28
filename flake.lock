@@ -261,17 +261,14 @@
         ]
       },
       "locked": {
-        "lastModified": 1790353645,
-        "narHash": "sha256-FwrAsaZCWLza5hAIrlJC7o+ULZInofTKt313MTmmY6I=",
-        "owner": "appaquet",
-        "repo": "nixantic",
-        "rev": "b6caef399bcbb0b463c7e92b42b3268d9bbd335a",
-        "type": "github"
+        "lastModified": 1790609929,
+        "narHash": "sha256-jpekT2rwyWhB84dNSVphZWQs3I1G9G9vVuth3l5aFuA=",
+        "path": "/home/appaquet/dotfiles/.workspaces/nixantic-codex/nixantic",
+        "type": "path"
       },
       "original": {
-        "owner": "appaquet",
-        "repo": "nixantic",
-        "type": "github"
+        "path": "/home/appaquet/dotfiles/.workspaces/nixantic-codex/nixantic",
+        "type": "path"
       }
     },
     "nixos": {

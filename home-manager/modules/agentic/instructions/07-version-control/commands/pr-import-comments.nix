@@ -29,6 +29,11 @@
              * Run `gh repo view --json owner --jq '.owner.login'` with the shell tool for the repo owner.
              * Run `gh repo view --json name --jq '.name'` with the shell tool for the repo name.
            '';
+           codex = ''
+             * Run `gh pr view the-branch-name --json number --jq '.number'` with the shell tool for the current PR number.
+             * Run `gh repo view --json owner --jq '.owner.login'` with the shell tool for the repo owner.
+             * Run `gh repo view --json name --jq '.name'` with the shell tool for the repo name.
+           '';
            default = ''
              * Current PR number: !`gh pr view the-branch-name --json number --jq '.number'`
              * Repo owner: !`gh repo view --json owner --jq '.owner.login'`

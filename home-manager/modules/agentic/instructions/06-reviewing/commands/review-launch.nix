@@ -44,6 +44,10 @@
          3. ${
            scope.forHarness {
              pi = "Collect results with `${scope.harness.tools.agentResult}`. If an agent's summary lacks detail, use `${scope.harness.tools.agentSteer}` to send focused follow-up guidance.";
+             codex = ''
+               Collect results from agent summaries delivered to the main thread when agents complete. NEVER read agent
+               output files. If an agent's summary lacks detail, send it a follow-up message to ask specific questions.
+             '';
              default = ''
                Collect results from agent summaries (returned directly for foreground agents, or delivered
                automatically for background agents). NEVER call `TaskOutput` or read agent output files.

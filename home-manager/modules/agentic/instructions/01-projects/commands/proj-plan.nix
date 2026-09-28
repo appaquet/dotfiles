@@ -23,6 +23,7 @@
 
         ${scope.forHarness {
           pi = "Run `date +%Y/%m/%d` with the shell tool and use its stdout as the current date.";
+          codex = "Run `date +%Y/%m/%d` with the shell tool and use its stdout as the current date.";
           default = "Current date: !`date +%Y/%m/%d`";
         }}
 

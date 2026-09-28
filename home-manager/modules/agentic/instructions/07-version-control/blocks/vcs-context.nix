@@ -12,6 +12,10 @@
           Run `agentic-vcs-context` with the shell tool, then use its stdout as the current version control context.
           ${workspacePolicy}
         '';
+        codex = ''
+          Run `agentic-vcs-context` with the shell tool, then use its stdout as the current version control context.
+          ${workspacePolicy}
+        '';
         default = ''
           Current version control context: !`agentic-vcs-context`
           ${workspacePolicy}
