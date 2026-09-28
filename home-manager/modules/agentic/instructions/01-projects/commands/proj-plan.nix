@@ -36,9 +36,11 @@
            * ${scope.harness.prose.questions.request} if the goal or task is empty or unclear.
 
         3. 🔳 Find or create project files
-           * If no committed project files, confirm with user that a new project should be created and suggest a name based on the goal or current version control context value. On confirmation, create the initial project doc structure and the project link following project files rules.
-           * If committed project files exist, check if goal aligned with project and can be added as phase. Otherwise, confirm with user and propose new project to be created.
-           * If committed project files exist and goal is aligned, confirm phase name with user.
+           * Invoking this command authorizes project and phase setup. Use your best judgment without asking for setup confirmation; follow ${
+             scope.skills."project-docs".reference
+           } for names and document structure.
+           * If no committed project files exist, create the initial project documents and project link.
+           * If committed project files exist and the goal is aligned, add a phase to that project. Otherwise, create a new project and update the project link, preserving the existing project's documents.
            * If new project, follow the document version control rules in ${
              scope.skills."project-docs".reference
            }: the proj symlink gets its own commit and documents stay uncommitted.

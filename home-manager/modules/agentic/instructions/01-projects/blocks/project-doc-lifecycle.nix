@@ -22,6 +22,7 @@
           ### Creation and updates
 
           * Create project and phase files only when an active user-invoked workflow explicitly directs their creation. Otherwise, stop and ask the user to invoke an appropriate project workflow.
+          * Use user-supplied project and phase names; otherwise, choose concise, descriptive names from the goal and current version control context without asking for naming approval. Preserve existing project and phase names.
           * Use the active project link (`proj` or `proj-adhoc`) reported by project state; permissions may allow only that location.
           * Outside multi-question interviews, update documents continuously during planning, development, review, and other work: on task completion, when ${
             scope.commands."proj-save".reference
