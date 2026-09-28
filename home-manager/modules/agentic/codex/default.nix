@@ -21,15 +21,26 @@ let
   agentsMaterialized = materialize "agents";
   skillsMaterialized = materialize "skills";
 
-  # Codex's own skill root, not the shared ~/.agents/skills that Pi also reads.
-  skillFiles = lib.listToAttrs (
-    lib.map (name: {
-      name = ".codex/skills/${name}";
-      value = {
-        source = "${skillsMaterialized}/${name}";
-      };
-    }) (lib.attrNames (builtins.readDir "${codexDir}/skills"))
-  );
+  # Read from the rendered output paths: readDir on the built tree would make evaluation
+  # build the instructions package for the target platform.
+  skillNames = lib.pipe instructions.codex [
+    builtins.attrValues
+    (builtins.map (instruction: instruction.outputPath))
+    (builtins.filter (path: lib.hasPrefix "skills/" path))
+    (builtins.map (path: lib.head (lib.splitString "/" (lib.removePrefix "skills/" path))))
+    lib.unique
+  ];
+
+  # Codex's own skill root, not the shared ~/.agents/skills that Pi also reads. It stays a real
+  # directory so Codex can install its bundled .system skills, hence one entry per skill.
+  skillFiles =
+    assert skillNames != [ ] || throw "nixantic rendered no codex skill directories";
+    lib.listToAttrs (
+      lib.map (name: {
+        name = ".codex/skills/${name}";
+        value.source = "${skillsMaterialized}/${name}";
+      }) skillNames
+    );
 in
 {
   # Only AGENTS.md stays a symlink; its loader follows symlinks.
