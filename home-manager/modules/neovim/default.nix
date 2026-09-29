@@ -102,7 +102,6 @@ in
           vim-fugitive # Git (diff|log|...) commands
           gitsigns-nvim # Show git signs in gutter
           diffview-nvim # :DiffviewOpen, :DiffviewClose
-          octo-nvim
           gitlinker-nvim # generate github/gitlab/bitbucket url for the current line/file/selection
 
           # Treesitter

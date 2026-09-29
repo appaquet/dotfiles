@@ -30,7 +30,6 @@ require("catppuccin").setup({
 	integrations = {
 		neotest = true,
 		diffview = true,
-		octo = true,
 		lsp_trouble = true,
 		which_key = true,
 		mini = true,

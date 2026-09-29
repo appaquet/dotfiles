@@ -257,21 +257,6 @@ vim.keymap.set("n", "<Leader>ggp", switch_gutter_base_prev, { silent = true, des
 vim.keymap.set("n", "<Leader>ggh", switch_gutter_base_head, { silent = true, desc = "Git: switch gutter base to head" })
 vim.keymap.set("n", "<Leader>ggw", switch_gutter_base_working, { silent = true, desc = "Git: switch gutter base against current bookmark" })
 
--- Octo.nvim
--- https://github.com/pwntester/octo.nvim
-require("octo").setup({
-	use_local_fs = true, -- Use local filesystem for right side, allowing LSP to work and stop error'ing
-	picker = "fzf-lua",
-})
-require("which-key").add({
-	{ "<leader>gp", group = "PR review" },
-})
-vim.keymap.set("n", "<Leader>gpl", ":Octo pr list<CR>", { silent = true, desc = "Git: PR list" })
-vim.keymap.set("n", "<Leader>gpo", ":Octo review open<CR>", { silent = true, desc = "Git: PR review open" })
-vim.keymap.set("n", "<Leader>gpq", ":Octo review close<CR>", { silent = true, desc = "Git: PR review close" })
-vim.keymap.set("n", "<Leader>gpc", ":Octo review comments<CR>", { silent = true, desc = "Git: PR review comments" })
-vim.keymap.set("n", "<Leader>gps", ":Octo review submit<CR>", { silent = true, desc = "Git: PR review submit" })
-
 -- Gitlinker
 -- Generates shareable links
 -- https://github.com/ruifm/gitlinker.nvim
