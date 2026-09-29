@@ -30,7 +30,6 @@ vim.opt.pumborder = "rounded"
 vim.opt.pummaxwidth = 60
 
 -- Line numbers (see keymap.lua for toggling)
-vim.opt.relativenumber = true -- relative line numbers
 vim.opt.number = true -- show current absolute number instead of 0
 
 -- Defaults to space indentation

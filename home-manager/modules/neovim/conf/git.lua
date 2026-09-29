@@ -196,7 +196,7 @@ vim.keymap.set("n", "<Leader>gdq", close_all_diffviews, { silent = true, desc = 
 local gitsigns = require("gitsigns")
 require("gitsigns").setup({
 	current_line_blame = true, -- show blame info on current line as virtual text
-	update_debounce = 300,
+	update_debounce = 500,
 	on_attach = function(bufnr)
 		local buf_name = vim.api.nvim_buf_get_name(bufnr)
 		if buf_name:match("^diffview://") then

@@ -15,15 +15,16 @@ require("lualine").setup({
 		always_divide_middle = true,
 		always_divide_tabline = true,
 		globalstatus = true,
+		refresh_time = 30, -- ~60fps
 		refresh = {
-			statusline = 500,
-			tabline = 500,
-			winbar = 500,
+			statusline = 1000,
+			tabline = 1000,
+			winbar = 1000,
 		},
 	},
 	sections = {
 		lualine_a = { "mode" },
-		lualine_b = { "branch", "diff", "diagnostics" },
+		lualine_b = { "diagnostics" },
 		lualine_c = {
 			{
 				"filename",

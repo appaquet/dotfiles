@@ -137,21 +137,17 @@ vim.keymap.set("n", "<Leader>Tw", toggle_wrap, { silent = true, desc = "Toggle l
 vim.keymap.set("n", "<Leader>Tm", function()
 	if vim.o.mouse == "a" then
 		vim.o.mouse = ""
-		vim.o.relativenumber = false
 		vim.o.number = false
 	else
 		vim.o.mouse = "a"
-		vim.o.relativenumber = true
 		vim.o.number = true
 	end
 end, { silent = true, desc = "Toggle mouse support" })
 
 local function toggle_numbers()
 	if vim.wo.relativenumber then
-		vim.wo.relativenumber = false
 		vim.wo.number = false
 	else
-		vim.wo.relativenumber = true
 		vim.wo.number = true
 	end
 end
