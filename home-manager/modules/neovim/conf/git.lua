@@ -5,7 +5,6 @@ require("which-key").add({
 -- Diffview
 -- https://github.com/dlyongemallo/diffview-plus.nvim/
 -- https://github.com/dlyongemallo/diffview-plus.nvim/blob/main/lua/diffview/config.lua
--- `--imply-local` means it will use the local version of the file on the right side
 local diffview_lib = require("diffview.lib")
 local diffview_actions = require("diffview.actions")
 
@@ -136,14 +135,14 @@ end
 local function open_diffview_main()
 	close_all_diffviews()
 	local main_branch = git_main_branch()
-	vim.api.nvim_command("DiffviewOpen " .. main_branch .. "... --imply-local")
+	vim.api.nvim_command("DiffviewOpen " .. main_branch .. "...")
 	vim.notify("Diffing against " .. main_branch)
 end
 
 local function open_diffview_prev()
 	close_all_diffviews()
 	local prev_branch = git_prev_branch()
-	vim.api.nvim_command("DiffviewOpen " .. prev_branch .. " --imply-local")
+	vim.api.nvim_command("DiffviewOpen " .. prev_branch)
 	vim.notify("Diffing against " .. prev_branch)
 end
 
@@ -155,7 +154,7 @@ local function open_diffview_rev()
 	end
 
 	close_all_diffviews()
-	vim.api.nvim_command("DiffviewOpen " .. rev .. " --imply-local")
+	vim.api.nvim_command("DiffviewOpen " .. rev)
 end
 
 local function open_diffview_head()
@@ -170,7 +169,7 @@ end
 local function open_diffview_working()
 	close_all_diffviews()
 	local remote = git_current_branch()
-	vim.api.nvim_command("DiffviewOpen " .. remote .. " --imply-local")
+	vim.api.nvim_command("DiffviewOpen " .. remote)
 	vim.notify("Diffing against " .. remote)
 end
 
