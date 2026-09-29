@@ -53,7 +53,6 @@ end
 -- Add completion on tab (if visible), but real tab via shift-tab
 local cpsug = require("copilot.suggestion")
 local cpnes = require("copilot.nes.api")
-local luasnip = require("luasnip")
 vim.keymap.set("i", "<Tab>", function()
 	if cpsug.is_visible() then
 		-- Copilot Inline suggestion
@@ -61,8 +60,8 @@ vim.keymap.set("i", "<Tab>", function()
 	elseif cpnes.nes_apply_pending_nes() then
 		-- Copilot Next Edit Suggestion
 		cpnes.nes_walk_cursor_end_edit()
-	elseif luasnip.expand_or_jumpable() then
-		luasnip.expand_or_jump()
+	elseif vim.snippet.active({ direction = 1 }) then
+		vim.snippet.jump(1)
 	else
 		passthrough_keymap("<Tab>")
 	end
@@ -78,7 +77,11 @@ vim.keymap.set({ "n", "v" }, "<Tab>", function()
 end, { noremap = true, silent = true })
 
 vim.keymap.set("i", "<S-Tab>", function()
-	passthrough_keymap("<Tab>")
+	if vim.snippet.active({ direction = -1 }) then
+		vim.snippet.jump(-1)
+	else
+		passthrough_keymap("<Tab>")
+	end
 end, { noremap = true, silent = true })
 
 vim.keymap.set("i", "<M-J>", function()

@@ -240,7 +240,6 @@ require("blink.cmp").setup({
 		["<C-p>"] = { "select_prev", "fallback" },
 		["<C-n>"] = { "select_next", "fallback" },
 	},
-	snippets = { preset = "luasnip" },
 	completion = {
 		list = {
 			selection = {
@@ -260,14 +259,10 @@ require("blink.cmp").setup({
 	},
 	signature = { enabled = true },
 	sources = {
-		default = { "lsp", "buffer", "snippets", "path" },
+		default = { "lsp", "buffer", "path" },
 	},
 	fuzzy = { implementation = "prefer_rust" },
 })
-
--- Load default snippets
--- Can be called again to load more from specific paths (see doc or HF backend repo)
-require("luasnip.loaders.from_vscode").lazy_load({})
 
 -- Golang
 -- https://github.com/ray-x/go.nvim

@@ -157,10 +157,6 @@ in
             copilot-lua # use `Copilot auth` to login
             copilot-lsp # needed for NES on copilot-lua
 
-            # Snippets
-            luasnip
-            friendly-snippets # easy load from vscode, languages, etc.
-
             # AI assistants
             codecompanion-nvim
             claudecode-nvim

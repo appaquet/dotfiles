@@ -309,8 +309,8 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<M-n>` Accept suggestion and go to next edit
 * `<C-]>` Dismiss suggestion
 * `<M-J>` Show Copilot panel
-* `<Tab>` Accept inline suggestion if visible, apply next edit suggestion (NES), expand/jump snippet, or insert tab
-* `<S-Tab>` Insert tab (skip snippet expansion and suggestions)
+* `<Tab>` Accept inline suggestion if visible, apply next edit suggestion (NES), jump to next snippet placeholder, or insert tab
+* `<S-Tab>` Jump to previous snippet placeholder, otherwise insert tab
 
 ## Toggle Options (T)
 
