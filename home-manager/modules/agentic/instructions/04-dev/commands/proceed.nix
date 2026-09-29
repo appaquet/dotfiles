@@ -11,7 +11,7 @@
 
         ## Instructions
 
-        1. 🔳 Breakdown work and create tasks as needed using `${scope.harness.tools.taskCreate}`
+        1. 🔳 Break down the work and track it as you go
 
         2. 🔳 Execute tasks one by one
 

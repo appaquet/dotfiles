@@ -187,7 +187,6 @@ let
       grep -R -F '`Agent`' "$pi"
       grep -R -F '`get_subagent_result`' "$pi"
       grep -R -F '`steer_subagent`' "$pi"
-      grep -R -F '`TaskCreate`' "$pi"
       grep -R -F '`ask_user_question`' "$pi"
       ! grep -R -F 'AskUserQuestion' "$pi"
       ! grep -R -F 'EnterPlanMode' "$pi"
@@ -200,7 +199,6 @@ let
 
       codex=${instructions.package}/codex
 
-      grep -R -F 'update_plan' "$codex"
       grep -R -F 'experimental_request_user_input' "$codex"
       ! grep -R -F 'TaskOutput' "$codex"
       ! grep -R -F 'EnterPlanMode' "$codex"

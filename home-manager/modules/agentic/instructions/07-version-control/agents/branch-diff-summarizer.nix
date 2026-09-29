@@ -40,12 +40,12 @@
 
         ## Task Tracking
 
-        **FIRST**: Create one `${scope.harness.tools.taskCreate}` per item below BEFORE any other work:
+        **FIRST**: Before any other work, set up tracking for the items below:
 
         * Check version control context: reuse the current version control context and changed-file list
         * Read project doc: check for an existing Files section and note whether an update is needed
-        * Create file tasks: **FIRST**: reuse the changed-file list above. **THEN**: for each code file (skip docs and generated files), create `${scope.harness.tools.taskCreate}` with subject "Summarize: [filename]"
-        * Summarize files: for each Summarize task, read the diff, understand the changes, write the technical summary, and mark the task complete
+        * Track file summaries: **FIRST**: reuse the changed-file list above. **THEN**: for each code file (skip docs and generated files), note a "Summarize: [filename]" item
+        * Summarize files: for each file to summarize, read the diff, understand the changes, and write the technical summary
         * Format and return: compile the summaries into the Files section format and return the result
 
         ## Instructions
@@ -59,19 +59,16 @@
            * Note if it already has a Files section with summaries
            * If Files section exists and seems complete, ask if you should update it
 
-        3. Create file tasks:
+        3. Set up file tracking:
             * **FIRST**: Get overview of changes from the changed-file list above
-            * **THEN**: For **EACH** code file (excluding project docs and generated files like *.pb.go):
-              * Create `${scope.harness.tools.taskCreate}` with subject "Summarize: [filename]"
-             * Description: "Read diff, understand purpose, write 1-2 sentence technical summary"
+            * **THEN**: For **EACH** code file (excluding project docs and generated files like *.pb.go), note a "Summarize: [filename]" item to track
+              * Purpose: read the diff, understand the purpose, write a 1-2 sentence technical summary
 
-        4. Summarize files - For **EACH** Summarize task:
-           * Mark task in-progress
+        4. Summarize files - For **EACH** file to summarize:
            * Check code diff for each file
            * If needed for context, read the full file or surrounding files
            * Understand both what the file does and what changes were made
            * Create a concise technical summary
-           * Mark task complete before moving to next file
 
         6. Format and return:
            * Compile all summaries using this structure:

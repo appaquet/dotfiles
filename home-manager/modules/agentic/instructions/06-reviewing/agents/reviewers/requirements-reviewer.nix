@@ -36,8 +36,7 @@
 
         If no project doc exists, report "No project requirements found" and skip review.
 
-        * For EACH requirement (R1, R2, etc.), create a task with `${scope.harness.tools.taskCreate}`
-          * Make sure that each requirement is checked against guidelines
+        * For EACH requirement (R1, R2, etc.), check it against the guidelines and note whether it is met, partially met, or missing
 
         * Cross-check completeness
           * Verify each completed phase task (`[x]`) in phase docs has corresponding implementation

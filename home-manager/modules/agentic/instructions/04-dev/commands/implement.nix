@@ -28,9 +28,8 @@
            * Clarify if task contradicts or overlaps
 
         3. 🔳 Load tasks from project/phase docs
-           * For each task, create 1..n `${scope.harness.tools.taskCreate}`
-             * Segment for better tracking
-           * Create validation tasks using ${scope.blocks.testing-principles.reference}, grouping related checks. Verification is not a reviewer pass.
+           * For each task in the plan, set it up for tracking and segment for greater clarity
+           * Add validation checks using ${scope.blocks.testing-principles.reference}, grouping related checks. Verification is not a reviewer pass.
            * If user validation needed, task description should be clear about waiting for user input
            * If in orchestrator mode, decide whether each task can be delegated, make the task
              description clear and select the dev agent using ${

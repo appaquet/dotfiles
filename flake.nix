@@ -13,7 +13,7 @@
 
     nixantic = {
       url = "github:appaquet/nixantic";
-      #url = "path:/home/appaquet/dotfiles/.workspaces/nixantic-codex/nixantic";
+      #url = "path:/home/appaquet/dotfiles/.workspaces/disable-todos/nixantic";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-parts.follows = "flake-parts";
       inputs.home-manager.follows = "home-manager";

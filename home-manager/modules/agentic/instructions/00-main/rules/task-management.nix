@@ -11,17 +11,18 @@
 
   nixantic.sources.main.blocks."task-management" =
     { scope }:
+    let
+      body = ''
+        Track every 🔳-annotated instruction step as you work through it, to avoid deviating from plan/goal. Where a task tool is available, use it; otherwise keep the steps in-context.
+          * One or more tasks per 🔳 step where a task tool is available (1:n; break a complex step into multiple tasks, never group multiple 🔳 steps into one). Don't skip a step just because it looks trivial.
+          * Mark each in-progress/completed as you go; before moving on, check the remaining pending steps so none are forgotten, and mark a step done only when it is fully done.
+      '';
+      recall = ''
+        Follow task management: track each 🔳 annotated instruction (a task tool where available, else in-context) and keep its status as you go. No step is trivial enough to skip.
+      '';
+    in
     {
-      content = ''
-        ALWAYS use the task tool (`${scope.harness.tools.taskCreate}`) to create tasks for any instruction step that has a 🔳 annotation, before executing any of the instructions to avoid deviating from plan/goal
-          * Create one or more tasks per 🔳 step, 1:n mapping using the `${scope.harness.tools.taskCreate}` tool. If you think a step is too complex, break it down into multiple tasks. But never group multiple 🔳 steps into a single task.
-          * NEVER skip task creation because of triviality.
-          * If tool unavailable, just mention tasks out loud and mention them as you complete them.
-          * Mark them in-progress/completed as you proceed. Always check all pending tasks in case we forgot to mark them. Never mark complete before done.
-      '';
-
-      preFlightRecall = ''
-        Follow task management, create tasks for each 🔳 annotated instructions, follow guidelines status tracking. No task trivial enough.
-      '';
+      content = body;
+      preFlightRecall = recall;
     };
 }
