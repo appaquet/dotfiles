@@ -316,8 +316,3 @@ require("todo-comments").setup({
 		},
 	},
 })
-
--- markdown rendering
-require("render-markdown").setup({
-	file_types = { "markdown" },
-})

@@ -152,7 +152,6 @@ in
             neotest-python
             rustaceanvim
             conform-nvim # formatting
-            render-markdown-nvim
             nvim-lint # linting
 
             # Completion popup
