@@ -84,7 +84,6 @@ in
           zen-mode-nvim
           mini-nvim # tabline, bufremove, etc.
           lualine-nvim # https://github.com/nvim-lualine/lualine.nvim
-          nvim-navic # symbol breadcrumbs in statusline
 
           # Tools
           fzf-lua
