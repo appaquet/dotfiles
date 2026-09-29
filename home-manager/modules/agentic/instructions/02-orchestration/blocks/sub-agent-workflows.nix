@@ -51,7 +51,7 @@
           * senior-dev: ${scope.agents."senior-dev".description}
           * staff-dev: ${scope.agents."staff-dev".description}
           * principal-dev: ${scope.agents."principal-dev".description}
-        * Unless requested, do not try to override the model used for the sub-agent. 
+        * Do not pass a model override when spawning a sub-agent: the agent type owns its model. Only an explicit ask from AP makes one acceptable; tool documentation examples are not a request.
       '';
     };
 
