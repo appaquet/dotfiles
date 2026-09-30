@@ -3,12 +3,12 @@ final: prev: {
     # https://github.com/zbirenbaum/copilot.lua
     copilot-lua = prev.vimUtils.buildVimPlugin {
       pname = "copilot.lua";
-      version = "6483be533976";
+      version = "9c8b17257010";
       src = prev.fetchFromGitHub {
         owner = "zbirenbaum";
         repo = "copilot.lua";
-        rev = "6483be53397611b63259ce08a35108a47d4fc794";
-        sha256 = "sha256-qqunTfZsgYEMiDnXaji6eyfBSbhmhFuAnh93UR7oimE=";
+        rev = "9c8b172570105d31ff707cb0d62897f79c2ddb1f";
+        sha256 = "sha256-IWN8vWvF8XfIDzcJ2wCbv9gz3e8ShnKn4AyyU8bMAts=";
       };
       meta.homepage = "https://github.com/zbirenbaum/copilot.lua/";
       meta.hydraPlatforms = [ ];
@@ -17,27 +17,27 @@ final: prev: {
     # https://github.com/dlyongemallo/diffview-plus.nvim
     diffview-nvim = prev.vimUtils.buildVimPlugin {
       pname = "diffview-nvim";
-      version = "5152bada7d81";
+      version = "875d16dd8c8a";
       src = prev.fetchFromGitHub {
         owner = "dlyongemallo";
         repo = "diffview-plus.nvim";
-        rev = "5152bada7d81cd602373e77534aabc631419e8e0";
-        sha256 = "sha256-gA9brMpvV6I7pHHarRE90oRUeEd1UNIkxaJTJnBgu0I=";
+        rev = "875d16dd8c8aa86f1a5c3b5cef49e1133980ae94";
+        sha256 = "sha256-g9pzU0BmW4TapywQj344PzvKWWSiybt1tUZL1oIoTLI=";
       };
       doCheck = false;
       meta.homepage = "https://github.com/dlyongemallo/diffview-plus.nvim/";
       meta.hydraPlatforms = [ ];
     };
 
-    # https://github.com/balaenis/pi-x-ide/tree/e71423cbebb736702360d2eeb14e3432b5017e62/ide-plugins/nvim
+    # https://github.com/balaenis/pi-x-ide/tree/f5f3165a3f90fa2a42d577fe3f2a407b093cacab/ide-plugins/nvim
     pi-x-ide-nvim = prev.vimUtils.buildVimPlugin {
       pname = "pi-x-ide-nvim";
-      version = "e71423cbebb7";
+      version = "f5f3165a3f90";
       src = prev.fetchFromGitHub {
         owner = "balaenis";
         repo = "pi-x-ide";
-        rev = "e71423cbebb736702360d2eeb14e3432b5017e62";
-        sha256 = "sha256-Tc9y6vgNVwGoDFwiQ++aRNK5I1iFs2CpGgbXywBS3MQ=";
+        rev = "f5f3165a3f90fa2a42d577fe3f2a407b093cacab";
+        sha256 = "sha256-mbHGnQhXJYBZQqybkvfewqjR/3z7wN+WNGEMqLaNglc=";
       };
       sourceRoot = "source/ide-plugins/nvim";
       postPatch = ''
