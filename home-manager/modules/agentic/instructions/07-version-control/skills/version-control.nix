@@ -93,7 +93,7 @@
 
           Every agent change description is a semantic commit message (conventional commits): the `private: agent: ` prefix, then `<type>(<area>): <short imperative>`, e.g. `private: agent: feat(instr): add jj workspace rule`, `private: agent: fix(pi): bump mcp adapter`, `private: agent: chore(deps): bump flake lock`. Format follows the Conventional Commits spec (https://www.conventionalcommits.org/).
 
-          * `<type>` is the conventional commit type: `build`, `chore`, `docs`, `feat`, `fix`, `perf`, `refact`
+          * `<type>` is the conventional commit type: `build`, `chore`, `docs`, `feat`, `fix`, `perf`, `refactor`
           * `<area>` is the conventional scope: a lowercase tag for the subsystem the change touches. Check jj log for examples. Optional per the format, but include it when the change maps to one clear area.
           * Keep the description imperative and near 10 words
           * The `private: agent: ` prefix is what keeps the change unpushed (`private()`) and selectable (`agent()`); never drop it. This applies to every agent change, scratch and final
