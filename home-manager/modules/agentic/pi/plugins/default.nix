@@ -39,12 +39,12 @@ let
 
     # https://github.com/Quartermaster-Labs/pi-on-demand-context
     {
-      package = "npm:@quartermaster-labs/pi-on-demand-context@0.3.1";
+      package = "npm:@quartermaster-labs/pi-on-demand-context@0.3.2";
     }
 
     # https://github.com/YuGiMob/pi-hashline-edit-pro
     {
-      package = "npm:pi-hashline-edit-pro@4.3.5";
+      package = "npm:pi-hashline-edit-pro@4.4.3";
     }
 
     # https://github.com/tintinweb/pi-subagents
@@ -83,7 +83,7 @@ let
 
     # https://github.com/juicesharp/rpiv-mono
     {
-      package = "npm:@juicesharp/rpiv-ask-user-question@2.10.1";
+      package = "npm:@juicesharp/rpiv-ask-user-question@2.11.0";
     }
 
     # https://github.com/nicobailon/pi-web-access
@@ -101,7 +101,7 @@ let
 
     # https://github.com/balaenis/pi-x-ide
     {
-      package = "npm:pi-x-ide@1.20.0";
+      package = "npm:pi-x-ide@1.20.1";
       environment = {
         PI_X_IDE_AUTO_INSTALL.value = "0";
       };
@@ -122,7 +122,7 @@ let
 
     # https://github.com/nicobailon/pi-powerline-footer
     {
-      package = "npm:pi-powerline-footer@0.17.1";
+      package = "npm:pi-powerline-footer@0.18.0";
       environment = {
         POWERLINE_NERD_FONTS.value = "1";
       };
