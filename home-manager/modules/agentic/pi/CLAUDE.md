@@ -13,14 +13,6 @@ Local Pi tests live beside their source under `plugins/*.test.ts` or `lib/*.test
 
 `bash-timeout.test.ts` is the lone `node:test` file.
 
-## Core MCP configuration
-
-`mcp.nix` owns the global `~/.pi/agent/mcp.json`; it is core configuration, not plugin data. Keep global server definitions, enablement, and exposure declarative. Native `/mcp` can inspect and reconnect servers, but its persistent configuration edits and `pi mcp add/remove` cannot write the Home Manager store symlink. Trusted projects can override servers by name in their own `.pi/mcp.json`.
-
-Chrome uses native `codemode` exposure, which activates codemode when the server connects without hiding ordinary tools. Discover tools with `searchTools()`/`describeTool()` and call `tools.mcp__chrome__<tool>()` in codemode scripts. MCP calls return `CallToolResult` (`content`, optional `structuredContent`, `isError`); use `text()` or `image()` to return selected output. Do not use adapter `mcp`/`mcpScript` gateway APIs.
-
-After changing configured packages, activate Home Manager and start a fresh Pi process so the wrapper remerges settings. `/reload` refreshes resources and MCP configuration but does not rerun that wrapper merge. Unlisted npm packages are not loaded, even if cached install files remain.
-
 ## Extension loading and Home Manager wiring
 
 - `plugins/default.nix` `files` entries install into the live agent dir `~/.pi/agent/` after `./x home build` + switch. Extension global config/state files live in the owning plugin's `files` attr there, not in the top-level `default.nix`.
