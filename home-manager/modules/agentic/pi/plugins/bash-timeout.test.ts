@@ -3,7 +3,7 @@ import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 import { test, beforeEach, afterEach } from "node:test";
-import {
+import bashTimeout, {
   CONFIG_FILE_NAME,
   FALLBACK_CONFIG,
   loadTimeoutConfig,
@@ -224,4 +224,61 @@ test("policy: custom config uses its own default and ceiling", () => {
     action: "block",
     reason: "Bash timeout 601s exceeds the 600s ceiling. Reduce to at most 600 seconds.",
   });
+});
+
+test("factory: nested bash calls use configured defaults, preserve valid limits, and block excess", () => {
+  writeConfig({ defaultTimeoutSeconds: 45, maxTimeoutSeconds: 90 });
+  const previous = process.env.PI_CODING_AGENT_DIR;
+  process.env.PI_CODING_AGENT_DIR = agentDir;
+  try {
+    let handler: (event: any) => unknown = () => {
+      throw new Error("tool_call handler was not registered");
+    };
+    bashTimeout({
+      on: (event: string, callback: typeof handler) => {
+        assert.equal(event, "tool_call");
+        handler = callback;
+      },
+    } as never);
+    const omitted = { command: "echo fixture" };
+    assert.equal(
+      handler({
+        toolName: "bash",
+        input: omitted,
+        toolCallId: "child",
+        parentToolCallId: "parent",
+      }),
+      undefined,
+    );
+    assert.deepEqual(omitted, { command: "echo fixture", timeout: 45 });
+    const valid = { command: "echo fixture", timeout: 90 };
+    assert.equal(
+      handler({
+        toolName: "bash",
+        input: valid,
+        toolCallId: "child",
+        parentToolCallId: "parent",
+      }),
+      undefined,
+    );
+    assert.deepEqual(valid, { command: "echo fixture", timeout: 90 });
+    const excessive = { command: "echo fixture", timeout: 91 };
+    assert.deepEqual(
+      handler({
+        toolName: "bash",
+        input: excessive,
+        toolCallId: "child",
+        parentToolCallId: "parent",
+      }),
+      {
+        block: true,
+        reason:
+          "Bash timeout 91s exceeds the 90s ceiling. Reduce to at most 90 seconds.",
+      },
+    );
+    assert.deepEqual(excessive, { command: "echo fixture", timeout: 91 });
+  } finally {
+    if (previous === undefined) delete process.env.PI_CODING_AGENT_DIR;
+    else process.env.PI_CODING_AGENT_DIR = previous;
+  }
 });

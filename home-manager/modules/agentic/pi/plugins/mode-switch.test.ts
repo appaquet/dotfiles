@@ -359,6 +359,7 @@ type Harness = {
   toolCall: (event: unknown) => unknown;
   toolResult: (event: unknown) => unknown;
   agentStart: () => unknown;
+  agentEnd: () => void;
 };
 
 function createHarness(options: {
@@ -426,6 +427,7 @@ function createHarness(options: {
     agentStart: () => {
       throw new Error("before_agent_start handler was not registered");
     },
+    agentEnd: () => {},
   };
   const ctx = harness.ctx;
   (ctx as any).__selectorCalls = harness.selectorCalls;
@@ -436,6 +438,7 @@ function createHarness(options: {
   let toolCall: ((event: unknown, ctx: unknown) => unknown) | undefined;
   let toolResult: ((event: unknown, ctx: unknown) => unknown) | undefined;
   let beforeAgentStart: ((event: unknown, ctx: unknown) => unknown) | undefined;
+  let agentEnd: ((event: unknown, ctx: unknown) => unknown) | undefined;
   const pi = {
     on: (event: string, handler: (event: unknown, ctx: unknown) => unknown) => {
       switch (event) {
@@ -456,6 +459,9 @@ function createHarness(options: {
           break;
         case "before_agent_start":
           beforeAgentStart = handler;
+          break;
+        case "agent_end":
+          agentEnd = handler;
           break;
         default:
           throw new Error(`unexpected event registration: ${event}`);
@@ -548,6 +554,10 @@ function createHarness(options: {
     if (!beforeAgentStart)
       throw new Error("before_agent_start handler was not registered");
     return beforeAgentStart({}, ctx);
+  };
+  harness.agentEnd = () => {
+    if (!agentEnd) throw new Error("agent_end handler was not registered");
+    agentEnd({}, ctx);
   };
   return harness;
 }
@@ -1505,8 +1515,186 @@ test("factory: soft policy appends the reminder to the first and tenth non-md re
     ],
   });
   for (let i = 0; i < 8; i++) expect(result([])).toBeUndefined();
-  expect(result([])).toEqual({ content: [{ type: "text", text: REMINDER_TEXT }] });
+  expect(result([])).toEqual({
+    content: [{ type: "text", text: REMINDER_TEXT }],
+  });
   expect(result([])).toBeUndefined();
+});
+
+test("factory: nested soft reminders reach only the visible parent result", async () => {
+  const h = createHarness({ policy: "soft" });
+  h.startSession();
+  await h.shortcut("orchestrator");
+  const child = {
+    ...POLICY_READ,
+    toolCallId: "child",
+    parentToolCallId: "parent",
+    content: [{ type: "text", text: "file body" }],
+    isError: false,
+  };
+  expect(h.toolResult(child)).toBeUndefined();
+  expect(child.content).toEqual([{ type: "text", text: "file body" }]);
+  const parent = {
+    toolName: "codemode",
+    toolCallId: "parent",
+    content: [{ type: "text", text: "script output" }],
+    isError: true,
+  };
+  expect(h.toolResult(parent)).toEqual({
+    content: [...parent.content, { type: "text", text: REMINDER_TEXT }],
+  });
+  expect(parent.isError).toBe(true);
+  expect(h.toolResult(parent)).toBeUndefined();
+});
+
+test("factory: sibling reminders coalesce while distinct parents remain independent", async () => {
+  const h = createHarness({ policy: "soft" });
+  h.startSession();
+  await h.shortcut("orchestrator");
+  for (let i = 1; i <= 20; i++) {
+    expect(
+      h.toolResult({
+        ...POLICY_READ,
+        toolCallId: `child-${i}`,
+        parentToolCallId: i <= 10 ? "first" : "second",
+        content: [],
+        isError: false,
+      }),
+    ).toBeUndefined();
+  }
+  for (const toolCallId of ["first", "second"]) {
+    expect(
+      h.toolResult({ toolName: "codemode", toolCallId, content: [] }),
+    ).toEqual({
+      content: [{ type: "text", text: REMINDER_TEXT }],
+    });
+  }
+});
+
+test("factory: soft reminders follow explicit parents through multiple levels", async () => {
+  const h = createHarness({ policy: "soft" });
+  h.startSession();
+  await h.shortcut("orchestrator");
+  expect(
+    h.toolResult({
+      ...POLICY_READ,
+      toolCallId: "leaf",
+      parentToolCallId: "middle",
+      content: [],
+      isError: false,
+    }),
+  ).toBeUndefined();
+  expect(
+    h.toolResult({
+      toolName: "custom",
+      toolCallId: "middle",
+      parentToolCallId: "root",
+      content: [],
+    }),
+  ).toBeUndefined();
+  expect(
+    h.toolResult({ toolName: "custom", toolCallId: "root", content: [] }),
+  ).toEqual({
+    content: [{ type: "text", text: REMINDER_TEXT }],
+  });
+});
+
+test("factory: ignored nested results do not consume soft reminder cadence", async () => {
+  const h = createHarness({ policy: "soft" });
+  h.startSession();
+  await h.shortcut("orchestrator");
+  for (const overrides of [
+    { isError: true },
+    { input: { path: "notes.md" } },
+    { content: "malformed" },
+  ]) {
+    expect(
+      h.toolResult({
+        ...POLICY_READ,
+        toolCallId: "ignored",
+        parentToolCallId: "parent",
+        content: [],
+        isError: false,
+        ...overrides,
+      }),
+    ).toBeUndefined();
+  }
+  expect(
+    h.toolResult({ toolName: "codemode", toolCallId: "parent", content: [] }),
+  ).toBeUndefined();
+  expect(h.toolResult({ ...POLICY_READ, content: [], isError: false })).toEqual(
+    {
+      content: [{ type: "text", text: REMINDER_TEXT }],
+    },
+  );
+});
+
+test("factory: lifecycle resets discard pending nested reminders", async () => {
+  for (const reset of ["mode", "session", "compact", "agent-end"] as const) {
+    const h = createHarness({ policy: "soft" });
+    h.startSession();
+    await h.shortcut("orchestrator");
+    h.toolResult({
+      ...POLICY_READ,
+      toolCallId: "child",
+      parentToolCallId: "parent",
+      content: [],
+      isError: false,
+    });
+    if (reset === "mode") {
+      await h.shortcut("builder");
+      await h.shortcut("orchestrator");
+    } else if (reset === "session") {
+      h.entries = [
+        {
+          type: "custom",
+          customType: "mode-switch",
+          data: { mode: "orchestrator" },
+        },
+      ];
+      h.startSession("resume");
+    } else if (reset === "compact") h.compact();
+    else h.agentEnd();
+    expect(
+      h.toolResult({ toolName: "codemode", toolCallId: "parent", content: [] }),
+    ).toBeUndefined();
+    const direct = h.toolResult({
+      ...POLICY_READ,
+      content: [],
+      isError: false,
+    });
+    expect(direct).toEqual(
+      reset === "agent-end"
+        ? undefined
+        : {
+            content: [{ type: "text", text: REMINDER_TEXT }],
+          },
+    );
+  }
+});
+
+test("factory: hard policy still blocks nested file calls", async () => {
+  const h = createHarness({ policy: "hard" });
+  h.startSession();
+  await h.shortcut("orchestrator");
+  for (const toolName of ["read", "write", "edit"]) {
+    expect(
+      h.toolCall({
+        toolName,
+        input: { path: "src/app.ts" },
+        toolCallId: "child",
+        parentToolCallId: "parent",
+      }),
+    ).toEqual({ block: true, reason: REMINDER_TEXT });
+    expect(
+      h.toolCall({
+        toolName,
+        input: { path: "notes.md" },
+        toolCallId: "child",
+        parentToolCallId: "parent",
+      }),
+    ).toBeUndefined();
+  }
 });
 
 test("factory: soft policy leaves md, failed, unrelated and builder results untouched", async () => {

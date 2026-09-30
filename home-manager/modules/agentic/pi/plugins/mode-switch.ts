@@ -262,6 +262,7 @@ export default function modeSwitch(pi: ExtensionAPI): void {
   let turns = 0;
   // Non-markdown file touches since entering the mode, for the soft cadence.
   let touches = 0;
+  const pendingReminderCalls = new Set<string>();
   let remindOnNextTurn = false;
   const reminderInterval = readReminderInterval();
   const policyEnv = process.env.PI_ORCHESTRATOR_POLICY;
@@ -302,6 +303,7 @@ export default function modeSwitch(pi: ExtensionAPI): void {
     mode = target;
     turns = 0;
     touches = 0;
+    pendingReminderCalls.clear();
     remindOnNextTurn = true;
     pi.appendEntry("mode-switch", { mode });
     pi.events.emit("mode-switch:changed", { mode });
@@ -363,6 +365,7 @@ export default function modeSwitch(pi: ExtensionAPI): void {
     // active mode from the (possibly new or summarized) context.
     turns = 0;
     touches = 0;
+    pendingReminderCalls.clear();
     remindOnNextTurn = true;
     publishLabel(ctx);
   }
@@ -406,8 +409,11 @@ export default function modeSwitch(pi: ExtensionAPI): void {
     // context no longer contains the mode instruction.
     turns = 0;
     touches = 0;
+    pendingReminderCalls.clear();
     remindOnNextTurn = true;
   });
+
+  pi.on("agent_end", () => pendingReminderCalls.clear());
 
   pi.on("tool_call", (event) => {
     try {
@@ -421,15 +427,22 @@ export default function modeSwitch(pi: ExtensionAPI): void {
 
   pi.on("tool_result", (event) => {
     try {
-      if (!shouldNudge(mode, orchestratorPolicy, event as ToolResultEvent))
+      let due = pendingReminderCalls.delete(event.toolCallId);
+      if (
+        shouldNudge(mode, orchestratorPolicy, event as ToolResultEvent) &&
+        Array.isArray(event.content)
+      ) {
+        touches += 1;
+        due = shouldNudgeOnTouch(touches, reminderInterval) || due;
+      }
+      if (!due) return undefined;
+
+      // Nested results reach scripts, not necessarily the model-visible output.
+      if (event.parentToolCallId) {
+        pendingReminderCalls.add(event.parentToolCallId);
         return undefined;
-      // A tool reporting a non-array result cannot carry the reminder; skip it
-      // before the touch counter moves so the cadence cannot drift.
+      }
       if (!Array.isArray(event.content)) return undefined;
-
-      touches += 1;
-      if (!shouldNudgeOnTouch(touches, reminderInterval)) return undefined;
-
       return {
         content: [...event.content, { type: "text", text: REMINDER }],
       };
