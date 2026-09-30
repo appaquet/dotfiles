@@ -99,26 +99,6 @@ let
       };
     }
 
-    # https://github.com/nicobailon/pi-mcp-adapter
-    {
-      package = "npm:pi-mcp-adapter@2.34.0";
-      files = {
-        ".pi/agent/mcp.json".text = builtins.toJSON {
-          scriptMode = false;
-          settings.mcpFooterStatus = "off";
-          mcpServers.chrome = {
-            command = "mcp-npx";
-            args = [
-              "-y"
-              "chrome-devtools-mcp@latest"
-              "--browser-url=http://127.0.0.1:9222"
-              "--experimentalPageIdRouting"
-            ];
-          };
-        };
-      };
-    }
-
     # https://github.com/balaenis/pi-x-ide
     {
       package = "npm:pi-x-ide@1.20.0";

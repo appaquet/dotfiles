@@ -11,6 +11,7 @@ in
   imports = [
     ./module.nix
     ./models.nix
+    ./mcp.nix
     ./plugins
   ];
 
