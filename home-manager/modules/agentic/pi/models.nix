@@ -161,7 +161,7 @@ in
 
       codex = {
         main = {
-          model = "openai-codex/gpt-5.6-sol";
+          model = "openai-codex/gpt-6.1-sol";
           thinking = "medium";
         };
         remap = {
@@ -170,19 +170,19 @@ in
             thinking = "low";
           };
           "scoped/summary" = {
-            model = "openai-codex/gpt-5.6-luna";
+            model = "openai-codex/gpt-6-luna";
             thinking = "high";
           };
           "scoped/mid" = {
-            model = "openai-codex/gpt-5.6-luna";
+            model = "openai-codex/gpt-6-luna";
             thinking = "high";
           };
           "scoped/senior" = {
-            model = "openai-codex/gpt-5.6-sol";
+            model = "openai-codex/gpt-6.1-sol";
             thinking = "medium";
           };
           "scoped/staff" = {
-            model = "openai-codex/gpt-5.6-sol";
+            model = "openai-codex/gpt-6.1-sol";
             thinking = "high";
           };
           "scoped/principal" = {
@@ -190,7 +190,7 @@ in
             thinking = "medium";
           };
           "scoped/reviewer" = {
-            model = "openai-codex/gpt-5.6-sol";
+            model = "openai-codex/gpt-6.1-sol";
             thinking = "low";
           };
         };
@@ -198,7 +198,7 @@ in
 
       codex-high = {
         main = {
-          model = "openai-codex/gpt-5.6-sol";
+          model = "openai-codex/gpt-6.1-sol";
           thinking = "high";
         };
         remap = {
@@ -207,15 +207,15 @@ in
             thinking = "low";
           };
           "scoped/summary" = {
-            model = "openai-codex/gpt-5.6-luna";
+            model = "openai-codex/gpt-6-luna";
             thinking = "high";
           };
           "scoped/mid" = {
-            model = "openai-codex/gpt-5.6-sol";
+            model = "openai-codex/gpt-6.1-sol";
             thinking = "medium";
           };
           "scoped/senior" = {
-            model = "openai-codex/gpt-5.6-sol";
+            model = "openai-codex/gpt-6.1-sol";
             thinking = "xhigh";
           };
           "scoped/staff" = {
