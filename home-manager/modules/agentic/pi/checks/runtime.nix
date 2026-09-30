@@ -61,6 +61,9 @@ let
     jq -s -e '
       any(.[].data.commands[]?; .name == "smoke-probe")
     ' "$HOME/response.jsonl"
+
+    timeout 60 ${pkgs.nodejs}/bin/node ${./native-mcp-smoke.mjs} \
+      ${selectedPi}/lib/node_modules/@earendil-works/pi-coding-agent ${../.}
     touch "$out"
   '';
 
