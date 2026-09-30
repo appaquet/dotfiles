@@ -300,7 +300,6 @@ vim.g.rustaceanvim = {
 			["rust-analyzer"] = {},
 		},
 	},
-	dap = {},
 }
 
 -- highlight todo, fixme, etc

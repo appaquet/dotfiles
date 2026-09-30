@@ -156,8 +156,6 @@ vim.keymap.set("n", "<leader>fli", fzf.lsp_implementations, { desc = "FZF: LSP t
 vim.keymap.set("n", "<leader>flm", fzf.lsp_document_diagnostics, { desc = "FZF: LSP document diagnostics" })
 vim.keymap.set("n", "<leader>flM", fzf.lsp_workspace_diagnostics, { desc = "FZF: LSP workspace diagnostics" })
 
-vim.keymap.set("n", "<leader>fdb", fzf.dap_breakpoints, { desc = "FZF: DAP breakpoints" })
-
 vim.keymap.set({ "n", "v", "i" }, "<C-x><C-f>", function()
 	require("fzf-lua").complete_path()
 end, { silent = true, desc = "FZF: Fuzzy complete path" })

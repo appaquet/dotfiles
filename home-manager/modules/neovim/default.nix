@@ -161,13 +161,6 @@ in
             codecompanion-nvim
             claudecode-nvim
             pi-x-ide-nvim
-
-            # Debugging
-            nvim-dap
-            nvim-dap-ui
-            nvim-dap-go
-            nvim-dap-python
-            nvim-dap-virtual-text
           ]
         ));
 
@@ -206,7 +199,6 @@ in
             (includeLuaFile "agentic.lua")
 
             (includeLuaFile "testing.lua")
-            (includeLuaFile "debugging.lua")
 
             (includeLuaFile "exomind.lua")
           ])

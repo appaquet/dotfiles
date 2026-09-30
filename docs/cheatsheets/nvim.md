@@ -68,7 +68,6 @@ keymaps, but also default/built-ins that I tend to forget.
 * `<leader>flm` Fuzzy find through LSP document diagnostics
 * `<leader>flM` Fuzzy find through LSP workspace diagnostics
 * `<leader>fi` Scope next picker to a folder (auto-clears after 5s or use)
-* `<leader>fdb` Fuzzy find through DAP breakpoints
 * `<leader>fw` Grep word under cursor in workspace
 * `<leader>fW` Grep WORD under cursor in workspace
 * `<leader>fk` Fuzzy find through keymaps
@@ -256,13 +255,9 @@ keymaps, but also default/built-ins that I tend to forget.
 ## Testing (t)
 
 * `<leader>tc` Run nearest test / under cursor
-* `<leader>tdc` Debug nearest test
 * `<leader>tf` Run file tests
-* `<leader>tdf` Debug file tests
 * `<leader>tp` Run package/directory tests
-* `<leader>tdp` Debug package/directory tests
 * `<leader>tl` Run last test
-* `<leader>tdl` Debug last test
 * `<leader>tu` Stop test
 * `<leader>to` Show output pane
 * `<leader>tq` Close output & side panel
@@ -271,27 +266,6 @@ keymaps, but also default/built-ins that I tend to forget.
   * `u` Stop a test
   * `i` Open test source
   * `?` Show help
-
-## Debugging (d)
-
-* `<leader>db` Toggle breakpoint
-* `<leader>dc` Start/continue debugging
-* `<leader>do` Step over
-* `<leader>dI` Step into
-* `<leader>dO` Step out
-* `<leader>dj` Move down in stack trace
-* `<leader>dk` Move up in stack trace
-* `<leader>dp` Pause execution
-* `<leader>dt` Terminate debugging session
-* `<leader>dr` Restart debugging session
-* `<leader>de` Toggle REPL
-* `<leader>dl` Run last
-* `<leader>dC` Run to cursor
-* `<leader>du` Open DAP UI
-* `<leader>dq` Terminate & quit DAP UI
-* In stack frames:
-  * `o` Open current stack frame
-  * `t` Toggle hidden stack frames
 
 ## LSP Completion (Insert Mode)
 

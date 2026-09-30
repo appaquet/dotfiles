@@ -85,22 +85,10 @@ local function run_nearest()
 	Neotest.run.run()
 end
 
-local function debug_nearest()
-	Neotest.summary.close() -- it gets in the way
-	require("dapui").open()
-	Neotest.run.run({ strategy = "dap" })
-end
-
 local function run_file()
 	summary_was_opened = is_summary_opened()
 	Neotest.summary.open()
 	Neotest.run.run(vim.fn.expand("%"))
-end
-
-local function debug_file()
-	Neotest.summary.close() -- it gets in the way
-	require("dapui").open()
-	Neotest.run.run({ vim.fn.expand("%"), strategy = "dap" })
 end
 
 local function run_dir()
@@ -110,23 +98,10 @@ local function run_dir()
 	Neotest.run.run(dir)
 end
 
-local function debug_dir()
-	Neotest.summary.close() -- it gets in the way
-	require("dapui").open()
-	local dir = vim.fn.expand("%:p:h")
-	Neotest.run.run({ dir, strategy = "dap" })
-end
-
 local function run_last()
 	summary_was_opened = is_summary_opened()
 	Neotest.summary.open()
 	Neotest.run.run_last()
-end
-
-local function debug_last()
-	Neotest.summary.close() -- it gets in the way
-	require("dapui").open()
-	Neotest.run.run_last({ strategy = "dap" })
 end
 
 local function open_output()
@@ -146,13 +121,9 @@ local function close()
 end
 
 vim.keymap.set("n", "<leader>tc", run_nearest, { desc = "Test: Run nearest / under cursor" })
-vim.keymap.set("n", "<leader>tdc", debug_nearest, { desc = "Test: Debug nearest" })
 vim.keymap.set("n", "<leader>tf", run_file, { desc = "Test: Run file" })
-vim.keymap.set("n", "<leader>tdf", debug_file, { desc = "Test: Debug file" })
 vim.keymap.set("n", "<leader>tp", run_dir, { desc = "Test: Run package/dir" })
-vim.keymap.set("n", "<leader>tdp", debug_dir, { desc = "Test: Debug package/dir" })
 vim.keymap.set("n", "<leader>tl", run_last, { desc = "Test: Run last" })
-vim.keymap.set("n", "<leader>tdl", debug_last, { desc = "Test: Debug last" })
 
 vim.keymap.set("n", "<leader>tu", stop_test, { desc = "Test: Stop" })
 vim.keymap.set("n", "<leader>ts", toggle_summary, { desc = "Test: Toggle summary / side panel" })
