@@ -26,7 +26,6 @@ let
     "implement-orchestrator"
     "introspect"
     "jj-resolve-conflicts"
-    "mem-edit"
     "proceed"
     "proj-load"
     "proj-plan"
