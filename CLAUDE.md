@@ -40,8 +40,8 @@ separate external repo (`github:appaquet/nixantic`) consumed as a flake input. F
 what, the nixantic change workflow (clone, `path:` override, no-push), and validation: read
 `home-manager/modules/agentic/CLAUDE.md` before editing.
 
-`./nixantic` clones can exist in multiple dotfiles checkouts; identify the canonical one before
-touching it (`home-manager/modules/agentic/CLAUDE.md`, Nixantic section).
+`./nixantic` clones are workspace-relative: work in the clone of the jj workspace you are in
+(`home-manager/modules/agentic/CLAUDE.md`, Nixantic section, for the workflow).
 
 ## Documentation
 

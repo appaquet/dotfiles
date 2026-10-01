@@ -20,11 +20,11 @@ This tree owns all production instruction sources, acceptance checks, and AP run
 `nixantic` (`github:appaquet/nixantic`) is a separate external repo, consumed as a flake input. The dotfiles `flake.nix` has a commented local `path:` override.
 
 To change nixantic:
-1. Run `just nixantic-clone` from the dotfiles root: it clones the repo into the gitignored `./nixantic` dir (jj git colocate, `main` tracking `main@origin`), or fetches the latest if the clone already exists. Don't use an https remote, but git+ssh. Make the changes there, as separate commits in that repo, alongside the dotfiles change.
-2. Switch the dotfiles nixantic input to the `path:` override so dotfiles acts on the unpushed local changes.
+1. Run `just nixantic-clone` from the jj workspace you are working in (or from the dotfiles root if you are not in one): it creates the gitignored `./nixantic` clone in that checkout (jj git colocate, `main` tracking `main@origin`), or fetches the latest if the clone already exists. Don't use an https remote, but git+ssh. Make the changes there, as separate commits in that clone, alongside the dotfiles change.
+2. Switch the dotfiles nixantic input to the `path:` override pointing at this workspace's `./nixantic` dir, so dotfiles acts on the unpushed local changes.
 3. Never push to the nixantic repo: when a push is required, tell the user and let the user push. After the push, the user removes the `path:` override and updates the input back to `github:appaquet/nixantic` (`nix flake update nixantic`).
 
-`./nixantic` is gitignored and workspace-relative: the dotfiles root and each jj workspace may each hold a separate clone, and `just nixantic-clone` only maintains the root's. Identify which checkout is canonical for the current work before touching a clone (project docs may name one).
+`./nixantic` is gitignored and workspace-relative: the dotfiles root and each jj workspace may each hold a separate clone, maintained independently by `just nixantic-clone`. Work in the clone of the jj workspace you are in (create it if missing); do not reach for a clone in another checkout. If a project doc names a canonical checkout for the current work, that one wins.
 
 Validate the standalone framework with `nix flake check --show-trace` inside a nixantic clone.
 
