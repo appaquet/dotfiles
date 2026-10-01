@@ -98,9 +98,12 @@ require("diffview").setup({
 		},
 	},
 	view = {
-		default = { layout = "diff2_horizontal" },
+		default = { layout = "diff1_inline" },
 		cycle_layouts = { default = { "diff1_inline", "diff2_horizontal" } },
-		inline = { style = "unified" }, -- modes: "unified" (classic +/- lines), "overleaf" (inline strikethrough deletions)
+		inline = {
+			style = "unified", -- modes: "unified" (classic +/- lines), "overleaf" (inline strikethrough deletions)
+			fold_unchanged = true,
+		},
 	},
 })
 
