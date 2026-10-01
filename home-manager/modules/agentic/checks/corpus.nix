@@ -51,7 +51,6 @@ let
   piRules = [
     "development"
     "orchestration"
-    "pi-prompts"
     "pi-questionnaire"
     "pi-workflows"
     "review-comments"
