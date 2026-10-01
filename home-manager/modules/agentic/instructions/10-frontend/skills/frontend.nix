@@ -30,10 +30,14 @@
           * Responsive: resize the viewport to mobile (~375px), tablet (~768px), desktop. Screenshot and check each
           * Affected states render: hover, focus, loading, empty, error. Keyboard focus visible
           * No text overflow or clipping, no unexpected horizontal scroll
+          * Reduced motion: `prefers-reduced-motion` disables or reduces animations when set
 
           ## Pitfalls
           * Screenshot elements for detail, full page for layout context
           * Compare against the captured reference, not memory of it, in the same app state (logged in, data loaded)
+          * Element-scoped and section-scoped selectors can cancel each other on padding/margin between sections (`.cta` vs `.section`): check specificity before assuming a rule applies
+          * Generated-UI tells to check against when the design is free on an axis: uniform border-radius and soft shadow on every card, ALL-CAPS eyebrow labels above headings, `→` appended to link or button text, numbered 01/02/03 markers on non-sequential content, scattered fade-and-slide-up section entrances, cream+terracotta or near-black+acid-green palettes by default
+          * Motion: one orchestrated moment beats scattered effects; motion should answer a user action
 
           ## Out of scope
           * New-UI design (aesthetics), accessibility and performance audits (WCAG, Lighthouse), framework-specific rules
