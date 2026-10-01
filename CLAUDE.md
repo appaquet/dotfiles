@@ -69,3 +69,4 @@ This means:
 - When updating an overlay / fetchFromGithub dependency, set the rev to target (commit, tag, etc.),
   then set hash to `lib.fakeHash`, then build home/nixos. This will fail with the expected hash that
   you can then use. DON'T manually fetch dependencies to compute its hash.
+- `just agent-build` and flake builds of a dirty tree see the jj working copy directly (nix warns "Git tree is dirty"): new files only need a jj snapshot (any jj command) before the build; no `git add` staging is required (nix 2.34)

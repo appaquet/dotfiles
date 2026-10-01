@@ -4,11 +4,11 @@
     main =
       { scope }:
       {
-        description = "Use this skill the moment you are about to run a version-control command (jj), including need to look at repository state: status, log, diffs, commits, branches, merges, rebase intent, etc.";
+        description = "Use this skill the moment you are about to run a version-control command (jj & git), including need to look at repository state: status, log, diffs, commits, branches, merges, rebase intent, etc.";
         content = ''
           # Version Control (Jujutsu)
 
-          We use Jujutsu (`jj`) in colocated Git repositories. The Git checkout is always detached; use `jj` for writes and use `git` only for an unavoidable read-only query.
+          We use Jujutsu (`jj`) in colocated git repositories. The git checkout is always detached; use `jj` for writes and use `git` only for an unavoidable read-only query.
 
           ## Mental model
 
@@ -18,6 +18,9 @@
           * Save the full change ID for a durable handle. A shortest prefix can become ambiguous as the graph grows, and an empty undescribed `@` can be abandoned when you leave it
           * Bookmarks are the branch equivalent; `trunk()` is the main immutable base
           * `jj new`, `jj edit`, and workspace switches replace the tracked working tree. Files absent from the destination disappear from disk until you return
+          * We use colocated repos, git `HEAD` stays detached at `@-` (the working change's parent): the `HEAD` commit never contains working-copy changes, and only `jj commit` moves it
+          * jj keeps the git index roughly in sync but with empty-blob placeholders for new or changed files and stale entries for deleted files, so git index hashes and `git status` views can mislead; `jj status` is the source of truth for file state
+          * Working-copy renames are detected per file at ≥50% content similarity and are not configurable; a move with heavy edits shows as add+delete, and `jj file annotate` does not follow renames
 
           ## Inspect before writing
 
@@ -56,13 +59,14 @@
 
           Template example: `jj log -r <revset> -T 'change_id.shortest() ++ " " ++ description.first_line() ++ "\n"'`. Template output is suitable for display; use full `change_id` when saving a target for later writes.
 
-          Jujutsu is not Git syntax:
+          Jujutsu is not git syntax:
 
           * Use `jj diff --from A --to B`, not `jj diff -r 'A..B'`
           * Use `parents(x)` or known forms such as `@-`, not postfix `x^`
           * Remote bookmarks are `name@remote`, not `remote/name`
           * `jj diff` has no `--check` or `--name-status`; use project checks and `--summary` or `--name-only`
-          * `jj log` has no Git `-S` pickaxe or `-f` follow flag; use path arguments and inspect history with supported revsets
+          * `jj log` has no git `-S` pickaxe or `-f` follow flag: narrow with path arguments (`jj log <paths...>` shows the revisions that modified them); for history across a rename, pass both the old and new paths
+          * jj revsets (`@`, `@-`) are not valid git arguments; when a read-only `git` query needs a revision, take the git hash printed next to each change id in `jj ls` output
 
           After any unknown command, option, revset, template, or fileset error, stop guessing and read version-matched help: `jj help <command>`, `jj <command> --help`, or `jj help -k revsets|templates|filesets|bookmarks|config|glossary`.
 
@@ -75,6 +79,7 @@
           * Move current content into its parent, keeping the parent's message: `jj squash -u [<files...>]`
           * Move current content into its parent and replace the parent's message: `jj squash -m "private: agent: <type>(<area>): description" [<files...>]`
           * Split selected files into the original change: `jj split -m "private: agent: <type>(<area>): description" <files...>`
+          * Path arguments to `jj commit <paths>` and `jj split <paths>` are literal filesets, not rename-aware: pass both the old and new paths to include a rename
 
           For `jj split`, selected files remain in the original change and `-m` describes that selected/original side. Never run bare `jj split`, `-i`, or an unspecified merge tool in an agent shell; they are interactive.
 
@@ -83,11 +88,15 @@
           * Empty `@` -> `jj describe -m "private: agent: <type>(<area>): description"`
           * `@` has content -> `jj new -m "private: agent: <type>(<area>): description"`
 
-          Prefer `jj new <rev>` plus `jj squash -u` over `jj edit <rev>` when modifying an existing change. `jj edit` moves `@` directly to that change, replaces the whole tree, and can abandon the previous empty `@`; use it only when that direct behavior is intended and the target is conflict-free.
-
           `jj restore <paths...>` restores paths in `@` from its parents. `jj restore` without paths restores the whole working-copy change from its parents but keeps the now-empty change and its description. `jj restore -c <rev>` reverses the changes introduced by a revision.
 
-          Create rollback points before implementation, refactoring, or review fixes. At completion, consolidate only `private: agent:` changes created in this session: normally one change for ad-hoc work or one per phase.
+          ## Recipes
+
+          * Move a file path in the working copy: plain `mv <old> <new>` (no jj command exists for this); the next `jj` command snapshots the move
+          * Move file content from one change into another: `jj squash --from <A> --into <B> <paths...>`; an emptied source change is abandoned automatically
+          * Modify an existing change without `jj edit`: `jj new <rev>`, make the change, then `jj squash -u`; use `jj edit <rev>` only when its direct behavior is intended (it replaces the whole working tree and can abandon the previous empty `@`) and the target is conflict-free
+          * Resolve a conflicted revision: in a child created by `jj new <change_id>`, resolve the markers, inspect with `jj diff`, then `jj squash -u`; never `jj edit` the conflicted revision
+          * Rollback and consolidate: create rollback points before implementation, refactoring, or review fixes; at completion, consolidate only `private: agent:` changes created in this session (normally one change for ad-hoc work or one per phase)
 
           ## Semantic commit messages
 
@@ -106,7 +115,7 @@
           * Current branch against the previous stacked bookmark: `jj-diff-branch --git`
           * Current, main, or previous branch name: `jj-current-branch`, `jj-main-branch`, `jj-prev-branch`
 
-          For `gh`, use `$(jj-current-branch)` because Git is detached.
+          For `gh`, use `$(jj-current-branch)` because git is detached.
 
           ## Conflicts
 
@@ -116,7 +125,6 @@
           * Paths conflicted in one revision: `jj resolve --list -r <change_id>`
           * `jj resolve --list` defaults to `@` and exits non-zero with `No conflicts found` when clean; do not put it before required commands in an `&&` chain
           * Plain `jj resolve` invokes a merge tool. Unless a tool is explicitly configured and approved, edit markers manually
-          * Resolve a conflicted revision in a child created by `jj new <change_id>`, inspect the resolution with `jj diff`, then apply it with `jj squash -u`; do not `jj edit` the conflicted revision
 
           For stacked conflicts, use ${scope.commands."jj-resolve-conflicts".reference}.
 
