@@ -21,19 +21,13 @@ let
     "ask"
     "builder"
     "continue"
-    "ctx-check"
     "ctx-improve"
     "ctx-plan"
-    "ctx-usage"
     "implement"
     "introspect"
-    "jj-absorb"
     "jj-resolve-conflicts"
     "mem-edit"
     "orchestrator"
-    "pr-desc"
-    "pr-import-comments"
-    "pr-reply-comments"
     "proceed"
     "proj-load"
     "proj-plan"
@@ -48,13 +42,12 @@ let
     builtins.filter (
       command:
       !(builtins.elem command [
-        "ctx-usage"
         "orchestrator"
         "builder"
       ])
     ) claudeCommands
     ++ [ "show-me" ];
-  piCommands = builtins.filter (command: command != "ctx-usage") claudeCommands;
+  piCommands = claudeCommands;
   claudeRules = [
     "development"
     "orchestration"
@@ -230,22 +223,18 @@ let
         "${instructions.package}/claude/commands/ctx-plan.md" \
         "${instructions.package}/claude/commands/proj-load.md" \
         "${instructions.package}/claude/commands/proj-plan.md" \
-        "${instructions.package}/claude/commands/pr-import-comments.md" \
         "${instructions.package}/claude/agents/branch-diff-summarizer.md" \
         "${instructions.package}/opencode/commands/ctx-plan.md" \
         "${instructions.package}/opencode/commands/proj-load.md" \
         "${instructions.package}/opencode/commands/proj-plan.md" \
-        "${instructions.package}/opencode/commands/pr-import-comments.md" \
         "${instructions.package}/opencode/agents/branch-diff-summarizer.md" \
         "${instructions.package}/opencode/skills/proj-load/SKILL.md" \
         "$pi/prompts/ctx-plan.md" \
         "$pi/prompts/proj-load.md" \
         "$pi/prompts/proj-plan.md" \
-        "$pi/prompts/pr-import-comments.md" \
         "$pi/agents/branch-diff-summarizer.md" \
         "$pi/skills/proj-load/SKILL.md" \
         "$codex/skills/proj-plan/SKILL.md" \
-        "$codex/skills/pr-import-comments/SKILL.md" \
         "$codex/agents/branch-diff-summarizer.toml"; do
         grep -F '${expectedVcsContext}' "$path"
         ! grep -F '${unexpectedVcsContext}' "$path"
