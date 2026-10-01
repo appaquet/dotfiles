@@ -3,7 +3,10 @@
     { scope }:
     {
       description = "Fast read-only scout for local code search and web research. Use it to find files by pattern (eg. \"src/components/**/*.tsx\"), grep for symbols or keywords (eg. \"API endpoints\"), answer \"where is X defined / which files reference Y\", or scout the web (docs, library usage, error messages, releases). Do NOT use it for code review, design-doc auditing, cross-file consistency checks, or open-ended analysis — it reads excerpts rather than whole files and will miss content past its read window. When calling, specify search breadth: \"quick\" for a single targeted lookup, \"medium\" for moderate exploration, or \"very thorough\" to search across multiple locations and naming conventions.";
+
       harnesses = [ "pi" ];
+
+      promptMode = "replace"; # No need for full context for explorer
 
       model = {
         pi = {
