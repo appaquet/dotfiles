@@ -19,15 +19,14 @@ let
   piAgents = [ "Explore" ];
   claudeCommands = [
     "ask"
-    "builder"
     "continue"
     "ctx-improve"
     "ctx-plan"
     "implement"
+    "implement-orchestrator"
     "introspect"
     "jj-resolve-conflicts"
     "mem-edit"
-    "orchestrator"
     "proceed"
     "proj-load"
     "proj-plan"
@@ -38,15 +37,7 @@ let
     "review-plan"
     "think"
   ];
-  commonCommands =
-    builtins.filter (
-      command:
-      !(builtins.elem command [
-        "orchestrator"
-        "builder"
-      ])
-    ) claudeCommands
-    ++ [ "show-me" ];
+  commonCommands = claudeCommands ++ [ "show-me" ];
   piCommands = claudeCommands;
   claudeRules = [
     "development"
@@ -60,7 +51,6 @@ let
   piRules = [
     "development"
     "orchestration"
-    "pi-mode"
     "pi-prompts"
     "pi-questionnaire"
     "pi-workflows"
