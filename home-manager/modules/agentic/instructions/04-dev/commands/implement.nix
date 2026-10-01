@@ -8,11 +8,13 @@
 
       effort = "xhigh";
 
+      agent = scope.forHarness {
+        opencode = "build"; # opencode selects the mode through its agents
+        default = null;
+      };
+
       content = ''
-        ${scope.forHarness {
-          opencode = "";
-          default = scope.blocks."builder-prompt".body;
-        }}
+        ${scope.blocks."builder-prompt".body}
 
         Goal: proceed to implementation of the plan/task at hand
 
