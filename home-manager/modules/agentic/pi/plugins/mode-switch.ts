@@ -3,13 +3,14 @@
  *
  * The footer always shows the current session mode. `ctrl+shift+m` and `/mode`
  * open a fuzzy selector, and `/mode <builder|orchestrator>` sets it
- * explicitly. At launch the `PI_MODE` env var (builder|orchestrator) selects
- * the initial mode of a session with no persisted mode entry (analog of
- * `PI_SCOPE` for scope presets); an explicit valid value is persisted so a
- * later resume environment cannot change the selection. On resume/fork the
- * persisted entry wins. On `/new` the outgoing instance hands the current
- * mode to the replacement instance through Pi's session lifecycle events and
- * persists it in the new session; the transfer wins over `PI_MODE`.
+ * explicitly. The mode of a session comes from the command that starts the work:
+ * the implement commands are mapped to a mode in `mode-switch.json` under
+ * `modeCommands`, and the `input` hook applies that mapping before the prompt
+ * runs. A session that never runs a mapped command stays on builder. On
+ * resume/fork the persisted entry wins; on `/new` the outgoing instance hands the
+ * current mode to the replacement instance through Pi's session lifecycle events
+ * and persists it in the new session. `PI_MODE` is no longer supported: a set
+ * value is reported once per session and ignored.
  *
  * The model is reminded of the active mode by an injected reminder message on
  * the next agent turn after every session start (startup, reload, resume,
@@ -111,29 +112,28 @@ export function restoreMode(entries: unknown[]): Mode | undefined {
   return restored;
 }
 
-export type ResolvedMode = {
-  mode: Mode;
-  invalid: boolean;
-};
-
 /**
  * Decide the startup mode: a mode transferred across `/new` wins, then the
- * latest persisted mode-switch entry, then the trimmed PI_MODE env value when
- * valid, then builder. `invalid` flags an unusable env value.
+ * latest persisted mode-switch entry, then builder.
  */
-export function resolveMode(
-  entries: unknown[],
-  env: unknown,
-  transferred?: Mode,
-): ResolvedMode {
-  if (transferred) return { mode: transferred, invalid: false };
-  const persisted = restoreMode(entries);
-  if (persisted) return { mode: persisted, invalid: false };
+export function resolveMode(entries: unknown[], transferred?: Mode): Mode {
+  return transferred ?? restoreMode(entries) ?? "builder";
+}
 
-  const value = typeof env === "string" ? env.trim() : "";
-  if (value === "") return { mode: "builder", invalid: false };
-  if (isMode(value)) return { mode: value, invalid: false };
-  return { mode: "builder", invalid: true };
+/**
+ * Resolve the mode selected by a submitted prompt: the leading command token
+ * (`/implement`, `/implement-orchestrator`) is looked up in the command map.
+ * Returns `undefined` for any other input.
+ */
+export function resolveModeFromInput(
+  text: string,
+  commands: Record<string, Mode>,
+): Mode | undefined {
+  const trimmed = text.trim();
+  if (!trimmed.startsWith("/")) return undefined;
+
+  const token = trimmed.slice(1).split(/\s+/, 1)[0] ?? "";
+  return token === "" ? undefined : commands[token];
 }
 
 export type ModeArg =
@@ -220,6 +220,23 @@ export function readReminderInterval(agentDir = defaultAgentDir()): number {
     : DEFAULT_REMINDER_INTERVAL;
 }
 
+/** Reads the command-to-mode map, dropping names or modes that are unusable. */
+export function readModeCommands(
+  agentDir = defaultAgentDir(),
+): Record<string, Mode> {
+  const configured = readModeSwitchConfig(agentDir)?.modeCommands;
+  if (typeof configured !== "object" || configured === null) return {};
+
+  const commands: Record<string, Mode> = {};
+  for (const [name, mode] of Object.entries(
+    configured as Record<string, unknown>,
+  )) {
+    const command = name.trim();
+    if (command !== "" && isMode(mode)) commands[command] = mode;
+  }
+  return commands;
+}
+
 export type ResolvedPolicy = {
   policy: OrchestratorPolicy;
   invalid: boolean;
@@ -265,6 +282,7 @@ export default function modeSwitch(pi: ExtensionAPI): void {
   const pendingReminderCalls = new Set<string>();
   let remindOnNextTurn = false;
   const reminderInterval = readReminderInterval();
+  const modeCommands = readModeCommands();
   const policyEnv = process.env.PI_ORCHESTRATOR_POLICY;
   const { policy: orchestratorPolicy, invalid: invalidPolicy } =
     resolveOrchestratorPolicy();
@@ -333,14 +351,14 @@ export default function modeSwitch(pi: ExtensionAPI): void {
         : undefined;
 
     const entries = ctx.sessionManager.getEntries();
-    const env = process.env.PI_MODE;
-    const resolved = resolveMode(entries, env, handoff?.mode);
+    const legacyEnv = process.env.PI_MODE;
+    const resolved = resolveMode(entries, handoff?.mode);
 
-    if (resolved.invalid) {
+    if (typeof legacyEnv === "string" && legacyEnv.trim() !== "") {
       ctx.ui.notify(
-        `mode-switch: invalid PI_MODE "${env}" (available: ${MODES.join(
-          ", ",
-        )}); defaulting to builder`,
+        `mode-switch: PI_MODE is no longer supported, ignoring "${legacyEnv.trim()}". ` +
+          "Select a mode with /mode, or start work with /implement or " +
+          "/implement-orchestrator",
         "warning",
       );
     }
@@ -355,12 +373,11 @@ export default function modeSwitch(pi: ExtensionAPI): void {
     }
 
     // Persist only choices that came from outside this session's entries:
-    // a `/new` transfer or an explicit PI_MODE selection.
-    const explicitEnv = typeof env === "string" ? env.trim() : "";
-    if (handoff || (restoreMode(entries) === undefined && isMode(explicitEnv)))
-      pi.appendEntry("mode-switch", { mode: resolved.mode });
+    // Persist only a `/new` transfer, which comes from outside this session's
+    // entries.
+    if (handoff) pi.appendEntry("mode-switch", { mode: resolved });
 
-    mode = resolved.mode;
+    mode = resolved;
     // Every start loses in-memory counter state; the reminder re-teaches the
     // active mode from the (possibly new or summarized) context.
     turns = 0;
@@ -414,6 +431,14 @@ export default function modeSwitch(pi: ExtensionAPI): void {
   });
 
   pi.on("agent_end", () => pendingReminderCalls.clear());
+
+  pi.on("input", (event: any, ctx: any) => {
+    const target = resolveModeFromInput(event?.text ?? "", modeCommands);
+    // setMode notifies, so act only on an actual change.
+    if (target !== undefined && target !== mode) setMode(ctx, target);
+
+    return { action: "continue" };
+  });
 
   pi.on("tool_call", (event) => {
     try {

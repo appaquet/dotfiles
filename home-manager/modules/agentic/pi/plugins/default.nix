@@ -216,6 +216,10 @@ let
         ".pi/agent/mode-switch.json".text = builtins.toJSON {
           reminderInterval = 10; # reminder cadence (turns, and non-md touches) in orchestrator mode
           orchestratorPolicy = "soft"; # orchestrator file policy: hard blocks, soft nudges
+          modeCommands = {
+            implement = "builder";
+            "implement-orchestrator" = "orchestrator";
+          }; # commands that select the session mode when invoked
         };
       };
     }

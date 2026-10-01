@@ -54,8 +54,10 @@ const {
   modeLabel,
   parseModeArg,
   readReminderInterval,
+  readModeCommands,
   restoreMode,
   resolveMode,
+  resolveModeFromInput,
   shouldBlock,
   resolveOrchestratorPolicy,
   shouldNudge,
@@ -163,26 +165,18 @@ test("restoreMode: tolerates malformed entries and keeps the latest valid one", 
   ).toBe("orchestrator");
 });
 
-test("resolveMode: transferred mode beats any persisted entry and PI_MODE value", () => {
+test("resolveMode: a transferred mode beats any persisted entry", () => {
   const persisted = (mode: Mode) => ({
     type: "custom",
     customType: "mode-switch",
     data: { mode },
   });
 
-  for (const env of [undefined, "", "builder", "orchestrator", "banana", 42]) {
-    expect(resolveMode([persisted("builder")], env, "orchestrator")).toEqual({
-      mode: "orchestrator",
-      invalid: false,
-    });
-    expect(resolveMode([persisted("orchestrator")], env, "builder")).toEqual({
-      mode: "builder",
-      invalid: false,
-    });
-  }
+  expect(resolveMode([persisted("builder")], "orchestrator")).toBe("orchestrator");
+  expect(resolveMode([persisted("orchestrator")], "builder")).toBe("builder");
 });
 
-test("resolveMode: persisted entry wins over any PI_MODE value", () => {
+test("resolveMode: a persisted entry wins over the builder default", () => {
   const builder = {
     type: "custom",
     customType: "mode-switch",
@@ -194,54 +188,34 @@ test("resolveMode: persisted entry wins over any PI_MODE value", () => {
     data: { mode: "orchestrator" },
   };
 
-  for (const env of [undefined, "", "builder", "orchestrator", "banana", 42]) {
-    expect(resolveMode([builder], env, undefined)).toEqual({
-      mode: "builder",
-      invalid: false,
-    });
-    expect(resolveMode([orchestrator], env, undefined)).toEqual({
-      mode: "orchestrator",
-      invalid: false,
-    });
-  }
+  expect(resolveMode([builder])).toBe("builder");
+  expect(resolveMode([orchestrator])).toBe("orchestrator");
 });
 
-test("resolveMode: without transferred or persisted state the PI_MODE value selects the mode", () => {
-  expect(resolveMode([], undefined, undefined)).toEqual({
-    mode: "builder",
-    invalid: false,
-  });
-  expect(resolveMode([], "", undefined)).toEqual({
-    mode: "builder",
-    invalid: false,
-  });
-  expect(resolveMode([], "   ", undefined)).toEqual({
-    mode: "builder",
-    invalid: false,
-  });
-  expect(resolveMode([], 42, undefined)).toEqual({
-    mode: "builder",
-    invalid: false,
-  });
-  expect(resolveMode([], "builder", undefined)).toEqual({
-    mode: "builder",
-    invalid: false,
-  });
-  expect(resolveMode([], "  orchestrator  ", undefined)).toEqual({
-    mode: "orchestrator",
-    invalid: false,
-  });
+test("resolveMode: without transferred or persisted state the mode is builder", () => {
+  expect(resolveMode([])).toBe("builder");
+  expect(resolveMode([], undefined)).toBe("builder");
 });
 
-test("resolveMode: invalid PI_MODE without other state defaults to builder and flags invalid", () => {
-  expect(resolveMode([], "wizard", undefined)).toEqual({
-    mode: "builder",
-    invalid: true,
-  });
-  expect(resolveMode([], " ORCHESTRATOR ", undefined)).toEqual({
-    mode: "builder",
-    invalid: true,
-  });
+test("resolveModeFromInput: maps only a leading mapped command token", () => {
+  const commands = {
+    implement: "builder",
+    "implement-orchestrator": "orchestrator",
+  };
+
+  expect(resolveModeFromInput("/implement", commands)).toBe("builder");
+  expect(resolveModeFromInput("/implement-orchestrator", commands)).toBe(
+    "orchestrator",
+  );
+  expect(
+    resolveModeFromInput("/implement-orchestrator do the thing", commands),
+  ).toBe("orchestrator");
+  expect(resolveModeFromInput("   /implement   ", commands)).toBe("builder");
+  expect(resolveModeFromInput("/implement-other", commands)).toBeUndefined();
+  expect(resolveModeFromInput("implement", commands)).toBeUndefined();
+  expect(resolveModeFromInput("/", commands)).toBeUndefined();
+  expect(resolveModeFromInput("", commands)).toBeUndefined();
+  expect(resolveModeFromInput("/implement", {})).toBeUndefined();
 });
 
 // ---------------------------------------------------------------------------
@@ -360,6 +334,7 @@ type Harness = {
   toolResult: (event: unknown) => unknown;
   agentStart: () => unknown;
   agentEnd: () => void;
+  input: (text: string) => unknown;
 };
 
 function createHarness(options: {
@@ -428,6 +403,9 @@ function createHarness(options: {
       throw new Error("before_agent_start handler was not registered");
     },
     agentEnd: () => {},
+    input: () => {
+      throw new Error("input handler was not registered");
+    },
   };
   const ctx = harness.ctx;
   (ctx as any).__selectorCalls = harness.selectorCalls;
@@ -439,6 +417,7 @@ function createHarness(options: {
   let toolResult: ((event: unknown, ctx: unknown) => unknown) | undefined;
   let beforeAgentStart: ((event: unknown, ctx: unknown) => unknown) | undefined;
   let agentEnd: ((event: unknown, ctx: unknown) => unknown) | undefined;
+  let inputHandler: ((event: unknown, ctx: unknown) => unknown) | undefined;
   const pi = {
     on: (event: string, handler: (event: unknown, ctx: unknown) => unknown) => {
       switch (event) {
@@ -462,6 +441,9 @@ function createHarness(options: {
           break;
         case "agent_end":
           agentEnd = handler;
+          break;
+        case "input":
+          inputHandler = handler;
           break;
         default:
           throw new Error(`unexpected event registration: ${event}`);
@@ -559,6 +541,10 @@ function createHarness(options: {
     if (!agentEnd) throw new Error("agent_end handler was not registered");
     agentEnd({}, ctx);
   };
+  harness.input = (text) => {
+    if (!inputHandler) throw new Error("input handler was not registered");
+    return inputHandler({ type: "input", text, source: "interactive" }, ctx);
+  };
   return harness;
 }
 
@@ -634,7 +620,7 @@ test("session_start: restore of a session with only malformed entries defaults t
 });
 
 // ---------------------------------------------------------------------------
-// PI_MODE startup env var
+// PI_MODE (legacy, ignored)
 // ---------------------------------------------------------------------------
 
 function withPiMode(value: string | undefined, fn: () => void): void {
@@ -649,54 +635,36 @@ function withPiMode(value: string | undefined, fn: () => void): void {
   }
 }
 
-test("session_start: PI_MODE=orchestrator on a fresh session selects, persists and arms orchestrator", () => {
+test("session_start: PI_MODE is ignored and reported once", () => {
   const h = createHarness({ policy: "hard" });
   withPiMode("orchestrator", () => h.startSession());
-
-  expect(h.appends).toEqual([
-    { customType: "mode-switch", data: { mode: "orchestrator" } },
-  ]);
-  expect(h.sends).toEqual([]);
-  expect(h.statuses).toEqual([{ key: "mode", value: "[accent]👑" }]);
-  expect(h.modeChanges).toEqual([]);
-  expect(h.notifies).toEqual([]);
-  expect(h.agentStart()).toEqual(REMINDER_MESSAGE); // armed on entry
-  expect(h.agentStart()).toBeUndefined();
-  expect(blocked(h.toolCall({ toolName: "read", input: { path: "src/app.ts" } }))).toBe(true);
-});
-
-test("session_start: PI_MODE=builder on a fresh session persists the choice and arms the builder reminder", () => {
-  const h = createHarness();
-  withPiMode("builder", () => h.startSession());
-
-  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
-  expect(h.notifies).toEqual([]);
-  expect(h.sends).toEqual([]);
-  expect(h.appends).toEqual([
-    { customType: "mode-switch", data: { mode: "builder" } },
-  ]);
-  expect(h.agentStart()).toEqual(BUILDER_REMINDER_MESSAGE);
-  expect(h.agentStart()).toBeUndefined();
-});
-
-test("session_start: invalid PI_MODE on a fresh session warns, stays builder and arms its reminder", () => {
-  const h = createHarness();
-  withPiMode("banana", () => h.startSession());
 
   expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
   expect(h.notifies).toEqual([
     {
       message:
-        'mode-switch: invalid PI_MODE "banana" (available: builder, orchestrator); defaulting to builder',
+        'mode-switch: PI_MODE is no longer supported, ignoring "orchestrator". Select a mode with /mode, or start work with /implement or /implement-orchestrator',
       type: "warning",
     },
   ]);
+  expect(h.appends).toEqual([]);
   expect(h.sends).toEqual([]);
+  expect(h.modeChanges).toEqual([]);
+  expect(h.agentStart()).toEqual(BUILDER_REMINDER_MESSAGE);
+  expect(h.toolCall({ toolName: "read", input: { path: "src/app.ts" } })).toBeUndefined();
+});
+
+test("session_start: PI_MODE=builder no longer persists the choice", () => {
+  const h = createHarness();
+  withPiMode("builder", () => h.startSession());
+
+  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
+  expect(h.notifies.map((entry) => entry.type)).toEqual(["warning"]);
   expect(h.appends).toEqual([]);
   expect(h.agentStart()).toEqual(BUILDER_REMINDER_MESSAGE);
 });
 
-test("session_start: persisted orchestrator entry wins over PI_MODE=builder", () => {
+test("session_start: a persisted entry wins and PI_MODE still warns", () => {
   const h = createHarness({
     policy: "hard",
     entries: [
@@ -706,25 +674,11 @@ test("session_start: persisted orchestrator entry wins over PI_MODE=builder", ()
   withPiMode("builder", () => h.startSession());
 
   expect(h.statuses).toEqual([{ key: "mode", value: "[accent]👑" }]);
+  expect(h.notifies.map((entry) => entry.type)).toEqual(["warning"]);
   expect(h.sends).toEqual([]);
   expect(h.appends).toEqual([]);
   expect(h.agentStart()).toEqual(REMINDER_MESSAGE);
   expect(blocked(h.toolCall({ toolName: "read", input: { path: "src/app.ts" } }))).toBe(true);
-});
-
-test("session_start: persisted builder entry wins over PI_MODE=orchestrator", () => {
-  const h = createHarness({
-    entries: [
-      { type: "custom", customType: "mode-switch", data: { mode: "builder" } },
-    ],
-  });
-  withPiMode("orchestrator", () => h.startSession());
-
-  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
-  expect(h.sends).toEqual([]);
-  expect(h.appends).toEqual([]);
-  expect(h.agentStart()).toEqual(BUILDER_REMINDER_MESSAGE);
-  expect(h.toolCall({ toolName: "read", input: { path: "src/app.ts" } })).toBeUndefined();
 });
 
 test("mode shortcut opens the current-mode picker and cancellation changes no state", async () => {
@@ -1784,4 +1738,106 @@ test("factory: a malformed tool result consumes no soft touch", async () => {
   expect(h.toolResult({ ...POLICY_READ, content: [], isError: false })).toEqual({
     content: [{ type: "text", text: REMINDER_TEXT }],
   });
+});
+
+// ---------------------------------------------------------------------------
+// Command-driven mode selection
+// ---------------------------------------------------------------------------
+
+test("readModeCommands: maps configured commands and drops unusable entries", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "mode-switch-commands-"));
+  await writeFile(
+    join(dir, "mode-switch.json"),
+    JSON.stringify({
+      modeCommands: {
+        implement: "builder",
+        "implement-orchestrator": "orchestrator",
+        "  spaced  ": "orchestrator",
+        unknown: "wizard",
+        "": "builder",
+      },
+    }),
+  );
+
+  expect(readModeCommands(dir)).toEqual({
+    implement: "builder",
+    "implement-orchestrator": "orchestrator",
+    spaced: "orchestrator",
+  });
+
+  await writeFile(join(dir, "mode-switch.json"), JSON.stringify({ modeCommands: [] }));
+  expect(readModeCommands(dir)).toEqual({});
+
+  await writeFile(join(dir, "mode-switch.json"), "not json");
+  expect(readModeCommands(dir)).toEqual({});
+});
+
+test("input: a mapped command switches mode, persists it and keeps the prompt", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "mode-switch-input-"));
+  await writeFile(
+    join(dir, "mode-switch.json"),
+    JSON.stringify({
+      modeCommands: {
+        implement: "builder",
+        "implement-orchestrator": "orchestrator",
+      },
+    }),
+  );
+  const h = createHarness({ agentDir: dir, policy: "hard" });
+  h.startSession();
+  h.agentStart(); // consume the startup one-shot
+
+  expect(h.input("/implement-orchestrator build the thing")).toEqual({ action: "continue" });
+  expect(h.appends).toEqual([
+    { customType: "mode-switch", data: { mode: "orchestrator" } },
+  ]);
+  expect(h.statuses).toEqual([
+    { key: "mode", value: "[muted]🔨" },
+    { key: "mode", value: "[accent]👑" },
+  ]);
+  expect(h.notifies).toEqual([
+    { message: "mode-switch: orchestrator", type: "info" },
+  ]);
+  expect(h.modeChanges).toEqual([
+    { event: "mode-switch:changed", data: { mode: "orchestrator" } },
+  ]);
+  expect(h.agentStart()).toEqual(REMINDER_MESSAGE);
+  expect(blocked(h.toolCall({ toolName: "read", input: { path: "src/app.ts" } }))).toBe(true);
+
+  expect(h.input("/implement")).toEqual({ action: "continue" });
+  expect(h.appends).toEqual([
+    { customType: "mode-switch", data: { mode: "orchestrator" } },
+    { customType: "mode-switch", data: { mode: "builder" } },
+  ]);
+  expect(h.toolCall({ toolName: "read", input: { path: "src/app.ts" } })).toBeUndefined();
+});
+
+test("input: an unmapped prompt, a repeated mode and an empty map change nothing", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "mode-switch-input-noise-"));
+  await writeFile(
+    join(dir, "mode-switch.json"),
+    JSON.stringify({ modeCommands: { implement: "builder" } }),
+  );
+  const h = createHarness({ agentDir: dir });
+  h.startSession();
+  h.agentStart();
+
+  expect(h.input("/review-plan")).toEqual({ action: "continue" });
+  expect(h.input("plain question")).toEqual({ action: "continue" });
+  expect(h.input("/implement")).toEqual({ action: "continue" }); // already builder
+  expect(h.appends).toEqual([]);
+  expect(h.notifies).toEqual([]);
+  expect(h.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
+
+  const emptyDir = await mkdtemp(join(tmpdir(), "mode-switch-input-empty-"));
+  await writeFile(
+    join(emptyDir, "mode-switch.json"),
+    JSON.stringify({ reminderInterval: 10 }),
+  );
+  const empty = createHarness({ agentDir: emptyDir });
+  empty.startSession();
+
+  expect(empty.input("/implement-orchestrator")).toEqual({ action: "continue" });
+  expect(empty.appends).toEqual([]);
+  expect(empty.statuses).toEqual([{ key: "mode", value: "[muted]🔨" }]);
 });
