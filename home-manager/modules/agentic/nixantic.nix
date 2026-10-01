@@ -14,7 +14,7 @@
         pi = {
           rules.output = "files";
           agents = "tintinweb";
-          tasks = "none";
+          tasks = "tintinweb";
           questions = "rpiv-ask-user-question";
         };
       };
