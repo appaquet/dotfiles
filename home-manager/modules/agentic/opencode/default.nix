@@ -284,7 +284,7 @@ let
       "~/.config/opencode/rules/*.md"
     ];
 
-    default_agent = "orchestrator";
+    default_agent = "build"; # mode comes from the implement commands; builder matches the other harnesses
 
     permission = permissions.agent.base;
 
