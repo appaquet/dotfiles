@@ -19,7 +19,7 @@
 
       ## Instructions
 
-      1. 🔳 Prepare the review phase
+      1. Prepare the review phase
          * If no committed project files exist, confirm with the user and create the project
            (docs + link) following the project files rules.
          * Create a new phase in project documentation for this review session.

@@ -32,10 +32,10 @@
         ## Instructions
         1. Ensure ${scope.skills."project-docs".reference} loaded.
 
-        2. 🔳 Ensure context loaded, goal clear, task defined
+        2. Ensure context loaded, goal clear, task defined
            * ${scope.harness.prose.questions.request} if the goal or task is empty or unclear.
 
-        3. 🔳 Find or create project files
+        3. Find or create project files
            * Invoking this command authorizes project and phase setup. Use your best judgment without asking for setup confirmation; follow ${
              scope.skills."project-docs".reference
            } for names and document structure.
@@ -45,14 +45,14 @@
              scope.skills."project-docs".reference
            }: the proj symlink gets its own commit and documents stay uncommitted.
 
-        4. 🔳 Research, clarify and plan
+        4. Research, clarify and plan
             ${scope.blocks."plan-procedure".embed}
 
-        5. 🔳 Report your understanding using ${scope.blocks.context-understanding.reference}. If understanding < 10/10, suggest ${
+        5. Report your understanding using ${scope.blocks.context-understanding.reference}. If understanding < 10/10, suggest ${
           scope.commands."ctx-improve".reference
         }
 
-        6. 🔳 Write plan to docs
+        6. Write plan to docs
            * Use ${scope.skills."project-docs".reference} for project and phase document rules.
 
         7. ${scope.blocks."engagement-gate".gate}

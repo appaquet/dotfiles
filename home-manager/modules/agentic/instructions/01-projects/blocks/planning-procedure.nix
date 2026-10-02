@@ -8,7 +8,7 @@
         * Use ${scope.blocks.context-understanding.reference} to improve understanding
 
         * Search web for unfamiliar or potential outdated info
-        * Track uncertainties that block the next planned step as sub-tasks 🔳.
+        * Track uncertainties that block the next planned step as sub-tasks.
 
         * Follow ${scope.blocks.clarification-procedure.reference} to resolve gaps before asking questions.
 

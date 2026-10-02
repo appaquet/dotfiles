@@ -25,18 +25,18 @@
 
         ## Reviewer Workflow
 
-        1. 🔳 Load context
+        1. Load context
            * Load project / phase docs using ${scope.skills."project-docs".reference}.
            * If not very clear in prompt, use ${
              scope.commands."proj-load".reference
            } to load project context, version control context, and project docs
 
-        2. 🔳 Gather guidelines (merge in priority order)
+        2. Gather guidelines (merge in priority order)
            * Project guidelines: Find via Scope patterns (highest salience)
            * User guidelines: Only if explicitly referenced in agent's Scope section
            * General Guidelines: Agent's built-in criteria (in agent file)
 
-        3. 🔳 Load changed files
+        3. Load changed files
            * Based on requested scope. If no scope, assume a full current-work review
            * List version control changed files (not code diff yet)
              * Exclude reviewing docs themselves and generated files (e.g., *.pb.go)
@@ -46,7 +46,7 @@
              * Load diff for file
              * Load surrounding context if needed to understand changes
 
-        4. 🔳 Execute rule checks
+        4. Execute rule checks
            * For EACH rule in the merged guidelines (project > user > general):
              * Examine the changed hunks for violations of this rule
                * Focus on changed code, not unrelated areas (unless blatant problem)
@@ -57,16 +57,16 @@
                * If Edit fails (parallel agent modified file), re-read the file and retry Edit
                * Insert ALL violations, minor or major
 
-        5. 🔳 Cross-file synthesis
+        5. Cross-file synthesis
            * Look back at all files and rules, add comments for issues that span multiple files that may
              have been missed
 
-        6. 🔳 Verify insertions
+        6. Verify insertions
            * Search changed files for `// REVIEW:`
            * If you found issues but grep returns no matches, go back to step 6 and insert via Edit
            * Every reported issue MUST have a corresponding comment in the code
 
-        7. 🔳 Return summary in one SINGLE LAST message
+        7. Return summary in one SINGLE LAST message
            * Review independently — do not soften findings. If you find no issues in your domain,
              state what you examined rather than defaulting to praise
            * Overall assessment to parent agent

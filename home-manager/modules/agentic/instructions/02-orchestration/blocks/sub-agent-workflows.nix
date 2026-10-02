@@ -62,7 +62,7 @@
         Rules for managing our context and maximizing sub-agents delegation to preserve it.
       '';
 
-      preFlightRecall = "Your context precious, use <sub-agents-workflows> instructions.";
+      preFlightContent = "Your context precious, use <sub-agents-workflows> instructions.";
 
       tag = "sub-agents-workflows";
       taggedContent = ''

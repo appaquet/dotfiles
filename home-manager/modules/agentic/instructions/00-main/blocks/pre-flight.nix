@@ -1,9 +1,6 @@
 {
   nixantic.sources.main.blocks."pre-flight" =
     { scope }:
-    let
-      toolLine = "* Track each 🔳 step / task as you go, using appropriate task tools if available";
-    in
     {
       heading = "Pre-flight instructions";
 
@@ -13,14 +10,15 @@
 
       tag = "pre-flight";
       taggedContent = ''
-        * ${scope.blocks."task-management".preFlightRecall}
-        * ${scope.blocks."sub-agents-workflows".preFlightRecall}
-        * ${scope.blocks."project-doc-recall".preFlightRecall}
+        * ${scope.blocks."task-management".preFlightContent}
+        * ${scope.blocks."sub-agents-workflows".preFlightContent}
+        * ${scope.blocks."project-doc-recall".preFlightContent}
       '';
 
+      # Injected in each command
       reference = ''
         Before proceeding with any instructions above, you NEED to follow <pre-flight> instructions. 
-        ${toolLine}
+        * Track the work as you go, using task tools where appropriate
         * Follow sub-agents workflows
         * Use & maintain freshness/accuracy of project/phase docs. Use ${
           scope.skills."project-docs".reference

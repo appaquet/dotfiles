@@ -20,9 +20,9 @@
 
         1. Ensure ${scope.skills."project-docs".reference} loaded.
 
-        2. 🔳 Note the active project link (`proj` or `proj-adhoc`) from state above. Identify current phase from checkpoint or ask user
+        2. Note the active project link (`proj` or `proj-adhoc`) from state above. Identify current phase from checkpoint or ask user
 
-        3. 🔳 Update current phase doc(s)
+        3. Update current phase doc(s)
            * Requirements
              * Read/validate current requirements
              * Update or add new ones if needed based on work done
@@ -38,11 +38,11 @@
            * Files
              * Update with changes
 
-        4. 🔳 Update other impacted phases docs
+        4. Update other impacted phases docs
            * Any changes in context, requirements, design choices may impact multiple phases, make sure to review and update them all accordingly
            * Check modified files, good indicator of impacted phases. Generic review/docs phases are usually impacted by any changes. When we just conducting review, it usually involves changes in multiple phases.
 
-        5. 🔳 Update main project doc
+        5. Update main project doc
            * Requirements
              * Read/validate current requirements
              * Update or add new ones if needed based on work done
@@ -61,7 +61,7 @@
              * Update next step if decided/obvious
              * Keep short like project docs mention
 
-        6. 🔳 Leave doc changes uncommitted
+        6. Leave doc changes uncommitted
            * Per the document version control rules in ${
              scope.skills."project-docs".reference
            }: document changes remain as working-copy changes; never commit `proj-adhoc`, its temporary target, or its documents.

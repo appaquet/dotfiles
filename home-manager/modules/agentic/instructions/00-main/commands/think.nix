@@ -22,16 +22,16 @@
 
          1. If context empty or unclear, ${scope.harness.prose.questions.request} to clarify
 
-        2. 🔳 Research and understand
+        2. Research and understand
            * Map full scope: files involved, related files, cross-file concepts
            * Explore, research, web search, etc.
 
-        3. 🔳 Analyze and evaluate
+        3. Analyze and evaluate
            * Question assumptions: what haven't you verified? Simplest explanation?
            * Consider 2-3 alternative approaches, why one is better
            * Draft solution mentally, then critique it. What could go wrong?
 
-        4. 🔳 Present findings with structure
+        4. Present findings with structure
            * Show reasoning, what was considered, why this approach
            * Challenge assumptions
 

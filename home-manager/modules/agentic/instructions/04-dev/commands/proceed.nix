@@ -11,11 +11,11 @@
 
         ## Instructions
 
-        1. 🔳 Break down the work and track it as you go
+        1. Break down the work and track it as you go
 
-        2. 🔳 Execute tasks one by one
+        2. Execute tasks one by one
 
-        3. 🔳 Debrief me on
+        3. Debrief me on
            * What you did, learned and deviations from plan
            * Any blockers
            * Expected next steps

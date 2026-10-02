@@ -26,21 +26,21 @@
         ## Instructions
         1. Ensure ${scope.skills."project-docs".reference} loaded.
 
-        2. 🔳 Create the ad hoc folder
+        2. Create the ad hoc folder
            * From the workspace root, run `agentic-proj-create-adhoc` with no arguments.
            * Create normal `00-<project>.md` and `01-<phase>.md` files in the directory reported by `agentic-proj-docs`.
 
-        3. 🔳 Ensure context loaded, goal clear, task defined
+        3. Ensure context loaded, goal clear, task defined
            * ${scope.harness.prose.questions.request} if the goal or task is empty or unclear.
 
-        4. 🔳 Research, clarify and plan
+        4. Research, clarify and plan
            ${scope.blocks."plan-procedure".embed}
 
-        5. 🔳 Report your understanding using ${scope.blocks.context-understanding.reference}. If understanding < 10/10, suggest ${
+        5. Report your understanding using ${scope.blocks.context-understanding.reference}. If understanding < 10/10, suggest ${
           scope.commands."ctx-improve".reference
         }
 
-        6. 🔳 Write plan to docs
+        6. Write plan to docs
            * Using ${scope.skills."project-docs".reference}, use project & phase docs rules and structure
 
         7. ${scope.blocks."engagement-gate".gate}

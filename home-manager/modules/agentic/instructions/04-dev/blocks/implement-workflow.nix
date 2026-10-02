@@ -16,13 +16,13 @@
           scope.skills."project-docs".reference
         } loaded before reading or updating project or phase documents.
 
-        2. 🔳 Verify 10/10 understanding, if not already done
+        2. Verify 10/10 understanding, if not already done
            * Skip if we just planned and understanding is already in context
            * Read ALL requirements in project doc
            * If unclear, ask user to use ${scope.commands."ctx-improve".reference}
            * Clarify if task contradicts or overlaps
 
-        3. 🔳 Load tasks from project/phase docs
+        3. Load tasks from project/phase docs
            * For each task in the plan, set it up for tracking and segment for greater clarity
            * Add validation checks using ${scope.blocks.testing-principles.reference}, grouping related checks. Verification is not a reviewer pass.
            * If user validation needed, task description should be clear about waiting for user input
@@ -35,7 +35,7 @@
            * Check active changes
            * Commit with proper message or change active commit message
 
-        5. 🔳 Implement tasks
+        5. Implement tasks
            * You need to follow ${scope.blocks."sub-agents-workflows".reference}
            * Update documentation if existing:
              * Mark phase doc task `[~]` when starting, `[x]` when done
@@ -50,16 +50,16 @@
              scope.blocks."sub-agent-selection".reference
            } when the task needs a different agent
 
-        6. 🔳 Validate via ${scope.blocks."development-completion-checklist".reference}
+        6. Validate via ${scope.blocks."development-completion-checklist".reference}
            * Check every item; report validation results, failures, and deviations rather than reciting the checklist.
 
-        7. 🔳 Validate formatting, linting, tests done
+        7. Validate formatting, linting, tests done
            * If sub-agents did it, trust them
            * If not, ask them back instead of wasting your context
 
-        8. 🔳 Run ${scope.commands."proj-save".reference} to update project and phase docs.
+        8. Run ${scope.commands."proj-save".reference} to update project and phase docs.
 
-        9. 🔳 Debrief me on
+        9. Debrief me on
            * What you did, learned and deviations from plan
            * Any blockers
            * Expected next steps
