@@ -44,7 +44,7 @@ let
 
     # https://github.com/YuGiMob/pi-hashline-edit-pro
     {
-      package = "npm:pi-hashline-edit-pro@4.4.3";
+      package = "npm:pi-hashline-edit-pro@4.4.4";
     }
 
     # https://github.com/tintinweb/pi-subagents
