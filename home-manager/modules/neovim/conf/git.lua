@@ -38,6 +38,18 @@ local function focus_diffview_keymap()
 	return { "n", "<Leader>E", focus_diffview_view, { desc = "Diffview: focus diff view" } }
 end
 
+-- Select keys that open the diff and focus it (default select_entry leaves focus in the panel).
+-- Keys must be spelled exactly like the plugin defaults (e.g. lowercase <cr>) to override them
+local function select_focus_keymaps()
+	local desc = "Diffview: open entry and focus diff"
+	return {
+		{ "n", "<cr>", diffview_actions.focus_entry, { desc = desc } },
+		{ "n", "o", diffview_actions.focus_entry, { desc = desc } },
+		{ "n", "l", diffview_actions.focus_entry, { desc = desc } },
+		{ "n", "<2-LeftMouse>", diffview_actions.focus_entry, { desc = desc } },
+	}
+end
+
 local function refresh_diffview_keymap()
 	return { "n", "<Leader>gdr", "<cmd>DiffviewRefresh<CR>", { desc = "Diffview: refresh" } }
 end
@@ -76,14 +88,14 @@ require("diffview").setup({
 				vim.cmd("normal! [c")
 			end), { desc = "Git: previous hunk" } },
 		},
-		file_panel = {
+		file_panel = vim.list_extend({
 			focus_diffview_keymap(),
 			refresh_diffview_keymap(),
-		},
-		file_history_panel = {
+		}, select_focus_keymaps()),
+		file_history_panel = vim.list_extend({
 			focus_diffview_keymap(),
 			refresh_diffview_keymap(),
-		},
+		}, select_focus_keymaps()),
 		option_panel = {
 			focus_diffview_keymap(),
 			refresh_diffview_keymap(),
