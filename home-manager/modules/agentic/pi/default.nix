@@ -23,6 +23,7 @@ in
       doubleEscapeAction = "tree";
       enableInstallTelemetry = false;
       hideThinkingBlock = false;
+      quietStartup = "header";
       showCacheMissNotices = true;
       tuiMode = "fullscreen";
     };
