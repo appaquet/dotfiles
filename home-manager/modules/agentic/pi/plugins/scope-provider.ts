@@ -12,7 +12,7 @@
  * target (`scoped/summary`), independent of the active work model.
  *
  * Env:
- *  PI_SCOPE            active preset at launch (default "codex")
+ *  PI_SCOPE            active preset at launch (default "go")
  *  PI_SCOPE_LOG        path to append debug lines
  *  PI_SCOPE_REWRITE=0  kill switch: disable alias resolution (pass-through)
  */
@@ -137,7 +137,7 @@ const scopeProcess: {
   rewriteDisabled?: boolean;
 } = globalThis as any;
 if (!scopeProcess.activePreset)
-  scopeProcess.activePreset = process.env.PI_SCOPE ?? "codex";
+  scopeProcess.activePreset = process.env.PI_SCOPE ?? "go";
 
 // Per-session model registry used by the streamSimple hook: set on
 // session_start so the hook resolves live target lookups against the registry
@@ -152,7 +152,7 @@ const state: ScopeMapping & {
   concreteModels: Record<string, any>;
   targetAuth: Record<string, TargetAuth>;
 } = {
-  preset: process.env.PI_SCOPE ?? "codex",
+  preset: process.env.PI_SCOPE ?? "go",
   entries: {},
   targets: {},
   concreteModels: {},

@@ -621,6 +621,16 @@ const presets: ScopeConfig = {
   },
 };
 
+// `presets` plus the implicit fallback preset, so tests that launch without
+// PI_SCOPE resolve the same default production sessions do.
+const defaultPresets: ScopeConfig = {
+  ...presets,
+  go: {
+    main: { model: "golang/go-main" },
+    remap: { "scoped/summary": { model: "golang/go-main", thinking: "low" } },
+  },
+};
+
 const selectorPresets: ScopeConfig = {
   ...presets,
   local: {
@@ -937,12 +947,18 @@ test("a failed shortcut scope selection keeps the existing transaction rollback"
 
 test("a successful scope switch persists its structured preset state", async () => {
   delete process.env.PI_SCOPE;
-  const harness = await createHarness(presets, {
-    apiKeys: { old: "old-key", next: "next-key", noauth: undefined },
+  const harness = await createHarness(defaultPresets, {
+    apiKeys: {
+      old: "old-key",
+      next: "next-key",
+      noauth: undefined,
+      golang: "go-key",
+    },
     models: [
       target("old", "old-main", "Cloud main model"),
       target("next", "next-main", "Local main model"),
       target("noauth", "noauth-main", "Unauthenticated main model"),
+      target("golang", "go-main", "Go main model"),
     ],
   });
 
@@ -1009,16 +1025,22 @@ test("persists an explicit launch scope and restores its concrete mappings", asy
   expect(restored.sessionEntries).toEqual(savedEntries);
 });
 
-test("does not persist the implicit no-env Codex default", async () => {
+test("resolves the implicit no-env Go default without persisting it", async () => {
   delete process.env.PI_SCOPE;
   const globals = globalThis as Record<string, unknown>;
   globals.activePreset = undefined;
   globals.upgradedPreset = undefined;
-  const harness = await createHarness(presets, {
-    apiKeys: { old: "old-key" },
-    models: [target("old", "old-main", "Cloud main model")],
+  const harness = await createHarness(defaultPresets, {
+    apiKeys: { old: "old-key", golang: "go-key" },
+    models: [
+      target("old", "old-main", "Cloud main model"),
+      target("golang", "go-main", "Go main model"),
+    ],
   });
 
+  expect(harness.registry.find("scoped", "main")?.name).toBe(
+    "Go main model [S]",
+  );
   expect(harness.sessionEntries).toEqual([]);
 });
 
