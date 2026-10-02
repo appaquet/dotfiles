@@ -4,11 +4,16 @@
     main =
       { scope }:
       {
-        description = "Process and validation rules for frontend UI development. Use as soon as creating or modifying UI: HTML, CSS, JS/TS, React, Next.js, templates, components, styles, including one-line spacing or color fixes.";
+        description = "Process and validation rules for frontend UI planning and development. Use when planning UI behavior or acceptance criteria, or creating or modifying UI: HTML, CSS, JS/TS, React, Next.js, templates, components, styles, including one-line spacing or color fixes.";
         content = ''
           # Frontend
 
           Judge UI by how it renders, not by reading code. Every change affecting rendered UI is validated in the browser via the `chrome` MCP server before it is considered done. Use its browser capabilities (navigate, screenshot, snapshot, evaluate JS, console, network, resize); do not rely on fixed tool names
+
+          ## UI copy
+          * Write UI text for the operator's task: needed state, values, useful actions, blocking reasons, and the consequences of irreversible actions.
+          * Do not narrate internal architecture, topology, component ownership, or implementation limits, or restate information the view already conveys. If a limit blocks an action, state the blocking reason or next step.
+          * Define frontend acceptance criteria as observable behavior, not explanatory copy proving compliance. Satisfy a constraint against implying something by removing the implication, never by adding text that denies it.
 
           ## Workflow
           ### 1. Capture reference (before changing)
@@ -31,6 +36,7 @@
           * Affected states render: hover, focus, loading, empty, error. Keyboard focus visible
           * No text overflow or clipping, no unexpected horizontal scroll
           * Reduced motion: `prefers-reduced-motion` disables or reduces animations when set
+          * Copy: review added or changed text in the rendered view against the UI-copy guidance; each string must give the operator a needed fact or action.
 
           ## Pitfalls
           * Screenshot elements for detail, full page for layout context
