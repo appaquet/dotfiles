@@ -63,7 +63,7 @@ let
 
   models = {
     providers.deskapp = {
-      baseUrl = "http://deskapp.n3x.net:15000/v1";
+      baseUrl = "http://deskapp.n3x.net:8080/v1";
       api = "openai-completions";
       apiKey = "local";
       compat.supportsDeveloperRole = false;
