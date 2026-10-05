@@ -29,6 +29,7 @@ export const NIX_SETTINGS_ENV = "PI_NIX_SETTINGS_FILE";
 
 /** Paths reported at runtime but deliberately left to Pi and its extensions. */
 export const IGNORED_PATHS: readonly string[] = [
+  "deviceId", // Pi owns this; a random UUID is minted on first run to identify the machine in bug reports
   "lastChangelogVersion", // Pi owns this; a new value is written on every release
 ];
 
