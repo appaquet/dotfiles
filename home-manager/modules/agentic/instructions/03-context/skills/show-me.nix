@@ -38,9 +38,10 @@
 
         Use this section only for artifact requests.
 
+        * For follow-up changes to the same visual, update its existing HTML file in place and keep its filename instead of creating versioned copies. Create a new file only for a distinct artifact or an explicitly requested separate version or filename.
         * Use the user's filename when supplied. Otherwise choose a concise descriptive kebab-case `.html` filename.
         * Keep the artifact inside the selected root. Reject path traversal or an absolute destination outside that root.
-        * Start from `template.html` in this skill's directory. Preserve its document structure, pinned dependency notes, focus treatment, and reduced-motion guard; drop every unused dependency and sample section.
+        * For a new artifact, start from `template.html` in this skill's directory. Preserve its document structure, pinned dependency notes, focus treatment, and reduced-motion guard; drop every unused dependency and sample section.
         * Treat the template's dark expressive theme as a high-quality fallback, not a mandatory layout. Establish a visual thesis suited to the subject, then adapt the accent palette, composition, and content-specific components instead of mechanically filling placeholder sections.
         * Use hierarchy, depth, and restrained semantic color to explain relationships, status, or emphasis. Avoid a generic grayscale document or a repetitive grid of interchangeable cards when a diagram, timeline, comparison, annotated system view, or focused data display communicates better.
         * Add lightweight interaction when it materially improves understanding or exploration, such as filters, toggles, expandable detail, hover or focus inspection, or controlled animation. Keep the artifact useful without interaction; make controls keyboard-operable, show the current state, and provide a predictable initial or reset state.
