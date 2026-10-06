@@ -79,6 +79,7 @@
           inputs.nixantic.flakeModules.default
           ./overlays
           ./home-manager/modules/agentic/flake-module.nix
+          ./home-manager/modules/git/flake-module.nix
           ./home-manager
           ./nixos
           ./darwin

@@ -136,6 +136,11 @@ in
 
   home.packages = with pkgs; [
     jjui
+
+    # Promote agent changes out of private() by stripping their description prefix. The
+    # command lives in scripts/ as a plain shell file and shares that single source with
+    # the jj-promote-unit check, so the test exercises exactly what ships.
+    (writeShellScriptBin "jj-promote" (builtins.readFile ./scripts/jj-promote.sh))
     (writeShellScriptBin "jj-proj-tug" ''
       set -euo pipefail
 
@@ -452,6 +457,7 @@ in
       jjrt = "jj rebase-trunk";
       jjsi = "jj squash -t (jj-select) -i";
       jjsw = "jj squash-working";
+      jjpm = "jj-promote";
       jjci = "jj commit -i";
       jjcm = {
         expansion = "jj commit -m \"%\"";
