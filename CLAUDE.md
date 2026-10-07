@@ -28,9 +28,16 @@ Use `./x` script for building and evaluating nix configurations:
 - `HOST=deskapp ./x nixos check` - Check specific host
 - `./x check` - Eval all nixos/home/darwin configs for all hosts. Heavy, only use if you think a change could affect other hosts.
 
+home-manager, nixos, and darwin are independent activation surfaces: each `./x <home|nixos|darwin> switch`
+applies only its own surface. Changes under `home-manager/` (ssh, fish, tool configs, ...) take
+effect only via `./x home switch` on that host. Pick the surface by where the change lives; check
+the surfaces whose configs include the changed tree.
+
 For quick iteration, use `check` first (fast eval) before `build`.
 Always pipe `* build` output to temp file since it can be massive, then read it in part.
 To find a missing hash, use build functions instead of trying to eval.
+
+NEVER run switch/activate without my explicit approval
 
 ## Agentic Instructions
 
