@@ -8,7 +8,9 @@
       heading = "Engagement Gate";
 
       content = ''
-        Some workflows use an engagement gate that requires the exact handoff signal before proceeding with approved execution. Follow the gate instruction when presented. Do not bypass it.
+        I use an engagement gate to ensure that we only proceed when I decide to engage.
+        You should never proceed with an implementation without a clear handoff signal (`${signal}`) from me. 
+        You should never request it via the question tool. You can remind me but not ask for it.
       '';
 
       inherit signal;

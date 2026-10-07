@@ -36,7 +36,6 @@
            * Commit with proper message or change active commit message
 
         5. Implement tasks
-           * You need to follow ${scope.blocks."sub-agents-workflows".reference}
            * Update documentation if existing:
              * Mark phase doc task `[~]` when starting, `[x]` when done
                Like task format dictates. Done = all ACs verified passing
@@ -50,19 +49,13 @@
              scope.blocks."sub-agent-selection".reference
            } when the task needs a different agent
 
-        6. Validate via ${scope.blocks."development-completion-checklist".reference}
-           * Check every item; report validation results, failures, and deviations rather than reciting the checklist.
+        6. Validate ${scope.blocks."development-completion-checklist".reference}
 
         7. Validate formatting, linting, tests done
-           * If sub-agents did it, trust them
-           * If not, ask them back instead of wasting your context
 
-        8. Run ${scope.commands."proj-save".reference} to update project and phase docs.
+        8. Update project & phase docs using ${scope.commands."proj-save".reference}
 
-        9. Debrief me on
-           * What you did, learned and deviations from plan
-           * Any blockers
-           * Expected next steps
+        9. Debrief me, following ${scope.blocks."user-briefing".reference}
 
         ${scope.blocks."engagement-gate".release}
       '';

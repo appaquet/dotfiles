@@ -30,7 +30,7 @@
 
         ${scope.blocks."communication-style".embed}
 
-        ${scope.blocks."user-input-briefing".embed}
+        ${scope.blocks."user-briefing".embed}
 
         ${scope.blocks."pre-flight".embed}
 

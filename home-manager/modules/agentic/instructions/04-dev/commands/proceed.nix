@@ -15,10 +15,7 @@
 
         2. Execute tasks one by one
 
-        3. Debrief me on
-           * What you did, learned and deviations from plan
-           * Any blockers
-           * Expected next steps
+        3. Debrief me, following ${scope.blocks."user-briefing".reference}
 
         ${scope.blocks."engagement-gate".release}
       '';
