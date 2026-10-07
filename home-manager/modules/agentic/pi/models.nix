@@ -162,43 +162,6 @@ in
       codex = {
         main = {
           model = "openai/gpt-6.1-sol";
-          thinking = "medium";
-        };
-        remap = {
-          "scoped/junior" = {
-            model = "opencode-go/deepseek-v4.1-flash";
-            thinking = "low";
-          };
-          "scoped/summary" = {
-            model = "openai/gpt-6-luna";
-            thinking = "high";
-          };
-          "scoped/mid" = {
-            model = "openai/gpt-6-luna";
-            thinking = "high";
-          };
-          "scoped/senior" = {
-            model = "openai/gpt-6.1-sol";
-            thinking = "medium";
-          };
-          "scoped/staff" = {
-            model = "openai/gpt-6.1-sol";
-            thinking = "high";
-          };
-          "scoped/principal" = {
-            model = "openai/gpt-6-astra";
-            thinking = "medium";
-          };
-          "scoped/reviewer" = {
-            model = "openai/gpt-6.1-sol";
-            thinking = "low";
-          };
-        };
-      };
-
-      codex-high = {
-        main = {
-          model = "openai/gpt-6.1-sol";
           thinking = "high";
         };
         remap = {
@@ -211,24 +174,24 @@ in
             thinking = "high";
           };
           "scoped/mid" = {
-            model = "openai/gpt-6.1-sol";
-            thinking = "medium";
+            model = "openai/gpt-6-luna";
+            thinking = "high";
           };
           "scoped/senior" = {
             model = "openai/gpt-6.1-sol";
-            thinking = "xhigh";
+            thinking = "high";
           };
           "scoped/staff" = {
-            model = "openai/gpt-6-astra";
-            thinking = "medium";
+            model = "openai/gpt-6.1-sol";
+            thinking = "xhigh";
           };
           "scoped/principal" = {
             model = "openai/gpt-6-astra";
-            thinking = "high";
+            thinking = "medium";
           };
           "scoped/reviewer" = {
-            model = "openai/gpt-6-astra";
-            thinking = "low";
+            model = "openai/gpt-6.1-sol";
+            thinking = "medium";
           };
         };
       };

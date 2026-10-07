@@ -389,19 +389,9 @@ let
         npm = "@ai-sdk/openai-compatible";
         name = "deskapp";
         options = {
-          baseURL = "http://deskapp.n3x.net:15000/v1";
+          baseURL = "http://deskapp.n3x.net:8080/v1";
         };
         models = {
-          "unsloth/gemma-4-12B-it-qat-GGUF" = {
-            name = "unsloth/gemma-4-12B-it-qat-GGUF";
-          };
-          "RedHatAI/Muse-Glimmer-30B-NVFP4" = {
-            name = "RedHatAI/Muse-Glimmer-30B-NVFP4";
-          };
-          "ornith-1.5-35b" = {
-            name = "ornith-1.5-35b";
-          };
-
           # Official sampling params: https://huggingface.co/Qwen/Qwen3.6-27B
           "qwen3.8-27b" = {
             name = "qwen3.8-27b";
