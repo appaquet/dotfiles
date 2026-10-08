@@ -14,8 +14,7 @@
     ./git
     ./neovim
     ./utils
-    ./ssh.nix
-    ./ssh-agent.nix
+    ./ssh
     ./herdr
   ];
 
