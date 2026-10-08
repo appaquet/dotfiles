@@ -61,10 +61,10 @@
              * Update next step if decided/obvious
              * Keep short like project docs mention
 
-        6. Leave doc changes uncommitted
+        6. Place doc changes
            * Per the document version control rules in ${
              scope.skills."project-docs".reference
-           }: document changes remain as working-copy changes; never commit `proj-adhoc`, its temporary target, or its documents.
+           }: prefer folding documents into the work change over a standalone document commit, and never commit `proj-adhoc`, its temporary target, or its documents. When the documents live in this repository, try to keep them in the change holding the work they document.
       '';
     };
 }

@@ -43,7 +43,7 @@
            * If committed project files exist and the goal is aligned, add a phase to that project. Otherwise, create a new project and update the project link, preserving the existing project's documents.
            * If new project, follow the document version control rules in ${
              scope.skills."project-docs".reference
-           }: the proj symlink gets its own commit and documents stay uncommitted.
+           }: the proj symlink gets its own commit and documents are preferably folded into the work change.
 
         4. Research, clarify and plan
             ${scope.blocks."plan-procedure".embed}

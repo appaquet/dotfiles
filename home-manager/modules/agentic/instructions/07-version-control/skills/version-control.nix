@@ -96,7 +96,8 @@
           * Move file content from one change into another: `jj squash --from <A> --into <B> <paths...>`; an emptied source change is abandoned automatically
           * Modify an existing change without `jj edit`: `jj new <rev>`, make the change, then `jj squash -u`; use `jj edit <rev>` only when its direct behavior is intended (it replaces the whole working tree and can abandon the previous empty `@`) and the target is conflict-free
           * Resolve a conflicted revision: in a child created by `jj new <change_id>`, resolve the markers, inspect with `jj diff`, then `jj squash -u`; never `jj edit` the conflicted revision
-          * Rollback and consolidate: create rollback points before implementation, refactoring, or review fixes; at completion, consolidate only `private: agent:` changes created in this session (normally one change for ad-hoc work or one per phase)
+          * Rollback and consolidate: create rollback points before implementation, refactoring, or review fixes; at completion, consolidate only `private: agent:` changes created in this session (normally one change for ad-hoc work or one per phase). Project documents kept in this repository should travel with the work change they document
+          * Docs recipe (project documents in this repository): move the document paths from `@` into the full change ID of the work change they document with `jj squash --from @ --into <change_id> <doc paths...>`. Path-limited, so unrelated working changes stay in `@`. Nothing to do when `@` already is that change. This is a non-parent squash: apply the destructive-target inspection under Safety first, and skip it (mention that) when the target is immutable or not an agent change of this session
 
           ## Semantic commit messages
 

@@ -81,7 +81,12 @@
 
           ### Document version control
 
-          * Project and phase document changes remain as uncommitted working-copy changes. Never create a dedicated document commit. In a separate docs repository the user commits them when they choose; in the same repository they are part of the working change and ship with the work.
+          * Prefer folding documents into the work change over a standalone document commit. `jj status` lists the document files when they are in this repository.
+            * Separate docs repository, or `proj-adhoc`: leave them alone. The user commits them when they choose.
+            * Same repository: try to keep them with the work they document, in the `private: agent:` change holding that work (normally the phase change), rather than stranded on a trailing `@` or in the symlink commit. When you write documents and they are not there, move them with the docs recipe in ${
+              scope.skills."version-control".reference
+            }. Best effort: skip it when the owner change is unclear or the move would be risky, and mention it.
+            * Planning with no work change yet: leave them in `@`; implementation picks them up when it starts.
           * For a committed project, keep the `proj` symlink in its own commit named `private: proj - <project-name>`. That commit contains the symlink only; never mix document changes into it.
           * Review document changes as working-copy diffs (e.g. `jj diff` in the docs repo) before relying on them.
           * Never commit `proj-adhoc`, its temporary target, or its project and phase documents.

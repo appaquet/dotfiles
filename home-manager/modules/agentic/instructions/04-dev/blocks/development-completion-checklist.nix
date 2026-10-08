@@ -21,7 +21,7 @@
         * [ ] Formatting, linting, type check, tests pass
         * [ ] No unexpected file deletions
         * [ ] Dependent code is still compiling & testing
-        * [ ] Project doc updated, if exists
+        * [ ] Project doc updated, if exists, and in-repo docs ideally sit in the change holding the work
         * [ ] Full project test suite passes
       '';
     };

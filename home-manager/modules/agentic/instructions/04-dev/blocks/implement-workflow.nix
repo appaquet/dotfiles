@@ -34,6 +34,10 @@
         4. Create version control commits for this implementation
            * Check active changes
            * Commit with proper message or change active commit message
+           * Try to carry documents already in `@` from planning along with the work: describe `@` as the work change instead of running `jj new` past them, or move them into the new change with the docs recipe if `@` holds unrelated edits
+           * This commit is the preferred owner change for project documents kept in this repository (see the document version control rules in ${
+             scope.skills."project-docs".reference
+           })
 
         5. Implement tasks
            * Update documentation if existing:
@@ -54,6 +58,7 @@
         7. Validate formatting, linting, tests done
 
         8. Update project & phase docs using ${scope.commands."proj-save".reference}
+           * Check in-repo docs sit in the owner change from step 4; fix if easy
 
         9. Debrief me, following ${scope.blocks."user-briefing".reference}
 

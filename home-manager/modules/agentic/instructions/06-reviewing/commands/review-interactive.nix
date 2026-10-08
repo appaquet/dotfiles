@@ -38,7 +38,7 @@
          Do NOT launch review agents for feedback. We're just collecting evidence, not reviewing anything yet.
 
       3. When user calls planning flow for those items and all feedback/comments are investigated
-         and collected, project-document updates remain as uncommitted working-copy changes per the
+         and collected, place project-document updates per the
          document version control rules in ${scope.skills."project-docs".reference}. 
 
       ${scope.forHarness {
