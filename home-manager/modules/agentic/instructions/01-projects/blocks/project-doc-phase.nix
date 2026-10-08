@@ -13,6 +13,7 @@
 
         ${scope.forHarness {
           pi = "Order: Context, Requirements (optional), Design (optional), Questions & Investigations (optional), Sessions (optional), Tasks, Files\n";
+          claude = "Order: Context, Requirements (optional), Design (optional), Questions & Investigations (optional), Sessions (optional), Tasks, Files\n";
           default = "Order: Context, Requirements (optional), Design (optional), Questions & Investigations (optional), Tasks, Files\n";
         }}
 
@@ -36,6 +37,11 @@
 
         ${scope.forHarness {
           pi = ''
+            ### Sessions (optional)
+
+            Register sessions that planned this phase and sessions that worked on its tasks. Follow the Sessions rules.
+          '';
+          claude = ''
             ### Sessions (optional)
 
             Register sessions that planned this phase and sessions that worked on its tasks. Follow the Sessions rules.

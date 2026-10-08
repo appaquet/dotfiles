@@ -75,6 +75,11 @@
 
             Register sessions that contributed project-level knowledge (project planning, cross-phase decisions, investigations); phase planning and task sessions belong to the phase document. Follow the Sessions rules.
           '';
+          claude = ''
+            ### Sessions (optional)
+
+            Register sessions that contributed project-level knowledge (project planning, cross-phase decisions, investigations); phase planning and task sessions belong to the phase document. Follow the Sessions rules.
+          '';
           default = "";
         }}
 

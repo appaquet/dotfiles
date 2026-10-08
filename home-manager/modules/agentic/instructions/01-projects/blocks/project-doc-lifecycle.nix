@@ -59,6 +59,23 @@
               * <full-session-id>: Investigated concurrency limits
               ```
           '';
+          claude = ''
+            ### Sessions
+
+            Sessions sections list the sessions that contributed to the document, in chronological order; append an entry when a session's planning, work, or investigation is recorded.
+            * Each entry records the full session ID, the absolute transcript file path when known, and a concise purpose. When the transcript path is unknown, the entry omits the path.
+            * Record no entry when the session has no session ID.
+            * Keep one entry per session; a resumed session keeps its ID, so amend the existing entry instead of duplicating it.
+            * Obtain the session ID with `printf '%s\n' "$CLAUDE_CODE_SESSION_ID"`; never use a broad `env | grep CLAUDE` dump. Find its transcript with `ls "''${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/projects/*/"$CLAUDE_CODE_SESSION_ID".jsonl`.
+            * Project and phase documents remain authoritative; the transcript holds details the documents may omit or summarize.
+            * When loaded documents reference a session and your context lacks what that entry's purpose covers (fresh or compacted session), read the transcript at the recorded path with bounded queries, selecting only the messages the entry's purpose needs. Broad transcript scans go to an Explore agent; keep bounded queries in-session.
+            * Fold durable recovered facts into the document section they belong to, so later sessions do not depend on the transcript.
+            * Example entries:
+              ```markdown
+              * <full-session-id> /abs/path/to/transcript.jsonl: Planned phase 01 scope
+              * <full-session-id>: Investigated concurrency limits
+              ```
+          '';
           default = "";
         }}
 
