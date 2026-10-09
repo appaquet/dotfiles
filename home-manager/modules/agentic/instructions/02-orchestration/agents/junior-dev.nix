@@ -17,13 +17,7 @@
       };
 
       model = {
-        claude = {
-          claude = {
-            model = "sonnet";
-            effort = "low";
-          };
-          effort = "medium";
-        };
+        claude = "haiku";
         opencode = "openai/gpt-5.6-luna";
         pi = "scoped/junior";
       };
