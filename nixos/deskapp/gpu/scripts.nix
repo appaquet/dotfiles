@@ -682,7 +682,8 @@ rec {
         gpu_driver=$(get_bus_driver $gpu_bus)
         if [ "$gpu_driver" == "$to_driver" ]; then
             echo "Loading drivers bound to $to_driver automatically"
-            exit 0
+            # Return rather than exit so callers still run their post-switch steps
+            return 0
         fi
 
         echo "Rescanning PCI bus"
@@ -707,6 +708,10 @@ rec {
 
         # Force drivers to persist, preventing high power usage on idle
         nvidia-smi -pm 1
+
+        # Re-apply the power cap, which resets when the driver is reloaded. No-block
+        # because nvidia-power-cap is ordered after switch-gpu-boot, which runs this script.
+        systemctl restart --no-block nvidia-power-cap.service
 
         # Restart nvidia docker related stuff to make sure they get rebound
         systemctl reset-failed docker.service
