@@ -7,7 +7,6 @@ let
     in
     {
       macpow = final.callPackage ./macpow { };
-      jujutsu = final.callPackage ./jj { };
       mboxshell = final.callPackage ./mboxshell { };
     };
 
