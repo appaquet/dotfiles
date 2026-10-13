@@ -60,7 +60,8 @@ let
 
     # https://github.com/tintinweb/pi-tasks
     {
-      package = "npm:@tintinweb/pi-tasks@0.9.0";
+      # Prefer npm:@tintinweb/pi-tasks when a release includes the typebox peer fix.
+      package = "git:github.com/tintinweb/pi-tasks@fac016c192ac58727b3aea838831007be04664da";
       files = {
         # The /tasks settings UI only writes per-project overrides, never this file,
         # so nix can own it without clobbering runtime state.
@@ -241,7 +242,7 @@ let
     }
   ];
 
-  # npm packages feed settings.packages; local extension entries have no package.
+  # Package sources feed settings.packages; local extension entries have no package.
   npmPlugins = lib.filter (p: p ? "package") plugins;
 
   # Merge one optional attribute out of every plugin entry, dropping entries
