@@ -44,12 +44,12 @@ let
 
     # https://github.com/YuGiMob/pi-hashline-edit-pro
     {
-      package = "npm:pi-hashline-edit-pro@5.1.0";
+      package = "npm:pi-hashline-edit-pro@6.3.0";
     }
 
     # https://github.com/tintinweb/pi-subagents
     {
-      package = "npm:@tintinweb/pi-subagents@0.19.0";
+      package = "npm:@tintinweb/pi-subagents@0.20.0";
       files = {
         ".pi/agent/subagents.json".text = builtins.toJSON {
           disableDefaultAgents = true;
@@ -88,7 +88,7 @@ let
 
     # https://github.com/nicobailon/pi-web-access
     {
-      package = "npm:pi-web-access@0.35.0";
+      package = "npm:pi-web-access@0.38.0";
       files = {
         ".pi/agent/web-search.json".text = builtins.toJSON {
           provider = "exa";
@@ -175,7 +175,7 @@ let
 
     # https://github.com/arhen/pi-extensions
     {
-      package = "npm:@arhen/pi-core-tps-stats@1.3.2";
+      package = "npm:@arhen/pi-core-tps-stats@1.3.4";
       settings = {
         tokenSpeed = {
           slidingWindow = 1000;
