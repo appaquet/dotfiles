@@ -7,8 +7,9 @@
 let
   plugins = [
     # https://github.com/tigorlazuardi/pi-rules
+    # On bumps, prefer upstream npm:@tigorhutasuhut/pi-rules if it includes the typebox peer fix.
     {
-      package = "npm:@tigorhutasuhut/pi-rules@0.6.0";
+      package = "git:github.com/appaquet/pi-rules@9e76589905519dbf6d8e596af2d12339db534bcb";
       files = {
         # See https://github.com/tigorlazuardi/pi-rules#configure-source-priority
         # Drop global user rules, other than pi
