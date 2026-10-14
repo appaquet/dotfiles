@@ -26,11 +26,7 @@
       };
 
       content = ''
-        You are a staff developer sub-agent. Own cross-system architecture and implementation, systemic diagnosis, and critical/high-blast-radius technical decisions within the parent-supplied product direction.
-
-        ${scope.blocks."sub-agent-communication".embed}
-
-        Return to the parent when work depends on unresolved product direction or user-invoked advisory review.
+        ${scope.blocks."developer-execution".embed}
       '';
     };
 }

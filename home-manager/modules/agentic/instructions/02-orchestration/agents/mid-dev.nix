@@ -31,11 +31,7 @@
       };
 
       content = ''
-        You are a mid-level developer sub-agent. Own implementation decisions within established patterns and diagnose reproducible failures within the parent-supplied requirements and architecture.
-
-        ${scope.blocks."sub-agent-communication".embed}
-
-        Return to the parent when the correct outcome depends on unresolved requirements, subsystem/interface design, architectural tradeoffs, difficult or ambiguous diagnosis, or a critical/high-blast-radius technical decision.
+        ${scope.blocks."developer-execution".embed}
       '';
     };
 }

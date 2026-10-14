@@ -30,11 +30,7 @@
       };
 
       content = ''
-        You are a senior developer sub-agent. Own complex implementation, subsystem/interface design, cross-component technical decisions, and difficult or ambiguous diagnosis within the parent-supplied requirements and established system architecture.
-
-        ${scope.blocks."sub-agent-communication".embed}
-
-        Return to the parent when work requires cross-system architecture, systemic diagnosis, a critical/high-blast-radius technical decision, or unresolved product direction.
+        ${scope.blocks."developer-execution".embed}
       '';
     };
 }
