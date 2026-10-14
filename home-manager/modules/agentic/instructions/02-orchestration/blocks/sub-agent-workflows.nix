@@ -21,7 +21,6 @@
   #   - Implementation and decisions: Cross-system architecture/implementation and technical decisions within supplied product direction.
   #   - Diagnosis: Systemic failures.
   #   - Risk and ownership: Own critical/high-blast-radius technical work; return product direction or user-requested advisory review.
-  #   - Frontend: Owns design-level frontend UI/UX work (create + change); small mechanical UI tweaks within the established design are below that tier.
   # - Principal
   #   - Exploration: User-requested review only.
   #   - Implementation and decisions: Options, risks, evidence, and recommendations; no execution decisions or ownership.
@@ -44,7 +43,7 @@
 
       tag = "sub-agent-selection";
       taggedContent = ''
-        * Agent selection: select the listed dev agent whose description fits the task. Do not substitute explore/general/plan agents.
+        * Agent selection: select the listed dev agent by task complexity, required decisions, and risk, using the role descriptions below. Apply the same judgment to frontend work. Do not substitute explore/general/plan agents.
           * explore: Local code exploration, web search/explore, but not to be used for debugging / decision-making
           * junior-dev: ${scope.agents."junior-dev".description}
           * mid-dev: ${scope.agents."mid-dev".description}
