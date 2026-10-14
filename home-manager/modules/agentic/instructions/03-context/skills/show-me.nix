@@ -1,7 +1,7 @@
 {
   nixantic.sources.context-management.skills."show-me" = {
     kind = "directory";
-    main = {
+    main = { scope }: {
       description = "Use when the user explicitly asks to show, visualize, explain visually, mock, or design something, or asks to start or reuse a show-me server.";
       asCommand = {
         opencode = true;
@@ -15,7 +15,6 @@
         ## Boundaries
 
         * Act only on explicit visual intent, direct skill invocation, or an explicit show-me server request.
-        * Keep generated artifacts uncommitted unless the user separately asks to commit them.
         * Do not include unrequested secrets or sensitive repository content.
         * Run `agentic-show-me-serve` as a background process through this harness's background-process tools. Never use shell `&` or another unmanaged process.
         * `agentic-show-me-serve` serves the root on all interfaces with no authentication. It opens an anonymous cloudflared quick tunnel only when `--public` is passed, and that tunnel's random `trycloudflare.com` hostname is then the only access control.
@@ -45,10 +44,19 @@
         * Treat the template's dark expressive theme as a high-quality fallback, not a mandatory layout. Establish a visual thesis suited to the subject, then adapt the accent palette, composition, and content-specific components instead of mechanically filling placeholder sections.
         * Use hierarchy, depth, and restrained semantic color to explain relationships, status, or emphasis. Avoid a generic grayscale document or a repetitive grid of interchangeable cards when a diagram, timeline, comparison, annotated system view, or focused data display communicates better.
         * Add lightweight interaction when it materially improves understanding or exploration, such as filters, toggles, expandable detail, hover or focus inspection, or controlled animation. Keep the artifact useful without interaction; make controls keyboard-operable, show the current state, and provide a predictable initial or reset state.
+        * When adding page-level controls for variations, filters, or display modes, prefer a compact sticky control area so controls and their selected state remain visible and usable while scrolling. Adapt its placement and size to the viewport without obscuring content or keyboard focus.
         * Use a further pinned CDN dependency only when it materially improves the requested result.
         * When the user gives explicit design direction, replace or remove the template defaults instead of layering around them.
 
         * Use semantic markup, responsive layout, keyboard-accessible interaction, visible focus, adequate contrast, and reduced-motion handling.
+
+        ## Commit project artifacts
+
+        * For artifact requests using a committed `proj/`, if the artifact's canonical path belongs to the same repository as the symlink, commit new artifacts and follow-up edits in the existing `private: proj - <project-name>` change/commit containing that symlink, not in the implementation change.
+        * Follow ${
+          scope.skills."version-control".reference
+        } for repository operations. Inspect the target change and move only the artifact paths. If the symlink change is missing, ambiguous, immutable, or cannot be safely updated under those rules, leave the artifact changes uncommitted and report the blocker instead of creating a substitute commit or rewriting unrelated work.
+        * Keep artifacts in separate repositories, `proj-adhoc/`, or temporary serving directories uncommitted. For a separate repository, report that the artifact cannot join the symlink commit; do not relocate it or commit in the other repository.
 
         ## Manage a show-me server
 

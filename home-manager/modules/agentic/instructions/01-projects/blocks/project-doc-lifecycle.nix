@@ -87,7 +87,7 @@
               scope.skills."version-control".reference
             }. Best effort: skip it when the owner change is unclear or the move would be risky, and mention it.
             * Planning with no work change yet: leave them in `@`; implementation picks them up when it starts.
-          * For a committed project, keep the `proj` symlink in its own commit named `private: proj - <project-name>`. That commit contains the symlink only; never mix document changes into it.
+          * For a committed project, keep the `proj` symlink in its own commit named `private: proj - <project-name>`. That commit may also contain show-me artifacts stored in the same repository, including follow-up edits; keep project and phase documents with the work they document as described above, not in the symlink commit.
           * Review document changes as working-copy diffs (e.g. `jj diff` in the docs repo) before relying on them.
           * Never commit `proj-adhoc`, its temporary target, or its project and phase documents.
       '';
