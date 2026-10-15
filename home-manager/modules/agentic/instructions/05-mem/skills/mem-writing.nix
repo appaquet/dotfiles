@@ -10,8 +10,8 @@
         ## Context
 
         These guidelines cover skills, main and directory instructions, commands/prompts, agents, and reusable blocks. In AP's setup, harness means an agentic coding tool: Claude Code, OpenCode, or Pi.
-        Personal instruction sources are Nix files, typically under **~/dotfiles/**; harness artifacts are rendered from them. Some instruction files are directly authored Markdown and are edited in place. Read the applicable repository authoring guidance to tell them apart and to find the validation commands. Ask AP if the authoritative source cannot be located.
-        Source folders organize fragments and are not reflected in rendered output. The model sees delivered text, not Nix attributes, source folders, or block provenance. Judge structure and behavior in that delivered context.
+        AP's personal instruction sources are Nix files rendered by Nixantic (see the Nixantic section); other instruction files are directly authored Markdown and are edited in place. Read the applicable repository authoring guidance to tell them apart and to find the validation commands. Ask AP if the authoritative source cannot be located.
+        The model sees delivered text, not source files or fragments. Judge structure and behavior in that delivered context.
 
         ## Instructions
 
@@ -20,9 +20,8 @@
         * Keep structure simple and related guidance together. Use the relevant artifact section below; do not turn every concern into a separate top-level section or force every artifact into the same template.
         * Use `*` for ordinary unordered lists; keep `-` only in fenced or literal output templates. Never mix ordinary marker styles in one rendered file.
         * Use bullets for distinct points. Never lay out instructions as a table: binding column headers to values is harder for a model than reading a labelled bullet, so write each row as its own bullet with its labels inline.
-        * Steer and route rather than duplicate facts owned by code or other documentation. Code is the source of truth, while instructions rot because nothing compiles or refactors them. Keep one authoritative location per policy, reference or embed it where needed, and check for repetition in delivered text, including when a command, skill, or sub-directory instruction file restates what a more global file owns.
+        * Steer and route rather than duplicate facts owned by code or other documentation. Code is the source of truth, while instructions rot because nothing compiles or refactors them. Keep one authoritative location per policy and reference it where needed; never copy owned guidance into another file. Check for repetition in delivered text, including when a command, skill, or sub-directory instruction file restates what a more global file owns.
         * Keep shared guidance model-neutral. Scope harness- or model-specific behavior explicitly; preserve AP's planning, safety, testing, and approval requirements.
-        * Nixantic removes empty lines from rendered output. Use them for source readability; avoid wrapping instruction prose across indented source lines.
 
         ### Editing and reviewing instructions
 
@@ -37,7 +36,7 @@
 
         ### Harness surfaces
 
-        * Repo-level content is the only authoring surface that differs by harness. Everything of AP's own is authored once as Nix sources under **~/dotfiles** and rendered for every harness, so never send an author to a rendered artifact path.
+        * Repo-level content is the only authoring surface that differs by harness.
         * Repo instruction files are concatenated, never merged, and a file in a parent directory applies to every repo beneath it.
         * Prefer `CLAUDE.md` for a repo that serves several harnesses: Claude Code reads it directly, while OpenCode and Pi reach it only as a fallback behind `AGENTS.md`. Claude Code's `AGENTS.md` support is recent and unreliable without telemetry, so treat `AGENTS.md` as an alternative rather than the shared default.
 
@@ -56,6 +55,12 @@
         * Repo instruction files: one per directory, first match wins: `AGENTS.override.md`, `AGENTS.md`, `CLAUDE.md`. Every directory from the repo up to the filesystem root is read.
         * Repo artifacts: `.pi/prompts/*.md`, `.pi/skills/**/SKILL.md` plus `.agents/skills/`, and, from AP's extensions, `.pi/agents/*.md` and `.pi/rules/*.md`.
 
+        ### Nixantic (dotfiles only)
+
+        * Nixantic renders AP's personal instructions from Nix sources under **~/dotfiles/** into every harness; it is used only in the dotfiles repo. All other instruction files are directly authored Markdown.
+        * Nix sources organize fragments into source folders that are not reflected in rendered output, and Nixantic removes empty lines from rendered text. Use empty lines for source readability and avoid wrapping instruction prose across indented source lines.
+        * Edit the Nix sources, never rendered artifacts; validate with the dotfiles agentic guidance's build and check commands.
+
         ### Skills
 
         * Give each skill one coherent area of guidance and a concise description that makes its activation conditions clear. Skills generally explain how to work, rather than request a particular operation.
@@ -66,7 +71,8 @@
 
         ### Main and directory instructions
 
-        * Put persistent policies and broadly relevant context here. Keep global rules global; directory instructions should add only local guidance, source boundaries, and relevant commands.
+        * Instruction files steer and point: they carry policies, boundaries, preferences, and pointers to where to look, read, and run. Include a context fact only when the agent cannot discover it and needs it; if removing a line would cause no mistake, cut it, and if code or documentation owns the fact, point there instead.
+        * Keep global rules global; directory instructions should add only local guidance, source boundaries, and relevant commands.
         * Route to task-specific skills or documentation rather than loading their full procedures unconditionally.
 
         ### Commands / prompts
