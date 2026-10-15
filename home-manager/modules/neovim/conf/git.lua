@@ -188,6 +188,17 @@ local function open_diffview_working()
 	vim.notify("Diffing against " .. remote)
 end
 
+local function open_diffview_unreviewed()
+	close_all_diffviews()
+	local base = vim.fn.system("jj-unreviewed-base"):gsub("%s+", "")
+	if base == "" then
+		vim.notify("No unreviewed work on the current line")
+		return
+	end
+	vim.api.nvim_command("DiffviewOpen " .. base)
+	vim.notify("Diffing unreviewed stack against " .. base)
+end
+
 local function open_diffview_file_history()
 	close_all_diffviews()
 	vim.api.nvim_command("DiffviewFileHistory %")
@@ -199,6 +210,7 @@ require("which-key").add({
 
 vim.keymap.set("n", "<Leader>gdh", open_diffview_head, { desc = "Git: open diff view against head" })
 vim.keymap.set("n", "<Leader>gdw", open_diffview_working, { desc = "Git: open diff view against current bookmark" })
+vim.keymap.set("n", "<Leader>gdu", open_diffview_unreviewed, { desc = "Git: open diff view of unreviewed stack" })
 vim.keymap.set("n", "<Leader>gdm", open_diffview_main, { desc = "Git: open diff view against main branch" })
 vim.keymap.set("n", "<Leader>gdp", open_diffview_prev, { desc = "Git: open diff view against previous branch" })
 vim.keymap.set("n", "<Leader>gdf", open_diffview_file_history, { desc = "Git: open file history" })

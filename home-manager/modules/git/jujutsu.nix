@@ -72,7 +72,8 @@ in
         "closest_bookmark(to)" = "heads(::to & bookmarks())";
         "recent()" = "committer_date(after:\"1 months ago\")";
         "private()" = "description(glob:'private:*')";
-        "agent()" = "description(glob:'private: agent:*') | description(glob:'private: claude:*')";
+        "unreviewed()" = "description(glob:'unreviewed:*')";
+        "agent()" = "description(glob:'unreviewed:*') | description(glob:'private: agent:*')";
       };
 
       aliases = {
@@ -137,10 +138,47 @@ in
   home.packages = with pkgs; [
     jjui
 
-    # Promote agent changes out of private() by stripping their description prefix. The
-    # command lives in scripts/ as a plain shell file and shares that single source with
-    # the jj-promote-unit check, so the test exercises exactly what ships.
+    (writeShellScriptBin "jj-main-branch" ''
+      jj log --no-graph -r 'trunk()' -T 'coalesce(local_bookmarks)'
+    '')
+
+    (writeShellScriptBin "jj-current-branch" ''
+      jj --ignore-working-copy log --no-graph -r "closest_bookmark(@)" -T 'local_bookmarks.map(|b| b.name()).join(",")'
+    '')
+
+    (writeShellScriptBin "jj-prev-branch" ''
+      jj-stacked-branches | head -n 2 | tail -n 1
+    '')
+
+    (writeShellScriptBin "jj-unreviewed-base" ''
+      set -euo pipefail
+
+      # Explicit globs, not the agent() alias: this must work without user-config revsets
+      agent_globs="description(glob:'unreviewed:*') | description(glob:'private: agent:*') | description(glob:'private: claude:*')"
+
+      if [ -z "$(jj --ignore-working-copy log --no-graph -r "trunk()..@ & ($agent_globs)" -T 'change_id')" ]; then
+        # No pending agent work on the line: print nothing, the caller reports it
+        exit 0
+      fi
+
+      base=$(jj --ignore-working-copy log --no-graph \
+        -r "latest(heads(::@- & ~($agent_globs)), 1)" -T 'commit_id ++ "\n"')
+
+      # The line is entirely agent work (or only the synthetic root remains): diff from trunk
+      if [ -z "$base" ] || [[ "$base" =~ ^0{40}$ ]]; then
+        base=$(jj --ignore-working-copy log --no-graph -r 'trunk()' -T 'commit_id ++ "\n"')
+      fi
+
+      if [ -z "$base" ]; then
+        echo "Unable to resolve a base for the unreviewed stack diff." >&2
+        exit 1
+      fi
+      printf '%s\n' "$base"
+    '')
+
+    # Promote agent / unreviewed changes by stripping their changes prefix
     (writeShellScriptBin "jj-promote" (builtins.readFile ./scripts/jj-promote.sh))
+
     (writeShellScriptBin "jj-proj-tug" ''
       set -euo pipefail
 
@@ -154,15 +192,7 @@ in
 
       jj tug
     '')
-    (writeShellScriptBin "jj-main-branch" ''
-      jj log --no-graph -r 'trunk()' -T 'coalesce(local_bookmarks)'
-    '')
-    (writeShellScriptBin "jj-current-branch" ''
-      jj --ignore-working-copy log --no-graph -r "closest_bookmark(@)" -T 'local_bookmarks.map(|b| b.name()).join(",")'
-    '')
-    (writeShellScriptBin "jj-prev-branch" ''
-      jj-stacked-branches | head -n 2 | tail -n 1
-    '')
+
     (writeShellScriptBin "jj-diff-working" ''
       set -euo pipefail
       ${resolveJjDiffBase}
@@ -180,6 +210,17 @@ in
       base=$(resolve_jj_diff_base "$previous" 'the previous stacked bookmark')
       jj diff --from "$base" --to @ "$@"
     '')
+    (writeShellScriptBin "jj-diff-unreviewed" ''
+      set -euo pipefail
+
+      base=$(jj-unreviewed-base)
+      if [ -z "$base" ]; then
+        echo "No unreviewed work on the current line."
+        exit 0
+      fi
+      jj diff --from "$base" --to @ "$@"
+    '')
+
     (writeShellScriptBin "jj-stacked-branches" ''
       jj log --no-graph -r '(trunk()..@ | trunk()) & bookmarks()' -T 'coalesce(local_bookmarks) ++ "\n"' | sed 's/ *\*$//'
     '')

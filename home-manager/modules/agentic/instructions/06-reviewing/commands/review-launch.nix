@@ -3,7 +3,7 @@
     { scope }:
     let
       reviewCheckpoint = ''
-        1. Prepare a dedicated `jj` review change named `private: agent: review - <topic>` using the repository version-control rule
+        1. Prepare a dedicated `jj` review change named `unreviewed: review - <topic>` using the repository version-control rule
            * Keep reviewer follow-up isolated from unrelated edits
       '';
     in

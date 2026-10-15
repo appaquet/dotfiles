@@ -55,7 +55,7 @@
           * `<rev>::@` - descendants from a revision through `@`
           * `ancestors(<rev>, <depth>)` - bounded ancestry
           * `trunk()`, `bookmarks()`, `all()` - repository sets
-          * AP aliases: `private()`, `agent()`, `proj()`, `recent()`
+          * AP aliases: `private()`, `unreviewed()`, `agent()`, `proj()`, `recent()`
 
           Template example: `jj log -r <revset> -T 'change_id.shortest() ++ " " ++ description.first_line() ++ "\n"'`. Template output is suitable for display; use full `change_id` when saving a target for later writes.
 
@@ -72,21 +72,21 @@
 
           ## Shape changes
 
-          * Finalize current changes and create a new empty `@`: `jj commit -m "private: agent: <type>(<area>): description"`
-          * Finalize selected files; the remaining files move to the new `@`: `jj commit -m "private: agent: <type>(<area>): description" <files...>`
-          * Create a child of the current or named revision: `jj new [<rev>] -m "private: agent: <type>(<area>): description"`
-          * Describe the current change: `jj describe -m "private: agent: <type>(<area>): description"`
+          * Finalize current changes and create a new empty `@`: `jj commit -m "unreviewed: <type>(<area>): description"`
+          * Finalize selected files; the remaining files move to the new `@`: `jj commit -m "unreviewed: <type>(<area>): description" <files...>`
+          * Create a child of the current or named revision: `jj new [<rev>] -m "unreviewed: <type>(<area>): description"`
+          * Describe the current change: `jj describe -m "unreviewed: <type>(<area>): description"`
           * Move current content into its parent, keeping the parent's message: `jj squash -u [<files...>]`
-          * Move current content into its parent and replace the parent's message: `jj squash -m "private: agent: <type>(<area>): description" [<files...>]`
-          * Split selected files into the original change: `jj split -m "private: agent: <type>(<area>): description" <files...>`
+          * Move current content into its parent and replace the parent's message: `jj squash -m "unreviewed: <type>(<area>): description" [<files...>]`
+          * Split selected files into the original change: `jj split -m "unreviewed: <type>(<area>): description" <files...>`
           * Path arguments to `jj commit <paths>` and `jj split <paths>` are literal filesets, not rename-aware: pass both the old and new paths to include a rename
 
           For `jj split`, selected files remain in the original change and `-m` describes that selected/original side. Never run bare `jj split`, `-i`, or an unspecified merge tool in an agent shell; they are interactive.
 
           Before starting a work unit:
 
-          * Empty `@` -> `jj describe -m "private: agent: <type>(<area>): description"`
-          * `@` has content -> `jj new -m "private: agent: <type>(<area>): description"`
+          * Empty `@` -> `jj describe -m "unreviewed: <type>(<area>): description"`
+          * `@` has content -> `jj new -m "unreviewed: <type>(<area>): description"`
 
           `jj restore <paths...>` restores paths in `@` from its parents. `jj restore` without paths restores the whole working-copy change from its parents but keeps the now-empty change and its description. `jj restore -c <rev>` reverses the changes introduced by a revision.
 
@@ -96,17 +96,17 @@
           * Move file content from one change into another: `jj squash --from <A> --into <B> <paths...>`; an emptied source change is abandoned automatically
           * Modify an existing change without `jj edit`: `jj new <rev>`, make the change, then `jj squash -u`; use `jj edit <rev>` only when its direct behavior is intended (it replaces the whole working tree and can abandon the previous empty `@`) and the target is conflict-free
           * Resolve a conflicted revision: in a child created by `jj new <change_id>`, resolve the markers, inspect with `jj diff`, then `jj squash -u`; never `jj edit` the conflicted revision
-          * Rollback and consolidate: create rollback points before implementation, refactoring, or review fixes; at completion, consolidate only `private: agent:` changes created in this session (normally one change for ad-hoc work or one per phase). Project documents kept in this repository should travel with the work change they document
+          * Rollback and consolidate: create rollback points before implementation, refactoring, or review fixes; at completion, consolidate only `unreviewed:` changes created in this session (in-flight legacy `private: agent:` changes may still appear; consolidate them the same way; normally one change for ad-hoc work or one per phase). Project documents kept in this repository should travel with the work change they document
           * Docs recipe (project documents in this repository): move the document paths from `@` into the full change ID of the work change they document with `jj squash --from @ --into <change_id> <doc paths...>`. Path-limited, so unrelated working changes stay in `@`. Nothing to do when `@` already is that change. This is a non-parent squash: apply the destructive-target inspection under Safety first, and skip it (mention that) when the target is immutable or not an agent change of this session
 
           ## Semantic commit messages
 
-          Every agent change description is a semantic commit message (conventional commits): the `private: agent: ` prefix, then `<type>(<area>): <short imperative>`, e.g. `private: agent: feat(instr): add jj workspace rule`, `private: agent: fix(pi): bump mcp adapter`, `private: agent: chore(deps): bump flake lock`. Format follows the Conventional Commits spec (https://www.conventionalcommits.org/).
+          Every agent change description is a semantic commit message (conventional commits): the `unreviewed: ` prefix, then `<type>(<area>): <short imperative>`, e.g. `unreviewed: feat(instr): add jj workspace rule`, `unreviewed: fix(pi): bump mcp adapter`, `unreviewed: chore(deps): bump flake lock`. Format follows the Conventional Commits spec (https://www.conventionalcommits.org/).
 
           * `<type>` is the conventional commit type: `build`, `chore`, `docs`, `feat`, `fix`, `perf`, `refactor`
           * `<area>` is the conventional scope: a lowercase tag for the subsystem the change touches. Check jj log for examples. Optional per the format, but include it when the change maps to one clear area.
           * Keep the description imperative and near 10 words
-          * The `private: agent: ` prefix is what keeps the change unpushed (`private()`) and selectable (`agent()`); never drop it. This applies to every agent change, scratch and final
+          * The `unreviewed: ` prefix marks the change as pending review and promotion: it is selectable (`unreviewed()`, via `agent()`) and stripped by AP's promotion (jj-promote); never drop it yourself, and never push a change while it still carries the prefix. This applies to every agent change, scratch and final
 
           ## AP helpers
 
@@ -115,6 +115,8 @@
           * Work since closest bookmark or trunk, including private changes: `jj-diff-working --git` (`--stat` for files)
           * Current branch against the previous stacked bookmark: `jj-diff-branch --git`
           * Current, main, or previous branch name: `jj-current-branch`, `jj-main-branch`, `jj-prev-branch`
+          * Unreviewed stack against its base: `jj-diff-unreviewed --git` (`--stat` for files); with no pending work it prints a notice and exits
+          * Base of the unreviewed stack: `jj-unreviewed-base` (last reviewed ancestor of the current line; `trunk()` when the whole line is agent work; empty output when there is no pending agent work) — feeds `jj-diff-unreviewed` and the nvim `<leader>gdu` diffview review
 
           For `gh`, use `$(jj-current-branch)` because git is detached.
 

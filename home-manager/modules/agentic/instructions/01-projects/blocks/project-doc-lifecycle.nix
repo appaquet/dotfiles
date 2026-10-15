@@ -83,7 +83,7 @@
 
           * Prefer folding documents into the work change over a standalone document commit. `jj status` lists the document files when they are in this repository.
             * Separate docs repository, or `proj-adhoc`: leave them alone. The user commits them when they choose.
-            * Same repository: try to keep them with the work they document, in the `private: agent:` change holding that work (normally the phase change), rather than stranded on a trailing `@` or in the symlink commit. When you write documents and they are not there, move them with the docs recipe in ${
+            * Same repository: try to keep them with the work they document, in the `unreviewed:` change holding that work (normally the phase change), rather than stranded on a trailing `@` or in the symlink commit. When you write documents and they are not there, move them with the docs recipe in ${
               scope.skills."version-control".reference
             }. Best effort: skip it when the owner change is unclear or the move would be risky, and mention it.
             * Planning with no work change yet: leave them in `@`; implementation picks them up when it starts.

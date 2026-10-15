@@ -59,7 +59,6 @@ direct `import ./path` of the overlay/file that wraps the fetch (reads the uncom
 flake ref reads git HEAD in this worktree). This catches `sourceRoot`/`postPatch` failures. Skip
 this build for darwin-only packages on Linux (hash + eval suffice).
 
-4. Commit with jj per the version-control workflow: one commit for the bump, prefix `private:
-agent:`.
+4. Commit with jj per the version-control workflow: one commit for the bump, prefix `unreviewed:`.
 
 5. Final eval after the commit (the flake ref now sees the change): `HOST=deskapp ./x home check`.

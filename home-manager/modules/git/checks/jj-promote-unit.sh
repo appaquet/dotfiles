@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 #
-# Behavioral suite for the jj-promote command (see the phase doc "jj promote agent commits").
+# Behavioral suite for the jj-promote command (see the phase doc "unreviewed prefix").
 #
-# jj-promote promotes agent-authored jujutsu changes by stripping the
-# `private: agent: ` (or legacy `private: claude: `) description prefix, which moves the
-# change outside the private() revset and makes it pushable while keeping its
-# conventional-commit message untouched.
+# jj-promote promotes agent-authored jujutsu changes by stripping the `unreviewed: `
+# description prefix. The previous `private: agent: ` / `private: claude: ` prefixes are
+# recognized too, but those changes are only stripped after a confirmation prompt (or with
+# --yes); non-interactive runs without --yes leave them untouched. Stripping a legacy prefix
+# additionally moves the change outside the private() revset, making it pushable.
 #
 # The suite builds throwaway jj repositories, runs the command under test, and asserts
 # resulting descriptions byte-exactly plus repository-level effects (dry-run leaves no
@@ -72,7 +73,7 @@ desc_of() {
   (cd "$1" && jj log --no-graph -r "$2" -T 'description')
 }
 
-# private_of <repo> <change-id>  -> "true"/"false" whether the change is still in private()
+# private_of <repo> <change-id>  -> "private"/"public" whether the change is still in private()
 private_of() {
   local out
   out=$( (cd "$1" && jj log --no-graph \
@@ -121,20 +122,20 @@ change_id_of() {
 
 echo "== jj-promote suite =="
 
-# --- Case: single-line agent change, explicit revset ----------------------------
+# --- Case: single-line new-prefix change, explicit revset -------------------------
 repo=$(new_repo) || { echo "FATAL: repo setup failed" >&2; exit 1; }
-add_change "$repo" -m 'private: agent: feat(home): add example command'
+add_change "$repo" -m 'unreviewed: feat(home): add example command'
 cid_single=$(change_id_of "$repo" '@-')
 (cd "$repo" && "$PROMOTE" "$cid_single" >"$out/out.log" 2>&1); rc=$?
 assert_true "single-line promote exits 0" "$rc"
-assert_eq "single-line description stripped to conventional form" \
+assert_eq "single-line new prefix stripped to conventional form" \
   'feat(home): add example command' \
   "$(desc_of "$repo" "$cid_single")"
 assert_eq "single-line change left private()" \
   "public" "$(private_of "$repo" "$cid_single")"
 
-# --- Case: multiline agent change keeps its body byte-exact ---------------------
-add_change "$repo" -m 'private: agent: fix(nix): guard workspace delete' -m 'body line one
+# --- Case: multiline new-prefix change keeps its body byte-exact ------------------
+add_change "$repo" -m 'unreviewed: fix(nix): guard workspace delete' -m 'body line one
 body line two'
 cid_multi=$(change_id_of "$repo" '@-')
 (cd "$repo" && "$PROMOTE" "$cid_multi" >"$out/out.log" 2>&1); rc=$?
@@ -146,57 +147,100 @@ body line one
 body line two' \
   "$(desc_of "$repo" "$cid_multi")"
 
-# --- Case: legacy claude prefix is also promoted --------------------------------
-add_change "$repo" -m 'private: claude: docs(readme): refresh cheat sheet'
-cid_claude=$(change_id_of "$repo" '@-')
-(cd "$repo" && "$PROMOTE" "$cid_claude" >"$out/out.log" 2>&1); rc=$?
-assert_true "legacy claude promote exits 0" "$rc"
-assert_eq "legacy claude prefix stripped" \
+# --- Case: new-prefix-only description is skipped ----------------------------------
+add_change "$repo" -m 'unreviewed: '
+cid_prefixonly=$(change_id_of "$repo" '@-')
+before_prefixonly=$(desc_of "$repo" "$cid_prefixonly")
+(cd "$repo" && "$PROMOTE" "$cid_prefixonly" >"$out/out.log" 2>&1); rc=$?
+assert_true "new-prefix-only skip run exits 0" "$rc"
+assert_eq "new-prefix-only description untouched" "$before_prefixonly" "$(desc_of "$repo" "$cid_prefixonly")"
+
+# --- Case: legacy agent prefix stripped with --yes ---------------------------------
+add_change "$repo" -m 'private: agent: docs(readme): refresh cheat sheet'
+cid_agent=$(change_id_of "$repo" '@-')
+(cd "$repo" && "$PROMOTE" --yes "$cid_agent" >"$out/out.log" 2>&1); rc=$?
+assert_true "legacy agent --yes promote exits 0" "$rc"
+assert_eq "legacy agent prefix stripped with --yes" \
   'docs(readme): refresh cheat sheet' \
+  "$(desc_of "$repo" "$cid_agent")"
+assert_eq "legacy agent change left private()" \
+  "public" "$(private_of "$repo" "$cid_agent")"
+
+# --- Case: legacy claude prefix stripped after a piped yes -------------------------
+add_change "$repo" -m 'private: claude: chore(ci): tune check job'
+cid_claude=$(change_id_of "$repo" '@-')
+(cd "$repo" && printf 'y\n' | "$PROMOTE" "$cid_claude" >"$out/out.log" 2>&1); rc=$?
+assert_true "legacy claude piped-yes promote exits 0" "$rc"
+assert_eq "legacy claude prefix stripped after piped yes" \
+  'chore(ci): tune check job' \
   "$(desc_of "$repo" "$cid_claude")"
 
-# --- Case: protected and unrelated descriptions are skipped ---------------------
+# --- Case: protected and unrelated descriptions are skipped ------------------------
 add_change "$repo" -m 'private: proj - some-project'
 cid_proj=$(change_id_of "$repo" '@-')
 add_change "$repo" -m 'private: scratch note'
 cid_scratch=$(change_id_of "$repo" '@-')
 add_change "$repo" -m 'feat(already): public change'
 cid_public=$(change_id_of "$repo" '@-')
-add_change "$repo" -m 'private: agent: '
-cid_prefixonly=$(change_id_of "$repo" '@-')
 
-revset="$cid_proj | $cid_scratch | $cid_public | $cid_prefixonly"
+revset="$cid_proj | $cid_scratch | $cid_public"
 before_proj=$(desc_of "$repo" "$cid_proj")
 before_scratch=$(desc_of "$repo" "$cid_scratch")
 before_public=$(desc_of "$repo" "$cid_public")
-before_prefixonly=$(desc_of "$repo" "$cid_prefixonly")
 (cd "$repo" && "$PROMOTE" "$revset" >"$out/out.log" 2>&1)
 rc=$?
 assert_true "skip-only run exits 0" "$rc"
 assert_eq "proj commit description untouched" "$before_proj" "$(desc_of "$repo" "$cid_proj")"
 assert_eq "scratch private description untouched" "$before_scratch" "$(desc_of "$repo" "$cid_scratch")"
 assert_eq "already-public description untouched" "$before_public" "$(desc_of "$repo" "$cid_public")"
-assert_eq "prefix-only description untouched" "$before_prefixonly" "$(desc_of "$repo" "$cid_prefixonly")"
-assert_eq "prefix-only change stays private" "private" "$(private_of "$repo" "$cid_prefixonly")"
 
-# --- Case: default revset promotes agent changes above trunk --------------------
-# the earlier agent changes are already promoted; add a fresh agent chain instead
-add_change "$repo" -m 'private: agent: chore(ci): tune check job'
-add_change "$repo" -m 'private: agent: perf(shell): speed up prompt'
+# --- Case: mixed decline: new prefix promoted, legacy untouched on a piped no ------
+add_change "$repo" -m 'unreviewed: feat(shell): new pending work'
+cid_mixed_new=$(change_id_of "$repo" '@-')
+add_change "$repo" -m 'private: agent: fix(shell): legacy pending work'
+cid_mixed_legacy=$(change_id_of "$repo" '@-')
+before_mixed_legacy=$(desc_of "$repo" "$cid_mixed_legacy")
+(cd "$repo" && printf 'n\n' | "$PROMOTE" "$cid_mixed_new | $cid_mixed_legacy" >"$out/out.log" 2>&1); rc=$?
+assert_true "mixed decline run exits 0" "$rc"
+assert_eq "mixed decline: unreviewed change stripped" \
+  'feat(shell): new pending work' \
+  "$(desc_of "$repo" "$cid_mixed_new")"
+assert_eq "mixed decline: legacy change untouched" \
+  "$before_mixed_legacy" "$(desc_of "$repo" "$cid_mixed_legacy")"
+assert_eq "mixed decline: legacy change still private" \
+  "private" "$(private_of "$repo" "$cid_mixed_legacy")"
+
+# --- Case: default revset promotes new-prefix changes above trunk ------------------
+add_change "$repo" -m 'unreviewed: chore(ci): tune check job'
+add_change "$repo" -m 'unreviewed: perf(shell): speed up prompt'
 cid_agent_a=$(change_id_of "$repo" '@--')
 cid_agent_b=$(change_id_of "$repo" '@-')
 (cd "$repo" && "$PROMOTE" >"$out/out.log" 2>&1); rc=$?
 assert_true "bare invoke exits 0" "$rc"
-assert_eq "bare invoke promotes agent change A via default revset" \
+assert_eq "bare invoke promotes new-prefix change A via default revset" \
   'chore(ci): tune check job' \
   "$(desc_of "$repo" "$cid_agent_a")"
-assert_eq "bare invoke promotes agent change B via default revset" \
+assert_eq "bare invoke promotes new-prefix change B via default revset" \
   'perf(shell): speed up prompt' \
   "$(desc_of "$repo" "$cid_agent_b")"
 assert_eq "proj commit still skipped after bare invoke" "$before_proj" "$(desc_of "$repo" "$cid_proj")"
 assert_eq "scratch private still skipped after bare invoke" "$before_scratch" "$(desc_of "$repo" "$cid_scratch")"
 
-# --- Case: bare invoke leaves commits at or below trunk untouched -----------------
+# --- Case: default revset with --yes promotes legacy changes above trunk -----------
+add_change "$repo" -m 'private: agent: chore(ci): legacy tune'
+add_change "$repo" -m 'private: agent: perf(shell): legacy speedup'
+cid_legacy_a=$(change_id_of "$repo" '@--')
+cid_legacy_b=$(change_id_of "$repo" '@-')
+(cd "$repo" && "$PROMOTE" --yes >"$out/out.log" 2>&1); rc=$?
+assert_true "bare invoke --yes exits 0" "$rc"
+assert_eq "bare invoke --yes promotes legacy change A" \
+  'chore(ci): legacy tune' \
+  "$(desc_of "$repo" "$cid_legacy_a")"
+assert_eq "bare invoke --yes promotes legacy change B" \
+  'perf(shell): legacy speedup' \
+  "$(desc_of "$repo" "$cid_legacy_b")"
+
+# --- Case: bare invoke leaves commits at or below trunk untouched ------------------
 # trunk() is the master@origin remote bookmark, so a published commit sits outside
 # trunk()..@ and must never be swept by a bare invoke. This pins the blast radius of
 # the default revset: the remote is only created here, after the earlier cases ran.
@@ -209,36 +253,50 @@ assert_true "adding a remote to the test repo succeeds" "$rc"
 assert_true "moving the trunk bookmark onto the agent commit succeeds" "$rc"
 (cd "$repo" && jj git push --allow-private -b master >/dev/null 2>&1); rc=$?
 assert_true "publishing the trunk bookmark succeeds" "$rc"
-(cd "$repo" && "$PROMOTE" >"$out/out.log" 2>&1); rc=$?
+(cd "$repo" && "$PROMOTE" --yes >"$out/out.log" 2>&1); rc=$?
 assert_true "bare invoke with trunk at an agent commit exits 0" "$rc"
 assert_eq "agent commit at trunk stays out of the default trunk()..@ range" \
   'private: agent: fix(trunk): buried on mainline' \
   "$(desc_of "$repo" "$cid_buried")"
 
-# --- Case: re-run after promotion is a no-op ------------------------------------
+# --- Case: re-run after promotion is a no-op ---------------------------------------
 op_before=$(first_op_id "$repo")
 (cd "$repo" && "$PROMOTE" >"$out/out2.log" 2>&1); rc=$?
 assert_true "re-run exits 0" "$rc"
 op_after=$(first_op_id "$repo")
 assert_eq "re-run creates no mutation" "$op_before" "$op_after"
 
-# --- Case: --dry-run reports without mutating -----------------------------------
-add_change "$repo" -m 'private: agent: refactor(vcs): extract helper'
+# --- Case: --dry-run reports without mutating --------------------------------------
+add_change "$repo" -m 'unreviewed: refactor(vcs): extract helper'
 cid_dry=$(change_id_of "$repo" '@-')
+before_dry=$(desc_of "$repo" "$cid_dry")
 op_before=$(first_op_id "$repo")
 (cd "$repo" && "$PROMOTE" --dry-run "$cid_dry" >"$out/out3.log" 2>&1); rc=$?
 assert_true "dry-run exits 0" "$rc"
-assert_eq "dry-run leaves description untouched" \
-  'private: agent: refactor(vcs): extract helper' \
-  "$(desc_of "$repo" "$cid_dry")"
+assert_eq "dry-run leaves description untouched" "$before_dry" "$(desc_of "$repo" "$cid_dry")"
 op_after=$(first_op_id "$repo")
 assert_eq "dry-run creates no mutation" "$op_before" "$op_after"
 
-# --- Case: unknown revset fails loudly ------------------------------------------
+# --- Case: --dry-run with legacy in scope does not block or mutate ------------------
+add_change "$repo" -m 'private: agent: refactor(vcs): legacy helper'
+cid_dry_legacy=$(change_id_of "$repo" '@-')
+before_dry_legacy=$(desc_of "$repo" "$cid_dry_legacy")
+op_before=$(first_op_id "$repo")
+(cd "$repo" && "$PROMOTE" --dry-run "$cid_dry_legacy" </dev/null >"$out/out4.log" 2>&1); rc=$?
+assert_true "dry-run with legacy exits 0 without a TTY" "$rc"
+assert_eq "dry-run with legacy leaves description untouched" \
+  "$before_dry_legacy" "$(desc_of "$repo" "$cid_dry_legacy")"
+op_after=$(first_op_id "$repo")
+assert_eq "dry-run with legacy creates no mutation" "$op_before" "$op_after"
+grep -q 'would promote (previous format, confirm at write time)' "$out/out4.log" \
+  && pass "dry-run flags the legacy change for confirmation" \
+  || fail "dry-run flags the legacy change for confirmation" "$(cat "$out/out4.log")"
+
+# --- Case: unknown revset fails loudly ----------------------------------------------
 (cd "$repo" && "$PROMOTE" 'this is not a revset((' >/dev/null 2>&1); rc=$?
 assert_false "invalid revset exits non-zero" "$rc"
 
-# --- Cleanup ---------------------------------------------------------------------
+# --- Cleanup ------------------------------------------------------------------------
 rm -rf "$repo"
 
 echo "== results: $((tests - failures))/$tests passed =="

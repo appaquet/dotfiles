@@ -189,6 +189,7 @@ keymaps, but also default/built-ins that I tend to forget.
 
 * `<leader>gdh` Open diff view against head (uncommitted changes)
 * `<leader>gdw` Open diff view against current bookmark (changes since last push)
+* `<leader>gdu` Open diff view of the unreviewed stack (agent work pending review, since last promoted change)
 * `<leader>gdm` Open diff view against main branch
 * `<leader>gdp` Open diff view against previous branch
 * `<leader>gdc` Open diff view against given rev/commit
