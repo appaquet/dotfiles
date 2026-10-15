@@ -6,8 +6,9 @@
 # ($fakehome/.ssh/agent/s.<hash>.sshd.<rand> — sshd tags forwarded sockets
 # "sshd") stand in for forwarded
 # sockets (default-layout sockets under a $TMPDIR-based fake home exceed
-# macOS's 104-char Unix socket path limit), and an arbitrary non-layout
-# path stands in for the configured local agent.
+# macOS's 104-char Unix socket path limit), an arbitrary non-layout
+# path stands in for the configured local agent, and a symlink to a layout-shaped
+# socket stands in for herdr's (>= 0.9.2) stable agent address.
 set -euo pipefail
 
 script=${1:?usage: ssh-agent-slot.test.sh <path-to-ssh-agent-slot>}
@@ -290,6 +291,85 @@ t_local_agent_layout() {
     assert_link "local-agent: backup untouched" "$home/.ssh/ssh_auth_sock_b" /dev/null
 }
 
+# 11. A herdr stable-address symlink to a live forwarded socket promotes like the raw
+# socket: primary tracks the link, configured local socket moves to backup.
+t_herdr_link_promotion() {
+    local home local_sock fwd link
+    home=$(new_home)
+    local_sock="$home/local.sock"
+    start_agent "$local_sock" >/dev/null
+    fwd="$home/.ssh/agent/s.h1.sshd.r1"
+    start_agent "$fwd" >/dev/null
+    link="$home/.config/herdr/herdr.sock.agent"
+    mkdir -p -- "$home/.config/herdr"
+    ln -s -- "$fwd" "$link"
+    init_run "$home" "$local_sock" "$link"
+    assert_link "herdr-link: primary is the link" "$home/.ssh/ssh_auth_sock" "$link"
+    assert_link "herdr-link: backup is local" "$home/.ssh/ssh_auth_sock_b" "$local_sock"
+}
+
+# 12. Herdr retargets the link between init runs: the slot keeps the link and resolves
+# the new target; the probe fails once the target dies.
+t_herdr_link_retarget() {
+    local home link f1 f2 p1 p2
+    home=$(new_home)
+    f1="$home/.ssh/agent/s.h1.sshd.r1"
+    f2="$home/.ssh/agent/s.h2.sshd.r2"
+    p1=$(start_agent "$f1")
+    link="$home/.config/herdr/herdr.sock.agent"
+    mkdir -p -- "$home/.config/herdr"
+    ln -s -- "$f1" "$link"
+    init_run "$home" "" "$link"
+    assert_link "herdr-retarget: primary is the link" "$home/.ssh/ssh_auth_sock" "$link"
+    p2=$(start_agent "$f2")
+    ln -sfn -- "$f2" "$link"
+    init_run "$home" "" "$link"
+    assert_link "herdr-retarget: primary stays the link" "$home/.ssh/ssh_auth_sock" "$link"
+    expect_rc "herdr-retarget: probe resolves new target" 0 run "$home" "" probe "$home/.ssh/ssh_auth_sock"
+    kill "$p1" "$p2" 2>/dev/null
+    sleep 0.3
+    expect_rc "herdr-retarget: probe fails after agent death" 1 run "$home" "" probe "$home/.ssh/ssh_auth_sock"
+}
+
+# 13. A link to a live non-layout socket (herdr unavailable marker or arbitrary agent)
+# is never promoted; the slots are left untouched.
+t_herdr_link_unavailable() {
+    local home local_sock other link
+    home=$(new_home)
+    local_sock="$home/local.sock"
+    start_agent "$local_sock" >/dev/null
+    init_run "$home" "$local_sock"
+    mkdir -p -- "$home/.config/herdr"
+    other="$home/.config/herdr/other.sock"
+    start_agent "$other" >/dev/null
+    link="$home/.config/herdr/herdr.sock.agent"
+    ln -s -- "$other" "$link"
+    init_run "$home" "$local_sock" "$link"
+    assert_link "herdr-unavailable: primary untouched" "$home/.ssh/ssh_auth_sock" "$local_sock"
+    assert_link "herdr-unavailable: backup untouched" "$home/.ssh/ssh_auth_sock_b" /dev/null
+}
+
+# 14. A dangling link (target removed, as when the herdr server stops) is never
+# promoted.
+t_herdr_link_dangling() {
+    local home local_sock fwd link pd
+    home=$(new_home)
+    local_sock="$home/local.sock"
+    start_agent "$local_sock" >/dev/null
+    init_run "$home" "$local_sock"
+    fwd="$home/.ssh/agent/s.h9.sshd.r9"
+    pd=$(start_agent "$fwd")
+    link="$home/.config/herdr/herdr.sock.agent"
+    mkdir -p -- "$home/.config/herdr"
+    ln -s -- "$fwd" "$link"
+    kill "$pd" 2>/dev/null
+    rm -f -- "$fwd"
+    sleep 0.3
+    init_run "$home" "$local_sock" "$link"
+    assert_link "herdr-dangling: primary untouched" "$home/.ssh/ssh_auth_sock" "$local_sock"
+    assert_link "herdr-dangling: backup untouched" "$home/.ssh/ssh_auth_sock_b" /dev/null
+}
+
 t_bootstrap_local
 t_bootstrap_none
 t_stale_ineligible
@@ -301,6 +381,11 @@ t_steady_state
 t_non_symlink_guard
 t_fixup
 t_local_agent_layout
+
+t_herdr_link_promotion
+t_herdr_link_retarget
+t_herdr_link_unavailable
+t_herdr_link_dangling
 
 printf 'ssh-agent-slot.test: %d passed, %d failed\n' "$pass" "$fail"
 [[ "$fail" -eq 0 ]]

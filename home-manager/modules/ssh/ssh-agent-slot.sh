@@ -50,7 +50,7 @@ main() {
         # SSH_CONNECTION marker never promotes (nested shells).
         local incoming candidate
         incoming=${SSH_AUTH_SOCK:-}
-        if [[ -n ${SSH_CONNECTION:-} && -S "$incoming" ]] && forwarded "$incoming"; then
+        if [[ -n ${SSH_CONNECTION:-} && -S "$incoming" ]] && forwarded_socket "$incoming"; then
             if [[ "$incoming" != "$primary_target" ]]; then publish "$incoming"; fi
         elif ! eligible "$primary_target"; then
             candidate=/dev/null
@@ -107,17 +107,26 @@ read_slot() {
 # $HOME/.ssh/agent/s.<hash>.sshd.<rand> (sshd tags the socket "sshd"; a local
 # ssh-agent's default layout is tagged "agent" and is not forwarded)
 # or legacy /tmp/ssh-*/agent.<pid>. Anything else (macOS built-in launchd agent, arbitrary
-# sockets) is not forwarded.
-forwarded() {
-    [[ ! -L "$1" && ( "$1" =~ ^/(private/)?tmp/ssh-[^/]+/agent\.[0-9]+$ ||
-        "$1" =~ ^"$HOME"/\.ssh/agent/s\.[^./]+\.sshd\.[^./]+$ ) ]]
+# sockets) is not a forwarded layout.
+forwarded_shape() {
+    [[ "$1" =~ ^/(private/)?tmp/ssh-[^/]+/agent\.[0-9]+$ ||
+        "$1" =~ ^"$HOME"/\.ssh/agent/s\.[^./]+\.sshd\.[^./]+$ ]]
+}
+
+# A forwarded agent socket, or a symlink indirection to one: herdr (>= 0.9.2)
+# serves panes a stable agent address it retargets across attaches.
+forwarded_socket() {
+    local target=$1
+    if [[ -L "$target" ]]; then target=$(readlink -- "$target"); fi
+    forwarded_shape "$target"
 }
 
 # Selectable as a shared agent: absolute, not the /dev/null placeholder, not a slot path
-# itself, and either the configured local socket or a forwarded layout.
+# itself, and either the configured local socket or a forwarded agent (direct
+# layout socket or indirection to one).
 eligible() {
     [[ "$1" = /* && "$1" != /dev/null && "$1" != "$primary" && "$1" != "$backup" ]] &&
-        { [[ -n "$local_socket" && "$1" = "$local_socket" ]] || forwarded "$1"; }
+        { [[ -n "$local_socket" && "$1" = "$local_socket" ]] || forwarded_socket "$1"; }
 }
 
 # Rotate slots: the previous eligible primary becomes backup, $1 becomes primary.
