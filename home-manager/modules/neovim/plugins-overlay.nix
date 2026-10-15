@@ -3,12 +3,12 @@ final: prev: {
     # https://github.com/zbirenbaum/copilot.lua
     copilot-lua = prev.vimUtils.buildVimPlugin {
       pname = "copilot.lua";
-      version = "9c8b17257010";
+      version = "84c129a0fe68";
       src = prev.fetchFromGitHub {
         owner = "zbirenbaum";
         repo = "copilot.lua";
-        rev = "9c8b172570105d31ff707cb0d62897f79c2ddb1f";
-        sha256 = "sha256-IWN8vWvF8XfIDzcJ2wCbv9gz3e8ShnKn4AyyU8bMAts=";
+        rev = "84c129a0fe6841743ad7180fb714d4018e132f1e";
+        sha256 = "sha256-Ni81ELSa+4WOyBQKNujEb7kc/G3PDlVykH+Ivk/cOiU=";
       };
       meta.homepage = "https://github.com/zbirenbaum/copilot.lua/";
       meta.hydraPlatforms = [ ];
@@ -17,12 +17,12 @@ final: prev: {
     # https://github.com/dlyongemallo/diffview-plus.nvim
     diffview-nvim = prev.vimUtils.buildVimPlugin {
       pname = "diffview-nvim";
-      version = "875d16dd8c8a";
+      version = "2a2d89a07f5d";
       src = prev.fetchFromGitHub {
         owner = "dlyongemallo";
         repo = "diffview-plus.nvim";
-        rev = "875d16dd8c8aa86f1a5c3b5cef49e1133980ae94";
-        sha256 = "sha256-g9pzU0BmW4TapywQj344PzvKWWSiybt1tUZL1oIoTLI=";
+        rev = "2a2d89a07f5d5d3cef7f542b99c3e28050ca205c";
+        sha256 = "sha256-0Zu2HPU9rzsyIOVLPWB9ABmfu5UffYkJtkIQUtBLVOs=";
       };
       doCheck = false;
       meta.homepage = "https://github.com/dlyongemallo/diffview-plus.nvim/";
