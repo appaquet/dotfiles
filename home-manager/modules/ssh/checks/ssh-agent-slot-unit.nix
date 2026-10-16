@@ -26,5 +26,6 @@ pkgs.runCommand "ssh-agent-slot-unit-check"
       exit 1
     fi
 
+    tail -n 1 unit.out
     touch "$out"
   ''

@@ -96,6 +96,15 @@ assert_link() { # assert_link <name> <slot> <expected>
     fi
 }
 
+# An inactive slot is absent, not a dangling symlink or another filesystem object.
+assert_absent() { # assert_absent <name> <slot>
+    if [[ ! -e "$2" && ! -L "$2" ]]; then
+        ok "$1"
+    else
+        bad "$1: $2 exists or is a symlink"
+    fi
+}
+
 # Run a command and assert its exit code.
 expect_rc() { # expect_rc <name> <want> <cmd...>
     local rc=0
@@ -115,16 +124,19 @@ t_bootstrap_local() {
     start_agent "$local_sock" >/dev/null
     init_run "$home" "$local_sock"
     assert_link "bootstrap(local): primary is local" "$home/.ssh/ssh_auth_sock" "$local_sock"
-    assert_link "bootstrap(local): backup is placeholder" "$home/.ssh/ssh_auth_sock_b" /dev/null
+    assert_absent "bootstrap(local): backup is absent" "$home/.ssh/ssh_auth_sock_b"
 }
 
-# 2. Bootstrap without a local agent: both slots are placeholders.
+# 2. Bootstrap without a local agent: both slots are absent.
 t_bootstrap_none() {
     local home
     home=$(new_home)
     init_run "$home" ""
-    assert_link "bootstrap(none): primary is placeholder" "$home/.ssh/ssh_auth_sock" /dev/null
-    assert_link "bootstrap(none): backup is placeholder" "$home/.ssh/ssh_auth_sock_b" /dev/null
+    assert_absent "bootstrap(none): primary is absent" "$home/.ssh/ssh_auth_sock"
+    assert_absent "bootstrap(none): backup is absent" "$home/.ssh/ssh_auth_sock_b"
+    expect_rc "bootstrap(none): primary probe fails" 1 run "$home" "" probe "$home/.ssh/ssh_auth_sock"
+    expect_rc "bootstrap(none): backup probe fails" 1 run "$home" "" probe "$home/.ssh/ssh_auth_sock_b"
+    expect_rc "bootstrap(none): fixup has no agent" 1 run "$home" "" fixup
 }
 
 # 3. Stale live non-layout targets in both slots are replaced, no a = b.
@@ -139,7 +151,7 @@ t_stale_ineligible() {
     ln -s -- "$stale" "$home/.ssh/ssh_auth_sock_b"
     init_run "$home" "$local_sock"
     assert_link "stale: primary is local" "$home/.ssh/ssh_auth_sock" "$local_sock"
-    assert_link "stale: backup is placeholder" "$home/.ssh/ssh_auth_sock_b" /dev/null
+    assert_absent "stale: backup is absent" "$home/.ssh/ssh_auth_sock_b"
 }
 
 # 3b. An a = b = local state self-heals to distinct slots.
@@ -152,7 +164,7 @@ t_same_target_local() {
     ln -s -- "$local_sock" "$home/.ssh/ssh_auth_sock_b"
     init_run "$home" "$local_sock"
     assert_link "a=b(local): primary is local" "$home/.ssh/ssh_auth_sock" "$local_sock"
-    assert_link "a=b(local): backup is placeholder" "$home/.ssh/ssh_auth_sock_b" /dev/null
+    assert_absent "a=b(local): backup is absent" "$home/.ssh/ssh_auth_sock_b"
 }
 
 # 4. An incoming forwarded socket promotes to primary; local moves to backup.
@@ -201,7 +213,7 @@ t_rotation_no_local() {
     p1=$(start_agent "$f1")
     init_run "$home" "" "$f1"
     assert_link "rotation: primary is first" "$home/.ssh/ssh_auth_sock" "$f1"
-    assert_link "rotation: backup is placeholder" "$home/.ssh/ssh_auth_sock_b" /dev/null
+    assert_absent "rotation: backup is absent" "$home/.ssh/ssh_auth_sock_b"
     p2=$(start_agent "$f2")
     init_run "$home" "" "$f2"
     assert_link "rotation: primary is second" "$home/.ssh/ssh_auth_sock" "$f2"
@@ -224,7 +236,7 @@ t_steady_state() {
     ln -s -- /dev/null "$home/.ssh/ssh_auth_sock_b"
     init_run "$home" "$local_sock"
     assert_link "steady: primary unchanged" "$home/.ssh/ssh_auth_sock" "$local_sock"
-    assert_link "steady: backup unchanged" "$home/.ssh/ssh_auth_sock_b" /dev/null
+    assert_absent "steady: legacy backup is cleared" "$home/.ssh/ssh_auth_sock_b"
     dead_f="$home/.ssh/agent/s.hd.sshd.rd"
     pd=$(start_agent "$dead_f")
     kill "$pd" 2>/dev/null
@@ -288,7 +300,7 @@ t_local_agent_layout() {
     assert_link "local-agent: primary is local" "$home/.ssh/ssh_auth_sock" "$local_sock"
     init_run "$home" "$local_sock" "$local_agent"
     assert_link "local-agent: not promoted as forwarded" "$home/.ssh/ssh_auth_sock" "$local_sock"
-    assert_link "local-agent: backup untouched" "$home/.ssh/ssh_auth_sock_b" /dev/null
+    assert_absent "local-agent: backup stays absent" "$home/.ssh/ssh_auth_sock_b"
 }
 
 # 11. A herdr stable-address symlink to a live forwarded socket promotes like the raw
@@ -346,7 +358,7 @@ t_herdr_link_unavailable() {
     ln -s -- "$other" "$link"
     init_run "$home" "$local_sock" "$link"
     assert_link "herdr-unavailable: primary untouched" "$home/.ssh/ssh_auth_sock" "$local_sock"
-    assert_link "herdr-unavailable: backup untouched" "$home/.ssh/ssh_auth_sock_b" /dev/null
+    assert_absent "herdr-unavailable: backup stays absent" "$home/.ssh/ssh_auth_sock_b"
 }
 
 # 14. A dangling link (target removed, as when the herdr server stops) is never
@@ -367,7 +379,53 @@ t_herdr_link_dangling() {
     sleep 0.3
     init_run "$home" "$local_sock" "$link"
     assert_link "herdr-dangling: primary untouched" "$home/.ssh/ssh_auth_sock" "$local_sock"
-    assert_link "herdr-dangling: backup untouched" "$home/.ssh/ssh_auth_sock_b" /dev/null
+    assert_absent "herdr-dangling: backup stays absent" "$home/.ssh/ssh_auth_sock_b"
+}
+
+# Legacy placeholders are migrated without discarding a usable backup.
+t_legacy_placeholders() {
+    local home fwd
+    home=$(new_home)
+    ln -s -- /dev/null "$home/.ssh/ssh_auth_sock"
+    ln -s -- /dev/null "$home/.ssh/ssh_auth_sock_b"
+    init_run "$home" ""
+    assert_absent "legacy: primary cleared" "$home/.ssh/ssh_auth_sock"
+    assert_absent "legacy: backup cleared" "$home/.ssh/ssh_auth_sock_b"
+    init_run "$home" ""
+    assert_absent "legacy: repeated init keeps primary absent" "$home/.ssh/ssh_auth_sock"
+    assert_absent "legacy: repeated init keeps backup absent" "$home/.ssh/ssh_auth_sock_b"
+
+    fwd="$home/.ssh/agent/s.legacy.sshd.backup"
+    start_agent "$fwd" >/dev/null
+    ln -sfn -- /dev/null "$home/.ssh/ssh_auth_sock"
+    ln -sfn -- "$fwd" "$home/.ssh/ssh_auth_sock_b"
+    init_run "$home" ""
+    assert_absent "legacy: mixed primary cleared" "$home/.ssh/ssh_auth_sock"
+    assert_link "legacy: mixed backup preserved" "$home/.ssh/ssh_auth_sock_b" "$fwd"
+}
+
+# Herdr becoming unavailable clears only the primary; explicit fixup restores backup.
+t_herdr_unavailable_transition() {
+    local home fwd current link
+    home=$(new_home)
+    fwd="$home/.ssh/agent/s.previous.sshd.backup"
+    current="$home/.ssh/agent/s.current.sshd.herdr"
+    start_agent "$fwd" >/dev/null
+    start_agent "$current" >/dev/null
+    init_run "$home" "" "$fwd"
+    link="$home/.config/herdr/herdr.sock.agent"
+    mkdir -p -- "$home/.config/herdr"
+    ln -s -- "$current" "$link"
+    init_run "$home" "" "$link"
+    assert_link "herdr-transition: primary tracks stable link" "$home/.ssh/ssh_auth_sock" "$link"
+    assert_link "herdr-transition: old forward is backup" "$home/.ssh/ssh_auth_sock_b" "$fwd"
+    ln -sfn -- "$home/.config/herdr/herdr.sock.unavailable" "$link"
+    init_run "$home" "" "$link"
+    assert_absent "herdr-transition: unavailable primary cleared" "$home/.ssh/ssh_auth_sock"
+    assert_link "herdr-transition: backup preserved" "$home/.ssh/ssh_auth_sock_b" "$fwd"
+    expect_rc "herdr-transition: explicit fixup succeeds" 0 run "$home" "" fixup
+    assert_link "herdr-transition: fixup promotes backup" "$home/.ssh/ssh_auth_sock" "$fwd"
+    assert_absent "herdr-transition: promoted backup is cleared" "$home/.ssh/ssh_auth_sock_b"
 }
 
 t_bootstrap_local
@@ -386,6 +444,8 @@ t_herdr_link_promotion
 t_herdr_link_retarget
 t_herdr_link_unavailable
 t_herdr_link_dangling
+t_legacy_placeholders
+t_herdr_unavailable_transition
 
 printf 'ssh-agent-slot.test: %d passed, %d failed\n' "$pass" "$fail"
 [[ "$fail" -eq 0 ]]

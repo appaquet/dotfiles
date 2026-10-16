@@ -46,14 +46,14 @@ main() {
 
     if [[ "$cmd" = init ]]; then
         # Register a genuinely incoming forwarded candidate; otherwise
-        # bootstrap placeholder state. An inherited agent without an
+        # bootstrap inactive state. An inherited agent without an
         # SSH_CONNECTION marker never promotes (nested shells).
         local incoming candidate
         incoming=${SSH_AUTH_SOCK:-}
         if [[ -n ${SSH_CONNECTION:-} && -S "$incoming" ]] && forwarded_socket "$incoming"; then
             if [[ "$incoming" != "$primary_target" ]]; then publish "$incoming"; fi
         elif ! eligible "$primary_target"; then
-            candidate=/dev/null
+            candidate=""
             if eligible "$local_socket" && [[ -S "$local_socket" ]]; then candidate=$local_socket; fi
             publish "$candidate"
         fi
@@ -67,7 +67,7 @@ main() {
         else
             # Never leave both slots on the same target; neutralize stale backups.
             if [[ "$primary_target" = "$backup_target" ]] || ! eligible "$backup_target"; then
-                write_slot "$backup" /dev/null
+                write_slot "$backup" ""
             fi
         fi
         return
@@ -121,7 +121,7 @@ forwarded_socket() {
     forwarded_shape "$target"
 }
 
-# Selectable as a shared agent: absolute, not the /dev/null placeholder, not a slot path
+# Selectable as a shared agent: absolute, not a legacy /dev/null target, not a slot path
 # itself, and either the configured local socket or a forwarded agent (direct
 # layout socket or indirection to one).
 eligible() {
@@ -131,19 +131,22 @@ eligible() {
 
 # Rotate slots: the previous eligible primary becomes backup, $1 becomes primary.
 publish() {
-    local previous=/dev/null
+    local previous=""
     if eligible "$primary_target"; then previous=$primary_target
     elif eligible "$backup_target"; then previous=$backup_target; fi
     # Never leave both slots on the same target.
-    [[ "$previous" != "$1" ]] || previous=/dev/null
+    [[ "$previous" != "$1" ]] || previous=""
     write_slot "$backup" "$previous"
     write_slot "$primary" "$1"
 }
 
-# Atomically repoint a slot symlink at $2: build the link in a temp dir, then mv -T over
-# the slot so readers never observe a missing or half-set slot.
+# Clear inactive slots; atomically repoint populated slots through a temporary symlink.
 write_slot() {
     [[ ! -e "$1" || -L "$1" ]] || die "$1 is not a symlink; move it aside first"
+    if [[ -z "$2" ]]; then
+        if [[ -L "$1" ]]; then rm -f -- "$1"; fi
+        return 0
+    fi
     if [[ -L "$1" && "$(readlink -- "$1")" = "$2" ]]; then return; fi
     temporary=$(mktemp -d "$dir/.ssh-auth.XXXXXX")
     ln -s -- "$2" "$temporary/link"
