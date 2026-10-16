@@ -2,12 +2,12 @@
 #
 # jj-promote: promote agent-authored jujutsu changes by stripping the
 # `unreviewed: ` description prefix. Un-promoted work may still carry the previous
-# `private: agent: ` / `private: claude: ` prefixes; those are recognized too, but
-# only stripped after a confirmation prompt (or with --yes).
+# `private: agent: ` / `private: claude: ` prefixes; those are recognized and
+# stripped the same way.
 #
 # The prefix marks a change as pending review and promotion; after stripping,
-# the change keeps its conventional-commit message. Legacy `private:` changes
-# additionally leave the private() revset and become pushable.
+# the change keeps its conventional-commit message and leaves the private()
+# revset, becoming pushable.
 # Descriptions that do not carry an agent prefix (proj symlink commits, human
 # scratch, already-promoted changes) are never modified.
 #
@@ -17,28 +17,24 @@ set -euo pipefail
 
 dry_run=false
 edit=false
-yes=false
 revsets=()
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --dry-run) dry_run=true ;;
     --edit) edit=true ;;
-    --yes) yes=true ;;
     -h|--help)
       cat <<'EOF'
 jj-promote: promote agent-authored jujutsu changes by stripping the `unreviewed: `
 description prefix while keeping the conventional-commit message.
 
-The previous `private: agent: ` / `private: claude: ` prefixes are recognized too, but
-changes using them are only stripped after a confirmation prompt (or with --yes).
-Non-interactive runs without --yes leave them untouched.
+The previous `private: agent: ` / `private: claude: ` prefixes are recognized too and
+stripped the same way.
 
-Usage: jj-promote [--dry-run] [--edit] [--yes] [REVSET...]
+Usage: jj-promote [--dry-run] [--edit] [REVSET...]
   REVSET...  revisions to promote (default: agent changes on the current branch, trunk()..@)
   --dry-run  show what would change, modify nothing
   --edit     open the editor on each pre-filled new description before writing
-  --yes      answer yes to the previous-format confirmation prompt
 
 Descriptions without an agent prefix (proj symlink commits, human scratch, already-promoted
 changes) are reported as skipped and left untouched. Every write is a jujutsu operation, so
@@ -75,20 +71,20 @@ trap 'rm -f "$records"' EXIT
 jj log --no-graph --ignore-working-copy -r "$target" \
   -T 'change_id ++ "\t" ++ description ++ "\0"' >"$records"
 
-# classify <record> -> CLASSIFY_KIND (unreviewed|legacy|prefix-only|none) and CLASSIFY_PREFIX
+# classify <record> -> CLASSIFY_KIND (agent|prefix-only|none) and CLASSIFY_PREFIX
 classify() {
   local desc=${1#*$'\t'}
   case "$desc" in
     unreviewed:*)
-      CLASSIFY_KIND=unreviewed
+      CLASSIFY_KIND=agent
       CLASSIFY_PREFIX='unreviewed: '
       ;;
     private:\ agent:*)
-      CLASSIFY_KIND=legacy
+      CLASSIFY_KIND=agent
       CLASSIFY_PREFIX='private: agent: '
       ;;
     private:\ claude:*)
-      CLASSIFY_KIND=legacy
+      CLASSIFY_KIND=agent
       CLASSIFY_PREFIX='private: claude: '
       ;;
     *)
@@ -105,32 +101,7 @@ classify() {
   fi
 }
 
-# Pass 1: count previous-format changes so the confirmation happens once, up front
-legacy_count=0
-while IFS= read -r -d '' record; do
-  classify "$record"
-  if [ "$CLASSIFY_KIND" = legacy ]; then
-    legacy_count=$((legacy_count + 1))
-  fi
-done <"$records"
-
-legacy_confirmed=false
-if [ "$legacy_count" -gt 0 ]; then
-  if [ "$yes" = true ]; then
-    legacy_confirmed=true
-  elif [ "$dry_run" = false ]; then
-    echo "$legacy_count change(s) use the previous \"private: agent:\"/\"private: claude:\" format"
-    printf 'Strip them too? [y/N] '
-    # EOF (non-interactive, no piped answer) or anything but an explicit yes = decline
-    answer=""
-    read -r answer || answer=""
-    case "$answer" in
-      y | Y | yes | YES) legacy_confirmed=true ;;
-    esac
-  fi
-fi
-
-# Pass 2: strip (or preview) each record
+# strip (or preview) each record
 while IFS= read -r -d '' record; do
   cid=${record%%$'\t'*}
   desc=${record#*$'\t'}
@@ -155,18 +126,6 @@ while IFS= read -r -d '' record; do
   # Command substitution drops the trailing newline; jj re-adds description normalization.
   new_desc=$(printf '%s' "${desc#"$prefix"}")
   new_first_line=${new_desc%%$'\n'*}
-
-  if [ "$kind" = legacy ] && [ "$legacy_confirmed" = false ]; then
-    if [ "$dry_run" = true ]; then
-      printf 'would promote (previous format, confirm at write time)  %s  %s  ->  %s\n' \
-        "${cid:0:12}" "$first_line" "$new_first_line"
-      promoted=$((promoted + 1))
-    else
-      printf 'skip  %s  %s (previous format, not confirmed)\n' "${cid:0:12}" "$first_line"
-      skipped=$((skipped + 1))
-    fi
-    continue
-  fi
 
   if [ "$dry_run" = true ]; then
     printf 'would promote  %s  %s  ->  %s\n' "${cid:0:12}" "$first_line" "$new_first_line"

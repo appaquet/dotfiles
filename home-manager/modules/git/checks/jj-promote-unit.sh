@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 #
-# Behavioral suite for the jj-promote command (see the phase doc "unreviewed prefix").
+# Behavioral suite for the jj-promote command (see the phase doc "remove legacy confirm").
 #
 # jj-promote promotes agent-authored jujutsu changes by stripping the `unreviewed: `
 # description prefix. The previous `private: agent: ` / `private: claude: ` prefixes are
-# recognized too, but those changes are only stripped after a confirmation prompt (or with
-# --yes); non-interactive runs without --yes leave them untouched. Stripping a legacy prefix
-# additionally moves the change outside the private() revset, making it pushable.
+# recognized too and stripped the same way, with no prompt and no stdin read. Stripping a
+# prefix moves the change outside the private() revset, making it pushable.
 #
 # The suite builds throwaway jj repositories, runs the command under test, and asserts
 # resulting descriptions byte-exactly plus repository-level effects (dry-run leaves no
@@ -155,25 +154,30 @@ before_prefixonly=$(desc_of "$repo" "$cid_prefixonly")
 assert_true "new-prefix-only skip run exits 0" "$rc"
 assert_eq "new-prefix-only description untouched" "$before_prefixonly" "$(desc_of "$repo" "$cid_prefixonly")"
 
-# --- Case: legacy agent prefix stripped with --yes ---------------------------------
+# --- Case: legacy agent prefix stripped without prompting --------------------------
 add_change "$repo" -m 'private: agent: docs(readme): refresh cheat sheet'
 cid_agent=$(change_id_of "$repo" '@-')
-(cd "$repo" && "$PROMOTE" --yes "$cid_agent" >"$out/out.log" 2>&1); rc=$?
-assert_true "legacy agent --yes promote exits 0" "$rc"
-assert_eq "legacy agent prefix stripped with --yes" \
+(cd "$repo" && "$PROMOTE" "$cid_agent" </dev/null >"$out/out.log" 2>&1); rc=$?
+assert_true "legacy agent promote exits 0 with stdin closed" "$rc"
+assert_eq "legacy agent prefix stripped without prompting" \
   'docs(readme): refresh cheat sheet' \
   "$(desc_of "$repo" "$cid_agent")"
 assert_eq "legacy agent change left private()" \
   "public" "$(private_of "$repo" "$cid_agent")"
+prompt_hits=$(grep -c 'previous format\|Strip them too' "$out/out.log" || true)
+assert_eq "legacy agent strip prints no prompt text" "0" "$prompt_hits"
 
-# --- Case: legacy claude prefix stripped after a piped yes -------------------------
+# --- Case: legacy claude prefix stripped without prompting -------------------------
 add_change "$repo" -m 'private: claude: chore(ci): tune check job'
 cid_claude=$(change_id_of "$repo" '@-')
-(cd "$repo" && printf 'y\n' | "$PROMOTE" "$cid_claude" >"$out/out.log" 2>&1); rc=$?
-assert_true "legacy claude piped-yes promote exits 0" "$rc"
-assert_eq "legacy claude prefix stripped after piped yes" \
+(cd "$repo" && "$PROMOTE" "$cid_claude" </dev/null >"$out/out.log" 2>&1); rc=$?
+assert_true "legacy claude promote exits 0 with stdin closed" "$rc"
+assert_eq "legacy claude prefix stripped without prompting" \
   'chore(ci): tune check job' \
   "$(desc_of "$repo" "$cid_claude")"
+assert_eq "legacy claude change left private()" \
+  "public" "$(private_of "$repo" "$cid_claude")"
+
 
 # --- Case: protected and unrelated descriptions are skipped ------------------------
 add_change "$repo" -m 'private: proj - some-project'
@@ -194,21 +198,21 @@ assert_eq "proj commit description untouched" "$before_proj" "$(desc_of "$repo" 
 assert_eq "scratch private description untouched" "$before_scratch" "$(desc_of "$repo" "$cid_scratch")"
 assert_eq "already-public description untouched" "$before_public" "$(desc_of "$repo" "$cid_public")"
 
-# --- Case: mixed decline: new prefix promoted, legacy untouched on a piped no ------
+# --- Case: mixed run strips both prefix families without prompting -----------------
 add_change "$repo" -m 'unreviewed: feat(shell): new pending work'
 cid_mixed_new=$(change_id_of "$repo" '@-')
 add_change "$repo" -m 'private: agent: fix(shell): legacy pending work'
 cid_mixed_legacy=$(change_id_of "$repo" '@-')
-before_mixed_legacy=$(desc_of "$repo" "$cid_mixed_legacy")
-(cd "$repo" && printf 'n\n' | "$PROMOTE" "$cid_mixed_new | $cid_mixed_legacy" >"$out/out.log" 2>&1); rc=$?
-assert_true "mixed decline run exits 0" "$rc"
-assert_eq "mixed decline: unreviewed change stripped" \
+(cd "$repo" && "$PROMOTE" "$cid_mixed_new | $cid_mixed_legacy" </dev/null >"$out/out.log" 2>&1); rc=$?
+assert_true "mixed run exits 0 with stdin closed" "$rc"
+assert_eq "mixed run strips the unreviewed change" \
   'feat(shell): new pending work' \
   "$(desc_of "$repo" "$cid_mixed_new")"
-assert_eq "mixed decline: legacy change untouched" \
-  "$before_mixed_legacy" "$(desc_of "$repo" "$cid_mixed_legacy")"
-assert_eq "mixed decline: legacy change still private" \
-  "private" "$(private_of "$repo" "$cid_mixed_legacy")"
+assert_eq "mixed run strips the legacy change" \
+  'fix(shell): legacy pending work' \
+  "$(desc_of "$repo" "$cid_mixed_legacy")"
+assert_eq "mixed run leaves both changes public" \
+  "public public" "$(private_of "$repo" "$cid_mixed_new") $(private_of "$repo" "$cid_mixed_legacy")"
 
 # --- Case: default revset promotes new-prefix changes above trunk ------------------
 add_change "$repo" -m 'unreviewed: chore(ci): tune check job'
@@ -226,17 +230,17 @@ assert_eq "bare invoke promotes new-prefix change B via default revset" \
 assert_eq "proj commit still skipped after bare invoke" "$before_proj" "$(desc_of "$repo" "$cid_proj")"
 assert_eq "scratch private still skipped after bare invoke" "$before_scratch" "$(desc_of "$repo" "$cid_scratch")"
 
-# --- Case: default revset with --yes promotes legacy changes above trunk -----------
+# --- Case: default revset promotes legacy changes above trunk without --yes --------
 add_change "$repo" -m 'private: agent: chore(ci): legacy tune'
 add_change "$repo" -m 'private: agent: perf(shell): legacy speedup'
 cid_legacy_a=$(change_id_of "$repo" '@--')
 cid_legacy_b=$(change_id_of "$repo" '@-')
-(cd "$repo" && "$PROMOTE" --yes >"$out/out.log" 2>&1); rc=$?
-assert_true "bare invoke --yes exits 0" "$rc"
-assert_eq "bare invoke --yes promotes legacy change A" \
+(cd "$repo" && "$PROMOTE" </dev/null >"$out/out.log" 2>&1); rc=$?
+assert_true "bare invoke with legacy changes exits 0" "$rc"
+assert_eq "bare invoke promotes legacy change A" \
   'chore(ci): legacy tune' \
   "$(desc_of "$repo" "$cid_legacy_a")"
-assert_eq "bare invoke --yes promotes legacy change B" \
+assert_eq "bare invoke promotes legacy change B" \
   'perf(shell): legacy speedup' \
   "$(desc_of "$repo" "$cid_legacy_b")"
 
@@ -253,7 +257,7 @@ assert_true "adding a remote to the test repo succeeds" "$rc"
 assert_true "moving the trunk bookmark onto the agent commit succeeds" "$rc"
 (cd "$repo" && jj git push --allow-private -b master >/dev/null 2>&1); rc=$?
 assert_true "publishing the trunk bookmark succeeds" "$rc"
-(cd "$repo" && "$PROMOTE" --yes >"$out/out.log" 2>&1); rc=$?
+(cd "$repo" && "$PROMOTE" </dev/null >"$out/out.log" 2>&1); rc=$?
 assert_true "bare invoke with trunk at an agent commit exits 0" "$rc"
 assert_eq "agent commit at trunk stays out of the default trunk()..@ range" \
   'private: agent: fix(trunk): buried on mainline' \
@@ -288,9 +292,22 @@ assert_eq "dry-run with legacy leaves description untouched" \
   "$before_dry_legacy" "$(desc_of "$repo" "$cid_dry_legacy")"
 op_after=$(first_op_id "$repo")
 assert_eq "dry-run with legacy creates no mutation" "$op_before" "$op_after"
-grep -q 'would promote (previous format, confirm at write time)' "$out/out4.log" \
-  && pass "dry-run flags the legacy change for confirmation" \
-  || fail "dry-run flags the legacy change for confirmation" "$(cat "$out/out4.log")"
+would_hits=$(grep -cE '^would promote  [a-z0-9]{12}  private: agent: refactor\(vcs\): legacy helper  ->  refactor\(vcs\): legacy helper$' "$out/out4.log" || true)
+assert_eq "dry-run reports the legacy change with the plain would-promote line" "1" "$would_hits"
+prompt_hits=$(grep -c 'previous format\|confirm at write time' "$out/out4.log" || true)
+assert_eq "dry-run prints no previous-format wording" "0" "$prompt_hits"
+
+# --- Case: the removed --yes flag is rejected --------------------------------------
+add_change "$repo" -m 'private: agent: refactor(vcs): rejected flag'
+cid_yes=$(change_id_of "$repo" '@-')
+before_yes=$(desc_of "$repo" "$cid_yes")
+(cd "$repo" && "$PROMOTE" --yes "$cid_yes" >"$out/out-yes.log" 2>&1); rc=$?
+assert_false "removed --yes flag exits non-zero" "$rc"
+grep -q "unknown option '--yes'" "$out/out-yes.log" \
+  && pass "--yes rejection reports the unknown option" \
+  || fail "--yes rejection reports the unknown option" "$(cat "$out/out-yes.log")"
+assert_eq "--yes rejection leaves the description untouched" \
+  "$before_yes" "$(desc_of "$repo" "$cid_yes")"
 
 # --- Case: unknown revset fails loudly ----------------------------------------------
 (cd "$repo" && "$PROMOTE" 'this is not a revset((' >/dev/null 2>&1); rc=$?
