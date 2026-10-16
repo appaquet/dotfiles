@@ -45,12 +45,12 @@ let
 
     # https://github.com/YuGiMob/pi-hashline-edit-pro
     {
-      package = "npm:pi-hashline-edit-pro@6.3.0";
+      package = "npm:pi-hashline-edit-pro@6.4.1";
     }
 
     # https://github.com/tintinweb/pi-subagents
     {
-      package = "npm:@tintinweb/pi-subagents@0.20.0";
+      package = "npm:@tintinweb/pi-subagents@0.22.0";
       files = {
         ".pi/agent/subagents.json".text = builtins.toJSON {
           disableDefaultAgents = true;
@@ -75,7 +75,7 @@ let
 
     # https://github.com/HaphazardDev/pi-extensions/tree/main/extensions/pi-background-bash
     {
-      package = "npm:@haphazarddev/pi-background-bash@0.1.0";
+      package = "npm:@haphazarddev/pi-background-bash@0.1.1";
       files = {
         ".pi/agent/extensions/pi-background-bash/config.json".text = builtins.toJSON {
           shortcut = "ctrl+shift+b";
@@ -85,12 +85,12 @@ let
 
     # https://github.com/juicesharp/rpiv-mono
     {
-      package = "npm:@juicesharp/rpiv-ask-user-question@2.12.0";
+      package = "npm:@juicesharp/rpiv-ask-user-question@2.13.8";
     }
 
     # https://github.com/nicobailon/pi-web-access
     {
-      package = "npm:pi-web-access@0.38.0";
+      package = "npm:pi-web-access@0.40.0";
       files = {
         ".pi/agent/web-search.json".text = builtins.toJSON {
           provider = "exa";
@@ -124,7 +124,7 @@ let
 
     # https://github.com/nicobailon/pi-powerline-footer
     {
-      package = "npm:pi-powerline-footer@0.19.1";
+      package = "npm:pi-powerline-footer@0.20.1";
       environment = {
         POWERLINE_NERD_FONTS.value = "1";
       };
