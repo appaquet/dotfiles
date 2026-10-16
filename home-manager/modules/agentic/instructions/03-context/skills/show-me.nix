@@ -37,6 +37,7 @@
 
         Use this section only for artifact requests.
 
+        * Ensure ${scope.skills."frontend".reference} loaded before creating or editing any HTML artifact.
         * For follow-up changes to the same visual, update its existing HTML file in place and keep its filename instead of creating versioned copies. Create a new file only for a distinct artifact or an explicitly requested separate version or filename.
         * Use the user's filename when supplied. Otherwise choose a concise descriptive kebab-case `.html` filename.
         * Keep the artifact inside the selected root. Reject path traversal or an absolute destination outside that root.
