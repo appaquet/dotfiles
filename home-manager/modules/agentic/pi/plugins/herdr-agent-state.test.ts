@@ -138,6 +138,57 @@ test("Pi maps the Windows socket marker path to a named pipe endpoint", async ()
   expect(connectedEndpoint()).toBe(`\\\\.\\pipe\\${markerPath}`);
 });
 
+for (const [name, sessionFile, sessionRef] of [
+  ["POSIX", "/sessions/root.jsonl", { agent_session_path: "/sessions/root.jsonl" }],
+  ["Windows drive", "C:\\sessions\\root.jsonl", { agent_session_path: "C:\\sessions\\root.jsonl" }],
+  [
+    "Windows UNC",
+    "\\\\server\\sessions\\root.jsonl",
+    { agent_session_path: "\\\\server\\sessions\\root.jsonl" },
+  ],
+  ["relative", "sessions/root.jsonl", { agent_session_id: "root-session" }],
+  ["Windows drive-relative", "C:root.jsonl", { agent_session_id: "root-session" }],
+] as const) {
+  test(`Pi reports the ${name} session reference in identity and state payloads`, async () => {
+    const requests = await startRecordingServer("pi-session-path");
+    const { handlers, pi } = createExtensionHarness();
+    const { default: install } = await importFresh("./herdr-agent-state.ts");
+    install(pi);
+
+    await handlers.get("session_start")?.(
+      { reason: "startup" },
+      {
+        ...piContext(() => true),
+        sessionManager: {
+          getSessionFile: () => sessionFile,
+          getSessionId: () => "root-session",
+        },
+      },
+    );
+    await waitFor(() => requests.length === 2);
+
+    const params = requests.map((request) => (isRecord(request) ? request.params : undefined));
+    expect(params).toEqual([
+      {
+        pane_id: "test:p1",
+        source: "herdr:pi",
+        agent: "pi",
+        seq: expect.any(Number),
+        session_start_source: "startup",
+        ...sessionRef,
+      },
+      {
+        pane_id: "test:p1",
+        source: "herdr:pi",
+        agent: "pi",
+        seq: expect.any(Number),
+        state: "idle",
+        ...sessionRef,
+      },
+    ]);
+  });
+}
+
 test("Pi reload preserves working state when the agent is active", async () => {
   const requests = await startRecordingServer("pi");
   const { handlers, pi } = createExtensionHarness();

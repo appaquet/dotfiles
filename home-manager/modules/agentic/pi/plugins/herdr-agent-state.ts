@@ -1,10 +1,11 @@
-// Dotfiles-owned modified copy of Herdr 0.8.2's Pi integration (integration version 8).
-// Upstream: https://github.com/herdrdev/herdr/blob/v0.8.2/src/integration/assets/pi/herdr-agent-state.ts
+// Dotfiles-owned modified copy of Herdr 0.9.5's Pi integration (integration version 9).
+// Upstream: https://github.com/herdrdev/herdr/blob/v0.9.5/src/integration/assets/pi/herdr-agent-state.ts
 // HERDR_INTEGRATION_ID=pi
-// HERDR_INTEGRATION_VERSION=8
+// HERDR_INTEGRATION_VERSION=9
 // @ts-nocheck
 
 import net from "node:net";
+import path from "node:path";
 
 const HERDR_ENV = process.env.HERDR_ENV;
 const socketPath = process.env.HERDR_SOCKET_PATH;
@@ -73,7 +74,10 @@ function updateSessionRef(ctx: any): void {
   try {
     const file = ctx?.sessionManager?.getSessionFile?.();
     currentAgentSessionPath =
-      typeof file === "string" && file.startsWith("/") ? file : undefined;
+      typeof file === "string" &&
+      (path.posix.isAbsolute(file) || path.win32.isAbsolute(file))
+        ? file
+        : undefined;
   } catch {
     currentAgentSessionPath = undefined;
   }
