@@ -28,10 +28,6 @@
 
   dotfiles.neovim.devMode = false;
 
-  home.packages = with pkgs; [
-    pkgsCuda.llama-cpp
-  ];
-
   home.username = "appaquet";
   home.homeDirectory = "/home/appaquet";
   home.stateVersion = "23.11";
