@@ -8,7 +8,8 @@
 # sockets (default-layout sockets under a $TMPDIR-based fake home exceed
 # macOS's 104-char Unix socket path limit), an arbitrary non-layout
 # path stands in for the configured local agent, and a symlink to a layout-shaped
-# socket stands in for herdr's (>= 0.9.2) stable agent address.
+# socket stands in for herdr's (>= 0.9.2) stable agent address. A SIGKILLed
+# agent leaves its socket file behind with nothing listening (hung agent).
 set -euo pipefail
 
 script=${1:?usage: ssh-agent-slot.test.sh <path-to-ssh-agent-slot>}
@@ -92,6 +93,37 @@ link_of() {
     readlink -- "$1" 2>/dev/null || printf '<missing>'
 }
 
+# Session stack targets, newest first, space-separated.
+stack_of() { # stack_of <home>
+    local -a names=()
+    local i out=""
+    shopt -s nullglob
+    names=("$1"/.ssh/agent-sessions/*)
+    shopt -u nullglob
+    for (( i = ${#names[@]} - 1; i >= 0; i-- )); do
+        out+="${out:+ }$(readlink -- "${names[i]}")"
+    done
+    printf '%s' "$out"
+}
+
+# Assert the exact session stack, newest first.
+assert_stack() { # assert_stack <name> <home> [targets...]
+    local actual want="${*:3}"
+    actual=$(stack_of "$2")
+    if [[ "$actual" = "$want" ]]; then
+        ok "$1"
+    else
+        bad "$1: stack [$actual], want [$want]"
+    fi
+}
+
+# Stop an agent and remove its socket, as sshd does on disconnect.
+disconnect() { # disconnect <pid> <socket>
+    kill "$1" 2>/dev/null || true
+    sleep 0.2
+    rm -f -- "$2"
+}
+
 # Assert a slot symlink points exactly at the expected target.
 assert_link() { # assert_link <name> <slot> <expected>
     local actual
@@ -123,7 +155,7 @@ expect_rc() { # expect_rc <name> <want> <cmd...>
     fi
 }
 
-# 1. Bootstrap with a local agent: fresh slots, live local socket.
+# Bootstrap with a local agent: primary is local, stack empty.
 t_bootstrap_local() {
     local home local_sock
     home=$(new_home)
@@ -131,130 +163,254 @@ t_bootstrap_local() {
     start_agent "$local_sock" >/dev/null
     init_run "$home" "$local_sock"
     assert_link "bootstrap(local): primary is local" "$home/.ssh/ssh_auth_sock" "$local_sock"
-    assert_absent "bootstrap(local): backup is absent" "$home/.ssh/ssh_auth_sock_b"
+    assert_stack "bootstrap(local): stack empty" "$home"
+    if [[ -d "$home/.ssh/agent-sessions" ]]; then ok "bootstrap(local): sessions dir created"; else bad "bootstrap(local): sessions dir created"; fi
 }
 
-# 2. Bootstrap without a local agent: both slots are absent.
+# Without a local agent nothing is selected and fixup has nothing to offer.
 t_bootstrap_none() {
     local home
     home=$(new_home)
     init_run "$home" ""
     assert_absent "bootstrap(none): primary is absent" "$home/.ssh/ssh_auth_sock"
-    assert_absent "bootstrap(none): backup is absent" "$home/.ssh/ssh_auth_sock_b"
-    expect_rc "bootstrap(none): primary probe fails" 1 run "$home" "" probe "$home/.ssh/ssh_auth_sock"
-    expect_rc "bootstrap(none): backup probe fails" 1 run "$home" "" probe "$home/.ssh/ssh_auth_sock_b"
     expect_rc "bootstrap(none): fixup has no agent" 1 run "$home" "" fixup
 }
 
-# 3. Stale live non-layout targets in both slots are replaced, no a = b.
-t_stale_ineligible() {
-    local home local_sock stale
+# The configured local agent is selected even while its socket is missing.
+t_local_missing_selected() {
+    local home
     home=$(new_home)
-    local_sock="$home/local.sock"
-    start_agent "$local_sock" >/dev/null
-    stale="$home/launchd-standin"
-    start_agent "$stale" >/dev/null
-    ln -s -- "$stale" "$home/.ssh/ssh_auth_sock"
-    ln -s -- "$stale" "$home/.ssh/ssh_auth_sock_b"
-    init_run "$home" "$local_sock"
-    assert_link "stale: primary is local" "$home/.ssh/ssh_auth_sock" "$local_sock"
-    assert_absent "stale: backup is absent" "$home/.ssh/ssh_auth_sock_b"
+    init_run "$home" "$home/local.sock"
+    assert_link "local(missing): primary is local" "$home/.ssh/ssh_auth_sock" "$home/local.sock"
 }
 
-# 3b. An a = b = local state self-heals to distinct slots.
-t_same_target_local() {
-    local home local_sock
-    home=$(new_home)
-    local_sock="$home/local.sock"
-    start_agent "$local_sock" >/dev/null
-    ln -s -- "$local_sock" "$home/.ssh/ssh_auth_sock"
-    ln -s -- "$local_sock" "$home/.ssh/ssh_auth_sock_b"
-    init_run "$home" "$local_sock"
-    assert_link "a=b(local): primary is local" "$home/.ssh/ssh_auth_sock" "$local_sock"
-    assert_absent "a=b(local): backup is absent" "$home/.ssh/ssh_auth_sock_b"
-}
-
-# 4. An incoming forwarded socket promotes to primary; local moves to backup.
-t_forwarded_promotion() {
-    local home local_sock fwd
-    home=$(new_home)
-    local_sock="$home/local.sock"
-    start_agent "$local_sock" >/dev/null
-    fwd="$home/.ssh/agent/s.h1.sshd.r1"
-    start_agent "$fwd" >/dev/null
-    init_run "$home" "$local_sock" "$fwd"
-    assert_link "forward: primary is forwarded" "$home/.ssh/ssh_auth_sock" "$fwd"
-    assert_link "forward: backup is local" "$home/.ssh/ssh_auth_sock_b" "$local_sock"
-}
-
-# 5. Consecutive forwarded sessions: local stays in backup; after both die
-# the dead primary stays and the probe fallback reaches local.
-t_consecutive_forwarded() {
-    local home local_sock f1 f2 p1 p2
+# Sessions stack newest-first; popping the newest falls back to the older one, then local.
+t_push_pop_newest() {
+    local home local_sock f1 f2
     home=$(new_home)
     local_sock="$home/local.sock"
     start_agent "$local_sock" >/dev/null
     f1="$home/.ssh/agent/s.h1.sshd.r1"
     f2="$home/.ssh/agent/s.h2.sshd.r2"
+    start_agent "$f1" >/dev/null
+    start_agent "$f2" >/dev/null
+    init_run "$home" "$local_sock" "$f1"
+    assert_link "push: primary is first session" "$home/.ssh/ssh_auth_sock" "$f1"
+    init_run "$home" "$local_sock" "$f2"
+    assert_link "push: primary is newest session" "$home/.ssh/ssh_auth_sock" "$f2"
+    assert_stack "push: stack newest first" "$home" "$f2" "$f1"
+    run "$home" "$local_sock" release "$f2"
+    assert_link "pop(newest): primary is older session" "$home/.ssh/ssh_auth_sock" "$f1"
+    assert_stack "pop(newest): older remains" "$home" "$f1"
+    run "$home" "$local_sock" release "$f1"
+    assert_link "pop(last): primary is local" "$home/.ssh/ssh_auth_sock" "$local_sock"
+    assert_stack "pop(last): stack empty" "$home"
+}
+
+# The older session ending first leaves the newest active; the last pop clears the primary without local.
+t_pop_older_first() {
+    local home f1 f2
+    home=$(new_home)
+    f1="$home/.ssh/agent/s.h1.sshd.r1"
+    f2="$home/.ssh/agent/s.h2.sshd.r2"
+    start_agent "$f1" >/dev/null
+    start_agent "$f2" >/dev/null
+    init_run "$home" "" "$f1"
+    init_run "$home" "" "$f2"
+    run "$home" "" release "$f1"
+    assert_link "pop(older): primary stays newest" "$home/.ssh/ssh_auth_sock" "$f2"
+    assert_stack "pop(older): newest remains" "$home" "$f2"
+    run "$home" "" release "$f2"
+    assert_absent "pop(last, no local): primary absent" "$home/.ssh/ssh_auth_sock"
+    assert_stack "pop(last, no local): stack empty" "$home"
+}
+
+# Logging in again with a known socket moves it to the top without duplicating it.
+t_relogin_moves_top() {
+    local home f1 f2
+    home=$(new_home)
+    f1="$home/.ssh/agent/s.h1.sshd.r1"
+    f2="$home/.ssh/agent/s.h2.sshd.r2"
+    start_agent "$f1" >/dev/null
+    start_agent "$f2" >/dev/null
+    init_run "$home" "" "$f1"
+    init_run "$home" "" "$f2"
+    init_run "$home" "" "$f1"
+    assert_stack "relogin: moved to top, no duplicate" "$home" "$f1" "$f2"
+    assert_link "relogin: primary follows" "$home/.ssh/ssh_auth_sock" "$f1"
+}
+
+# Every init (both modes) prunes entries whose socket is gone and repoints.
+t_prune() {
+    local home local_sock f1 f2 f3 p2
+    home=$(new_home)
+    local_sock="$home/local.sock"
+    start_agent "$local_sock" >/dev/null
+    f1="$home/.ssh/agent/s.h1.sshd.r1"
+    f2="$home/.ssh/agent/s.h2.sshd.r2"
+    f3="$home/.ssh/agent/s.h3.sshd.r3"
+    start_agent "$f1" >/dev/null
+    p2=$(start_agent "$f2")
+    start_agent "$f3" >/dev/null
+    init_run "$home" "$local_sock" "$f1"
+    init_run "$home" "$local_sock" "$f2"
+    disconnect "$p2" "$f2"
+    init_run "$home" "$local_sock"
+    assert_stack "prune: dead newest dropped" "$home" "$f1"
+    assert_link "prune: primary is live older" "$home/.ssh/ssh_auth_sock" "$f1"
+    init_run_ni "$home" "$local_sock" "$f3"
+    assert_stack "prune(non-interactive): no push" "$home" "$f1"
+}
+
+# A non-interactive session never pushes; an empty stack still selects local.
+t_non_interactive() {
+    local home local_sock f1 f2
+    home=$(new_home)
+    local_sock="$home/local.sock"
+    start_agent "$local_sock" >/dev/null
+    f1="$home/.ssh/agent/s.h1.sshd.r1"
+    f2="$home/.ssh/agent/s.h2.sshd.r2"
+    start_agent "$f1" >/dev/null
+    start_agent "$f2" >/dev/null
+    init_run "$home" "$local_sock" "$f1"
+    init_run_ni "$home" "$local_sock" "$f2"
+    assert_link "non-interactive: primary keeps interactive session" "$home/.ssh/ssh_auth_sock" "$f1"
+    assert_stack "non-interactive: not pushed" "$home" "$f1"
+
+    home=$(new_home)
+    local_sock="$home/local.sock"
+    start_agent "$local_sock" >/dev/null
+    f1="$home/.ssh/agent/s.h1.sshd.r1"
+    start_agent "$f1" >/dev/null
+    init_run_ni "$home" "$local_sock" "$f1"
+    assert_link "non-interactive(empty): primary is local" "$home/.ssh/ssh_auth_sock" "$local_sock"
+
+    home=$(new_home)
+    f1="$home/.ssh/agent/s.h1.sshd.r1"
+    start_agent "$f1" >/dev/null
+    init_run_ni "$home" "" "$f1"
+    assert_absent "non-interactive(no local): primary absent" "$home/.ssh/ssh_auth_sock"
+    expect_rc "init: rejects unknown flag" 1 run "$home" "" init --bogus
+}
+
+# A nested shell inherits the primary path itself; it never becomes an entry.
+t_nested_shell() {
+    local home f1
+    home=$(new_home)
+    f1="$home/.ssh/agent/s.h1.sshd.r1"
+    start_agent "$f1" >/dev/null
+    init_run "$home" "" "$f1"
+    init_run "$home" "" "$home/.ssh/ssh_auth_sock"
+    assert_stack "nested: primary path not pushed" "$home" "$f1"
+    assert_link "nested: primary unchanged" "$home/.ssh/ssh_auth_sock" "$f1"
+}
+
+# Release works after sshd already removed the socket.
+t_release_deleted_socket() {
+    local home local_sock f1 p1
+    home=$(new_home)
+    local_sock="$home/local.sock"
+    start_agent "$local_sock" >/dev/null
+    f1="$home/.ssh/agent/s.h1.sshd.r1"
     p1=$(start_agent "$f1")
     init_run "$home" "$local_sock" "$f1"
-    p2=$(start_agent "$f2")
-    init_run "$home" "$local_sock" "$f2"
-    assert_link "consecutive: primary is second" "$home/.ssh/ssh_auth_sock" "$f2"
-    assert_link "consecutive: backup is local, not first" "$home/.ssh/ssh_auth_sock_b" "$local_sock"
-    kill "$p1" "$p2" 2>/dev/null
-    sleep 0.3
-    init_run "$home" "$local_sock"
-    assert_link "consecutive: dead primary kept" "$home/.ssh/ssh_auth_sock" "$f2"
-    assert_link "consecutive: backup still local" "$home/.ssh/ssh_auth_sock_b" "$local_sock"
-    expect_rc "consecutive: probe dead primary fails" 1 run "$home" "$local_sock" probe "$home/.ssh/ssh_auth_sock"
-    expect_rc "consecutive: probe backup local succeeds" 0 run "$home" "$local_sock" probe "$home/.ssh/ssh_auth_sock_b"
+    disconnect "$p1" "$f1"
+    expect_rc "release(deleted): exit 0" 0 run "$home" "$local_sock" release "$f1"
+    assert_link "release(deleted): primary is local" "$home/.ssh/ssh_auth_sock" "$local_sock"
+    assert_stack "release(deleted): stack empty" "$home"
 }
 
-# 6. Without a local agent, rotation keeps the previous forwarded socket.
-t_rotation_no_local() {
-    local home f1 f2 p1 p2
-    home=$(new_home)
-    f1="$home/.ssh/agent/s.h1.sshd.r1"
-    f2="$home/.ssh/agent/s.h2.sshd.r2"
-    p1=$(start_agent "$f1")
-    init_run "$home" "" "$f1"
-    assert_link "rotation: primary is first" "$home/.ssh/ssh_auth_sock" "$f1"
-    assert_absent "rotation: backup is absent" "$home/.ssh/ssh_auth_sock_b"
-    p2=$(start_agent "$f2")
-    init_run "$home" "" "$f2"
-    assert_link "rotation: primary is second" "$home/.ssh/ssh_auth_sock" "$f2"
-    assert_link "rotation: backup is first" "$home/.ssh/ssh_auth_sock_b" "$f1"
-    kill "$p1" "$p2" 2>/dev/null
-    sleep 0.3
-    init_run "$home" ""
-    assert_link "rotation: dead slots kept after death" "$home/.ssh/ssh_auth_sock" "$f2"
-    assert_link "rotation: dead backup kept after death" "$home/.ssh/ssh_auth_sock_b" "$f1"
-}
-
-# 7. Primary = local steady state is idempotent; a dead layout-shaped
-# backup is preserved (eligible layouts are not sanitized).
-t_steady_state() {
-    local home local_sock dead_f pd
+# Releasing an unknown socket or the local agent changes nothing.
+t_release_noop() {
+    local home local_sock f1
     home=$(new_home)
     local_sock="$home/local.sock"
     start_agent "$local_sock" >/dev/null
-    ln -s -- "$local_sock" "$home/.ssh/ssh_auth_sock"
-    ln -s -- /dev/null "$home/.ssh/ssh_auth_sock_b"
-    init_run "$home" "$local_sock"
-    assert_link "steady: primary unchanged" "$home/.ssh/ssh_auth_sock" "$local_sock"
-    assert_absent "steady: legacy backup is cleared" "$home/.ssh/ssh_auth_sock_b"
-    dead_f="$home/.ssh/agent/s.hd.sshd.rd"
-    pd=$(start_agent "$dead_f")
-    kill "$pd" 2>/dev/null
-    sleep 0.3
-    ln -sf -- "$dead_f" "$home/.ssh/ssh_auth_sock_b"
-    init_run "$home" "$local_sock"
-    assert_link "steady: dead layout backup kept" "$home/.ssh/ssh_auth_sock" "$local_sock"
-    assert_link "steady: dead layout backup kept (b)" "$home/.ssh/ssh_auth_sock_b" "$dead_f"
+    f1="$home/.ssh/agent/s.h1.sshd.r1"
+    start_agent "$f1" >/dev/null
+    init_run "$home" "$local_sock" "$f1"
+    expect_rc "release(unknown): exit 0" 0 run "$home" "$local_sock" release "$home/.ssh/agent/s.hx.sshd.rx"
+    expect_rc "release(local): exit 0" 0 run "$home" "$local_sock" release "$local_sock"
+    assert_stack "release(noop): stack unchanged" "$home" "$f1"
+    assert_link "release(noop): primary unchanged" "$home/.ssh/ssh_auth_sock" "$f1"
+    expect_rc "release: rejects relative path" 1 run "$home" "$local_sock" release relative.sock
 }
 
-# 8. A non-symlink slot is refused with a message and left untouched.
+# Release never talks to an agent: a hung local agent is still selected.
+t_release_no_agent_protocol() {
+    local home local_sock f1 pl
+    home=$(new_home)
+    local_sock="$home/local.sock"
+    pl=$(start_agent "$local_sock")
+    kill -KILL "$pl" 2>/dev/null
+    f1="$home/.ssh/agent/s.h1.sshd.r1"
+    start_agent "$f1" >/dev/null
+    init_run "$home" "$local_sock" "$f1"
+    run "$home" "$local_sock" release "$f1"
+    assert_link "release(no protocol): primary is hung local" "$home/.ssh/ssh_auth_sock" "$local_sock"
+}
+
+# fixup drops a hung newest entry, selects the next responsive one; --local forgets all.
+t_fixup() {
+    local home local_sock f1 f2 p2
+    home=$(new_home)
+    local_sock="$home/local.sock"
+    start_agent "$local_sock" >/dev/null
+    f1="$home/.ssh/agent/s.h1.sshd.r1"
+    f2="$home/.ssh/agent/s.h2.sshd.r2"
+    start_agent "$f1" >/dev/null
+    p2=$(start_agent "$f2")
+    init_run "$home" "$local_sock" "$f1"
+    init_run "$home" "$local_sock" "$f2"
+    kill -KILL "$p2" 2>/dev/null
+    sleep 0.2
+    expect_rc "fixup: exit 0" 0 run "$home" "$local_sock" fixup
+    assert_link "fixup: primary is responsive older" "$home/.ssh/ssh_auth_sock" "$f1"
+    assert_stack "fixup: hung entry dropped" "$home" "$f1"
+    expect_rc "fixup --local: exit 0" 0 run "$home" "$local_sock" fixup --local
+    assert_link "fixup --local: primary is local" "$home/.ssh/ssh_auth_sock" "$local_sock"
+    assert_stack "fixup --local: stack cleared" "$home"
+    expect_rc "fixup --local: dies without local socket" 1 run "$home" "" fixup --local
+}
+
+# Migration seeds live forwarded slot targets (old primary newest) and removes the backup slot.
+t_migration() {
+    local home local_sock f1 f2
+    home=$(new_home)
+    local_sock="$home/local.sock"
+    start_agent "$local_sock" >/dev/null
+    f1="$home/.ssh/agent/s.h1.sshd.r1"
+    f2="$home/.ssh/agent/s.h2.sshd.r2"
+    start_agent "$f1" >/dev/null
+    start_agent "$f2" >/dev/null
+    ln -s -- "$f2" "$home/.ssh/ssh_auth_sock"
+    ln -s -- "$f1" "$home/.ssh/ssh_auth_sock_b"
+    init_run "$home" "$local_sock"
+    assert_stack "migration: slots seeded, primary newest" "$home" "$f2" "$f1"
+    assert_link "migration: primary kept" "$home/.ssh/ssh_auth_sock" "$f2"
+    assert_absent "migration: backup slot removed" "$home/.ssh/ssh_auth_sock_b"
+
+    home=$(new_home)
+    ln -s -- "$local_sock" "$home/.ssh/ssh_auth_sock"
+    ln -s -- "$home/.ssh/agent/s.hd.sshd.rd" "$home/.ssh/ssh_auth_sock_b"
+    init_run "$home" "$local_sock"
+    assert_stack "migration(dead backup): nothing seeded" "$home"
+    assert_absent "migration(dead backup): backup slot removed" "$home/.ssh/ssh_auth_sock_b"
+    assert_link "migration(dead backup): primary local" "$home/.ssh/ssh_auth_sock" "$local_sock"
+}
+
+# Legacy /dev/null placeholders are cleared.
+t_legacy_placeholders() {
+    local home
+    home=$(new_home)
+    ln -s -- /dev/null "$home/.ssh/ssh_auth_sock"
+    ln -s -- /dev/null "$home/.ssh/ssh_auth_sock_b"
+    init_run "$home" ""
+    assert_absent "legacy: primary cleared" "$home/.ssh/ssh_auth_sock"
+    assert_absent "legacy: backup cleared" "$home/.ssh/ssh_auth_sock_b"
+}
+
+# A non-symlink primary is refused with a message and left untouched.
 t_non_symlink_guard() {
     local home local_sock
     home=$(new_home)
@@ -275,27 +431,7 @@ t_non_symlink_guard() {
     fi
 }
 
-# 9. fixup promotes a responsive local backup over a dead layout primary;
-# fixup --local dies without a configured local socket.
-t_fixup() {
-    local home local_sock dead_f pd
-    home=$(new_home)
-    local_sock="$home/local.sock"
-    start_agent "$local_sock" >/dev/null
-    dead_f="$home/.ssh/agent/s.hd.sshd.rd"
-    pd=$(start_agent "$dead_f")
-    kill "$pd" 2>/dev/null
-    sleep 0.3
-    ln -s -- "$dead_f" "$home/.ssh/ssh_auth_sock"
-    ln -s -- "$local_sock" "$home/.ssh/ssh_auth_sock_b"
-    expect_rc "fixup: exit 0" 0 run "$home" "$local_sock" fixup
-    assert_link "fixup: primary is local" "$home/.ssh/ssh_auth_sock" "$local_sock"
-    assert_link "fixup: backup is old primary" "$home/.ssh/ssh_auth_sock_b" "$dead_f"
-    expect_rc "fixup --local: dies without local socket" 1 run "$home" "" fixup --local
-}
-
-# 10. A local ssh-agent layout socket (tag "agent") is not treated as
-# forwarded and is never promoted.
+# A local ssh-agent layout socket (tag "agent") is not forwarded and never pushed.
 t_local_agent_layout() {
     local home local_sock local_agent
     home=$(new_home)
@@ -303,292 +439,75 @@ t_local_agent_layout() {
     start_agent "$local_sock" >/dev/null
     local_agent="$home/.ssh/agent/s.ha.agent.ra"
     start_agent "$local_agent" >/dev/null
-    init_run "$home" "$local_sock"
-    assert_link "local-agent: primary is local" "$home/.ssh/ssh_auth_sock" "$local_sock"
     init_run "$home" "$local_sock" "$local_agent"
-    assert_link "local-agent: not promoted as forwarded" "$home/.ssh/ssh_auth_sock" "$local_sock"
-    assert_absent "local-agent: backup stays absent" "$home/.ssh/ssh_auth_sock_b"
+    assert_stack "local-agent: not pushed" "$home"
+    assert_link "local-agent: primary is local" "$home/.ssh/ssh_auth_sock" "$local_sock"
 }
 
-# 11. A herdr stable-address symlink to a live forwarded socket promotes like the raw
-# socket: primary tracks the link, configured local socket moves to backup.
-t_herdr_link_promotion() {
-    local home local_sock fwd link
+# A herdr stable link pushes like a raw socket, follows retargets, and is
+# pruned once herdr marks it unavailable.
+t_herdr_link() {
+    local home local_sock f1 f2 link
     home=$(new_home)
     local_sock="$home/local.sock"
     start_agent "$local_sock" >/dev/null
-    fwd="$home/.ssh/agent/s.h1.sshd.r1"
-    start_agent "$fwd" >/dev/null
-    link="$home/.config/herdr/herdr.sock.agent"
-    mkdir -p -- "$home/.config/herdr"
-    ln -s -- "$fwd" "$link"
-    init_run "$home" "$local_sock" "$link"
-    assert_link "herdr-link: primary is the link" "$home/.ssh/ssh_auth_sock" "$link"
-    assert_link "herdr-link: backup is local" "$home/.ssh/ssh_auth_sock_b" "$local_sock"
-}
-
-# 12. Herdr retargets the link between init runs: the slot keeps the link and resolves
-# the new target; the probe fails once the target dies.
-t_herdr_link_retarget() {
-    local home link f1 f2 p1 p2
-    home=$(new_home)
     f1="$home/.ssh/agent/s.h1.sshd.r1"
     f2="$home/.ssh/agent/s.h2.sshd.r2"
-    p1=$(start_agent "$f1")
+    start_agent "$f1" >/dev/null
+    start_agent "$f2" >/dev/null
     link="$home/.config/herdr/herdr.sock.agent"
     mkdir -p -- "$home/.config/herdr"
     ln -s -- "$f1" "$link"
-    init_run "$home" "" "$link"
-    assert_link "herdr-retarget: primary is the link" "$home/.ssh/ssh_auth_sock" "$link"
-    p2=$(start_agent "$f2")
+    init_run "$home" "$local_sock" "$link"
+    assert_stack "herdr-link: pushed" "$home" "$link"
+    assert_link "herdr-link: primary is the link" "$home/.ssh/ssh_auth_sock" "$link"
     ln -sfn -- "$f2" "$link"
-    init_run "$home" "" "$link"
-    assert_link "herdr-retarget: primary stays the link" "$home/.ssh/ssh_auth_sock" "$link"
-    expect_rc "herdr-retarget: probe resolves new target" 0 run "$home" "" probe "$home/.ssh/ssh_auth_sock"
-    kill "$p1" "$p2" 2>/dev/null
-    sleep 0.3
-    expect_rc "herdr-retarget: probe fails after agent death" 1 run "$home" "" probe "$home/.ssh/ssh_auth_sock"
+    init_run "$home" "$local_sock"
+    assert_stack "herdr-link: kept across retarget" "$home" "$link"
+    ln -sfn -- "$home/.config/herdr/herdr.sock.unavailable" "$link"
+    init_run "$home" "$local_sock"
+    assert_stack "herdr-link: unavailable pruned" "$home"
+    assert_link "herdr-link: primary back to local" "$home/.ssh/ssh_auth_sock" "$local_sock"
 }
 
-# 13. A link to a live non-layout socket (herdr unavailable marker or arbitrary agent)
-# is never promoted; the slots are left untouched.
-t_herdr_link_unavailable() {
+# Links to non-layout or missing targets are never pushed.
+t_herdr_link_rejected() {
     local home local_sock other link
     home=$(new_home)
     local_sock="$home/local.sock"
     start_agent "$local_sock" >/dev/null
-    init_run "$home" "$local_sock"
     mkdir -p -- "$home/.config/herdr"
     other="$home/.config/herdr/other.sock"
     start_agent "$other" >/dev/null
     link="$home/.config/herdr/herdr.sock.agent"
     ln -s -- "$other" "$link"
     init_run "$home" "$local_sock" "$link"
-    assert_link "herdr-unavailable: primary untouched" "$home/.ssh/ssh_auth_sock" "$local_sock"
-    assert_absent "herdr-unavailable: backup stays absent" "$home/.ssh/ssh_auth_sock_b"
-}
-
-# 14. A dangling link (target removed, as when the herdr server stops) is never
-# promoted.
-t_herdr_link_dangling() {
-    local home local_sock fwd link pd
-    home=$(new_home)
-    local_sock="$home/local.sock"
-    start_agent "$local_sock" >/dev/null
-    init_run "$home" "$local_sock"
-    fwd="$home/.ssh/agent/s.h9.sshd.r9"
-    pd=$(start_agent "$fwd")
-    link="$home/.config/herdr/herdr.sock.agent"
-    mkdir -p -- "$home/.config/herdr"
-    ln -s -- "$fwd" "$link"
-    kill "$pd" 2>/dev/null
-    rm -f -- "$fwd"
-    sleep 0.3
+    assert_stack "herdr-rejected: non-layout target not pushed" "$home"
+    ln -sfn -- "$home/.ssh/agent/s.h9.sshd.r9" "$link"
     init_run "$home" "$local_sock" "$link"
-    assert_link "herdr-dangling: primary untouched" "$home/.ssh/ssh_auth_sock" "$local_sock"
-    assert_absent "herdr-dangling: backup stays absent" "$home/.ssh/ssh_auth_sock_b"
-}
-
-# Legacy placeholders are migrated without discarding a usable backup.
-t_legacy_placeholders() {
-    local home fwd
-    home=$(new_home)
-    ln -s -- /dev/null "$home/.ssh/ssh_auth_sock"
-    ln -s -- /dev/null "$home/.ssh/ssh_auth_sock_b"
-    init_run "$home" ""
-    assert_absent "legacy: primary cleared" "$home/.ssh/ssh_auth_sock"
-    assert_absent "legacy: backup cleared" "$home/.ssh/ssh_auth_sock_b"
-    init_run "$home" ""
-    assert_absent "legacy: repeated init keeps primary absent" "$home/.ssh/ssh_auth_sock"
-    assert_absent "legacy: repeated init keeps backup absent" "$home/.ssh/ssh_auth_sock_b"
-
-    fwd="$home/.ssh/agent/s.legacy.sshd.backup"
-    start_agent "$fwd" >/dev/null
-    ln -sfn -- /dev/null "$home/.ssh/ssh_auth_sock"
-    ln -sfn -- "$fwd" "$home/.ssh/ssh_auth_sock_b"
-    init_run "$home" ""
-    assert_absent "legacy: mixed primary cleared" "$home/.ssh/ssh_auth_sock"
-    assert_link "legacy: mixed backup preserved" "$home/.ssh/ssh_auth_sock_b" "$fwd"
-}
-
-# Herdr becoming unavailable clears only the primary; explicit fixup restores backup.
-t_herdr_unavailable_transition() {
-    local home fwd current link
-    home=$(new_home)
-    fwd="$home/.ssh/agent/s.previous.sshd.backup"
-    current="$home/.ssh/agent/s.current.sshd.herdr"
-    start_agent "$fwd" >/dev/null
-    start_agent "$current" >/dev/null
-    init_run "$home" "" "$fwd"
-    link="$home/.config/herdr/herdr.sock.agent"
-    mkdir -p -- "$home/.config/herdr"
-    ln -s -- "$current" "$link"
-    init_run "$home" "" "$link"
-    assert_link "herdr-transition: primary tracks stable link" "$home/.ssh/ssh_auth_sock" "$link"
-    assert_link "herdr-transition: old forward is backup" "$home/.ssh/ssh_auth_sock_b" "$fwd"
-    ln -sfn -- "$home/.config/herdr/herdr.sock.unavailable" "$link"
-    init_run "$home" "" "$link"
-    assert_absent "herdr-transition: unavailable primary cleared" "$home/.ssh/ssh_auth_sock"
-    assert_link "herdr-transition: backup preserved" "$home/.ssh/ssh_auth_sock_b" "$fwd"
-    expect_rc "herdr-transition: explicit fixup succeeds" 0 run "$home" "" fixup
-    assert_link "herdr-transition: fixup promotes backup" "$home/.ssh/ssh_auth_sock" "$fwd"
-    assert_absent "herdr-transition: promoted backup is cleared" "$home/.ssh/ssh_auth_sock_b"
-}
-
-# A non-interactive session never takes over a live primary, but an empty
-# primary still bootstraps to the local agent (never to the incoming forward).
-t_non_interactive_skip() {
-    local home local_sock f1 f2
-    home=$(new_home)
-    local_sock="$home/local.sock"
-    start_agent "$local_sock" >/dev/null
-    f1="$home/.ssh/agent/s.h1.sshd.r1"
-    f2="$home/.ssh/agent/s.h2.sshd.r2"
-    start_agent "$f1" >/dev/null
-    start_agent "$f2" >/dev/null
-    init_run "$home" "$local_sock" "$f1"
-    init_run_ni "$home" "$local_sock" "$f2"
-    assert_link "non-interactive: primary keeps interactive forward" "$home/.ssh/ssh_auth_sock" "$f1"
-    assert_link "non-interactive: backup stays local" "$home/.ssh/ssh_auth_sock_b" "$local_sock"
-
-    home=$(new_home)
-    local_sock="$home/local.sock"
-    start_agent "$local_sock" >/dev/null
-    f1="$home/.ssh/agent/s.h1.sshd.r1"
-    start_agent "$f1" >/dev/null
-    init_run_ni "$home" "$local_sock" "$f1"
-    assert_link "non-interactive(empty): primary bootstraps local" "$home/.ssh/ssh_auth_sock" "$local_sock"
-    assert_absent "non-interactive(empty): backup is absent" "$home/.ssh/ssh_auth_sock_b"
-
-    home=$(new_home)
-    f1="$home/.ssh/agent/s.h1.sshd.r1"
-    start_agent "$f1" >/dev/null
-    init_run_ni "$home" "" "$f1"
-    assert_absent "non-interactive(no local): primary stays absent" "$home/.ssh/ssh_auth_sock"
-    expect_rc "init: rejects unknown flag" 1 run "$home" "" init --bogus
-}
-
-# Releasing the primary falls back to a live backup forward, keeping local in backup.
-t_release_primary_to_backup() {
-    local home local_sock f1 f2
-    home=$(new_home)
-    local_sock="$home/local.sock"
-    start_agent "$local_sock" >/dev/null
-    f1="$home/.ssh/agent/s.h1.sshd.r1"
-    f2="$home/.ssh/agent/s.h2.sshd.r2"
-    start_agent "$f1" >/dev/null
-    start_agent "$f2" >/dev/null
-    ln -s -- "$f2" "$home/.ssh/ssh_auth_sock"
-    ln -s -- "$f1" "$home/.ssh/ssh_auth_sock_b"
-    expect_rc "release(backup fwd): exit 0" 0 run "$home" "$local_sock" release "$f2"
-    assert_link "release(backup fwd): primary is backup forward" "$home/.ssh/ssh_auth_sock" "$f1"
-    assert_link "release(backup fwd): backup is local" "$home/.ssh/ssh_auth_sock_b" "$local_sock"
-}
-
-# Releasing the primary of a disconnected session (socket already deleted) falls back to local.
-t_release_primary_to_local() {
-    local home local_sock fwd pd
-    home=$(new_home)
-    local_sock="$home/local.sock"
-    start_agent "$local_sock" >/dev/null
-    fwd="$home/.ssh/agent/s.h1.sshd.r1"
-    pd=$(start_agent "$fwd")
-    init_run "$home" "$local_sock" "$fwd"
-    kill "$pd" 2>/dev/null
-    rm -f -- "$fwd"
-    expect_rc "release(local): exit 0" 0 run "$home" "$local_sock" release "$fwd"
-    assert_link "release(local): primary is local" "$home/.ssh/ssh_auth_sock" "$local_sock"
-    assert_absent "release(local): backup is absent" "$home/.ssh/ssh_auth_sock_b"
-}
-
-# Without a local agent, releasing the only forward clears the primary; a
-# remaining backup forward is promoted and its slot cleared.
-t_release_no_local() {
-    local home f1 f2
-    home=$(new_home)
-    f1="$home/.ssh/agent/s.h1.sshd.r1"
-    start_agent "$f1" >/dev/null
-    init_run "$home" "" "$f1"
-    expect_rc "release(no local): exit 0" 0 run "$home" "" release "$f1"
-    assert_absent "release(no local): primary cleared" "$home/.ssh/ssh_auth_sock"
-    assert_absent "release(no local): backup absent" "$home/.ssh/ssh_auth_sock_b"
-
-    f2="$home/.ssh/agent/s.h2.sshd.r2"
-    start_agent "$f2" >/dev/null
-    init_run "$home" "" "$f1"
-    init_run "$home" "" "$f2"
-    run "$home" "" release "$f2"
-    assert_link "release(no local): backup forward promoted" "$home/.ssh/ssh_auth_sock" "$f1"
-    assert_absent "release(no local): promoted backup cleared" "$home/.ssh/ssh_auth_sock_b"
-}
-
-# Releasing a socket held only in the backup clears it (or restores local);
-# releasing an unknown socket or the local agent changes nothing.
-t_release_backup_and_noop() {
-    local home local_sock f1 f2
-    home=$(new_home)
-    f1="$home/.ssh/agent/s.h1.sshd.r1"
-    f2="$home/.ssh/agent/s.h2.sshd.r2"
-    start_agent "$f1" >/dev/null
-    start_agent "$f2" >/dev/null
-    init_run "$home" "" "$f1"
-    init_run "$home" "" "$f2"
-    run "$home" "" release "$f1"
-    assert_link "release(backup): primary untouched" "$home/.ssh/ssh_auth_sock" "$f2"
-    assert_absent "release(backup): backup cleared" "$home/.ssh/ssh_auth_sock_b"
-    expect_rc "release(unknown): exit 0" 0 run "$home" "" release "$home/.ssh/agent/s.hx.sshd.rx"
-    assert_link "release(unknown): primary untouched" "$home/.ssh/ssh_auth_sock" "$f2"
-
-    home=$(new_home)
-    local_sock="$home/local.sock"
-    start_agent "$local_sock" >/dev/null
-    init_run "$home" "$local_sock"
-    expect_rc "release(local agent): exit 0" 0 run "$home" "$local_sock" release "$local_sock"
-    assert_link "release(local agent): primary stays local" "$home/.ssh/ssh_auth_sock" "$local_sock"
-    expect_rc "release: rejects relative path" 1 run "$home" "$local_sock" release relative.sock
-}
-
-# Release never talks to an agent: a local socket left by a SIGKILLed agent
-# (file present, nothing listening) is still selected.
-t_release_no_agent_protocol() {
-    local home local_sock fwd pl
-    home=$(new_home)
-    local_sock="$home/local.sock"
-    pl=$(start_agent "$local_sock")
-    kill -KILL "$pl" 2>/dev/null
-    sleep 0.3
-    fwd="$home/.ssh/agent/s.h1.sshd.r1"
-    ln -s -- "$fwd" "$home/.ssh/ssh_auth_sock"
-    ln -s -- "$local_sock" "$home/.ssh/ssh_auth_sock_b"
-    run "$home" "$local_sock" release "$fwd"
-    assert_link "release(no protocol): primary is unanswered local socket" "$home/.ssh/ssh_auth_sock" "$local_sock"
-    assert_absent "release(no protocol): backup is absent" "$home/.ssh/ssh_auth_sock_b"
+    assert_stack "herdr-rejected: dangling link not pushed" "$home"
+    assert_link "herdr-rejected: primary is local" "$home/.ssh/ssh_auth_sock" "$local_sock"
 }
 
 t_bootstrap_local
 t_bootstrap_none
-t_stale_ineligible
-t_same_target_local
-t_forwarded_promotion
-t_consecutive_forwarded
-t_rotation_no_local
-t_steady_state
-t_non_symlink_guard
-t_fixup
-t_local_agent_layout
-
-t_herdr_link_promotion
-t_herdr_link_retarget
-t_herdr_link_unavailable
-t_herdr_link_dangling
-t_legacy_placeholders
-t_herdr_unavailable_transition
-t_non_interactive_skip
-t_release_primary_to_backup
-t_release_primary_to_local
-t_release_no_local
-t_release_backup_and_noop
+t_local_missing_selected
+t_push_pop_newest
+t_pop_older_first
+t_relogin_moves_top
+t_prune
+t_non_interactive
+t_nested_shell
+t_release_deleted_socket
+t_release_noop
 t_release_no_agent_protocol
+t_fixup
+t_migration
+t_legacy_placeholders
+t_non_symlink_guard
+t_local_agent_layout
+t_herdr_link
+t_herdr_link_rejected
 
 printf 'ssh-agent-slot.test: %d passed, %d failed\n' "$pass" "$fail"
 [[ "$fail" -eq 0 ]]
