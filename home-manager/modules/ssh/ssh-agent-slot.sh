@@ -1,13 +1,13 @@
 # shellcheck shell=bash
-# Shared SSH agent slots: init/probe run automatically, fixup repairs explicitly.
+# Shared SSH agent slots: init/probe/release run automatically, fixup repairs explicitly.
 # Only fixup and probe touch the agent protocol, always through bounded probes;
-# init is filesystem-only.
+# init and release are filesystem-only.
 set -euo pipefail
 
 main() {
     local cmd="${1:-}"
     case "$cmd" in
-        --help|-h) printf 'Usage: ssh-agent-slot {init|probe <slot>|fixup [--local]}\n'; return ;;
+        --help|-h) printf 'Usage: ssh-agent-slot {init [--non-interactive]|probe <slot>|release <socket>|fixup [--local]}\n'; return ;;
         probe)
             # Match exec runs this on every ssh invocation: read-only and
             # lock-free, so it can never block or serialize an ssh call
@@ -16,13 +16,17 @@ main() {
             return 1
             ;;
         init)
-            (( $# == 1 )) || die "usage: ssh-agent-slot init"
+            (( $# <= 2 )) || die "usage: ssh-agent-slot init [--non-interactive]"
+            [[ -z "${2:-}" || "${2:-}" = --non-interactive ]] || die "usage: ssh-agent-slot init [--non-interactive]"
+            ;;
+        release)
+            (( $# == 2 )) && [[ "$2" = /* ]] || die "usage: ssh-agent-slot release <socket>"
             ;;
         fixup)
             (( $# <= 2 )) || die "usage: ssh-agent-slot fixup [--local]"
             [[ -z "${2:-}" || "${2:-}" = --local ]] || die "usage: ssh-agent-slot fixup [--local]"
             ;;
-        *) die "usage: ssh-agent-slot {init|probe <slot>|fixup [--local]}" ;;
+        *) die "usage: ssh-agent-slot {init [--non-interactive]|probe <slot>|release <socket>|fixup [--local]}" ;;
     esac
     [[ ${HOME:-} = /* ]] || die "HOME must be an absolute path"
     local_socket=${local_socket:-}
@@ -47,29 +51,41 @@ main() {
     if [[ "$cmd" = init ]]; then
         # Register a genuinely incoming forwarded candidate; otherwise
         # bootstrap inactive state. An inherited agent without an
-        # SSH_CONNECTION marker never promotes (nested shells).
+        # SSH_CONNECTION marker never promotes (nested shells), and
+        # non-interactive sessions (ssh host cmd) never take over the slots.
         local incoming candidate
         incoming=${SSH_AUTH_SOCK:-}
-        if [[ -n ${SSH_CONNECTION:-} && -S "$incoming" ]] && forwarded_socket "$incoming"; then
+        if [[ "${2:-}" != --non-interactive && -n ${SSH_CONNECTION:-} && -S "$incoming" ]] &&
+            forwarded_socket "$incoming"; then
             if [[ "$incoming" != "$primary_target" ]]; then publish "$incoming"; fi
         elif ! eligible "$primary_target"; then
             candidate=""
             if eligible "$local_socket" && [[ -S "$local_socket" ]]; then candidate=$local_socket; fi
             publish "$candidate"
         fi
-        # Local agent invariant: hosts that configure one keep it in a slot at all
-        # times; otherwise a stale ineligible backup is neutralized. Targets are
-        # re-read since a promotion may have rewritten the slots.
-        primary_target=$(read_slot "$primary")
-        backup_target=$(read_slot "$backup")
-        if [[ -n "$local_socket" && "$primary_target" != "$local_socket" ]]; then
-            write_slot "$backup" "$local_socket"
-        else
-            # Never leave both slots on the same target; neutralize stale backups.
-            if [[ "$primary_target" = "$backup_target" ]] || ! eligible "$backup_target"; then
-                write_slot "$backup" ""
+        normalize_backup
+        return
+    fi
+
+    if [[ "$cmd" = release ]]; then
+        # A session's forwarded agent leaves the slots when the session ends,
+        # whether or not sshd has removed its socket yet. The local agent is
+        # never released.
+        local gone=$2 next=""
+        [[ "$gone" != "$local_socket" ]] || return 0
+        if [[ "$primary_target" = "$gone" ]]; then
+            if [[ "$backup_target" != "$gone" && -S "$backup_target" ]] && eligible "$backup_target"; then
+                next=$backup_target
+            elif [[ -S "$local_socket" ]] && eligible "$local_socket"; then
+                next=$local_socket
             fi
+            write_slot "$primary" "$next"
+        elif [[ "$backup_target" = "$gone" ]]; then
+            write_slot "$backup" ""
+        else
+            return 0
         fi
+        normalize_backup
         return
     fi
 
@@ -127,6 +143,22 @@ forwarded_socket() {
 eligible() {
     [[ "$1" = /* && "$1" != /dev/null && "$1" != "$primary" && "$1" != "$backup" ]] &&
         { [[ -n "$local_socket" && "$1" = "$local_socket" ]] || forwarded_socket "$1"; }
+}
+
+# Local agent invariant: hosts that configure one keep it in a slot at all
+# times; otherwise a stale ineligible backup is neutralized. Targets are
+# re-read since the caller may have rewritten the slots.
+normalize_backup() {
+    primary_target=$(read_slot "$primary")
+    backup_target=$(read_slot "$backup")
+    if [[ -n "$local_socket" && "$primary_target" != "$local_socket" ]]; then
+        write_slot "$backup" "$local_socket"
+    else
+        # Never leave both slots on the same target; neutralize stale backups.
+        if [[ "$primary_target" = "$backup_target" ]] || ! eligible "$backup_target"; then
+            write_slot "$backup" ""
+        fi
+    fi
 }
 
 # Rotate slots: the previous eligible primary becomes backup, $1 becomes primary.
