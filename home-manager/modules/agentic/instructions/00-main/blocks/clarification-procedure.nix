@@ -12,6 +12,10 @@
 
         * Ask only for missing information or decisions that materially affect scope, behavior, risk, or user-owned trade-offs. Required approvals still apply. When needed, ${scope.harness.prose.questions.request}.
 
+        * When a choice is better shown than described (layout, look, spacing, color, composition, options side by side), show it with ${
+          scope.skills."show-me".reference
+        } and ask for the pick in the message carrying the link. Never encode a visual option as ASCII inside a question, including option labels, descriptions, and preview panes. 
+
         * Group independent questions; ask sequentially only when answers depend on earlier decisions. Give brief context and a recommendation.
 
         * Stop clarifying when the next planned step is sufficiently defined. Report remaining uncertainty instead of inventing questions to reach certainty.
