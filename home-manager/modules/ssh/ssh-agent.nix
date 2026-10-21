@@ -39,11 +39,13 @@ in
       # Push incoming forwarding before normalizing persistent sessions.
       # Non-interactive sessions (ssh host cmd) never take over the agent,
       # except herdr --remote bridges: they are a connection from another
-      # machine, like a login. fish -c keeps its command in its own args.
+      # machine, like a login. fish -c keeps its command in its own args;
+      # herdr's is its ready marker, then exec <path>/herdr remote-client-bridge.
       set -l slot_incoming "$SSH_AUTH_SOCK"
       set -l slot_init init
       if not status is-interactive
-        set -q SSH_CONNECTION; and string match -q '*herdr remote-client-bridge*' -- (ps -o args= -p $fish_pid 2>/dev/null)
+        set -q SSH_CONNECTION
+        and string match -qr '(?s)herdr-remote-output-ready:1.*exec /\S+/herdr remote-client-bridge( |$)' -- "$(ps -o args= -p $fish_pid 2>/dev/null)"
         or set -a slot_init --non-interactive
       end
       if ${lib.getExe slotHelper} $slot_init
