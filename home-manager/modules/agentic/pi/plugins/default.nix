@@ -61,8 +61,7 @@ let
 
     # https://github.com/tintinweb/pi-tasks
     {
-      # Prefer npm:@tintinweb/pi-tasks when a release includes the typebox peer fix.
-      package = "git:github.com/tintinweb/pi-tasks@fac016c192ac58727b3aea838831007be04664da";
+      package = "npm:@tintinweb/pi-tasks@0.9.1";
       files = {
         # The /tasks settings UI only writes per-project overrides, never this file,
         # so nix can own it without clobbering runtime state.
