@@ -5,8 +5,12 @@ description: Audit and update fetchFromGitHub pins (rev + hash) in the dotfiles 
 
 # Bump fetchFromGitHub pins
 
-Run from the worktree root. Scope: `fetchFromGitHub` only (not flake `github:` inputs, not other
-fetchers). Audit every pin, show a table, then after confirmation update the chosen ones end-to-end.
+All paths below are relative to the jj workspace you are working in: the default checkout
+(`~/dotfiles`) or a task workspace (`~/dotfiles/.workspaces/<name>`). Run every edit, `./x` and `jj`
+command from that root; `./x` resolves its flake from its own script directory, so a parent or
+sibling checkout's `./x` builds a different tree. Scope: `fetchFromGitHub` only (not flake `github:`
+inputs, not other fetchers). Audit every pin, show a table, then after confirmation update the chosen
+ones end-to-end.
 
 ## Audit
 
@@ -55,10 +59,12 @@ for a tag pin); set `hash`/`sha256`; update any stale commit-tree comment to the
 fmt`.
 
 3. Verify the affected package builds from the edited on-disk file. Build the specific attr with a
-direct `import ./path` of the overlay/file that wraps the fetch (reads the uncommitted edit — the
-flake ref reads git HEAD in this worktree). This catches `sourceRoot`/`postPatch` failures. Skip
+direct `import ./path` of the overlay/file that wraps the fetch, which reads the uncommitted edit
+regardless of how a flake ref resolves. This catches `sourceRoot`/`postPatch` failures. Skip
 this build for darwin-only packages on Linux (hash + eval suffice).
 
 4. Commit with jj per the version-control workflow: one commit for the bump, prefix `unreviewed:`.
 
-5. Final eval after the commit (the flake ref now sees the change): `HOST=deskapp ./x home check`.
+5. Final eval from this workspace: `./x home check` (local host by default; `HOST=<name>` only for
+   another host). It is `nix eval --raw`, so it builds nothing and the generation path it prints need
+   not exist in the store; the flake ref reads the working tree, dirty or committed.
