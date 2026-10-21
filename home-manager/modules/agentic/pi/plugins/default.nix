@@ -45,7 +45,7 @@ let
 
     # https://github.com/YuGiMob/pi-hashline-edit-pro
     {
-      package = "npm:pi-hashline-edit-pro@6.4.1";
+      package = "npm:pi-hashline-edit-pro@6.4.7";
     }
 
     # https://github.com/tintinweb/pi-subagents
@@ -85,12 +85,12 @@ let
 
     # https://github.com/juicesharp/rpiv-mono
     {
-      package = "npm:@juicesharp/rpiv-ask-user-question@2.13.8";
+      package = "npm:@juicesharp/rpiv-ask-user-question@2.13.9";
     }
 
     # https://github.com/nicobailon/pi-web-access
     {
-      package = "npm:pi-web-access@0.40.0";
+      package = "npm:pi-web-access@0.42.0";
       files = {
         ".pi/agent/web-search.json".text = builtins.toJSON {
           provider = "exa";
@@ -124,7 +124,7 @@ let
 
     # https://github.com/nicobailon/pi-powerline-footer
     {
-      package = "npm:pi-powerline-footer@0.20.1";
+      package = "npm:pi-powerline-footer@0.20.2";
       environment = {
         POWERLINE_NERD_FONTS.value = "1";
       };
