@@ -129,8 +129,8 @@ remove_entries() {
     return "$removed"
 }
 
-# Drop entries whose agent socket is gone (a herdr link pointing at its
-# unavailable marker counts as gone).
+# Drop entries whose agent socket is gone, and entries that are not
+# candidates (such as herdr stable links).
 prune() {
     local entry
     while IFS= read -r entry; do
@@ -166,19 +166,13 @@ entries() {
     done
 }
 
-# A socket that may become an entry: a forwarded agent that is neither the
-# configured local agent nor one of our own paths.
+# A socket that may become an entry: a raw forwarded agent that is neither the
+# configured local agent nor one of our own paths. Symlinks never qualify:
+# herdr's (>= 0.9.2) stable agent link can point back at the primary, which
+# would make the primary resolve through itself.
 incoming_candidate() {
-    [[ "$1" = /* && "$1" != "$primary" && "$1" != "$sessions"/* &&
-        ( -z "$local_socket" || "$1" != "$local_socket" ) ]] && forwarded_socket "$1"
-}
-
-# A forwarded agent socket, or a symlink indirection to one: herdr (>= 0.9.2)
-# serves panes a stable agent address it retargets across attaches.
-forwarded_socket() {
-    local target=$1
-    if [[ -L "$target" ]]; then target=$(readlink -- "$target"); fi
-    forwarded_shape "$target"
+    [[ "$1" = /* && ! -L "$1" && "$1" != "$primary" && "$1" != "$sessions"/* &&
+        ( -z "$local_socket" || "$1" != "$local_socket" ) ]] && forwarded_shape "$1"
 }
 
 # A recognized OpenSSH forwarded-socket layout: modern sshd-forwarded
