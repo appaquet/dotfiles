@@ -127,6 +127,7 @@
     enableFishIntegration = true;
     settings = {
       command_timeout = 2000;
+      format = "$username$hostname$localip$shlvl$singularity$kubernetes$nats$directory$jj_bookmark$all";
 
       username = {
         disabled = false;
