@@ -100,6 +100,14 @@ let
       };
     }
 
+    # https://github.com/nicobailon/pi-cached-compaction
+    # Pinned by git commit (v0.2.0 tag): the npm mirror snapshot predates the
+    # package's first publish, so the npm spec cannot install. Swap to
+    # npm:pi-cached-compaction@0.2.0 once the mirror carries it.
+    {
+      package = "git:github.com/nicobailon/pi-cached-compaction@e1e20de0a7e433070414602f1105cdcac258ef4f";
+    }
+
     # https://github.com/balaenis/pi-x-ide
     {
       package = "npm:pi-x-ide@1.20.1";

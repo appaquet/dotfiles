@@ -321,6 +321,7 @@ beforeEach(() => {
   process.env.PI_SCOPE = "codex";
   delete process.env.PI_SCOPE_REWRITE;
   delete process.env.PI_SCOPE_LOG;
+  delete process.env.PI_SCOPE_SUMMARY_COMPACTION;
   delete (globalThis as Record<string, unknown>).__PI_SCOPE_SEQ__;
   (globalThis as Record<string, unknown>).activePreset = "codex";
   (globalThis as Record<string, unknown>).upgradedPreset = undefined;
@@ -1932,6 +1933,7 @@ test("registers one native summary handler per event and declines direct models"
 });
 
 test("passes native compaction state and exact concrete request configuration through unchanged", async () => {
+  process.env.PI_SCOPE_SUMMARY_COMPACTION = "1";
   const concrete = {
     ...target("old", "old-main", "Cloud main model"),
     thinkingLevelMap: { high: "xhigh" },
@@ -2084,6 +2086,7 @@ test("declines tree generation when no summary is requested or there are no entr
 });
 
 test("compaction and branch summaries use the dedicated summary target, not the active work alias", async () => {
+  process.env.PI_SCOPE_SUMMARY_COMPACTION = "1";
   const mainModel = target("old", "old-main", "Cloud main model");
   const summaryModel = target("old", "old-junior", "Cloud junior model");
   const harness = await createHarness(
@@ -2129,6 +2132,31 @@ test("compaction and branch summaries use the dedicated summary target, not the 
   expect(treeCalls).toHaveLength(1);
   expect(treeCalls[0][1].model).toEqual(summaryModel);
   expect(treeCalls[0][1].apiKey).toBe("summary-key");
+});
+
+test("compaction yields by default so cached-compaction can use the session's cached prompt", async () => {
+  const harness = await createHarness(
+    {
+      codex: {
+        main: { model: "old/old-main", thinking: "xhigh" },
+        remap: { "scoped/summary": { model: "old/old-junior", thinking: "low" } },
+      },
+    },
+    {
+      apiKeys: { old: "old-key" },
+      models: [target("old", "old-main", "Cloud main model"), target("old", "old-junior", "Cloud junior model")],
+      requestAuth: {
+        "old/old-main": { ok: true, apiKey: "main-key" },
+        "old/old-junior": { ok: true, apiKey: "summary-key" },
+      },
+    },
+  );
+  const result = await harness.summaryHandlers.session_before_compact[0](
+    { preparation: { firstKeptEntryId: "kept" }, signal: new AbortController().signal },
+    harness.ctx,
+  );
+  expect(result).toBeUndefined();
+  expect(compactCalls).toEqual([]);
 });
 
 test("scoped/summary is validated but never exposed as a selectable work model", async () => {
@@ -2184,6 +2212,7 @@ test("a scoped/summary target absent from the registry fails registration clearl
 });
 
 test("a summary event cancels without native fallback when the dedicated target becomes unavailable", async () => {
+  process.env.PI_SCOPE_SUMMARY_COMPACTION = "1";
   const mainModel = target("old", "old-main", "Cloud main model");
   const summaryModel = target("old", "old-junior", "Cloud junior model");
   const harness = await createHarness(
@@ -2211,6 +2240,7 @@ test("a summary event cancels without native fallback when the dedicated target 
 });
 
 test("summaries observe only committed targets across deferred failure and successful scope commit", async () => {
+  process.env.PI_SCOPE_SUMMARY_COMPACTION = "1";
   let rejectCredential!: (error: Error) => void;
   let credentialStarted!: () => void;
   const started = new Promise<void>((resolve) => {
@@ -2272,6 +2302,7 @@ test("summaries observe only committed targets across deferred failure and succe
 });
 
 test("snapshots the concrete summary target before an in-flight scope switch", async () => {
+  process.env.PI_SCOPE_SUMMARY_COMPACTION = "1";
   let releaseSwitchAuth!: (auth: RequestAuth) => void;
   let switchAuthStarted!: () => void;
   const switchAuthStartedPromise = new Promise<void>((resolve) => {
@@ -2327,6 +2358,7 @@ test("snapshots the concrete summary target before an in-flight scope switch", a
 });
 
 test("reports auth and generation failures and cancels without alias fallback", async () => {
+  process.env.PI_SCOPE_SUMMARY_COMPACTION = "1";
   const concrete = target("old", "old-main", "Cloud main model");
   const authHarness = await createHarness(presets, {
     apiKeys: { old: "old-key" },
@@ -2383,6 +2415,7 @@ test("reports auth and generation failures and cancels without alias fallback", 
 });
 
 test("forwards configured retry policy and cancels retry exhaustion, disabled retry and abort outcomes", async () => {
+  process.env.PI_SCOPE_SUMMARY_COMPACTION = "1";
   const concrete = target("old", "old-main", "Cloud main model");
   const harness = await createHarness(presets, {
     apiKeys: { old: "old-key" },
@@ -2545,6 +2578,7 @@ test("no session id is fabricated when the session reports none", async () => {
 });
 
 test("summary requests leave identity and headers to Pi", async () => {
+  process.env.PI_SCOPE_SUMMARY_COMPACTION = "1";
   const harness = await goHarness({
     ok: true,
     apiKey: "summary-key",

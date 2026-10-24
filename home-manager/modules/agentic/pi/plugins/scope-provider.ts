@@ -8,13 +8,19 @@
  * completion (agent loop, raw `ModelRegistry.complete`, summaries) to the
  * concrete target provider, so no payload rewriting is needed.
  *
- * Compaction and /tree branch summaries route to a dedicated per-preset
- * target (`scoped/summary`), independent of the active work model.
+ * /tree branch summaries route to a dedicated per-preset target
+ * (`scoped/summary`), independent of the active work model. Compaction uses
+ * the same target only when enabled via PI_SCOPE_SUMMARY_COMPACTION; by
+ * default it yields to the session's cached-compaction extension (or Pi's
+ * native path), which summarizes warm sessions through the already-cached
+ * work-model prompt.
  *
  * Env:
  *  PI_SCOPE            active preset at launch (default "go")
  *  PI_SCOPE_LOG        path to append debug lines
  *  PI_SCOPE_REWRITE=0  kill switch: disable alias resolution (pass-through)
+ *  PI_SCOPE_SUMMARY_COMPACTION=1  enable dedicated-summary-model compaction
+ *                      (off by default; cached-compaction covers warm sessions)
  */
 import * as fs from "node:fs";
 import * as path from "node:path";
@@ -85,7 +91,7 @@ type ScopeSnapshot = {
 
 const SCOPE_IDS = ["main", "junior", "mid", "senior", "staff", "principal", "reviewer"];
 
-// Reserved internal alias for context compaction and /tree branch summaries.
+// Reserved internal alias for /tree branch summaries and opt-in context compaction.
 // It is resolved and validated per preset like a work alias, but it is never
 // added to the selectable work-model list, so it stays hidden from normal
 // model selection. Summary events resolve this alias instead of the active
@@ -556,10 +562,10 @@ function snapshotSummaryTarget(ctx: any): ScopedSummaryTarget | undefined {
   // Direct non-scoped sessions keep Pi's native summary behavior.
   if (!aliasModel || aliasModel.provider !== "scoped") return undefined;
 
-  // Scoped sessions summarize through the preset's dedicated target, independent
-  // of the active work alias, so compaction never rides the selected work model.
-  // A missing or unavailable target fails the summary rather than falling back
-  // to the work model.
+  // Scope-provider's compaction path is opt-in (PI_SCOPE_SUMMARY_COMPACTION);
+  // when enabled, scoped sessions summarize through the preset's dedicated
+  // target, independent of the active work alias. A missing or unavailable
+  // target fails the summary rather than falling back to the work model.
   const alias = SUMMARY_ALIAS;
   const entry = state.entries[alias];
   const target = state.targets[alias];
@@ -931,6 +937,10 @@ export default function scopeProvider(pi: any): void {
   });
 
   pi.on("session_before_compact", async (event: any, ctx: any) => {
+    // Off by default: warm sessions are summarized by the cached-compaction
+    // extension through the session's own cached prompt, which a dedicated
+    // summary call here would duplicate and then discard.
+    if (process.env.PI_SCOPE_SUMMARY_COMPACTION !== "1") return;
     let target: ScopedSummaryTarget | undefined;
     try {
       target = snapshotSummaryTarget(ctx);
