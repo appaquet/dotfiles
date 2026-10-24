@@ -11,71 +11,39 @@ let
     max = "xhigh";
   };
 
-  mkLocalModel =
-    model:
-    {
-      reasoning = true;
-      input = [ "text" ];
-      maxTokens = 32000;
-      inherit thinkingLevelMap;
-      cost = {
-        input = 0;
-        output = 0;
-        cacheRead = 0;
-        cacheWrite = 0;
-      };
-    }
-    // model;
-
-  mkLocalNinferModel =
-    model:
-    mkLocalModel (
-      {
-        compat = {
-          supportsReasoningEffort = true;
-          supportsStrictMode = false;
-          thinkingFormat = "openai";
-        };
-      }
-      // model
-    );
-
-  mkLocalVllmModel =
-    model:
-    mkLocalModel (
-      {
-        compat = {
-          supportsReasoningEffort = false;
-          thinkingFormat = "chat-template";
-          chatTemplateKwargs = {
-            enable_thinking = {
-              "$var" = "thinking.enabled";
-            };
-            reasoning_effort = {
-              "$var" = "thinking.effort";
-            };
-            preserve_thinking = true;
-          };
-        };
-      }
-      // model
-    );
-
   models = {
     providers.deskapp = {
       baseUrl = "http://deskapp.n3x.net:8080/v1";
       api = "openai-completions";
       apiKey = "local";
-      compat.supportsDeveloperRole = false;
-      models = [
-        (mkLocalNinferModel {
-          id = "qwen3.8-27b";
-          name = "qwen3.8-27b";
+
+      discoverModels = true; # used by `model-discovery` extension to register models from GET /v1/models
+      discoverDefaults = {
+        contextWindow = 125000;
+        maxTokens = 32000;
+        input = [
+          "text"
+        ];
+      };
+
+      compat = {
+        supportsDeveloperRole = false;
+        supportsReasoningEffort = true;
+        supportsStrictMode = false;
+        thinkingFormat = "openai";
+      };
+
+      modelOverrides = {
+        "qwen3.8-27b" = {
+          contextWindow = 250000;
+          maxTokens = 32000;
           input = [
             "text"
             "image"
           ];
-          contextWindow = 250000;
+
+          inherit thinkingLevelMap;
+
           samplingParams = {
             temperature = 1.0;
             top_p = 0.95;
@@ -83,28 +51,8 @@ let
             presence_penalty = 0.0;
             repetition_penalty = 1.0;
           };
-        })
-
-        # For a Qwen vLLM launcher, use this model expression instead:
-        # (mkLocalVllmModel {
-        #   id = "qwen3.8-27b";
-        #   name = "qwen3.8-27b";
-        #   contextWindow = 185000;
-        #   samplingParams = {
-        #     temperature = 1.0;
-        #     top_p = 0.95;
-        #     top_k = 20;
-        #     presence_penalty = 0.0;
-        #     repetition_penalty = 1.0;
-        #   };
-        # })
-
-        (mkLocalVllmModel {
-          id = "ornith-1.5-35b";
-          name = "Ornith-1.5-35B";
-          contextWindow = 262144;
-        })
-      ];
+        };
+      };
     };
   };
 in
@@ -114,9 +62,6 @@ in
     defaultModel = "main";
     defaultThinkingLevel = "medium";
 
-    # Optional per-preset prompt pair: `enable` is injected into the model
-    # context on the next turn while the preset is active, `disable` when the
-    # scope switches away from it. Presets without a pair inject nothing.
     scopeProvider = {
       local = {
         main = {

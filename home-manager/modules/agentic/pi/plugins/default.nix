@@ -43,6 +43,16 @@ let
       package = "npm:@quartermaster-labs/pi-on-demand-context@0.3.2";
     }
 
+    # In-repo discovery extension: deskapp serves its catalog from
+    # GET /v1/models; the extension registers the discovered models before
+    # startup finishes, so models.nix only owns the endpoint plus the
+    # per-model overrides.
+    {
+      files = {
+        ".pi/agent/extensions/model-discovery.ts".source = ./model-discovery.ts;
+      };
+    }
+
     # https://github.com/YuGiMob/pi-hashline-edit-pro
     {
       package = "npm:pi-hashline-edit-pro@6.4.7";
