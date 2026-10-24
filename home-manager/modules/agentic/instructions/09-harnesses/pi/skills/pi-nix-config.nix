@@ -11,7 +11,7 @@
 
         Pi's `~/.pi/agent/settings.json` is a mutable runtime file. Nix-owned defaults are merged into it at launch by the pi wrapper (nix values win).
 
-        All nix sources live under `~/dotfiles/`.
+        All Nix sources live in `~/dotfiles/`, or in `~/dotfiles/.workspaces/<name>/` when working in a dotfiles workspace. Resolve the `~/dotfiles/...` source paths below against that workspace when applicable.
 
         ## Nix-owned settings
 
