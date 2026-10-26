@@ -111,6 +111,7 @@ class TestRegistry {
   readonly providerStubs = new Map<string, any>();
   readonly providerStreamCalls: TargetStreamCall[] = [];
 
+  readonly authWithoutKey: string[] = [];
   find(provider: string, id: string): Model | undefined {
     return this.models.get(`${provider}/${id}`);
   }
@@ -143,6 +144,7 @@ class TestRegistry {
   }
 
   async getApiKeyAndHeaders(model: Model): Promise<RequestAuth> {
+    if (this.authWithoutKey.includes(model.provider)) return { ok: true };
     const resolve = this.requestAuth.get(`${model.provider}/${model.id}`);
     if (!resolve) return { ok: true, apiKey: `${model.provider}-summary-key` };
     return resolve();
@@ -191,6 +193,10 @@ type Harness = {
   ctx: TestContext;
   command: ScopeCommand;
   completions: ScopeCompletion;
+  modelSelect: (event: any, ctx: TestContext) => void;
+  setModelCalls: any[];
+  setModelResult: boolean;
+  registeredEvents: string[];
   commandDescription: string;
   shortcuts: Array<{
     key: string;
@@ -324,6 +330,7 @@ beforeEach(() => {
   delete process.env.PI_SCOPE_SUMMARY_COMPACTION;
   delete (globalThis as Record<string, unknown>).__PI_SCOPE_SEQ__;
   (globalThis as Record<string, unknown>).activePreset = "codex";
+  delete (globalThis as Record<string, unknown>).followModel;
   (globalThis as Record<string, unknown>).upgradedPreset = undefined;
   (globalThis as Record<string, unknown>).rewriteDisabled = false;
   compactCalls = [];
@@ -375,6 +382,7 @@ async function createHarness(
     >;
     models?: Model[];
     requestAuth?: Record<string, RequestAuth | (() => Promise<RequestAuth>)>;
+    authWithoutKey?: string[];
     sessionEntries?: SessionEntry[];
     deferSessionStart?: boolean;
     parentSession?: string;
@@ -396,6 +404,7 @@ async function createHarness(
       typeof auth === "function" ? auth : async () => auth,
     );
   }
+  registry.authWithoutKey = options.authWithoutKey ?? [];
 
   const messages: string[] = [];
   const entries: ScopeEntryNotice[] = [];
@@ -410,6 +419,9 @@ async function createHarness(
     | ((event: unknown, ctx: TestContext) => any)
     | undefined;
   let compact: (() => void) | undefined;
+  let modelSelect:
+    | ((event: any, ctx: TestContext) => void)
+    | undefined;
   const shortcuts: Array<{
     key: string;
     description: string;
@@ -455,6 +467,12 @@ async function createHarness(
     completions: () => {
       throw new Error("scope completions were not registered");
     },
+    modelSelect: () => {
+      throw new Error("model_select handler was not registered");
+    },
+    setModelCalls: [],
+    setModelResult: true,
+    registeredEvents: [],
     commandDescription: "",
     shortcuts,
     summaryHandlers,
@@ -470,6 +488,14 @@ async function createHarness(
     registerProvider: (provider: string, registration: ProviderConfig) => {
       if (provider !== "scoped")
         throw new Error(`unexpected provider ${provider}`);
+      if (
+        (registration.models?.length ?? 0) > 0 &&
+        !registration.baseUrl &&
+        !registration.models.every((model: any) => model.baseUrl)
+      )
+        throw new Error(
+          'Provider scoped: "baseUrl" is required when defining custom models.',
+        );
       if (harness.restoreFailure && registration.apiKey === "old-key")
         throw new Error("restore unavailable");
       registry.setScoped(registration);
@@ -482,11 +508,14 @@ async function createHarness(
         | ((event: unknown, ctx: TestContext) => Promise<void>)
         | ((event: { payload: Record<string, unknown> }) => void),
     ) => {
+      harness.registeredEvents.push(event);
       if (event === "session_start")
         sessionStart = handler as SessionStartHandler;
       if (event === "before_agent_start")
         beforeAgentStart = handler as (event: unknown, ctx: TestContext) => any;
       if (event === "session_compact") compact = handler as () => void;
+      if (event === "model_select")
+        modelSelect = handler as (event: any, ctx: TestContext) => void;
       if (
         event === "session_before_compact" ||
         event === "session_before_tree"
@@ -531,6 +560,12 @@ async function createHarness(
     setThinkingLevel: (level: string) => {
       harness.ctx.thinkingLevel = level;
     },
+    setModel: async (model: any) => {
+      if (!harness.setModelResult) return false;
+      harness.setModelCalls.push(model);
+      harness.ctx.model = model;
+      return true;
+    },
   };
 
   (harness.ctx as any).__selectorCalls = selectorCalls;
@@ -543,6 +578,11 @@ async function createHarness(
   if (!sessionStart || !beforeAgentStart || !compact || !command || !completions)
     throw new Error("scope extension did not register its handlers");
   harness.sessionStart = sessionStart;
+  harness.modelSelect = (event: any, ctx: TestContext) => {
+    if (!modelSelect)
+      throw new Error("model_select handler was not registered");
+    modelSelect(event, ctx);
+  };
   harness.startSession = () => harness.sessionStart({}, harness.ctx);
   harness.beforeAgentStart = () => beforeAgentStart?.(undefined, harness.ctx);
   harness.compact = compact;
@@ -739,7 +779,7 @@ test("scope shortcut cancellation keeps the current scope unchanged", async () =
   expect(harness.selectorCalls).toEqual([
     {
       title: "Select scope:",
-      values: ["codex", "local"],
+      values: ["codex", "local", "none"],
       initialSearchInput: "",
       initialSelectedValue: "codex",
     },
@@ -784,33 +824,34 @@ test("scope shortcut selecting the current preset preserves no-op feedback", asy
   expect(harness.messages).toEqual([]);
 });
 
-test("empty scope configuration reports an error for shortcut and command", async () => {
+test("empty scope configuration offers the built-in none scope", async () => {
   const harness = await createHarness({});
-  const beforeStatuses = [...harness.statuses];
-  const beforeEntries = [...harness.entries];
+  harness.selection = "none";
 
   await harness.shortcuts[0].handler(harness.ctx);
   await harness.command("", harness.ctx);
 
-  expect(harness.selectorCalls).toEqual([]);
-  expect(harness.statuses).toEqual(beforeStatuses);
-  expect(harness.entries.slice(beforeEntries.length)).toEqual([
+  expect(harness.selectorCalls).toEqual([
     {
-      type: "custom",
-      customType: "scoped",
-      data: {
-        text: "scope: ERROR — no scope presets are configured; add scopeProvider settings before selecting a scope.",
-        error: true,
-      },
+      title: "Select scope:",
+      values: ["none"],
+      initialSearchInput: "",
+      initialSelectedValue: "codex",
     },
     {
-      type: "custom",
-      customType: "scoped",
-      data: {
-        text: "scope: ERROR — no scope presets are configured; add scopeProvider settings before selecting a scope.",
-        error: true,
-      },
+      title: "Select scope:",
+      values: ["none"],
+      initialSearchInput: "",
+      initialSelectedValue: "none",
     },
+  ]);
+  expect(harness.registry.getRegisteredProviderConfig("scoped")?.name).toBe(
+    "Scoped (none)",
+  );
+  expect(harness.statuses).toEqual([{ key: "scope", value: "scope:none" }]);
+  expect(harness.entries.map((entry) => entry.data.text).slice(-2)).toEqual([
+    "scope preset: none",
+    'already on preset "none"',
   ]);
   expect(harness.messages).toEqual([]);
 });
@@ -831,7 +872,7 @@ test("scope shortcut opens configured order and switches only after selection", 
   expect(harness.selectorCalls).toEqual([
     {
       title: "Select scope:",
-      values: ["codex", "local"],
+      values: ["codex", "local", "none"],
       initialSearchInput: "",
       initialSelectedValue: "codex",
     },
@@ -866,7 +907,7 @@ test("scope shortcut opens configured order and switches only after selection", 
 
   expect(harness.selectorCalls.at(-1)).toEqual({
     title: "Select scope:",
-    values: ["codex", "local"],
+    values: ["codex", "local", "none"],
     initialSearchInput: "",
     initialSelectedValue: "local",
   });
@@ -916,7 +957,7 @@ test("a failed shortcut scope selection keeps the existing transaction rollback"
   expect(harness.selectorCalls).toEqual([
     {
       title: "Select scope:",
-      values: ["codex", "noauth", "unavailable", "local"],
+      values: ["codex", "noauth", "unavailable", "local", "none"],
       initialSearchInput: "",
       initialSelectedValue: "codex",
     },
@@ -1304,6 +1345,7 @@ test("scope completions use configured order and native fuzzy ranking", async ()
     { value: "noauth", label: "noauth" },
     { value: "unavailable", label: "unavailable" },
     { value: "local", label: "local" },
+    { value: "none", label: "none" },
   ]);
   expect(harness.completions("LC")).toEqual([
     { value: "local", label: "local" },
@@ -1329,7 +1371,7 @@ test("a UI selection uses configured order and the transactional switch path", a
   expect(harness.selectorCalls).toEqual([
     {
       title: "Select scope:",
-      values: ["codex", "noauth", "unavailable", "local"],
+      values: ["codex", "noauth", "unavailable", "local", "none"],
       initialSearchInput: "",
       initialSelectedValue: "codex",
     },
@@ -1379,7 +1421,7 @@ test("partial and unmatched scope arguments open a prefilled selector", async ()
   expect(harness.selectorCalls).toEqual([
     {
       title: "Select scope:",
-      values: ["codex", "noauth", "unavailable", "local"],
+      values: ["codex", "noauth", "unavailable", "local", "none"],
       initialSearchInput: "ocl",
       initialSelectedValue: "codex",
     },
@@ -1393,7 +1435,7 @@ test("partial and unmatched scope arguments open a prefilled selector", async ()
 
   expect(harness.selectorCalls.at(-1)).toEqual({
     title: "Select scope:",
-    values: ["codex", "noauth", "unavailable", "local"],
+    values: ["codex", "noauth", "unavailable", "local", "none"],
     initialSearchInput: "zzz",
     initialSelectedValue: "local",
   });
@@ -1427,7 +1469,7 @@ test("cancelling the UI selector is a complete no-op", async () => {
   expect(harness.selectorCalls).toEqual([
     {
       title: "Select scope:",
-      values: ["codex", "noauth", "unavailable", "local"],
+      values: ["codex", "noauth", "unavailable", "local", "none"],
       initialSearchInput: "",
       initialSelectedValue: "codex",
     },
@@ -1467,7 +1509,7 @@ test("a selected current preset keeps direct same-preset behavior", async () => 
   expect(harness.selectorCalls).toEqual([
     {
       title: "Select scope:",
-      values: ["codex", "noauth", "unavailable", "local"],
+      values: ["codex", "noauth", "unavailable", "local", "none"],
       initialSearchInput: "",
       initialSelectedValue: "codex",
     },
@@ -1576,7 +1618,7 @@ test("a selected failed switch rolls back like a direct argument", async () => {
   expect(harness.selectorCalls).toEqual([
     {
       title: "Select scope:",
-      values: ["codex", "noauth", "unavailable", "local"],
+      values: ["codex", "noauth", "unavailable", "local", "none"],
       initialSearchInput: "",
       initialSelectedValue: "codex",
     },
@@ -2609,6 +2651,435 @@ test("summary requests leave identity and headers to Pi", async () => {
   expect(treeCalls).toHaveLength(1);
   expect(treeCalls[0][1].headers).toEqual({ "x-auth": "resolved" });
   expect(treeCalls[0][1]).not.toHaveProperty("sessionId");
+});
+
+// ---------------------------------------------------------------------------
+// None scope (built-in): every alias follows the manually selected model
+// ---------------------------------------------------------------------------
+
+test("none is a built-in scope offered with or without configured presets", async () => {
+  const empty = await createHarness({});
+  expect(empty.completions("")).toEqual([{ value: "none", label: "none" }]);
+
+  const configured = await createHarness(markerPresets, {
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: markerModels(),
+  });
+  expect(configured.completions("")).toEqual([
+    { value: "codex", label: "codex" },
+    { value: "local", label: "local" },
+    { value: "none", label: "none" },
+  ]);
+});
+
+test("PI_SCOPE=none launches, persists, and asks for a model selection", async () => {
+  process.env.PI_SCOPE = "none";
+  const harness = await createHarness({});
+
+  expect(harness.registry.getRegisteredProviderConfig("scoped")?.name).toBe(
+    "Scoped (none)",
+  );
+  expect(scopedNames(harness)).toEqual({
+    main: "Selected model (none scope) [S]",
+    junior: "Selected model (none scope)",
+    mid: "Selected model (none scope)",
+    senior: "Selected model (none scope)",
+    staff: "Selected model (none scope)",
+    principal: "Selected model (none scope)",
+    reviewer: "Selected model (none scope)",
+  });
+  expect(harness.statuses).toEqual([{ key: "scope", value: "scope:none" }]);
+  expect(harness.entries).toEqual([
+    {
+      type: "custom",
+      customType: "scoped",
+      data: {
+        text: "scope none: no model selected yet; pick a model with the model picker and sub-agents and summaries will follow it",
+        error: false,
+      },
+    },
+  ]);
+  expect(
+    harness.sessionEntries.filter(
+      (entry) => entry.customType === "scope-provider-state",
+    ),
+  ).toEqual([
+    { type: "custom", customType: "scope-provider-state", data: { preset: "none" } },
+  ]);
+});
+
+test("resuming restores a persisted none scope without a config entry", async () => {
+  process.env.PI_SCOPE = "none";
+  const launched = await createHarness({});
+  const saved = [...launched.sessionEntries];
+
+  const resumed = await createHarness({}, { sessionEntries: saved });
+
+  expect(resumed.registry.getRegisteredProviderConfig("scoped")?.name).toBe(
+    "Scoped (none)",
+  );
+  expect(resumed.statuses).toEqual([{ key: "scope", value: "scope:none" }]);
+});
+
+test("a configured preset named none is shadowed by the built-in", async () => {
+  process.env.PI_SCOPE = "none";
+  const config: ScopeConfig = {
+    none: {
+      main: { model: "next/next-main" },
+      remap: { "scoped/summary": { model: "next/next-main", thinking: "low" } },
+    },
+  };
+  const oldMain = target("old", "old-main", "Cloud main model");
+  const nextMain = target("next", "next-main", "Local main model");
+  const harness = await createHarness(config, {
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: [oldMain, nextMain],
+  });
+
+  expect(harness.registry.getRegisteredProviderConfig("scoped")?.name).toBe(
+    "Scoped (none)",
+  );
+  harness.modelSelect(
+    { type: "model_select", model: oldMain, previousModel: undefined, source: "set" },
+    harness.ctx,
+  );
+  await expect(scopedStream(harness, "main")).resolves.toBe("old-stream");
+  expect(lastTargetCall(harness)).toMatchObject({
+    provider: "old",
+    model: { provider: "old", id: "old-main" },
+  });
+});
+
+test("only top-level concrete selections update the followed model", async () => {
+  const nextMain = target("next", "next-main", "Local main model");
+  const oldJunior = target("old", "old-junior", "Cloud junior model");
+  const main = await createHarness(markerPresets, {
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: markerModels(),
+  });
+
+  main.modelSelect(
+    { type: "model_select", model: nextMain, previousModel: undefined, source: "set" },
+    main.ctx,
+  );
+  expect((globalThis as Record<string, unknown>).followModel).toEqual({
+    provider: "next",
+    id: "next-main",
+  });
+
+  main.modelSelect(
+    {
+      type: "model_select",
+      model: { provider: "scoped", id: "mid" },
+      previousModel: nextMain,
+      source: "cycle",
+    },
+    main.ctx,
+  );
+  expect((globalThis as Record<string, unknown>).followModel).toEqual({
+    provider: "next",
+    id: "next-main",
+  });
+
+  main.modelSelect({ type: "model_select" }, main.ctx);
+  expect((globalThis as Record<string, unknown>).followModel).toEqual({
+    provider: "next",
+    id: "next-main",
+  });
+
+  const child = await createHarness(markerPresets, {
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: markerModels(),
+    parentSession: "/tmp/parent-session.jsonl",
+  });
+  child.modelSelect(
+    { type: "model_select", model: oldJunior, previousModel: undefined, source: "restore" },
+    child.ctx,
+  );
+  expect((globalThis as Record<string, unknown>).followModel).toEqual({
+    provider: "next",
+    id: "next-main",
+  });
+});
+
+test("sub-agent scoped completion delegates to the followed model with its credentials", async () => {
+  const main = await createHarness(markerPresets, {
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: markerModels(),
+  });
+  await main.command("none", main.ctx);
+  const selected = target("next", "next-main", "Local main model");
+  main.modelSelect(
+    { type: "model_select", model: selected, previousModel: undefined, source: "set" },
+    main.ctx,
+  );
+
+  const child = await createHarness(markerPresets, {
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: markerModels(),
+    parentSession: "/tmp/parent-session.jsonl",
+  });
+
+  await expect(scopedStream(child, "mid")).resolves.toBe("next-stream");
+  expect(lastTargetCall(child)?.model).toEqual(selected);
+  expect(lastTargetCall(child)?.options).toEqual({
+    sessionId: "session-abc",
+    apiKey: "next-summary-key",
+  });
+});
+
+test("a scoped request without a followed model fails with a clear pick-a-model error", async () => {
+  process.env.PI_SCOPE = "none";
+  const harness = await createHarness({});
+  await expect(scopedStream(harness, "mid")).rejects.toThrow(
+    /scope none has no selected model yet; pick a model with the model picker/,
+  );
+});
+
+test("session start seeds the followed model from the latest concrete model change", async () => {
+  process.env.PI_SCOPE = "none";
+  const harness = await createHarness({}, {
+    models: markerModels(),
+    sessionEntries: [
+      { type: "model_change", provider: "old", modelId: "old-main" },
+      { type: "model_change", provider: "scoped", modelId: "mid" },
+      { type: "model_change", provider: "next", modelId: "next-main" },
+    ],
+  });
+
+  await expect(scopedStream(harness, "mid")).resolves.toBe("next-stream");
+  expect(lastTargetCall(harness)).toMatchObject({
+    provider: "next",
+    model: { provider: "next", id: "next-main" },
+  });
+});
+
+test("an unavailable followed model reports at session start and fails requests", async () => {
+  process.env.PI_SCOPE = "none";
+  const harness = await createHarness({}, {
+    sessionEntries: [
+      { type: "model_change", provider: "ghost", modelId: "ghost-main" },
+    ],
+  });
+
+  expect(harness.entries.at(-1)?.data).toMatchObject({
+    error: true,
+    text: expect.stringContaining("ghost/ghost-main is not available"),
+  });
+  await expect(scopedStream(harness, "mid")).rejects.toThrow(
+    /selected model ghost\/ghost-main is not available/,
+  );
+});
+
+test("compaction and branch summaries use the followed model in none scope", async () => {
+  process.env.PI_SCOPE = "none";
+  process.env.PI_SCOPE_SUMMARY_COMPACTION = "1";
+  const followed = target("next", "next-main", "Local main model");
+  const harness = await createHarness({}, { models: [followed] });
+  harness.modelSelect(
+    { type: "model_select", model: followed, previousModel: undefined, source: "set" },
+    harness.ctx,
+  );
+  const signal = new AbortController().signal;
+
+  await harness.summaryHandlers.session_before_compact[0](
+    { preparation: { firstKeptEntryId: "kept" }, signal },
+    harness.ctx,
+  );
+  expect(compactCalls).toHaveLength(1);
+  expect(compactCalls[0][1]).toEqual(followed);
+  expect(compactCalls[0][6]).toBe("medium");
+
+  await harness.summaryHandlers.session_before_tree[0](
+    {
+      preparation: { userWantsSummary: true, entriesToSummarize: [{}] },
+      signal,
+    },
+    harness.ctx,
+  );
+  expect(treeCalls).toHaveLength(1);
+  expect(treeCalls[0][1].model).toEqual(followed);
+});
+
+test("summaries cancel with a clear notice when none scope has no followed model", async () => {
+  process.env.PI_SCOPE = "none";
+  process.env.PI_SCOPE_SUMMARY_COMPACTION = "1";
+  const harness = await createHarness({});
+  const signal = new AbortController().signal;
+
+  await expect(
+    harness.summaryHandlers.session_before_compact[0](
+      { preparation: {}, signal },
+      harness.ctx,
+    ),
+  ).resolves.toEqual({ cancel: true });
+  expect(harness.entries.at(-1)?.data).toMatchObject({
+    error: true,
+    text: expect.stringContaining("the followed model (scope none)"),
+  });
+});
+
+test("compaction follows the selected model when the session model is already concrete", async () => {
+  process.env.PI_SCOPE = "none";
+  process.env.PI_SCOPE_SUMMARY_COMPACTION = "1";
+  const followed = target("next", "next-main", "Local main model");
+  const harness = await createHarness({}, { models: [followed] });
+  harness.modelSelect(
+    { type: "model_select", model: followed, previousModel: undefined, source: "set" },
+    harness.ctx,
+  );
+  harness.ctx.model = followed;
+  const signal = new AbortController().signal;
+
+  await harness.summaryHandlers.session_before_compact[0](
+    { preparation: { firstKeptEntryId: "kept" }, signal },
+    harness.ctx,
+  );
+  expect(compactCalls).toHaveLength(1);
+  expect(compactCalls[0][1]).toEqual(followed);
+});
+
+test("a followed provider without an api key drops the stale scoped credential", async () => {
+  const main = await createHarness(markerPresets, {
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: markerModels(),
+    authWithoutKey: ["next"],
+  });
+  await main.command("none", main.ctx);
+  const selected = target("next", "next-main", "Local main model");
+  main.modelSelect(
+    { type: "model_select", model: selected, previousModel: undefined, source: "set" },
+    main.ctx,
+  );
+
+  await expect(
+    scopedStream(main, "main", { apiKey: "stale-scoped-key" }),
+  ).resolves.toBe("next-stream");
+  expect(lastTargetCall(main)?.options).toEqual({ sessionId: "session-abc" });
+});
+
+test("/scope none unscopes a scoped/main session to the concrete model in use", async () => {
+  const oldMain = target("old", "old-main", "Cloud main model");
+  const harness = await createHarness(markerPresets, {
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: markerModels(),
+  });
+
+  await harness.command("none", harness.ctx);
+
+  expect(harness.setModelCalls).toEqual([oldMain]);
+  expect(harness.ctx.model).toEqual(oldMain);
+  expect((globalThis as Record<string, unknown>).followModel).toEqual({
+    provider: "old",
+    id: "old-main",
+  });
+  expect(harness.registry.getRegisteredProviderConfig("scoped")?.name).toBe(
+    "Scoped (none)",
+  );
+  expect(harness.statuses).toEqual([
+    { key: "scope", value: "scope:codex" },
+    { key: "scope", value: "scope:none" },
+  ]);
+  await expect(scopedStream(harness, "mid")).resolves.toBe("old-stream");
+});
+
+test("/scope none keeps an already-concrete session model and follows it", async () => {
+  const nextMain = target("next", "next-main", "Local main model");
+  const harness = await createHarness(markerPresets, {
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: markerModels(),
+  });
+  harness.ctx.model = nextMain;
+
+  await harness.command("none", harness.ctx);
+
+  expect(harness.setModelCalls).toEqual([]);
+  expect((globalThis as Record<string, unknown>).followModel).toEqual({
+    provider: "next",
+    id: "next-main",
+  });
+  await expect(scopedStream(harness, "main")).resolves.toBe("next-stream");
+});
+
+test("a failed unscope keeps the none switch and reports the failure", async () => {
+  const harness = await createHarness(markerPresets, {
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: markerModels(),
+  });
+  harness.setModelResult = false;
+
+  await harness.command("none", harness.ctx);
+
+  expect(harness.ctx.model).toEqual({ provider: "scoped", id: "main" });
+  expect(harness.registry.getRegisteredProviderConfig("scoped")?.name).toBe(
+    "Scoped (none)",
+  );
+  expect(
+    harness.entries.map((entry) => entry.data.text).join("\n"),
+  ).toContain(
+    "scope: ERROR — scope none could not switch the session to old/old-main",
+  );
+});
+
+test("switching back to a preset keeps the concrete session model and restores the table", async () => {
+  const nextMain = target("next", "next-main", "Local main model");
+  const harness = await createHarness(markerPresets, {
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: markerModels(),
+  });
+  await harness.command("none", harness.ctx);
+  harness.modelSelect(
+    { type: "model_select", model: nextMain, previousModel: undefined, source: "set" },
+    harness.ctx,
+  );
+  harness.ctx.model = nextMain;
+
+  await harness.command("codex", harness.ctx);
+
+  expect(harness.ctx.model).toEqual(nextMain);
+  expect(harness.registry.getRegisteredProviderConfig("scoped")?.name).toBe(
+    "Scoped",
+  );
+  await expect(scopedStream(harness, "junior")).resolves.toBe("old-stream");
+});
+
+test("a failed switch away from none restores the none provider", async () => {
+  const config: ScopeConfig = {
+    ...markerPresets,
+    unavailable: {
+      main: { model: "missing/missing-main" },
+      remap: {
+        "scoped/summary": { model: "missing/missing-main", thinking: "low" },
+      },
+    },
+  };
+  const harness = await createHarness(config, {
+    apiKeys: { old: "old-key", next: "next-key" },
+    models: markerModels(),
+  });
+  await harness.command("none", harness.ctx);
+  expect(harness.registry.getRegisteredProviderConfig("scoped")?.name).toBe(
+    "Scoped (none)",
+  );
+
+  await harness.command("unavailable", harness.ctx);
+
+  expect(harness.registry.getRegisteredProviderConfig("scoped")?.name).toBe(
+    "Scoped (none)",
+  );
+  expect(harness.entries.at(-1)?.data).toMatchObject({
+    error: true,
+    text: expect.stringContaining('previous preset "none" restored'),
+  });
+  await expect(scopedStream(harness, "mid")).resolves.toBe("old-stream");
+});
+
+test("none scope tracks model selections but not thinking levels", async () => {
+  process.env.PI_SCOPE = "none";
+  const harness = await createHarness({});
+  expect(harness.registeredEvents).toContain("model_select");
+  expect(harness.registeredEvents).not.toContain("thinking_level_select");
+  expect(harness.ctx.thinkingLevel).toBe("medium");
 });
 
 // ---------------------------------------------------------------------------

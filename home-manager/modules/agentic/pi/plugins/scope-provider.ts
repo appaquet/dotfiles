@@ -15,8 +15,15 @@
  * native path), which summarizes warm sessions through the already-cached
  * work-model prompt.
  *
+ *
+ * The built-in `none` scope needs no scopeProvider config. In `none` scope
+ * every alias resolves per request to the last concrete (non-scoped) model
+ * selected in the top-level session, recorded process-wide on model_select;
+ * the target's credentials are resolved per request. Compaction and /tree
+ * branch summaries follow the same model.
  * Env:
- *  PI_SCOPE            active preset at launch (default "go")
+ *  PI_SCOPE            active preset at launch (default "go"); the built-in
+ *                      "none" scope needs no scopeProvider entry
  *  PI_SCOPE_LOG        path to append debug lines
  *  PI_SCOPE_REWRITE=0  kill switch: disable alias resolution (pass-through)
  *  PI_SCOPE_SUMMARY_COMPACTION=1  enable dedicated-summary-model compaction
@@ -97,11 +104,19 @@ const SCOPE_IDS = ["main", "junior", "mid", "senior", "staff", "principal", "rev
 // model selection. Summary events resolve this alias instead of the active
 // work alias, so summarization is independent of the selected scoped model.
 const SUMMARY_ALIAS = "summary";
+
+// Built-in scope that resolves every alias to the user's manually selected
+// model; available with or without any scopeProvider configuration.
+const NONE_SCOPE = "none";
 const SCOPE_STATE_ENTRY = "scope-provider-state";
 const SCOPE_PROMPT_ENTRY = "scope-prompt";
 
 // Stub entries so `scoped/<id>` resolves before session_start upgrades them
 // from the live registry; upgrade failure fails loud (see session_start).
+// Placeholder endpoint for scoped provider configs that have no static
+// targets: the streamSimple hook intercepts every request before any HTTP
+// happens, and the real registry requires a baseUrl on custom providers.
+const STUB_BASE_URL = "http://deskapp.n3x.net:15000/v1";
 const STUB_MODEL = {
   reasoning: true,
   input: ["text"],
@@ -141,6 +156,7 @@ const scopeProcess: {
   activePreset?: string;
   upgradedPreset?: string;
   rewriteDisabled?: boolean;
+  followModel?: { provider: string; id: string };
 } = globalThis as any;
 if (!scopeProcess.activePreset)
   scopeProcess.activePreset = process.env.PI_SCOPE ?? "go";
@@ -208,6 +224,8 @@ function scopePromptText(
   preset: string,
   kind: keyof ScopePrompt,
 ): string | undefined {
+  // The built-in none scope shadows any user preset of the same name.
+  if (preset === NONE_SCOPE) return undefined;
   const value = readScopeConfig()[preset]?.prompt?.[kind];
   return typeof value === "string" && value.trim() !== "" ? value.trim() : undefined;
 }
@@ -223,7 +241,7 @@ export function findSavedScopePreset(
       entry?.type === "custom" &&
       entry.customType === SCOPE_STATE_ENTRY &&
       typeof entry.data?.preset === "string" &&
-      presets[entry.data.preset]
+      (entry.data.preset === NONE_SCOPE || presets[entry.data.preset])
     )
       return entry.data.preset;
   }
@@ -232,6 +250,10 @@ export function findSavedScopePreset(
 
 /** Build a preset mapping without publishing it as committed scope state. */
 function buildPreset(name: string): ScopeMapping | undefined {
+  if (name === NONE_SCOPE) {
+    // Built-in scope: no config entry, no static targets.
+    return { preset: NONE_SCOPE, entries: {}, targets: {} };
+  }
   const cfg = readScopeConfig();
   const preset = cfg[name];
   if (!preset) {
@@ -288,13 +310,19 @@ function streamScopedModel(
   options: any,
 ): any {
   const alias = model.id as string;
+  const killSwitch =
+    process.env.PI_SCOPE_REWRITE === "0" || scopeProcess.rewriteDisabled;
+  // The none scope resolves every request against the selected model; the
+  // static target lookup below does not apply to it.
+  if (state.preset === NONE_SCOPE && !killSwitch) {
+    return streamFollowedModel(alias, context, options);
+  }
   const target = state.targets[alias];
   // Snapshot at registration; a live find covers the stub stage, where
   // targets are known but no snapshot exists yet.
   const concrete =
     state.concreteModels[alias] ??
     (target && scopeRegistry ? scopeRegistry.find(target.provider, target.id) : undefined);
-  const killSwitch = process.env.PI_SCOPE_REWRITE === "0";
   if (killSwitch || !target || !concrete || !scopeRegistry) {
     debug(
       `streamSimple[${source}]: scoped/${alias} unresolved (kill=${killSwitch} target=${target ? `${target.provider}/${target.id}` : "none"} concrete=${concrete ? "yes" : "no"} registry=${scopeRegistry ? "yes" : "no"}), passing through to native behavior`,
@@ -328,6 +356,60 @@ function streamScopedModel(
 }
 
 /**
+ * Resolve a scoped alias to the user's manually selected model and delegate
+ * to that provider. Credentials are resolved per request because the
+ * followed target changes with every manual selection.
+ */
+async function streamFollowedModel(
+  alias: string,
+  context: any,
+  options: any,
+): Promise<any> {
+  const follow = scopeProcess.followModel;
+  if (!follow) {
+    throw new Error(
+      `scoped/${alias}: scope none has no selected model yet; pick a model with the model picker and sub-agents and summaries will follow it`,
+    );
+  }
+  if (!scopeRegistry) {
+    throw new Error(
+      `scoped/${alias}: scope none cannot resolve the selected model before session start`,
+    );
+  }
+  const concrete = scopeRegistry.find(follow.provider, follow.id);
+  if (!concrete) {
+    throw new Error(
+      `scoped/${alias}: selected model ${follow.provider}/${follow.id} is not available; pick another model with the model picker`,
+    );
+  }
+  const auth = await scopeRegistry.getApiKeyAndHeaders(concrete);
+  if (!auth.ok) {
+    throw new Error(
+      `scoped/${alias}: no credentials for selected model ${follow.provider}/${follow.id}: ${auth.error}`,
+    );
+  }
+  const provider = scopeRegistry.getProvider(follow.provider);
+  if (!provider) {
+    throw new Error(
+      `scoped/${alias}: provider ${follow.provider} is not registered`,
+    );
+  }
+  debug(
+    `streamSimple[${source}]: scoped/${alias} -> ${follow.provider}/${follow.id} (scope none)`,
+  );
+  const next: any = { ...withConversationSessionId(options) };
+  if (auth.apiKey) next.apiKey = auth.apiKey;
+  else delete next.apiKey;
+  if (auth.headers) next.headers = auth.headers;
+  if (auth.env) next.env = auth.env;
+  return provider.streamSimple(
+    auth.baseUrl ? { ...concrete, baseUrl: auth.baseUrl } : concrete,
+    context,
+    next,
+  );
+}
+
+/**
  * Replace the scoped provider's credentials with the target provider's own
  * request auth: provider adapters take options.apiKey verbatim and never
  * resolve credentials, so forwarding the scoped options would send the main
@@ -353,25 +435,29 @@ function withTargetAuth(
   };
 }
 
-/** Register the stub entries so `scoped/<id>` resolves at startup. */
-function registerScopeStubs(pi: any): void {
-  pi.registerProvider("scoped", {
-    name: "Scoped",
-    baseUrl: "http://deskapp.n3x.net:15000/v1",
+/** Stub-shaped scoped provider config: present and dispatching to the hook, with no targets. */
+function stubProviderConfig(name: string, modelNames: (id: string) => string): any {
+  return {
+    name,
+    baseUrl: STUB_BASE_URL,
     api: "openai-completions",
     apiKey: "local",
-    // Stubs have no resolved targets: pass-through until session_start
-    // commits the target snapshot.
     streamSimple: streamScopedModel,
-    models: SCOPE_IDS.map((id) => ({
-      id,
-      name: scopedModelName(
-        id,
-        `scoped/${id} (preset stub, upgraded at session start)`,
-      ),
-      ...STUB_MODEL,
-    })),
-  });
+    models: SCOPE_IDS.map((id) => ({ id, name: modelNames(id), ...STUB_MODEL })),
+  };
+}
+
+/** Register the stub entries so `scoped/<id>` resolves at startup. */
+function registerScopeStubs(pi: any): void {
+  // Stubs have no resolved targets: pass-through until session_start
+  // commits the target snapshot.
+  pi.registerProvider(
+    "scoped",
+    stubProviderConfig(
+      "Scoped",
+      (id) => scopedModelName(id, `scoped/${id} (preset stub, upgraded at session start)`),
+    ),
+  );
   debug("factory: registered scoped stubs");
 }
 
@@ -540,6 +626,25 @@ async function prepareScopeRegistration(
   };
 }
 
+/**
+ * Register the none scope: the aliases exist without static targets, and the
+ * stream hook resolves each request to the selected model.
+ */
+function prepareNoneRegistration(): ScopeRegistration {
+  debug(`prepareNoneRegistration: models=[${SCOPE_IDS.join(",")}] (follows the selected model)`);
+  return {
+    count: SCOPE_IDS.length,
+    mainAvailable: true,
+    summaryAvailable: true,
+    concreteModels: {},
+    targetAuth: {},
+    providerConfig: stubProviderConfig(
+      "Scoped (none)",
+      (id) => scopedModelName(id, "Selected model (none scope)"),
+    ),
+  };
+}
+
 /** Atomically publish a prepared provider and its matching scope mapping. */
 function commitScopeRegistration(
   pi: any,
@@ -559,6 +664,32 @@ function commitScopeRegistration(
 /** Snapshot the preset's dedicated summary target before asynchronous resolution begins. */
 function snapshotSummaryTarget(ctx: any): ScopedSummaryTarget | undefined {
   const aliasModel = ctx.model;
+  // The none scope has no static summary target: summaries follow the
+  // selected model at the session's current thinking level. In none scope
+  // the session model is usually concrete (entry unscopes it), so this check
+  // runs before the scoped-session gate.
+  if (state.preset === NONE_SCOPE) {
+    const follow = scopeProcess.followModel;
+    if (!follow) {
+      throw new Error(
+        `scope none has no selected model for ${SUMMARY_ALIAS}; pick a model with the model picker`,
+      );
+    }
+    const followed = ctx.modelRegistry.find(follow.provider, follow.id);
+    if (!followed) {
+      throw new Error(
+        `selected model ${follow.provider}/${follow.id} is unavailable for ${SUMMARY_ALIAS}`,
+      );
+    }
+    return {
+      alias: SUMMARY_ALIAS,
+      entry: { model: `${follow.provider}/${follow.id}` },
+      target: { provider: follow.provider, id: follow.id },
+      model: { ...followed },
+      thinkingLevel: ctx.thinkingLevel as SummaryThinkingLevel,
+    };
+  }
+
   // Direct non-scoped sessions keep Pi's native summary behavior.
   if (!aliasModel || aliasModel.provider !== "scoped") return undefined;
 
@@ -628,9 +759,12 @@ function reportSummaryFailure(
   target: ScopedSummaryTarget | undefined,
   error: unknown,
 ): void {
-  const concrete = target
-    ? `${target.target.provider}/${target.target.id}`
-    : "the configured scoped target";
+  const concrete =
+    state.preset === NONE_SCOPE
+      ? "the followed model (scope none)"
+      : target
+        ? `${target.target.provider}/${target.target.id}`
+        : "the configured scoped target";
   const detail = error instanceof Error ? error.message : String(error);
   try {
     publishScopeNote(
@@ -879,7 +1013,8 @@ export default function scopeProvider(pi: any): void {
     const persistLaunchPreset =
       !restoredPreset &&
       typeof explicitLaunchPreset === "string" &&
-      Boolean(presets[explicitLaunchPreset]) &&
+      (explicitLaunchPreset === NONE_SCOPE ||
+        Boolean(presets[explicitLaunchPreset])) &&
       state.preset === explicitLaunchPreset;
     const restoreSource = restoredPreset ? "session-state" : "launch";
     if (restoredPreset) {
@@ -887,8 +1022,20 @@ export default function scopeProvider(pi: any): void {
       scopeProcess.activePreset = restoredPreset;
     }
 
-    const registration = await prepareScopeRegistration(ctx, state);
-    const mainTarget = registration.concreteModels?.main;
+    const registration =
+      state.preset === NONE_SCOPE
+        ? prepareNoneRegistration()
+        : await prepareScopeRegistration(ctx, state);
+    // Seed the followed model before mainTarget so the log line and the
+    // notice below report the value this session will use.
+    if (state.preset === NONE_SCOPE && isTopLevelSession(ctx)) {
+      const seeded = latestConcreteModelChange(ctx.sessionManager.getEntries());
+      if (seeded) scopeProcess.followModel = seeded;
+    }
+    const mainTarget =
+      state.preset === NONE_SCOPE
+        ? scopeProcess.followModel
+        : registration.concreteModels?.main;
     debug(
       `session_start: restore source=${restoreSource} preset="${state.preset}" scoped/main -> ${mainTarget ? `${mainTarget.provider}/${mainTarget.id}` : "<unresolved>"}`,
     );
@@ -898,7 +1045,7 @@ export default function scopeProvider(pi: any): void {
       !registration.mainAvailable ||
       !registration.summaryAvailable
     ) {
-      const available = Object.keys(readScopeConfig()).join(", ") || "<none>";
+      const available = availablePresets().join(", ");
       const msg = registration.failure
         ? `scope: ERROR — preset "${state.preset}" ${registration.failure}; scoped provider registration was not changed. Check the provider credentials and restart the session.`
         : !registration.mainAvailable
@@ -915,6 +1062,21 @@ export default function scopeProvider(pi: any): void {
     commitScopeRegistration(pi, state, registration);
     if (!refreshMainIfScopedMain(pi, ctx, "session_start")) return;
     if (isTopLevelSession(ctx)) armScopePromptReinject();
+    if (state.preset === NONE_SCOPE) {
+      const follow = scopeProcess.followModel;
+      if (!follow) {
+        publishScopeNote(
+          pi,
+          "scope none: no model selected yet; pick a model with the model picker and sub-agents and summaries will follow it",
+        );
+      } else if (!scopeRegistry.find(follow.provider, follow.id)) {
+        publishScopeNote(
+          pi,
+          `scope: ERROR — selected model ${follow.provider}/${follow.id} is not available; pick another model with the model picker`,
+          true,
+        );
+      }
+    }
     if (persistLaunchPreset) persistScopePreset(pi, state.preset);
     // Record the usable preset for re-imported sessions after session_start
     // upgrades the current registry, including a registry reused by /reload.
@@ -924,6 +1086,25 @@ export default function scopeProvider(pi: any): void {
 
   pi.on("session_compact", () => {
     armScopePromptReinject();
+  });
+
+  // Record the manually selected concrete model process-wide so every
+  // session, including re-imported sub-agent sessions, resolves the none
+  // scope against it. Only top-level sessions update it, and scoped
+  // selections never do, so an alias can never resolve to itself.
+  pi.on("model_select", (event: any, ctx: any) => {
+    if (scopeProcess.rewriteDisabled) return;
+    if (!isTopLevelSession(ctx)) return;
+    const model = event?.model;
+    if (
+      !model ||
+      typeof model.provider !== "string" ||
+      typeof model.id !== "string" ||
+      model.provider === "scoped"
+    )
+      return;
+    scopeProcess.followModel = { provider: model.provider, id: model.id };
+    debug(`model_select: scope none follows ${model.provider}/${model.id}`);
   });
 
   // The prompt is injected through the hook rather than sendMessage so it lands
@@ -1038,21 +1219,25 @@ export default function scopeProvider(pi: any): void {
     if (!next) {
       publishScopeNote(
         pi,
-        `unknown preset "${name}" (available: ${Object.keys(readScopeConfig()).join(", ")})`,
+        `unknown preset "${name}" (available: ${availablePresets().join(", ")})`,
         true,
       );
       return;
     }
 
     try {
-      const registration = await prepareScopeRegistration(ctx, next);
+      const registration =
+        name === NONE_SCOPE
+          ? prepareNoneRegistration()
+          : await prepareScopeRegistration(ctx, next);
 
       if (
-        registration.count === 0 ||
-        !registration.mainAvailable ||
-        !registration.summaryAvailable
+        name !== NONE_SCOPE &&
+        (registration.count === 0 ||
+          !registration.mainAvailable ||
+          !registration.summaryAvailable)
       ) {
-        const available = Object.keys(readScopeConfig()).join(", ") || "<none>";
+        const available = availablePresets().join(", ");
         const msg = registration.failure
           ? `scope: ERROR — preset "${name}" ${registration.failure}; scoped provider registration was not changed. Check the provider credentials.`
           : !registration.mainAvailable
@@ -1069,6 +1254,9 @@ export default function scopeProvider(pi: any): void {
           `scope: ERROR — preset "${name}" could not refresh the selected scoped/main entry; scoped/main requests will fail. Check the scopeProvider settings and models.`,
         );
       }
+
+      if (name === NONE_SCOPE)
+        await establishFollowModel(pi, ctx, previous.concreteModels?.main);
 
       // Publish process-wide after the alias refresh succeeds so re-importing
       // sub-agent sessions only observes a usable preset.
@@ -1092,21 +1280,13 @@ export default function scopeProvider(pi: any): void {
   };
 
   const scopeSelectorItems = (): FuzzySelectorItem[] =>
-    Object.keys(readScopeConfig()).map((value) => ({ value, label: value }));
+    availablePresets().map((value) => ({ value, label: value }));
 
   const selectScope = async (
     ctx: any,
     initialSearchInput = "",
   ): Promise<void> => {
     const items = scopeSelectorItems();
-    if (items.length === 0) {
-      publishScopeNote(
-        pi,
-        "scope: ERROR — no scope presets are configured; add scopeProvider settings before selecting a scope.",
-        true,
-      );
-      return;
-    }
 
     const selected = await selectFuzzyItem(ctx, "Select scope:", items, {
       initialSearchInput,
@@ -1157,4 +1337,106 @@ export default function scopeProvider(pi: any): void {
 
 function scopedModelName(id: string, name: string): string {
   return id === "main" ? `${name} [S]` : name;
+}
+
+/** The scope names the selector offers: configured presets plus built-in none. */
+function availablePresets(): string[] {
+  return [
+    ...Object.keys(readScopeConfig()).filter((name) => name !== NONE_SCOPE),
+    NONE_SCOPE,
+  ];
+}
+
+
+/** The newest non-scoped model selection persisted on a session. */
+function latestConcreteModelChange(
+  entries: readonly unknown[],
+): { provider: string; id: string } | undefined {
+  for (let index = entries.length - 1; index >= 0; index -= 1) {
+    const entry = entries[index] as any;
+    if (
+      entry?.type === "model_change" &&
+      typeof entry.provider === "string" &&
+      typeof entry.modelId === "string" &&
+      entry.provider !== "scoped"
+    ) {
+      return { provider: entry.provider, id: entry.modelId };
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Enter the none scope from the session's current model: a session still on
+ * scoped/main is unscoped to the concrete model its preset resolved it to,
+ * and an already-concrete session keeps its model; both become the followed
+ * model so the manual selection starts where the session stands.
+ */
+async function establishFollowModel(
+  pi: any,
+  ctx: any,
+  previousMain: { provider: string; id: string } | undefined,
+): Promise<void> {
+  const current = ctx.model;
+  if (
+    current &&
+    typeof current.provider === "string" &&
+    current.provider !== "scoped" &&
+    typeof current.id === "string"
+  ) {
+    scopeProcess.followModel = { provider: current.provider, id: current.id };
+    debug(
+      `entering none: following the session's selected model ${current.provider}/${current.id}`,
+    );
+    return;
+  }
+  if (current?.provider === "scoped" && current?.id === "main" && previousMain) {
+    const concrete = ctx.modelRegistry.find(
+      previousMain.provider,
+      previousMain.id,
+    );
+    if (!concrete) {
+      publishScopeNote(
+        pi,
+        `scope: ERROR — scope none could not unscope scoped/main: ${previousMain.provider}/${previousMain.id} is no longer available${followedModelNote()}`,
+        true,
+      );
+      return;
+    }
+    let switched = false;
+    try {
+      switched = await pi.setModel(concrete);
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : String(error);
+      debug(`entering none: setModel failed: ${detail}`);
+    }
+    if (switched) {
+      scopeProcess.followModel = {
+        provider: concrete.provider,
+        id: concrete.id,
+      };
+      debug(
+        `entering none: unscoped scoped/main -> ${concrete.provider}/${concrete.id}`,
+      );
+      return;
+    }
+    publishScopeNote(
+      pi,
+      `scope: ERROR — scope none could not switch the session to ${concrete.provider}/${concrete.id}${followedModelNote()}`,
+      true,
+    );
+    return;
+  }
+
+  // The session is on another scoped alias (or no model): the followed model
+  // stays as is and scoped requests fail with a clear pick-a-model error.
+}
+
+/** The entry-failure advice: keep following an available picked model, else ask for a pick. */
+function followedModelNote(): string {
+  const follow = scopeProcess.followModel;
+  if (follow && scopeRegistry?.find(follow.provider, follow.id)) {
+    return `; scoped requests keep following ${follow.provider}/${follow.id} until you pick a model`;
+  }
+  return "; pick a model with the model picker";
 }
