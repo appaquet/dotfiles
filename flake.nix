@@ -43,7 +43,7 @@
 
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
-      #inputs.nixpkgs.follows = "nixpkgs"; # do not follow nixpkgs, may not align with their cache
+      # don't follow nixpkgs for binary cache
     };
 
     nixvirt = {
@@ -58,6 +58,7 @@
 
     nixos-raspberrypi = {
       url = "github:nvmd/nixos-raspberrypi/main";
+      # don't follow nixpkgs for binary cache
     };
   };
 
