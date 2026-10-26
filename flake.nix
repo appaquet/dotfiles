@@ -43,7 +43,7 @@
 
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
+      #inputs.nixpkgs.follows = "nixpkgs"; # do not follow nixpkgs, may not align with their cache
     };
 
     nixvirt = {
