@@ -66,6 +66,7 @@ in
     filesystem.allow = [
       "$HOME/.pi"
       "$HOME/.local/share/pi"
+      "$HOME/.config/pi-hashline-edit-pro"
     ];
 
     filesystem.read_file = [

@@ -55,7 +55,7 @@ let
 
     # https://github.com/YuGiMob/pi-hashline-edit-pro
     {
-      package = "npm:pi-hashline-edit-pro@6.4.7";
+      package = "npm:pi-hashline-edit-pro@7.0.0";
     }
 
     # https://github.com/tintinweb/pi-subagents
@@ -94,12 +94,12 @@ let
 
     # https://github.com/juicesharp/rpiv-mono
     {
-      package = "npm:@juicesharp/rpiv-ask-user-question@2.13.9";
+      package = "npm:@juicesharp/rpiv-ask-user-question@2.15.0";
     }
 
     # https://github.com/nicobailon/pi-web-access
     {
-      package = "npm:pi-web-access@0.42.0";
+      package = "npm:pi-web-access@0.44.0";
       files = {
         ".pi/agent/web-search.json".text = builtins.toJSON {
           provider = "exa";
@@ -111,11 +111,8 @@ let
     }
 
     # https://github.com/nicobailon/pi-cached-compaction
-    # Pinned by git commit (v0.2.0 tag): the npm mirror snapshot predates the
-    # package's first publish, so the npm spec cannot install. Swap to
-    # npm:pi-cached-compaction@0.2.0 once the mirror carries it.
     {
-      package = "git:github.com/nicobailon/pi-cached-compaction@e1e20de0a7e433070414602f1105cdcac258ef4f";
+      package = "npm:pi-cached-compaction@0.2.0";
     }
 
     # https://github.com/balaenis/pi-x-ide
@@ -141,7 +138,7 @@ let
 
     # https://github.com/nicobailon/pi-powerline-footer
     {
-      package = "npm:pi-powerline-footer@0.20.2";
+      package = "npm:pi-powerline-footer@0.21.0";
       environment = {
         POWERLINE_NERD_FONTS.value = "1";
       };
