@@ -7,7 +7,7 @@ let
   agentic-proj-create-adhoc = import ./proj-create-adhoc.nix { inherit pkgs; };
   agentic-proj-create = import ./proj-create.nix { inherit pkgs; };
   pi-session-query = import ./pi-session-query.nix { inherit pkgs; };
-  showMeServe = import ./show-me-serve.nix { inherit pkgs; };
+  showMeServe = import ./show-me/show-me-serve.nix { inherit pkgs; };
 in
 {
   home.packages = [

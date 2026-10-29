@@ -31,13 +31,13 @@ let
     '';
   };
 
-  testShowMeServe = pkgs.callPackage ../tools/show-me-serve.nix {
+  testShowMeServe = pkgs.callPackage ../tools/show-me/show-me-serve.nix {
     pkgs = pkgs // {
       cloudflared = fakeCloudflared;
     };
   };
 
-  testShowMeServeDeadTunnel = pkgs.callPackage ../tools/show-me-serve.nix {
+  testShowMeServeDeadTunnel = pkgs.callPackage ../tools/show-me/show-me-serve.nix {
     pkgs = pkgs // {
       cloudflared = fakeDeadCloudflared;
     };
