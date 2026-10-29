@@ -50,6 +50,13 @@
         * When the user gives explicit design direction, replace or remove the template defaults instead of layering around them.
 
         * Use semantic markup, responsive layout, keyboard-accessible interaction, visible focus, adequate contrast, and reduced-motion handling.
+        * For a text-heavy review where the user should comment on named sections or selected passages, load `feedback.md` from this skill's directory and mount the shared component. Ordinary visuals keep their own choice controls and get no feedback UI.
+
+        ## Browse the served root
+
+        * The server picks the mode from the URL: `/` and directory URLs are generated indexes, ordinary files are served unchanged, and a `.md` or `.markdown` URL opens the docs reader with a left-hand tree and shared comments.
+        * Enter docs mode by linking the document's real URL. There is no mode switch, manifest, or preparation step.
+        * Read `docs-viewer.md` in this skill's directory before relying on reader behavior, link handling, or comment scope.
 
         ## Commit project artifacts
 
@@ -73,7 +80,7 @@
         ### Start a server
 
         * Start a background job with `cwd` set to the canonical root, a clear label, a 24-hour timeout when the harness supports one, and the command `agentic-show-me-serve .`, or `agentic-show-me-serve --public .` when the user asked for a public link.
-        * The command picks a free port and serves the root with `simple-http-server`. Do not select a port or start a server yourself.
+        * The command picks a free port and serves the root. Do not select a port or start a server yourself.
         * Read the URL sentences from the background job log. A private server prints the internal URL; a public one prints the public URL a few seconds later, so read the log again if it has not appeared.
 
         ### Verify readiness
@@ -99,6 +106,14 @@
       "template.html" = {
         kind = "md";
         content = builtins.readFile ./show-me.template.html;
+      };
+      "docs-viewer.md" = {
+        kind = "md";
+        content = builtins.readFile ./show-me.docs.md;
+      };
+      "feedback.md" = {
+        kind = "md";
+        content = builtins.readFile ./show-me.feedback.md;
       };
     };
   };

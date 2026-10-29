@@ -107,12 +107,27 @@ let
     ++ filesIn "pi" "prompts" piCommands
     ++ filesIn "pi" "rules" piRules
     ++ skillFiles "pi" piSkills
-    ++ [ "pi/skills/show-me/template.html" ]
-    ++ [
-      "claude/skills/show-me/template.html"
-      "codex/skills/show-me/template.html"
-      "opencode/skills/show-me/template.html"
+    ++ map (name: "pi/skills/show-me/${name}") [
+      "template.html"
+      "docs-viewer.md"
+      "feedback.md"
     ]
+    ++ builtins.concatLists (
+      map
+        (
+          harness:
+          map (name: "${harness}/skills/show-me/${name}") [
+            "template.html"
+            "docs-viewer.md"
+            "feedback.md"
+          ]
+        )
+        [
+          "claude"
+          "codex"
+          "opencode"
+        ]
+    )
   );
   mkAcceptanceCheck =
     name: instructions:

@@ -1,0 +1,40 @@
+<!doctype html>
+<!--
+  Docs reader shell served by show-me for Markdown URLs. It carries no document
+  content: the reader fetches the live source, the docs tree, and the shared
+  feedback component from the server's reserved /_show-me/ namespace.
+-->
+<html lang="en" class="smd">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Docs</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="/_show-me/docs.css" />
+    <link rel="stylesheet" href="/_show-me/feedback.css" />
+    <!--
+      Pinned renderer dependencies (verified 2026-10):
+      - marked 18.1.2: Markdown to HTML
+      - DOMPurify 3.4.17: sanitizes the rendered HTML before insertion
+    -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@18.1.2/lib/marked.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.4.17/dist/purify.min.js"></script>
+    <script type="module" src="/_show-me/docs.js"></script>
+  </head>
+  <body>
+    <header class="smd-top">
+      <button class="smd-btn smd-navtoggle" type="button" aria-expanded="false" aria-controls="smd-nav">
+        Files
+      </button>
+      <h1 class="smd-title">Docs</h1>
+      <span class="smd-path"></span>
+    </header>
+    <div class="smd-layout">
+      <nav class="smd-nav" id="smd-nav" aria-label="Documents"></nav>
+      <main class="smd-main">
+        <p class="smd-state" role="status" hidden></p>
+        <article class="smd-doc"></article>
+      </main>
+    </div>
+  </body>
+</html>

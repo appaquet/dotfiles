@@ -1,12 +1,24 @@
 { pkgs }:
 
+let
+  # Reader shell and shared feedback assets are immutable runtime data served
+  # under the server's reserved namespace, never regenerated per review.
+  assets = pkgs.runCommand "show-me-assets" { } ''
+    mkdir -p $out
+    cp ${./show-me-docs.html} $out/docs.html
+    cp ${./show-me-docs.js} $out/docs.js
+    cp ${./show-me-docs.css} $out/docs.css
+    cp ${./show-me-feedback.js} $out/feedback.js
+    cp ${./show-me-feedback.css} $out/feedback.css
+  '';
+in
 pkgs.writeShellApplication {
   name = "agentic-show-me-serve";
 
   runtimeInputs = with pkgs; [
+    bun
     coreutils
     gnugrep
-    simple-http-server
     cloudflared
   ];
 
@@ -38,7 +50,7 @@ pkgs.writeShellApplication {
       tunnel_url=""
 
       work_dir=$(mktemp -d)
-      server_log="$work_dir/simple-http-server.log"
+      server_log="$work_dir/server.log"
       tunnel_log="$work_dir/cloudflared.log"
 
       trap cleanup EXIT
@@ -64,7 +76,7 @@ pkgs.writeShellApplication {
       await_children
     }
 
-    # Starts simple-http-server on a free random port, retrying the pick-and-start
+    # Starts the show-me server on a free random port, retrying the pick-and-start
     # sequence because the port can be taken between the probe and the bind.
     start_server() {
       local attempt
@@ -75,18 +87,18 @@ pkgs.writeShellApplication {
           continue
         fi
 
-        simple-http-server -i --port "$port" . >"$server_log" 2>&1 &
+        bun ${./show-me-serve.ts} --root "$root" --port "$port" --assets ${assets} >"$server_log" 2>&1 &
         server_pid=$!
 
         if wait_for_port "$port"; then
           return 0
         fi
 
-        echo "simple-http-server did not start on port $port (attempt $attempt)." >&2
+        echo "The show-me server did not start on port $port (attempt $attempt)." >&2
         stop_children
       done
 
-      echo "Could not start simple-http-server in $root after 5 attempts." >&2
+      echo "Could not start the show-me server in $root after 5 attempts." >&2
       tail -n 10 "$server_log" >&2 || true
       exit 1
     }
@@ -110,6 +122,13 @@ pkgs.writeShellApplication {
       done
 
       tunnel_url=""
+
+      # A tunnel that exited without a URL is not supervised: the HTTP server keeps
+      # serving internally instead of the whole command stopping.
+      if ! kill -0 "$tunnel_pid" 2>/dev/null; then
+        wait "$tunnel_pid" 2>/dev/null || true
+        tunnel_pid=""
+      fi
     }
 
     # cloudflared reports the URL before the tunnel is connected, so the public URL
@@ -117,7 +136,7 @@ pkgs.writeShellApplication {
     await_children() {
       if [ -z "$tunnel_pid" ]; then
         wait "$server_pid" || true
-        echo "simple-http-server stopped." >&2
+        echo "The show-me server stopped." >&2
         exit 1
       fi
 
@@ -127,7 +146,7 @@ pkgs.writeShellApplication {
         echo "cloudflared stopped; stopping the HTTP server." >&2
         tail -n 10 "$tunnel_log" >&2 || true
       else
-        echo "simple-http-server stopped; stopping the tunnel." >&2
+        echo "The show-me server stopped; stopping the tunnel." >&2
       fi
 
       exit 1
@@ -150,7 +169,6 @@ pkgs.writeShellApplication {
     # Stops both children and removes the temporary log directory. It runs from the
     # EXIT trap, so it has no direct call site.
     # shellcheck disable=SC2329
-
     cleanup() {
       stop_children
       rm -rf "$work_dir"
@@ -164,6 +182,10 @@ pkgs.writeShellApplication {
       for _ in $(seq 1 40); do
         if port_is_listening "$1"; then
           return 0
+        fi
+
+        if [ -n "$server_pid" ] && ! kill -0 "$server_pid" 2>/dev/null; then
+          return 1
         fi
 
         sleep 0.25
