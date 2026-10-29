@@ -58,9 +58,17 @@ async function start() {
 
   els.navToggle.addEventListener("click", toggleNavigation);
   window.addEventListener("popstate", () => {
+    // The browser also fires popstate when only the fragment changes, so a
+    // same-document fragment must scroll instead of refetching the document.
+    if (location.pathname.replace(/^\/+/, "") === reader.currentPath) {
+      scrollToFragment(location.hash);
+      return;
+    }
+
     showDocument(location.pathname + location.search + location.hash, { push: false });
   });
   window.addEventListener("beforeunload", warnAboutUnsavedComments);
+  window.addEventListener("hashchange", () => scrollToFragment(location.hash));
   document.addEventListener("click", interceptDocumentLink);
 
   await showDocument(location.pathname + location.search + location.hash, { push: false });
@@ -125,7 +133,7 @@ async function showDocument(target, { push }) {
 function renderDocument(text, documentUrl) {
   const rendered = window.marked.parse(text, { gfm: true });
   els.doc.innerHTML = window.DOMPurify.sanitize(rendered, { USE_PROFILES: { html: true } });
-  assignHeadingIds();
+  prepareHeadings();
   renderCallouts();
   detachRemoteImages(documentUrl);
   reader.feedback?.setTargets(buildSections());
@@ -133,7 +141,8 @@ function renderDocument(text, documentUrl) {
 
 // --- rendering ---
 
-function assignHeadingIds() {
+/** Give every heading a stable id and the anchor that shares its section. */
+function prepareHeadings() {
   const used = new Set();
   for (const heading of els.doc.querySelectorAll("h1, h2, h3, h4, h5, h6")) {
     const base = slugify(heading.textContent) || "section";
@@ -142,7 +151,24 @@ function assignHeadingIds() {
     while (used.has(id)) id = `${base}-${suffix++}`;
     used.add(id);
     heading.id = id;
+    heading.append(sectionAnchor(id));
   }
+}
+
+function sectionAnchor(id) {
+  const anchor = document.createElement("a");
+  anchor.className = "smd-anchor";
+  anchor.href = `#${encodeURIComponent(id)}`;
+  anchor.textContent = "#";
+  anchor.setAttribute("aria-label", "Link to this section");
+  return anchor;
+}
+
+/** Heading text without the section anchor, for comment labels and quotes. */
+function headingLabel(heading) {
+  const clone = heading.cloneNode(true);
+  clone.querySelector(".smd-anchor")?.remove();
+  return clone.textContent.trim();
 }
 
 function renderCallouts() {
@@ -207,7 +233,7 @@ function buildSections() {
       fragment.append(section);
 
       if (isHeading) {
-        const label = node.textContent.trim();
+        const label = headingLabel(node);
         const targetId = `${reader.currentPath}#${node.id}`;
         section.dataset.targetId = targetId;
         targets.push({
@@ -301,6 +327,10 @@ function interceptDocumentLink(event) {
   const url = new URL(anchor.getAttribute("href"), location.href);
   if (url.origin !== location.origin || !isMarkdown(url.pathname)) return;
 
+  // A fragment in this same document is plain anchor navigation: the browser
+  // updates the URL and scrolls, so there is nothing to fetch or re-render.
+  if (url.hash !== "" && url.pathname === location.pathname) return;
+
   event.preventDefault();
   showDocument(url.pathname + url.search + url.hash, { push: true });
 }
@@ -329,14 +359,24 @@ function findSection(targetId) {
 }
 
 function scrollToFragment(hash) {
+  for (const linked of els.doc.querySelectorAll(".smd-linked")) linked.classList.remove("smd-linked");
+
   if (!hash || hash === "#") return;
+
   let id;
   try {
+    // Decoding the fragment keeps unicode ids working: the browser does not
+    // match a percent-encoded fragment against a DOM id.
     id = decodeURIComponent(hash.slice(1));
   } catch {
     return;
   }
-  document.getElementById(id)?.scrollIntoView({ block: "start" });
+
+  const target = document.getElementById(id);
+  if (!target) return;
+
+  target.scrollIntoView({ block: "start" });
+  target.classList.add("smd-linked");
 }
 
 function warnAboutUnsavedComments(event) {

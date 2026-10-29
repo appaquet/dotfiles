@@ -240,6 +240,39 @@
   font-size: 0.95rem;
 }
 
+/* Section anchors: a copyable "#<id>" link beside each heading title. */
+
+.smd-doc :is(h1, h2, h3, h4, h5, h6) {
+  scroll-margin-top: 3.5rem;
+}
+
+.smd-doc .smd-anchor {
+  margin-left: 0.4rem;
+  color: var(--smd-faint);
+  font-weight: 400;
+  text-decoration: none;
+  opacity: 0;
+  user-select: none;
+  transition: opacity 120ms ease;
+}
+
+.smd-doc :is(h1, h2, h3, h4, h5, h6):hover .smd-anchor,
+.smd-doc .smd-linked .smd-anchor,
+.smd-doc .smd-anchor:focus-visible {
+  opacity: 1;
+}
+
+.smd-doc .smd-anchor:hover {
+  color: var(--smd-accent);
+}
+
+/* Touch screens cannot hover, so the anchor stays visible there. */
+@media (hover: none) {
+  .smd-doc .smd-anchor {
+    opacity: 1;
+  }
+}
+
 .smd-doc p,
 .smd-doc ul,
 .smd-doc ol {

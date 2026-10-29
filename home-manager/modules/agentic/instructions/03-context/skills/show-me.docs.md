@@ -21,5 +21,6 @@
 ### Links and comments
 
 * Document URLs are real URLs. Relative and root-relative links, directory links, and heading fragments behave normally; links to ordinary files leave the reader.
+* Every heading carries a `#` link: clicking it puts that section's fragment in the URL, so a section can be shared or linked from the chat as `<document URL>#<section>`.
 * Comments belong to the whole serving root and are keyed by root-relative document paths, so one review spans several documents. Drafts stay in that browser.
 * Ask the user to use Copy all in the comments drawer and paste the result into the chat. There is no submission endpoint.
