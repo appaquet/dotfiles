@@ -10,10 +10,11 @@ let
     cp ${./show-me-docs.css} $out/docs.css
     cp ${./show-me-feedback.js} $out/feedback.js
     cp ${./show-me-feedback.css} $out/feedback.css
+    cp ${./show-me-feedback-auto.js} $out/feedback-auto.js
   '';
 in
 pkgs.writeShellApplication {
-  name = "agentic-show-me-serve";
+  name = "show-me-serve";
 
   runtimeInputs = with pkgs; [
     bun
@@ -25,22 +26,53 @@ pkgs.writeShellApplication {
   text = ''
     main() {
       public=""
-      if [ "$#" -gt 0 ] && [ "$1" = "--public" ]; then
-        public="1"
-        shift
+      help=""
+
+      # Options precede the optional directory, as they always have. The
+      # directory itself defaults to the current one.
+      while [ "$#" -gt 0 ]; do
+        case "$1" in
+          -h | --help)
+            help="1"
+            shift
+            ;;
+          --public)
+            public="1"
+            shift
+            ;;
+          --)
+            shift
+            break
+            ;;
+          -*)
+            echo "Unknown option '$1'." >&2
+            usage_hint
+            exit 2
+            ;;
+          *)
+            break
+            ;;
+        esac
+      done
+
+      if [ -n "$help" ]; then
+        usage
+        exit 0
       fi
 
-      if [ "$#" -ne 1 ]; then
-        echo "Usage: agentic-show-me-serve [--public] <directory>" >&2
+      if [ "$#" -gt 1 ]; then
+        echo "Too many arguments." >&2
+        usage_hint
         exit 2
       fi
 
-      if [ ! -d "$1" ]; then
-        echo "Cannot serve '$1': not an existing directory." >&2
+      directory="''${1-.}"
+      if [ ! -d "$directory" ]; then
+        echo "Cannot serve '$directory': not an existing directory." >&2
         exit 1
       fi
 
-      root=$(cd "$1" && pwd -P)
+      root=$(cd "$directory" && pwd -P)
       cd "$root"
       host=$(uname -n | tr '[:upper:]' '[:lower:]' | sed 's/\.local//')
 
@@ -74,6 +106,26 @@ pkgs.writeShellApplication {
       fi
 
       await_children
+    }
+
+    usage() {
+      printf '%s\n\n' 'Usage: show-me-serve [--public] [directory]'
+      printf '%s\n' 'Serve a directory over HTTP and print its internal URL. The directory defaults to the current one.'
+      printf '\n'
+      printf '%s\n' 'Each request chooses its mode from the path:'
+      printf '%s\n' '  / and other directories  generated file index'
+      printf '%s\n' '  ordinary files           served unchanged with their own content type'
+      printf '%s\n' '  *.md and *.markdown      document reader with a docs tree and comments'
+      printf '\n'
+      printf '%s\n' 'Options:'
+      printf '%s\n' '  --public    also open an anonymous cloudflared quick tunnel for sharing'
+      printf '%s\n' '  -h, --help  print this help and exit'
+      printf '\n'
+      printf '%s\n' 'The command picks a free port and serves every reachable file below the directory' 'without authentication, so choose the narrowest directory that works. File edits' 'appear on the next request.'
+    }
+
+    usage_hint() {
+      echo "Usage: show-me-serve [--public] [directory]. Run 'show-me-serve --help' for details." >&2
     }
 
     # Starts the show-me server on a free random port, retrying the pick-and-start

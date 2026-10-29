@@ -2,7 +2,7 @@
 
 ## Context
 
-`agentic-show-me-serve` chooses the experience from the requested path. Read this file when the user reviews Markdown documents through show-me.
+`show-me-serve` chooses the experience from the requested path. Read this file when the user reviews Markdown documents through show-me.
 
 ## Instructions
 

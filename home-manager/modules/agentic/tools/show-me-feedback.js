@@ -80,7 +80,11 @@ export function mountFeedback(options = {}) {
 
   const instanceId = `smfb-${(instanceCount += 1)}`;
   const wrapper = document.createElement("div");
+  // Marking the wrapper excludes every piece of chrome below it, so a host that
+  // Marking the wrapper excludes every piece of chrome below it, so a host that
+  // annotates a container holding the component never makes the drawer text a target.
   wrapper.className = "smfb";
+  wrapper.dataset.smfbUi = "";
   wrapper.innerHTML = TEMPLATE;
   (options.container ?? document.body).append(wrapper);
 

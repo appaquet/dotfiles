@@ -43,7 +43,7 @@ let
     };
   };
 in
-pkgs.runCommand "agentic-show-me-serve-check"
+pkgs.runCommand "show-me-serve-check"
   {
     nativeBuildInputs = [
       testShowMeServe
@@ -64,9 +64,44 @@ pkgs.runCommand "agentic-show-me-serve-check"
 
     fail() {
       echo "$1" >&2
-      cat "$log" >&2
+
+      if [ -n "${"log:-"}" ] && [ -f "${"log:-"}" ]; then
+        cat "$log" >&2
+      fi
+
       exit 1
     }
+
+    # Help and argument handling never start a server.
+    "${testShowMeServe}/bin/show-me-serve" --help >"$TMPDIR/help.log" 2>&1
+    grep -q 'Usage: show-me-serve \[--public\] \[directory\]' "$TMPDIR/help.log" || fail "The help output does not show the usage line."
+    grep -q 'defaults to the current one' "$TMPDIR/help.log" || fail "The help output does not document the default directory."
+    grep -q -- '--public' "$TMPDIR/help.log" || fail "The help output does not document --public."
+    grep -q 'document reader' "$TMPDIR/help.log" || fail "The help output does not document the automatic modes."
+    grep -q 'Serving' "$TMPDIR/help.log" && fail "The help path started serving."
+    "${testShowMeServe}/bin/show-me-serve" -h | grep -q 'Usage: show-me-serve' || fail "The short help flag did not print the usage line."
+
+    if pgrep -f 'show-me-serve.ts' >/dev/null; then
+      fail "The help path left a server process behind."
+    fi
+
+    if "${testShowMeServe}/bin/show-me-serve" "$served" extra >"$TMPDIR/extra.log" 2>&1; then
+      fail "Extra arguments were accepted."
+    fi
+
+    grep -q 'Usage: show-me-serve' "$TMPDIR/extra.log" || fail "Extra arguments did not print the usage hint."
+
+    if "${testShowMeServe}/bin/show-me-serve" --nope "$served" >"$TMPDIR/unknown.log" 2>&1; then
+      fail "An unknown option was accepted."
+    fi
+
+    grep -q "Unknown option '--nope'" "$TMPDIR/unknown.log" || fail "An unknown option did not report the expected message."
+
+    if "${testShowMeServe}/bin/show-me-serve" "$TMPDIR/missing" >"$TMPDIR/missing.log" 2>&1; then
+      fail "A missing directory was accepted."
+    fi
+
+    grep -q 'not an existing directory' "$TMPDIR/missing.log" || fail "A missing directory did not report the expected message."
 
     # Starts the command in the given mode, waits for the internal URL, checks the
     # generated index, an ordinary file, and the Markdown modes, stops it, and
@@ -75,10 +110,14 @@ pkgs.runCommand "agentic-show-me-serve-check"
       mode="$1"
       log="$TMPDIR/$mode.log"
 
-      if [ "$mode" = "public" ]; then
-        agentic-show-me-serve --public "$served" >"$log" 2>&1 &
+      # The cwd case proves the directory argument is optional: the command
+      # serves the working directory when none is given.
+      if [ "$mode" = "cwd" ]; then
+        ( cd "$served" && exec show-me-serve >"$log" 2>&1 ) &
+      elif [ "$mode" = "public" ]; then
+        show-me-serve --public "$served" >"$log" 2>&1 &
       else
-        agentic-show-me-serve "$served" >"$log" 2>&1 &
+        show-me-serve "$served" >"$log" 2>&1 &
       fi
 
       tool_pid=$!
@@ -140,8 +179,9 @@ pkgs.runCommand "agentic-show-me-serve-check"
 
       # The packaged feedback asset is reachable under the reserved namespace.
       curl -fsS "$base/_show-me/feedback.js" | grep -q 'mountFeedback' || fail "The shared feedback asset was not served."
+      curl -fsS "$base/_show-me/feedback-auto.js" | grep -q 'data-target-id' || fail "The one-line feedback entry was not served."
 
-      if [ "$mode" = "private" ] && pgrep -f cloudflared >/dev/null; then
+      if [ "$mode" != "public" ] && pgrep -f cloudflared >/dev/null; then
         fail "The command started cloudflared without --public."
       fi
 
@@ -166,10 +206,11 @@ pkgs.runCommand "agentic-show-me-serve-check"
     fi
 
     exercise public
+    exercise cwd
 
     # A tunnel that never reports a URL leaves the HTTP server serving internally.
     log="$TMPDIR/dead-tunnel.log"
-    ${testShowMeServeDeadTunnel}/bin/agentic-show-me-serve --public "$served" >"$log" 2>&1 &
+    ${testShowMeServeDeadTunnel}/bin/show-me-serve --public "$served" >"$log" 2>&1 &
     tool_pid=$!
 
     internal_url=""

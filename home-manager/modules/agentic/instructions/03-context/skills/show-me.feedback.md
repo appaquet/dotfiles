@@ -8,57 +8,52 @@ The component owns the selection affordance, the comment popover, the drawer, an
 
 ## Instructions
 
-### Load the assets
+### Add it with one line
 
-The show-me server publishes both assets under its reserved `/_show-me/` namespace, so no copying is needed:
+The show-me server publishes the assets under its reserved `/_show-me/` namespace, so nothing is copied:
 
 ```html
-<link rel="stylesheet" href="/_show-me/feedback.css" />
-<script type="module">
-  import { mountFeedback } from "/_show-me/feedback.js";
-</script>
+<script type="module" src="/_show-me/feedback-auto.js"></script>
 ```
 
-### Mount and register targets
+That mounts the component over the page's `main` element, or the body when there is none. It loads its own stylesheet, uses the page path as the comment source, and stores drafts per page. No host script is needed.
+
+### Mark the sections (optional)
+
+Add `data-target-id` to each region the user may comment on, plus `data-target-label` when the id is not readable:
+
+```html
+<section data-target-id="rollout" data-target-label="Rollout plan">
+  <h2>Rollout plan</h2>
+</section>
+```
+
+* The label falls back to the region's first heading, then to the id. Choose ids that survive content edits, because stored comments keep them.
+* Selecting text inside a marked region comments on that passage; selecting the region's heading comments on the region itself, with the heading as the quote.
+* Without marked regions the whole page is one target, which suits a short artifact. Prose outside every marked region cannot be commented on.
+* Set `data-smfb-artifact` on `<body>` when sibling pages belong to one review and should share drafts. Add `data-smfb-root` to narrow the annotatable text to one element instead of `main` or the body.
+
+### Drive it explicitly instead
+
+Use the controller API when the artifact swaps documents without a reload, owns its own comment count or drawer chrome, or needs a callback to return to a commented region:
 
 ```js
+import { mountFeedback } from "/_show-me/feedback.js";
+
 const feedback = mountFeedback({
-  root: document.querySelector("main"), // annotatable text root
-  artifact: "release-notes", // one id per review; scopes saved drafts
+  root: document.querySelector("main"),
+  artifact: "release-notes",
   title: "Comments",
-  onCountChange: (count) => updateCounter(count),
   onNavigate: ({ targetId }) => scrollToTarget(targetId),
 });
 
-feedback.setTargets([
-  {
-    id: "release-notes#rollout", // stable across edits
-    label: "Rollout plan", // shown in the drawer and the export
-    sourceId: "release-notes", // artifact or document identity
-    sourceLabel: "Release notes", // what the agent reads in the export
-    element: document.querySelector("#rollout"),
-  },
-]);
+feedback.setTargets([{ id, label, sourceId, sourceLabel, element }]);
 ```
 
-Add a host-owned control for whole-section comments; the component does not inject markup into annotated content:
-
-```js
-button.addEventListener("click", () => feedback.openSectionComment("release-notes#rollout", button));
-```
-
-### Identity
-
-* Give every registered target a stable `id` that survives content edits. Selected-passage comments also store the original quote with bounded surrounding context, so never re-map a stored comment to new text.
-* One `artifact` id per review. Drafts are stored under `smfb:<artifact>` and unrelated artifacts must not share one.
-* Text outside a registered target, and any text inside the component's own UI or a form field, cannot be commented on.
+The controller exposes `registerTarget`, `unregisterTarget`, `setTargets`, `getComments`, `openSectionComment(targetId, anchor?)`, `openDrawer`, `closeDrawer`, `isPersistent`, and `destroy`.
 
 ### Comment handoff
 
 * Copy all writes grouped plain text to the clipboard. Ask the user to paste it into the chat; there is no submission endpoint.
 * When the clipboard is unavailable, the component shows the same text in a selectable box. Leave that fallback in place.
 * `isPersistent()` reports whether drafts reach browser storage. Warn the user before an in-page navigation would discard comments when it returns `false`.
-
-### Controller
-
-`registerTarget`, `unregisterTarget`, `setTargets`, `getComments`, `openSectionComment(targetId, anchor?)`, `openDrawer`, `closeDrawer`, `isPersistent`, and `destroy`.

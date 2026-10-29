@@ -16,8 +16,8 @@
 
         * Act only on explicit visual intent, direct skill invocation, or an explicit show-me server request.
         * Do not include unrequested secrets or sensitive repository content.
-        * Run `agentic-show-me-serve` as a background process through this harness's background-process tools. Never use shell `&` or another unmanaged process.
-        * `agentic-show-me-serve` serves the root on all interfaces with no authentication. It opens an anonymous cloudflared quick tunnel only when `--public` is passed, and that tunnel's random `trycloudflare.com` hostname is then the only access control.
+        * Run `show-me-serve` as a background process through this harness's background-process tools. Never use shell `&` or another unmanaged process.
+        * `show-me-serve` serves the root on all interfaces with no authentication. It opens an anonymous cloudflared quick tunnel only when `--public` is passed, and that tunnel's random `trycloudflare.com` hostname is then the only access control.
         * Do not open a browser.
 
         ## Route the request
@@ -50,7 +50,7 @@
         * When the user gives explicit design direction, replace or remove the template defaults instead of layering around them.
 
         * Use semantic markup, responsive layout, keyboard-accessible interaction, visible focus, adequate contrast, and reduced-motion handling.
-        * For a text-heavy review where the user should comment on named sections or selected passages, load `feedback.md` from this skill's directory and mount the shared component. Ordinary visuals keep their own choice controls and get no feedback UI.
+        * For a text-heavy review where the user should comment on named sections or selected passages, load `feedback.md` from this skill's directory and add its one-line include. Ordinary visuals keep their own choice controls and get no feedback UI.
 
         ## Browse the served root
 
@@ -79,7 +79,7 @@
 
         ### Start a server
 
-        * Start a background job with `cwd` set to the canonical root, a clear label, a 24-hour timeout when the harness supports one, and the command `agentic-show-me-serve .`, or `agentic-show-me-serve --public .` when the user asked for a public link.
+        * Start a background job with `cwd` set to the canonical root, a clear label, a 24-hour timeout when the harness supports one, and the command `show-me-serve`, or `show-me-serve --public` when the user asked for a public link.
         * The command picks a free port and serves the root. Do not select a port or start a server yourself.
         * Read the URL sentences from the background job log. A private server prints the internal URL; a public one prints the public URL a few seconds later, so read the log again if it has not appeared.
 
