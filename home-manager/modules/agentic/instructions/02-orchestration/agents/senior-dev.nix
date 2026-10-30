@@ -19,6 +19,7 @@
       model = {
         claude = {
           model = "opus";
+          effort = "medium";
         };
         opencode = {
           model = "openai/gpt-5.6-terra";

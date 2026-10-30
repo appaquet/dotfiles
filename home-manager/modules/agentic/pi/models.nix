@@ -179,23 +179,19 @@ in
         };
       };
 
-      # Mirrors the per-agent `model.claude` choices under instructions/: haiku for
-      # junior work, sonnet for mid, opus for senior/staff/review, fable for
-      # principal. Levels must exist in the target's thinkingLevelMap (fable 5.1
-      # only accepts xhigh and max).
       claude = {
         main = {
           model = "claude-code/claude-opus-5-5";
-          thinking = "high";
+          thinking = "medium";
         };
         remap = {
           "scoped/junior" = {
             model = "claude-code/claude-haiku-5-5";
-            thinking = "low";
+            thinking = "medium";
           };
           "scoped/summary" = {
             model = "claude-code/claude-haiku-5-5";
-            thinking = "low";
+            thinking = "medium";
           };
           "scoped/mid" = {
             model = "claude-code/claude-sonnet-5-5";
@@ -203,7 +199,7 @@ in
           };
           "scoped/senior" = {
             model = "claude-code/claude-opus-5-5";
-            thinking = "high";
+            thinking = "medium";
           };
           "scoped/staff" = {
             model = "claude-code/claude-opus-5-5";
@@ -211,7 +207,7 @@ in
           };
           "scoped/principal" = {
             model = "claude-code/claude-fable-5-1";
-            thinking = "xhigh";
+            thinking = "high";
           };
           "scoped/reviewer" = {
             model = "claude-code/claude-opus-5-5";

@@ -17,11 +17,16 @@
       };
 
       model = {
-        claude = "fable";
+        claude = {
+          model = "fable";
+          effort = "high";
+        };
+
         opencode = {
           model = "openai/gpt-5.6-sol";
           effort = "xhigh";
         };
+
         pi = {
           model = "scoped/principal";
         };
