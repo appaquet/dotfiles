@@ -45,10 +45,10 @@ AP's personal agentic instructions (CLAUDE/AGENTS files, commands, skills, rules
 `nixantic` from .nix sources under `home-manager/modules/agentic/instructions/`. `nixantic` is a
 separate external repo (`github:appaquet/nixantic`) consumed as a flake input. For where to edit
 what, the nixantic change workflow (clone, `path:` override, no-push), and validation: read
-`home-manager/modules/agentic/CLAUDE.md` before editing.
+`home-manager/modules/agentic/AGENTS.md` before editing.
 
 `./nixantic` clones are workspace-relative: work in the clone of the jj workspace you are in
-(`home-manager/modules/agentic/CLAUDE.md`, Nixantic section, for the workflow).
+(`home-manager/modules/agentic/AGENTS.md`, Nixantic section, for the workflow).
 
 ## Documentation
 
