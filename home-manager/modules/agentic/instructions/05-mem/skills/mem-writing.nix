@@ -38,11 +38,11 @@
 
         * Repo-level content is the only authoring surface that differs by harness.
         * Repo instruction files are concatenated, never merged, and a file in a parent directory applies to every repo beneath it.
-        * Prefer `CLAUDE.md` for a repo that serves several harnesses: Claude Code reads it directly, while OpenCode and Pi reach it only as a fallback behind `AGENTS.md`. Claude Code's `AGENTS.md` support is recent and unreliable without telemetry, so treat `AGENTS.md` as an alternative rather than the shared default.
+        * Use `AGENTS.md` as the repo instruction file: OpenCode, Pi, and Claude Code all read it.
 
         #### Claude Code
 
-        * Repo instruction files: `CLAUDE.md` or `.claude/CLAUDE.md` for team content, `CLAUDE.local.md` for personal gitignored content, and `.claude/rules/*.md` with optional `paths:` scoping. `AGENTS.md` loads only when no `CLAUDE.md` exists in the working directory or any parent.
+        * Repo instruction files: `AGENTS.md` for team content, `CLAUDE.local.md` for personal gitignored content, and `.claude/rules/*.md` with optional `paths:` scoping. A subdirectory's instruction file attaches on demand when Claude reads a file there. Claude never reads `AGENTS.local.md`, `AGENTS.override.md`, or anything under `.agents/`, so repo skills must live in `.claude/skills/` for Claude to see them.
         * Repo artifacts: `.claude/commands/*.md` (legacy; prefer skills), `.claude/skills/<name>/SKILL.md`, `.claude/agents/*.md`.
 
         #### OpenCode
