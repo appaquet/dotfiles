@@ -175,14 +175,15 @@ incoming_candidate() {
         ( -z "$local_socket" || "$1" != "$local_socket" ) ]] && forwarded_shape "$1"
 }
 
-# A recognized OpenSSH forwarded-socket layout: modern sshd-forwarded
-# $HOME/.ssh/agent/s.<hash>.sshd.<rand> (sshd tags the socket "sshd"; a local
-# ssh-agent's default layout is tagged "agent" and is not forwarded)
-# or legacy /tmp/ssh-*/agent.<pid>. Anything else (macOS built-in launchd agent, arbitrary
-# sockets) is not a forwarded layout.
+# A recognized OpenSSH forwarded-socket layout. Modern sshd-forwarded sockets live
+# under $HOME/.ssh/agent as s.<hash>.sshd.<pid>.<rand>: we anchor on the agent dir and
+# the "sshd" tag as a whole segment, but match everything after the tag loosely because
+# those tokens (pid, rand) vary by OpenSSH version. A local ssh-agent socket carries the
+# "local" tag and is not forwarded; legacy /tmp/ssh-*/agent.<pid> is also recognized.
+# Anything else (macOS built-in launchd agent, arbitrary sockets) is not forwarded.
 forwarded_shape() {
     [[ "$1" =~ ^/(private/)?tmp/ssh-[^/]+/agent\.[0-9]+$ ||
-        "$1" =~ ^"$HOME"/\.ssh/agent/s\.[^./]+\.sshd\.[^./]+$ ]]
+        "$1" =~ ^"$HOME"/\.ssh/agent/s\.[^./]+\.sshd\..*$ ]]
 }
 
 # Remove the slot when $2 is empty; otherwise atomically repoint it through a temporary symlink.

@@ -3,7 +3,7 @@
 #
 # Each scenario runs against its own fake $HOME. Live agents are real
 # ssh-agent instances bound with -a: self-built layout-shaped paths
-# ($fakehome/.ssh/agent/s.<hash>.sshd.<rand> — sshd tags forwarded sockets
+# ($fakehome/.ssh/agent/s.<hash>.sshd.<pid>.<rand> — sshd tags forwarded sockets
 # "sshd") stand in for forwarded
 # sockets (default-layout sockets under a $TMPDIR-based fake home exceed
 # macOS's 104-char Unix socket path limit), an arbitrary non-layout
@@ -191,8 +191,8 @@ t_push_pop_newest() {
     home=$(new_home)
     local_sock="$home/local.sock"
     start_agent "$local_sock" >/dev/null
-    f1="$home/.ssh/agent/s.h1.sshd.r1"
-    f2="$home/.ssh/agent/s.h2.sshd.r2"
+    f1="$home/.ssh/agent/s.h1.sshd.100.r1"
+    f2="$home/.ssh/agent/s.h2.sshd.100.r2"
     start_agent "$f1" >/dev/null
     start_agent "$f2" >/dev/null
     init_run "$home" "$local_sock" "$f1"
@@ -212,8 +212,8 @@ t_push_pop_newest() {
 t_pop_older_first() {
     local home f1 f2
     home=$(new_home)
-    f1="$home/.ssh/agent/s.h1.sshd.r1"
-    f2="$home/.ssh/agent/s.h2.sshd.r2"
+    f1="$home/.ssh/agent/s.h1.sshd.100.r1"
+    f2="$home/.ssh/agent/s.h2.sshd.100.r2"
     start_agent "$f1" >/dev/null
     start_agent "$f2" >/dev/null
     init_run "$home" "" "$f1"
@@ -230,8 +230,8 @@ t_pop_older_first() {
 t_relogin_moves_top() {
     local home f1 f2
     home=$(new_home)
-    f1="$home/.ssh/agent/s.h1.sshd.r1"
-    f2="$home/.ssh/agent/s.h2.sshd.r2"
+    f1="$home/.ssh/agent/s.h1.sshd.100.r1"
+    f2="$home/.ssh/agent/s.h2.sshd.100.r2"
     start_agent "$f1" >/dev/null
     start_agent "$f2" >/dev/null
     init_run "$home" "" "$f1"
@@ -247,9 +247,9 @@ t_prune() {
     home=$(new_home)
     local_sock="$home/local.sock"
     start_agent "$local_sock" >/dev/null
-    f1="$home/.ssh/agent/s.h1.sshd.r1"
-    f2="$home/.ssh/agent/s.h2.sshd.r2"
-    f3="$home/.ssh/agent/s.h3.sshd.r3"
+    f1="$home/.ssh/agent/s.h1.sshd.100.r1"
+    f2="$home/.ssh/agent/s.h2.sshd.100.r2"
+    f3="$home/.ssh/agent/s.h3.sshd.100.r3"
     start_agent "$f1" >/dev/null
     p2=$(start_agent "$f2")
     start_agent "$f3" >/dev/null
@@ -269,8 +269,8 @@ t_non_interactive() {
     home=$(new_home)
     local_sock="$home/local.sock"
     start_agent "$local_sock" >/dev/null
-    f1="$home/.ssh/agent/s.h1.sshd.r1"
-    f2="$home/.ssh/agent/s.h2.sshd.r2"
+    f1="$home/.ssh/agent/s.h1.sshd.100.r1"
+    f2="$home/.ssh/agent/s.h2.sshd.100.r2"
     start_agent "$f1" >/dev/null
     start_agent "$f2" >/dev/null
     init_run "$home" "$local_sock" "$f1"
@@ -281,13 +281,13 @@ t_non_interactive() {
     home=$(new_home)
     local_sock="$home/local.sock"
     start_agent "$local_sock" >/dev/null
-    f1="$home/.ssh/agent/s.h1.sshd.r1"
+    f1="$home/.ssh/agent/s.h1.sshd.100.r1"
     start_agent "$f1" >/dev/null
     init_run_ni "$home" "$local_sock" "$f1"
     assert_link "non-interactive(empty): primary is local" "$home/.ssh/ssh_auth_sock" "$local_sock"
 
     home=$(new_home)
-    f1="$home/.ssh/agent/s.h1.sshd.r1"
+    f1="$home/.ssh/agent/s.h1.sshd.100.r1"
     start_agent "$f1" >/dev/null
     init_run_ni "$home" "" "$f1"
     assert_absent "non-interactive(no local): primary absent" "$home/.ssh/ssh_auth_sock"
@@ -298,7 +298,7 @@ t_non_interactive() {
 t_nested_shell() {
     local home f1
     home=$(new_home)
-    f1="$home/.ssh/agent/s.h1.sshd.r1"
+    f1="$home/.ssh/agent/s.h1.sshd.100.r1"
     start_agent "$f1" >/dev/null
     init_run "$home" "" "$f1"
     init_run "$home" "" "$home/.ssh/ssh_auth_sock"
@@ -312,7 +312,7 @@ t_release_deleted_socket() {
     home=$(new_home)
     local_sock="$home/local.sock"
     start_agent "$local_sock" >/dev/null
-    f1="$home/.ssh/agent/s.h1.sshd.r1"
+    f1="$home/.ssh/agent/s.h1.sshd.100.r1"
     p1=$(start_agent "$f1")
     init_run "$home" "$local_sock" "$f1"
     disconnect "$p1" "$f1"
@@ -327,10 +327,10 @@ t_release_noop() {
     home=$(new_home)
     local_sock="$home/local.sock"
     start_agent "$local_sock" >/dev/null
-    f1="$home/.ssh/agent/s.h1.sshd.r1"
+    f1="$home/.ssh/agent/s.h1.sshd.100.r1"
     start_agent "$f1" >/dev/null
     init_run "$home" "$local_sock" "$f1"
-    expect_rc "release(unknown): exit 0" 0 run "$home" "$local_sock" release "$home/.ssh/agent/s.hx.sshd.rx"
+    expect_rc "release(unknown): exit 0" 0 run "$home" "$local_sock" release "$home/.ssh/agent/s.hx.sshd.100.rx"
     expect_rc "release(local): exit 0" 0 run "$home" "$local_sock" release "$local_sock"
     assert_stack "release(noop): stack unchanged" "$home" "$f1"
     assert_link "release(noop): primary unchanged" "$home/.ssh/ssh_auth_sock" "$f1"
@@ -344,7 +344,7 @@ t_release_no_agent_protocol() {
     local_sock="$home/local.sock"
     pl=$(start_agent "$local_sock")
     kill -KILL "$pl" 2>/dev/null
-    f1="$home/.ssh/agent/s.h1.sshd.r1"
+    f1="$home/.ssh/agent/s.h1.sshd.100.r1"
     start_agent "$f1" >/dev/null
     init_run "$home" "$local_sock" "$f1"
     run "$home" "$local_sock" release "$f1"
@@ -357,8 +357,8 @@ t_fixup() {
     home=$(new_home)
     local_sock="$home/local.sock"
     start_agent "$local_sock" >/dev/null
-    f1="$home/.ssh/agent/s.h1.sshd.r1"
-    f2="$home/.ssh/agent/s.h2.sshd.r2"
+    f1="$home/.ssh/agent/s.h1.sshd.100.r1"
+    f2="$home/.ssh/agent/s.h2.sshd.100.r2"
     start_agent "$f1" >/dev/null
     p2=$(start_agent "$f2")
     init_run "$home" "$local_sock" "$f1"
@@ -380,8 +380,8 @@ t_migration() {
     home=$(new_home)
     local_sock="$home/local.sock"
     start_agent "$local_sock" >/dev/null
-    f1="$home/.ssh/agent/s.h1.sshd.r1"
-    f2="$home/.ssh/agent/s.h2.sshd.r2"
+    f1="$home/.ssh/agent/s.h1.sshd.100.r1"
+    f2="$home/.ssh/agent/s.h2.sshd.100.r2"
     start_agent "$f1" >/dev/null
     start_agent "$f2" >/dev/null
     ln -s -- "$f2" "$home/.ssh/ssh_auth_sock"
@@ -393,7 +393,7 @@ t_migration() {
 
     home=$(new_home)
     ln -s -- "$local_sock" "$home/.ssh/ssh_auth_sock"
-    ln -s -- "$home/.ssh/agent/s.hd.sshd.rd" "$home/.ssh/ssh_auth_sock_b"
+    ln -s -- "$home/.ssh/agent/s.hd.sshd.100.rd" "$home/.ssh/ssh_auth_sock_b"
     init_run "$home" "$local_sock"
     assert_stack "migration(dead backup): nothing seeded" "$home"
     assert_absent "migration(dead backup): backup slot removed" "$home/.ssh/ssh_auth_sock_b"
@@ -432,13 +432,13 @@ t_non_symlink_guard() {
     fi
 }
 
-# A local ssh-agent layout socket (tag "agent") is not forwarded and never pushed.
+# A local ssh-agent layout socket (tag "local") is not forwarded and never pushed.
 t_local_agent_layout() {
     local home local_sock local_agent
     home=$(new_home)
     local_sock="$home/local.sock"
     start_agent "$local_sock" >/dev/null
-    local_agent="$home/.ssh/agent/s.ha.agent.ra"
+    local_agent="$home/.ssh/agent/s.ha.local.100.ra"
     start_agent "$local_agent" >/dev/null
     init_run "$home" "$local_sock" "$local_agent"
     assert_stack "local-agent: not pushed" "$home"
@@ -451,7 +451,7 @@ t_herdr_link() {
     home=$(new_home)
     local_sock="$home/local.sock"
     start_agent "$local_sock" >/dev/null
-    f1="$home/.ssh/agent/s.h1.sshd.r1"
+    f1="$home/.ssh/agent/s.h1.sshd.100.r1"
     start_agent "$f1" >/dev/null
     mkdir -p -- "$home/.config/herdr"
     other="$home/.config/herdr/other.sock"
@@ -475,8 +475,8 @@ t_herdr_link() {
 t_herdr_link_legacy_entry() {
     local home f1 f2 link
     home=$(new_home)
-    f1="$home/.ssh/agent/s.h1.sshd.r1"
-    f2="$home/.ssh/agent/s.h2.sshd.r2"
+    f1="$home/.ssh/agent/s.h1.sshd.100.r1"
+    f2="$home/.ssh/agent/s.h2.sshd.100.r2"
     start_agent "$f1" >/dev/null
     start_agent "$f2" >/dev/null
     init_run "$home" "" "$f1"
