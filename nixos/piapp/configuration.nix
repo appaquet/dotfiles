@@ -10,6 +10,7 @@
     ../modules/netconsole/receiver.nix
     ../modules/dotblip.nix
     ./adguardhome.nix
+    ./caddy.nix
   ];
 
   services.openssh.enable = true;

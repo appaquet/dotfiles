@@ -444,11 +444,11 @@
         "sops-nix": "sops-nix"
       },
       "locked": {
-        "lastModified": 1793359614,
-        "narHash": "sha256-jjLvNvX0zVLg4wrro+qJL1b0uBpZP0dRXkFTUaX/Fto=",
+        "lastModified": 1793367435,
+        "narHash": "sha256-0A5yQvSkIJhBOHOqojIEwfQCFYvNC0hsU3FH2aIbSAo=",
         "owner": "appaquet",
         "repo": "dotfiles-secrets",
-        "rev": "aca27e18a9201bc409b18e8414e8bd80c4c7b891",
+        "rev": "62403d9a22ecd560fabedd79c4a9984fc8175503",
         "type": "github"
       },
       "original": {

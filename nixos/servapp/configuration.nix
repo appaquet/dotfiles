@@ -10,6 +10,7 @@
     ./monitoring.nix
     ./samba.nix
     ./hardware-configuration.nix
+    ./caddy.nix
     ../modules/common.nix
     ../modules/dev.nix
     ../modules/docker.nix
