@@ -38,6 +38,16 @@ let
       };
     }
 
+    # https://github.com/earendil-works/pi-claude-code
+    # Not published on npm; pinned by git commit like pi-rules. Registers the
+    # claude-code provider (Claude subscription via the Claude Code CLI).
+    # Pinned to jdbrew88's fork because upstream main (70abb65) exceeds Anthropic's
+    # four cache_control breakpoints on replay; this branch is PR #11, which caps
+    # them. Repin to earendil-works once that PR lands.
+    {
+      package = "git:github.com/jdbrew88/pi-claude-code@4937f1b6971f1f2491df991d7d8043132e9f5c1a";
+    }
+
     # https://github.com/Quartermaster-Labs/pi-on-demand-context
     {
       package = "npm:@quartermaster-labs/pi-on-demand-context@0.3.2";
