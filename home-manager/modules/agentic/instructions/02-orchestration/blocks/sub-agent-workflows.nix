@@ -85,7 +85,6 @@
             * Ask yourself if the action will cost the context window. Still in doubt, ask the user.
           * May be switched at any moment mid-session via an explicit mode prompt.
 
-
         ${scope.blocks."sub-agent-selection".embed}
 
         * Sub-agents
@@ -110,14 +109,10 @@
             * If insufficient, resume the sub-agent with targeted questions or work; don't redo its work.
 
           * Project files: always reference relevant project files rather than copying their contents into sub-agent prompts. Project and phase documentation remain main-agent-owned. Other documentation may be delegated according to agent descriptions.
-      '';
 
-      /*
-          * Sub-sub-agents:
-            * Use specialist review/exploration agents only for work within the delegating dev agent's stated task and decision limits.
-            * Return work exceeding those limits to the parent instead of delegating it to another dev agent.
-            * Delegate lower-tier work only when separable, deterministic, independently verifiable, and worth the handoff.
-            * Never delegate to the same tier.
-      */
+          * Sub-agent output to me: I don't see the output of sub-agents. When debrifinging me, assume I need full context agent. Follow ${
+            scope.blocks."user-briefing".reference
+          }.
+      '';
     };
 }
