@@ -16,6 +16,8 @@ jobs:
             os: ubuntu-latest
           - host: "servapp"
             os: ubuntu-latest
+          - host: "piapp"
+            os: ubuntu-24.04-arm
           - host: "mbpapp"
             os: macos-latest
     runs-on: ${{ matrix.pair.os }}
@@ -101,10 +103,17 @@ jobs:
           path: "flake.lock"
 
   update_nixos:
-    runs-on: ubuntu-latest
     strategy:
       matrix:
-        host: ["deskapp", "servapp"]
+        pair:
+          - host: "deskapp"
+            os: ubuntu-latest
+          - host: "servapp"
+            os: ubuntu-latest
+          - host: "piapp"
+            os: ubuntu-24.04-arm
+    runs-on: ${{ matrix.pair.os }}
+    timeout-minutes: 120 # because sometimes it gets stuck
     steps:
       - uses: actions/checkout@v4
 
@@ -122,6 +131,8 @@ jobs:
           extra-conf: |
             experimental-features = nix-command flakes
             access-tokens = github.com=${{ secrets.GH_PAT }}
+            substituters = https://cache.nixos.org https://nix-community.cachix.org https://nixos-raspberrypi.cachix.org https://cache.numtide.com https://cache.nixos-cuda.org https://pi.cachix.org
+            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI= niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M= pi.cachix.org-1:lGeoGJaZ5ZDabuRzkcD5EBTNnDM4HJ1vqeOxlWk1Flk=
           github-token: ${{ secrets.GH_PAT }}
 
       - name: Add & update nixpkgs channel
@@ -133,7 +144,7 @@ jobs:
       - name: Building NixOS baseline
         run: |
           set -xe
-          HOST="${{ matrix.host }}" ./x nixos build --cores 0 --max-jobs 1 # limiting concurrency to prevent freezes
+          HOST="${{ matrix.pair.host }}" ./x nixos build --cores 0 --max-jobs 1 # limiting concurrency to prevent freezes
           nix-collect-garbage # free up intermediary, since we're low on disk on gha
           mv result result-before
 
@@ -145,7 +156,7 @@ jobs:
       - name: Building NixOS new
         run: |
           set -xe
-          HOST="${{ matrix.host }}" ./x nixos build --cores 0 --max-jobs 1 # limiting concurrency to prevent freezes
+          HOST="${{ matrix.pair.host }}" ./x nixos build --cores 0 --max-jobs 1 # limiting concurrency to prevent freezes
           mv result result-after
 
       - name: Diffing...
@@ -161,18 +172,18 @@ jobs:
           #   Closure size: 1637 -> 1637 (29 paths added, 29 paths removed, delta +0, disk usage +7.5KiB).
           NB_CHANGES=$(grep -vcE "(Version changes|No version|nixos-system|Closure size|<<<|>>>)" diff || true)
           if [ $NB_CHANGES -gt 0 ]; then
-            echo "Changes for ${{ matrix.host }} nixos:" > diff-out
+            echo "Changes for ${{ matrix.pair.host }} nixos:" > diff-out
             cat diff >> diff-out
             echo -n " " >> diff-out
             echo -n "------------------" >> diff-out
-            cat diff-out > "${{ matrix.host }}-nixos-diff"
+            cat diff-out > "${{ matrix.pair.host }}-nixos-diff"
           fi
 
       - name: Add as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: "${{ matrix.host }}-nixos-diff"
-          path: "${{ matrix.host }}-nixos-diff"
+          name: "${{ matrix.pair.host }}-nixos-diff"
+          path: "${{ matrix.pair.host }}-nixos-diff"
           if-no-files-found: ignore # no files means no diff
 
   update_darwin:
