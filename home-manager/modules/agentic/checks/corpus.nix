@@ -47,15 +47,6 @@ let
     "task-management"
   ];
   opencodeRules = builtins.filter (rule: rule != "planning") claudeRules;
-  piRules = [
-    "development"
-    "orchestration"
-    "pi-questionnaire"
-    "pi-workflows"
-    "review-comments"
-    "reviewer-usage"
-    "task-management"
-  ];
   claudeSkills = [
     "frontend"
     "human-writer"
@@ -105,7 +96,6 @@ let
     ++ filesIn "pi" "agents" agents
     ++ filesIn "pi" "agents" piAgents
     ++ filesIn "pi" "prompts" piCommands
-    ++ filesIn "pi" "rules" piRules
     ++ skillFiles "pi" piSkills
     ++ map (name: "pi/skills/show-me/${name}") [
       "template.html"
@@ -156,7 +146,6 @@ let
       test -d ${instructions.package}/opencode/commands
       test -d ${instructions.package}/opencode/skills
       test -d ${instructions.package}/pi/prompts
-      test -d ${instructions.package}/pi/rules
       test -d ${instructions.package}/pi/skills
       test -d ${instructions.package}/codex/agents
       test -d ${instructions.package}/codex/skills

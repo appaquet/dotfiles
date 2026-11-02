@@ -1,6 +1,5 @@
 {
   config,
-  pkgs,
   ...
 }:
 
@@ -46,11 +45,6 @@ in
   home.file.".pi/agent/prompts".source = "${instructions.package}/pi/prompts";
   home.file.".pi/agent/skills".source = "${instructions.package}/pi/skills";
   home.file.".pi/agent/agents".source = "${instructions.package}/pi/agents";
-
-  # pi-rules skips symlinked entries during rule discovery, so materialize the rendered rule files as regular files.
-  home.file.".pi/agent/rules".source = pkgs.runCommand "pi-rules-materialized" {
-    preferLocalBuild = true;
-  } "cp -rL ${instructions.package}/pi/rules $out";
 
   # pi secrets
   sops.secrets.pi_exa_api_key.sopsFile = config.sops.secretsFiles.work;

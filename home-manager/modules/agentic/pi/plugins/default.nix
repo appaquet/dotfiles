@@ -6,40 +6,8 @@
 
 let
   plugins = [
-    # https://github.com/tigorlazuardi/pi-rules
-    # On bumps, prefer upstream npm:@tigorhutasuhut/pi-rules if it includes the typebox peer fix.
-    {
-      package = "git:github.com/appaquet/pi-rules@9e76589905519dbf6d8e596af2d12339db534bcb";
-      files = {
-        # See https://github.com/tigorlazuardi/pi-rules#configure-source-priority
-        # Drop global user rules, other than pi
-        # But include repo rules for pi, agents, and claude.
-        ".pi/agent/rules.json".text = builtins.toJSON {
-          enabled = true;
-          sources = [
-            {
-              scope = "repo";
-              kind = "pi";
-            }
-            {
-              scope = "repo";
-              kind = "agents";
-            }
-            {
-              scope = "repo";
-              kind = "claude";
-            }
-            {
-              scope = "user";
-              kind = "pi";
-            }
-          ];
-        };
-      };
-    }
-
     # https://github.com/earendil-works/pi-claude-code
-    # Not published on npm; pinned by git commit like pi-rules. Registers the
+    # Not published on npm, so it is pinned by git commit. Registers the
     # claude-code provider (Claude subscription via the Claude Code CLI).
     # Pinned to jdbrew88's fork because upstream main (70abb65) exceeds Anthropic's
     # four cache_control breakpoints on replay; this branch is PR #11, which caps
