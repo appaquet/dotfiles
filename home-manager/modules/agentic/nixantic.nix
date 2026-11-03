@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, inputs', ... }:
 
 {
   nixantic = {
@@ -18,6 +18,10 @@
           questions = "rpiv-ask-user-question";
         };
       };
+    };
+
+    sources.harnesses.skills."herdr".main = {
+      file = "${inputs'.llm-agents.packages.herdr.src}/skills/herdr/SKILL.md";
     };
   };
 }

@@ -2,12 +2,17 @@
 
 {
   perSystem =
-    { pkgs, lib, ... }:
+    {
+      pkgs,
+      lib,
+      inputs',
+      ...
+    }:
     let
       evalInstructions =
         modules:
         lib.evalModules {
-          specialArgs = { inherit pkgs; };
+          specialArgs = { inherit pkgs inputs'; };
           modules = [
             inputs.nixantic.nixanticModules.core
             ./nixantic.nix
@@ -21,6 +26,7 @@
       homeManagerDefault =
         (inputs.home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
+          extraSpecialArgs = { inherit inputs inputs'; };
 
           modules = [
             inputs.nixantic.homeManagerModules.default
