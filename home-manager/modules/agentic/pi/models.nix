@@ -119,8 +119,8 @@ in
             thinking = "high";
           };
           "scoped/mid" = {
-            model = "openai/gpt-6-luna";
-            thinking = "high";
+            model = "openai/gpt-6.1-terra";
+            thinking = "medium";
           };
           "scoped/senior" = {
             model = "openai/gpt-6.1-sol";
