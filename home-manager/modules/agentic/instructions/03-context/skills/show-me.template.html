@@ -15,12 +15,16 @@
       Pinned dependencies (source: npm registry, verified 2026-09):
       - Tailwind Play CDN 3.4.17: utility CSS, JIT in the browser (Play CDN version list lags npm; verify the version against the CDN, not the registry)
       - D3 7.9.0: data visualization (SVG, scales, axes)
-      - Mermaid 11.17.1: text-defined diagrams (flowcharts, sequences, ...)
       Remove any include the artifact does not use.
     -->
     <script src="https://cdn.tailwindcss.com/3.4.17?plugins=typography"></script>
     <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@11.17.1/dist/mermaid.min.js"></script>
+    <!--
+      Diagrams use show-me's pinned Mermaid runtime: keep this include and write
+      `<pre class="mermaid">` blocks. Never add a Mermaid script tag, version, or
+      theme block; read diagrams.md in this skill's directory for the recipes.
+    -->
+    <script type="module" src="/_show-me/diagrams-auto.js"></script>
     <style>
       :root {
         --bg: #080b13;
@@ -171,13 +175,6 @@
         color: var(--faint);
         font-size: 0.82rem;
       }
-      .mermaid {
-        text-align: center;
-      }
-      .mermaid svg {
-        max-width: 100%;
-        height: auto;
-      }
       #chart text {
         fill: var(--muted);
         font-family: var(--mono);
@@ -245,16 +242,14 @@
             <span class="section-index">02</span>
             <h2 id="diagram-heading" class="section-title">Diagram</h2>
           </div>
-          <!-- Remove this section and Mermaid include when the artifact has no diagram. -->
+          <!-- Remove this section when the artifact has no diagram; keep the head include. -->
           <figure>
-            <div class="surface visual-frame" tabindex="0" aria-label="Scrollable diagram">
-              <pre class="mermaid">
+            <pre class="mermaid">
 flowchart LR
   A[Signal] --> B{Decision}
   B -->|Primary| C[Outcome]
   B -->|Alternate| D[Fallback]
               </pre>
-            </div>
             <figcaption class="caption">Figure caption: explain the relationship or sequence shown</figcaption>
           </figure>
         </section>
@@ -278,26 +273,6 @@ flowchart LR
     </div>
 
     <script>
-      mermaid.initialize({
-        startOnLoad: true,
-        theme: "base",
-        themeVariables: {
-          background: "transparent",
-          primaryColor: "#132c31",
-          primaryTextColor: "#edf2f7",
-          primaryBorderColor: "#2dd4bf",
-          secondaryColor: "#241d3d",
-          secondaryTextColor: "#edf2f7",
-          secondaryBorderColor: "#a78bfa",
-          tertiaryColor: "#111827",
-          tertiaryTextColor: "#edf2f7",
-          tertiaryBorderColor: "#60a5fa",
-          lineColor: "#9aa8bd",
-          edgeLabelBackground: "#0d1220",
-          fontFamily: "system-ui, sans-serif",
-        },
-      });
-
       const chartData = [
         { name: "Signal", value: 42, color: "#2dd4bf" },
         { name: "Context", value: 68, color: "#60a5fa" },

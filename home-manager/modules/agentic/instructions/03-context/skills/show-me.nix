@@ -52,6 +52,12 @@
         * Use semantic markup, responsive layout, keyboard-accessible interaction, visible focus, adequate contrast, and reduced-motion handling.
         * For a text-heavy review where the user should comment on named sections or selected passages, load `feedback.md` from this skill's directory and add its one-line include. Ordinary visuals keep their own choice controls and get no feedback UI.
 
+        ## Show a diagram
+
+        * Use Mermaid for a diagram: one fenced block in a Markdown document, or a `pre.mermaid` block plus the one-line include in an artifact.
+        * Read `diagrams.md` in this skill's directory before writing diagram source. It owns the two recipes, the diagram types, and the syntax rules that break Mermaid.
+        * A diagram-first request is served fastest by a Markdown document whose body is one fence, because the reader adds the document tree and comments around it.
+
         ## Browse the served root
 
         * The server picks the mode from the URL: `/` and directory URLs are generated indexes, ordinary files are served unchanged, and a `.md` or `.markdown` URL opens the docs reader with a left-hand tree and shared comments.
@@ -114,6 +120,10 @@
       "feedback.md" = {
         kind = "md";
         content = builtins.readFile ./show-me.feedback.md;
+      };
+      "diagrams.md" = {
+        kind = "md";
+        content = builtins.readFile ./show-me.diagrams.md;
       };
     };
   };

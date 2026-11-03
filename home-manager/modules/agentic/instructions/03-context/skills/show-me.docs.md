@@ -11,6 +11,7 @@
 * `/` and directory URLs return a generated index with ordinary links to files and subdirectories. The index stays an index even when the directory holds `index.html`; link `/index.html` explicitly to open that file.
 * Ordinary files are served unchanged with their own content type, so an HTML artifact keeps its CSS, scripts, and images.
 * A `.md` or `.markdown` URL returns the docs reader: the live document, a left-hand tree of every readable Markdown file beneath the serving root, and shared comments. Adding `?raw=1` returns the plain source.
+* A code fence whose language is `mermaid` renders as a diagram in the document; every other fence keeps its code-block rendering.
 
 ### Scope
 

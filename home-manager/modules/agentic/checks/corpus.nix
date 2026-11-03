@@ -101,6 +101,7 @@ let
       "template.html"
       "docs-viewer.md"
       "feedback.md"
+      "diagrams.md"
     ]
     ++ builtins.concatLists (
       map
@@ -110,6 +111,7 @@ let
             "template.html"
             "docs-viewer.md"
             "feedback.md"
+            "diagrams.md"
           ]
         )
         [

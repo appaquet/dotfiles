@@ -181,6 +181,11 @@ pkgs.runCommand "show-me-serve-check"
       curl -fsS "$base/_show-me/feedback.js" | grep -q 'mountFeedback' || fail "The shared feedback asset was not served."
       curl -fsS "$base/_show-me/feedback-auto.js" | grep -q 'data-target-id' || fail "The one-line feedback entry was not served."
 
+      # The diagram runtime is packaged the same way, so both serving paths share it.
+      curl -fsS "$base/_show-me/diagrams.js" | grep -q 'mountDiagrams' || fail "The diagram runtime was not served."
+      curl -fsS "$base/_show-me/diagrams-auto.js" | grep -q 'mountDiagrams' || fail "The one-line diagram entry was not served."
+      curl -fsS "$base/_show-me/diagrams.css" | grep -q 'smdg' || fail "The diagram stylesheet was not served."
+
       if [ "$mode" != "public" ] && pgrep -f cloudflared >/dev/null; then
         fail "The command started cloudflared without --public."
       fi

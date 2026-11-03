@@ -4,6 +4,7 @@
  * component once per served root.
  */
 
+import { mountDiagrams } from "/_show-me/diagrams.js";
 import { mountFeedback } from "/_show-me/feedback.js";
 
 const MARKDOWN_EXTENSIONS = [".md", ".markdown"];
@@ -120,7 +121,10 @@ async function showDocument(target, { push }) {
     setState("empty", "This document is empty.");
     reader.feedback?.setTargets([]);
   } else {
-    renderDocument(text, url);
+    await renderDocument(text, url, abort.signal);
+    // Diagram rendering yields for the Mermaid import and each diagram, so a
+    // navigation that started meanwhile owns the DOM now.
+    if (token !== reader.token) return;
     setState(null, "");
   }
 
@@ -130,9 +134,12 @@ async function showDocument(target, { push }) {
   closeNavigation();
 }
 
-function renderDocument(text, documentUrl) {
+async function renderDocument(text, documentUrl, signal) {
   const rendered = window.marked.parse(text, { gfm: true });
   els.doc.innerHTML = window.DOMPurify.sanitize(rendered, { USE_PROFILES: { html: true } });
+  await mountDiagrams(els.doc, { signal });
+  if (signal?.aborted) return;
+
   prepareHeadings();
   renderCallouts();
   detachRemoteImages(documentUrl);

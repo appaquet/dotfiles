@@ -11,6 +11,9 @@ let
     cp ${./show-me-feedback.js} $out/feedback.js
     cp ${./show-me-feedback.css} $out/feedback.css
     cp ${./show-me-feedback-auto.js} $out/feedback-auto.js
+    cp ${./show-me-diagrams.js} $out/diagrams.js
+    cp ${./show-me-diagrams-auto.js} $out/diagrams-auto.js
+    cp ${./show-me-diagrams.css} $out/diagrams.css
   '';
 in
 pkgs.writeShellApplication {

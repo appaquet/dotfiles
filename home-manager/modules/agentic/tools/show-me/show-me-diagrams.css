@@ -1,0 +1,75 @@
+/*
+ * Diagram rendering styles for show-me. The container, its pending state, and
+ * the failure state are self-contained: the same stylesheet serves the docs
+ * reader and authored artifacts.
+ */
+
+.smdg,
+pre.mermaid {
+  margin: 0.9rem 0;
+  padding: 0.75rem;
+  max-height: 70vh;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.45rem;
+  background: #0f1420;
+}
+
+.smdg {
+  display: block;
+  text-align: center;
+}
+
+.smdg svg {
+  display: block;
+  margin-inline: auto;
+}
+
+.smdg:focus-visible {
+  outline: 2px solid rgba(45, 212, 191, 0.8);
+  outline-offset: 3px;
+}
+
+/* A diagram block keeps its source visible and readable until it renders. */
+pre.mermaid {
+  padding: 0.75rem 0.9rem;
+  color: #9aa8bd;
+  font-family: ui-monospace, "SFMono-Regular", "Cascadia Code", Menlo, monospace;
+  font-size: 0.85em;
+  white-space: pre;
+}
+
+.smdg-error {
+  text-align: left;
+  border-color: rgba(251, 113, 133, 0.45);
+  background: rgba(251, 113, 133, 0.06);
+}
+
+.smdg-error-message {
+  margin: 0 0 0.4rem;
+  color: #fb7185;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.smdg-error-detail {
+  margin: 0 0 0.6rem;
+  color: #e8edf4;
+  font-family: ui-monospace, "SFMono-Regular", "Cascadia Code", Menlo, monospace;
+  font-size: 0.82rem;
+  white-space: pre-wrap;
+}
+
+.smdg-source {
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+  overflow-x: auto;
+  border-radius: 0.35rem;
+  background: #121826;
+  color: #9aa8bd;
+  font-family: ui-monospace, "SFMono-Regular", "Cascadia Code", Menlo, monospace;
+  font-size: 0.8rem;
+  text-align: left;
+}
