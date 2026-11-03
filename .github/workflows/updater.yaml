@@ -2,7 +2,8 @@ name: "Flake updater"
 
 on:
   schedule:
-    - cron: "45 5 * * *" # UTC, 12/1AM EST
+    - cron: "25 5 * * *" # 5:25AM EST, 25th minute to prevent GitHub's top-of-hour scheduling delay
+      timezone: "America/Toronto"
   workflow_dispatch: # allow manual triggering
   # pull_request:
   # push:
