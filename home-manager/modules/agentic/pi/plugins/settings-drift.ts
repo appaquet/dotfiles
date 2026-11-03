@@ -31,6 +31,7 @@ export const NIX_SETTINGS_ENV = "PI_NIX_SETTINGS_FILE";
 export const IGNORED_PATHS: readonly string[] = [
   "deviceId", // Pi owns this; a random UUID is minted on first run to identify the machine in bug reports
   "lastChangelogVersion", // Pi owns this; a new value is written on every release
+  "extensionChangelogVersions", // Pi owns this; it records the last changelog version shown per extension package
 ];
 
 const SETTINGS_FILE = "settings.json";

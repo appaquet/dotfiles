@@ -278,9 +278,20 @@ test("loadDrift: returns runtime-only paths and filters ignored ones", async () 
 
 test("loadDrift: reports runtime-only paths by default", async () => {
   await publishNixSettings({});
-  await writeJsonFile("settings.json", { deviceId: "runtime-device", tokenSpeed: { slidingWindow: 1000 } });
+  await writeJsonFile("settings.json", {
+    deviceId: "runtime-device",
+    extensionChangelogVersions: {
+      '{"source":"npm:pi-web-access@0.44.0","scope":"user"}': "0.44.0",
+    },
+    tokenSpeed: { slidingWindow: 1000 },
+  });
 
-  expect(IGNORED_PATHS).toEqual(["deviceId", "lastChangelogVersion"]);
+  expect(IGNORED_PATHS).toEqual([
+    "deviceId",
+    "lastChangelogVersion",
+    "extensionChangelogVersions",
+  ]);
+  // Pi owns the whole changelog map, and a sibling runtime-only path still surfaces.
   expect(loadDrift()).toEqual([
     { path: "tokenSpeed.slidingWindow", value: 1000 },
   ]);

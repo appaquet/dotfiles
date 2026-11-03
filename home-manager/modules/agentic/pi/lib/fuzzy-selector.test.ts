@@ -168,6 +168,7 @@ test("input edits update filtering and select the best current match", () => {
 
 test("arrow input changes the selected fuzzy result", () => {
   const completed: Array<string | undefined> = [];
+  const ranked = filterFuzzyItems(ITEMS, "d");
   const component = createComponent(
     { initialSearchInput: "d" },
     (value) => completed.push(value),
@@ -176,7 +177,9 @@ test("arrow input changes the selected fuzzy result", () => {
   component.handleInput("tui.select.down");
   component.handleInput("tui.select.confirm");
 
-  expect(completed).toEqual(["builder"]);
+  // Movement is ours to test; the ranking order comes from Pi and shifts between releases.
+  expect(ranked.length).toBeGreaterThan(1);
+  expect(completed).toEqual([ranked[1].value]);
 });
 
 test("Enter with no matches keeps the selector unresolved", () => {
@@ -202,11 +205,16 @@ test("cancel resolves undefined", () => {
 
 test("selectFuzzyItem forwards named selector options to custom UI", async () => {
   let factoryResult: InstanceType<typeof FuzzySelectorComponent> | undefined;
+  let customOptions:
+    | { blocked?: { kind: string; message: string } }
+    | undefined;
   const ctx = {
     ui: {
       custom: async (
         factory: (...args: any[]) => InstanceType<typeof FuzzySelectorComponent>,
+        options?: { blocked?: { kind: string; message: string } },
       ) => {
+        customOptions = options;
         let selected: string | undefined;
         factoryResult = factory(
           { requestRender: () => {} },
@@ -233,4 +241,7 @@ test("selectFuzzyItem forwards named selector options to custom UI", async () =>
     }),
   ).resolves.toBe("orchestrator");
   expect(factoryResult).toBeInstanceOf(FuzzySelectorComponent);
+  expect(customOptions).toEqual({
+    blocked: { kind: "question", message: "Select mode:" },
+  });
 });

@@ -235,16 +235,20 @@ export function selectFuzzyItem(
   items: readonly FuzzySelectorItem[],
   options: FuzzySelectorOptions = {},
 ): Promise<string | undefined> {
-  return ctx.ui.custom<string | undefined>((tui, theme, keybindings, done) =>
-    new FuzzySelectorComponent(
-      tui,
-      theme,
-      keybindings,
-      title,
-      items,
-      options,
-      done,
-    ),
+  return ctx.ui.custom<string | undefined>(
+    (tui, theme, keybindings, done) =>
+      new FuzzySelectorComponent(
+        tui,
+        theme,
+        keybindings,
+        title,
+        items,
+        options,
+        done,
+      ),
+    // A selector always waits for the user, so terminals that show program
+    // status report pi as blocked with the selector title as the reason.
+    { blocked: { kind: "question", message: title } },
   );
 }
 
