@@ -30,6 +30,7 @@
         If ad-hoc project files are listed, stop and report. This command creates committed project files.
 
         ## Instructions
+
         1. Ensure ${scope.skills."project-docs".reference} loaded.
 
         2. Ensure context loaded, goal clear, task defined

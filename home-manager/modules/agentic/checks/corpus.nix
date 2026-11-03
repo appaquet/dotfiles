@@ -27,6 +27,7 @@ let
     "introspect"
     "jj-resolve-conflicts"
     "proceed"
+    "proj-brief"
     "proj-load"
     "proj-plan"
     "proj-save"
@@ -56,11 +57,13 @@ let
     "version-control"
   ];
   opencodeSkills = claudeSkills ++ [
+    "proj-brief"
     "proj-load"
     "proj-save"
   ];
   piSkills = claudeSkills ++ [
     "pi-recaller"
+    "proj-brief"
     "proj-load"
     "proj-save"
   ];
