@@ -11,6 +11,7 @@ import { mountFeedback } from "/_show-me/feedback.js";
 
 const HEADING_SELECTOR = "h1, h2, h3, h4, h5, h6";
 const ROOT_SELECTOR = "[data-smfb-root]";
+const MOUNTED_ATTRIBUTE = "data-smfb-mounted";
 
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", start, { once: true });
@@ -19,13 +20,18 @@ if (document.readyState === "loading") {
 }
 
 /** Mounts the component and publishes its controller as `window.showMeFeedback`. */
-function start() {
-  if (window.showMeFeedback) return;
+async function start() {
+  // Claimed before the stylesheet wait, which defers publishing the controller:
+  // a second copy of this entry would otherwise mount a duplicate instance.
+  if (document.documentElement.hasAttribute(MOUNTED_ATTRIBUTE) || window.showMeFeedback) return;
+  document.documentElement.setAttribute(MOUNTED_ATTRIBUTE, "");
 
   const source = pageSource();
   const root = document.querySelector(ROOT_SELECTOR) ?? document.querySelector("main") ?? document.body;
 
-  loadStylesheet();
+  // The drawer's closed look lives in the stylesheet: a component mounted before
+  // that sheet applies paints the drawer in page flow, then slides it away.
+  await loadStylesheet();
   const feedback = mountFeedback({
     root,
     artifact: document.body.dataset.smfbArtifact?.trim() || source,
@@ -86,12 +92,20 @@ function regionLabel(element, targetId) {
   return heading?.textContent.trim() || targetId;
 }
 
+/**
+ * Applies the component stylesheet, resolving once it is loaded or has failed.
+ *
+ * A failure still resolves: the component mounts unstyled rather than not at all.
+ */
 function loadStylesheet() {
-  if (document.querySelector("link[data-smfb-stylesheet]")) return;
-
   const link = document.createElement("link");
   link.rel = "stylesheet";
   link.href = "/_show-me/feedback.css";
   link.dataset.smfbStylesheet = "";
   document.head.append(link);
+
+  return new Promise((resolve) => {
+    link.addEventListener("load", resolve, { once: true });
+    link.addEventListener("error", resolve, { once: true });
+  });
 }
