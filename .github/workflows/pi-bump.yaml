@@ -1,0 +1,87 @@
+name: "Pi plugin bumper"
+
+# The agent drives this run: it reads the bump skill, decides what is worth bumping, edits the
+# pins, verifies the evaluation, and opens or updates the pull request. The workflow only
+# supplies a trigger, tokens, nix, and node.
+#
+# Comment `@pi-bump ...` on the bump PR to relaunch; the comment text becomes that run's
+# extra instruction.
+
+on:
+  schedule:
+    - cron: "40 6 * * 1" # Mondays 6:40AM ET; an odd minute avoids GitHub's top-of-hour queueing
+      timezone: "America/Toronto"
+  workflow_dispatch: # allow manual triggering
+    inputs:
+      extra_instruction:
+        description: "Optional instruction for the agent, e.g. 'skip pi-web-access'"
+        required: false
+        type: string
+  issue_comment: # reply on the bump PR with a comment starting with @pi-bump to relaunch
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: pi-bump
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    # Comment runs only from AP, only on a PR, and only with the command prefix. The bot's own
+    # comments are authored by github-actions[bot], so they can never satisfy this check.
+    if: |
+      github.event_name != 'issue_comment' ||
+      (github.event.issue.pull_request != null &&
+       github.event.comment.user.login == 'appaquet' &&
+       (github.event.comment.body == '@pi-bump' || startsWith(github.event.comment.body, '@pi-bump ')))
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_PAT }}
+
+      - uses: ./.github/actions/nix-setup
+        with:
+          github-token: ${{ secrets.GH_PAT }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Match the local npm release-age policy
+        run: npm config set min-release-age 3
+
+      - name: Bump the plugin pins
+        uses: shaftoe/pi-coding-agent-action@381f578da466b8d2ef48f0fdb8a940f276fe4c3c # v2.30.1
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }} # lets the agent read release notes and clone branches
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          provider: opencode-go
+          model: deepseek-v4.1-flash
+          token: ${{ secrets.OPENCODE_API_KEY }}
+          thinking_level: high
+          refresh_model_catalog: false
+          update_comment: ${{ github.event_name == 'issue_comment' }}
+          prompt: |
+            Run the Pi npm plugin bump.
+
+            You are in a CI checkout of `appaquet/dotfiles` on `master`: work in git (not jj), and never
+            run `./x home switch`. Eligibility, release notes, and the verification commands come from
+            `.agents/skills/pi-plugin-bump/SKILL.md`; adapt them to this checkout. Before publishing,
+            `HOST=deskapp ./x home check` must exit 0 and the skill's packages eval must list the new
+            pin specs.
+
+            Publish via `create_pull_request`, or `update_pull_request` when the `pi/plugin-bump` PR
+            already exists — start from its branch so earlier decisions survive. Title:
+            `chore(pi): bump plugin pins`. The body must list old/new versions with publish dates, risk
+            notes from the release notes, the verification commands, the apply step, and the `@pi-bump`
+            steering commands. If nothing is worth bumping, change nothing and explain why — no empty PR.
+
+            Extra instruction for this run, if any (it may start with `@pi-bump`; ignore that word):
+            ${{ inputs.extra_instruction || github.event.comment.body }}
