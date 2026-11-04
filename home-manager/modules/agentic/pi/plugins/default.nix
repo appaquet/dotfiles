@@ -9,11 +9,10 @@ let
     # https://github.com/earendil-works/pi-claude-code
     # Not published on npm, so it is pinned by git commit. Registers the
     # claude-code provider (Claude subscription via the Claude Code CLI).
-    # Pinned to jdbrew88's fork because upstream main (70abb65) exceeds Anthropic's
-    # four cache_control breakpoints on replay; this branch is PR #11, which caps
-    # them. Repin to earendil-works once that PR lands.
+    # Upstream main caps cache_control markers at Anthropic's four-per-request
+    # limit when it replays a request.
     {
-      package = "git:github.com/jdbrew88/pi-claude-code@4937f1b6971f1f2491df991d7d8043132e9f5c1a";
+      package = "git:github.com/earendil-works/pi-claude-code@47f9e2bb408f8b5c351edf95f7b756bc5c8f45cf";
     }
 
     # https://github.com/Quartermaster-Labs/pi-on-demand-context
@@ -33,12 +32,12 @@ let
 
     # https://github.com/YuGiMob/pi-hashline-edit-pro
     {
-      package = "npm:pi-hashline-edit-pro@7.0.0";
+      package = "npm:pi-hashline-edit-pro@7.1.1";
     }
 
     # https://github.com/tintinweb/pi-subagents
     {
-      package = "npm:@tintinweb/pi-subagents@0.22.0";
+      package = "npm:@tintinweb/pi-subagents@0.22.1";
       files = {
         ".pi/agent/subagents.json".text = builtins.toJSON {
           disableDefaultAgents = true;
@@ -77,7 +76,7 @@ let
 
     # https://github.com/nicobailon/pi-web-access
     {
-      package = "npm:pi-web-access@0.44.0";
+      package = "npm:pi-web-access@0.46.0";
       files = {
         ".pi/agent/web-search.json".text = builtins.toJSON {
           provider = "exa";
@@ -116,7 +115,7 @@ let
 
     # https://github.com/nicobailon/pi-powerline-footer
     {
-      package = "npm:pi-powerline-footer@0.21.0";
+      package = "npm:pi-powerline-footer@0.22.0";
       environment = {
         POWERLINE_NERD_FONTS.value = "1";
       };
