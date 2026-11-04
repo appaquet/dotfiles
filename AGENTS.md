@@ -50,22 +50,6 @@ what, the nixantic change workflow (clone, `path:` override, no-push), and valid
 `./nixantic` clones are workspace-relative: work in the clone of the jj workspace you are in
 (`home-manager/modules/agentic/AGENTS.md`, Nixantic section, for the workflow).
 
-## Documentation
-
-IMPORTANT: this repository's docs root is `~/dotfiles/secrets/docs/features`, so project docs live at
-`~/dotfiles/secrets/docs/features/<yyyy>/<mm>/<dd>-<project-name>/`. Always use that absolute path:
-`docs/features/` is not a docs location in this repo and nothing links it to the docs root.
-
-Link the docs folder with `agentic-proj-create <absolute docs path>`, so the committed `proj` link is
-absolute like the other dotfiles workspaces.
-
-This means:
-
-- Project docs (`proj/` → `~dotfiles/secrets/docs/features/.../00-*.md`) are NOT in this repo
-- Changes to project docs are tracked in the secrets repo, not here
-- `jj status` in dotfiles will NOT show project doc changes
-- Commit dotfiles changes (commands, skills, etc.) in this repo. Project doc changes stay as uncommitted working-copy changes in the secrets repo; do not commit them
-
 ## Nix Conventions
 
 - Format with `just fmt` (nixfmt) before committing

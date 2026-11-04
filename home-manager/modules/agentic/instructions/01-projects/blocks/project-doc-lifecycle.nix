@@ -11,13 +11,13 @@
 
           ### Locations
 
-          Project instructions name the repository's docs root. When they are silent, the docs root is `docs/features/` relative to the repository root.
+          Project instructions name the repository's docs root. When they are silent, use the `Docs root:` line printed by `agentic-proj-docs`: the repository's git config `agentic.docsRoot`, else `docs/features/` at the repository root. When the docs root is not an existing directory, STOP and ask the user; never create it. The user can set one with `git config agentic.docsRoot <path>`.
           * Project folder: `<docs-root>/<yyyy>/<mm>/<dd>-<project-name>/` (run `date +%Y/%m/%d` to get it)
           * Main document: `00-<project-name>.md` inside the project folder
           * Phase documents: `01-<phase-name>.md`, `02-<phase-name>.md`, and so on; numbers establish ordering
           * The repository-root `proj/` symlink points to committed project files; `proj-adhoc/` points to ad-hoc or temporary project files
           * Create links only from the workspace root: `agentic-proj-create <project-folder>` for the committed link once that folder and its documents exist, `agentic-proj-create-adhoc` for the ad-hoc link; never create a link with `ln`
-          * Run `agentic-proj-docs` to print the location and contents of `proj` or `proj-adhoc`
+          * Run `agentic-proj-docs` to print the docs root and the location and contents of `proj` or `proj-adhoc`
 
           ### Creation and updates
 
