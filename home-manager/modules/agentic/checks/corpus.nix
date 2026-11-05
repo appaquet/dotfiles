@@ -55,6 +55,7 @@ let
     "human-writer"
     "mem-writing"
     "pi-nix-config"
+    "security-audit"
     "show-me"
     "version-control"
   ];
@@ -76,17 +77,13 @@ let
     harness: directory: names:
     map (name: "${harness}/${directory}/${name}.md") names;
   skillFiles = harness: names: map (name: "${harness}/skills/${name}/SKILL.md") names;
-  expectedFiles = builtins.sort builtins.lessThan (
+  requiredFiles = builtins.sort builtins.lessThan (
     [
-      "claude/BOM.md"
       "claude/CLAUDE.md"
       "codex/AGENTS.md"
-      "codex/BOM.md"
       "opencode/.gitignore"
       "opencode/AGENTS.md"
-      "opencode/BOM.md"
       "pi/AGENTS.md"
-      "pi/BOM.md"
     ]
     ++ filesIn "claude" "agents" agents
     ++ filesIn "claude" "commands" claudeCommands
@@ -125,6 +122,23 @@ let
           "opencode"
         ]
     )
+    ++
+      builtins.concatMap
+        (
+          harness:
+          map (name: "${harness}/skills/security-audit/${name}") [
+            "LICENSE"
+            "report-schema.json"
+            "validate-coverage-ledger.cjs"
+            "validate-findings.cjs"
+          ]
+        )
+        [
+          "claude"
+          "codex"
+          "opencode"
+          "pi"
+        ]
   );
   mkAcceptanceCheck =
     name: instructions:
@@ -133,17 +147,19 @@ let
       unexpectedVcsContext = "agentic-vcs-context git";
       unresolvedInterpolation = "\${scope.";
       wrappedVcsContext = "`!`${expectedVcsContext}``";
-      manifest = pkgs.writeText "${name}-manifest" "${builtins.concatStringsSep "\n" expectedFiles}\n";
+      requiredManifest = pkgs.writeText "${name}-required-files" "${builtins.concatStringsSep "\n" requiredFiles}\n";
     in
     pkgs.runCommand name { } ''
       set -eu
       : ${instructions.check}
       : ${instructions.package}
 
-      find -L ${instructions.package} -type f -printf '%P\n' \
-        | grep -v -E '^(claude|opencode|pi|codex)/(rules/project-doc[.]md|skills/(proj-writing|project-docs)/SKILL[.]md)$' \
-        | sort > actual-manifest
-      diff -u ${manifest} actual-manifest
+      while IFS= read -r path; do
+        if [ ! -f "${instructions.package}/$path" ]; then
+          echo "Missing required instruction file: $path" >&2
+          exit 1
+        fi
+      done < ${requiredManifest}
 
       for harness in claude opencode pi codex; do
         test -n "$(find -L ${instructions.package}/$harness/agents -mindepth 1 -maxdepth 1 -type f -print -quit)"

@@ -12,7 +12,7 @@
       evalInstructions =
         modules:
         lib.evalModules {
-          specialArgs = { inherit pkgs inputs'; };
+          specialArgs = { inherit pkgs inputs inputs'; };
           modules = [
             inputs.nixantic.nixanticModules.core
             ./nixantic.nix

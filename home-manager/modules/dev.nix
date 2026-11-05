@@ -43,6 +43,7 @@ in
       gnumake
       bintools # ld, objdump, etc.
 
+      nodejs
     ])
     ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
       pkgs.mold
