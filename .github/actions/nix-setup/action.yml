@@ -1,0 +1,39 @@
+name: "Nix setup"
+description: "Install Nix with this repo's GitHub token, substituters and trusted keys, then optionally install packages from a nixpkgs channel."
+
+inputs:
+  github-token:
+    description: "Token for authenticated GitHub requests, used to resolve private flake inputs"
+    required: true
+  channel:
+    description: "nixpkgs channel added before installing packages; ignored when packages is empty"
+    required: false
+    default: "nixos-unstable"
+  packages:
+    description: "Space-separated nixpkgs attributes to install, for example \"nixpkgs#just\". Empty skips the channel and install steps"
+    required: false
+    default: ""
+  extra-features:
+    description: "Extra Nix experimental features appended to \"nix-command flakes\""
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - uses: DeterminateSystems/nix-installer-action@main
+      with:
+        extra-conf: |
+          experimental-features = nix-command flakes ${{ inputs.extra-features }}
+          access-tokens = github.com=${{ inputs.github-token }}
+          substituters = https://cache.nixos.org https://nix-community.cachix.org https://nixos-raspberrypi.cachix.org https://cache.numtide.com https://cache.nixos-cuda.org https://pi.cachix.org
+          trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI= niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M= pi.cachix.org-1:lGeoGJaZ5ZDabuRzkcD5EBTNnDM4HJ1vqeOxlWk1Flk=
+        github-token: ${{ inputs.github-token }}
+
+    - name: Add & update nixpkgs channel
+      if: inputs.packages != ''
+      shell: bash
+      run: |
+        nix-channel --add "https://nixos.org/channels/${{ inputs.channel }}" nixpkgs
+        nix-channel --update nixpkgs
+        nix profile install ${{ inputs.packages }}
