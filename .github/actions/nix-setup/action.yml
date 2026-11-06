@@ -25,7 +25,6 @@ inputs:
 runs:
   using: composite
   steps:
-    # Pinned by commit like hestia below: the installer writes nix.conf and reads the token.
     - uses: DeterminateSystems/nix-installer-action@3138316df39ed29be04236d7ffc686fa525866aa # v23
       with:
         extra-conf: |
