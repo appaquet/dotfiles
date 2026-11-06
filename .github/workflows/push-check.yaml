@@ -3,7 +3,7 @@ name: "Push checker"
 on:
   pull_request:
   push:
-    # PR branches are covered by pull_request; pushing here would run every check twice per push.
+    # Without this, every push to a PR branch runs the checks twice: once for push, once for pull_request.
     branches: [master]
 
 jobs:

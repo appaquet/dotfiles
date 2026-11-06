@@ -1,19 +1,17 @@
 # Garbage collection for the hestia binary cache.
 #
-# GC must run on the default branch: a PR job's cache scope is read-only towards the default branch and dies with the
-# PR, while the default-branch scope grows forever without GC.
-#
+# Only useful on the default branch: a PR's cache scope is read-only and disappears with the PR, while the
+# default-branch scope keeps growing until something deletes from it.
 name: "Cache GC"
 
-# GC handles concurrent pushes but not a concurrent GC: a second run's repack reads race the first run's post-commit
-# pack deletes. Queue manual runs behind the scheduled one instead of overlapping it.
+# A second GC must not overlap the first: its repack reads race the first run's pack deletes.
 concurrency:
   group: hestia-gc
   cancel-in-progress: false
 
 on:
   schedule:
-    - cron: "17 4 * * 0" # Sundays 4:17AM EST, off-peak and out of the way of the nightly updater
+    - cron: "17 4 * * 0" # Sundays; the cache churns slowly, so daily GC would buy nothing
       timezone: "America/Toronto"
   workflow_dispatch: # allow manual triggering
     inputs:
@@ -30,21 +28,20 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
-      # REST cache deletes need actions:write.
+      # Deleting cache entries uses the REST API, which needs `actions: write`.
       actions: write
       contents: read
     steps:
       - uses: actions/checkout@v4
 
-      # The hestia action writes a nix.conf and a hook shim, so Nix is installed first, mirroring hestia's own gc.yml.
+      # hestia's action needs Nix installed and writes a nix.conf, even though `gc` itself only calls the REST API.
       - uses: ./.github/actions/nix-setup
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: Mic92/hestia@v3
+      - uses: Mic92/hestia@dfed9ced335d28978ba74e513939a10db1f71025 # v3.1.0
         with:
           version: "v3.1.0"
-          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run garbage collection
         run: |

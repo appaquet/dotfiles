@@ -6,7 +6,7 @@ inputs:
     description: "Token for authenticated GitHub requests, used to resolve private flake inputs"
     required: true
   cache:
-    description: "Cache build results in the GitHub Actions cache with hestia. Enable only in jobs that build, since substitutes and evaluation never reach the post-build hook"
+    description: "Cache build results with hestia. Only useful in jobs that build: fetching from a substituter and `nix eval` never trigger the post-build hook"
     required: false
     default: "false"
   channel:
@@ -34,19 +34,17 @@ runs:
           trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI= niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M= pi.cachix.org-1:lGeoGJaZ5ZDabuRzkcD5EBTNnDM4HJ1vqeOxlWk1Flk=
         github-token: ${{ inputs.github-token }}
 
-    # Registers a localhost substituter plus a post-build hook for the rest of the job. No
-    # permissions are needed: uploads authenticate with the runner-injected ACTIONS_RUNTIME_TOKEN.
-    - uses: Mic92/hestia@v3
+    # Caching only covers steps that run after this one, so it has to sit above the build steps.
+    # Pinned by commit: the action writes nix.conf and reads the token, so a moved tag would change CI silently.
+    - uses: Mic92/hestia@dfed9ced335d28978ba74e513939a10db1f71025 # v3.1.0
       if: inputs.cache == 'true'
       with:
         version: "v3.1.0"
-        github-token: ${{ inputs.github-token }}
-        # Keep the 10 GB repo quota for this repo's own derivations: anything our substituters can
-        # already serve is skipped instead of uploaded.
         upstream-cache-filter: true
         upstream-cache-key-names: cache.nixos.org-1 nix-community.cachix.org-1 nixos-raspberrypi.cachix.org-1 niks3.numtide.com-1 cache.nixos-cuda.org pi.cachix.org-1
-        # Updater closures are large; the 300s default is short for them.
+        # The updater jobs' closures need longer than hestia's 300s default to finish uploading.
         drain-timeout: 900
+
     - name: Add & update nixpkgs channel
       if: inputs.packages != ''
       shell: bash
