@@ -24,7 +24,7 @@ jobs:
     runs-on: ${{ matrix.pair.os }}
     timeout-minutes: 120 # because sometimes it gets stuck
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Free up disk space
         if: runner.os == 'Linux'
@@ -79,14 +79,14 @@ jobs:
           fi
 
       - name: Add diff as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: "${{ matrix.pair.host }}-home-diff"
           path: "${{ matrix.pair.host }}-home-diff"
           if-no-files-found: ignore # no files means no diff
 
       - name: Add flake.lock
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: "${{ matrix.pair.host }}-flake"
           path: "flake.lock"
@@ -104,7 +104,7 @@ jobs:
     runs-on: ${{ matrix.pair.os }}
     timeout-minutes: 120 # because sometimes it gets stuck
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Free up disk space
         if: runner.os == 'Linux'
@@ -160,7 +160,7 @@ jobs:
           fi
 
       - name: Add as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: "${{ matrix.pair.host }}-nixos-diff"
           path: "${{ matrix.pair.host }}-nixos-diff"
@@ -172,7 +172,7 @@ jobs:
       matrix:
         host: ["mbpapp"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: ./.github/actions/nix-setup
         with:
@@ -218,7 +218,7 @@ jobs:
           fi
 
       - name: Add as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: "${{ matrix.host }}-darwin-diff"
           path: "${{ matrix.host }}-darwin-diff"
@@ -227,19 +227,19 @@ jobs:
   # test_incoming:
   #   runs-on: ubuntu-latest
   #   steps:
-  #     - uses: actions/checkout@v4
+  #     - uses: actions/checkout@v7
   #     - name: Create PR
   #       run: |
   #         echo "something" > something-diff
   #         echo -n " " >> flake.lock
   #     - name: Add as artifact
-  #       uses: actions/upload-artifact@v4
+  #       uses: actions/upload-artifact@v7
   #       with:
   #         name: diff
   #         path: something-diff
   #         if-no-files-found: ignore # no files means no diff
   #     - name: Add as artifact
-  #       uses: actions/upload-artifact@v4
+  #       uses: actions/upload-artifact@v7
   #       with:
   #         name: flake.lock
   #         path: flake.lock
@@ -249,10 +249,10 @@ jobs:
     needs: [update_homes, update_nixos, update_darwin]
     # needs: [test_incoming]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Fetch all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: diffs
 
