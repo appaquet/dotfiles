@@ -31,6 +31,7 @@ jobs:
         packages: nixpkgs#just
     - name: Run flake checks
       run: just test
+
   home_check:
     runs-on: ubuntu-latest
     strategy:

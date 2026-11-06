@@ -71,6 +71,39 @@ pkgs.runCommand "show-me-serve-check"
 
       exit 1
     }
+    # Greps a captured body for a marker. Bodies are written to a file first:
+    # piping into grep lets the reader exit at the first match, which truncates
+    # the writer and can fail the build.
+    expect_contains() {
+      content="$1"
+      marker="$2"
+      message="$3"
+
+      printf '%s' "$content" >"$TMPDIR/body"
+      grep -q -- "$marker" "$TMPDIR/body" || fail "$message"
+    }
+
+    reject_contains() {
+      content="$1"
+      marker="$2"
+      message="$3"
+
+      printf '%s' "$content" >"$TMPDIR/body"
+
+      if grep -q -- "$marker" "$TMPDIR/body"; then
+        fail "$message"
+      fi
+    }
+
+    # Downloads a served path and checks its body contains a marker.
+    expect_served() {
+      url="$1"
+      marker="$2"
+      message="$3"
+
+      curl -fsS --output "$TMPDIR/body" "$url" || fail "$message"
+      grep -q -- "$marker" "$TMPDIR/body" || fail "$message"
+    }
 
     # Help and argument handling never start a server.
     "${testShowMeServe}/bin/show-me-serve" --help >"$TMPDIR/help.log" 2>&1
@@ -162,29 +195,29 @@ pkgs.runCommand "show-me-serve-check"
 
       # The root URL is a generated index that links the served entries.
       index=$(curl -fsS "$base/")
-      printf '%s' "$index" | grep -q 'href="/hello.txt"' || fail "The root index does not link hello.txt."
-      printf '%s' "$index" | grep -q 'href="/docs/"' || fail "The root index does not link the docs directory."
+      expect_contains "$index" 'href="/hello.txt"' "The root index does not link hello.txt."
+      expect_contains "$index" 'href="/docs/"' "The root index does not link the docs directory."
 
       # An ordinary HTML file is served unchanged.
-      curl -fsS "$base/artifact.html" | grep -q '<h1>artifact</h1>' || fail "The HTML artifact was not served unchanged."
+      expect_served "$base/artifact.html" '<h1>artifact</h1>' "The HTML artifact was not served unchanged."
 
       # Markdown returns the packaged reader shell, and raw mode returns the source.
-      curl -fsS "$base/docs/notes.md" | grep -q 'class="smd-doc"' || fail "Markdown did not return the packaged reader shell."
+      expect_served "$base/docs/notes.md" 'class="smd-doc"' "Markdown did not return the packaged reader shell."
       [ "$(curl -fsS "$base/docs/notes.md?raw=1")" = "$(printf '# Notes\n\nCheck document.')" ] || fail "Raw Markdown did not match the source."
 
       # The docs tree reports root-relative Markdown paths only.
       tree=$(curl -fsS "$base/_show-me/tree")
-      printf '%s' "$tree" | grep -q '"docs/notes.md"' || fail "The docs tree is missing docs/notes.md."
-      printf '%s' "$tree" | grep -q 'hello.txt' && fail "The docs tree listed a non-Markdown file."
+      expect_contains "$tree" '"docs/notes.md"' "The docs tree is missing docs/notes.md."
+      reject_contains "$tree" 'hello.txt' "The docs tree listed a non-Markdown file."
 
       # The packaged feedback asset is reachable under the reserved namespace.
-      curl -fsS "$base/_show-me/feedback.js" | grep -q 'mountFeedback' || fail "The shared feedback asset was not served."
-      curl -fsS "$base/_show-me/feedback-auto.js" | grep -q 'data-target-id' || fail "The one-line feedback entry was not served."
+      expect_served "$base/_show-me/feedback.js" 'mountFeedback' "The shared feedback asset was not served."
+      expect_served "$base/_show-me/feedback-auto.js" 'data-target-id' "The one-line feedback entry was not served."
 
       # The diagram runtime is packaged the same way, so both serving paths share it.
-      curl -fsS "$base/_show-me/diagrams.js" | grep -q 'mountDiagrams' || fail "The diagram runtime was not served."
-      curl -fsS "$base/_show-me/diagrams-auto.js" | grep -q 'mountDiagrams' || fail "The one-line diagram entry was not served."
-      curl -fsS "$base/_show-me/diagrams.css" | grep -q 'smdg' || fail "The diagram stylesheet was not served."
+      expect_served "$base/_show-me/diagrams.js" 'mountDiagrams' "The diagram runtime was not served."
+      expect_served "$base/_show-me/diagrams-auto.js" 'mountDiagrams' "The one-line diagram entry was not served."
+      expect_served "$base/_show-me/diagrams.css" 'smdg' "The diagram stylesheet was not served."
 
       if [ "$mode" != "public" ] && pgrep -f cloudflared >/dev/null; then
         fail "The command started cloudflared without --public."
