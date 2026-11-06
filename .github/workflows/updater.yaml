@@ -38,6 +38,7 @@ jobs:
       - uses: ./.github/actions/nix-setup
         with:
           github-token: ${{ secrets.GH_PAT }}
+          cache: true
           extra-features: fetch-closure
           packages: nixpkgs#nvd
 
@@ -117,6 +118,7 @@ jobs:
       - uses: ./.github/actions/nix-setup
         with:
           github-token: ${{ secrets.GH_PAT }}
+          cache: true
           packages: nixpkgs#nixos-rebuild nixpkgs#nvd
 
       - name: Building NixOS baseline
@@ -175,6 +177,7 @@ jobs:
       - uses: ./.github/actions/nix-setup
         with:
           github-token: ${{ secrets.GH_PAT }}
+          cache: true
           packages: nixpkgs#nvd
 
       - name: Building baseline...

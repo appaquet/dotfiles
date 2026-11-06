@@ -25,6 +25,7 @@ jobs:
     - uses: ./.github/actions/nix-setup
       with:
         github-token: ${{ secrets.GH_PAT }}
+        cache: true
         packages: nixpkgs#just
     - name: Run flake checks
       run: just test
