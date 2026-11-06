@@ -3,27 +3,34 @@ name: "Push checker"
 on:
   pull_request:
   push:
+    # Without this, every push to a PR branch runs the checks twice: once for push, once for pull_request.
+    branches: [master]
 
 jobs:
   fmt_check:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - uses: DeterminateSystems/nix-installer-action@main
+    - uses: ./.github/actions/nix-setup
       with:
-        extra-conf: |
-          experimental-features = nix-command flakes
-          access-tokens = github.com=${{ secrets.GH_PAT }}
         github-token: ${{ secrets.GH_PAT }}
-    - name: Add & update nixpkgs channel
-      run: |
-        nix-channel --add https://nixos.org/channels/nixos-24.05 nixpkgs
-        nix-channel --update nixpkgs
-    - name: Install formatter & format
-      run: |
-        nix profile install nixpkgs#nixfmt-rfc-style nixpkgs#just
-        just fmt --check
+        channel: nixos-24.05
+        packages: nixpkgs#nixfmt-rfc-style nixpkgs#just
+    - name: Check formatting
+      run: just fmt --check
 
+  nix_tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ./.github/actions/nix-setup
+      with:
+        github-token: ${{ secrets.GH_PAT }}
+        cache: true
+        packages: nixpkgs#just
+    - name: Run flake checks
+      run: just test
   home_check:
     runs-on: ubuntu-latest
     strategy:
@@ -32,13 +39,8 @@ jobs:
         host: ["mbpapp", "deskapp", "servapp", "piapp", "piprint", "piups", "vps"]
     steps:
     - uses: actions/checkout@v4
-    - uses: DeterminateSystems/nix-installer-action@main
+    - uses: ./.github/actions/nix-setup
       with:
-        extra-conf: |
-          experimental-features = nix-command flakes
-          access-tokens = github.com=${{ secrets.GH_PAT }}
-          substituters = https://cache.nixos.org https://nix-community.cachix.org https://nixos-raspberrypi.cachix.org https://cache.numtide.com https://cache.nixos-cuda.org https://pi.cachix.org
-          trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI= niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M= pi.cachix.org-1:lGeoGJaZ5ZDabuRzkcD5EBTNnDM4HJ1vqeOxlWk1Flk=
         github-token: ${{ secrets.GH_PAT }}
     - run: HOST="${{ matrix.host }}" ./x home check
 
@@ -50,11 +52,8 @@ jobs:
         host: ["mbpapp"]
     steps:
     - uses: actions/checkout@v4
-    - uses: DeterminateSystems/nix-installer-action@main
+    - uses: ./.github/actions/nix-setup
       with:
-        extra-conf: |
-          experimental-features = nix-command flakes
-          access-tokens = github.com=${{ secrets.GH_PAT }}
         github-token: ${{ secrets.GH_PAT }}
     - run: HOST="${{ matrix.host }}" ./x darwin check
 
@@ -66,11 +65,8 @@ jobs:
         host: ["deskapp", "servapp", "piapp", "piprint", "piups", "vps"]
     steps:
     - uses: actions/checkout@v4
-    - uses: DeterminateSystems/nix-installer-action@main
+    - uses: ./.github/actions/nix-setup
       with:
-        extra-conf: |
-          experimental-features = nix-command flakes
-          access-tokens = github.com=${{ secrets.GH_PAT }}
         github-token: ${{ secrets.GH_PAT }}
     - name: Check
       run:
