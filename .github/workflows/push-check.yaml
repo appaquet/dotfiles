@@ -3,6 +3,8 @@ name: "Push checker"
 on:
   pull_request:
   push:
+    # PR branches are covered by pull_request; pushing here would run every check twice per push.
+    branches: [master]
 
 jobs:
   fmt_check:
