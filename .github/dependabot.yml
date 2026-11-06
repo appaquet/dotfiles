@@ -1,0 +1,20 @@
+version: 2
+
+updates:
+  - package-ecosystem: "github-actions"
+    # Dependabot's default scan reads only .github/workflows plus a root action.yml, so the
+    # action pins inside the composite action stay unmanaged without this second entry.
+    directories:
+      - "/"
+      - "/.github/actions/nix-setup"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:00"
+      timezone: "America/Toronto"
+    # One PR per run instead of one per action.
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 5
