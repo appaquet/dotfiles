@@ -1,0 +1,79 @@
+name: "Nix fetch bumper"
+
+description: "Bumps fetchFromGitHub pins, verified by real deskapp builds; comment @nix-bump ... on the bump PR to relaunch"
+
+on:
+  schedule:
+    - cron: "48 6 */3 * *" # every 3 days (month days 1, 4, 7, …), offset 8 min from the Pi bumper; an odd minute avoids GitHub's top-of-hour queueing
+      timezone: "America/Toronto"
+  workflow_dispatch: # allow manual triggering
+    inputs:
+      extra_instruction:
+        description: "Optional instruction for the agent, e.g. 'skip mboxshell'"
+        required: false
+        type: string
+  issue_comment: # reply on the bump PR with a comment starting with @nix-bump to relaunch
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: nix-bump
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    # Comment runs only from AP, only on a PR, and only with the command prefix. The bot's own
+    # comments are authored by github-actions[bot], so they can never satisfy this check.
+    if: |
+      github.event_name != 'issue_comment' ||
+      (github.event.issue.pull_request != null &&
+       github.event.comment.user.login == 'appaquet' &&
+       (github.event.comment.body == '@nix-bump' || startsWith(github.event.comment.body, '@nix-bump ')))
+    runs-on: ubuntu-latest
+    timeout-minutes: 120 # real home + nixos builds for deskapp
+    steps:
+      - name: Free up disk space
+        # The verification ladder builds two deskapp closures; the runner needs the room.
+        # See https://carlosbecker.com/posts/github-actions-disk-space/
+        run: |
+          df -h
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          sudo docker system prune -a -f
+          df -h
+
+      - uses: ./.github/actions/pi-agent
+        with:
+          cache: "true" # build results cache with hestia; the run builds, not just evals
+          prompt: |
+            Run the fetchFromGitHub pin bump.
+
+            You are in a CI checkout of `appaquet/dotfiles` on `master`: work in git (not jj), and never
+            run `./x home switch` or any activation command. The audit, eligibility, target selection,
+            and hash procedure come from `.agents/skills/github-fetch-bump/SKILL.md`; adapt them to this
+            checkout. The skill's interactive confirmation is answered by the extra instruction at the
+            end of this prompt: apply exactly the fetches it names, or when it names none, all
+            `bumpable` rows. `needs-review` rows are never bumped — list them in the PR body or the run
+            report instead. Scope is `fetchFromGitHub` pins only: never touch `flake.lock` or any file
+            outside the pins.
+
+            Before publishing, run the verification ladder in order; every step must pass:
+            1. `HOST=deskapp ./x home check` exits 0
+            2. `HOST=deskapp ./x nixos check` exits 0
+            3. the skill's scoped steps per bumped pin (dummy-hash fetch to read the real hash; build
+               the specific attribute from the edited file — skip that build for darwin-only packages,
+               hash + eval suffice)
+            4. `HOST=deskapp ./x home build --cores 0 --max-jobs 1 --print-build-logs --verbose` exits 0
+            5. `HOST=deskapp ./x nixos build --cores 0 --max-jobs 1` exits 0
+
+            Publish per `.github/prompts/agent-publish-contract.md`. Open the PR against `master` on branch
+            `nix/fetch-bump`, title `chore(nix): bump fetchFromGitHub pins`. The body must carry the
+            skill's audit table (fetch, current, proposed, latest-rev date, status, change summary),
+            the verification ladder commands, the apply step, and the `@nix-bump` steering commands.
+
+            Extra instruction for this run, if any (it may start with `@nix-bump`; ignore that word):
+            ${{ inputs.extra_instruction || github.event.comment.body }}
+          update-comment: ${{ github.event_name == 'issue_comment' }}
