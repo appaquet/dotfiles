@@ -77,11 +77,16 @@ jobs:
             `HOST=deskapp ./x home check` must exit 0 and the skill's packages eval must list the new
             pin specs.
 
-            Publish via `create_pull_request`, or `update_pull_request` when the `pi/plugin-bump` PR
-            already exists — start from its branch so earlier decisions survive. Title:
-            `chore(pi): bump plugin pins`. The body must list old/new versions with publish dates, risk
-            notes from the release notes, the verification commands, the apply step, and the `@pi-bump`
-            steering commands. If nothing is worth bumping, change nothing and explain why — no empty PR.
+            Publish with git and the `gh` CLI (authenticates as the repo owner via `GH_TOKEN`); do not
+            use the `create_pull_request` tool — it runs as the Actions bot, which cannot open a PR
+            here. When the `pi/plugin-bump` PR already exists, fetch and start from its branch so
+            earlier decisions survive; otherwise create `pi/plugin-bump` from `master`. Commit the pins
+            file (set `user.name`/`user.email` inline if the checkout has no identity) and push to that
+            branch — the existing PR updates from the push; refresh its body with `gh pr edit` when the
+            bump set changes. Open the PR with `gh pr create` against `master`, title `chore(pi): bump
+            plugin pins`. The body must list old/new versions with publish dates, risk notes from the
+            release notes, the verification commands, the apply step, and the `@pi-bump` steering
+            commands. If nothing is worth bumping, change nothing and explain why — no empty PR.
 
             Extra instruction for this run, if any (it may start with `@pi-bump`; ignore that word):
             ${{ inputs.extra_instruction || github.event.comment.body }}
