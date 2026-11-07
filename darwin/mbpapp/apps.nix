@@ -4,6 +4,7 @@
   homebrew = {
     masApps = {
       Notability = 360593530;
+      Amphetamine = 937984704;
     };
 
     brews = [
