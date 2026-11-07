@@ -2,7 +2,7 @@ name: "Pi plugin bumper"
 
 # The agent drives this run: it reads the bump skill, decides what is worth bumping, edits the
 # pins, verifies the evaluation, and opens or updates the pull request. The workflow only
-# supplies a trigger, tokens, nix, and node.
+# supplies a trigger, tokens, and the shared pi-agent setup (environment + agent invocation).
 #
 # Comment `@pi-bump ...` on the bump PR to relaunch; the comment text becomes that run's
 # extra instruction.
@@ -41,33 +41,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - uses: ./.github/actions/pi-agent
         with:
-          fetch-depth: 0
-          token: ${{ secrets.GH_PAT }}
-
-      - uses: ./.github/actions/nix-setup
-        with:
-          github-token: ${{ secrets.GH_PAT }}
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-
-      - name: Match the local npm release-age policy
-        run: npm config set min-release-age 3
-
-      - name: Bump the plugin pins
-        uses: shaftoe/pi-coding-agent-action@381f578da466b8d2ef48f0fdb8a940f276fe4c3c # v2.30.1
-        env:
-          GH_TOKEN: ${{ secrets.GH_PAT }} # lets the agent read release notes and clone branches
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          provider: opencode-go
-          model: deepseek-v4.1-flash
-          token: ${{ secrets.OPENCODE_API_KEY }}
-          thinking_level: high
-          refresh_model_catalog: false
-          update_comment: ${{ github.event_name == 'issue_comment' }}
           prompt: |
             Run the Pi npm plugin bump.
 
@@ -77,16 +52,13 @@ jobs:
             `HOST=deskapp ./x home check` must exit 0 and the skill's packages eval must list the new
             pin specs.
 
-            Publish with git and the `gh` CLI (authenticates as the repo owner via `GH_TOKEN`); do not
-            use the `create_pull_request` tool — it runs as the Actions bot, which cannot open a PR
-            here. When the `pi/plugin-bump` PR already exists, fetch and start from its branch so
-            earlier decisions survive; otherwise create `pi/plugin-bump` from `master`. Commit the pins
-            file (set `user.name`/`user.email` inline if the checkout has no identity) and push to that
-            branch — the existing PR updates from the push; refresh its body with `gh pr edit` when the
-            bump set changes. Open the PR with `gh pr create` against `master`, title `chore(pi): bump
-            plugin pins`. The body must list old/new versions with publish dates, risk notes from the
-            release notes, the verification commands, the apply step, and the `@pi-bump` steering
-            commands. If nothing is worth bumping, change nothing and explain why — no empty PR.
+            Publish per `.github/prompts/agent-publish-contract.md`. Open the PR against `master` on branch
+            `pi/plugin-bump`, title `chore(pi): bump plugin pins`. The body must list old/new versions
+            with publish dates, risk notes from the release notes, the verification commands, the apply
+            step, and the `@pi-bump` steering commands.
 
             Extra instruction for this run, if any (it may start with `@pi-bump`; ignore that word):
             ${{ inputs.extra_instruction || github.event.comment.body }}
+          with-node: "true"
+          npm-min-release-age: "3"
+          update-comment: ${{ github.event_name == 'issue_comment' }}

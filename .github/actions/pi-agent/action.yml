@@ -1,0 +1,67 @@
+name: "Pi agent setup"
+
+description: >-
+  Shared setup for the dotfiles agent workflows (pi-bump, nix-bump, pi-dotfiles):
+  checks out the repo with the private token, installs Nix, optionally installs
+  Node and the local npm release-age policy, then runs the pinned
+  pi-coding-agent-action. Workflows keep only their trigger, guard, and prompt.
+
+inputs:
+  prompt:
+    description: "Full prompt for the agent"
+    required: true
+  cache:
+    description: "Cache build results with hestia (passed to nix-setup). Only useful in jobs that build"
+    required: false
+    default: "false"
+  with-node:
+    description: "Install Node 24 before the agent runs"
+    required: false
+    default: "false"
+  npm-min-release-age:
+    description: "When non-empty, apply `npm config set min-release-age <value>` so the agent's installs match the local machine"
+    required: false
+    default: ""
+  update-comment:
+    description: "Have the action post a report comment on the triggering comment"
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GH_PAT }}
+
+    - uses: ./.github/actions/nix-setup
+      with:
+        github-token: ${{ secrets.GH_PAT }}
+        cache: ${{ inputs.cache }}
+
+    - uses: actions/setup-node@v6
+      if: ${{ inputs.with-node == 'true' }}
+      with:
+        node-version: 24
+
+    # Must run after setup-node and before the agent, so it lives here rather than in the workflow.
+    - name: Match the local npm release-age policy
+      if: ${{ inputs.npm-min-release-age != '' }}
+      shell: bash
+      run: npm config set min-release-age ${{ inputs.npm-min-release-age }}
+
+    # Pinned by commit: a moved tag would change the agent silently.
+    - name: Run the agent
+      uses: shaftoe/pi-coding-agent-action@381f578da466b8d2ef48f0fdb8a940f276fe4c3c # v2.30.1
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT }} # lets the agent read release notes and clone branches
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        provider: opencode-go
+        model: deepseek-v4.1-flash
+        token: ${{ secrets.OPENCODE_API_KEY }}
+        thinking_level: high
+        refresh_model_catalog: false
+        update_comment: ${{ inputs.update-comment }}
+        prompt: ${{ inputs.prompt }}

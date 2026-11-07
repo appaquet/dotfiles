@@ -6,6 +6,13 @@ version, the `GH_PAT` access token, the substituters list and the trusted public
 Build jobs pass `cache: true`, which caches build results with hestia; leave it off elsewhere, since substituting and
 `nix eval` never reach hestia's post-build hook. Nothing prunes that cache: GitHub evicts least-recently-used entries.
 
+The agent workflows (`pi-bump`, `nix-bump`, `pi-dotfiles`) are siblings: each shares `./.github/actions/pi-agent`
+(checkout, nix, optional node, pinned agent invocation), and every prompt defers the PR mechanics to
+`.github/prompts/agent-publish-contract.md`. The CI agent only reads its prompt — this file guides the agent that
+maintains the workflows, not the agent that runs them. Check the siblings together: a change that fixes one
+workflow usually applies to the others, and a change to the shared action or the contract must be reviewed against
+every consuming workflow in the same change.
+
 Dependabot (`.github/dependabot.yml`) bumps the action pins weekly as one grouped PR. Its second `directories` entry is what
 keeps the pins in `.github/actions/nix-setup` in scope; dropping it leaves that composite action unmanaged. Flake inputs are
 not Dependabot's: the "Flake updater" workflow owns `flake.lock`.
