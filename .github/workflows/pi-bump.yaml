@@ -9,7 +9,7 @@ name: "Pi plugin bumper"
 
 on:
   schedule:
-    - cron: "40 6 * * 1" # Mondays 6:40AM ET; an odd minute avoids GitHub's top-of-hour queueing
+    - cron: "40 6 */3 * *" # every 3 days (month days 1, 4, 7, …); an odd minute avoids GitHub's top-of-hour queueing
       timezone: "America/Toronto"
   workflow_dispatch: # allow manual triggering
     inputs:

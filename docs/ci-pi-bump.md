@@ -12,7 +12,7 @@ steps and your review of the PR are the safety net.
 
 | Trigger | When |
 | --- | --- |
-| `schedule` | Mondays 06:40 America/Toronto |
+| `schedule` | Every 3 days at 06:40 America/Toronto (month days 1, 4, 7, …, 28 — a 4-day gap at month end) |
 | `workflow_dispatch` | Manual, with an optional `extra_instruction` |
 | `issue_comment` | A comment starting with `@pi-bump` on a PR, authored by `appaquet` |
 
