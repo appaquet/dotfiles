@@ -23,8 +23,6 @@ concurrency:
 
 jobs:
   agent:
-    # Comment runs only from AP and only with the command prefix, on an issue or a PR. The bot's
-    # own comments are authored by github-actions[bot], so they can never satisfy this check.
     if: |
       github.event_name != 'issue_comment' ||
       (github.event.comment.user.login == 'appaquet' &&
@@ -32,9 +30,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 120 # open-ended work may include real builds
     steps:
+      # Fixes may need real builds; the runner needs the room.
+      # See https://carlosbecker.com/posts/github-actions-disk-space/
       - name: Free up disk space
-        # Fixes may need real builds; the runner needs the room.
-        # See https://carlosbecker.com/posts/github-actions-disk-space/
         run: |
           df -h
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL

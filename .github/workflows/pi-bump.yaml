@@ -1,15 +1,10 @@
 name: "Pi plugin bumper"
 
-# The agent drives this run: it reads the bump skill, decides what is worth bumping, edits the
-# pins, verifies the evaluation, and opens or updates the pull request. The workflow only
-# supplies a trigger, tokens, and the shared pi-agent setup (environment + agent invocation).
-#
-# Comment `@pi-bump ...` on the bump PR to relaunch; the comment text becomes that run's
-# extra instruction.
+description: "Bumps Pi npm extension pins; comment @pi-bump ... on the bump PR to relaunch"
 
 on:
   schedule:
-    - cron: "40 6 */3 * *" # every 3 days (month days 1, 4, 7, …); an odd minute avoids GitHub's top-of-hour queueing
+    - cron: "40 6 */3 * *" # every 3 days; odd minute avoids top-of-hour queueing
       timezone: "America/Toronto"
   workflow_dispatch: # allow manual triggering
     inputs:

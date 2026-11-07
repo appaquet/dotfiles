@@ -1,10 +1,5 @@
 name: "Pi agent setup"
-
-description: >-
-  Shared setup for the dotfiles agent workflows (pi-bump, nix-bump, pi-dotfiles):
-  checks out the repo with the private token, installs Nix, optionally installs
-  Node and the local npm release-age policy, then runs the pinned
-  pi-coding-agent-action. Workflows keep only their trigger, guard, and prompt.
+description: "Shared setup for the dotfiles agent workflows."
 
 inputs:
   prompt:

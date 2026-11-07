@@ -4,7 +4,7 @@ description: "Bumps fetchFromGitHub pins, verified by real deskapp builds; comme
 
 on:
   schedule:
-    - cron: "48 6 */3 * *" # every 3 days (month days 1, 4, 7, …), offset 8 min from the Pi bumper; an odd minute avoids GitHub's top-of-hour queueing
+    - cron: "48 6 */3 * *" # every 3 days; odd minute avoids top-of-hour queueing
       timezone: "America/Toronto"
   workflow_dispatch: # allow manual triggering
     inputs:
