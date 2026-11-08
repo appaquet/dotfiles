@@ -26,15 +26,6 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - name: Free up disk space
-        if: runner.os == 'Linux'
-        run: |
-          # See https://carlosbecker.com/posts/github-actions-disk-space/
-          df -h
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
-          sudo docker system prune -a -f
-          df -h
-
       - uses: ./.github/actions/nix-setup
         with:
           github-token: ${{ secrets.GH_PAT }}
@@ -105,15 +96,6 @@ jobs:
     timeout-minutes: 120 # because sometimes it gets stuck
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-
-      - name: Free up disk space
-        if: runner.os == 'Linux'
-        run: |
-          # See https://carlosbecker.com/posts/github-actions-disk-space/
-          df -h
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
-          sudo docker system prune -a -f
-          df -h
 
       - uses: ./.github/actions/nix-setup
         with:

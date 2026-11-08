@@ -40,14 +40,6 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GH_PAT }}
-      - name: Free up disk space
-        # The verification ladder builds two deskapp closures; the runner needs the room.
-        # See https://carlosbecker.com/posts/github-actions-disk-space/
-        run: |
-          df -h
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
-          sudo docker system prune -a -f
-          df -h
 
       - uses: ./.github/actions/pi-agent
         with:
