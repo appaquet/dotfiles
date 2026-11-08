@@ -12,7 +12,8 @@ The agent workflows (`pi-bump`, `nix-bump`, `pi-dotfiles`) are siblings: each ch
 maintains the workflows, not the agent that runs them. Check the siblings together: a change that fixes one
 workflow usually applies to the others, and a change to the shared action or the contract must be reviewed against
 every consuming workflow in the same change.
+Only the agent workflows pass `GH_PAT` to `actions/checkout`: the agent publishes as the repo owner. The other jobs
+rely on the default token — push-check is read-only, and the Flake updater's PR is deliberately bot-authored.
 
-Dependabot (`.github/dependabot.yml`) bumps the action pins weekly as one grouped PR. Its second `directories` entry is what
-keeps the pins in `.github/actions/nix-setup` in scope; dropping it leaves that composite action unmanaged. Flake inputs are
-not Dependabot's: the "Flake updater" workflow owns `flake.lock`.
+All action references are pinned by commit hash with a `# vX` comment — version tags can move, so a bump is an
+explicit, reviewed change. Flake inputs are not action pins: the "Flake updater" workflow owns `flake.lock`.
