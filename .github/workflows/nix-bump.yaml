@@ -51,6 +51,8 @@ jobs:
 
       - uses: ./.github/actions/pi-agent
         with:
+          gh-pat: ${{ secrets.GH_PAT }}
+          opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}
           cache: "true" # build results cache with hestia; the run builds, not just evals
           prompt: |
             Run the fetchFromGitHub pin bump.

@@ -21,13 +21,19 @@ inputs:
     description: "Have the action post a report comment on the triggering comment"
     required: false
     default: "false"
+  gh-pat:
+    description: "Repo owner token, for nix-setup and the agent's git/gh publish path (composite actions cannot read secrets directly)"
+    required: true
+  opencode-api-key:
+    description: "API key for the opencode-go provider"
+    required: true
 
 runs:
   using: composite
   steps:
     - uses: ./.github/actions/nix-setup
       with:
-        github-token: ${{ secrets.GH_PAT }}
+        github-token: ${{ inputs.gh-pat }}
         cache: ${{ inputs.cache }}
 
     - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
@@ -45,12 +51,12 @@ runs:
     - name: Run the agent
       uses: shaftoe/pi-coding-agent-action@381f578da466b8d2ef48f0fdb8a940f276fe4c3c # v2.30.1
       env:
-        GH_TOKEN: ${{ secrets.GH_PAT }} # lets the agent read release notes and clone branches
+        GH_TOKEN: ${{ inputs.gh-pat }} # lets the agent read release notes and clone branches
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ github.token }}
         provider: opencode-go
         model: deepseek-v4.1-flash
-        token: ${{ secrets.OPENCODE_API_KEY }}
+        token: ${{ inputs.opencode-api-key }}
         thinking_level: high
         refresh_model_catalog: false
         update_comment: ${{ inputs.update-comment }}

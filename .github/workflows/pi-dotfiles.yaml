@@ -45,6 +45,8 @@ jobs:
 
       - uses: ./.github/actions/pi-agent
         with:
+          gh-pat: ${{ secrets.GH_PAT }}
+          opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}
           cache: "true" # build results cache with hestia; the agent may build to verify fixes
           with-node: "true"
           npm-min-release-age: "3"
