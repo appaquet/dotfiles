@@ -11,7 +11,7 @@ jobs:
     if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
     - uses: ./.github/actions/nix-setup
       with:
         github-token: ${{ secrets.GH_PAT }}
@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
     - uses: ./.github/actions/nix-setup
       with:
         github-token: ${{ secrets.GH_PAT }}
@@ -42,7 +42,7 @@ jobs:
       matrix:
         host: ["mbpapp", "deskapp", "servapp", "piapp", "piprint", "piups", "vps"]
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
     - uses: ./.github/actions/nix-setup
       with:
         github-token: ${{ secrets.GH_PAT }}
@@ -56,7 +56,7 @@ jobs:
       matrix:
         host: ["mbpapp"]
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
     - uses: ./.github/actions/nix-setup
       with:
         github-token: ${{ secrets.GH_PAT }}
@@ -70,7 +70,7 @@ jobs:
       matrix:
         host: ["deskapp", "servapp", "piapp", "piprint", "piups", "vps"]
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
     - uses: ./.github/actions/nix-setup
       with:
         github-token: ${{ secrets.GH_PAT }}
