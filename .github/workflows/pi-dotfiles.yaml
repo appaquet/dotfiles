@@ -1,0 +1,73 @@
+name: "Dotfiles agent"
+
+description: "Catch-all dotfiles agent; comment @pi-dotfiles ... on any issue or PR to invoke; never pushes to master or merges"
+
+on:
+  workflow_dispatch: # allow manual triggering
+    inputs:
+      extra_instruction:
+        description: "Instruction for the agent, e.g. 'explain why the last nix-bump run failed'"
+        required: false
+        type: string
+  issue_comment: # tag `@pi-dotfiles ...` on any issue or PR to hand the conversation to the agent
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: pi-dotfiles
+  cancel-in-progress: false
+
+jobs:
+  agent:
+    if: |
+      github.event_name != 'issue_comment' ||
+      (github.event.comment.user.login == 'appaquet' &&
+       (github.event.comment.body == '@pi-dotfiles' || startsWith(github.event.comment.body, '@pi-dotfiles ')))
+    runs-on: ubuntu-latest
+    timeout-minutes: 120 # open-ended work may include real builds
+    steps:
+      # Fixes may need real builds; the runner needs the room.
+      # See https://carlosbecker.com/posts/github-actions-disk-space/
+      - name: Free up disk space
+        run: |
+          df -h
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          sudo docker system prune -a -f
+          df -h
+
+      - uses: ./.github/actions/pi-agent
+        with:
+          cache: "true" # build results cache with hestia; the agent may build to verify fixes
+          with-node: "true"
+          npm-min-release-age: "3"
+          prompt: |
+            You are the dotfiles catch-all agent. Your instruction for this run is at the end of
+            this prompt (it may start with `@pi-dotfiles`; ignore that word). Do what it asks.
+
+            You are in a CI checkout of `appaquet/dotfiles` on `master`: work in git (not jj), and never
+            run `./x home switch` or any activation command.
+
+            Investigate in the checkout: read the code, eval the affected surface
+            (`HOST=<host> ./x <home|nixos|darwin> check`), and when the work needs a build, build it
+            with `--cores 0 --max-jobs 1` (e.g. `HOST=deskapp ./x home build`). A `fetchFromGitHub`
+            pin change follows `.agents/skills/github-fetch-bump/SKILL.md`; an npm pin change follows
+            `.agents/skills/pi-plugin-bump/SKILL.md`.
+
+            Power ceiling: you may open or update pull requests, and nothing more — do not push to
+            `master`, do not force-push, and do not merge. Publish per
+            `.github/prompts/agent-publish-contract.md`, on branch `pi/dotfiles-<slug>` for a short
+            topic slug (reuse the branch when an earlier run already opened the PR for that topic),
+            with title `fix(dotfiles): <slug>` or `chore(dotfiles): <slug>`. The body must carry what
+            you found, what you changed and why, the verification commands you ran, and how to apply
+            the merge.
+
+            If there is nothing to change, say so in the run's report and change nothing — no empty
+            PR.
+
+            Instruction for this run, if any:
+            ${{ inputs.extra_instruction || github.event.comment.body }}
+          update-comment: ${{ github.event_name == 'issue_comment' }}
