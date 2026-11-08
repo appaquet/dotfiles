@@ -1,5 +1,5 @@
 name: "Pi agent setup"
-description: "Shared setup for the dotfiles agent workflows."
+description: "Shared setup for the dotfiles agent workflows. The workflow checks out the repo first; this runs nix-setup, optional node, then the pinned pi-coding-agent-action."
 
 inputs:
   prompt:
@@ -25,11 +25,6 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        token: ${{ secrets.GH_PAT }}
-
     - uses: ./.github/actions/nix-setup
       with:
         github-token: ${{ secrets.GH_PAT }}
