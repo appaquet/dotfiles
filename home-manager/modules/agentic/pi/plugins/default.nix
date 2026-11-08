@@ -76,7 +76,7 @@ let
 
     # https://github.com/nicobailon/pi-web-access
     {
-      package = "npm:pi-web-access@0.46.0";
+      package = "npm:pi-web-access@0.47.0";
       files = {
         ".pi/agent/web-search.json".text = builtins.toJSON {
           provider = "exa";
