@@ -16,6 +16,7 @@
     ./modules/media.nix
     ./modules/restic/backup.nix
     ./modules/work
+    ./modules/hc
   ];
 
   dotfiles.nono.profiles.machine.filesystem.allow = [

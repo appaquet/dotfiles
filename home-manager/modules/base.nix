@@ -77,7 +77,6 @@
       bandwhich
       dig
       whois
-
       jq
       jless
       hl-log-viewer
