@@ -1,6 +1,6 @@
 name: "Nix fetch bumper"
 
-description: "Bumps fetchFromGitHub pins, verified by real deskapp builds; comment @nix-bump ... on the bump PR to relaunch"
+description: "Bumps fetchFromGitHub pins, verified by real deskapp builds"
 
 on:
   schedule:
@@ -12,8 +12,6 @@ on:
         description: "Optional instruction for the agent, e.g. 'skip mboxshell'"
         required: false
         type: string
-  issue_comment: # reply on the bump PR with a comment starting with @nix-bump to relaunch
-    types: [created]
 
 permissions:
   contents: write
@@ -26,13 +24,6 @@ concurrency:
 
 jobs:
   bump:
-    # Comment runs only from AP, only on a PR, and only with the command prefix. The bot's own
-    # comments are authored by github-actions[bot], so they can never satisfy this check.
-    if: |
-      github.event_name != 'issue_comment' ||
-      (github.event.issue.pull_request != null &&
-       github.event.comment.user.login == 'appaquet' &&
-       (github.event.comment.body == '@nix-bump' || startsWith(github.event.comment.body, '@nix-bump ')))
     runs-on: ubuntu-latest
     timeout-minutes: 120 # real home + nixos builds for deskapp
     steps:
@@ -70,8 +61,7 @@ jobs:
             Publish per `.github/prompts/agent-publish-contract.md`. Open the PR against `master` on branch
             `nix/fetch-bump`, title `chore(nix): bump fetchFromGitHub pins`. The body must carry the
             skill's audit table (fetch, current, proposed, latest-rev date, status, change summary),
-            the verification ladder commands, the apply step, and the `@nix-bump` steering commands.
+            the verification ladder commands, the apply step, and a note that a `@pi-dotfiles ...` comment on the bump PR relaunches the bump.
 
-            Extra instruction for this run, if any (it may start with `@nix-bump`; ignore that word):
-            ${{ inputs.extra_instruction || github.event.comment.body }}
-          update-comment: ${{ github.event_name == 'issue_comment' }}
+            Extra instruction for this run, if any:
+            ${{ inputs.extra_instruction }}
