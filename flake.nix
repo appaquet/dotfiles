@@ -95,6 +95,7 @@
                 pkgs.bun
                 pkgs.just
                 pkgs.nixfmt
+                pkgs.nvd
               ];
             };
           };
