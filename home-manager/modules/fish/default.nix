@@ -1,9 +1,6 @@
 { pkgs, ... }:
 
 {
-  imports = [
-    ./fish-ai.nix
-  ];
 
   home.packages = with pkgs; [
     any-nix-shell # allows using fish for `nix shell`

@@ -26,11 +26,6 @@ let
   nvimEnv = ''
     let g:minimal_nvim = ${if !cfg.full then "v:true" else "v:false"}
 
-    if filereadable("${config.sops.secrets.nvim_secrets.path}")
-      lua dofile("${config.sops.secrets.nvim_secrets.path}")
-    else
-      lua print("nvim secrets not found!!")
-    endif
   '';
 in
 {
@@ -59,7 +54,6 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    sops.secrets.nvim_secrets.sopsFile = config.sops.secretsFiles.common;
 
     programs.neovim = {
       enable = true;
