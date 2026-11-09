@@ -1,24 +1,22 @@
 {
   pkgs,
-  promoteScript,
+  jjUtils,
   unitTest,
 }:
 
 # Behavioral check for the jj-promote command. The suite drives throwaway jujutsu
 # repositories and asserts description rewrites, skip rules, dry-run purity, and error
-# handling against the packaged binary. Its files are referenced through the flake source
-# tree, which only carries snapshotted files.
+# handling against the command built into the jj-utils package.
 pkgs.runCommand "jj-promote-unit-check"
   {
     nativeBuildInputs = [
       pkgs.git
       pkgs.jujutsu
+      jjUtils
     ];
   }
   ''
-    set -eu
-
-    JJ_PROMOTE_BIN=${pkgs.writeShellScriptBin "jj-promote" (builtins.readFile promoteScript)}/bin/jj-promote \
+    JJ_PROMOTE_BIN=${jjUtils}/bin/jj-promote \
       bash ${unitTest}
 
     touch "$out"

@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 #
 # jj-promote: promote agent-authored jujutsu changes by stripping the
 # `unreviewed: ` description prefix. Un-promoted work may still carry the previous
@@ -13,7 +12,6 @@
 #
 # Usage and options: `jj-promote --help`.
 
-set -euo pipefail
 
 dry_run=false
 edit=false
