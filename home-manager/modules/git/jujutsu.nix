@@ -447,6 +447,8 @@ in
         exit 1
       fi
     '')
+
+    (writeShellScriptBin "jj-workspace-branch" (builtins.readFile ./scripts/jj-workspace-branch.sh))
   ];
 
   programs.fish = {
@@ -514,6 +516,7 @@ in
       jjwu = "jj workspace update-stale";
       jjwls = "jj workspace list";
       jjwa = "jj-workspace-add";
+      jjwb = "jj-workspace-branch";
       jjwc = "jj-workspace-add";
       jjwd = "jj-workspace-delete";
       jjwrm = "jj-workspace-delete";

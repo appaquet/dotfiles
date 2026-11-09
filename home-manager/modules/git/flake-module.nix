@@ -10,6 +10,11 @@
           promoteScript = ./scripts/jj-promote.sh;
           unitTest = ./checks/jj-promote-unit.sh;
         };
+        jj-workspace-branch-unit = import ./checks/jj-workspace-branch-unit.nix {
+          inherit pkgs;
+          branchScript = ./scripts/jj-workspace-branch.sh;
+          unitTest = ./checks/jj-workspace-branch-unit.sh;
+        };
       };
     };
 }
