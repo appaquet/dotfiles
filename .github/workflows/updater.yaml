@@ -101,7 +101,7 @@ jobs:
         with:
           github-token: ${{ secrets.GH_PAT }}
           cache: true
-          packages: nixpkgs#nixos-rebuild nixpkgs#nvd
+          packages: nixpkgs#nixos-rebuild nixpkgs#nvd nixpkgs#just
 
       - name: Building NixOS baseline
         run: |
@@ -114,6 +114,15 @@ jobs:
         run: |
           set -xe
           nix flake update
+
+      - name: Refresh caddy hash
+        run: |
+          set -xe
+          # A flake update may move the caddy/Go toolchain, invalidating the per-host plugin hash
+          # pinned in nixos/<host>/caddy.nix; the recipe recomputes it and rebuilds to verify.
+          if [[ -f "nixos/${{ matrix.pair.host }}/caddy.nix" ]]; then
+            HOST="${{ matrix.pair.host }}" just caddy-hash
+          fi
 
       - name: Building NixOS new
         run: |
@@ -147,6 +156,13 @@ jobs:
           name: "${{ matrix.pair.host }}-nixos-diff"
           path: "${{ matrix.pair.host }}-nixos-diff"
           if-no-files-found: ignore # no files means no diff
+
+      - name: Add caddy hash file
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: "${{ matrix.pair.host }}-caddy"
+          path: "nixos/${{ matrix.pair.host }}/caddy.nix"
+          if-no-files-found: ignore
 
   update_darwin:
     runs-on: macos-latest
@@ -256,8 +272,11 @@ jobs:
           fi
 
           find diffs -type f -name "flake.lock" -exec cp {} flake.lock \;
-          if [ -z "$(git diff --exit-code flake.lock)" ]; then
-            echo "No flake.lock changes found, exiting"
+          # Caddy hash refreshes (nixos/<host>/caddy.nix) travel back the same way as the lock.
+          for file in $(find diffs -type f -name "caddy.nix"); do host="$(basename "$(dirname "$file")" | sed 's/-caddy$//')"; cp "$file" "nixos/$host/caddy.nix"; done
+          git add flake.lock 'nixos/*/caddy.nix'
+          if [ -z "$(git diff --cached --exit-code)" ]; then
+            echo "No lock or caddy hash changes found, exiting"
             exit 0
           fi
 
@@ -276,6 +295,14 @@ jobs:
           echo "\`\`\`" >> body
           cat all-diffs >> body
           echo "\`\`\`" >> body
+          CADDY_DIFF="$(git diff --cached -- 'nixos/*/caddy.nix')"
+          if [ -n "$CADDY_DIFF" ]; then
+            echo "" >> body
+            echo "Caddy plugin hash updates:" >> body
+            echo "\`\`\`diff" >> body
+            echo "$CADDY_DIFF" >> body
+            echo "\`\`\`" >> body
+          fi
           cat body
 
           gh pr create --title "Flake update" --body-file body --base master --head "$BRANCH_NAME" --reviewer appaquet
