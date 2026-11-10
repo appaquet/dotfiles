@@ -1,10 +1,13 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 
 let
+  libExtensions = import ./lib-extensions.nix { inherit pkgs; };
+
   plugins = [
     # https://github.com/earendil-works/pi-claude-code
     # Not published on npm, so it is pinned by git commit. Registers the
@@ -178,13 +181,7 @@ let
 
     {
       files = {
-        ".pi/agent/lib/fuzzy-selector.ts".source = ../lib/fuzzy-selector.ts;
-      };
-    }
-
-    {
-      files = {
-        ".pi/agent/extensions/scope-provider.ts".source = ./scope-provider.ts;
+        ".pi/agent/extensions/scope-provider.ts".source = "${libExtensions}/extensions/scope-provider.ts";
       };
     }
 
@@ -205,7 +202,7 @@ let
 
     {
       files = {
-        ".pi/agent/extensions/mode-switch.ts".source = ./mode-switch.ts;
+        ".pi/agent/extensions/mode-switch.ts".source = "${libExtensions}/extensions/mode-switch.ts";
         ".pi/agent/mode-switch.json".text = builtins.toJSON {
           reminderInterval = 10; # reminder cadence (turns, and non-md touches) in orchestrator mode
           orchestratorPolicy = "soft"; # orchestrator file policy: hard blocks, soft nudges

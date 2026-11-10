@@ -29,6 +29,8 @@ let
     TS
   '';
 
+  libExtensions = import ../plugins/lib-extensions.nix { inherit pkgs; };
+
   # The smoke test executes the package selected by the production module, not
   # a separately chosen test package that could drift from production.
   productionHome = home-manager.lib.homeManagerConfiguration {
@@ -63,6 +65,29 @@ let
     ' "$HOME/response.jsonl"
     touch "$out"
   '';
+
+  # Loads the production extension bundle through real symlinks, as Home
+  # Manager installs it, so relative `../lib` imports must resolve from the
+  # symlink target's real path.
+  libExtensionsSmoke =
+    pkgs.runCommand "pi-lib-extensions-smoke" { nativeBuildInputs = [ pkgs.jq ]; }
+      ''
+        export HOME="$TMPDIR/home"
+        export PI_CODING_AGENT_DIR="$HOME/.pi/agent"
+        export PI_OFFLINE=1
+        mkdir -p "$PI_CODING_AGENT_DIR/extensions"
+        ln -s ${libExtensions}/extensions/mode-switch.ts "$PI_CODING_AGENT_DIR/extensions/mode-switch.ts"
+        ln -s ${libExtensions}/extensions/scope-provider.ts "$PI_CODING_AGENT_DIR/extensions/scope-provider.ts"
+        printf '%s\n' '{}' >"$PI_CODING_AGENT_DIR/settings.json"
+
+        printf '%s\n' '{"id":"probe","type":"get_commands"}' \
+          | timeout 30 ${selectedPi}/bin/pi --mode rpc --no-session --no-approve \
+          >"$HOME/response.jsonl" 2>"$HOME/stderr.log" || { cat "$HOME/stderr.log" >&2; exit 1; }
+        jq -s -e '
+          ([.[].data.commands[]?.name] | (index("mode") != null and index("scope") != null))
+        ' "$HOME/response.jsonl" || { cat "$HOME/response.jsonl" "$HOME/stderr.log" >&2; exit 1; }
+        touch "$out"
+      '';
 
   # Nono cannot run inside the Nix build sandbox. This generated host smoke
   # validates the real profile, helper commands, wrapper, and secret boundary.
@@ -220,6 +245,7 @@ assert nonoPi != null;
 {
   inherit
     authMergeSmoke
+    libExtensionsSmoke
     nonoSmoke
     runtimeSmoke
     ;
