@@ -128,6 +128,87 @@ assert_eq "select: the printed name resolves to its path" \
 ( cd "$repo" && jj-workspace-select "ws-a-x" ) >/dev/null 2>&1; rc=$?
 assert_false "select: an unknown name is rejected" "$rc"
 
+# --- Case: interactive focus preserves candidates and explicit selection ------------
+( cd "$repo" && jj workspace add --name ws-a-extra "$repo/ws-a-extra" ) >/dev/null 2>&1 \
+  || { echo "FATAL: selector fixture setup failed" >&2; exit 1; }
+mkdir -p "$out/bin"
+printf '#!%s\n' "$(command -v bash)" >"$out/bin/fzf"
+cat >>"$out/bin/fzf" <<'FZF'
+printf 'called\n' >>"$FZF_TEST_DIR/calls"
+printf '%s\n' "$@" >"$FZF_TEST_DIR/args"
+cat >"$FZF_TEST_DIR/input"
+printf '%s' "${FZF_TEST_RESULT:-}"
+exit "${FZF_TEST_STATUS:-0}"
+FZF
+chmod +x "$out/bin/fzf"
+export FZF_TEST_DIR="$out" FZF_TEST_RESULT="ws spaced"
+saved_path="$PATH"
+PATH="$out/bin:$PATH"
+: >"$out/calls"
+display_args=$(printf '%s\n' --prompt 'Workspace > ' --height '40%' --layout reverse --border)
+candidates=$(printf '%s\n' default 'ws spaced' ws-a ws-a-extra)
+position=0
+for workspace in default 'ws spaced' ws-a ws-a-extra; do
+  position=$((position + 1))
+  workspace_path="$repo/$workspace"
+  if [ "$workspace" = default ]; then workspace_path="$repo"; fi
+  ( cd "$workspace_path" && jj-workspace-select ) >"$out/pick.log" 2>"$out/pick.err"; rc=$?
+  assert_eq "select: interactive from $workspace exits 0" 0 "$rc"
+  assert_eq "select: from $workspace returns the chosen name" 'ws spaced' "$(cat "$out/pick.log")"
+  assert_eq "select: from $workspace preserves all candidates in order" "$candidates" "$(cat "$out/input")"
+  assert_eq "select: from $workspace focuses its exact row without filtering or accepting" \
+    "$display_args"$'\n--bind\n'"load:pos($position)" "$(cat "$out/args")"
+done
+
+: >"$out/calls"
+for workspace in default ws-a 'ws spaced'; do
+  ( cd "$repo" && jj-workspace-select "$workspace" ) >"$out/explicit.log" 2>&1; rc=$?
+  assert_eq "select: explicit $workspace exits 0" 0 "$rc"
+  assert_eq "select: explicit $workspace is returned unchanged" "$workspace" "$(cat "$out/explicit.log")"
+done
+for workspace in '' ws-a-x; do
+  ( cd "$repo" && jj-workspace-select "$workspace" ) >/dev/null 2>&1; rc=$?
+  assert_false "select: invalid explicit name '$workspace' fails" "$rc"
+done
+( cd "$repo" && jj-workspace-select ws-a ws-a-extra ) >/dev/null 2>&1; rc=$?
+assert_false "select: too many arguments fail" "$rc"
+assert_eq "select: explicit targets and usage failures bypass fzf" '' "$(cat "$out/calls")"
+
+for status in 0 130; do
+  ( export FZF_TEST_RESULT='' FZF_TEST_STATUS="$status"
+    cd "$repo" && jj-workspace-select
+  ) >"$out/cancel.log" 2>"$out/cancel.err"; rc=$?
+  assert_eq "select: empty output or cancellation ($status) exits 1" 1 "$rc"
+  assert_eq "select: empty output or cancellation ($status) emits no name" '' "$(cat "$out/cancel.log")"
+done
+
+# A current workspace absent from the captured list keeps ordinary focus.
+printf '#!%s\n' "$(command -v bash)" >"$out/bin/jj-workspace-name"
+cat >>"$out/bin/jj-workspace-name" <<'CURRENT'
+printf '%s\n' 'not-in-candidates'
+exit "${CURRENT_TEST_STATUS:-0}"
+CURRENT
+chmod +x "$out/bin/jj-workspace-name"
+( cd "$repo" && jj-workspace-select ) >"$out/fallback.log" 2>"$out/fallback.err"; rc=$?
+assert_eq "select: missing current row still permits selection" 0 "$rc"
+assert_eq "select: missing current row returns the chosen name" 'ws spaced' "$(cat "$out/fallback.log")"
+assert_eq "select: missing current row adds no positioning binding" "$display_args" "$(cat "$out/args")"
+assert_eq "select: missing current row keeps every candidate" "$candidates" "$(cat "$out/input")"
+
+: >"$out/calls"
+( export CURRENT_TEST_STATUS=1
+  cd "$repo" && jj-workspace-select
+) >"$out/current-failed.log" 2>"$out/current-failed.err"; rc=$?
+assert_false "select: failed current-name lookup fails" "$rc"
+assert_eq "select: failed current-name lookup emits no name" '' "$(cat "$out/current-failed.log")"
+assert_eq "select: failed current-name lookup does not open fzf" '' "$(cat "$out/calls")"
+: >"$out/calls"
+( cd "$out" && jj-workspace-select ) >"$out/list-failed.log" 2>"$out/list-failed.err"; rc=$?
+assert_false "select: failed candidate listing fails" "$rc"
+assert_eq "select: failed candidate listing emits no name" '' "$(cat "$out/list-failed.log")"
+assert_eq "select: failed candidate listing does not open fzf" '' "$(cat "$out/calls")"
+PATH="$saved_path"
+
 # --- Case: workspace paths are the real directories ---------------------------------
 assert_eq "path: a workspace whose name jj quotes" \
   "$(realpath "$repo/ws spaced")" "$( cd "$repo" && jj-workspace-path "ws spaced" )"
