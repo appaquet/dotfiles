@@ -79,7 +79,6 @@
       whois
       jq
       jless
-      hl-log-viewer
 
       zip
       unzip
