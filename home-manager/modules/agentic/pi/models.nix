@@ -35,7 +35,7 @@ let
 
       modelOverrides = {
         "qwen3.8-27b" = {
-          contextWindow = 250000;
+          contextWindow = 230000;
           maxTokens = 32000;
           input = [
             "text"
