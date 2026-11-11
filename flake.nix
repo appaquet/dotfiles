@@ -1,6 +1,10 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs = {
+      #url = "github:NixOS/nixpkgs/nixos-unstable";
+      #url = "path:/home/appaquet/dotfiles/.workspaces/nixpkgs-fixes/nixpkgs";
+      url = "github:appaquet/nixpkgs/nixos-unstable";
+    };
 
     nixos.url = "github:nixos/nixpkgs/nixos-26.05";
 
