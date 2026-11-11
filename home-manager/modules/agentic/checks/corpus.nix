@@ -26,6 +26,7 @@ let
     "implement-orchestrator"
     "introspect"
     "jj-resolve-conflicts"
+    "pr-desc"
     "proceed"
     "proj-brief"
     "proj-load"
