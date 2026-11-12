@@ -40,12 +40,17 @@
     device = "/dev/disk/by-uuid/1bece886-d8b2-4fd4-a057-990de4ba308c";
     fsType = "ext4";
   };
+
   swapDevices = [
     {
-      device = "/swapfile";
-      size = 16 * 1024; # 16GB
+      device = "/mnt/secondary/swapfile";
+      size = 32 * 1024; # 32 GiB
     }
   ];
+  boot.zswap = {
+    enable = true;
+    maxPoolPercent = 20;
+  };
 
   # Networking
   networking.myBridge = {
