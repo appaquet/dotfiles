@@ -6,17 +6,17 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "mboxshell";
-  version = "1.3.0";
+  version = "1.4.0";
 
   # https://github.com/dcarrero/mboxshell
   src = fetchFromGitHub {
     owner = "dcarrero";
     repo = "mboxshell";
     rev = "v${version}";
-    hash = "sha256-dOnq4zEV72uEyw5cguKf+2FVuOsSpP+ACWmOZmtLPd8=";
+    hash = "sha256-NX+7SJg26ResYOeJntcJKbVCpL71trqCxN2OeRRKjGI=";
   };
 
-  cargoHash = "sha256-/eoMM7aTZiA1FV39HT/xmpnWO9r5zpEn6DuBpve/8ec=";
+  cargoHash = "sha256-0qx/0WtD5ao90N08oD/ffpuXriMfqBEhBJT/+CIr45w=";
 
   doCheck = false;
 
