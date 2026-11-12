@@ -40,9 +40,18 @@ jobs:
 
             You are in a CI checkout of `appaquet/dotfiles` on `master`: work in git (not jj), and never
             run `./x home switch`. Eligibility, release notes, and the verification commands come from
-            `.agents/skills/pi-plugin-bump/SKILL.md`; adapt them to this checkout. Before publishing,
-            `HOST=deskapp ./x home check` must exit 0 and the skill's packages eval must list the new
-            pin specs.
+            `.agents/skills/pi-plugin-bump/SKILL.md`; adapt them to this checkout.
+
+            Audit first, then verify. Finish the skill's eligibility steps, and stop there when no package
+            moves: every pin is already the newest eligible version, or the only newer release is still
+            inside the 3-day release-age window. A run with nothing to bump is a no-op — skip
+            `./x home check`, skip the packages eval, skip the PR, and report one row per package with its
+            pin, the newest eligible version, that version's publish date, and either the bump decision or
+            the date the held-back release becomes eligible. A failed lookup is not "nothing to bump": report
+            the failure instead of an empty audit.
+
+            Only when at least one pin changes, verify before publishing: `HOST=deskapp ./x home check` must
+            exit 0 and the skill's packages eval must list the new pin specs.
 
             Publish per `.github/prompts/agent-publish-contract.md`. Open the PR against `master` on branch
             `pi/plugin-bump`, title `chore(pi): bump plugin pins`. The body must list old/new versions

@@ -49,7 +49,15 @@ jobs:
             report instead. Scope is `fetchFromGitHub` pins only: never touch `flake.lock` or any file
             outside the pins.
 
-            Before publishing, run the verification ladder in order; every step must pass:
+            Audit first, then verify. Run the skill's audit and stop there when no pin is `bumpable`: every
+            row is `up-to-date`, or only `needs-review` rows are left, and the extra instruction names no
+            fetch to apply. A run with nothing to bump is a no-op — skip the verification ladder below,
+            skip the PR, and report the audit table with each row's status and the one-line reason it was
+            held back. A failed lookup is not "nothing to bump": report the failure instead of an empty
+            audit.
+
+            Only when at least one pin changes, run the verification ladder in order before publishing;
+            every step must pass:
             1. `HOST=deskapp ./x home check` exits 0
             2. `HOST=deskapp ./x nixos check` exits 0
             3. the skill's scoped steps per bumped pin (dummy-hash fetch to read the real hash; build
