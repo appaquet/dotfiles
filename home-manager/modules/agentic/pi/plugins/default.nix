@@ -202,6 +202,14 @@ let
 
     {
       files = {
+        # herdr-core status extension; rewrites Pi's OSC 7501 reports while a
+        # sub-agent runs or a questionnaire waits (see the plugin source).
+        ".pi/agent/extensions/hc-agent-state.ts".source = ./hc-agent-state.ts;
+      };
+    }
+
+    {
+      files = {
         ".pi/agent/extensions/mode-switch.ts".source = "${libExtensions}/extensions/mode-switch.ts";
         ".pi/agent/mode-switch.json".text = builtins.toJSON {
           reminderInterval = 10; # reminder cadence (turns, and non-md touches) in orchestrator mode
