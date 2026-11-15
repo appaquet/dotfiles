@@ -11,6 +11,7 @@
     ".bun"
     ".cargo"
     ".rustup"
+    ".dotcore"
     "**/target/debug"
     "**/target/release"
     "__pycache__"
