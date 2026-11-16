@@ -7,7 +7,7 @@
 }:
 
 let
-  cfg = config.power.myUps;
+  cfg = config.dotfiles.ups.client;
 
   upssched-cmd = pkgs.writeShellApplication {
     name = "upssched-cmd";

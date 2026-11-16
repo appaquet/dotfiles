@@ -6,10 +6,10 @@
 }:
 
 let
-  cfg = config.services.netconsole.receiver;
+  cfg = config.dotfiles.netconsole.receiver;
 in
 {
-  options.services.netconsole.receiver = {
+  options.dotfiles.netconsole.receiver = {
     enable = lib.mkEnableOption "Enable netconsole receiver service";
 
     port = lib.mkOption {

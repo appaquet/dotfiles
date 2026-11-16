@@ -6,7 +6,7 @@
 }:
 
 let
-  cfg = config.power.myUps;
+  cfg = config.dotfiles.ups.client;
 
   mapNotifyFlags =
     listTypes: notification:
@@ -17,7 +17,7 @@ let
 in
 
 {
-  options.power.myUps = {
+  options.dotfiles.ups.client = {
     enable = lib.mkEnableOption "Enable UPS client listening after network UPS";
 
     name = lib.mkOption {

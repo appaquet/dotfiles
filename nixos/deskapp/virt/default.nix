@@ -8,19 +8,18 @@
 {
   imports = [
     ../../modules/virt.nix
-    ../../modules/virt-gpu-passthrough.nix
     inputs.nixvirt.nixosModules.default
   ];
 
-  virtualisation = {
-    gpuPassthrough = {
-      enable = true;
-      devices = [
-        "10de:2b85" # Graphics
-        "10de:22e8" # Audio
-      ];
-    };
+  dotfiles.virt-gpu-passthrough = {
+    enable = true;
+    devices = [
+      "10de:2b85" # Graphics
+      "10de:22e8" # Audio
+    ];
+  };
 
+  virtualisation = {
     libvirt.enable = true;
     libvirt.connections = {
       "qemu:///system" = {

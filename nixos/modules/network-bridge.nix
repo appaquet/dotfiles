@@ -6,10 +6,10 @@
 }:
 
 let
-  cfg = config.networking.myBridge;
+  cfg = config.dotfiles.network-bridge;
 in
 {
-  options.networking.myBridge = {
+  options.dotfiles.network-bridge = {
     enable = lib.mkEnableOption "Enable module";
 
     interface = lib.mkOption {

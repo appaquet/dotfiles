@@ -89,7 +89,7 @@ in
     '';
   };
 
-  restic-backup = {
+  dotfiles.restic.backup = {
     enable = true;
     sopsFile = config.sops.secretsFiles.home;
 
@@ -99,7 +99,7 @@ in
     };
   };
 
-  restic-server = {
+  dotfiles.restic.server = {
     enable = true;
     dataDir = "/data/backup_restic";
     sopsFile = config.sops.secretsFiles.servapp;

@@ -15,10 +15,6 @@
     ../modules/dev.nix
     ../modules/docker.nix
     ../modules/dotblip.nix
-    ../modules/network-bridge.nix
-    ../modules/restic/backup.nix
-    ../modules/restic/server.nix
-    ../modules/ups/client.nix
   ];
 
   boot.loader.systemd-boot.enable = true;
@@ -28,7 +24,7 @@
   networking.hostId = "93ce7521";
 
   # Networking
-  networking.myBridge = {
+  dotfiles.network-bridge = {
     enable = true;
     interface = "enp1s0";
     lanIp = "192.168.0.13";
@@ -119,7 +115,7 @@
   services.openssh.enable = true;
 
   # UPS
-  power.myUps = {
+  dotfiles.ups.client = {
     enable = true;
     shutdownDelay = 300; # shutdown after 5 mins on bat
   };

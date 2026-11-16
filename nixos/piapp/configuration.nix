@@ -7,7 +7,6 @@
   imports = [
     ../modules/common.nix
     ../modules/common-pi.nix
-    ../modules/netconsole/receiver.nix
     ../modules/dotblip.nix
     ./adguardhome.nix
     ./caddy.nix
@@ -25,7 +24,7 @@
     firewall.enable = false;
   };
 
-  services.netconsole.receiver = {
+  dotfiles.netconsole.receiver = {
     enable = true;
   };
 

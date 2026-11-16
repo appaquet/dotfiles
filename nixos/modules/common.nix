@@ -3,6 +3,13 @@
 {
   imports = [
     ./cachix.nix
+    ./restic/backup.nix
+    ./restic/server.nix
+    ./ups/client.nix
+    ./network-bridge.nix
+    ./netconsole/sender.nix
+    ./netconsole/receiver.nix
+    ./virt-gpu-passthrough.nix
   ];
 
   time.timeZone = "America/Toronto";

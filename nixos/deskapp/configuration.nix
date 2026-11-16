@@ -10,10 +10,6 @@
     ../modules/dev.nix
     ../modules/docker.nix
     ../modules/dotblip.nix
-    ../modules/netconsole/sender.nix
-    ../modules/network-bridge.nix
-    ../modules/restic/backup.nix
-    ../modules/ups/client.nix
     ./gpu
     ./ha-ctrl.nix
     ./hardware-configuration.nix
@@ -53,7 +49,7 @@
   };
 
   # Networking
-  networking.myBridge = {
+  dotfiles.network-bridge = {
     enable = true;
     interface = "enp5s0";
     lanIp = "192.168.0.30";
@@ -96,7 +92,7 @@
     chromium
   ];
 
-  restic-backup = {
+  dotfiles.restic.backup = {
     enable = true;
     sopsFile = config.sops.secretsFiles.home;
 
@@ -119,7 +115,7 @@
   };
 
   # UPS
-  power.myUps = {
+  dotfiles.ups.client = {
     enable = true;
     shutdownDelay = 60; # suspend after 1 min on bat
     shutdownCmd = "${pkgs.systemd}/bin/systemctl suspend";

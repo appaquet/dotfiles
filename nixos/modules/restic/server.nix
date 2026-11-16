@@ -8,10 +8,10 @@
 }:
 
 let
-  cfg = config.restic-server;
+  cfg = config.dotfiles.restic.server;
 in
 {
-  options.restic-server = {
+  options.dotfiles.restic.server = {
     enable = lib.mkEnableOption "Enable restic REST server";
 
     dataDir = lib.mkOption {

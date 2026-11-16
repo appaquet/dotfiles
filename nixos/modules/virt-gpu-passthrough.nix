@@ -2,10 +2,10 @@
 { lib, config, ... }:
 
 let
-  cfg = config.virtualisation.gpuPassthrough;
+  cfg = config.dotfiles.virt-gpu-passthrough;
 in
 {
-  options.virtualisation.gpuPassthrough = {
+  options.dotfiles.virt-gpu-passthrough = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = false;

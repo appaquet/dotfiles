@@ -8,7 +8,7 @@
 }:
 
 let
-  cfg = config.restic-backup;
+  cfg = config.dotfiles.restic.backup;
   hostname = config.networking.hostName;
   resticLib = import ../../../lib/restic.nix { inherit lib; };
 
@@ -75,7 +75,7 @@ let
 
 in
 {
-  options.restic-backup = {
+  options.dotfiles.restic.backup = {
     enable = lib.mkEnableOption "Enable restic backup to rest-server";
 
     sopsFile = lib.mkOption {

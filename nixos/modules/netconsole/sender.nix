@@ -6,10 +6,10 @@
 }:
 
 let
-  cfg = config.services.netconsole.sender;
+  cfg = config.dotfiles.netconsole.sender;
 in
 {
-  options.services.netconsole.sender = {
+  options.dotfiles.netconsole.sender = {
     enable = lib.mkEnableOption "Enable netconsole sender";
 
     interface = lib.mkOption {
