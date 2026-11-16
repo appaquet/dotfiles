@@ -51,8 +51,6 @@ let
   opencodeRules = builtins.filter (rule: rule != "planning") claudeRules;
   claudeSkills = [
     "frontend"
-    "herdr-app"
-    "herdr-core"
     "human-writer"
     "mem-writing"
     "pi-nix-config"

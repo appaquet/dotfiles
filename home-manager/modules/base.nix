@@ -9,6 +9,8 @@
   imports = [
     inputs.secrets.homeManager.common
     inputs.nix-index-database.homeModules.default
+    inputs.nixantic.homeManagerModules.default
+
     ./fish
     ./tmux.nix
     ./git

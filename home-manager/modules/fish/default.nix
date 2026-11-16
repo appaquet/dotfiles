@@ -116,36 +116,6 @@
         eval $cmd
         popd
       '';
-
-      # watch own herdr mods in dotfiles and touch their app link on change so the running app reloads them
-      # usage: herdr-mod-watch [app-src] [app-mods]
-      "herdr-mod-watch" = ''
-        set -l app_src ~/dotfiles/home-manager/modules/hc/app
-        set -l app_mods ~/.config/herdr-app/mods
-        if test (count $argv) -ge 1
-          set app_src $argv[1]
-        end
-        if test (count $argv) -ge 2
-          set app_mods $argv[2]
-        end
-        set app_src (realpath $app_src)
-
-        ${pkgs.fswatch}/bin/fswatch -r -0 $app_src | while read -z file
-          set -l rel (string replace -r "^$app_src/" "" -- $file)
-          # Only <package>/mods/<mod>/... events; skip the app's own typings and config writes, hidden files and node_modules
-          if not string match -qr '^[^/]+/mods/[^/]+/' -- $rel
-            continue
-          end
-          if string match -qr '(^|/)(\.|node_modules/)|(^|/)(gpui-kit\.d\.ts|jsconfig\.json)$' -- $rel
-            continue
-          end
-          set -l name (string split / -- $rel)[3]
-          if test -L $app_mods/$name
-            touch -h $app_mods/$name
-            and echo "reloaded $name"
-          end
-        end
-      '';
     };
   };
 

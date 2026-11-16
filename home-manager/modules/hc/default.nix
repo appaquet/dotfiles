@@ -45,7 +45,11 @@ let
   esc = code: builtins.fromJSON ''"${code}"'';
 in
 {
-  imports = [ ./app-module.nix ];
+  imports = [
+    ./app-module.nix
+    ./mod-watch.nix
+    ./skills.nix
+  ];
 
   # Look: applied live by the app, and only to layouts that leave fonts unset.
   dotfiles.herdr-app.settings = {

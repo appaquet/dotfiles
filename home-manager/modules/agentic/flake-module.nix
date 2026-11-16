@@ -1,7 +1,25 @@
-{ inputs, ... }:
-
 {
-  perSystem =
+  inputs,
+  config,
+  lib,
+  ...
+}:
+
+let
+  instructionModules = config.dotfiles.agentic.instructionModules;
+in
+{
+  options.dotfiles.agentic.instructionModules = lib.mkOption {
+    type = lib.types.listOf lib.types.deferredModule;
+    default = [ ];
+    description = ''
+      Modules from feature folders that contribute nixantic sources (skills, rules, ...). They are added to the
+      standalone instruction evaluations below, so `agent-instructions` and its checks render the same
+      instructions as a home configuration that imports those features.
+    '';
+  };
+
+  config.perSystem =
     {
       pkgs,
       lib,
@@ -17,6 +35,7 @@
             inputs.nixantic.nixanticModules.core
             ./nixantic.nix
           ]
+          ++ instructionModules
           ++ modules;
         };
 
@@ -38,7 +57,8 @@
                 stateVersion = "24.11";
               };
             }
-          ];
+          ]
+          ++ instructionModules;
         }).config.nixantic;
 
       vcsContext = import ./tools/vcs-context.nix { inherit pkgs; };
@@ -111,6 +131,7 @@
 
         pi-nono-smoke = piRuntimeChecks.nonoSmoke;
       };
+
       checks = {
         agentic-proj-docs = projDocsCheck;
         agentic-show-me-kit = showMeKitCheck;

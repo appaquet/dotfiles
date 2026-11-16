@@ -1,12 +1,10 @@
 {
-  inputs,
   inputs',
   ...
 }:
 
 {
   imports = [
-    inputs.nixantic.homeManagerModules.default
     ./nixantic.nix
     ./tools
     ../nono
