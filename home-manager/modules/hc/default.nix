@@ -41,6 +41,18 @@ let
       name: pkg: config.lib.file.mkOutOfStoreSymlink (appLink "${pkg}/${kind}/${name}${suffix}")
     ) owners;
 
+  # Catppuccin themes only (not the repo's layout/mods), linked read-only from the store; named by the `ap` layout.
+  catppuccin = pkgs.fetchFromGitHub {
+    owner = "MarcozVD";
+    repo = "herdr-layout-catppuccin";
+    rev = "b58f43478fbf874c8be989b3336793f7c98b6d10";
+    hash = "sha256-bWlOzSpHZHvmje2CiqACqg10j5b/RxRs+TQ8MZsDm+k=";
+  };
+  catppuccinThemes = {
+    herdr-catppuccin = "${catppuccin}/themes/herdr-catppuccin.json";
+    herdr-catppuccin-latte = "${catppuccin}/themes/herdr-catppuccin-latte.json";
+  };
+
   # JSON escape decoder: nix strings have no unicode escape, the JSON parser does.
   esc = code: builtins.fromJSON ''"${code}"'';
 in
@@ -167,30 +179,10 @@ in
   # command) and a home switch.
   dotfiles.herdr-app.mods = linkAll "mods" "" dirNames;
   dotfiles.herdr-app.layouts = linkAll "layouts" ".json" jsonNames;
-  dotfiles.herdr-app.themes = linkAll "themes" ".json" jsonNames;
-
-  # Remote example (not wired): a package subfolder (here `kanso/`) of a pinned repo is linked read-only
-  # from the store, laid out like an own package, with explicit names so
-  # each mod gets reviewed (network, exec and out-of-folder reads) and no import-from-derivation is needed.
-  # Mods running gh/jj/node need the app started from a terminal to find them on PATH. To customize a
-  # remote layout or mod: `herdr-app do layout.clone '{"name":"kanso","as":"my-kanso"}'`, then move the
-  # result into an own package under app/<package>/layouts (or mods).
-  #
-  # dotfiles.herdr-app =
-  #   let
-  #     kanso = pkgs.fetchFromGitHub {
-  #       owner = "jlopezlira";
-  #       repo = "herdr-kanso";
-  #       rev = "d669b0403e848d8fc90ceb634a6367f44453c2ea";
-  #       hash = lib.fakeHash;
-  #     };
-  #   in
-  #   {
-  #     mods.kanso-sidebar = "${kanso}/kanso/mods/kanso-sidebar";
-  #     layouts.kanso = "${kanso}/kanso/layouts/kanso.json";
-  #     themes.kanso = "${kanso}/kanso/themes/kanso.json";
-  #     themes.kanso-day = "${kanso}/kanso/themes/kanso-day.json";
-  #   };
+  dotfiles.herdr-app.themes = lib.mkMerge [
+    (linkAll "themes" ".json" jsonNames)
+    catppuccinThemes
+  ];
 
   home.packages = [
     pkgs.rodeo # TUI client for hc

@@ -5,6 +5,10 @@
     "version": "0.1.11"
   },
   "type": "row",
+  "theme": {
+    "light": "herdr-catppuccin-latte",
+    "dark": "herdr-catppuccin"
+  },
   "children": [
     {
       "id": "sidebar",
