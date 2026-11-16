@@ -5,6 +5,7 @@
     ./modules/base.nix
     ./modules/agentic
     ./modules/dev.nix
+    ./modules/hc
   ];
 
   dotfiles.neovim.full = true;
