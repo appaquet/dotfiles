@@ -130,7 +130,7 @@ remove_entries() {
 }
 
 # Drop entries whose agent socket is gone, and entries that are not
-# candidates (such as herdr stable links).
+# candidates (such as symlinks).
 prune() {
     local entry
     while IFS= read -r entry; do
@@ -167,9 +167,9 @@ entries() {
 }
 
 # A socket that may become an entry: a raw forwarded agent that is neither the
-# configured local agent nor one of our own paths. Symlinks never qualify:
-# herdr's (>= 0.9.2) stable agent link can point back at the primary, which
-# would make the primary resolve through itself.
+# configured local agent nor one of our own paths. Symlinks never qualify: one
+# can point back at the primary, which would make the primary resolve through
+# itself.
 incoming_candidate() {
     [[ "$1" = /* && ! -L "$1" && "$1" != "$primary" && "$1" != "$sessions"/* &&
         ( -z "$local_socket" || "$1" != "$local_socket" ) ]] && forwarded_shape "$1"

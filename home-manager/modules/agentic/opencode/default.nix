@@ -456,7 +456,6 @@ let
   tuiJson = pkgs.writers.writeJSON "tui.json" {
     "$schema" = "https://opencode.ai/tui.json";
     theme = "tokyonight";
-    plugin = [ "./herdr-tui-session.js" ];
   };
 
   commonExports = ''
@@ -477,7 +476,6 @@ let
 
   nono-opencode = pkgs.writeShellScriptBin "nono-opencode" ''
     export OPENCODE_CONFIG=${yoloOpencodeJson}
-    export HERDR_AGENT=opencode
     exec maybe --profile opencode -- ${opencode}/bin/opencode "$@"
   '';
 
@@ -498,7 +496,6 @@ let
 
   nono-closecode = pkgs.writeShellScriptBin "nono-closecode" ''
     export OPENCODE_CONFIG=${yoloOpencodeJson}
-    export HERDR_AGENT=opencode
     exec maybe --profile opencode -- ${closecode}/bin/closecode "$@"
   '';
 
@@ -527,15 +524,12 @@ let
   ];
 
   fromPluginDir = name: pkgs.writeText name (builtins.readFile ./plugins/${name});
-  herdrAssets = "${inputs'.llm-agents.packages.herdr.src}/src/integration/assets/opencode";
   commonSources = {
     ".config/opencode/opencode.json".source = opencodeJson;
     ".config/opencode/opencode-yolo.json".source = yoloOpencodeJson;
     ".config/opencode/tui.json".source = tuiJson;
     ".config/opencode/plugins/direnv.ts".source = fromPluginDir "direnv.ts";
     ".config/opencode/plugins/throughput.ts".source = fromPluginDir "throughput.ts";
-    ".config/opencode/plugins/herdr-agent-state.js".source = "${herdrAssets}/herdr-agent-state.js";
-    ".config/opencode/herdr-tui-session.js".source = "${herdrAssets}/herdr-tui-session.js";
     #".config/opencode/plugins/notify.ts".source = fromPluginDir "notify.ts"; # FIXME: doesn't work because ssh key unavailable in sandbox
   };
 in

@@ -24,8 +24,14 @@
       };
     };
 
-    sources.harnesses.skills."herdr".main = {
-      file = "${inputs'.llm-agents.packages.herdr.src}/skills/herdr/SKILL.md";
+    sources.harnesses.skills."herdr-core".main = {
+      file = "${inputs'.llm-agents.packages.herdr-core.src}/skills/herdr-core/SKILL.md";
+    };
+
+    # The herdr-app source ships its skill without frontmatter, so the body is wrapped here.
+    sources.harnesses.skills."herdr-app".main = {
+      description = "Control the Herdr window with herdr-app: show, arrange or focus spaces, tabs and panes. Use only to change what the person sees; use herdr-core (hc) to start, read, message or clean up agents and programs.";
+      content = builtins.readFile "${inputs'.llm-agents.packages.herdr-app.src}/src/SKILL.md";
     };
 
     sources.harnesses.skills."security-audit".directory =

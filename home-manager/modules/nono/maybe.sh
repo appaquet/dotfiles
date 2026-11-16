@@ -43,7 +43,7 @@ done
 
 PROFILE=$(maybe-profile "$PROFILE")
 
-# wrap execs the agent directly so it stays herdr's foreground process;
+# wrap execs the agent directly so it stays the terminal's foreground process;
 # run (supervised) would hide it behind a non-dumpable supervisor + inner PTY.
 ARGS=(wrap --profile "$PROFILE" --allow-cwd --no-diagnostics)
 

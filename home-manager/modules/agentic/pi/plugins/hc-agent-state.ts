@@ -6,10 +6,7 @@
 // in-process sub-agent (pi-subagents) keeps working after the root settles, and
 // an ask_user_question questionnaire never reports blocked. This extension
 // rewrites Pi's own status reports while either of those is outstanding, and
-// passes everything else through unchanged.
-//
-// It is a separate file from the vendored herdr 0.9.5 socket integration
-// (herdr-agent-state.ts): different transport (terminal bytes, not a socket),
+// passes everything else through unchanged. The transport is terminal bytes,
 // and the process-global stdout wrapper should exist only where it is needed.
 
 const ESC = "\x1b";

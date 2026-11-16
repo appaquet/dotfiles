@@ -57,7 +57,6 @@ let
   '';
 
   nono-claude = pkgs.writeShellScriptBin "nono-claude" ''
-    export HERDR_AGENT=claude
     exec maybe --profile claude -- claude --allow-dangerously-skip-permissions "$@"
   '';
 

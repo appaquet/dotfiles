@@ -15,7 +15,6 @@
     ./neovim
     ./utils
     ./ssh
-    ./herdr
     ./hc
   ];
 

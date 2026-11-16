@@ -205,7 +205,6 @@ let
 
   # Sandboxed and direct launches share the same settings/environment wrapper.
   nonoPi = pkgs.writeShellScriptBin "nono-pi" ''
-    export HERDR_AGENT=pi
     exec maybe --profile pi -- ${piWrapper}/bin/pi "$@"
   '';
 in

@@ -8,8 +8,7 @@
 # sockets (default-layout sockets under a $TMPDIR-based fake home exceed
 # macOS's 104-char Unix socket path limit), an arbitrary non-layout
 # path stands in for the configured local agent, and a symlink to a layout-shaped
-# socket stands in for herdr's (>= 0.9.2) stable agent link, which is never an
-# entry. A SIGKILLed
+# socket stands in for a stable agent link, which is never an entry. A SIGKILLed
 # agent leaves its socket file behind with nothing listening (hung agent).
 set -euo pipefail
 
@@ -445,34 +444,34 @@ t_local_agent_layout() {
     assert_link "local-agent: primary is local" "$home/.ssh/ssh_auth_sock" "$local_sock"
 }
 
-# A herdr stable link is never pushed, whatever it points at.
-t_herdr_link() {
+# A stable agent link is never pushed, whatever it points at.
+t_agent_link() {
     local home local_sock f1 other link
     home=$(new_home)
     local_sock="$home/local.sock"
     start_agent "$local_sock" >/dev/null
     f1="$home/.ssh/agent/s.h1.sshd.100.r1"
     start_agent "$f1" >/dev/null
-    mkdir -p -- "$home/.config/herdr"
-    other="$home/.config/herdr/other.sock"
+    mkdir -p -- "$home/agent-link"
+    other="$home/agent-link/other.sock"
     start_agent "$other" >/dev/null
-    link="$home/.config/herdr/herdr.sock.agent"
+    link="$home/agent-link/agent"
     ln -s -- "$f1" "$link"
     init_run "$home" "$local_sock" "$link"
-    assert_stack "herdr-link: layout target not pushed" "$home"
-    assert_link "herdr-link: primary is local" "$home/.ssh/ssh_auth_sock" "$local_sock"
+    assert_stack "agent-link: layout target not pushed" "$home"
+    assert_link "agent-link: primary is local" "$home/.ssh/ssh_auth_sock" "$local_sock"
     ln -sfn -- "$other" "$link"
     init_run "$home" "$local_sock" "$link"
-    assert_stack "herdr-link: non-layout target not pushed" "$home"
+    assert_stack "agent-link: non-layout target not pushed" "$home"
     ln -sfn -- "$home/.ssh/ssh_auth_sock" "$link"
     init_run "$home" "$local_sock" "$link"
-    assert_stack "herdr-link: link to primary not pushed" "$home"
-    assert_link "herdr-link: primary still local" "$home/.ssh/ssh_auth_sock" "$local_sock"
+    assert_stack "agent-link: link to primary not pushed" "$home"
+    assert_link "agent-link: primary still local" "$home/.ssh/ssh_auth_sock" "$local_sock"
 }
 
-# A herdr link entry is pruned in both modes, so the primary falls back to
-# the next raw entry.
-t_herdr_link_legacy_entry() {
+# A link entry is pruned in both modes, so the primary falls back to the next
+# raw entry.
+t_agent_link_legacy_entry() {
     local home f1 f2 link
     home=$(new_home)
     f1="$home/.ssh/agent/s.h1.sshd.100.r1"
@@ -480,13 +479,13 @@ t_herdr_link_legacy_entry() {
     start_agent "$f1" >/dev/null
     start_agent "$f2" >/dev/null
     init_run "$home" "" "$f1"
-    link="$home/.config/herdr/herdr.sock.agent"
-    mkdir -p -- "$home/.config/herdr"
+    link="$home/agent-link/agent"
+    mkdir -p -- "$home/agent-link"
     ln -s -- "$f2" "$link"
     ln -s -- "$link" "$home/.ssh/agent-sessions/9999999999999999-1"
     init_run_ni "$home" "" "$f2"
-    assert_stack "herdr-legacy: entry pruned" "$home" "$f1"
-    assert_link "herdr-legacy: primary is the raw entry" "$home/.ssh/ssh_auth_sock" "$f1"
+    assert_stack "agent-link-legacy: entry pruned" "$home" "$f1"
+    assert_link "agent-link-legacy: primary is the raw entry" "$home/.ssh/ssh_auth_sock" "$f1"
 }
 
 t_bootstrap_local
@@ -506,8 +505,8 @@ t_migration
 t_legacy_placeholders
 t_non_symlink_guard
 t_local_agent_layout
-t_herdr_link
-t_herdr_link_legacy_entry
+t_agent_link
+t_agent_link_legacy_entry
 
 printf 'ssh-agent-slot.test: %d passed, %d failed\n' "$pass" "$fail"
 [[ "$fail" -eq 0 ]]

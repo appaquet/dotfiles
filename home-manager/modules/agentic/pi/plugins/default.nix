@@ -187,15 +187,6 @@ let
 
     {
       files = {
-        ".pi/agent/extensions/herdr-agent-state.ts" = {
-          source = ./herdr-agent-state.ts;
-          force = true; # rewrite the file on activation instead of failing
-        };
-      };
-    }
-
-    {
-      files = {
         ".pi/agent/extensions/rpiv-herdr-bridge.ts".source = ./rpiv-herdr-bridge.ts;
       };
     }
