@@ -1,4 +1,4 @@
-# Remove a workspace from jj and its directory from disk.
+# Remove a workspace from jj, its directory from disk, and its Herdr space.
 if [ "$#" -gt 1 ] || { [ "$#" -eq 1 ] && [ -z "$1" ]; }; then
   jj_usage 'Usage: jj-workspace-delete [workspace-name]'
 fi
@@ -22,20 +22,22 @@ if [ ! -d "$ws_root" ]; then
   exit 1
 fi
 
-# Resolve the Herdr workspace before removing its worktree from disk.
-wsid=""
-if wt_json=$(herdr worktree list --json 2>/dev/null); then
-  wsid=$(printf '%s' "$wt_json" \
-    | jq -r --arg path "$ws_root" '[.result.worktrees[] | select(.path == $path) | .open_workspace_id] | .[0] // empty' \
-    2>/dev/null || true)
-fi
+# Resolve the Herdr space's terminals while they still know their workspace folder. A failed
+# query only costs the space close: the workspace is deleted either way.
+space_id=$(jj_herdr_stable_space_id "$root" "$name")
+addresses=$(jj_herdr_space_terminals "$space_id" "$ws_root") || addresses=""
 
 # Run from the default workspace so deleting the caller's workspace does not leave this
 # process in a removed working directory.
 cd "$root"
 jj -R "$root" workspace remove "$name"
 
-# Herdr may close the active shell, so this must remain the final step.
-if [ -n "$wsid" ] && [ "$wsid" != "null" ]; then
-  herdr worktree remove --workspace "$wsid" --force >/dev/null 2>&1 || true
+# Ending a space's terminals closes its tabs, and a space closes with its last tab. Herdr may
+# end the active shell, so this must remain the final step.
+if [ -n "$addresses" ] && jj_herdr_core_available; then
+  while IFS= read -r address; do
+    [ -n "$address" ] || continue
+    hc kill "$address" >/dev/null 2>&1 ||
+      echo "jjwd: could not end terminal '$address' of the Herdr space of '$name'" >&2
+  done <<<"$addresses"
 fi

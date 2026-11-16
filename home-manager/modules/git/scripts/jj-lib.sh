@@ -71,6 +71,52 @@ jj_resolve_or_create_workspace() {
   jj-workspace-select "$@"
 }
 
+# jj_herdr_core_available - succeeds when herdr-core's CLI is installed on this host.
+jj_herdr_core_available() {
+  command -v hc >/dev/null 2>&1
+}
+
+# jj_herdr_space_terminals <space-id> <workspace-root> - addresses of the live terminals that
+# belong to that Herdr space: those carrying its herdr.space label, plus any working inside the
+# workspace folder. The folder half is what recognises a space jj-utils did not create — one
+# made in the Herdr window, or holding a git worktree instead of a jj workspace. Returns
+# non-zero when the query itself failed, so callers can tell "nothing there" from "cannot ask".
+jj_herdr_space_terminals() {
+  local space_id="$1"
+  local root="$2"
+  local labelled=""
+  local in_folder=""
+
+  command -v hc >/dev/null 2>&1 || return 0
+  command -v jq >/dev/null 2>&1 || return 0
+
+  if ! labelled=$(hc ls --json --label "herdr.space=$space_id" 2>/dev/null |
+    jq -r '.terminals[]?.address' 2>/dev/null); then
+    return 2
+  fi
+
+  if ! in_folder=$(hc ls --json 2>/dev/null |
+    jq -r --arg root "$root" \
+    '.terminals[]? | select(.cwd == $root or (.cwd | startswith($root + "/"))) | .address' \
+    2>/dev/null); then
+    return 2
+  fi
+
+  printf '%s\n%s\n' "$labelled" "$in_folder" | sed '/^$/d' | sort -u
+}
+
+# jj_herdr_stable_space_id <repo-root> <workspace-name> - the Herdr space id jj-utils uses for
+# that workspace. Deriving it from the repository and the name keeps one space per workspace,
+# and an id the Herdr window has not seen yet is exactly what makes it create that space when
+# it adopts the terminal.
+jj_herdr_stable_space_id() {
+  local digest=""
+
+  digest=$(printf '%s\t%s' "$1" "$2" | sha256sum | cut -c1-32)
+
+  printf 'sp%s\n' "$digest"
+}
+
 # jj_diff_base <preferred-revset> <label> - commit id of the nearest safe diff base: the
 # preferred revset when it is an ancestor of @, trunk() otherwise.
 jj_diff_base() {

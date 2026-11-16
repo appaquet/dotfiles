@@ -25,6 +25,10 @@
             inherit pkgs jjUtils;
             unitTest = ./checks/jj-workspace-utils-unit.sh;
           };
+          jj-workspace-herdr-unit = import ./checks/jj-workspace-herdr-unit.nix {
+            inherit pkgs jjUtils;
+            unitTest = ./checks/jj-workspace-herdr-unit.sh;
+          };
         };
     };
 }
