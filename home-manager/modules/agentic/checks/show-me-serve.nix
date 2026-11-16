@@ -50,7 +50,7 @@ pkgs.runCommand "show-me-serve-check"
       pkgs.coreutils
       pkgs.curl
       pkgs.gnugrep
-      pkgs.procps
+      pkgs.unixtools.ps
     ];
   }
   ''
@@ -71,6 +71,13 @@ pkgs.runCommand "show-me-serve-check"
 
       exit 1
     }
+
+    # Snapshot first so the matcher cannot find its own command line.
+    process_is_running() {
+      ps -A -o args= >"$TMPDIR/processes" || fail "Could not inspect processes."
+      grep -q -- "$1" "$TMPDIR/processes"
+    }
+
     # Greps a captured body for a marker. Bodies are written to a file first:
     # piping into grep lets the reader exit at the first match, which truncates
     # the writer and can fail the build.
@@ -114,7 +121,7 @@ pkgs.runCommand "show-me-serve-check"
     grep -q 'Serving' "$TMPDIR/help.log" && fail "The help path started serving."
     "${testShowMeServe}/bin/show-me-serve" -h | grep -q 'Usage: show-me-serve' || fail "The short help flag did not print the usage line."
 
-    if pgrep -f 'show-me-serve.ts' >/dev/null; then
+    if process_is_running 'show-me-serve.ts'; then
       fail "The help path left a server process behind."
     fi
 
@@ -219,9 +226,11 @@ pkgs.runCommand "show-me-serve-check"
       expect_served "$base/_show-me/diagrams-auto.js" 'mountDiagrams' "The one-line diagram entry was not served."
       expect_served "$base/_show-me/diagrams.css" 'smdg' "The diagram stylesheet was not served."
 
-      if [ "$mode" != "public" ] && pgrep -f cloudflared >/dev/null; then
+      if [ "$mode" != "public" ] && process_is_running cloudflared; then
         fail "The command started cloudflared without --public."
       fi
+
+      process_is_running 'show-me-serve.ts' || fail "The running server was not visible to the process check."
 
       kill -TERM "$tool_pid"
       wait "$tool_pid" 2>/dev/null || true
@@ -231,7 +240,7 @@ pkgs.runCommand "show-me-serve-check"
         exit 1
       fi
 
-      if pgrep -f 'show-me-serve.ts' >/dev/null || pgrep -f cloudflared >/dev/null; then
+      if process_is_running 'show-me-serve.ts' || process_is_running cloudflared; then
         echo "A child process survived termination." >&2
         exit 1
       fi
@@ -255,7 +264,7 @@ pkgs.runCommand "show-me-serve-check"
     for _ in $(seq 1 60); do
       internal_url=$(grep -oE 'http://[^ ]+/' "$log" 2>/dev/null | head -n 1 || true)
 
-      if [ -n "$internal_url" ]; then
+      if [ -n "$internal_url" ] && grep -q 'serving internally only' "$log"; then
         break
       fi
 
