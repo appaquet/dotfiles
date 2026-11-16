@@ -37,11 +37,17 @@ in
 
     programs.fish.shellInit = lib.mkAfter ''
       # Push incoming forwarding before normalizing persistent sessions.
-      # Non-interactive sessions (ssh host cmd) never take over the agent.
+      # Non-interactive sessions (ssh host cmd) never take over the agent, except
+      # herdr-core bridges: they are a connection from another machine, like a
+      # login. fish -c keeps its command in its own args, so the bridge is
+      # recognized there: its bootstrap, then "exec $p connect".
       set -l slot_incoming "$SSH_AUTH_SOCK"
       set -l slot_init init
       if not status is-interactive
-        set -a slot_init --non-interactive
+        set -l slot_args (ps -o args= -p $fish_pid 2>/dev/null | string collect)
+        set -q SSH_CONNECTION
+        and string match -qr '(?s)herdr-core.*\bconnect\b' -- "$slot_args"
+        or set -a slot_init --non-interactive
       end
       if ${lib.getExe slotHelper} $slot_init
         set -gx SSH_AUTH_SOCK "$HOME/.ssh/ssh_auth_sock"
@@ -57,10 +63,11 @@ in
         set -gx SSH_AUTH_SOCK "$slot_incoming"
       end
 
-      # Release this session's forwarded agent from the stack when it ends
-      # (exit or SIGHUP on disconnect). Only raw sshd sockets: a symlink
-      # inherited from a parent shell is shared and must survive this exit.
-      if status is-interactive; and set -q SSH_CONNECTION; and test -S "$slot_incoming"; and not test -L "$slot_incoming"
+      # Release a registered forwarded agent from the stack when its shell ends:
+      # a bridge's shell ends with its connection, an interactive login's on
+      # exit (SIGHUP is fish's job, best effort). Only raw sshd sockets: a
+      # symlink inherited from a parent shell is shared and must survive this exit.
+      if not contains -- --non-interactive $slot_init; and set -q SSH_CONNECTION; and test -S "$slot_incoming"; and not test -L "$slot_incoming"
         set -g __ssh_agent_slot_incoming "$slot_incoming"
         function __ssh_agent_slot_release --on-event fish_exit
           ${lib.getExe slotHelper} release "$__ssh_agent_slot_incoming" >/dev/null 2>&1
