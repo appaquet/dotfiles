@@ -16,6 +16,7 @@
     ./utils
     ./ssh
     ./herdr
+    ./hc
   ];
 
   programs.home-manager.enable = true;
