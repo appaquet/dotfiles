@@ -1,44 +1,7 @@
 {
-  config,
-  lib,
-  pkgs,
-  inputs',
-  ...
-}:
-
-let
-  cfg = config.dotfiles.nono;
-in
-{
-  imports = [ ./maybe.nix ];
-
-  options.dotfiles.nono = {
-    profiles = lib.mkOption {
-      type = lib.types.attrsOf (lib.types.attrsOf lib.types.anything);
-      default = { };
-      description = "Nono profiles, keyed by profile name. Each value is rendered to ~/.config/nono/profiles/<name>.json. The attrset key is auto-injected as meta.name.";
-    };
-  };
+  imports = [ ./module.nix ];
 
   config = {
-    home.file = lib.mapAttrs' (
-      name: profile:
-      lib.nameValuePair ".config/nono/profiles/${name}.json" {
-        source = pkgs.writers.writeJSON "nono-profile-${name}.json" (
-          profile
-          // {
-            meta = (profile.meta or { }) // {
-              name = name;
-            };
-          }
-        );
-      }
-    ) cfg.profiles;
-
-    home.packages = [
-      inputs'.llm-agents.packages.nono
-    ];
-
     # Per machine profile
     dotfiles.nono.profiles.machine = {
       meta.version = "1.0.0";

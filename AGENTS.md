@@ -50,6 +50,19 @@ what, the nixantic change workflow (clone, `path:` override, no-push), and valid
 `./nixantic` clones are workspace-relative: work in the clone of the jj workspace you are in
 (`home-manager/modules/agentic/AGENTS.md`, Nixantic section, for the workflow).
 
+## Module Layout
+
+For modules that declare options (examples: `home-manager/modules/hc/`, `home-manager/modules/agentic/pi/`):
+
+- Name options `dotfiles.<feature>[.<sub>]`, after the feature file or folder
+- A file declaring options holds only the declarations and the wiring that applies them, never AP's values.
+  In a feature folder that also holds values, name it `module.nix` (`<sub>-module.nix` for a sub-part, e.g.
+  `hc/app-module.nix`); an options-only file or folder keeps its name
+- AP's values go in the feature's `default.nix`, which imports the module; split them into more files only
+  when large. Host-specific values stay in host files
+- Import option modules for every host of their surface (`home-manager/modules/base.nix`,
+  `nixos/modules/common.nix`) and gate them with `enable`. Modules without options keep per-host imports
+
 ## Nix Conventions
 
 - Format with `just fmt` (nixfmt) before committing

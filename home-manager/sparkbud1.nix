@@ -6,8 +6,6 @@
     ./modules/agentic
   ];
 
-  dotfiles.neovim.full = true;
-
   programs.direnv.config = {
     whitelist = {
       prefix = [

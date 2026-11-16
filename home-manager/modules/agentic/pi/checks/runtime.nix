@@ -117,6 +117,7 @@ let
           settings.smoke = "generated";
           environment.SMOKE_SECRET.file = toString fakeSecret;
         };
+        dotfiles.nono.enable = true;
         dotfiles.nono.profiles.pi = {
           meta.version = "1.0.0";
           extends = "coding-agent";

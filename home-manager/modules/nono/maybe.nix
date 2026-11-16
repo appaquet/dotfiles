@@ -1,4 +1,9 @@
-{ pkgs, lib, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   maybe-pre = pkgs.writeShellScriptBin "maybe-pre" ''
@@ -34,11 +39,13 @@ let
   maybe = pkgs.writeShellScriptBin "maybe" (builtins.readFile ./maybe.sh);
 in
 {
-  home.packages = [
-    maybe-pre
-    maybe-in
-    maybe-profile
-    maybe-portal
-    maybe
-  ];
+  config = lib.mkIf config.dotfiles.nono.enable {
+    home.packages = [
+      maybe-pre
+      maybe-in
+      maybe-profile
+      maybe-portal
+      maybe
+    ];
+  };
 }

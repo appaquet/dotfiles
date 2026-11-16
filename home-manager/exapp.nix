@@ -11,12 +11,9 @@
     ./modules/agentic
     ./modules/dev.nix
     ./modules/ghostty.nix
-    ./modules/restic/backup.nix
   ];
 
-  dotfiles.neovim.devMode = false;
-
-  restic-backup = {
+  dotfiles.restic.backup = {
     enable = true;
     hostname = "exapp";
     sopsFile = config.sops.secretsFiles.home;

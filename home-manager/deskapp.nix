@@ -26,8 +26,6 @@
     };
   };
 
-  dotfiles.neovim.devMode = false;
-
   home.username = "appaquet";
   home.homeDirectory = "/home/appaquet";
   home.stateVersion = "23.11";

@@ -15,6 +15,8 @@
     ./tmux.nix
     ./git
     ./neovim
+    ./nono
+    ./restic/backup.nix
     ./utils
     ./ssh
     ./hc

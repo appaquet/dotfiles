@@ -6,7 +6,7 @@
 }:
 
 let
-  cfg = config.restic-backup;
+  cfg = config.dotfiles.restic.backup;
   hostname = cfg.hostname;
   resticLib = import ../../../lib/restic.nix { inherit lib; };
 
@@ -94,7 +94,7 @@ let
 
 in
 {
-  options.restic-backup = {
+  options.dotfiles.restic.backup = {
     enable = lib.mkEnableOption "restic backup scripts";
 
     hostname = lib.mkOption {
