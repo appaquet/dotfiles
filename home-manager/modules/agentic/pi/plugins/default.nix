@@ -187,12 +187,6 @@ let
 
     {
       files = {
-        ".pi/agent/extensions/rpiv-herdr-bridge.ts".source = ./rpiv-herdr-bridge.ts;
-      };
-    }
-
-    {
-      files = {
         # herdr-core status extension; rewrites Pi's OSC 7501 reports while a
         # sub-agent runs or a questionnaire waits (see the plugin source).
         ".pi/agent/extensions/hc-agent-state.ts".source = ./hc-agent-state.ts;

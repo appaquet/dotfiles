@@ -132,6 +132,19 @@ test("strict pass-through when mode is not tui", () => {
 
   // A sub-agent starting and a Pi report must not be rewritten.
   eventHandlers.get("subagents:started")?.(subagent("a1"));
+  eventHandlers.get("rpiv:ask-user:blocked")?.({ active: true });
+  process.stdout.write(DONE);
+  expect(recorder.written).toEqual([DONE]);
+});
+
+test("strict pass-through when stdout is not a TTY", () => {
+  const { handlers, eventHandlers, recorder } = createHarnessAndWrite();
+  process.env.HC_TERMINAL_ID = "t1";
+  (process.stdout as { isTTY?: boolean }).isTTY = false;
+  handlers.get("session_start")?.({}, { mode: "tui" });
+
+  eventHandlers.get("rpiv:ask-user:blocked")?.({ active: true });
+  eventHandlers.get("subagents:started")?.(subagent("a1"));
   process.stdout.write(DONE);
   expect(recorder.written).toEqual([DONE]);
 });
@@ -143,8 +156,24 @@ test("strict pass-through when HC_TERMINAL_ID is missing", () => {
   handlers.get("session_start")?.({}, { mode: "tui", isIdle: () => true });
 
   eventHandlers.get("subagents:started")?.(subagent("a1"));
+  eventHandlers.get("rpiv:ask-user:blocked")?.({ active: true });
   process.stdout.write(DONE);
   expect(recorder.written).toEqual([DONE]);
+});
+
+test("questionnaire events before session_start do not leave a pending block", () => {
+  const { handlers, eventHandlers, recorder } = createHarnessAndWrite();
+  process.env.HC_TERMINAL_ID = "t1";
+  (process.stdout as { isTTY?: boolean }).isTTY = true;
+
+  eventHandlers.get("rpiv:ask-user:blocked")?.({ active: true });
+  handlers.get("session_start")?.({}, { mode: "tui" });
+  process.stdout.write(DONE);
+  expect(recorder.written).toEqual([DONE]);
+
+  eventHandlers.get("rpiv:ask-user:blocked")?.({ active: true });
+  eventHandlers.get("rpiv:ask-user:blocked")?.({ active: false });
+  expect(recorder.written).toEqual([DONE, BLOCKED_QUESTION, DONE]);
 });
 
 test("with the gate open, nothing rewrites before Pi's first report", () => {
@@ -153,17 +182,24 @@ test("with the gate open, nothing rewrites before Pi's first report", () => {
   // A sub-agent starts before Pi has reported: the override is tracked but not
   // emitted (piReported is still false).
   eventHandlers.get("subagents:started")?.(subagent("a1"));
+  eventHandlers.get("rpiv:ask-user:blocked")?.({ active: true });
   expect(recorder.written).toEqual([]);
 
   // A TUI frame passes through untouched.
   process.stdout.write("\u001b[2Jframe");
   expect(recorder.written).toEqual(["\u001b[2Jframe"]);
+
+  process.stdout.write(DONE);
+  expect(recorder.written).toEqual(["\u001b[2Jframe", BLOCKED_QUESTION]);
+  eventHandlers.get("rpiv:ask-user:blocked")?.({ active: false });
+  eventHandlers.get("subagents:completed")?.(subagent("a1"));
+  expect(recorder.written).toEqual(["\u001b[2Jframe", BLOCKED_QUESTION, WORKING, DONE]);
 });
 
 test("a terminal that never answers the query sees no rewrite at all", () => {
   const { eventHandlers, recorder } = openSession();
   eventHandlers.get("subagents:started")?.(subagent("a1"));
-  eventHandlers.get("herdr:blocked")?.({ active: true });
+  eventHandlers.get("rpiv:ask-user:blocked")?.({ active: true });
   expect(recorder.written).toEqual([]);
 });
 
@@ -212,11 +248,11 @@ test("an open questionnaire reports blocked with kind=question, outranking worki
   eventHandlers.get("subagents:started")?.(subagent("a1"));
   expect(recorder.written).toEqual([DONE, WORKING]);
 
-  eventHandlers.get("herdr:blocked")?.({ active: true });
+  eventHandlers.get("rpiv:ask-user:blocked")?.({ active: true });
   expect(recorder.written).toEqual([DONE, WORKING, BLOCKED_QUESTION]);
 
   // Closing the questionnaire returns to the sub-agent's working.
-  eventHandlers.get("herdr:blocked")?.({ active: false });
+  eventHandlers.get("rpiv:ask-user:blocked")?.({ active: false });
   expect(recorder.written).toEqual([DONE, WORKING, BLOCKED_QUESTION, WORKING]);
 });
 
@@ -224,16 +260,66 @@ test("concurrent questionnaires keep blocked until the last closes", () => {
   const { eventHandlers, recorder } = openSession();
   process.stdout.write(DONE);
 
-  eventHandlers.get("herdr:blocked")?.({ active: true });
-  eventHandlers.get("herdr:blocked")?.({ active: true });
+  eventHandlers.get("rpiv:ask-user:blocked")?.({ active: true });
+  eventHandlers.get("rpiv:ask-user:blocked")?.({ active: true });
   // Only the first active produced a write; the second is deduped.
   expect(recorder.written).toEqual([DONE, BLOCKED_QUESTION]);
 
-  eventHandlers.get("herdr:blocked")?.({ active: false });
+  eventHandlers.get("rpiv:ask-user:blocked")?.({ active: false });
   expect(recorder.written).toEqual([DONE, BLOCKED_QUESTION]);
 
-  eventHandlers.get("herdr:blocked")?.({ active: false });
+  eventHandlers.get("rpiv:ask-user:blocked")?.({ active: false });
   expect(recorder.written).toEqual([DONE, BLOCKED_QUESTION, DONE]);
+});
+
+test("questionnaire close restores the latest Pi report and ignores extra fields", () => {
+  const { eventHandlers, recorder } = openSession();
+  process.stdout.write(DONE);
+
+  eventHandlers.get("rpiv:ask-user:blocked")?.({ active: true, toolCallId: "q1", label: "Question" });
+  process.stdout.write(ERROR);
+  expect(recorder.written).toEqual([DONE, BLOCKED_QUESTION]);
+
+  eventHandlers.get("rpiv:ask-user:blocked")?.({ active: false, toolCallId: "q2" });
+  expect(recorder.written).toEqual([DONE, BLOCKED_QUESTION, ERROR]);
+});
+
+test("unmatched questionnaire closes do not affect the next balanced pair", () => {
+  const { eventHandlers, recorder } = openSession();
+  process.stdout.write(DONE);
+
+  eventHandlers.get("rpiv:ask-user:blocked")?.({ active: false });
+  expect(recorder.written).toEqual([DONE]);
+
+  eventHandlers.get("rpiv:ask-user:blocked")?.({ active: true });
+  expect(recorder.written).toEqual([DONE, BLOCKED_QUESTION]);
+  eventHandlers.get("rpiv:ask-user:blocked")?.({ active: false });
+  expect(recorder.written).toEqual([DONE, BLOCKED_QUESTION, DONE]);
+});
+
+test("malformed questionnaire events cannot open or close a block", () => {
+  const { eventHandlers, recorder } = openSession();
+  process.stdout.write(DONE);
+  const expected = [DONE];
+
+  for (const payload of [
+    undefined, null, {}, { active: "true" }, { active: 1 }, { active: null },
+    "active", false, [], Object.assign([], { active: true }),
+    Object.create({ active: true }),
+  ]) {
+    eventHandlers.get("rpiv:ask-user:blocked")?.(payload);
+    expect(recorder.written).toEqual(expected);
+
+    eventHandlers.get("rpiv:ask-user:blocked")?.({ active: true });
+    expected.push(BLOCKED_QUESTION);
+    expect(recorder.written).toEqual(expected);
+
+    eventHandlers.get("rpiv:ask-user:blocked")?.(payload);
+    expect(recorder.written).toEqual(expected);
+    eventHandlers.get("rpiv:ask-user:blocked")?.({ active: false });
+    expected.push(DONE);
+    expect(recorder.written).toEqual(expected);
+  }
 });
 
 // --- Caching Pi's report under an active override (R4) -------------------
@@ -263,16 +349,21 @@ test("non-status bytes pass through unchanged under an active override", () => {
 
 // --- Shutdown (R4) -------------------------------------------------------
 
-test("session_shutdown restores the original write and stops substituting", () => {
+test("session_shutdown restores the writer and clears questionnaire and sub-agent activity", () => {
   const { handlers, eventHandlers, recorder } = openSession();
   process.stdout.write(DONE);
   eventHandlers.get("subagents:started")?.(subagent("a1"));
-  expect(recorder.written).toEqual([DONE, WORKING]);
+  eventHandlers.get("rpiv:ask-user:blocked")?.({ active: true });
+  expect(recorder.written).toEqual([DONE, WORKING, BLOCKED_QUESTION]);
 
   handlers.get("session_shutdown")?.({}, { mode: "tui" });
 
-  // A report and a sub-agent event after shutdown pass through / are ignored.
   eventHandlers.get("subagents:completed")?.(subagent("a1"));
+  eventHandlers.get("rpiv:ask-user:blocked")?.({ active: true });
   process.stdout.write(DONE);
-  expect(recorder.written).toEqual([DONE, WORKING, DONE]);
+  expect(recorder.written).toEqual([DONE, WORKING, BLOCKED_QUESTION, DONE]);
+
+  handlers.get("session_start")?.({}, { mode: "tui" });
+  process.stdout.write(DONE);
+  expect(recorder.written).toEqual([DONE, WORKING, BLOCKED_QUESTION, DONE, DONE]);
 });

@@ -159,13 +159,11 @@ export default function registerHcAgentState(pi: any): void {
     pi.events.on(lifecycle, (event: unknown) => updateSubagentActivity(event, "terminal"));
   }
 
-  // The questionnaire block is forwarded by rpiv-herdr-bridge onto this event,
-  // so the backend stays the same for both integrations.
-  pi.events.on("herdr:blocked", (data: unknown) => {
-    if (!rootSession) {
+  pi.events.on("rpiv:ask-user:blocked", (data: unknown) => {
+    if (!rootSession || !isBlockedEvent(data)) {
       return;
     }
-    if (!(data as { active?: unknown })?.active) {
+    if (!data.active) {
       blockedCount = Math.max(0, blockedCount - 1);
     } else {
       blockedCount += 1;
@@ -218,6 +216,15 @@ export function decodeStatus(chunk: string): StatusRecord | null {
 // True when the input is exactly one complete OSC 7501 status report.
 export function isStatusReport(chunk: unknown): boolean {
   return decodeStatus(toUtf8String(chunk)) !== null;
+}
+
+function isBlockedEvent(event: unknown): event is { active: boolean } {
+  if (typeof event !== "object" || event === null || Array.isArray(event)) return false;
+
+  return (
+    Object.prototype.hasOwnProperty.call(event, "active") &&
+    typeof (event as { active?: unknown }).active === "boolean"
+  );
 }
 
 function toUtf8String(chunk: unknown): string | undefined {
