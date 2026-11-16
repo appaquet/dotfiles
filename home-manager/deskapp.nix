@@ -1,4 +1,4 @@
-{ inputs, pkgs, ... }:
+{ inputs, ... }:
 
 {
   imports = [
@@ -11,7 +11,6 @@
     ./modules/vms.nix
     ./modules/vpn.nix
     ./modules/work
-    ./modules/hc
   ];
 
   dotfiles.nono.profiles.machine.filesystem.allow = [
