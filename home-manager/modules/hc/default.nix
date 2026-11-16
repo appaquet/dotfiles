@@ -4,8 +4,12 @@
   ...
 }:
 {
-  # Complete file: a partial keys.json silently unbinds every key it omits.
-  # Pinned: new default bindings from later app versions need a manual refresh.
+  imports = [ ./app-module.nix ];
+
+  dotfiles.herdr-app.settings = {
+    font = "FiraCode Nerd Font";
+  };
+
   xdg.configFile."herdr-app/keys.json".source = ./keys.json;
 
   home.packages = [
