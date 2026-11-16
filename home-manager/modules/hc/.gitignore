@@ -1,0 +1,4 @@
+# Typings, editor config and deps herdr-app writes into every mod folder it loads
+gpui-kit.d.ts
+jsconfig.json
+node_modules/

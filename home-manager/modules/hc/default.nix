@@ -1,9 +1,46 @@
 {
+  config,
+  lib,
   pkgs,
   inputs',
   ...
 }:
 let
+  appDir = ./app;
+  appLink = sub: "${config.home.homeDirectory}/dotfiles/home-manager/modules/hc/app/${sub}";
+
+  # Entries of an app/ subfolder (missing folder means none), filtered by file type.
+  entries =
+    sub:
+    if builtins.pathExists (appDir + "/${sub}") then builtins.readDir (appDir + "/${sub}") else { };
+  jsonNames =
+    sub:
+    lib.mapAttrsToList (file: _: lib.removeSuffix ".json" file) (
+      lib.filterAttrs (file: type: type == "regular" && lib.hasSuffix ".json" file) (entries sub)
+    );
+  dirNames = sub: lib.attrNames (lib.filterAttrs (_: type: type == "directory") (entries sub));
+  packages = dirNames "";
+
+  # Links every item of `kind` across all packages. A name found in two packages fails evaluation.
+  linkAll =
+    kind: suffix: names:
+    let
+      owners = lib.foldl' (
+        acc: pkg:
+        acc
+        // lib.genAttrs (names "${pkg}/${kind}") (
+          name:
+          if acc ? ${name} then
+            throw "hc: ${kind} '${name}' exists in both packages '${acc.${name}}' and '${pkg}' under app/"
+          else
+            pkg
+        )
+      ) { } packages;
+    in
+    lib.mapAttrs (
+      name: pkg: config.lib.file.mkOutOfStoreSymlink (appLink "${pkg}/${kind}/${name}${suffix}")
+    ) owners;
+
   # JSON escape decoder: nix strings have no unicode escape, the JSON parser does.
   esc = code: builtins.fromJSON ''"${code}"'';
 in
@@ -119,6 +156,37 @@ in
       "cmd-backspace" = "send:${esc "\\u0015"}";
     };
   };
+
+  # Own content is grouped by package: app/<package>/{mods/<mod>/, layouts/*.json, themes/*.json}.
+  # Every item of every package is linked to the live checkout, so edits by AP or the app show up
+  # as dotfiles diffs. Names must be unique across packages. Adding one needs a snapshot (any jj
+  # command) and a home switch.
+  dotfiles.herdr-app.mods = linkAll "mods" "" dirNames;
+  dotfiles.herdr-app.layouts = linkAll "layouts" ".json" jsonNames;
+  dotfiles.herdr-app.themes = linkAll "themes" ".json" jsonNames;
+
+  # Remote example (not wired): a package subfolder (here `kanso/`) of a pinned repo is linked read-only
+  # from the store, laid out like an own package, with explicit names so
+  # each mod gets reviewed (network, exec and out-of-folder reads) and no import-from-derivation is needed.
+  # Mods running gh/jj/node need the app started from a terminal to find them on PATH. To customize a
+  # remote layout or mod: `herdr-app do layout.clone '{"name":"kanso","as":"my-kanso"}'`, then move the
+  # result into an own package under app/<package>/layouts (or mods).
+  #
+  # dotfiles.herdr-app =
+  #   let
+  #     kanso = pkgs.fetchFromGitHub {
+  #       owner = "jlopezlira";
+  #       repo = "herdr-kanso";
+  #       rev = "d669b0403e848d8fc90ceb634a6367f44453c2ea";
+  #       hash = lib.fakeHash;
+  #     };
+  #   in
+  #   {
+  #     mods.kanso-sidebar = "${kanso}/kanso/mods/kanso-sidebar";
+  #     layouts.kanso = "${kanso}/kanso/layouts/kanso.json";
+  #     themes.kanso = "${kanso}/kanso/themes/kanso.json";
+  #     themes.kanso-day = "${kanso}/kanso/themes/kanso-day.json";
+  #   };
 
   home.packages = [
     pkgs.rodeo # TUI client for hc
