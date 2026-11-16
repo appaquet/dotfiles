@@ -8,6 +8,7 @@ let
     {
       macpow = final.callPackage ./macpow { };
       mboxshell = final.callPackage ./mboxshell { };
+      rodeo = final.callPackage ./rodeo { };
     };
 
   neovimPluginsOverlay = import ../home-manager/modules/neovim/plugins-overlay.nix;
