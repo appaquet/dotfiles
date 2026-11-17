@@ -1,10 +1,11 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 {
   imports = [
+    inputs.self.modules.darwin.cachix
+
     ./system.nix
     ./fonts.nix
     ./apps.nix
-    ../../nixos/modules/cachix.nix
   ];
 
   nix = {

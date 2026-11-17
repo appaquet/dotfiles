@@ -1,8 +1,9 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 
 {
   imports = [
-    ./cachix.nix
+    inputs.self.modules.nixos.cachix
+
     ./restic/backup.nix
     ./restic/server.nix
     ./ups/client.nix
