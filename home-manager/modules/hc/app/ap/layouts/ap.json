@@ -83,7 +83,7 @@
           "id": "tabs",
           "type": "block",
           "content": {
-            "mod": "tabs"
+            "mod": "tab-bar"
           },
           "size": {
             "px": 42

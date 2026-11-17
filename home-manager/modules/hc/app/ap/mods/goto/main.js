@@ -17,11 +17,11 @@ const STATUS_RANK = { blocked: 0, done: 1, working: 2, idle: 3 };
 
 const MARK = { ansi6: "#22a99a", ansi3: "#e3814f", ansi4: "#5b8def", ansi5: "#8b7cf6", ansi2: "#3fae6a", ansi1: "#d9649a" };
 
-// A PR's icon, as the sidebar draws it (spaces-status/prs.js `prLook`): the file per state, open PRs colored by CI.
+// A PR's icon, as the sidebar draws it (spaces-status/prs.js `prLook`): the file per state, open and draft PRs colored by CI.
 const PR_ICONS = { open: "git-pull-request.svg", draft: "git-pull-request-draft.svg", merged: "git-merge.svg", closed: "git-pull-request-closed.svg" };
 function prColor(t, pr) {
   if (pr.state === "merged") return t.ansi5;
-  if (pr.state !== "open") return t.dim;
+  if (pr.state !== "open" && pr.state !== "draft") return t.dim;
   return { passing: t.ansi2, failing: t.ansi1, running: t.ansi3 }[pr.ci] ?? t.dim;
 }
 

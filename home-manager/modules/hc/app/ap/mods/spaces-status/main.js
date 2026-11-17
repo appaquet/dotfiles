@@ -8,7 +8,7 @@ import * as fs from "fs/promises";
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
 import { spaces, machines, panes, run, openOverlay, exec, hc, theme, shared, setShared, watchFolder, window, layout, home, appHome } from "herdr";
-import { CAP, parseGh, prSummary, ciRollup, nextDue, prLook, prTip } from "./prs.js";
+import { CAP, parseGh, prSummary, ciRollup, nextDue, prLook, prTip, hasCi } from "./prs.js";
 
 function find(node, id) {
   if (node?.id === id) return node;
@@ -334,7 +334,7 @@ export default class Spaces extends View {
     let ok = pulls.status === 200 || pulls.status === 304;
     if (pulls.status === 200) e.pr = prSummary(pulls.body);
 
-    if (ok && e.pr?.state === "open") {
+    if (ok && hasCi(e.pr)) {
       // A new head commit has new checks: the old ETag would answer for the old one.
       if (e.etags.checksFor !== e.pr.headSha) {
         delete e.etags.checks;
@@ -616,8 +616,8 @@ export default class Spaces extends View {
   }
 }
 
-// A `space.prs` entry: what the icon and its tooltip need. CI only counts on an open PR.
+// A `space.prs` entry: what the icon and its tooltip need. CI only counts on open and draft PRs.
 function summary(e) {
   const { number, title, url, state } = e.pr;
-  return { number, title, url, state, ci: state === "open" ? e.ci : "none", repo: e.slug, bookmark: e.bookmark };
+  return { number, title, url, state, ci: hasCi(e.pr) ? e.ci : "none", repo: e.slug, bookmark: e.bookmark };
 }

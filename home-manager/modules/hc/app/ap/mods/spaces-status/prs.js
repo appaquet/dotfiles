@@ -101,24 +101,29 @@ export function nextDue(e) {
 }
 
 // The icon for a `space.prs` entry: its file and theme color (`t`: the theme).
-// Draft and closed stay grey, merged is purple, open takes its CI's color.
+// Closed stays grey, merged is purple, open and draft take their CI's color.
 export function prLook(pr, t) {
   const color = pr.state === "merged" ? t.ansi5
-    : pr.state !== "open" ? t.dim
+    : !hasCi(pr) ? t.dim
     : { passing: t.ansi2, failing: t.ansi1, running: t.ansi3 }[pr.ci] ?? t.dim;
   return { icon: ICONS[pr.state] ?? ICONS.open, color };
 }
 
 // "#111 · Declared limits · checks passing · owner/repo · bookmark"
 export function prTip(pr) {
-  const ci = pr.state === "open" || pr.state === "draft" ? CI_WORDS[pr.ci] ?? null : pr.state;
+  const ci = hasCi(pr) ? CI_WORDS[pr.ci] ?? null : pr.state;
   return [`#${pr.number}`, pr.title, ci, pr.repo, pr.bookmark].filter(Boolean).join(" · ");
+}
+
+// Whether a PR's CI matters: open and draft PRs still get pushed to and checked.
+export function hasCi(pr) {
+  return pr?.state === "open" || pr?.state === "draft";
 }
 
 // How often to look while nothing local changes; null: never.
 function interval(e) {
   if (!e.pr) return e.pushed ? 15 * MIN : null;
   if (e.pr.state === "merged" || e.pr.state === "closed") return null;
-  if (e.pr.state === "open" && e.ci === "running") return 45 * SEC;
+  if (hasCi(e.pr) && e.ci === "running") return 45 * SEC;
   return 10 * MIN;
 }
