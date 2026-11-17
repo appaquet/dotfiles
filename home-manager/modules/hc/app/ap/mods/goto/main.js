@@ -2,8 +2,9 @@
 // finished, working, idle), quiet spaces (no status) fold into "earlier"; within each, the most recently shown
 // space comes first (shared "space.seen", recorded by the status-bar mod). Opens on the first space other than the
 // current one. Worktree spaces show their parent space first, as the sidebar nests them. Type to filter fuzzily by
-// space, parent or machine name (match.js), ↑/↓ and Enter to go, Esc to leave. Cloned from the shipped `picker`,
-// which lists tabs instead.
+// space, parent or machine name (match.js), ↑/↓ and Enter to go, Esc to leave. A space whose bookmark has a GitHub
+// PR shows its icon before the machine (shared "space.prs", published by spaces-status). Cloned from the shipped
+// `picker`, which lists tabs instead.
 
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
@@ -15,6 +16,14 @@ const LIST_MAX = 320;
 const STATUS_RANK = { blocked: 0, done: 1, working: 2, idle: 3 };
 
 const MARK = { ansi6: "#22a99a", ansi3: "#e3814f", ansi4: "#5b8def", ansi5: "#8b7cf6", ansi2: "#3fae6a", ansi1: "#d9649a" };
+
+// A PR's icon, as the sidebar draws it (spaces-status/prs.js `prLook`): the file per state, open PRs colored by CI.
+const PR_ICONS = { open: "git-pull-request.svg", draft: "git-pull-request-draft.svg", merged: "git-merge.svg", closed: "git-pull-request-closed.svg" };
+function prColor(t, pr) {
+  if (pr.state === "merged") return t.ansi5;
+  if (pr.state !== "open") return t.dim;
+  return { passing: t.ansi2, failing: t.ansi1, running: t.ansi3 }[pr.ci] ?? t.dim;
+}
 
 // Space colors, kept by space id in shared "space.colors": a theme
 // color name ("ansi6") or a picked #rrggbb. A space seen without one gets
@@ -183,6 +192,7 @@ export default class SpacePicker extends View {
 
   spaceRow(t, r, selected) {
     const s = r.space;
+    const pr = (shared("space.prs") ?? {})[s.id];
     return h_flex()
       .id(`goto-${s.id}`)
       .mx(4)
@@ -202,6 +212,7 @@ export default class SpacePicker extends View {
         .child(div().truncate().text_color(t.foreground).when(s.active, (d) => d.font_semibold()).child(s.name)))
       .when(s.status === "blocked", (el) => el.child(div().text_size(11).text_color(t.blocked).child("needs you")))
       .when(s.status === "done", (el) => el.child(div().text_size(11).text_color(t.done).child("finished")))
+      .when(Boolean(pr), (el) => el.child(svg(`mods/spaces-status/${PR_ICONS[pr.state] ?? PR_ICONS.open}`).size(12).flex_none().text_color(prColor(t, pr))))
       .child(div().text_size(11).text_color(t.dim).child(machineOf(s)));
   }
 

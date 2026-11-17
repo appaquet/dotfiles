@@ -1,12 +1,14 @@
 // Workspace spaces: stable colored avatars, worktrees under their checkout,
-// grouped by machine when more than one is known. After a space's name, the repo
-// its first terminal is in now, only where unusual: its branch, which is a jj
-// bookmark where the repo is jj, and the space's most urgent agent status at the
-// row's end. Click to switch, right-click for its menu, drag to reorder.
+// grouped by machine when more than one is known. At a row's end, the GitHub PR of
+// the jj bookmark its first terminal is on (shape for its state, color for its CI;
+// a click opens it) and the space's most urgent agent status. Click to switch,
+// right-click for its menu, drag to reorder.
 
+import * as fs from "fs/promises";
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
-import { spaces, machines, panes, run, openOverlay, exec, hc, theme, shared, setShared, watchFolder, window, layout } from "herdr";
+import { spaces, machines, panes, run, openOverlay, exec, hc, theme, shared, setShared, watchFolder, window, layout, home, appHome } from "herdr";
+import { CAP, parseGh, prSummary, ciRollup, nextDue, prLook, prTip } from "./prs.js";
 
 function find(node, id) {
   if (node?.id === id) return node;
@@ -32,6 +34,12 @@ const base = (path) => path.replace(/\/+$/, "").split("/").pop();
 // Changes made outside Herdr (an editor's save, a commit in another app): looked
 // for this often, in repos the list shows, while the window is in front.
 const FALLBACK = 60000;
+// This mod's folder, for its own icons (`svg()` paths start at the app's folder).
+const SELF = "spaces-status";
+const HOUR = 3600000;
+// Without a working gh, how long until asking again whether there is one.
+const GH_RECHECK = 30 * 60000;
+const GH_LOG = () => `${appHome()}/data/${SELF}/github.log`;
 
 // What a stored color name looks like on an avatar (the same in every mod
 // that draws space avatars): one strong color per hue, light and dark alike.
@@ -57,6 +65,18 @@ export default class Spaces extends View {
     this.ready = {}; // machine -> its layout was readable at the last look
     this.at = {}; // space -> its where() at the last look
     this.watching = new Set(); // local repos' git folders
+    // GitHub PRs (see prs.js). gh runs here only, also for other machines' spaces:
+    // a PR depends on the repo and bookmark, not on where the checkout is.
+    this.gh = undefined; // gh's command once found, null: none or not logged in
+    this.ghAt = 0; // when gh was last looked for
+    this.slugs = {}; // repo -> "owner/name" on github.com, null: not GitHub
+    this.trunk = {}; // repo -> its trunk's bookmark names
+    this.prOf = {}; // where() -> "owner/name#bookmark", null: no PR possible there
+    this.prs = {}; // "owner/name#bookmark" -> what GitHub said and when to ask again
+    this.calls = []; // when each rate-limited GitHub call was made, the last hour's
+    this.tally = { counted: 0, free: 0, since: Date.now() }; // for the hourly log line
+    this.remaining = null; // GitHub's last x-ratelimit-remaining
+    this.asking = false;
     // Spaces made while this runs wait (at most a moment) for their git, so a
     // worktree appears under its repo instead of jumping there.
     this.shown = new Set(spaces().map((s) => s.id));
@@ -70,6 +90,7 @@ export default class Spaces extends View {
     // `git status` walks the whole tree, on another machine a process there:
     // only when its answer could have changed (see `due`).
     cx.timer.every(250, (cx) => this.checkNew(cx));
+    cx.timer.every(5000, (cx) => this.pollPrs(cx));
   }
 
   checkNew(cx) {
@@ -174,6 +195,7 @@ export default class Spaces extends View {
       if (info.branch === "(detached)") info.branch = await this.bookmark(cwd, on, repo);
       this.git[key] = info;
       if (!on) this.watch(repo, cx);
+      await this.track(key, info, cwd, on, repo);
     } catch {
       // Couldn't ask (the machine is away): keep what it showed, look again later.
       this.git[key] ??= null;
@@ -192,6 +214,51 @@ export default class Spaces extends View {
     return this.jj[repo];
   }
 
+  // Which PR a place's bookmark could have ("owner/name#bookmark"), and its pushed
+  // commit: a new one (or a new bookmark) is when GitHub is asked first. No PR is
+  // possible off jj, off GitHub, or on trunk's own bookmark.
+  async track(key, info, cwd, on, repo) {
+    const name = this.jj[repo] ? (info.branch ?? "").split(",")[0] : "";
+    const slug = name ? await this.slug(info.repo, cwd, on) : null;
+    if (!slug || (await this.trunkNames(info.repo, cwd, on)).includes(name)) {
+      this.prOf[key] = null;
+      return;
+    }
+
+    const r = await exec("jj", ["--ignore-working-copy", "log", "--no-graph", "-r",
+      `remote_bookmarks(exact:${JSON.stringify(name)}, exact:"origin")`, "-T", 'commit_id ++ "\\n"'], { cwd, on });
+    if (r.code !== 0) return;
+    const pushed = r.stdout.trim().split("\n")[0] || null;
+
+    const k = `${slug}#${name}`;
+    this.prOf[key] = k;
+    const e = (this.prs[k] ??= { slug, bookmark: name, at: 0, errors: 0, pr: null, ci: "none", etags: {} });
+    // Seen first, or pushed anew: ask now (an unpushed bookmark once, for a PR whose
+    // branch GitHub deleted after the merge).
+    if (!("pushed" in e) || e.pushed !== pushed) Object.assign(e, { since: Date.now(), due: Date.now(), urgent: true, errors: 0 });
+    e.pushed = pushed;
+  }
+
+  // The repo's GitHub "owner/name" from its origin remote, asked once per repo.
+  async slug(repo, cwd, on) {
+    if (repo in this.slugs) return this.slugs[repo];
+    const r = await exec("git", ["remote", "get-url", "origin"], { cwd, on });
+    const m = /github\.com[:/]([^/\s]+)\/([^/\s]+?)(?:\.git)?\/?$/.exec(r.stdout.trim());
+    this.slugs[repo] = r.code === 0 && m ? `${m[1]}/${m[2]}` : null;
+    return this.slugs[repo];
+  }
+
+  // The bookmarks on the repo's trunk (master, main): a workspace with no bookmark of
+  // its own resolves to them, and their PRs aren't the space's.
+  async trunkNames(repo, cwd, on) {
+    if (this.trunk[repo]) return this.trunk[repo];
+    const r = await exec("jj", ["--ignore-working-copy", "log", "--no-graph", "-r", "trunk()",
+      "-T", 'bookmarks.map(|b| b.name()).join(",")'], { cwd, on });
+    if (r.code !== 0) return [];
+    this.trunk[repo] = [...new Set(r.stdout.trim().split(",").filter(Boolean))];
+    return this.trunk[repo];
+  }
+
   watch(repo, cx) {
     if (this.watching.has(repo)) return;
     this.watching.add(repo);
@@ -204,6 +271,129 @@ export default class Spaces extends View {
         }
       } catch { this.watching.delete(repo); }
     });
+  }
+
+  // GitHub, one question at a time: the most overdue PR, a fresh push first. Timed
+  // checks only while the window is in front, all of them within the hourly cap.
+  pollPrs(cx) {
+    if (this.asking) return;
+    const now = Date.now();
+    if (this.gh === undefined || (this.gh === null && now - this.ghAt > GH_RECHECK)) return this.findGh(cx);
+    if (!this.gh) return;
+
+    this.logTally(now);
+    this.calls = this.calls.filter((c) => now - c < HOUR);
+    if (this.calls.length >= CAP) return;
+
+    const active = window().active;
+    const next = [...new Set(Object.values(this.prOf).filter(Boolean))]
+      .map((k) => this.prs[k])
+      .filter((e) => e?.due && e.due <= now && (e.urgent || active))
+      .sort((a, b) => b.urgent - a.urgent || a.due - b.due)[0];
+    if (!next) return;
+
+    this.asking = true;
+    cx.spawn(async (cx) => {
+      try {
+        await this.ask(next);
+      } finally {
+        this.asking = false;
+      }
+      cx.notify();
+    });
+  }
+
+  // gh on PATH, else the user's nix profile; logged in to github.com or it doesn't count.
+  findGh(cx) {
+    this.asking = true;
+    cx.spawn(async (cx) => {
+      const had = this.gh;
+      this.gh = null;
+      for (const cmd of ["gh", `${home()}/.nix-profile/bin/gh`]) {
+        try {
+          if ((await exec(cmd, ["auth", "status", "--hostname", "github.com"])).code === 0) {
+            this.gh = cmd;
+            break;
+          }
+        } catch {}
+      }
+      this.ghAt = Date.now();
+      if (!this.gh && had !== null) await this.note("gh missing or not logged in to github.com: no PR icons; looking again every 30 min");
+      this.asking = false;
+      cx.notify();
+    });
+  }
+
+  // One repo + bookmark: its newest PR, then the CI of that PR's head commit while it's
+  // open. Each request carries the last answer's ETag, so an unchanged one is free.
+  async ask(e) {
+    const now = Date.now();
+    e.urgent = false;
+    const owner = e.slug.split("/")[0];
+    const pulls = await this.api(`repos/${e.slug}/pulls?head=${owner}:${encodeURIComponent(e.bookmark)}&state=all&per_page=1`, e, "pulls");
+    let ok = pulls.status === 200 || pulls.status === 304;
+    if (pulls.status === 200) e.pr = prSummary(pulls.body);
+
+    if (ok && e.pr?.state === "open") {
+      // A new head commit has new checks: the old ETag would answer for the old one.
+      if (e.etags.checksFor !== e.pr.headSha) {
+        delete e.etags.checks;
+        e.etags.checksFor = e.pr.headSha;
+      }
+      const checks = await this.api(`repos/${e.slug}/commits/${e.pr.headSha}/check-runs?per_page=100`, e, "checks");
+      if (checks.status === 200) e.ci = ciRollup(checks.body);
+      ok = checks.status === 200 || checks.status === 304;
+    }
+
+    e.errors = ok ? 0 : e.errors + 1;
+    e.at = now;
+    e.remaining = this.remaining;
+    e.due = nextDue(e);
+  }
+
+  // `gh api -i`, conditional when an ETag is known; counts what the rate limit counts.
+  async api(path, e, slot) {
+    const args = ["api", "-i", path];
+    if (e.etags[slot]) args.push("-H", `If-None-Match: ${e.etags[slot]}`);
+    let r;
+    try {
+      r = parseGh(await exec(this.gh, args, { timeout: 20000 }));
+    } catch {
+      r = parseGh(null);
+    }
+
+    if (r.status === 304) this.tally.free++;
+    else if (r.status !== "error") {
+      this.calls.push(Date.now());
+      this.tally.counted++;
+    }
+    if (r.status === 200 && r.etag) e.etags[slot] = r.etag;
+    if (r.remaining !== null) this.remaining = r.remaining;
+    e.pollInterval = r.pollInterval;
+    return r;
+  }
+
+  // Once an hour with any GitHub traffic: how much of it the rate limit counted.
+  logTally(now) {
+    const { counted, free, since } = this.tally;
+    if (now - since < HOUR) return;
+    this.tally = { counted: 0, free: 0, since: now };
+    if (counted || free) this.note(`GitHub calls in the last hour: ${counted} counted, ${free} unchanged (304, free); ${this.remaining ?? "?"} left`);
+  }
+
+  // A line for the person, in data/spaces-status/github.log (its last 200 lines kept).
+  async note(line) {
+    console.log(`${SELF}: ${line}`);
+    try {
+      const path = GH_LOG();
+      await fs.mkdir(path.slice(0, path.lastIndexOf("/")), { recursive: true });
+      let old = "";
+      try {
+        old = await fs.readFile(path, "utf8");
+      } catch {}
+      const lines = [...old.split("\n").filter(Boolean), `${new Date().toISOString()} ${line}`].slice(-200);
+      await fs.writeFile(path, `${lines.join("\n")}\n`);
+    } catch {}
   }
 
   menu(w) {
@@ -234,6 +424,7 @@ export default class Spaces extends View {
       });
     }
     this.publishParents(parents);
+    this.publishPrs(sp, ps);
     return out;
   }
 
@@ -241,6 +432,23 @@ export default class Spaces extends View {
   // render, so it writes only when the nesting changed, keeping the write from re-rendering in a loop.
   publishParents(parents) {
     if (JSON.stringify(shared("space.parents") ?? {}) !== JSON.stringify(parents)) setShared("space.parents", parents);
+  }
+
+  // Shared "space.prs" (space id -> its PR), drawn by this list and the `goto` picker. Until GitHub has answered
+  // for a place, its last published PR stays, so icons show right after a restart. Written only on change.
+  publishPrs(sp, ps) {
+    const prev = shared("space.prs") ?? {};
+    const next = {};
+    if (this.gh !== null) {
+      for (const s of sp) {
+        const k = this.prOf[where(s, ps)];
+        const e = k ? this.prs[k] : null;
+        const old = prev[s.id];
+        if (e?.at && e.pr) next[s.id] = summary(e);
+        else if (old && (k === undefined || (e && !e.at && `${old.repo}#${old.bookmark}` === k))) next[s.id] = old;
+      }
+    }
+    if (JSON.stringify(prev) !== JSON.stringify(next)) setShared("space.prs", next);
   }
 
   // The rows, under a header per machine once one isn't this computer.
@@ -283,23 +491,24 @@ export default class Spaces extends View {
     });
   }
 
-  // Only what's unusual, after the name: "herdr \u00b7 spike". The repo or branch goes
-  // when the name already says it (a worktree is named after its branch).
-  gitTail(g, tree, name, t) {
-    const raw = g.branch ?? "detached";
-    const same = (a) => a.toLowerCase() === name.toLowerCase();
-    const branch = same(raw) ? "" : raw;
-    const repo = tree || same(g.name) ? "" : g.name;
-    const where = [repo, branch].filter(Boolean).join(" \u00b7 ");
-    return h_flex()
-      .flex_1()
-      .min_w(0)
-      .gap(5)
-      .justify_end()
-      .items_center()
-      .text_size(11.5)
-      .text_color(t.dim)
-      .when(Boolean(where), (el) => el.child(div().min_w(0).truncate().child(where)));
+  // The PR of the space's bookmark: shape for its state, color for its CI. A click opens it in the
+  // browser; the press stops here, so the row neither switches space nor starts a drag.
+  prIcon(w, pr, t) {
+    const { icon, color } = prLook(pr, t);
+    return div()
+      .id(`pr-${w.id}`)
+      .flex_none()
+      .p(2)
+      .rounded(4)
+      .cursor_pointer()
+      .hover((s) => s.bg(t.hover))
+      .tooltip(prTip(pr))
+      .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
+      .on_click((_e, cx) => {
+        cx.stop_propagation();
+        exec("open", [pr.url]).catch(() => {});
+      })
+      .child(svg(`mods/${SELF}/${icon}`).size(12).text_color(color));
   }
 
   // The space's most urgent agent status, in the agents list's shapes: a spinner
@@ -310,8 +519,9 @@ export default class Spaces extends View {
     return div().size(7).mx(2).flex_none().rounded(4).bg(tone(t, status));
   }
 
-  row({ w, i, g, tree }, t) {
+  row({ w, i, tree }, t) {
     const on = w.active;
+    const pr = (shared("space.prs") ?? {})[w.id];
     const colors = shared("space.colors") ?? {};
     const color = colors[w.id] ?? "ansi6";
     const fill = color.startsWith("#") ? color : (MARK[color] ?? t[color]);
@@ -360,7 +570,8 @@ export default class Spaces extends View {
           .when(Boolean(tree), el => el.pl(22).child(svg("mods/workspace-chrome/branch.svg").size(13).text_color(t.dim)))
           .when(!tree, el => el.child(h_flex().size(18).flex_none().rounded(5).bg(fill).items_center().justify_center().text_size(10.5).font_bold().text_color("#ffffff").child([...w.name][0]?.toUpperCase() ?? "?")))
           .child(div().flex_shrink(0).max_w(150).truncate().text_color(t.foreground).child(w.name))
-          .child(g ? this.gitTail(g, tree, w.name, t) : div().flex_1())
+          .child(div().flex_1())
+          .when(Boolean(pr), (el) => el.child(this.prIcon(w, pr, t)))
           .when(Boolean(w.status), (el) => el.child(this.statusDot(w.status, t))),
       );
   }
@@ -403,4 +614,10 @@ export default class Spaces extends View {
         .on_mouse_up("left", (_e, cx) => { this.pressed = null; cx.notify(); })
         .children(this.grouped(t, collapsed)));
   }
+}
+
+// A `space.prs` entry: what the icon and its tooltip need. CI only counts on an open PR.
+function summary(e) {
+  const { number, title, url, state } = e.pr;
+  return { number, title, url, state, ci: state === "open" ? e.ci : "none", repo: e.slug, bookmark: e.bookmark };
 }
