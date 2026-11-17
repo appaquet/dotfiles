@@ -1,6 +1,7 @@
 // Window status bar: machine, branch, agents count, Claude plan usage and the palette hint. A clone of the
 // shipped `workspace-status` with one added segment: the 5-hour and weekly Claude limits, read from the
-// statusline payloads `tap.sh` saves (see data.js, copied from PostHog's claude-usage mod).
+// statusline payloads `tap.sh` saves (see data.js, copied from PostHog's claude-usage mod). Being always on
+// screen, it also records when each space was last shown, for the `goto` picker's ordering.
 
 import { View, div, svg } from "gpui-kit";
 import { h_flex } from "gpui-base";
@@ -11,6 +12,7 @@ const REFRESH_EVERY = 10000;
 const PRUNE_EVERY = 3600000;
 const DIM_AFTER = 3600000;
 const SEEN = "status-bar.usage-seen";
+const SPACE_SEEN = "space.seen";
 const SHOWN = ["five_hour", "seven_day"];
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -39,6 +41,16 @@ export default class WorkspaceStatus extends View {
   remember() {
     const sig = JSON.stringify(this.usage);
     if (shared(SEEN)?.sig !== sig) setShared(SEEN, { sig, at: Date.now() });
+  }
+
+  // Shared "space.seen": space id -> when it was last shown, read by the `goto` picker. Render runs on every
+  // live-data change, so writing only when the shown space changes keeps the write from re-rendering in a loop.
+  recordShown(space) {
+    if (!space || space.id === this.lastShown) return;
+    this.lastShown = space.id;
+    const ids = new Set(spaces().map((s) => s.id));
+    const seen = Object.fromEntries(Object.entries(shared(SPACE_SEEN) ?? {}).filter(([id]) => ids.has(id)));
+    setShared(SPACE_SEEN, { ...seen, [space.id]: Date.now() });
   }
 
   // The palette key as actually bound, not a hardcoded one; without a
@@ -72,6 +84,7 @@ export default class WorkspaceStatus extends View {
   render() {
     const t = theme();
     const space = spaces().find(s => s.active);
+    this.recordShown(space);
     const list = agents();
     const needs = list.filter(a => a.status === "blocked").length;
     const usage = this.usageSegment(t);

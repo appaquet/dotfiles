@@ -87,7 +87,7 @@ in
       "cmd-[" = "agent.prev";
       "cmd-shift-l" = "layout.switch";
       "cmd-n" = "space.new";
-      "cmd-p" = "mod.open:picker";
+      "cmd-p" = "mod.open:goto";
       "cmd-shift-p" = "app.palette";
       "cmd-," = "app.settings";
       "cmd-d" = "pane.split:right";
@@ -132,7 +132,8 @@ in
       "ctrl-a shift-n" = "space.new";
       "ctrl-a shift-w" = "space.rename";
       "ctrl-a shift-d" = "space.close";
-      "ctrl-a g" = "mod.open:picker";
+      "ctrl-a g" = "mod.open:goto";
+      "ctrl-a w" = "mod.open:goto";
       "ctrl-a c" = "tab.new";
       "ctrl-a n" = "tab.next";
       "ctrl-a p" = "tab.prev";
