@@ -51,7 +51,7 @@ let
     export DISABLE_TELEMETRY=""
 
     # Code Mode and agent teams cannot be on in the same session. Code Mode is on; agent teams stay off.
-    export CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1
+    export CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=0
     export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=0
 
     export CLAUDE_CODE_NO_FLICKER=1 # alt-mode
