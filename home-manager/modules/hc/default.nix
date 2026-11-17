@@ -133,8 +133,6 @@ in
       "ctrl-a shift-w" = "space.rename";
       "ctrl-a shift-d" = "space.close";
       "ctrl-a g" = "mod.open:picker";
-      "ctrl-a up" = "space.prev";
-      "ctrl-a down" = "space.next";
       "ctrl-a c" = "tab.new";
       "ctrl-a n" = "tab.next";
       "ctrl-a p" = "tab.prev";
