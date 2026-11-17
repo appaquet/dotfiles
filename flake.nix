@@ -6,6 +6,8 @@
 
     flake-parts.url = "github:hercules-ci/flake-parts";
 
+    import-tree.url = "github:denful/import-tree";
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -78,13 +80,16 @@
         imports = [
           inputs.nixantic.flakeModules.default
           ./overlays
-          ./home-manager/modules/agentic/flake-module.nix
-          ./home-manager/modules/git/flake-module.nix
-          ./home-manager/modules/hc/flake-module.nix
-          ./home-manager/modules/ssh/flake-module.nix
           ./home-manager
           ./nixos
           ./darwin
+
+          # Automatically load any flake-module.nix files.
+          (inputs.import-tree.filter (path: builtins.match ".*/flake-module\\.nix" path != null) [
+            ./home-manager
+            ./nixos
+            ./darwin
+          ])
         ];
 
         perSystem =
