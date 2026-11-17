@@ -120,7 +120,7 @@
   "model": "opus",
   "statusLine": {
     "type": "command",
-    "command": "{ [ -f \"$HOME/.config/herdr-app/mods/claude-usage/tap.sh\" ] && sh \"$HOME/.config/herdr-app/mods/claude-usage/tap.sh\" --tee || cat; } | {\n~/.claude/statusline.sh\n}"
+    "command": "{ [ -f \"$HOME/.config/herdr-app/mods/status-bar/tap.sh\" ] && sh \"$HOME/.config/herdr-app/mods/status-bar/tap.sh\" --tee || cat; } | {\n~/.claude/statusline.sh\n}"
   },
   "enabledPlugins": {
     "plugin-dev@claude-plugins-official": true

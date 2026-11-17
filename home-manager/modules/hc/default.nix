@@ -53,18 +53,6 @@ let
     herdr-catppuccin-latte = "${catppuccin}/themes/herdr-catppuccin-latte.json";
   };
 
-  # PostHog's claude-usage mod only: not its other pieces, not its layout. Read-only from the store because
-  # the mod writes only into <appHome>/data/claude-usage, never into its own folder.
-  posthogHerdr = pkgs.fetchFromGitHub {
-    owner = "PostHog";
-    repo = "herdr";
-    rev = "489f528149c60c5312a6f3eca2ff94796d73a3cd";
-    hash = "sha256-gLWpAzjdyyF3Lh2YOaJWT6/IxiwBJ2U5VLTPnh+f0ik=";
-  };
-  claudeUsageMod = {
-    claude-usage = "${posthogHerdr}/claude-usage/mods/claude-usage";
-  };
-
   # JSON escape decoder: nix strings have no unicode escape, the JSON parser does.
   esc = code: builtins.fromJSON ''"${code}"'';
 in
@@ -189,10 +177,7 @@ in
   # Every item of every package is linked to the live checkout, so edits by AP or the app show up
   # as dotfiles diffs. Names must be unique across packages. Adding one needs a snapshot (any jj
   # command) and a home switch.
-  dotfiles.herdr-app.mods = lib.mkMerge [
-    (linkAll "mods" "" dirNames)
-    claudeUsageMod
-  ];
+  dotfiles.herdr-app.mods = linkAll "mods" "" dirNames;
   dotfiles.herdr-app.layouts = linkAll "layouts" ".json" jsonNames;
   dotfiles.herdr-app.themes = lib.mkMerge [
     (linkAll "themes" ".json" jsonNames)
