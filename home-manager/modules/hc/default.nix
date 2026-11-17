@@ -188,5 +188,6 @@ in
     pkgs.rodeo # TUI client for hc
     inputs'.llm-agents.packages.herdr-core
     inputs'.llm-agents.packages.herdr-app
+    inputs'.llm-agents.packages.herdr # keep until we fully transitioned
   ];
 }
