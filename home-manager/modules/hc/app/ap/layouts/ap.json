@@ -54,6 +54,16 @@
           ]
         },
         {
+          "id": "usage",
+          "type": "block",
+          "content": {
+            "mod": "claude-usage"
+          },
+          "size": {
+            "px": 140
+          }
+        },
+        {
           "id": "sidebar-footer",
           "type": "block",
           "content": {
