@@ -221,15 +221,26 @@ export default class Spaces extends View {
     const nested = (r) => r.g?.linked && mains.has(r.g.repo);
     const out = [];
     const placed = new Set(); // repos whose worktrees are listed (under the first of its spaces)
+    const parents = {}; // worktree space id -> the space it's listed under
     for (const r of list) {
       if (nested(r)) continue;
       out.push({ ...r, tree: null });
       if (!r.g || r.g.linked || placed.has(r.g.repo)) continue;
       placed.add(r.g.repo);
       const kids = list.filter((k) => nested(k) && k.g.repo === r.g.repo);
-      kids.forEach((k, n) => out.push({ ...k, tree: n === kids.length - 1 ? "└─" : "├─" }));
+      kids.forEach((k, n) => {
+        out.push({ ...k, tree: n === kids.length - 1 ? "└─" : "├─" });
+        parents[k.w.id] = r.w.id;
+      });
     }
+    this.publishParents(parents);
     return out;
+  }
+
+  // Shared "space.parents", read by the `goto` picker to show and match each worktree's parent. Called from
+  // render, so it writes only when the nesting changed, keeping the write from re-rendering in a loop.
+  publishParents(parents) {
+    if (JSON.stringify(shared("space.parents") ?? {}) !== JSON.stringify(parents)) setShared("space.parents", parents);
   }
 
   // The rows, under a header per machine once one isn't this computer.

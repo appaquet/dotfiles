@@ -1,12 +1,14 @@
 // Go to a space. A popup listing spaces, never their tabs: spaces with agents come first by status (needs you,
 // finished, working, idle), quiet spaces (no status) fold into "earlier"; within each, the most recently shown
 // space comes first (shared "space.seen", recorded by the status-bar mod). Opens on the first space other than the
-// current one. Type to filter by space or machine name, ↑/↓ and Enter to go, Esc to leave. Cloned from the shipped
-// `picker`, which lists tabs instead.
+// current one. Worktree spaces show their parent space first, as the sidebar nests them. Type to filter fuzzily by
+// space, parent or machine name (match.js), ↑/↓ and Enter to go, Esc to leave. Cloned from the shipped `picker`,
+// which lists tabs instead.
 
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
 import { spaces, run, theme, settings, props, closeOverlay, shared, setShared } from "herdr";
+import { matches } from "./match.js";
 
 const ROW_HEIGHT = { space: 32, earlier: 35 };
 const LIST_MAX = 320;
@@ -65,13 +67,20 @@ export default class SpacePicker extends View {
   // Busy spaces, then quiet ones behind an "earlier" row; a filter shows every match unfolded.
   // Spaces never shown since recording began sort last in their group, in sidebar order (the sort is stable).
   rows() {
-    const f = this.filter.toLowerCase();
+    const all = spaces();
+    const f = this.filter.trim();
     const seen = shared("space.seen") ?? {};
     const recent = (a, b) => (seen[b.id] ?? 0) - (seen[a.id] ?? 0);
-    const matches = spaces().filter((s) => !f || `${s.name} ${s.machine ?? ""}`.toLowerCase().includes(f));
-    const busy = matches.filter((s) => s.status).sort((a, b) => (STATUS_RANK[a.status] ?? 4) - (STATUS_RANK[b.status] ?? 4) || recent(a, b));
-    const quiet = matches.filter((s) => !s.status).sort(recent);
-    const row = (space) => ({ kind: "space", space });
+
+    // A worktree space's parent, as the sidebar nests it (shared "space.parents", published by spaces-status).
+    const parentIds = shared("space.parents") ?? {};
+    const byId = new Map(all.map((s) => [s.id, s]));
+    const parentOf = (s) => byId.get(parentIds[s.id])?.name ?? null;
+
+    const found = all.filter((s) => matches(f, [s.name, parentOf(s), machineOf(s)]));
+    const busy = found.filter((s) => s.status).sort((a, b) => (STATUS_RANK[a.status] ?? 4) - (STATUS_RANK[b.status] ?? 4) || recent(a, b));
+    const quiet = found.filter((s) => !s.status).sort(recent);
+    const row = (space) => ({ kind: "space", space, parent: parentOf(space) });
 
     if (f) return [...busy, ...quiet].map(row);
 
@@ -188,10 +197,12 @@ export default class SpacePicker extends View {
       .on_click((_e, cx) => this.go(r, cx))
       .child(this.glyph(t, s.status))
       .child(h_flex().size(18).flex_none().rounded(5).bg(spaceColor(t, s)).items_center().justify_center().text_size(10.5).font_bold().text_color("#ffffff").child([...s.name][0]?.toUpperCase() ?? "?"))
-      .child(div().flex_1().truncate().text_color(t.foreground).when(s.active, (d) => d.font_semibold()).child(s.name))
+      .child(h_flex().flex_1().min_w(0).items_center()
+        .when(Boolean(r.parent), (el) => el.child(div().flex_none().text_color(t.dim).child(`${r.parent} › `)))
+        .child(div().truncate().text_color(t.foreground).when(s.active, (d) => d.font_semibold()).child(s.name)))
       .when(s.status === "blocked", (el) => el.child(div().text_size(11).text_color(t.blocked).child("needs you")))
       .when(s.status === "done", (el) => el.child(div().text_size(11).text_color(t.done).child("finished")))
-      .when(Boolean(s.machine), (el) => el.child(div().text_size(11).text_color(t.dim).child(s.machine)));
+      .child(div().text_size(11).text_color(t.dim).child(machineOf(s)));
   }
 
   earlierRow(t, r, selected) {
@@ -215,4 +226,9 @@ export default class SpacePicker extends View {
     if (st === "working") return svg("mods/workspace-chrome/spinner.svg").size(12).flex_none().text_color(t.working).spin(900);
     return div().w(12).flex_none().text_color(t[st] ?? t.dim).child(st === "idle" ? "○" : st ? "●" : "·");
   }
+}
+
+// herdr leaves `machine` unset for spaces on this computer.
+function machineOf(space) {
+  return space.machine ?? "local";
 }
