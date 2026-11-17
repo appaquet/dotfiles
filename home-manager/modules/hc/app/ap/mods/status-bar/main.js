@@ -18,6 +18,10 @@ const SPACE_SEEN = "space.seen";
 const SHOWN = ["five_hour", "seven_day"];
 // Tooltip nouns for those two windows; `data.js` keeps the shorter labels the bar itself shows.
 const NAMES = { five_hour: "5-hour", seven_day: "Weekly" };
+// Only the weekly budget earns a place in the bar. The 5-hour one swings from 20%/h on a fresh window to
+// 50%/h just before a reset, and there is little to decide with it, so it stays in the tooltip.
+const BAR_BUDGET = "seven_day";
+const BUDGET_SIZE = 11.2;
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default class WorkspaceStatus extends View {
@@ -68,22 +72,29 @@ export default class WorkspaceStatus extends View {
     return key ? `${key}  commands` : "commands";
   }
 
-  // `5h 82% (49%/h) · week 62% (23%/d)`: what remains of each window, with the spend budget per remaining
-  // hour or working day in parentheses. Reset times and leftovers live in the tooltip; null when nothing was
-  // ever tapped.
+  // `5h 82% · week 62% (23%/d)`: what remains of each window, with the weekly spend budget per remaining
+  // working day in a smaller parenthetical. Reset times and both leftovers live in the tooltip; null when
+  // nothing was ever tapped.
   usageSegment(t) {
     const shown = WINDOWS.filter((w) => SHOWN.includes(w.key) && this.usage[w.key]);
     if (shown.length === 0) return null;
 
     const now = Date.now();
     const pace = (w) => paceFor(w.key, this.usage[w.key], now);
-    const text = shown.map((w) => {
+    const parts = [];
+    for (const w of shown) {
+      if (parts.length > 0) parts.push(" · ");
       const v = this.usage[w.key];
-      if (v.resets * 1000 <= now) return `${w.label} --`;
+      if (v.resets * 1000 <= now) {
+        parts.push(`${w.label} --`);
+        continue;
+      }
       const p = pace(w);
-      const left = Math.round(p ? p.left : leftPercent(v.used));
-      return p ? `${w.label} ${left}% (${Math.round(p.perUnit)}%/${p.unit})` : `${w.label} ${left}%`;
-    }).join(" · ");
+      parts.push(`${w.label} ${Math.round(p ? p.left : leftPercent(v.used))}%`);
+      if (p && w.key === BAR_BUDGET) {
+        parts.push(div().flex_none().text_size(BUDGET_SIZE).child(` (${Math.round(p.perUnit)}%/${p.unit})`));
+      }
+    }
     const tip = shown.flatMap((w) => {
       const p = pace(w);
       const lines = [`${w.title}: ${resetText(this.usage[w.key].resets)}`];
@@ -94,7 +105,7 @@ export default class WorkspaceStatus extends View {
     const at = shared(SEEN)?.at;
     const old = Boolean(at) && now - at > DIM_AFTER;
 
-    return div().id("usage").text_color(old ? t.dim : t.muted).tooltip(tip.join("\n")).child(text);
+    return h_flex().id("usage").gap(0).items_center().text_color(old ? t.dim : t.muted).tooltip(tip.join("\n")).children(parts);
   }
 
   render() {
