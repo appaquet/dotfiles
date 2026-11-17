@@ -1,6 +1,5 @@
+# Bumps Pi npm extension pins
 name: "Pi plugin bumper"
-
-description: "Bumps Pi npm extension pins"
 
 on:
   schedule:

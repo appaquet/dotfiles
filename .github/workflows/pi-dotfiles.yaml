@@ -1,6 +1,5 @@
+# Catch-all dotfiles agent; comment @pi-dotfiles ... on any issue or PR to invoke; never pushes to master or merges
 name: "Dotfiles agent"
-
-description: "Catch-all dotfiles agent; comment @pi-dotfiles ... on any issue or PR to invoke; never pushes to master or merges"
 
 on:
   workflow_dispatch: # allow manual triggering

@@ -1,6 +1,5 @@
+# Bumps fetchFromGitHub pins, verified by real deskapp builds
 name: "Nix fetch bumper"
-
-description: "Bumps fetchFromGitHub pins, verified by real deskapp builds"
 
 on:
   schedule:
