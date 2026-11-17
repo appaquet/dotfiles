@@ -25,7 +25,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: DeterminateSystems/nix-installer-action@3138316df39ed29be04236d7ffc686fa525866aa # v23
+    - uses: DeterminateSystems/nix-installer-action@v23
       with:
         extra-conf: |
           experimental-features = nix-command flakes ${{ inputs.extra-features }}
@@ -35,8 +35,7 @@ runs:
         github-token: ${{ inputs.github-token }}
 
     # Caching only covers steps that run after this one, so it has to sit above the build steps.
-    # Pinned by commit: the action writes nix.conf and reads the token, so a moved tag would change CI silently.
-    - uses: Mic92/hestia@dfed9ced335d28978ba74e513939a10db1f71025 # v3.1.0
+    - uses: Mic92/hestia@v3.1.0
       if: inputs.cache == 'true'
       with:
         version: "v3.1.0"

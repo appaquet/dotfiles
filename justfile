@@ -1,4 +1,6 @@
 
+mod ci
+
 default:
     @just --list
 

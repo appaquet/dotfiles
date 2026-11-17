@@ -31,12 +31,12 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: ./.github/actions/nix-setup
+    - uses: $/.github/actions/nix-setup
       with:
         github-token: ${{ inputs.gh-pat }}
         cache: ${{ inputs.cache }}
 
-    - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+    - uses: actions/setup-node@v6.5.0
       if: ${{ inputs.with-node == 'true' }}
       with:
         node-version: 24
@@ -47,9 +47,8 @@ runs:
       shell: bash
       run: npm config set min-release-age ${{ inputs.npm-min-release-age }}
 
-    # Pinned by commit: a moved tag would change the agent silently.
     - name: Run the agent
-      uses: shaftoe/pi-coding-agent-action@381f578da466b8d2ef48f0fdb8a940f276fe4c3c # v2.30.1
+      uses: shaftoe/pi-coding-agent-action@v2.30.1
       env:
         GH_TOKEN: ${{ inputs.gh-pat }} # lets the agent read release notes and clone branches
       with:

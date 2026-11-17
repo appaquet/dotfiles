@@ -30,12 +30,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 120 # open-ended work may include real builds
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
           token: ${{ secrets.GH_PAT }}
 
-      - uses: ./.github/actions/pi-agent
+      - uses: $/.github/actions/pi-agent
         with:
           gh-pat: ${{ secrets.GH_PAT }}
           opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}

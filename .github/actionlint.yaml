@@ -1,0 +1,6 @@
+# actionlint doesn't know the `$/` self-repository form of `uses:` yet and reports it as a missing
+# ref (rhysd/actionlint#711). Drop this once a release accepts it.
+paths:
+  .github/workflows/*.yaml:
+    ignore:
+      - 'specifying action "\$/.+" in invalid format because ref is missing'
