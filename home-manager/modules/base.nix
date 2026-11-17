@@ -11,9 +11,10 @@
     inputs.nix-index-database.homeModules.default
     inputs.nixantic.homeManagerModules.default
 
+    inputs.self.modules.homeManager.git
+
     ./fish
     ./tmux.nix
-    ./git
     ./neovim
     ./nono
     ./restic/backup.nix

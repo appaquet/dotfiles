@@ -1,6 +1,8 @@
 { ... }:
 
 {
+  flake.modules.homeManager.git = ./default.nix;
+
   perSystem =
     { pkgs, ... }:
     {

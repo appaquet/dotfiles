@@ -79,6 +79,8 @@
 
         imports = [
           inputs.nixantic.flakeModules.default
+          inputs.flake-parts.flakeModules.modules
+
           ./overlays
           ./home-manager
           ./nixos
