@@ -12,8 +12,8 @@ The agent workflows (`pi-bump`, `nix-bump`, `pi-dotfiles`) are siblings: each ch
 maintains the workflows, not the agent that runs them. Check the siblings together: a change that fixes one
 workflow usually applies to the others, and a change to the shared action or the contract must be reviewed against
 every consuming workflow in the same change.
-Only the agent workflows pass `GH_PAT` to `actions/checkout`: the agent publishes as the repo owner. The other jobs
-rely on the default token — push-check is read-only, and the Flake updater's PR is deliberately bot-authored.
+Only the agent workflows pass `GH_PAT` to `actions/checkout` so the agent can push as the repo owner. See the
+publish contract for PR authorship. Other jobs rely on the default token; push-check is read-only.
 
 Action references use version tags (`actions/checkout@v7.0.1`); `.github/workflows/actions.lock` records the exact
 commit behind each tag, so a moved tag changes nothing until someone relocks. Local actions are referenced as

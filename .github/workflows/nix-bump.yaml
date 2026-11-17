@@ -32,6 +32,8 @@ jobs:
           token: ${{ secrets.GH_PAT }}
 
       - uses: $/.github/actions/pi-agent
+        env:
+          PR_CREATE_TOKEN: ${{ github.token }}
         with:
           gh-pat: ${{ secrets.GH_PAT }}
           opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}
@@ -65,10 +67,14 @@ jobs:
             4. `HOST=deskapp ./x home build --cores 0 --max-jobs 1 --print-build-logs --verbose` exits 0
             5. `HOST=deskapp ./x nixos build --cores 0 --max-jobs 1` exits 0
 
-            Publish per `.github/prompts/agent-publish-contract.md`. Open the PR against `master` on branch
-            `nix/fetch-bump`, title `chore(nix): bump fetchFromGitHub pins`. The body must carry the
-            skill's audit table (fetch, current, proposed, latest-rev date, status, change summary),
-            the verification ladder commands, the apply step, and a note that a `@pi-dotfiles ...` comment on the bump PR relaunches the bump.
+            Publish per `.github/prompts/agent-publish-contract.md` on `nix/fetch-bump` against `master`,
+            with title `chore(nix): bump fetchFromGitHub pins`. Use the owner token for pushes and
+            existing PR edits. Open new PRs with `PR_CREATE_TOKEN` as the Actions bot and request
+            review from `appaquet`. If that fails, report it; don't open the PR as the owner.
+
+            The body must carry the skill's audit table (fetch, current, proposed, latest-rev date,
+            status, change summary), the verification ladder commands, the apply step, and a note that
+            a `@pi-dotfiles ...` comment on the bump PR relaunches the bump.
 
             Extra instruction for this run, if any:
             ${{ inputs.extra_instruction }}
