@@ -1,7 +1,10 @@
+{ inputs', ... }:
 {
   imports = [ ./module.nix ];
 
   config = {
+    dotfiles.nono.package = inputs'.llm-agents.packages.nono;
+
     # Per machine profile
     dotfiles.nono.profiles.machine = {
       meta.version = "1.0.0";

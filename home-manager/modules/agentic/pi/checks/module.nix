@@ -23,10 +23,10 @@ let
     modules:
     home-manager.lib.homeManagerConfiguration {
       inherit pkgs;
-      extraSpecialArgs.inputs'.llm-agents.packages.pi = upstreamPi;
       modules = [
         ../module.nix
         {
+          dotfiles.pi.package = lib.mkDefault (upstreamPi.override { useBun = false; });
           home = {
             username = "pi-test";
             homeDirectory = "/home/pi-test";
@@ -37,10 +37,8 @@ let
       ++ modules;
     };
 
-  # These evaluations guard enablement and the production Node package choice
-  # without duplicating the module's option implementation.
+  # This evaluation guards enablement without duplicating the module's option implementation.
   disabled = mkHome [ ];
-  defaultEnabled = mkHome [ { dotfiles.pi.enable = true; } ];
   enabled = mkHome [
     {
       dotfiles.pi = {
@@ -69,7 +67,6 @@ let
 in
 
 assert builtins.filter (package: lib.getName package == "pi") disabled.config.home.packages == [ ];
-assert defaultEnabled.config.dotfiles.pi.package == upstreamPi.override { useBun = false; };
 assert piWrapper != null;
 
 pkgs.runCommand "pi-module-check"

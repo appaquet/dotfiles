@@ -31,11 +31,8 @@ let
 
   libExtensions = import ../plugins/lib-extensions.nix { inherit pkgs; };
 
-  # The smoke test executes the package selected by the production module, not
-  # a separately chosen test package that could drift from production.
   productionHome = home-manager.lib.homeManagerConfiguration {
     inherit pkgs;
-    extraSpecialArgs.inputs'.llm-agents.packages.pi = upstreamPi;
     modules = [
       ../module.nix
       {
@@ -45,6 +42,7 @@ let
           stateVersion = "24.11";
         };
         dotfiles.pi.enable = true;
+        dotfiles.pi.package = upstreamPi.override { useBun = false; };
       }
     ];
   };
@@ -100,7 +98,6 @@ let
   smokePkgs = pkgs.extend (_: _: { inherit nono; });
   smokeHome = home-manager.lib.homeManagerConfiguration {
     pkgs = smokePkgs;
-    extraSpecialArgs.inputs'.llm-agents.packages.pi = upstreamPi;
     extraSpecialArgs.inputs'.llm-agents.packages.nono = nono;
     modules = [
       ../../../nono/default.nix
@@ -188,7 +185,6 @@ let
     fragment:
     home-manager.lib.homeManagerConfiguration {
       inherit pkgs;
-      extraSpecialArgs.inputs'.llm-agents.packages.pi = upstreamPi;
       modules = [
         ../module.nix
         {
@@ -240,7 +236,6 @@ let
   '';
 in
 
-assert selectedPi == upstreamPi.override { useBun = false; };
 assert nonoPi != null;
 
 {

@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  inputs',
   ...
 }:
 
@@ -14,6 +13,11 @@ in
 
   options.dotfiles.nono = {
     enable = lib.mkEnableOption "nono sandbox, its profiles and the maybe launcher";
+
+    package = lib.mkOption {
+      type = lib.types.package;
+      description = "nono package installed alongside the generated profiles.";
+    };
 
     profiles = lib.mkOption {
       type = lib.types.attrsOf (lib.types.attrsOf lib.types.anything);
@@ -37,8 +41,6 @@ in
       }
     ) cfg.profiles;
 
-    home.packages = [
-      inputs'.llm-agents.packages.nono
-    ];
+    home.packages = [ cfg.package ];
   };
 }

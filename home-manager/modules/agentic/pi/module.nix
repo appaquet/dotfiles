@@ -1,6 +1,5 @@
 {
   config,
-  inputs',
   lib,
   pkgs,
   ...
@@ -214,7 +213,6 @@ in
 
     package = lib.mkOption {
       type = lib.types.package;
-      default = inputs'.llm-agents.packages.pi.override { useBun = false; };
       description = "Upstream Pi package wrapped by the local runtime integration.";
     };
 

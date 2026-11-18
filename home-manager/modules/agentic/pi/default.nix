@@ -1,5 +1,6 @@
 {
   config,
+  inputs',
   ...
 }:
 
@@ -15,6 +16,7 @@ in
 
   dotfiles.pi = {
     enable = true;
+    package = inputs'.llm-agents.packages.pi.override { useBun = false; };
     authFile = config.sops.secrets.pi_auth_json.path;
     environment.JJ_EDITOR.value = "false"; # fail loud if a jj command tries to open an editor
 
