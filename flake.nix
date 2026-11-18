@@ -21,9 +21,10 @@
     };
 
     secrets = {
-      url = "github:appaquet/dotfiles-secrets";
+      url = "github:appaquet/dotfiles-secrets/secret-broker";
       #url = "path:/home/appaquet/dotfiles/secrets";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
     };
 
     dotblip = {

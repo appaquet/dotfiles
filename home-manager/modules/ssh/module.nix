@@ -7,6 +7,10 @@
 
 let
   cfg = config.dotfiles.ssh.agent;
+  # The pb broker owns the session stack when enabled: its fish init replaces
+  # this one, so the legacy slot mechanism must go fully inactive for the
+  # same shell.
+  pbEnabled = config.dotfiles.ssh.pb.enable or false;
   slotHelper = pkgs.writeShellApplication {
     name = "ssh-agent-slot";
 
@@ -32,7 +36,7 @@ in
     };
   };
 
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf (cfg.enable && !pbEnabled) {
     home.packages = [ slotHelper ];
 
     programs.fish.shellInit = lib.mkAfter ''
