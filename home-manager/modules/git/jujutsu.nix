@@ -33,6 +33,7 @@ in
 
       revset-aliases = {
         "proj()" = "description(glob:'private: proj*')";
+        "nearest_proj(from)" = "heads(first_ancestors(from) & proj())";
         "closest_bookmark(to)" = "heads(::to & bookmarks())";
         "recent()" = "committer_date(after:\"1 months ago\")";
         "private()" = "description(glob:'private:*')";

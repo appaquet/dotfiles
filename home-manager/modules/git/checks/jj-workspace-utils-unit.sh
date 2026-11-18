@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-#
 # Behavioral suite for the jj workspace utilities: jj-workspace-name, -exists, -select,
 # -path, and -add.
 #
@@ -7,74 +5,13 @@
 # names that need quoting (e.g. names with spaces) with quotes in its listing. The suite
 # therefore holds a plain name and a quoted name in the same repo and asserts that each
 # command reports, selects, and resolves both.
-#
-# Usage:
-#   JJ_UTILS_BIN=/path/to/bin ./jj-workspace-utils-unit.sh
-#
-# JJ_UTILS_BIN must point at the bin directory holding the commands under test.
-
-set -uo pipefail
-
-if [ -z "${JJ_UTILS_BIN:-}" ]; then
-  echo "FATAL: JJ_UTILS_BIN is not set; point it at the jj-utils bin directory" >&2
-  exit 1
-fi
-
-command -v jj >/dev/null || { echo "FATAL: jj not on PATH" >&2; exit 1; }
-
-PATH="$JJ_UTILS_BIN:$PATH"
-export PATH
-
-# Command output goes here, never inside a repo working copy: jj snapshots untracked
-# files, and a later change rewrite would conflict on them.
-out=$(mktemp -d)
-# jj needs a writable HOME even for repo-level config (secure config lookup).
-HOME="$out/home"
-mkdir -p "$HOME"
-export HOME
-trap 'rm -rf "$out"' EXIT
-failures=0
-tests=0
-
-pass() { printf 'ok   - %s\n' "$1"; }
-fail() {
-  failures=$((failures + 1))
-  printf 'FAIL - %s\n' "$1" >&2
-  if [ -n "${2:-}" ]; then printf '       %s\n' "$2" >&2; fi
-}
-
-# assert_eq <label> <expected> <actual>
-assert_eq() {
-  tests=$((tests + 1))
-  if [ "$2" = "$3" ]; then
-    pass "$1"
-  else
-    fail "$1" "expected: [$2] / actual: [$3]"
-  fi
-}
-
-# assert_true <label> <exit-code>
-assert_true() {
-  tests=$((tests + 1))
-  if [ "$2" = "0" ]; then pass "$1"; else fail "$1" "command exited $2"; fi
-}
-
-# assert_false <label> <exit-code>  (expects a non-zero exit)
-assert_false() {
-  tests=$((tests + 1))
-  if [ "$2" != "0" ]; then pass "$1"; else fail "$1" "command unexpectedly exited 0"; fi
-}
 
 # new_repo -> prints a fresh repo dir holding a default, a plain, and a quoted workspace
 new_repo() {
   local repo
-  repo=$(mktemp -d) || return 1
+  repo=$(init_repo) || return 1
   (
     cd "$repo" || exit 1
-    jj git init >/dev/null || exit 1
-    # Commits need an identity: the check sandbox has no user jj config.
-    jj config set --repo user.name "Test User" >/dev/null || exit 1
-    jj config set --repo user.email "test@example.com" >/dev/null || exit 1
     printf 'content\n' > file.txt
     jj commit -m init >/dev/null || exit 1
     jj workspace add --name ws-a "$repo/ws-a" >/dev/null || exit 1
@@ -248,11 +185,4 @@ assert_false "exists: a missing name is rejected" "$rc"
 ( cd "$repo" && jj-workspace-path ) >/dev/null 2>&1; rc=$?
 assert_false "path: a missing name is rejected" "$rc"
 
-# --- Cleanup ------------------------------------------------------------------------
-rm -rf "$repo"
-
-echo "== results: $((tests - failures))/$tests passed =="
-if [ "$failures" -ne 0 ]; then
-  exit 1
-fi
-exit 0
+finish

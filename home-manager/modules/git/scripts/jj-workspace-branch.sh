@@ -13,7 +13,7 @@ fi
 # Snapshot before both lookups: local edits can make @ eligible, and Git
 # integration can change where the existing bookmark points.
 target=$(jj_commit_ids 'heads(::@ ~ (empty() | private()))')
-bookmark_revset="bookmarks(exact:\"${workspace}\")"
+bookmark_revset="bookmarks(exact:$(jj_str "$workspace"))"
 private_target=$(jj_commit_id "$bookmark_revset & private()")
 if [ -n "$private_target" ]; then
   echo "Bookmark '${workspace}' parked on a private change; not moving it"

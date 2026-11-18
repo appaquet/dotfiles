@@ -15,6 +15,12 @@ jj_unquote() {
   sed 's/^"//; s/"$//'
 }
 
+# jj_str <text> - quote text as a revset string literal, e.g. for `$(jj_str "$name")@`.
+jj_str() {
+  local text=${1//\\/\\\\}
+  printf '"%s"' "${text//\"/\\\"}"
+}
+
 # jj_commit_ids <revset> [log options...] - full commit IDs, one per matching revision.
 jj_commit_ids() {
   local revset="$1"

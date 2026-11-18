@@ -2,7 +2,7 @@
 # also tug the bookmarks after the rebase.
 jj_proj_tug() {
   local project_only=false project working working_empty parents
-  local project_revset='heads(first_ancestors(@) & proj())'
+  local project_revset='nearest_proj(@)'
 
   if [ "$#" -eq 1 ] && [ "$1" = '--project-only' ]; then
     project_only=true

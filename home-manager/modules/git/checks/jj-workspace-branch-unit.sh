@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-#
 # Behavioral suite for the jj-workspace-branch command.
 #
 # The workspace bookmark follows the nearest non-empty, non-private change.
@@ -8,84 +6,18 @@
 # The suite builds throwaway jj repositories with a second workspace, runs the
 # command under test, and asserts the resulting bookmarks, messages, and exit
 # codes.
-#
-# Usage:
-#   JJ_WORKSPACE_BRANCH_BIN=/path/to/jj-workspace-branch ./jj-workspace-branch-unit.sh
-#
-# JJ_WORKSPACE_BRANCH_BIN must point at the command under test (the built binary
-# or a dev copy).
-
-set -uo pipefail
-
-if [ -z "${JJ_WORKSPACE_BRANCH_BIN:-}" ]; then
-  echo "FATAL: JJ_WORKSPACE_BRANCH_BIN is not set; point it at the jj-workspace-branch binary under test" >&2
-  exit 1
-fi
-
-command -v jj >/dev/null || { echo "FATAL: jj not on PATH" >&2; exit 1; }
-
-BRANCH="$JJ_WORKSPACE_BRANCH_BIN"
-
-# Command output goes here, never inside a repo working copy: jj snapshots untracked
-# files, and a later change rewrite would conflict on them.
-out=$(mktemp -d)
-# jj needs a writable HOME even for repo-level config (secure config lookup).
-HOME="$out/home"
-JJ_CONFIG="$out/jj-config"
-mkdir -p "$HOME" "$JJ_CONFIG"
-export HOME JJ_CONFIG
-trap 'rm -rf "$out"' EXIT
-failures=0
-tests=0
-
-pass() { printf 'ok   - %s\n' "$1"; }
-fail() {
-  failures=$((failures + 1))
-  printf 'FAIL - %s\n' "$1" >&2
-  if [ -n "${2:-}" ]; then printf '       %s\n' "$2" >&2; fi
-}
-
-# assert_eq <label> <expected> <actual>
-assert_eq() {
-  tests=$((tests + 1))
-  if [ "$2" = "$3" ]; then
-    pass "$1"
-  else
-    fail "$1" "expected: [$2] / actual: [$3]"
-  fi
-}
-
-# assert_true <label> <exit-code>
-assert_true() {
-  tests=$((tests + 1))
-  if [ "$2" = "0" ]; then pass "$1"; else fail "$1" "command exited $2"; fi
-}
-
-# assert_false <label> <exit-code>  (expects a non-zero exit)
-assert_false() {
-  tests=$((tests + 1))
-  if [ "$2" != "0" ]; then pass "$1"; else fail "$1" "command unexpectedly exited 0"; fi
-}
 
 # bookmark_target <repo> <name> -> commit id the local bookmark points at (empty if absent)
 bookmark_target() {
-  (cd "$1" && jj --ignore-working-copy log --no-graph \
-    -r "bookmarks(exact:\"$2\")" -T 'commit_id')
+  rev_of "bookmarks(exact:\"$2\")" commit_id -R "$1"
 }
 
 # new_repo [empty] -> fresh repo with a ws-a workspace and an optional content commit.
 new_repo() {
   local repo
-  repo=$(mktemp -d "$out/repo.XXXXXX") || return 1
+  repo=$(init_repo) || return 1
   (
     cd "$repo" || exit 1
-    jj git init >/dev/null || exit 1
-    # Commits need an identity: the check sandbox has no user jj config.
-    jj config set --repo user.name "Test User" >/dev/null || exit 1
-    jj config set --repo user.email "test@example.com" >/dev/null || exit 1
-    # The sandbox HOME has no user config, so mirror the `private()` revset alias
-    # the command under test relies on.
-    jj config set --repo 'revset-aliases."private()"' "description(glob:'private:*')" >/dev/null || exit 1
     if [ "$#" -eq 0 ]; then
       printf 'content\n' > file.txt
       jj commit -m init >/dev/null || exit 1
@@ -101,11 +33,11 @@ repo=$(new_repo) || { echo "FATAL: repo setup failed" >&2; exit 1; }
 
 ws="$repo/ws-a"
 rev_id() {
-  (cd "$ws" && jj --ignore-working-copy log --no-graph -r "$1" -T 'commit_id')
+  rev_of "$1" commit_id -R "$ws"
 }
 
 run_branch() {
-  (cd "$ws" && "$BRANCH" >"$out/branch.log" 2>&1)
+  (cd "$ws" && jj-workspace-branch >"$out/branch.log" 2>&1)
 }
 
 # An empty working copy above content and private changes selects the content.
@@ -155,7 +87,7 @@ assert_eq "bookmark moves backwards to eligible @" "$work" "$(bookmark_target "$
   jj new -m next >/dev/null 2>&1 || exit 1
 ) >&2
 private_commit=$(bookmark_target "$repo" ws-a)
-( cd "$repo/ws-a" && "$BRANCH" >"$out/out5.log" 2>&1 ); rc=$?
+( cd "$repo/ws-a" && jj-workspace-branch >"$out/out5.log" 2>&1 ); rc=$?
 assert_true "private-parked run exits 0" "$rc"
 assert_eq "private-parked bookmark stays on its target" \
   "$private_commit" "$(bookmark_target "$repo" ws-a)"
@@ -164,7 +96,7 @@ grep -q "parked on a private change" "$out/out5.log" \
   || fail "private-parked run reports the exemption" "$(cat "$out/out5.log")"
 
 # --- Case: the default workspace is rejected ---------------------------------------------
-( cd "$repo" && "$BRANCH" >"$out/out6.log" 2>&1 ); rc=$?
+( cd "$repo" && jj-workspace-branch >"$out/out6.log" 2>&1 ); rc=$?
 assert_false "default workspace run exits non-zero" "$rc"
 assert_eq "default workspace run creates no bookmark" \
   "" "$(bookmark_target "$repo" default)"
@@ -174,7 +106,7 @@ grep -q "default workspace" "$out/out6.log" \
 
 # --- Case: extra arguments are rejected ----------------------------------------------------
 before_usage=$(bookmark_target "$repo" ws-a)
-( cd "$repo/ws-a" && "$BRANCH" surprise >"$out/out7.log" 2>&1 ); rc=$?
+( cd "$repo/ws-a" && jj-workspace-branch surprise >"$out/out7.log" 2>&1 ); rc=$?
 assert_false "extra argument exits non-zero" "$rc"
 assert_eq "usage error leaves the bookmark untouched" \
   "$before_usage" "$(bookmark_target "$repo" ws-a)"
@@ -237,8 +169,4 @@ assert_true "imported private bookmark run exits 0" "$rc"
 assert_eq "bookmark imported onto private content is not moved back off it" \
   "$(rev_id 'description(glob:"private: parked*")')" "$(bookmark_target "$repo" ws-a)"
 
-echo "== results: $((tests - failures))/$tests passed =="
-if [ "$failures" -ne 0 ]; then
-  exit 1
-fi
-exit 0
+finish
