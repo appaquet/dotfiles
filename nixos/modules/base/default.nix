@@ -50,7 +50,7 @@
 
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHNXBK1YpLeuIKx+tpVLpZOhKbMcqLeMx15SvcBG0jcR ssh 1pw"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIITLlZL+L2M3ckRBajb4lMjRX5K+5EbiAz6uXPkvYAws ssh breakglass"
+      inputs.secrets.sshPublicKeys.sshBreakglass
     ];
   };
   programs.fish.enable = true;
