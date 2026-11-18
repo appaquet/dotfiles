@@ -182,6 +182,51 @@ assert_true "delete: a workspace with no space succeeds" "$rc"
 assert_path "delete: removes the workspace folder" absent "$root/spartan"
 assert_not_recorded "delete: ends no terminal when no space exists" "hc|kill"
 
+# --- delete abandons the workspace's own project link ------------------------------
+mkdir -p "$out/docs"
+printf 'plan\n' >"$out/docs/plan.md"
+
+# add_project_workspace <name> -> commit id of a project link committed in a new workspace
+add_project_workspace() {
+  jj -R "$root" workspace add --name "$1" "$root/$1" >/dev/null 2>&1 || return 1
+  ln -s "$out/docs" "$root/$1/proj"
+  jj -R "$root/$1" commit -m "private: proj - $1" >/dev/null 2>&1 || return 1
+  rev_of @- commit_id -R "$root/$1"
+}
+
+# A name with a space checks the workspace revset quoting.
+project=$(add_project_workspace 'proj clean') || { echo "FATAL: project fixture setup failed" >&2; exit 1; }
+reset_stubs
+( cd "$repo" && jj-workspace-delete 'proj clean' ) >/dev/null 2>&1; rc=$?
+assert_true "project: deleting a workspace with a project link succeeds" "$rc"
+assert_eq "project: the link of a clean workspace is abandoned" "" "$(rev_of "commit_id($project) & visible()" commit_id -R "$root")"
+assert_eq "project: the linked documents are kept" "plan" "$(cat "$out/docs/plan.md")"
+
+# Work and unsnapshotted edits survive, without the link below them.
+project=$(add_project_workspace dirty) || { echo "FATAL: project fixture setup failed" >&2; exit 1; }
+printf 'work\n' >"$root/dirty/work.txt"
+jj -R "$root/dirty" commit -m 'unreviewed: work' >/dev/null 2>&1
+work=$(rev_of @- change_id -R "$root/dirty")
+printf 'wip\n' >"$root/dirty/wip.txt"
+( cd "$repo" && jj-workspace-delete dirty ) >/dev/null 2>&1; rc=$?
+assert_true "project: deleting a dirty workspace succeeds" "$rc"
+assert_eq "project: the link of a dirty workspace is abandoned" "" "$(rev_of "commit_id($project) & visible()" commit_id -R "$root")"
+assert_eq "project: work no longer contains the link" $'file.txt\nwork.txt' "$(cd "$root" && jj file list -r "$work")"
+assert_eq "project: unsnapshotted edits are recovered" "wip" "$(cd "$root" && jj file show -r 'files(wip.txt)' wip.txt)"
+
+# A link that another workspace or a bookmark builds on stays.
+project=$(add_project_workspace shared) || { echo "FATAL: project fixture setup failed" >&2; exit 1; }
+jj -R "$root" workspace add --name sharer -r "commit_id($project)" "$root/sharer" >/dev/null 2>&1
+( cd "$repo" && jj-workspace-delete shared ) >/dev/null 2>&1; rc=$?
+assert_true "project: deleting a workspace with a shared link succeeds" "$rc"
+assert_eq "project: a link shared with another workspace is kept" "$project" "$(rev_of "commit_id($project) & visible()" commit_id -R "$root")"
+
+project=$(add_project_workspace booked) || { echo "FATAL: project fixture setup failed" >&2; exit 1; }
+jj -R "$root" bookmark create booked -r "commit_id($project)" >/dev/null 2>&1
+( cd "$repo" && jj-workspace-delete booked ) >/dev/null 2>&1; rc=$?
+assert_true "project: deleting a workspace with a bookmarked link succeeds" "$rc"
+assert_eq "project: a bookmarked link is kept" "$project" "$(rev_of "commit_id($project) & visible()" commit_id -R "$root")"
+
 # --- hosts without herdr-core stay usable -----------------------------------------
 # Only meaningful where no herdr-core is installed (the check sandbox); nothing in PATH can
 # hide an installed binary from `command -v`.
