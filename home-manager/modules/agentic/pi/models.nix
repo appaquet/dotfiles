@@ -106,7 +106,7 @@ in
 
       codex = {
         main = {
-          model = "openai/gpt-6.1-sol";
+          model = "openai/gpt-6.2-sol";
           thinking = "high";
         };
         remap = {
@@ -123,19 +123,19 @@ in
             thinking = "medium";
           };
           "scoped/senior" = {
-            model = "openai/gpt-6.1-sol";
+            model = "openai/gpt-6.2-sol";
             thinking = "high";
           };
           "scoped/staff" = {
-            model = "openai/gpt-6.1-sol";
+            model = "openai/gpt-6.2-sol";
             thinking = "xhigh";
           };
           "scoped/principal" = {
-            model = "openai/gpt-6-astra";
+            model = "openai/gpt-6.2-astra";
             thinking = "medium";
           };
           "scoped/reviewer" = {
-            model = "openai/gpt-6.1-sol";
+            model = "openai/gpt-6.2-sol";
             thinking = "medium";
           };
         };
