@@ -3,9 +3,8 @@
 {
   imports = [
     inputs.self.modules.nixos.cachix
+    inputs.self.modules.nixos.restic
 
-    ./restic/backup.nix
-    ./restic/server.nix
     ./ups/client.nix
     ./network-bridge.nix
     ./netconsole/sender.nix

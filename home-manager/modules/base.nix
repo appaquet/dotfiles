@@ -12,12 +12,12 @@
     inputs.nixantic.homeManagerModules.default
 
     inputs.self.modules.homeManager.git
+    inputs.self.modules.homeManager.restic
 
     ./fish
     ./tmux.nix
     ./neovim
     ./nono
-    ./restic/backup.nix
     ./utils
     ./ssh
     ./hc
