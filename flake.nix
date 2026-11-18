@@ -86,11 +86,12 @@
           ./nixos
           ./darwin
 
-          # Automatically load any flake-module.nix files.
+          # Automatically load any flake-module.nix files: the three configuration surfaces plus the shared root.
           (inputs.import-tree.filter (path: builtins.match ".*/flake-module\\.nix" path != null) [
             ./home-manager
             ./nixos
             ./darwin
+            ./common
           ])
         ];
 

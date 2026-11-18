@@ -62,6 +62,10 @@ For modules that declare options (examples: `home-manager/modules/hc/`, `home-ma
   when large. Host-specific values stay in host files
 - Import option modules for every host of their surface (`home-manager/modules/base.nix`,
   `nixos/modules/common.nix`) and gate them with `enable`. Modules without options keep per-host imports
+- A feature that applies to more than one surface lives under `common/<feature>/`: its modules plus one
+  `flake-module.nix` registering it for every surface it covers. `common/` is an import-tree root alongside
+  `home-manager/`, `nixos/` and `darwin/`. Note the difference from each surface's `modules/common.nix`, which holds
+  what the hosts of that one surface share
 
 ## Nix Conventions
 
