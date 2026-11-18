@@ -15,9 +15,16 @@ jj_unquote() {
   sed 's/^"//; s/"$//'
 }
 
-# jj_commit_id <revset> - commit id of a single-revision revset, empty when nothing matches.
+# jj_commit_ids <revset> [log options...] - full commit IDs, one per matching revision.
+jj_commit_ids() {
+  local revset="$1"
+  shift
+  jj log --no-graph -r "$revset" -T 'commit_id ++ "\n"' "$@"
+}
+
+# jj_commit_id <revset> - lookup without snapshotting the working copy.
 jj_commit_id() {
-  jj --ignore-working-copy log --no-graph -r "$1" -T 'commit_id ++ "\n"'
+  jj_commit_ids "$1" --ignore-working-copy
 }
 
 # jj_bookmark_names <revset> - local bookmark names of one revision, comma-joined. The

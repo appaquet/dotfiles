@@ -15,6 +15,10 @@
             inherit pkgs jjUtils;
             unitTest = ./checks/jj-promote-unit.sh;
           };
+          jj-proj-tug-unit = import ./checks/jj-proj-tug-unit.nix {
+            inherit pkgs jjUtils;
+            unitTest = ./checks/jj-proj-tug-unit.sh;
+          };
           jj-workspace-branch-unit = import ./checks/jj-workspace-branch-unit.nix {
             inherit pkgs jjUtils;
             unitTest = ./checks/jj-workspace-branch-unit.sh;

@@ -2,11 +2,8 @@
 #
 # Behavioral suite for the jj-workspace-branch command.
 #
-# jj-workspace-branch keeps a jj bookmark named after the current jj workspace pointed
-# at that workspace's working-copy commit: it creates the bookmark if absent and
-# re-points it at the working copy if it points elsewhere, but never moves a
-# bookmark parked on a private change (a "private:" description). The command
-# refuses to run in the default (primary) workspace.
+# The workspace bookmark follows the nearest non-empty, non-private change.
+# A bookmark parked on a private change and the default workspace are exempt.
 #
 # The suite builds throwaway jj repositories with a second workspace, runs the
 # command under test, and asserts the resulting bookmarks, messages, and exit
@@ -34,8 +31,9 @@ BRANCH="$JJ_WORKSPACE_BRANCH_BIN"
 out=$(mktemp -d)
 # jj needs a writable HOME even for repo-level config (secure config lookup).
 HOME="$out/home"
-mkdir -p "$HOME"
-export HOME
+JJ_CONFIG="$out/jj-config"
+mkdir -p "$HOME" "$JJ_CONFIG"
+export HOME JJ_CONFIG
 trap 'rm -rf "$out"' EXIT
 failures=0
 tests=0
@@ -75,10 +73,10 @@ bookmark_target() {
     -r "bookmarks(exact:\"$2\")" -T 'commit_id')
 }
 
-# new_repo -> prints a fresh repo dir with one content commit and a ws-a workspace
+# new_repo [empty] -> fresh repo with a ws-a workspace and an optional content commit.
 new_repo() {
   local repo
-  repo=$(mktemp -d) || return 1
+  repo=$(mktemp -d "$out/repo.XXXXXX") || return 1
   (
     cd "$repo" || exit 1
     jj git init >/dev/null || exit 1
@@ -88,8 +86,10 @@ new_repo() {
     # The sandbox HOME has no user config, so mirror the `private()` revset alias
     # the command under test relies on.
     jj config set --repo 'revset-aliases."private()"' "description(glob:'private:*')" >/dev/null || exit 1
-    printf 'content\n' > file.txt
-    jj commit -m init >/dev/null || exit 1
+    if [ "$#" -eq 0 ]; then
+      printf 'content\n' > file.txt
+      jj commit -m init >/dev/null || exit 1
+    fi
     jj workspace add --name ws-a "$repo/ws-a" >/dev/null || exit 1
   ) >&2 || return 1
   printf '%s\n' "$repo"
@@ -99,67 +99,52 @@ echo "== jj-workspace-branch suite =="
 
 repo=$(new_repo) || { echo "FATAL: repo setup failed" >&2; exit 1; }
 
-# --- Case: creates a bookmark named after the workspace at its working copy ----------
-ws_at=$( (cd "$repo/ws-a" && jj --ignore-working-copy log --no-graph -r @ -T 'commit_id') )
-( cd "$repo/ws-a" && "$BRANCH" >"$out/out.log" 2>&1 ); rc=$?
+ws="$repo/ws-a"
+rev_id() {
+  (cd "$ws" && jj --ignore-working-copy log --no-graph -r "$1" -T 'commit_id')
+}
+
+run_branch() {
+  (cd "$ws" && "$BRANCH" >"$out/branch.log" 2>&1)
+}
+
+# An empty working copy above content and private changes selects the content.
+base=$(rev_id @-)
+(
+  cd "$ws" || exit 1
+  jj bookmark create ws-a-other -r @- || exit 1
+  printf 'private notes\n' > notes.txt
+  jj commit -m 'private: notes' || exit 1
+  jj new -m 'empty spacer' || exit 1
+) >&2 || exit 1
+run_branch; rc=$?
 assert_true "create run exits 0" "$rc"
-assert_eq "bookmark named after the workspace points at the workspace's @" \
-  "$ws_at" "$(bookmark_target "$repo" ws-a)"
-grep -q "Bookmark 'ws-a' created at @" "$out/out.log" \
-  && pass "create run reports the created bookmark" \
-  || fail "create run reports the created bookmark" "$(cat "$out/out.log")"
+assert_eq "create skips empty and non-empty private changes" "$base" "$(bookmark_target "$repo" ws-a)"
+run_branch; rc=$?
+assert_true "re-run exits 0" "$rc"
+assert_eq "re-run keeps the same eligible target" "$base" "$(bookmark_target "$repo" ws-a)"
 
-# --- Case: a re-run while the bookmark already points at @ is a no-op ----------------------
-( cd "$repo/ws-a" && "$BRANCH" >"$out/out2.log" 2>&1 ); rc=$?
-assert_true "re-run at @ exits 0" "$rc"
-assert_eq "re-run at @ leaves the bookmark target unchanged" \
-  "$ws_at" "$(bookmark_target "$repo" ws-a)"
-grep -q "Bookmark 'ws-a' already at @" "$out/out2.log" \
-  && pass "re-run at @ reports the existing bookmark" \
-  || fail "re-run at @ reports the existing bookmark" "$(cat "$out/out2.log")"
+# Unsnapshotted edits qualify @ even though the previous snapshot was empty.
+printf 'work in progress\n' > "$ws/work.txt"
+run_branch; rc=$?
+assert_true "re-run with unsnapshotted work exits 0" "$rc"
+work=$(rev_id @)
+assert_eq "bookmark advances to the newly snapshotted @" "$work" "$(bookmark_target "$repo" ws-a)"
+assert_eq "unsnapshotted work is part of the bookmark target" "work in progress" \
+  "$(cd "$ws" && jj --ignore-working-copy file show -r ws-a work.txt 2>/dev/null)"
+assert_eq "similarly named bookmark stays at base" "$base" "$(bookmark_target "$repo" ws-a-other)"
 
-# --- Case: a newer commit re-points the bookmark at the new @ -------------------------------
-# Committing rewrites the change the bookmark rides on (the bookmark follows the
-# change), while the workspace's working copy becomes a newer change. The re-run
-# must move the bookmark to the new @.
+# A bookmark ahead of the eligible revision can be pulled back.
 (
-  cd "$repo/ws-a" || exit 1
-  printf 'more\n' >> file.txt
-  jj commit -m second >/dev/null || exit 1
-) >&2
-bm_after_commit=$(bookmark_target "$repo" ws-a)
-ws_at_now=$( (cd "$repo/ws-a" && jj --ignore-working-copy log --no-graph -r @ -T 'commit_id') )
-if [ -n "$bm_after_commit" ] && [ "$bm_after_commit" != "$ws_at_now" ]; then
-  tests=$((tests + 1))
-  pass "precondition: bookmark target differs from the workspace's new @"
-else
-  tests=$((tests + 1))
-  fail "precondition: bookmark target differs from the workspace's new @" \
-    "bookmark: [$bm_after_commit] / @: [$ws_at_now]"
-fi
-( cd "$repo/ws-a" && "$BRANCH" >"$out/out3.log" 2>&1 ); rc=$?
-assert_true "re-run after a new commit exits 0" "$rc"
-assert_eq "new commit re-points the bookmark at the new @" \
-  "$ws_at_now" "$(bookmark_target "$repo" ws-a)"
-grep -q "Bookmark 'ws-a' moved to @" "$out/out3.log" \
-  && pass "move run reports the re-pointed bookmark" \
-  || fail "move run reports the re-pointed bookmark" "$(cat "$out/out3.log")"
-
-# --- Case: a bookmark ahead of @ is moved backwards ---------------------------------------
-# The bookmark is parked on a descendant of the working copy (as after a `jj
-# tug`-style relocation): the run must pull it back down to @.
-(
-  cd "$repo/ws-a" || exit 1
-  at_commit=$(jj --ignore-working-copy log --no-graph -r @ -T 'commit_id') || exit 1
-  jj new -m ahead >/dev/null 2>&1 || exit 1
-  jj bookmark set ws-a -r @ >/dev/null 2>&1 || exit 1
-  jj edit "$at_commit" >/dev/null 2>&1 || exit 1
-) >&2
-ws_at_back=$( (cd "$repo/ws-a" && jj --ignore-working-copy log --no-graph -r @ -T 'commit_id') )
-( cd "$repo/ws-a" && "$BRANCH" >"$out/out4.log" 2>&1 ); rc=$?
+  cd "$ws" || exit 1
+  jj new -m ahead || exit 1
+  printf 'ahead\n' > ahead.txt
+  jj bookmark set ws-a -r @ || exit 1
+  jj edit "$work" || exit 1
+) >&2 || exit 1
+run_branch; rc=$?
 assert_true "backwards run exits 0" "$rc"
-assert_eq "bookmark is moved back down to @" \
-  "$ws_at_back" "$(bookmark_target "$repo" ws-a)"
+assert_eq "bookmark moves backwards to eligible @" "$work" "$(bookmark_target "$repo" ws-a)"
 
 # --- Case: a bookmark parked on a private change is never moved ----------------------------
 # The bookmark's target carries a "private:" description and the working copy
@@ -194,8 +179,63 @@ assert_false "extra argument exits non-zero" "$rc"
 assert_eq "usage error leaves the bookmark untouched" \
   "$before_usage" "$(bookmark_target "$repo" ws-a)"
 
-# --- Cleanup ------------------------------------------------------------------------------
-rm -rf "$repo"
+# No target in a repository whose only changes are empty.
+repo=$(new_repo empty) || exit 1
+ws="$repo/ws-a"
+run_branch; rc=$?
+assert_false "all-empty history is rejected" "$rc"
+assert_eq "no bookmark is created in all-empty history" "" "$(bookmark_target "$repo" ws-a)"
+
+# Two incomparable non-empty parents are ambiguous, not timestamp-tiebroken.
+repo=$(new_repo) || exit 1
+ws="$repo/ws-a"
+base=$(rev_id @-)
+(
+  cd "$ws" || exit 1
+  printf 'one\n' > one.txt
+  jj commit -m one || exit 1
+  one=$(jj log --no-graph -r @- -T 'commit_id') || exit 1
+  jj new "$base" || exit 1
+  printf 'two\n' > two.txt
+  jj commit -m two || exit 1
+  jj new "$one" @- || exit 1
+) >&2 || exit 1
+run_branch; rc=$?
+assert_false "ambiguous history is rejected on create" "$rc"
+assert_eq "ambiguous history creates no bookmark" "" "$(bookmark_target "$repo" ws-a)"
+(cd "$ws" && jj bookmark set ws-a -r "$base" --allow-backwards) >&2 || exit 1
+run_branch; rc=$?
+assert_false "ambiguous history is rejected on update" "$rc"
+assert_eq "ambiguous history preserves existing bookmark" "$base" "$(bookmark_target "$repo" ws-a)"
+
+# A bookmark named like the selected hash does not redirect creation.
+repo=$(new_repo) || exit 1
+ws="$repo/ws-a"
+base=$(rev_id @-)
+(cd "$ws" && jj bookmark create "$base" -r @) >&2 || exit 1
+run_branch; rc=$?
+assert_true "hash-name collision run exits 0" "$rc"
+assert_eq "new bookmark points at the commit, not the hash-named bookmark" \
+  "$base" "$(bookmark_target "$repo" ws-a)"
+
+# A Git update can park an existing bookmark before JJ imports the new target.
+repo=$(new_repo) || exit 1
+ws="$repo/ws-a"
+base=$(rev_id @-)
+(
+  cd "$ws" || exit 1
+  jj bookmark create ws-a -r "$base" || exit 1
+  printf 'private content\n' > private.txt
+  jj commit -m 'private: parked' || exit 1
+  private=$(rev_id @-) || exit 1
+  printf 'later work\n' > later.txt
+  jj commit -m later || exit 1
+  git update-ref refs/heads/ws-a "$private" || exit 1
+) >&2 || exit 1
+run_branch; rc=$?
+assert_true "imported private bookmark run exits 0" "$rc"
+assert_eq "bookmark imported onto private content is not moved back off it" \
+  "$(rev_id 'description(glob:"private: parked*")')" "$(bookmark_target "$repo" ws-a)"
 
 echo "== results: $((tests - failures))/$tests passed =="
 if [ "$failures" -ne 0 ]; then

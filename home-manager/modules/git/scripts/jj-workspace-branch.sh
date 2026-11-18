@@ -1,6 +1,5 @@
-# Keep the current workspace's bookmark pointed at that workspace's working-copy commit.
-# Creates the bookmark when absent, re-points it otherwise, and never touches a bookmark
-# parked on a private change.
+# Point the current workspace's bookmark at its latest non-empty, non-private change.
+# Leave bookmarks deliberately parked on private changes alone.
 if [ "$#" -ne 0 ]; then
   jj_usage 'Usage: jj-workspace-branch'
 fi
@@ -11,29 +10,29 @@ if [ "$workspace" = "default" ]; then
   jj_usage 'Refusing to manage a workspace bookmark in the default workspace'
 fi
 
-# Exact-match string pattern, so the workspace name matches no other bookmark.
-bookmark_target=$(jj_commit_id "bookmarks(exact:\"${workspace}\")")
+# Snapshot before both lookups: local edits can make @ eligible, and Git
+# integration can change where the existing bookmark points.
+target=$(jj_commit_ids 'heads(::@ ~ (empty() | private()))')
+bookmark_revset="bookmarks(exact:\"${workspace}\")"
+private_target=$(jj_commit_id "$bookmark_revset & private()")
+if [ -n "$private_target" ]; then
+  echo "Bookmark '${workspace}' parked on a private change; not moving it"
+  exit 0
+fi
 
+case "$target" in
+  '') jj_usage "No non-empty, non-private change found in this workspace" ;;
+  *$'\n'*) jj_usage "Multiple non-empty, non-private ancestors qualify; set the bookmark explicitly" ;;
+esac
+
+bookmark_target=$(jj_commit_id "$bookmark_revset")
+short_target="${target:0:12}"
 if [ -z "$bookmark_target" ]; then
-  jj bookmark create "${workspace}"
-  echo "Bookmark '${workspace}' created at @"
-  exit 0
+  jj bookmark create "${workspace}" -r "commit_id($target)"
+  echo "Bookmark '${workspace}' created at $short_target"
+elif [ "$bookmark_target" = "$target" ]; then
+  echo "Bookmark '${workspace}' already at $short_target"
+else
+  jj bookmark set "${workspace}" -r "commit_id($target)" --allow-backwards
+  echo "Bookmark '${workspace}' moved to $short_target"
 fi
-
-# A bookmark parked on a private change (the `private()` revset alias) is deliberately
-# positioned (see the `jj tug` alias) and is never re-pointed.
-if [ -n "$(jj_commit_id "bookmarks(exact:\"${workspace}\") & private()")" ]; then
-  echo "Bookmark '${workspace}' parked on a private change; not moving to @"
-  exit 0
-fi
-
-working_commit=$(jj_commit_id '@')
-if [ "$bookmark_target" = "$working_commit" ]; then
-  echo "Bookmark '${workspace}' already at @"
-  exit 0
-fi
-
-# @ can sit below or beside the bookmark's target after a rebase or a `jj tug`, so
-# backwards moves must be allowed.
-jj bookmark set "${workspace}" -r @ --allow-backwards
-echo "Bookmark '${workspace}' moved to @"

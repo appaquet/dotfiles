@@ -140,6 +140,7 @@ in
 
     shellAbbrs = {
       jjt = "jj-proj-tug";
+      jjpt = "jj-proj-tug --project-only";
       jjg = "jj pull";
       jjp = "jj push";
       jjpr = {
