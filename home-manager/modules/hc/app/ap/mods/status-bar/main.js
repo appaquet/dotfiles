@@ -1,16 +1,23 @@
 // Window status bar: machine, branch, agents count, Claude plan usage and the palette hint. A clone of the
 // shipped `workspace-status` with one added segment: what remains of the 5-hour and weekly Claude limits, and
-// the spend budget per remaining hour or working day. The percentages come from the statusline payloads
-// `tap.sh` saves (see data.js, copied from PostHog's claude-usage mod); the budget from pace.js. Being always
-// on screen, it also records when each space was last shown, for the `goto` picker's ordering.
+// the spend budget per remaining hour or working day. The percentages come from the statusline payloads `tap.sh`
+// saves here and on every machine herdr-core reports connected (data.js, copied from PostHog's claude-usage mod,
+// for this machine; sources.js and remote.js for the others), read at most once a minute and only while the
+// window is active; the budget from pace.js. Being always on screen, it also records when each space was last
+// shown, for the `goto` picker's ordering.
 
 import { View, div, svg } from "gpui-kit";
 import { h_flex } from "gpui-base";
 import { spaces, agents, theme, run, window, keys, shared, setShared } from "herdr";
 import { WINDOWS, limits, ensureDataDir, prune } from "./data.js";
 import { WORK, leftPercent, paceFor } from "./pace.js";
+import { mergeWindows } from "./sources.js";
+import { fetchMachine, pollableMachines } from "./remote.js";
 
-const REFRESH_EVERY = 10000;
+const REFRESH_EVERY = 60000;
+// How often the window's own active state is looked at, so a read starts when herdr comes back to the front
+// instead of up to a minute later.
+const WAKE_EVERY = 2000;
 const PRUNE_EVERY = 3600000;
 const DIM_AFTER = 3600000;
 const SEEN = "status-bar.usage-seen";
@@ -27,20 +34,54 @@ const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export default class WorkspaceStatus extends View {
   init(_props, cx) {
     this.usage = {};
+    this.local = {}; // this machine's windows
+    this.remote = {}; // machine -> the windows its last successful read reported
+    this.refreshedAt = 0;
+    this.seenActive = false;
+    this.refreshing = false;
     ensureDataDir().then(() => prune()).catch(() => null);
     cx.timer.every(PRUNE_EVERY, () => prune().catch(() => null));
-    cx.timer.every(REFRESH_EVERY, (cx) => this.refresh(cx));
-    this.refresh(cx);
+    cx.timer.every(WAKE_EVERY, (cx) => this.wake(cx));
+    this.wake(cx);
   }
 
+  // Payloads only move on a Claude reply, so one read a minute is enough; nothing is read at all while herdr is in
+  // the background, and coming back to the front reads at once.
+  wake(cx) {
+    if (!window()?.active) {
+      this.seenActive = false;
+      return;
+    }
+    if (!this.seenActive || Date.now() - this.refreshedAt >= REFRESH_EVERY) this.refresh(cx);
+    this.seenActive = true;
+  }
+
+  // This machine's files plus one round trip per connected machine, all at once. The reports are rebuilt every time, so
+  // a machine that is gone, asleep or renamed stops contributing instead of pinning the bar at its last numbers; and
+  // only one refresh runs at a time, so alt-tabbing cannot stack polls.
   refresh(cx) {
+    if (this.refreshing) return;
+    this.refreshing = true;
+    this.refreshedAt = Date.now();
     cx.spawn(async (cx) => {
-      const data = await limits().catch(() => null);
-      if (data) {
-        this.usage = data.windows;
+      try {
+        const mine = await limits().catch(() => null);
+        if (mine) this.local = mine.windows;
+
+        const machines = await pollableMachines();
+        const reports = await Promise.all(machines.map((name) => fetchMachine(name)));
+        const remote = {};
+        machines.forEach((name, i) => {
+          if (!reports[i].failed) remote[name] = reports[i].windows;
+        });
+        this.remote = remote;
+
+        this.usage = mergeWindows(this.local, ...Object.values(this.remote));
         this.remember();
+        cx.notify();
+      } finally {
+        this.refreshing = false;
       }
-      cx.notify();
     });
   }
 

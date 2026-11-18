@@ -7,5 +7,6 @@
     { pkgs, ... }:
     {
       checks.status-bar-pace-unit = import ./checks/status-bar-pace-unit.nix { inherit pkgs; };
+      checks.status-bar-sources-unit = import ./checks/status-bar-sources-unit.nix { inherit pkgs; };
     };
 }
