@@ -1,8 +1,10 @@
 { config, ... }:
 {
   imports = [
-    ./ssh-agent.nix
+    ./module.nix
   ];
+
+  dotfiles.ssh.agent.enable = true;
 
   sops.secrets = {
     "ssh/github_breakglass" = {

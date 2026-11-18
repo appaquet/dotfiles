@@ -6,7 +6,7 @@
 }:
 
 let
-  cfg = config.dotfiles.ssh-agent;
+  cfg = config.dotfiles.ssh.agent;
   slotHelper = pkgs.writeShellApplication {
     name = "ssh-agent-slot";
 
@@ -22,7 +22,7 @@ let
   };
 in
 {
-  options.dotfiles.ssh-agent = {
+  options.dotfiles.ssh.agent = {
     enable = lib.mkEnableOption "shared SSH agent session stack for persistent terminal sessions";
 
     defaultSocket = lib.mkOption {

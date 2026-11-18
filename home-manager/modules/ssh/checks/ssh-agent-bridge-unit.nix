@@ -9,9 +9,9 @@ let
     inherit pkgs;
 
     modules = [
-      ../ssh-agent.nix
+      ../module.nix
       {
-        dotfiles.ssh-agent.enable = true;
+        dotfiles.ssh.agent.enable = true;
         programs.fish.enable = true;
 
         home = {

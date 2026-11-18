@@ -28,9 +28,6 @@
 
   programs.home-manager.enable = true;
 
-  # SSH agent socket persistence for tmux sessions
-  dotfiles.ssh-agent.enable = true;
-
   # https://github.com/nix-community/nix-direnv#via-home-manager
   programs.direnv = {
     enable = true;
