@@ -8,7 +8,7 @@
 {
   imports = [
     inputs.secrets.homeManager.exomind
-    ./modules/base.nix
+    ./modules/base
     ./modules/agentic
     ./modules/dev.nix
     ./modules/docker.nix

@@ -2,7 +2,7 @@
 
 {
   imports = [
-    ./modules/base.nix
+    ./modules/base
   ];
 
   dotfiles.neovim.full = false;

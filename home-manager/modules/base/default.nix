@@ -10,17 +10,20 @@
     inputs.secrets.homeManager.common
     inputs.nix-index-database.homeModules.default
     inputs.nixantic.homeManagerModules.default
-
-    inputs.self.modules.homeManager.git
-    inputs.self.modules.homeManager.restic
-
-    ./fish
-    ./tmux.nix
-    ./neovim
-    ./nono
-    ./utils
-    ./ssh
-    ./hc
+  ]
+  # Features published as flake.modules.homeManager.<name>
+  ++ (with inputs.self.modules.homeManager; [
+    git
+    restic
+    fish
+    tmux
+    neovim
+    nono
+    utils
+    ssh
+  ])
+  ++ [
+    ../hc
   ];
 
   programs.home-manager.enable = true;

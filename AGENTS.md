@@ -60,7 +60,7 @@ For modules that declare options (examples: `home-manager/modules/hc/`, `home-ma
   `hc/app-module.nix`); an options-only file or folder keeps its name
 - AP's values go in the feature's `default.nix`, which imports the module; split them into more files only
   when large. Host-specific values stay in host files
-- Import option modules for every host of their surface (`home-manager/modules/base.nix`,
+- Import option modules for every host of their surface (`home-manager/modules/base/`,
   `nixos/modules/common.nix`) and gate them with `enable`. Modules without options keep per-host imports
 - A feature that applies to more than one surface lives under `common/<feature>/`: its modules plus one
   `flake-module.nix` registering it for every surface it covers. `common/` is an import-tree root alongside

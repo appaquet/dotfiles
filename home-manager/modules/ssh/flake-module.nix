@@ -1,6 +1,8 @@
 { inputs, ... }:
 
 {
+  flake.modules.homeManager.ssh = ./default.nix;
+
   perSystem =
     { pkgs, ... }:
     let
