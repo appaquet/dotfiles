@@ -83,6 +83,7 @@ pkgs.writeShellApplication {
       server_pid=""
       tunnel_pid=""
       tunnel_url=""
+      hc_label_key=""
 
       work_dir=$(mktemp -d)
       server_log="$work_dir/server.log"
@@ -93,7 +94,9 @@ pkgs.writeShellApplication {
       trap 'exit 143' TERM
 
       start_server
-      echo "Serving $root internally at http://$host.n3x.net:$port/"
+      internal_url="http://$host.n3x.net:$port/"
+      set_hc_label "$port" "$internal_url"
+      echo "Serving $root internally at $internal_url"
 
       if [ -n "$public" ]; then
         start_tunnel
@@ -221,10 +224,32 @@ pkgs.writeShellApplication {
       fi
     }
 
+    # Advertises the server URL on the enclosing herdr-core terminal when present.
+    # Uses the inherited PATH so hosts without hc stay decoupled from herdr-core.
+    set_hc_label() {
+      if [ -z "''${HC_TERMINAL_ID:-}" ] || ! command -v hc >/dev/null 2>&1; then
+        return 0
+      fi
+
+      if hc label "$HC_TERMINAL_ID" "show-me.$1=$2" >/dev/null 2>&1; then
+        hc_label_key="show-me.$1"
+      fi
+    }
+
+    # Called from the EXIT trap via cleanup(), so it has no direct call site.
+    # shellcheck disable=SC2329
+    clear_hc_label() {
+      if [ -n "$hc_label_key" ] && [ -n "''${HC_TERMINAL_ID:-}" ] && command -v hc >/dev/null 2>&1; then
+        hc label "$HC_TERMINAL_ID" "$hc_label_key=" >/dev/null 2>&1 || true
+        hc_label_key=""
+      fi
+    }
+
     # Stops both children and removes the temporary log directory. It runs from the
     # EXIT trap, so it has no direct call site.
     # shellcheck disable=SC2329
     cleanup() {
+      clear_hc_label
       stop_children
       rm -rf "$work_dir"
     }

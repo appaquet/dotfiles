@@ -31,6 +31,21 @@ let
     '';
   };
 
+  # Records hc invocations to verify label set/clear lifecycle without a live core.
+  fakeHc = pkgs.writeShellApplication {
+    name = "hc";
+
+    runtimeInputs = [ pkgs.coreutils ];
+
+    text = ''
+      printf '%s\n' "$*" >> "$FAKE_HC_LOG"
+
+      if [ -n "''${FAKE_HC_FAIL:-}" ]; then
+        exit 1
+      fi
+    '';
+  };
+
   testShowMeServe = pkgs.callPackage ../tools/show-me/show-me-serve.nix {
     pkgs = pkgs // {
       cloudflared = fakeCloudflared;
@@ -286,5 +301,64 @@ pkgs.runCommand "show-me-serve-check"
       exit 1
     fi
 
+    # Inside an hc terminal, show-me-serve sets the label on start and clears it on SIGTERM.
+    hc_log="$TMPDIR/hc.log"
+    : >"$hc_log"
+    log="$TMPDIR/hc-label.log"
+    HC_TERMINAL_ID=t99 FAKE_HC_LOG="$hc_log" PATH="${fakeHc}/bin:$PATH" \
+      show-me-serve "$served" >"$log" 2>&1 &
+    tool_pid=$!
+
+    internal_url=""
+    for _ in $(seq 1 60); do
+      internal_url=$(grep -oE 'http://[^ ]+/' "$log" 2>/dev/null | head -n 1 || true)
+
+      if [ -n "$internal_url" ]; then
+        break
+      fi
+
+      sleep 0.5
+    done
+
+    [ -n "$internal_url" ] || fail "No internal URL sentence was printed in the hc-label test."
+    port=$(printf '%s' "$internal_url" | sed -n 's|^.*:\([0-9]\+\)/$|\1|p')
+    [ -n "$port" ] || fail "Could not read a port from '$internal_url' in the hc-label test."
+
+    grep -Fxq "label t99 show-me.$port=$internal_url" "$hc_log" || fail "Expected hc label set call, got: $(cat "$hc_log")"
+
+    kill -TERM "$tool_pid"
+    wait "$tool_pid" 2>/dev/null || true
+
+    grep -Fxq "label t99 show-me.$port=" "$hc_log" || fail "Expected hc label clear call, got: $(cat "$hc_log")"
+
+    # A failing hc binary must never stop show-me-serve from serving.
+    hc_fail_log="$TMPDIR/hc-fail.log"
+    : >"$hc_fail_log"
+    log="$TMPDIR/hc-fail-serve.log"
+    HC_TERMINAL_ID=t99 FAKE_HC_LOG="$hc_fail_log" FAKE_HC_FAIL=1 PATH="${fakeHc}/bin:$PATH" \
+      show-me-serve "$served" >"$log" 2>&1 &
+    tool_pid=$!
+
+    internal_url=""
+    for _ in $(seq 1 60); do
+      internal_url=$(grep -oE 'http://[^ ]+/' "$log" 2>/dev/null | head -n 1 || true)
+
+      if [ -n "$internal_url" ]; then
+        break
+      fi
+
+      sleep 0.5
+    done
+
+    [ -n "$internal_url" ] || fail "No internal URL sentence was printed when hc fails."
+    port=$(printf '%s' "$internal_url" | sed -n 's|^.*:\([0-9]\+\)/$|\1|p')
+    [ "$(curl -fsS "http://127.0.0.1:$port/hello.txt")" = "show-me-serve-check-payload" ] || fail "Server did not serve when hc failed."
+
+    kill -TERM "$tool_pid"
+    wait "$tool_pid" 2>/dev/null || true
+
+    if grep -Fxq "label t99 show-me.$port=" "$hc_fail_log"; then
+      fail "Should not attempt to clear a label that failed to set."
+    fi
     touch "$out"
   ''

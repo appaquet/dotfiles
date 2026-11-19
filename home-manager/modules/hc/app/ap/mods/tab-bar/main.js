@@ -5,7 +5,7 @@
 
 import { View, div, svg, image } from "gpui-kit";
 import { h_flex, ScrollHandle } from "gpui-base";
-import { spaces, panes, run, openOverlay, theme, window, shared, layout, settings, exec } from "herdr";
+import { spaces, panes, terminals, run, openOverlay, theme, window, shared, layout, settings, exec, hc } from "herdr";
 
 // A PR's icon and tooltip, as the sidebar draws them (spaces-status/prs.js `prLook`, `prTip`; a mod can't import
 // from another mod's folder): the file per state, open and draft PRs colored by CI.
@@ -118,6 +118,16 @@ export default class Tabs extends View {
         .child(svg(`mods/spaces-status/${PR_ICONS[pr.state] ?? PR_ICONS.open}`).size(14).text_color(prColor(t, pr)))
         .child(`#${pr.number}`);
     };
+    const showMe = space ? spaceShowMe(space.id) : [];
+    const showMeButton = () => {
+      return h_flex().id("show-me").h(26).px(8).gap(5).flex_none().items_center().rounded(6)
+        .text_size(12).bg(t.chrome).text_color(t.muted)
+        .hover(s => s.bg(t.hover)).tooltip(showMeTip(showMe)).on_mouse_down("left", stop)
+        .on_click(() => { exec("open", [showMe[0].url]).catch(() => {}); })
+        .on_mouse_down("right", (_e, cx) => { cx.stop_propagation(); clearShowMe(showMe); })
+        .child(svg("mods/workspace-chrome/monitor.svg").size(14).text_color(t.accent))
+        .child(showMe.length > 1 ? `Show-me (${showMe.length})` : "Show-me");
+    };
     return h_flex().size_full().min_w(0).px(10).pl(lightsPadding).gap(3).items_center().bg(t.chrome).border_b(1).border_color(t.border)
       .on_mouse_up("left", () => { this.pressed = null; })
       .on_scroll_wheel(e => { if (Math.abs(e.delta.y) >= 1) run(e.delta.y > 0 ? "tab.prev" : "tab.next"); })
@@ -128,6 +138,7 @@ export default class Tabs extends View {
       .when(enabled.includes("files"), el => el.child(panelButton("files", "Files", "mods/files/file.svg")))
       .when(enabled.includes("changes"), el => el.child(panelButton("changes", "Changes", "mods/changes/changes.svg")))
       .when(Boolean(pr), el => el.child(prButton()))
+      .when(showMe.length > 0, el => el.child(showMeButton()))
       .when(w?.buttons, el => el.child(button("minimize", w.platform === "windows" ? svg("mods/tabs/win-min.svg").size(16) : "−", () => run("window.minimize")))
         .child(button("maximize", w.platform === "windows" ? svg(`mods/tabs/${w.maximized ? "win-restore" : "win-max"}.svg`).size(16) : "□", () => run("window.maximize")))
         .child(button("close-window", w.platform === "windows" ? svg("mods/tabs/win-close.svg").size(16) : svg("mods/pane/close.svg").size(13), () => run("window.close"))));
@@ -144,4 +155,35 @@ function prColor(t, pr) {
 function prTip(pr) {
   const ci = pr.state === "open" || pr.state === "draft" ? CI_WORDS[pr.ci] ?? null : pr.state;
   return [`#${pr.number}`, pr.title, ci, pr.repo, pr.bookmark].filter(Boolean).join(" · ");
+}
+
+// Live `show-me.<port>=<url>` labels belonging to a space, highest port first.
+// Remote terminals omit the `machine/` prefix in `herdr.space`, so restore it from `address`.
+function spaceShowMe(spaceId) {
+  const out = [];
+  for (const term of terminals()) {
+    if (term.state !== "live" || !term.labels) continue;
+    const raw = term.labels["herdr.space"];
+    if (!raw) continue;
+    const slash = term.address.indexOf("/");
+    const full = slash >= 0 ? `${term.address.slice(0, slash + 1)}${raw}` : raw;
+    if (full !== spaceId) continue;
+    for (const [key, url] of Object.entries(term.labels)) {
+      if (key.startsWith("show-me.") && url) {
+        out.push({ address: term.address, key, port: Number(key.slice(8)) || 0, url });
+      }
+    }
+  }
+  return out.sort((a, b) => b.port - a.port);
+}
+
+function clearShowMe(entries) {
+  return Promise.all(entries.map(({ address, key }) => hc(["label", address, `${key}=`]).catch(() => {})));
+}
+
+function showMeTip(entries) {
+  const urls = entries.map((e) => e.url).join("\n");
+  return entries.length > 1
+    ? `Show-me (${entries.length})\n${urls}\nRight-click to clear`
+    : `Show-me · ${urls}\nRight-click to clear`;
 }

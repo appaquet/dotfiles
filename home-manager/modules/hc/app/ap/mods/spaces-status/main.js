@@ -7,7 +7,7 @@
 import * as fs from "fs/promises";
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
-import { spaces, machines, panes, run, openOverlay, exec, hc, theme, shared, setShared, watchFolder, window, layout, home, appHome } from "herdr";
+import { spaces, machines, panes, terminals, run, openOverlay, exec, hc, theme, shared, setShared, watchFolder, window, layout, home, appHome } from "herdr";
 import { CAP, parseGh, prSummary, ciRollup, nextDue, prLook, prTip, hasCi } from "./prs.js";
 
 function find(node, id) {
@@ -511,6 +511,28 @@ export default class Spaces extends View {
       .child(svg(`mods/${SELF}/${icon}`).size(12).text_color(color));
   }
 
+  // Click opens the space's show-me server in the browser; right-click clears stale labels.
+  showMeIcon(w, entries, t) {
+    return div()
+      .id(`show-me-${w.id}`)
+      .flex_none()
+      .p(2)
+      .rounded(4)
+      .cursor_pointer()
+      .hover((s) => s.bg(t.hover))
+      .tooltip(showMeTip(entries))
+      .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
+      .on_click((_e, cx) => {
+        cx.stop_propagation();
+        exec("open", [entries[0].url]).catch(() => {});
+      })
+      .on_mouse_down("right", (_e, cx) => {
+        cx.stop_propagation();
+        clearShowMe(entries);
+      })
+      .child(svg("mods/workspace-chrome/monitor.svg").size(12).text_color(t.accent));
+  }
+
   // The space's most urgent agent status, in the agents list's shapes: a spinner
   // while it works, filled for blocked and done, a hollow ring for idle.
   statusDot(status, t) {
@@ -522,6 +544,7 @@ export default class Spaces extends View {
   row({ w, i, tree }, t) {
     const on = w.active;
     const pr = (shared("space.prs") ?? {})[w.id];
+    const showMe = spaceShowMe(w.id);
     const colors = shared("space.colors") ?? {};
     const color = colors[w.id] ?? "ansi6";
     const fill = color.startsWith("#") ? color : (MARK[color] ?? t[color]);
@@ -571,6 +594,7 @@ export default class Spaces extends View {
           .when(!tree, el => el.child(h_flex().size(18).flex_none().rounded(5).bg(fill).items_center().justify_center().text_size(10.5).font_bold().text_color("#ffffff").child([...w.name][0]?.toUpperCase() ?? "?")))
           .child(div().flex_shrink(0).max_w(150).truncate().text_color(t.foreground).child(w.name))
           .child(div().flex_1())
+          .when(showMe.length > 0, (el) => el.child(this.showMeIcon(w, showMe, t)))
           .when(Boolean(pr), (el) => el.child(this.prIcon(w, pr, t)))
           .when(Boolean(w.status), (el) => el.child(this.statusDot(w.status, t))),
       );
@@ -620,4 +644,35 @@ export default class Spaces extends View {
 function summary(e) {
   const { number, title, url, state } = e.pr;
   return { number, title, url, state, ci: hasCi(e.pr) ? e.ci : "none", repo: e.slug, bookmark: e.bookmark };
+}
+
+// Live `show-me.<port>=<url>` labels belonging to a space, highest port first.
+// Remote terminals omit the `machine/` prefix in `herdr.space`, so restore it from `address`.
+function spaceShowMe(spaceId) {
+  const out = [];
+  for (const term of terminals()) {
+    if (term.state !== "live" || !term.labels) continue;
+    const raw = term.labels["herdr.space"];
+    if (!raw) continue;
+    const slash = term.address.indexOf("/");
+    const full = slash >= 0 ? `${term.address.slice(0, slash + 1)}${raw}` : raw;
+    if (full !== spaceId) continue;
+    for (const [key, url] of Object.entries(term.labels)) {
+      if (key.startsWith("show-me.") && url) {
+        out.push({ address: term.address, key, port: Number(key.slice(8)) || 0, url });
+      }
+    }
+  }
+  return out.sort((a, b) => b.port - a.port);
+}
+
+function clearShowMe(entries) {
+  return Promise.all(entries.map(({ address, key }) => hc(["label", address, `${key}=`]).catch(() => {})));
+}
+
+function showMeTip(entries) {
+  const urls = entries.map((e) => e.url).join("\n");
+  return entries.length > 1
+    ? `Show-me (${entries.length})\n${urls}\nRight-click to clear`
+    : `Show-me · ${urls}\nRight-click to clear`;
 }
