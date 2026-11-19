@@ -1,10 +1,13 @@
-{ pkgs, ... }:
+{ inputs, pkgs, ... }:
 
 {
-  imports = [
-    ../modules/common.nix
-    ./hardware-configuration.nix
-  ];
+  imports =
+    (with inputs.self.modules.nixos; [
+      base
+    ])
+    ++ [
+      ./hardware-configuration.nix
+    ];
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;

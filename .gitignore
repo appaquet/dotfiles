@@ -16,6 +16,6 @@ __pycache__/
 *.pyc
 
 secrets/
-dotblip/
+/dotblip/
 harness/
 nixantic/

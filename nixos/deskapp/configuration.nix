@@ -6,16 +6,19 @@
 }:
 
 {
-  imports = [
-    ../modules/common.nix
-    inputs.self.modules.nixos.dev
-    inputs.self.modules.nixos.docker
-    ../modules/dotblip.nix
-    ./gpu
-    ./ha-ctrl.nix
-    ./hardware-configuration.nix
-    ./virt
-  ];
+  imports =
+    (with inputs.self.modules.nixos; [
+      base
+      dev
+      docker
+      dotblip
+    ])
+    ++ [
+      ./gpu
+      ./ha-ctrl.nix
+      ./hardware-configuration.nix
+      ./virt
+    ];
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;

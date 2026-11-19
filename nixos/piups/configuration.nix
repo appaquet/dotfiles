@@ -1,15 +1,19 @@
 {
+  inputs,
   config,
   ...
 }:
 
 {
-  imports = [
-    ../modules/common.nix
-    ../modules/common-pi.nix
-    ../modules/dotblip.nix
-    ./ups-server.nix
-  ];
+  imports =
+    (with inputs.self.modules.nixos; [
+      base
+      raspberry-pi
+      dotblip
+    ])
+    ++ [
+      ./ups-server.nix
+    ];
 
   sops.secrets.ups_pw.sopsFile = config.sops.secretsFiles.home;
 

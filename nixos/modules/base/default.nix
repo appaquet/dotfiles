@@ -1,15 +1,13 @@
 { pkgs, inputs, ... }:
 
 {
-  imports = [
-    inputs.self.modules.nixos.cachix
-    inputs.self.modules.nixos.restic
-
-    ./ups/client.nix
-    ./network-bridge.nix
-    ./netconsole/sender.nix
-    ./netconsole/receiver.nix
-    ./virt-gpu-passthrough.nix
+  imports = with inputs.self.modules.nixos; [
+    cachix
+    restic
+    ups
+    network-bridge
+    netconsole
+    virt-gpu-passthrough
   ];
 
   time.timeZone = "America/Toronto";

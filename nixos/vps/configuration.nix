@@ -1,14 +1,18 @@
 {
+  inputs,
   config,
   ...
 }:
 {
-  imports = [
-    ../modules/common.nix
-    ../modules/dotblip.nix
-    ./disk-config.nix
-    ./hardware-configuration.nix
-  ];
+  imports =
+    (with inputs.self.modules.nixos; [
+      base
+      dotblip
+    ])
+    ++ [
+      ./disk-config.nix
+      ./hardware-configuration.nix
+    ];
 
   networking.hostName = "vps";
   networking.hostId = "2f1f15c1"; # used for zfs, preventing accidental pool import conflicts

@@ -7,7 +7,7 @@
 
 {
   imports = [
-    ../../modules/virt.nix
+    inputs.self.modules.nixos.virt
     inputs.nixvirt.nixosModules.default
   ];
 

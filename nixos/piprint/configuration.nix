@@ -1,14 +1,15 @@
 {
+  inputs,
   pkgs,
   config,
   ...
 }:
 
 {
-  imports = [
-    ../modules/common.nix
-    ../modules/common-pi.nix
-    ../modules/dotblip.nix
+  imports = with inputs.self.modules.nixos; [
+    base
+    raspberry-pi
+    dotblip
   ];
 
   networking = {

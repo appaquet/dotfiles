@@ -1,16 +1,20 @@
 {
+  inputs,
   config,
   ...
 }:
 
 {
-  imports = [
-    ../modules/common.nix
-    ../modules/common-pi.nix
-    ../modules/dotblip.nix
-    ./adguardhome.nix
-    ./caddy.nix
-  ];
+  imports =
+    (with inputs.self.modules.nixos; [
+      base
+      raspberry-pi
+      dotblip
+    ])
+    ++ [
+      ./adguardhome.nix
+      ./caddy.nix
+    ];
 
   services.openssh.enable = true;
 

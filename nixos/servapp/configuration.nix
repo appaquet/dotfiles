@@ -4,19 +4,22 @@
 }:
 
 {
-  imports = [
-    ./backups.nix
-    ./media.nix
-    ./datasets.nix
-    ./monitoring.nix
-    ./samba.nix
-    ./hardware-configuration.nix
-    ./caddy.nix
-    ../modules/common.nix
-    inputs.self.modules.nixos.dev
-    inputs.self.modules.nixos.docker
-    ../modules/dotblip.nix
-  ];
+  imports =
+    (with inputs.self.modules.nixos; [
+      base
+      dev
+      docker
+      dotblip
+    ])
+    ++ [
+      ./backups.nix
+      ./media.nix
+      ./datasets.nix
+      ./monitoring.nix
+      ./samba.nix
+      ./hardware-configuration.nix
+      ./caddy.nix
+    ];
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
