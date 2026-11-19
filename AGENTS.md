@@ -66,6 +66,9 @@ For modules that declare options (examples: `home-manager/modules/hc/`, `home-ma
   `flake-module.nix` registering it for every surface it covers. `common/` is an import-tree root alongside
   `home-manager/`, `nixos/` and `darwin/`. Note the difference from each surface's `modules/common.nix`, which holds
   what the hosts of that one surface share
+- Inside `common/<feature>/`, name a plain per-surface body after its surface (`common/docker/{home,nixos}.nix`);
+  option modules declaring the same option path on several surfaces keep their name in per-surface folders
+  (`common/restic/{home,nixos}/backup.nix`); one body valid on every surface stays `default.nix` (`common/cachix/`)
 
 ## Nix Conventions
 

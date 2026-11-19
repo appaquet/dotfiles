@@ -1,4 +1,5 @@
 {
+  inputs,
   pkgs,
   config,
   ...
@@ -7,8 +8,8 @@
 {
   imports = [
     ../modules/common.nix
-    ../modules/dev.nix
-    ../modules/docker.nix
+    inputs.self.modules.nixos.dev
+    inputs.self.modules.nixos.docker
     ../modules/dotblip.nix
     ./gpu
     ./ha-ctrl.nix

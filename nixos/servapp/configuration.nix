@@ -1,4 +1,5 @@
 {
+  inputs,
   ...
 }:
 
@@ -12,8 +13,8 @@
     ./hardware-configuration.nix
     ./caddy.nix
     ../modules/common.nix
-    ../modules/dev.nix
-    ../modules/docker.nix
+    inputs.self.modules.nixos.dev
+    inputs.self.modules.nixos.docker
     ../modules/dotblip.nix
   ];
 
