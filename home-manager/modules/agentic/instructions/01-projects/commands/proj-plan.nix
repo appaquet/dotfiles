@@ -21,12 +21,6 @@
         ${scope.blocks."vcs-context".embed}
         ${scope.blocks."project-files".embed}
 
-        ${scope.forHarness {
-          pi = "Run `date +%Y/%m/%d` with the shell tool and use its stdout as the current date.";
-          codex = "Run `date +%Y/%m/%d` with the shell tool and use its stdout as the current date.";
-          default = "Current date: !`date +%Y/%m/%d`";
-        }}
-
         If ad-hoc project files are listed, stop and report. This command creates committed project files.
 
         ## Instructions
@@ -40,7 +34,7 @@
            * Invoking this command authorizes project and phase setup. Use your best judgment without asking for setup confirmation; follow ${
              scope.skills."project-docs".reference
            } for names and document structure.
-           * If no committed project files exist, create the initial project documents and project link.
+           * If no committed project files exist, run `agentic-proj-create <project-name>` from the workspace root: one call builds the dated project folder and the `proj` link. Write the initial project documents through `proj/`.
            * If committed project files exist and the goal is aligned, add a phase to that project. Otherwise, create a new project and update the project link, preserving the existing project's documents.
            * If new project, follow the document version control rules in ${
              scope.skills."project-docs".reference

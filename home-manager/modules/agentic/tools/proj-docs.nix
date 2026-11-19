@@ -1,4 +1,4 @@
-{ pkgs }:
+{ pkgs, docsRootLib }:
 
 pkgs.writeShellApplication {
   name = "agentic-proj-docs";
@@ -8,33 +8,16 @@ pkgs.writeShellApplication {
     pkgs.git
   ];
 
-  text = ''
+  text = docsRootLib + ''
     candidates=("$PWD")
     [ -n "''${OPENCODE_ROOT:-}" ] && candidates+=("$OPENCODE_ROOT")
     [ -n "''${CLAUDE_ROOT:-}" ] && candidates+=("$CLAUDE_ROOT")
 
-    # Prints the docs root: git config agentic.docsRoot, else docs/features at
-    # the repository root. Never fails, since its output is embedded in prompts.
+    # Prints the docs root through the shared rule. Never fails, since its output is
+    # embedded in prompts.
     print_docs_root() {
-      local configured toplevel
-
-      if configured=$(git config --type=path --get agentic.docsRoot 2>/dev/null) && [ -n "$configured" ]; then
-        if [ -d "$configured" ]; then
-          echo "Docs root: $(readlink -f "$configured") (from git config agentic.docsRoot)"
-        else
-          # A misconfigured key must stay visible instead of falling back
-          echo "Docs root: missing, $configured from git config agentic.docsRoot does not exist"
-        fi
-        return
-      fi
-
-      toplevel=$(git rev-parse --show-toplevel 2>/dev/null) || toplevel="$PWD"
-      if [ -d "$toplevel/docs/features" ]; then
-        echo "Docs root: $(readlink -f "$toplevel/docs/features") (default docs/features)"
-        return
-      fi
-
-      echo "Docs root: none, git config agentic.docsRoot unset and no $toplevel/docs/features"
+      resolve_docs_root
+      echo "$docs_root_report"
     }
 
     print_proj_files() {
@@ -43,7 +26,6 @@ pkgs.writeShellApplication {
       local file found=0
 
       echo "Project link ($kind): $proj"
-      echo "Project folder: $(readlink -f "$proj")"
       echo "Project files:"
       for file in "$proj"/*; do
         [ -e "$file" ] || continue

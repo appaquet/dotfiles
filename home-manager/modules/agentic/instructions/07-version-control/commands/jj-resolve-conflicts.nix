@@ -21,7 +21,7 @@
         1. Create and plan a conflict-resolution sub-phase
            * Create a sub-phase of the latest phase worked on. If no project documentation exists, stop; do not move the working copy or edit conflict markers
            * Follow the document version-control rules in ${scope.skills."project-docs".reference}
-           * Run `agentic-proj-docs` and record the absolute project folder before leaving the original tree. Do not update project documents while the working tree is on a historical conflicted change
+           * Run `agentic-proj-docs` and record the project link before leaving the original tree. Do not update project documents while the working tree is on a historical conflicted change
            * Run an untruncated `jj ls`, then list current-stack conflicts oldest-first with `jj log -r '::@ & conflicts()' --reversed`
            * Choose one return revision: use `@` when it has content; when empty, list full parent IDs with `jj log -r 'parents(@)' --no-graph -T 'change_id ++ "\n"'` and use `@-` only for one parent, otherwise use `@`. Save the chosen full ID with `jj log -r <return_revision> --no-graph -T 'change_id ++ "\n"'`
            * For every listed conflict, record paths with `jj resolve --list -r <full_change_id>`. Use `jj file show -r <full_change_id> <path>` only when historical content is needed to settle a design question before checkout

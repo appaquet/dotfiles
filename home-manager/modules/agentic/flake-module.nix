@@ -65,8 +65,11 @@ in
 
       vcsContext = import ./tools/vcs-context.nix { inherit pkgs; };
       vcsContextCheck = import ./checks/vcs-context.nix { inherit pkgs vcsContext; };
-      projDocs = import ./tools/proj-docs.nix { inherit pkgs; };
+      docsRootLib = import ./tools/docs-root.nix { inherit pkgs; };
+      projDocs = import ./tools/proj-docs.nix { inherit pkgs docsRootLib; };
       projDocsCheck = import ./checks/proj-docs.nix { inherit pkgs projDocs; };
+      projCreate = import ./tools/proj-create.nix { inherit pkgs docsRootLib; };
+      projCreateCheck = import ./checks/proj-create.nix { inherit pkgs projCreate; };
       piSessionQuery = import ./tools/pi-session-query.nix { inherit pkgs; };
       piSessionQueryCheck = import ./checks/pi-session-query.nix { inherit pkgs piSessionQuery; };
       piSessionQueryUnitCheck = import ./checks/pi-session-query-unit.nix { inherit pkgs; };
@@ -135,6 +138,7 @@ in
       };
 
       checks = {
+        agentic-proj-create = projCreateCheck;
         agentic-proj-docs = projDocsCheck;
         agentic-show-me-kit = showMeKitCheck;
         agentic-show-me-serve = showMeServeCheck;

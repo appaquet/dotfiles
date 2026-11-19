@@ -28,7 +28,7 @@
 
         2. Create the ad hoc folder
            * From the workspace root, run `agentic-proj-create-adhoc` with no arguments.
-           * Create normal `00-<project>.md` and `01-<phase>.md` files in the directory reported by `agentic-proj-docs`.
+           * Write normal `00-<project>.md` and `01-<phase>.md` files through the `proj-adhoc` link.
 
         3. Ensure context loaded, goal clear, task defined
            * ${scope.harness.prose.questions.request} if the goal or task is empty or unclear.

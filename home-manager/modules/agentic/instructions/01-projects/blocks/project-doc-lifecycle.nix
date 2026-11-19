@@ -12,18 +12,18 @@
           ### Locations
 
           Project instructions name the repository's docs root. When they are silent, use the `Docs root:` line printed by `agentic-proj-docs`: the repository's git config `agentic.docsRoot`, else `docs/features/` at the repository root. When the docs root is not an existing directory, STOP and ask the user; never create it. The user can set one with `git config agentic.docsRoot <path>`.
-          * Project folder: `<docs-root>/<yyyy>/<mm>/<dd>-<project-name>/` (run `date +%Y/%m/%d` to get it)
-          * Main document: `00-<project-name>.md` inside the project folder
+          * Project folder: a dated folder under the docs root. `agentic-proj-create <project-name>` builds it; avoid assembling the dated path yourself
+          * Main document: `00-<project-name>.md` in the project folder, reached as `proj/00-<project-name>.md`
           * Phase documents: `01-<phase-name>.md`, `02-<phase-name>.md`, and so on; numbers establish ordering
           * The repository-root `proj/` symlink points to committed project files; `proj-adhoc/` points to ad-hoc or temporary project files
-          * Create links only from the workspace root: `agentic-proj-create <project-folder>` for the committed link once that folder and its documents exist, `agentic-proj-create-adhoc` for the ad-hoc link; never create a link with `ln`
-          * Run `agentic-proj-docs` to print the docs root and the location and contents of `proj` or `proj-adhoc`
+          * Create a committed project from the workspace root with `agentic-proj-create <project-name>`: one call makes the `proj` link, building a dated folder for a new project and reusing the folder of a project that already has one. `agentic-proj-create-adhoc` creates the ad-hoc link; never create a link with `ln`
+          * Run `agentic-proj-docs` to print the docs root, the project link, and the contents of `proj` or `proj-adhoc`
 
           ### Creation and updates
 
           * Create project and phase files only when an active user-invoked workflow explicitly directs their creation. Otherwise, stop and ask the user to invoke an appropriate project workflow.
           * Use user-supplied project and phase names; otherwise, choose concise, descriptive names from the goal and current version control context without asking for naming approval. Preserve existing project and phase names.
-          * Use the active project link (`proj` or `proj-adhoc`) reported by project state; permissions may allow only that location.
+          * Use the active project link (`proj` or `proj-adhoc`) reported by project state; permissions may allow only that location. Reach every project file through that link, never through a dated folder path.
           * Outside multi-question interviews, update documents continuously during planning, development, review, and other work: on task completion, when ${
             scope.commands."proj-save".reference
           } runs, and when significant information, uncertainties, decisions, insights, or outcomes arise.

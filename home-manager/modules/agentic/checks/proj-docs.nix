@@ -58,12 +58,11 @@ pkgs.runCommand "agentic-proj-docs-check"
     assert_docs_root "Docs root: none, git config agentic.docsRoot unset and no $TMPDIR/plain/docs/features" "$TMPDIR/plain"
 
     # Full output with a committed project link
-    mkdir -p "$main/docs/features/2026/01/01-demo"
-    touch "$main/docs/features/2026/01/01-demo/00-demo.md" "$main/docs/features/2026/01/01-demo/01-phase.md"
-    ln -s "$main/docs/features/2026/01/01-demo" "$main/proj"
+    mkdir -p "$main/docs/features/demo-project"
+    touch "$main/docs/features/demo-project/00-demo.md" "$main/docs/features/demo-project/01-phase.md"
+    ln -s "$main/docs/features/demo-project" "$main/proj"
     expected="Docs root: $main/docs/features (default docs/features)
     Project link (committed): $main/proj
-    Project folder: $main/docs/features/2026/01/01-demo
     Project files:
     * 00-demo.md
     * 01-phase.md"
