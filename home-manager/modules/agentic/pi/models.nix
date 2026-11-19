@@ -52,6 +52,10 @@ let
             repetition_penalty = 1.0;
           };
         };
+
+        "qwen3.8-flash-next" = {
+          contextWindow = 262144;
+        };
       };
     };
   };
