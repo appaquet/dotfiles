@@ -60,12 +60,14 @@ For modules that declare options (examples: `home-manager/modules/hc/`, `home-ma
   `hc/app-module.nix`); an options-only file or folder keeps its name
 - AP's values go in the feature's `default.nix`, which imports the module; split them into more files only
   when large. Host-specific values stay in host files
-- Import option modules for every host of their surface (`home-manager/modules/base/`,
-  `nixos/modules/base/`) and gate them with `enable`. Modules without options keep per-host imports
+- Every feature is a folder whose `flake-module.nix` publishes it as `flake.modules.<class>.<feature>` (`homeManager`,
+  `nixos`, `darwin`). Hosts and `base` import features by name (`with inputs.self.modules.<class>; [ ... ]`), then
+  host-local files by path; importing a feature is what enables it, so plain features get no `enable` flag
+- Import option modules from each surface's `base` (`<surface>/modules/base/`), which every host of that surface
+  imports, and gate them with `enable`
 - A feature that applies to more than one surface lives under `common/<feature>/`: its modules plus one
   `flake-module.nix` registering it for every surface it covers. `common/` is an import-tree root alongside
-  `home-manager/`, `nixos/` and `darwin/`. Note the difference from each surface's `modules/common.nix`, which holds
-  what the hosts of that one surface share
+  `home-manager/`, `nixos/` and `darwin/`
 - Inside `common/<feature>/`, name a plain per-surface body after its surface (`common/docker/{home,nixos}.nix`);
   option modules declaring the same option path on several surfaces keep their name in per-surface folders
   (`common/restic/{home,nixos}/backup.nix`); one body valid on every surface stays `default.nix` (`common/cachix/`)

@@ -1,9 +1,12 @@
-{ ... }:
+{ inputs, ... }:
 {
-  imports = [
-    ../modules/common.nix
-    ./apps.nix
-  ];
+  imports =
+    (with inputs.self.modules.darwin; [
+      base
+    ])
+    ++ [
+      ./apps.nix
+    ];
 
   networking.localHostName = "exapp";
 }
