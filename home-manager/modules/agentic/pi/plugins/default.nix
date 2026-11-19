@@ -26,12 +26,12 @@ let
 
     # https://github.com/YuGiMob/pi-hashline-edit-pro
     {
-      package = "npm:pi-hashline-edit-pro@7.1.1";
+      package = "npm:pi-hashline-edit-pro@7.2.0";
     }
 
     # https://github.com/tintinweb/pi-subagents
     {
-      package = "npm:@tintinweb/pi-subagents@0.25.0";
+      package = "npm:@tintinweb/pi-subagents@0.26.0";
       files = {
         ".pi/agent/subagents.json".text = builtins.toJSON {
           disableDefaultAgents = true;
@@ -70,7 +70,7 @@ let
 
     # https://github.com/nicobailon/pi-web-access
     {
-      package = "npm:pi-web-access@0.47.0";
+      package = "npm:pi-web-access@0.48.0";
       files = {
         ".pi/agent/web-search.json".text = builtins.toJSON {
           provider = "exa";
