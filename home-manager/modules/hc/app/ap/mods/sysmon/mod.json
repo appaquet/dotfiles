@@ -1,0 +1,5 @@
+{
+  "place": "none",
+  "title": "System monitor",
+  "overlay": { "kind": "popup", "width": 2, "height": 2, "frame": "none" }
+}
