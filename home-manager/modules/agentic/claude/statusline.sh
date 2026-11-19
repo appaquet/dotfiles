@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# JSON payload docs: https://code.claude.com/docs/en/statusline.md
 set -euo pipefail
+
+# JSON payload docs: https://code.claude.com/docs/en/statusline.md
 
 input=$(cat)
 
