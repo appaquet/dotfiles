@@ -181,36 +181,36 @@ in
 
       claude = {
         main = {
-          model = "claude-code/claude-opus-5-5";
+          model = "anthropic/claude-opus-5-5";
           thinking = "medium";
         };
         remap = {
           "scoped/junior" = {
-            model = "claude-code/claude-haiku-5-5";
+            model = "anthropic/claude-haiku-5-5";
             thinking = "medium";
           };
           "scoped/summary" = {
-            model = "claude-code/claude-haiku-5-5";
+            model = "anthropic/claude-haiku-5-5";
             thinking = "medium";
           };
           "scoped/mid" = {
-            model = "claude-code/claude-sonnet-5-5";
+            model = "anthropic/claude-sonnet-5-5";
             thinking = "medium";
           };
           "scoped/senior" = {
-            model = "claude-code/claude-opus-5-5";
+            model = "anthropic/claude-opus-5-5";
             thinking = "medium";
           };
           "scoped/staff" = {
-            model = "claude-code/claude-opus-5-5";
+            model = "anthropic/claude-opus-5-5";
             thinking = "high";
           };
           "scoped/principal" = {
-            model = "claude-code/claude-fable-5-1";
+            model = "anthropic/claude-fable-5-1";
             thinking = "high";
           };
           "scoped/reviewer" = {
-            model = "claude-code/claude-opus-5-5";
+            model = "anthropic/claude-opus-5-5";
             thinking = "high";
           };
         };

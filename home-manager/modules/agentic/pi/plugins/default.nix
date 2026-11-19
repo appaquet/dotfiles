@@ -9,15 +9,6 @@ let
   libExtensions = import ./lib-extensions.nix { inherit pkgs; };
 
   plugins = [
-    # https://github.com/earendil-works/pi-claude-code
-    # Not published on npm, so it is pinned by git commit. Registers the
-    # claude-code provider (Claude subscription via the Claude Code CLI).
-    # Upstream main caps cache_control markers at Anthropic's four-per-request
-    # limit when it replays a request.
-    {
-      package = "git:github.com/earendil-works/pi-claude-code@47f9e2bb408f8b5c351edf95f7b756bc5c8f45cf";
-    }
-
     # https://github.com/Quartermaster-Labs/pi-on-demand-context
     {
       package = "npm:@quartermaster-labs/pi-on-demand-context@0.3.2";
