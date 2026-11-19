@@ -1,9 +1,9 @@
-{ ... }:
+{ inputs, ... }:
 
 {
-  imports = [
-    ./modules/base
-    ./modules/agentic
+  imports = with inputs.self.modules.homeManager; [
+    base
+    agentic
   ];
 
   programs.direnv.config = {

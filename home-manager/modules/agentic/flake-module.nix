@@ -19,6 +19,8 @@ in
     '';
   };
 
+  config.flake.modules.homeManager.agentic = ./default.nix;
+
   config.perSystem =
     {
       pkgs,

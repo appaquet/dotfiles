@@ -1,10 +1,10 @@
-{ ... }:
+{ inputs, ... }:
 
 {
-  imports = [
-    ./modules/base
-    ./modules/agentic
-    ./modules/dev.nix
+  imports = with inputs.self.modules.homeManager; [
+    base
+    agentic
+    dev
   ];
 
   home.username = "appaquet";

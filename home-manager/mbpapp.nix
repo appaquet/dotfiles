@@ -8,14 +8,16 @@
 {
   imports = [
     inputs.secrets.homeManager.exomind
-    ./modules/base
-    ./modules/agentic
-    ./modules/dev.nix
-    ./modules/docker.nix
-    ./modules/ghostty.nix
-    ./modules/media.nix
-    ./modules/work
-  ];
+  ]
+  ++ (with inputs.self.modules.homeManager; [
+    base
+    agentic
+    dev
+    docker
+    ghostty
+    media
+    work
+  ]);
 
   dotfiles.nono.profiles.machine.filesystem.allow = [
     "$HOME/exomind"

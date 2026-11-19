@@ -7,11 +7,13 @@
 {
   imports = [
     inputs.secrets.homeManager.exomind
-    ./modules/base
-    ./modules/agentic
-    ./modules/dev.nix
-    ./modules/ghostty.nix
-  ];
+  ]
+  ++ (with inputs.self.modules.homeManager; [
+    base
+    agentic
+    dev
+    ghostty
+  ]);
 
   dotfiles.restic.backup = {
     enable = true;

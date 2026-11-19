@@ -1,8 +1,8 @@
-{ ... }:
+{ inputs, ... }:
 
 {
-  imports = [
-    ./modules/base
+  imports = with inputs.self.modules.homeManager; [
+    base
   ];
 
   dotfiles.neovim.full = false;

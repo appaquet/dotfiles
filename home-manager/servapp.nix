@@ -3,15 +3,17 @@
 {
   imports = [
     inputs.secrets.homeManager.exomind
-    ./modules/base
-    ./modules/agentic
-    ./modules/dev.nix
-    ./modules/docker.nix
-    ./modules/mboxshell.nix
-    ./modules/media.nix
-    ./modules/vms.nix
-    ./modules/vpn.nix
-  ];
+  ]
+  ++ (with inputs.self.modules.homeManager; [
+    base
+    agentic
+    dev
+    docker
+    mboxshell
+    media
+    vms
+    vpn
+  ]);
 
   home.username = "appaquet";
   home.homeDirectory = "/home/appaquet";
