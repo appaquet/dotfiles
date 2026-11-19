@@ -158,6 +158,7 @@ in
       "ctrl-a shift-k" = "pane.swap:up";
       "ctrl-a shift-l" = "pane.swap:right";
       "ctrl-a x" = "pane.close";
+      "ctrl-a z" = "pane.zoom";
       "ctrl-a b" = "layout.toggle:sidebar";
       "ctrl-a t" = "mod.open:sysmon";
     };
