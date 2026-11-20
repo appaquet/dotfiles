@@ -28,7 +28,7 @@
     };
   };
 
-  dotfiles.hc.space-url.vars = [ "DOTCORE_FRONTEND_ORIGIN" ];
+  dotfiles.hc.space-url.vars = [ "DOTCORE_PUBLIC_ORIGIN" ];
 
   home.username = "appaquet";
   home.homeDirectory = "/home/appaquet";
