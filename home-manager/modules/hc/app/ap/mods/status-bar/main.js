@@ -1,15 +1,17 @@
 // Window status bar: machine, branch, agents count, Claude plan usage and the palette hint. A clone of the
 // shipped `workspace-status` with one added segment: what remains of the 5-hour and weekly Claude limits, when the
-// 5-hour window ends, and the spend budget per remaining hour or working day. The percentages come from the
-// statusline payloads `tap.sh` saves here and on every machine herdr-core reports connected (data.js, copied from
-// PostHog's claude-usage mod, for this machine; sources.js and remote.js for the others), read at most once a
-// minute and only while the window is active; the budget from pace.js. Being always on screen, it also records
-// when each space was last shown, for the `goto` picker's ordering.
+// 5-hour window ends, and the spend budget per remaining hour or working day. A percentage turns amber at 25% of a
+// window left and red at 10% (color.js). The percentages come from the statusline payloads `tap.sh` saves here and on
+// every machine herdr-core reports connected (data.js, copied from PostHog's claude-usage mod, for this machine;
+// sources.js and remote.js for the others), read at most once a minute and only while the window is active; the
+// budget from pace.js. Being always on screen, it also records when each space was last shown, for the `goto`
+// picker's ordering.
 
 import { View, div, svg } from "gpui-kit";
 import { h_flex } from "gpui-base";
 import { spaces, agents, theme, run, window, keys, shared, setShared } from "herdr";
 import { DAYS, clockAt, resetText } from "./clock.js";
+import { tierOf } from "./color.js";
 import { WINDOWS, limits, ensureDataDir, prune } from "./data.js";
 import { WORK, leftPercent, paceFor } from "./pace.js";
 import { mergeWindows } from "./sources.js";
@@ -32,6 +34,9 @@ const NAMES = { five_hour: "5-hour", seven_day: "Weekly" };
 const BAR_BUDGET = "seven_day";
 // Size of the small parentheticals a window can carry: its spend budget, and the 5-hour window's end time.
 const DETAIL_SIZE = 11.2;
+// Theme tokens for the two low-usage tiers: amber and red, the ANSI pair the tab bar also uses for CI state. The
+// healthy tier keeps the segment's own muted colour, so the bar only stands out once a window is nearly spent.
+const TIER_TOKEN = { normal: "muted", warn: "ansi3", crit: "ansi1" };
 
 export default class WorkspaceStatus extends View {
   init(_props, cx) {
@@ -124,6 +129,8 @@ export default class WorkspaceStatus extends View {
 
     const now = Date.now();
     const pace = (w) => paceFor(w.key, this.usage[w.key], now);
+    const at = shared(SEEN)?.at;
+    const old = Boolean(at) && now - at > DIM_AFTER;
     const parts = [];
     for (const w of shown) {
       if (parts.length > 0) parts.push(" · ");
@@ -133,7 +140,9 @@ export default class WorkspaceStatus extends View {
         continue;
       }
       const p = pace(w);
-      parts.push(`${w.label} ${Math.round(p ? p.left : leftPercent(v.used))}%`);
+      const pct = Math.round(p ? p.left : leftPercent(v.used));
+      parts.push(`${w.label} `);
+      parts.push(div().flex_none().text_color(old ? t.dim : t[TIER_TOKEN[tierOf(pct)]]).child(`${pct}%`));
       if (w.key === "five_hour") parts.push(div().flex_none().text_size(DETAIL_SIZE).child(` (${clockAt(v.resets * 1000)})`));
       if (p && w.key === BAR_BUDGET) {
         parts.push(div().flex_none().text_size(DETAIL_SIZE).child(` (${Math.round(p.perUnit)}%/${p.unit})`));
@@ -146,8 +155,6 @@ export default class WorkspaceStatus extends View {
       return lines;
     });
     tip.push(workText());
-    const at = shared(SEEN)?.at;
-    const old = Boolean(at) && now - at > DIM_AFTER;
 
     return h_flex().id("usage").gap(0).items_center().text_color(old ? t.dim : t.muted).tooltip(tip.join("\n")).children(parts);
   }
