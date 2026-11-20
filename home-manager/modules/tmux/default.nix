@@ -55,6 +55,9 @@
         # Allow passthrough of OSC sequences (notifications, etc.)
         set -g allow-passthrough on
 
+        # Copies made in tmux, and OSC 52 printed by programs (pbcopy), go to the outer terminal's clipboard
+        set -g set-clipboard on
+
         # Truecolor passthrough
         set -sg terminal-overrides ',*:RGB'
 
@@ -130,7 +133,7 @@
           send-keys -X begin-selection
           send-keys -X rectangle-toggle
         }
-        bind -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "pbcopy"
+        bind -T copy-mode-vi y send-keys -X copy-selection-and-cancel
         bind -T copy-mode-vi p {
           run "pbpaste | tmux load-buffer -"
           send-keys -X paste-buffer

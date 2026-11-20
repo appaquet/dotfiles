@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
+#
+# Prints the system clipboard. Only a macOS session can read it: terminals never allow OSC 52
+# reads, so elsewhere the terminal's own paste (Cmd-V) is the way in.
 
-os=$(uname)
-if [[ "$os" == "Linux" ]]; then
-  if [[ "$DISPLAY" != "" ]]; then
-    xclip -selection clipboard -o
-  else
-    ssh -o ConnectTimeout=5 -o PasswordAuthentication=no -o KbdInteractiveAuthentication=no mbpapp.n3x.net /usr/bin/pbpaste
+set -euo pipefail
+
+if [[ "$(uname)" == "Darwin" ]]; then
+  if command -v reattach-to-user-namespace >/dev/null; then
+    exec reattach-to-user-namespace /usr/bin/pbpaste
   fi
-elif [[ "$os" == "Darwin" ]]; then
-  reattach-to-user-namespace /usr/bin/pbpaste
+  exec /usr/bin/pbpaste
 fi
+
+echo "pbpaste: reading the clipboard is not supported here; paste with the terminal's own shortcut (Cmd-V in herdr-app)" >&2
+exit 1
