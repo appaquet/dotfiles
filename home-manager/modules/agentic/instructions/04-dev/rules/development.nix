@@ -23,6 +23,8 @@
 
         * Leave existing TODO/FIXME/REVIEW comments intact, unless current work address them
 
+        * When you wait on or poll something, bound it and make sure it watches what you started and can actually end; otherwise a broken wait silently runs forever
+
         ${scope.blocks."code-insert-checklist".embed}
 
         ${scope.blocks."testing-principles".embed}

@@ -24,11 +24,15 @@
     whitelist = {
       prefix = [
         "/home/appaquet/work/dotcore/dotcore"
+        "/home/appaquet/work/bluecap/relay-app"
       ];
     };
   };
 
-  dotfiles.hc.space-url.vars = [ "DOTCORE_PUBLIC_ORIGIN" ];
+  dotfiles.hc.space-url.vars = [
+    "DOTCORE_PUBLIC_ORIGIN"
+    "PUBLIC_URL" # relay
+  ];
 
   home.username = "appaquet";
   home.homeDirectory = "/home/appaquet";
