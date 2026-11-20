@@ -7,6 +7,7 @@
     { pkgs, ... }:
     {
       checks.hc-space-url-hook = import ./checks/hc-space-url-hook.nix { inherit pkgs; };
+      checks.status-bar-clock-unit = import ./checks/status-bar-clock-unit.nix { inherit pkgs; };
       checks.status-bar-pace-unit = import ./checks/status-bar-pace-unit.nix { inherit pkgs; };
       checks.status-bar-sources-unit = import ./checks/status-bar-sources-unit.nix { inherit pkgs; };
     };

@@ -1,14 +1,15 @@
 // Window status bar: machine, branch, agents count, Claude plan usage and the palette hint. A clone of the
-// shipped `workspace-status` with one added segment: what remains of the 5-hour and weekly Claude limits, and
-// the spend budget per remaining hour or working day. The percentages come from the statusline payloads `tap.sh`
-// saves here and on every machine herdr-core reports connected (data.js, copied from PostHog's claude-usage mod,
-// for this machine; sources.js and remote.js for the others), read at most once a minute and only while the
-// window is active; the budget from pace.js. Being always on screen, it also records when each space was last
-// shown, for the `goto` picker's ordering.
+// shipped `workspace-status` with one added segment: what remains of the 5-hour and weekly Claude limits, when the
+// 5-hour window ends, and the spend budget per remaining hour or working day. The percentages come from the
+// statusline payloads `tap.sh` saves here and on every machine herdr-core reports connected (data.js, copied from
+// PostHog's claude-usage mod, for this machine; sources.js and remote.js for the others), read at most once a
+// minute and only while the window is active; the budget from pace.js. Being always on screen, it also records
+// when each space was last shown, for the `goto` picker's ordering.
 
 import { View, div, svg } from "gpui-kit";
 import { h_flex } from "gpui-base";
 import { spaces, agents, theme, run, window, keys, shared, setShared } from "herdr";
+import { DAYS, clockAt, resetText } from "./clock.js";
 import { WINDOWS, limits, ensureDataDir, prune } from "./data.js";
 import { WORK, leftPercent, paceFor } from "./pace.js";
 import { mergeWindows } from "./sources.js";
@@ -26,10 +27,11 @@ const SHOWN = ["five_hour", "seven_day"];
 // Tooltip nouns for those two windows; `data.js` keeps the shorter labels the bar itself shows.
 const NAMES = { five_hour: "5-hour", seven_day: "Weekly" };
 // Only the weekly budget earns a place in the bar. The 5-hour one swings from 20%/h on a fresh window to
-// 50%/h just before a reset, and there is little to decide with it, so it stays in the tooltip.
+// 50%/h just before a reset, and there is little to decide with it, so it stays in the tooltip. Its end time does
+// earn a place in the bar, since that is what tells how long the window still has to run.
 const BAR_BUDGET = "seven_day";
-const BUDGET_SIZE = 11.2;
-const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+// Size of the small parentheticals a window can carry: its spend budget, and the 5-hour window's end time.
+const DETAIL_SIZE = 11.2;
 
 export default class WorkspaceStatus extends View {
   init(_props, cx) {
@@ -113,9 +115,9 @@ export default class WorkspaceStatus extends View {
     return key ? `${key}  commands` : "commands";
   }
 
-  // `5h 82% · week 62% (23%/d)`: what remains of each window, with the weekly spend budget per remaining
-  // working day in a smaller parenthetical. Reset times and both leftovers live in the tooltip; null when
-  // nothing was ever tapped.
+  // `5h 82% (17:50) · week 62% (23%/d)`: what remains of each window, the 5-hour window's end time and the weekly
+  // spend budget per remaining working day, both in a smaller parenthetical. The reset wording and both leftovers
+  // live in the tooltip; null when nothing was ever tapped.
   usageSegment(t) {
     const shown = WINDOWS.filter((w) => SHOWN.includes(w.key) && this.usage[w.key]);
     if (shown.length === 0) return null;
@@ -132,8 +134,9 @@ export default class WorkspaceStatus extends View {
       }
       const p = pace(w);
       parts.push(`${w.label} ${Math.round(p ? p.left : leftPercent(v.used))}%`);
+      if (w.key === "five_hour") parts.push(div().flex_none().text_size(DETAIL_SIZE).child(` (${clockAt(v.resets * 1000)})`));
       if (p && w.key === BAR_BUDGET) {
-        parts.push(div().flex_none().text_size(BUDGET_SIZE).child(` (${Math.round(p.perUnit)}%/${p.unit})`));
+        parts.push(div().flex_none().text_size(DETAIL_SIZE).child(` (${Math.round(p.perUnit)}%/${p.unit})`));
       }
     }
     const tip = shown.flatMap((w) => {
@@ -166,22 +169,6 @@ export default class WorkspaceStatus extends View {
       .when(Boolean(usage), el => el.child(usage))
       .child(div().id("palette").text_color(t.dim).on_click(() => run("app.palette")).child(this.hint(t)));
   }
-}
-
-// Reset time as `resets 3pm`, `resets Fri 9:30am` or `resets in 12m`; taken from PostHog's claude-usage mod.
-function resetText(sec) {
-  const at = sec * 1000;
-  const left = at - Date.now();
-  if (left <= 0) return `reset at ${clock(new Date(at))}`;
-  if (left < 3600000) return `resets in ${Math.max(1, Math.round(left / 60000))}m`;
-  const d = new Date(at);
-  return `resets ${d.toDateString() === new Date().toDateString() ? "" : `${DAYS[d.getDay()]} `}${clock(d)}`;
-}
-
-function clock(d) {
-  const h = d.getHours();
-  const m = String(d.getMinutes()).padStart(2, "0");
-  return `${h % 12 || 12}${m === "00" ? "" : `:${m}`}${h < 12 ? "am" : "pm"}`;
 }
 
 // `1h 40m` for an hour span, `2.7 working days` for a working-day span.
