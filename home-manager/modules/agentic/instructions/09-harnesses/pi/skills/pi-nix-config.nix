@@ -19,11 +19,11 @@
 
         ## Pi instructions
 
-        Pi instructions (AGENTS.md, rules, skills, prompts, agents) are rendered by nixantic from `.nix` sources under `~/dotfiles/home-manager/modules/agentic/instructions/`. Edit the nix source, not the rendered artifacts. Read `~/dotfiles/home-manager/modules/agentic/CLAUDE.md` before editing instructions.
+        Pi instructions (AGENTS.md, rules, skills, prompts, agents) are rendered by nixantic from `.nix` sources under `~/dotfiles/home-manager/modules/agentic/instructions/`. Edit the nix source, not the rendered artifacts. Read `~/dotfiles/home-manager/modules/agentic/AGENTS.md` before editing instructions.
 
         ## Pi runtime
 
-        Pi package, wrapper, models, and plugins are managed under `~/dotfiles/home-manager/modules/agentic/pi/`. Read `~/dotfiles/home-manager/modules/agentic/pi/CLAUDE.md` for extension loading and testing details.
+        Pi package, wrapper, models, and plugins are managed under `~/dotfiles/home-manager/modules/agentic/pi/`. Read `~/dotfiles/home-manager/modules/agentic/pi/AGENTS.md` for extension loading and testing details.
       '';
     };
     files = { };
