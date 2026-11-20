@@ -139,6 +139,7 @@ in
       "ctrl-a n" = "tab.next";
       "ctrl-a p" = "tab.prev";
       "ctrl-a shift-x" = "tab.close";
+      "ctrl-a ," = "tab.rename";
       "ctrl-a 1" = "tab.select:1";
       "ctrl-a 2" = "tab.select:2";
       "ctrl-a 3" = "tab.select:3";
