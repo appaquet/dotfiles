@@ -28,7 +28,7 @@ if ((${#payload} > max_payload)); then
   exit 1
 fi
 
-if ! printf '\033]52;c;%s\a' "$payload" >"$tty" 2>/dev/null; then
+if ! { printf '\033]52;c;%s\a' "$payload" >"$tty"; } 2>/dev/null; then
   echo "pbcopy: no terminal to write to ($tty); OSC 52 copy needs an interactive terminal such as an hc terminal in herdr-app" >&2
   exit 1
 fi

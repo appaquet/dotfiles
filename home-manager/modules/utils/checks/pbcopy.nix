@@ -54,7 +54,7 @@ pkgs.runCommand "utils-pbcopy-check"
     if printf 'x' | PBCOPY_TTY=/nonexistent/tty run shim-linux $pbcopy 2> err.notty; then
       fail "pbcopy succeeded without a terminal"
     fi
-    grep -qF "no terminal to write to (/nonexistent/tty)" err.notty || fail "no-terminal message missing: $(cat err.notty)"
+    test "$(wc -l < err.notty)" = 1 && grep -qF "no terminal to write to (/nonexistent/tty)" err.notty || fail "no-terminal message missing: $(cat err.notty)"
 
     # Over the limit: refuses and says why
     head -c 800000 /dev/zero | tr '\0' a > big.txt

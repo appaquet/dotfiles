@@ -93,24 +93,13 @@ vim.keymap.set({ "n", "v" }, "<A-Left>", "b", { silent = true, desc = "Move to b
 vim.keymap.set({ "n", "v" }, "<A-Right>", "e", { silent = true, desc = "Move to end of word" })
 
 -- Clipboard / yanking
+-- Neovim runs shell commands without a controlling terminal, so pbcopy cannot reach the terminal from here:
+-- send the text through the UI as OSC 52 instead, which herdr-app turns into a local clipboard write.
+local function copy_to_clipboard(text)
+	require("vim.ui.clipboard.osc52").copy("+")(vim.split(text, "\n", { plain = true }))
+end
 local function copy_selection_to_clipboard()
-	local selected = get_selected_visual()
-
-	-- Write to a temp file
-	local temp_file = os.tmpname()
-	local file = io.open(temp_file, "w")
-	if not file then
-		vim.notify("Failed to open temp file for writing", vim.log.levels.ERROR)
-		return
-	end
-	file:write(selected)
-	file:close()
-
-	-- Copy the temp file to the clipboard
-	vim.fn.system("pbcopy < " .. temp_file)
-
-	-- Remove the temp file
-	os.remove(temp_file)
+	copy_to_clipboard(get_selected_visual())
 end
 local function yank_block_to_clipboard()
 	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "x", true)
@@ -172,6 +161,6 @@ vim.keymap.set("n", "<Leader>Ts", ":set spell!<CR>", { silent = true, desc = "To
 -- Show and copy current file's absolute path
 vim.keymap.set("n", "<Leader>yf", function()
 	local path = vim.fn.expand("%:p")
-	vim.fn.system("echo -n " .. vim.fn.shellescape(path) .. " | pbcopy")
+	copy_to_clipboard(path)
 	vim.notify(path)
 end, { silent = true, desc = "Yank file path" })
