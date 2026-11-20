@@ -43,7 +43,9 @@ in
       gnumake
       bintools # ld, objdump, etc.
 
+      # Agents tend to use directly when needed
       nodejs
+      python3
     ])
     ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
       pkgs.mold
