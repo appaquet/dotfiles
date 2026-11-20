@@ -118,6 +118,15 @@ export default class Tabs extends View {
         .child(svg(`mods/spaces-status/${PR_ICONS[pr.state] ?? PR_ICONS.open}`).size(14).text_color(prColor(t, pr)))
         .child(`#${pr.number}`);
     };
+    const url = space ? spaceUrl(space.id) : null;
+    const urlButton = () => {
+      return h_flex().id("space-url").h(26).px(8).gap(5).flex_none().items_center().rounded(6)
+        .text_size(12).bg(t.chrome).text_color(t.muted)
+        .hover(s => s.bg(t.hover)).tooltip(url).on_mouse_down("left", stop)
+        .on_click(() => { exec("open", [url]).catch(() => {}); })
+        .child(svg("mods/spaces-status/globe.svg").size(14).text_color(t.accent))
+        .child("Open");
+    };
     const showMe = space ? spaceShowMe(space.id) : [];
     const showMeButton = () => {
       return h_flex().id("show-me").h(26).px(8).gap(5).flex_none().items_center().rounded(6)
@@ -138,6 +147,7 @@ export default class Tabs extends View {
       .when(enabled.includes("files"), el => el.child(panelButton("files", "Files", "mods/files/file.svg")))
       .when(enabled.includes("changes"), el => el.child(panelButton("changes", "Changes", "mods/changes/changes.svg")))
       .when(Boolean(pr), el => el.child(prButton()))
+      .when(Boolean(url), el => el.child(urlButton()))
       .when(showMe.length > 0, el => el.child(showMeButton()))
       .when(w?.buttons, el => el.child(button("minimize", w.platform === "windows" ? svg("mods/tabs/win-min.svg").size(16) : "−", () => run("window.minimize")))
         .child(button("maximize", w.platform === "windows" ? svg(`mods/tabs/${w.maximized ? "win-restore" : "win-max"}.svg`).size(16) : "□", () => run("window.maximize")))
@@ -157,17 +167,29 @@ function prTip(pr) {
   return [`#${pr.number}`, pr.title, ci, pr.repo, pr.bookmark].filter(Boolean).join(" · ");
 }
 
-// Live `show-me.<port>=<url>` labels belonging to a space, highest port first.
+// Live labelled terminals belonging to a space.
 // Remote terminals omit the `machine/` prefix in `herdr.space`, so restore it from `address`.
-function spaceShowMe(spaceId) {
-  const out = [];
-  for (const term of terminals()) {
-    if (term.state !== "live" || !term.labels) continue;
+function spaceTerminals(spaceId) {
+  return terminals().filter((term) => {
+    if (term.state !== "live" || !term.labels) return false;
     const raw = term.labels["herdr.space"];
-    if (!raw) continue;
+    if (!raw) return false;
     const slash = term.address.indexOf("/");
     const full = slash >= 0 ? `${term.address.slice(0, slash + 1)}${raw}` : raw;
-    if (full !== spaceId) continue;
+    return full === spaceId;
+  });
+}
+
+// The space's workspace URL: the first `space.url` label, set by AP's fish hook from the
+// workspace's environment (hc/space-url.fish).
+function spaceUrl(spaceId) {
+  return spaceTerminals(spaceId).map((term) => term.labels["space.url"]).find(Boolean) ?? null;
+}
+
+// Live `show-me.<port>=<url>` labels belonging to a space, highest port first.
+function spaceShowMe(spaceId) {
+  const out = [];
+  for (const term of spaceTerminals(spaceId)) {
     for (const [key, url] of Object.entries(term.labels)) {
       if (key.startsWith("show-me.") && url) {
         out.push({ address: term.address, key, port: Number(key.slice(8)) || 0, url });

@@ -511,6 +511,24 @@ export default class Spaces extends View {
       .child(svg(`mods/${SELF}/${icon}`).size(12).text_color(color));
   }
 
+  // Click opens the space's workspace URL in the browser.
+  urlIcon(w, url, t) {
+    return div()
+      .id(`url-${w.id}`)
+      .flex_none()
+      .p(2)
+      .rounded(4)
+      .cursor_pointer()
+      .hover((s) => s.bg(t.hover))
+      .tooltip(url)
+      .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
+      .on_click((_e, cx) => {
+        cx.stop_propagation();
+        exec("open", [url]).catch(() => {});
+      })
+      .child(svg(`mods/${SELF}/globe.svg`).size(12).text_color(t.accent));
+  }
+
   // Click opens the space's show-me server in the browser; right-click clears stale labels.
   showMeIcon(w, entries, t) {
     return div()
@@ -545,6 +563,7 @@ export default class Spaces extends View {
     const on = w.active;
     const pr = (shared("space.prs") ?? {})[w.id];
     const showMe = spaceShowMe(w.id);
+    const url = spaceUrl(w.id);
     const colors = shared("space.colors") ?? {};
     const color = colors[w.id] ?? "ansi6";
     const fill = color.startsWith("#") ? color : (MARK[color] ?? t[color]);
@@ -594,6 +613,7 @@ export default class Spaces extends View {
           .when(!tree, el => el.child(h_flex().size(18).flex_none().rounded(5).bg(fill).items_center().justify_center().text_size(10.5).font_bold().text_color("#ffffff").child([...w.name][0]?.toUpperCase() ?? "?")))
           .child(div().flex_shrink(0).max_w(150).truncate().text_color(t.foreground).child(w.name))
           .child(div().flex_1())
+          .when(Boolean(url), (el) => el.child(this.urlIcon(w, url, t)))
           .when(showMe.length > 0, (el) => el.child(this.showMeIcon(w, showMe, t)))
           .when(Boolean(pr), (el) => el.child(this.prIcon(w, pr, t)))
           .when(Boolean(w.status), (el) => el.child(this.statusDot(w.status, t))),
@@ -646,17 +666,29 @@ function summary(e) {
   return { number, title, url, state, ci: hasCi(e.pr) ? e.ci : "none", repo: e.slug, bookmark: e.bookmark };
 }
 
-// Live `show-me.<port>=<url>` labels belonging to a space, highest port first.
+// Live labelled terminals belonging to a space.
 // Remote terminals omit the `machine/` prefix in `herdr.space`, so restore it from `address`.
-function spaceShowMe(spaceId) {
-  const out = [];
-  for (const term of terminals()) {
-    if (term.state !== "live" || !term.labels) continue;
+function spaceTerminals(spaceId) {
+  return terminals().filter((term) => {
+    if (term.state !== "live" || !term.labels) return false;
     const raw = term.labels["herdr.space"];
-    if (!raw) continue;
+    if (!raw) return false;
     const slash = term.address.indexOf("/");
     const full = slash >= 0 ? `${term.address.slice(0, slash + 1)}${raw}` : raw;
-    if (full !== spaceId) continue;
+    return full === spaceId;
+  });
+}
+
+// The space's workspace URL: the first `space.url` label, set by AP's fish hook from the
+// workspace's environment (hc/space-url.fish).
+function spaceUrl(spaceId) {
+  return spaceTerminals(spaceId).map((term) => term.labels["space.url"]).find(Boolean) ?? null;
+}
+
+// Live `show-me.<port>=<url>` labels belonging to a space, highest port first.
+function spaceShowMe(spaceId) {
+  const out = [];
+  for (const term of spaceTerminals(spaceId)) {
     for (const [key, url] of Object.entries(term.labels)) {
       if (key.startsWith("show-me.") && url) {
         out.push({ address: term.address, key, port: Number(key.slice(8)) || 0, url });

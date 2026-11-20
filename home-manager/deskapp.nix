@@ -28,6 +28,8 @@
     };
   };
 
+  dotfiles.hc.space-url.vars = [ "DOTCORE_FRONTEND_ORIGIN" ];
+
   home.username = "appaquet";
   home.homeDirectory = "/home/appaquet";
   home.stateVersion = "23.11";

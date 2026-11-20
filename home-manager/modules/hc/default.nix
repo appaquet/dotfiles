@@ -61,6 +61,7 @@ in
     ./app-module.nix
     ./mod-watch.nix
     ./skills.nix
+    ./space-url-module.nix
   ];
 
   # Look: applied live by the app, and only to layouts that leave fonts unset.
