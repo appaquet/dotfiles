@@ -9,6 +9,7 @@ import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
 import { spaces, machines, panes, terminals, run, openOverlay, exec, hc, theme, shared, setShared, watchFolder, window, layout, home, appHome } from "herdr";
 import { CAP, parseGh, prSummary, ciRollup, nextDue, prLook, prTip, hasCi } from "./prs.js";
+import { groupRows } from "./rows.js";
 
 function find(node, id) {
   if (node?.id === id) return node;
@@ -85,6 +86,9 @@ export default class Spaces extends View {
     this.over = null;
     this.machines = [];
     this.folded = new Set(JSON.parse(localStorage.getItem("machines.folded") ?? "[]"));
+    this.repoFolded = new Set(JSON.parse(localStorage.getItem("spaces.folded") ?? "[]")); // repos whose worktree rows are hidden, keyed like g.repo (machine-scoped)
+    // The active space at the last look: a folded repo opens on a change into it, never while it already holds the active space.
+    this.lastActive = spaces().find((s) => s.active)?.id ?? null;
     this.refreshMachines(cx);
     cx.timer.every(15000, cx => this.refreshMachines(cx));
     // `git status` walks the whole tree, on another machine a process there:
@@ -407,25 +411,21 @@ export default class Spaces extends View {
     const ready = (w) => this.shown.has(w.id) || where(w, ps) in this.git || Date.now() - (this.born[w.id] ??= Date.now()) > 1500;
     for (const w of sp) if (!this.shown.has(w.id) && ready(w)) this.shown.add(w.id);
     const list = sp.map((w, i) => ({ w, i, g: this.git[where(w, ps)] ?? null })).filter((r) => this.shown.has(r.w.id));
-    const mains = new Set(list.filter((r) => r.g && !r.g.linked).map((r) => r.g.repo));
-    const nested = (r) => r.g?.linked && mains.has(r.g.repo);
-    const out = [];
-    const placed = new Set(); // repos whose worktrees are listed (under the first of its spaces)
-    const parents = {}; // worktree space id -> the space it's listed under
-    for (const r of list) {
-      if (nested(r)) continue;
-      out.push({ ...r, tree: null });
-      if (!r.g || r.g.linked || placed.has(r.g.repo)) continue;
-      placed.add(r.g.repo);
-      const kids = list.filter((k) => nested(k) && k.g.repo === r.g.repo);
-      kids.forEach((k, n) => {
-        out.push({ ...k, tree: n === kids.length - 1 ? "└─" : "├─" });
-        parents[k.w.id] = r.w.id;
-      });
+    // A jump into a worktree of a folded repo opens it, but only on a change of
+    // active space: folding the group you're in sticks while you remain there.
+    const active = sp.find((s) => s.active);
+    if (active && active.id !== this.lastActive) {
+      const g = this.git[where(active, ps)];
+      if (g?.linked && this.repoFolded.has(g.repo)) {
+        this.repoFolded.delete(g.repo);
+        localStorage.setItem("spaces.folded", JSON.stringify([...this.repoFolded]));
+      }
     }
+    this.lastActive = active?.id ?? null;
+    const { rows, parents } = groupRows(list, this.repoFolded);
     this.publishParents(parents);
     this.publishPrs(sp, ps);
-    return out;
+    return rows;
   }
 
   // Shared "space.parents", read by the `goto` picker to show and match each worktree's parent. Called from
@@ -462,10 +462,10 @@ export default class Spaces extends View {
         || spaces().some(s => (s.machine ?? null) === m && !this.shown.has(s.id));
     };
     const loadingRow = m => div().id(`machine-loading-${m ?? "local"}`).h(28).flex_none().px(8).text_size(12).text_color(t.dim).child(collapsed ? "…" : "Loading…");
-    if (!remote.length) return loading(null) && !rows.length ? [loadingRow(null)] : rows.map(draw);
+    if (!remote.length) return loading(null) && !rows.length ? [loadingRow(null)] : rows.filter((r) => !r.hidden).map(draw);
     const machineNames = [null, ...remote];
     return machineNames.flatMap((m) => {
-      const mine = rows.filter((r) => (r.w.machine ?? null) === m);
+      const mine = rows.filter((r) => (r.w.machine ?? null) === m && !r.hidden);
       const machine = this.machines.find(k => k.name === m);
       const connected = !m || machine?.state === "connected";
       const folded = this.folded.has(m);
@@ -509,6 +509,29 @@ export default class Spaces extends View {
         exec("open", [pr.url]).catch(() => {});
       })
       .child(svg(`mods/${SELF}/${icon}`).size(12).text_color(color));
+  }
+
+  // Click opens the space's workspace URL in the browser.
+  // Fold/unfold a repo's worktree rows. Its own press target, like the PR and URL icons: the row
+  // keeps switching spaces on a click everywhere else.
+  foldChevron(w, g, t) {
+    const repo = g.repo;
+    const folded = this.repoFolded.has(repo);
+    return div()
+      .id(`fold-${w.id}`)
+      .flex_none()
+      .p(2)
+      .rounded(4)
+      .cursor_pointer()
+      .hover((s) => s.bg(t.hover))
+      .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
+      .on_click((_e, cx) => {
+        cx.stop_propagation();
+        folded ? this.repoFolded.delete(repo) : this.repoFolded.add(repo);
+        localStorage.setItem("spaces.folded", JSON.stringify([...this.repoFolded]));
+        cx.notify();
+      })
+      .child(svg(`mods/workspace-chrome/chevron-${folded ? "right" : "down"}.svg`).size(11).flex_none().text_color(t.dim));
   }
 
   // Click opens the space's workspace URL in the browser.
@@ -559,7 +582,7 @@ export default class Spaces extends View {
     return div().size(7).mx(2).flex_none().rounded(4).bg(tone(t, status));
   }
 
-  row({ w, i, tree }, t) {
+  row({ w, i, g, tree, kids }, t) {
     const on = w.active;
     const pr = (shared("space.prs") ?? {})[w.id];
     const showMe = spaceShowMe(w.id);
@@ -612,11 +635,13 @@ export default class Spaces extends View {
           .when(Boolean(tree), el => el.pl(22).child(svg("mods/workspace-chrome/branch.svg").size(13).text_color(t.dim)))
           .when(!tree, el => el.child(h_flex().size(18).flex_none().rounded(5).bg(fill).items_center().justify_center().text_size(10.5).font_bold().text_color("#ffffff").child([...w.name][0]?.toUpperCase() ?? "?")))
           .child(div().flex_shrink(0).max_w(150).truncate().text_color(t.foreground).child(w.name))
+          .when(kids > 0 && this.repoFolded.has(g.repo), (el) => el.child(div().flex_none().text_size(11).text_color(t.dim).child(String(kids))))
           .child(div().flex_1())
           .when(Boolean(url), (el) => el.child(this.urlIcon(w, url, t)))
           .when(showMe.length > 0, (el) => el.child(this.showMeIcon(w, showMe, t)))
           .when(Boolean(pr), (el) => el.child(this.prIcon(w, pr, t)))
-          .when(Boolean(w.status), (el) => el.child(this.statusDot(w.status, t))),
+          .when(Boolean(w.status), (el) => el.child(this.statusDot(w.status, t)))
+          .when(kids > 0, (el) => el.child(this.foldChevron(w, g, t))),
       );
   }
 
