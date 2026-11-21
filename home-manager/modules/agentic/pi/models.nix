@@ -59,6 +59,12 @@ let
 
         "inkling-2-mini" = {
           contextWindow = 300000;
+          input = [
+            "text"
+            "image"
+          ];
+
+          inherit thinkingLevelMap;
         };
       };
     };
@@ -73,7 +79,7 @@ in
     scopeProvider = {
       local = {
         main = {
-          model = "deskapp/qwen3.8-27b";
+          model = "deskapp/inkling-2-mini";
           thinking = "medium";
         };
         prompt = {
@@ -82,31 +88,31 @@ in
         };
         remap = {
           "scoped/junior" = {
-            model = "deskapp/qwen3.8-27b";
+            model = "deskapp/inkling-2-mini";
             thinking = "off";
           };
           "scoped/summary" = {
-            model = "deskapp/qwen3.8-27b";
+            model = "deskapp/inkling-2-mini";
             thinking = "off";
           };
           "scoped/mid" = {
-            model = "deskapp/qwen3.8-27b";
+            model = "deskapp/inkling-2-mini";
             thinking = "low";
           };
           "scoped/senior" = {
-            model = "deskapp/qwen3.8-27b";
+            model = "deskapp/inkling-2-mini";
             thinking = "medium";
           };
           "scoped/staff" = {
-            model = "deskapp/qwen3.8-27b";
+            model = "deskapp/inkling-2-mini";
             thinking = "xhigh";
           };
           "scoped/principal" = {
-            model = "deskapp/qwen3.8-27b";
+            model = "deskapp/inkling-2-mini";
             thinking = "xhigh";
           };
           "scoped/reviewer" = {
-            model = "deskapp/qwen3.8-27b";
+            model = "deskapp/inkling-2-mini";
             thinking = "xhigh";
           };
         };
