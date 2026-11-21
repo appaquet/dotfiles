@@ -56,6 +56,10 @@ let
         "qwen3.8-flash-next" = {
           contextWindow = 262144;
         };
+
+        "inkling-2-mini" = {
+          contextWindow = 300000;
+        };
       };
     };
   };
