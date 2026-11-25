@@ -7,10 +7,11 @@
 import * as fs from "fs/promises";
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
-import { spaces, machines, panes, terminals, run, openOverlay, exec, hc, theme, shared, setShared, watchFolder, window, layout, home, appHome } from "herdr";
+import { spaces, machines, panes, terminals, run, nextCommand, openOverlay, exec, hc, theme, shared, setShared, watchFolder, window, layout, home, appHome } from "herdr";
 import { CAP, parseGh, prSummary, ciRollup, nextDue, prLook, prTip, hasCi } from "./prs.js";
 import { groupRows } from "./rows.js";
 import { readMachineOrder, resolveMachineOrder, moveMachine, trackMachinePress, releaseMachinePress } from "./machine-order.js";
+import { visibleNavOrder, step } from "./nav.js";
 
 function find(node, id) {
   if (node?.id === id) return node;
@@ -93,12 +94,37 @@ export default class Spaces extends View {
     this.repoFolded = new Set(JSON.parse(localStorage.getItem("spaces.folded") ?? "[]")); // repos whose worktree rows are hidden, keyed like g.repo (machine-scoped)
     // The active space at the last look: a folded repo opens on a change into it, never while it already holds the active space.
     this.lastActive = spaces().find((s) => s.active)?.id ?? null;
+    this.navOrder = []; // ids of the rows the sidebar draws, in draw order
+    this.parents = {}; // worktree space id -> main space id
     this.refreshMachines(cx);
     cx.timer.every(15000, cx => this.refreshMachines(cx));
     // `git status` walks the whole tree, on another machine a process there:
     // only when its answer could have changed (see `due`).
     cx.timer.every(250, (cx) => this.checkNew(cx));
     cx.timer.every(5000, (cx) => this.pollPrs(cx));
+    this.startNav(cx);
+  }
+
+  // Step through the sidebar's visible rows on "next" / "prev" key commands.
+  startNav(cx) {
+    cx.spawn(async (cx) => {
+      for (;;) {
+        const c = await nextCommand();
+        const cmd = String(c).split(/[.:]/).pop();
+        if (cmd === "next") this.stepInto(1);
+        else if (cmd === "prev") this.stepInto(-1);
+        cx.notify();
+      }
+    });
+  }
+
+  // Cycle from the active space into the next visible row. Hidden spaces anchor
+  // on their group's main row (or no-op) since they are not in the order.
+  stepInto(direction) {
+    const active = spaces().find((space) => space.active);
+    if (!active) return;
+    const target = step(this.navOrder, active.id, direction, this.parents?.[active.id]);
+    if (target) run("space.select", { id: target });
   }
 
   checkNew(cx) {
@@ -427,6 +453,7 @@ export default class Spaces extends View {
     }
     this.lastActive = active?.id ?? null;
     const { rows, parents } = groupRows(list, this.repoFolded);
+    this.parents = parents;
     this.publishParents(parents);
     this.publishPrs(sp, ps);
     return rows;
@@ -471,7 +498,16 @@ export default class Spaces extends View {
         || spaces().some(s => (s.machine ?? null) === m && !this.shown.has(s.id));
     };
     const loadingRow = m => div().id(`machine-loading-${machineKey(m)}`).h(28).flex_none().px(8).text_size(12).text_color(t.dim).child(collapsed ? "…" : "Loading…");
-    if (!remote.length) return loading(null) && !rows.length ? [loadingRow(null)] : rows.filter((r) => !r.hidden).map(draw);
+    if (!remote.length) {
+      this.navOrder = rows.filter((r) => !r.hidden).map((r) => r.w.id);
+      return loading(null) && !rows.length ? [loadingRow(null)] : rows.filter((r) => !r.hidden).map(draw);
+    }
+
+    const sections = order.visible.map((m) => ({
+      machine: m,
+      rows: rows.filter((r) => (r.w.machine ?? null) === m),
+    }));
+    this.navOrder = visibleNavOrder(sections, this.folded);
 
     return order.visible.flatMap((m) => {
       const sectionRows = rows.filter((r) => (r.w.machine ?? null) === m);

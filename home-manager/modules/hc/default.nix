@@ -78,12 +78,12 @@ in
       "cmd-alt-h" = "app.hide_others";
       "cmd-t" = "tab.new";
       "cmd-w" = "tab.close";
-      "ctrl-tab" = "space.next";
-      "ctrl-shift-tab" = "space.prev";
+      "ctrl-tab" = "spaces-status.next";
+      "ctrl-shift-tab" = "spaces-status.prev";
       "cmd-shift-]" = "tab.next";
       "cmd-shift-[" = "tab.prev";
-      "cmd-alt-]" = "space.next";
-      "cmd-alt-[" = "space.prev";
+      "cmd-alt-]" = "spaces-status.next";
+      "cmd-alt-[" = "spaces-status.prev";
       "cmd-]" = "agent.next";
       "cmd-[" = "agent.prev";
       "cmd-shift-l" = "layout.switch";
