@@ -34,13 +34,22 @@ function providerEntry(overrides: Record<string, unknown> = {}): string {
 }
 
 /** Fetch stub returning an OpenAI-style model list; records requests. */
-function modelsFetch(ids: string[], calls: Array<{ url: string; auth?: string }>) {
+function modelsFetch(
+  ids: string[],
+  calls: Array<{ url: string; auth?: string }>,
+  reported: Record<string, Record<string, unknown>> = {},
+) {
   return async (url: string, init?: RequestInit) => {
     const headers = (init?.headers ?? {}) as Record<string, string>;
     calls.push({ url, auth: headers.Authorization });
     return new Response(
       JSON.stringify({
-        data: ids.map((id) => ({ id, object: "model", owned_by: "dotcore" })),
+        data: ids.map((id) => ({
+          id,
+          object: "model",
+          owned_by: "dotcore",
+          ...reported[id],
+        })),
       }),
       { status: 200, headers: { "content-type": "application/json" } },
     );
@@ -89,6 +98,28 @@ function modelsOf(entry: Registered | undefined): unknown[] {
 const cachePath = (dir: string) =>
   path.join(dir, "extensions", "model-discovery", "cache.json");
 
+/** Fingerprint the previous extension version wrote for the deskapp entry. */
+const LEGACY_FINGERPRINT = JSON.stringify([
+  DESKAPP.baseUrl,
+  DESKAPP.api,
+  DESKAPP.apiKey,
+  null,
+  DESKAPP.compat,
+]);
+
+/** Prime a version 1 cache file, as written before context discovery. */
+function writeLegacyCache(dir: string, ids: string[]): void {
+  const file = cachePath(dir);
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(
+    file,
+    JSON.stringify({
+      version: 1,
+      providers: { deskapp: { fingerprint: LEGACY_FINGERPRINT, ids } },
+    }),
+  );
+}
+
 test("cache miss fetches, registers parity models, and persists the cache", async () => {
   const dir = makeAgentDir(providerEntry());
   const calls: Array<{ url: string; auth?: string }> = [];
@@ -134,8 +165,12 @@ test("cache miss fetches, registers parity models, and persists the cache", asyn
   // The cache holds the raw discovered ids; models are constructed at
   // registration time from ids + discoverDefaults.
   const cache = JSON.parse(fs.readFileSync(cachePath(dir), "utf-8"));
+  expect(cache.version).toBe(2);
   expect(Object.keys(cache.providers)).toEqual(["deskapp"]);
-  expect(cache.providers.deskapp.ids).toEqual(["qwen3.8-27b", "gemma-4-e2b"]);
+  expect(cache.providers.deskapp.models).toEqual([
+    { id: "qwen3.8-27b" },
+    { id: "gemma-4-e2b" },
+  ]);
 });
 
 test("cache hit registers the cached catalog with zero network", async () => {
@@ -257,17 +292,153 @@ test("startup fetch failure writes no cache", async () => {
 
 test("a corrupted cache entry re-fetches", async () => {
   const dir = makeAgentDir(providerEntry());
-  // Prime a structurally valid cache, then corrupt the ids.
+  // Prime a structurally valid cache, then corrupt the model entries.
   await run(dir, modelsFetch(["a"], []));
   const file = cachePath(dir);
   const cache = JSON.parse(fs.readFileSync(file, "utf-8"));
-  cache.providers.deskapp.ids = ["a", 42];
+  cache.providers.deskapp.models = ["a", 42];
   fs.writeFileSync(file, JSON.stringify(cache));
 
   const calls: Array<{ url: string; auth?: string }> = [];
   const registered = await run(dir, modelsFetch(["b", "c"], calls));
   expect(calls).toHaveLength(1);
   expect(modelsOf(registered.find((r) => r.id === "deskapp")).map((m) => (m as { id: string }).id)).toEqual(["b", "c"]);
+});
+
+test("an unparseable cache with a dead endpoint registers no models", async () => {
+  const dir = makeAgentDir(providerEntry());
+  fs.mkdirSync(path.dirname(cachePath(dir)), { recursive: true });
+  fs.writeFileSync(cachePath(dir), "{ not json");
+
+  const registered = await run(dir, failFetch as typeof fetch);
+  const entry = registered.find((r) => r.id === "deskapp");
+  expect(entry?.config.models).toBeUndefined();
+});
+
+test("a bare array response body is accepted", async () => {
+  const dir = makeAgentDir(providerEntry());
+  const bareArrayFetch = (async () =>
+    new Response(
+      JSON.stringify([
+        { id: "a", object: "model" },
+        { id: "b", object: "model", context_length: 8_192 },
+      ]),
+      { status: 200, headers: { "content-type": "application/json" } },
+    )) as unknown as typeof fetch;
+
+  const registered = await run(dir, bareArrayFetch);
+  const models = modelsOf(registered.find((r) => r.id === "deskapp"));
+  expect(models.map((m) => (m as { id: string }).id)).toEqual(["a", "b"]);
+  expect((models[1] as { contextWindow: number }).contextWindow).toBe(8_192);
+});
+
+test("a cached catalog keeps reported context windows offline", async () => {
+  const dir = makeAgentDir(
+    providerEntry({ discoverDefaults: { contextWindow: 125_000 } }),
+  );
+  await run(
+    dir,
+    modelsFetch(["gemma-4-e2b"], [], {
+      "gemma-4-e2b": { context_length: 65_536 },
+    }),
+  );
+
+  const registered = await run(dir, failFetch as typeof fetch);
+  const models = modelsOf(registered.find((r) => r.id === "deskapp"));
+  expect(models[0]).toMatchObject({
+    id: "gemma-4-e2b",
+    contextWindow: 65_536,
+  });
+});
+
+test("a version 1 cache refetches once and stores reported context windows", async () => {
+  const dir = makeAgentDir(
+    providerEntry({ discoverDefaults: { contextWindow: 125_000 } }),
+  );
+  writeLegacyCache(dir, ["gemma-4-e2b"]);
+
+  const calls: Array<{ url: string; auth?: string }> = [];
+  const registered = await run(
+    dir,
+    modelsFetch(["gemma-4-e2b"], calls, {
+      "gemma-4-e2b": { context_length: 65_536 },
+    }),
+  );
+  expect(calls).toHaveLength(1);
+  expect(modelsOf(registered.find((r) => r.id === "deskapp"))[0]).toMatchObject(
+    { id: "gemma-4-e2b", contextWindow: 65_536 },
+  );
+
+  const cache = JSON.parse(fs.readFileSync(cachePath(dir), "utf-8"));
+  expect(cache.version).toBe(2);
+  expect(cache.providers.deskapp.models).toEqual([
+    { id: "gemma-4-e2b", contextWindow: 65_536 },
+  ]);
+});
+
+test("a version 1 cache still supplies the catalog when the endpoint is down", async () => {
+  const dir = makeAgentDir(
+    providerEntry({ discoverDefaults: { contextWindow: 125_000 } }),
+  );
+  writeLegacyCache(dir, ["a", "b"]);
+
+  const registered = await run(dir, failFetch as typeof fetch);
+  const models = modelsOf(registered.find((r) => r.id === "deskapp"));
+  expect(models.map((m) => (m as { id: string }).id)).toEqual(["a", "b"]);
+  expect((models[0] as { contextWindow: number }).contextWindow).toBe(125_000);
+});
+
+test("an online refresh updates reported context windows and persists them", async () => {
+  const dir = makeAgentDir(
+    providerEntry({ discoverDefaults: { contextWindow: 125_000 } }),
+  );
+  const registered = await run(
+    dir,
+    modelsFetch(["m"], [], { m: { context_length: 8_192 } }),
+  );
+
+  const refresh = registered[0].config.refreshModels as (context: {
+    allowNetwork: boolean;
+    signal: AbortSignal;
+  }) => Promise<Array<{ id: string; contextWindow: number }>>;
+  const result = await (async () => {
+    const realFetch = globalThis.fetch;
+    globalThis.fetch = modelsFetch(["m"], [], {
+      m: { context_length: 16_384 },
+    }) as typeof fetch;
+    try {
+      return await refresh({
+        allowNetwork: true,
+        signal: new AbortController().signal,
+      });
+    } finally {
+      globalThis.fetch = realFetch;
+    }
+  })();
+  expect(result[0]).toMatchObject({ id: "m", contextWindow: 16_384 });
+
+  // The refreshed window survives a startup with a dead endpoint.
+  const reregistered = await run(dir, failFetch as typeof fetch);
+  expect(modelsOf(reregistered.find((r) => r.id === "deskapp"))[0]).toMatchObject(
+    { id: "m", contextWindow: 16_384 },
+  );
+});
+
+test("an invalid cached context window falls back to discoverDefaults", async () => {
+  const dir = makeAgentDir(
+    providerEntry({ discoverDefaults: { contextWindow: 125_000 } }),
+  );
+  await run(dir, modelsFetch(["m"], [], { m: { context_length: 8_192 } }));
+
+  const file = cachePath(dir);
+  const cache = JSON.parse(fs.readFileSync(file, "utf-8"));
+  cache.providers.deskapp.models = [{ id: "m", contextWindow: 0 }];
+  fs.writeFileSync(file, JSON.stringify(cache));
+
+  const registered = await run(dir, failFetch as typeof fetch);
+  expect(modelsOf(registered.find((r) => r.id === "deskapp"))[0]).toMatchObject(
+    { id: "m", contextWindow: 125_000 },
+  );
 });
 
 test("discoverDefaults merge over the built-in defaults", async () => {
@@ -297,6 +468,90 @@ test("discoverDefaults merge over the built-in defaults", async () => {
       compat: { ...DESKAPP.compat },
     },
   ]);
+});
+
+test("a reported context length wins over discoverDefaults.contextWindow", async () => {
+  const dir = makeAgentDir(
+    providerEntry({
+      discoverDefaults: { contextWindow: 125_000, maxTokens: 32_000 },
+    }),
+  );
+  const registered = await run(
+    dir,
+    modelsFetch(["gemma-4-e2b"], [], {
+      "gemma-4-e2b": { context_length: 65_536 },
+    }),
+  );
+  expect(modelsOf(registered.find((r) => r.id === "deskapp"))).toEqual([
+    {
+      id: "gemma-4-e2b",
+      name: "gemma-4-e2b",
+      input: ["text", "image"],
+      cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
+      reasoning: true,
+      contextWindow: 65_536,
+      maxTokens: 32_000,
+      thinkingLevelMap: { xhigh: "xhigh", max: "max" },
+      compat: { ...DESKAPP.compat },
+    },
+  ]);
+});
+
+test("each known context length field is honored", async () => {
+  for (const field of [
+    "context_length",
+    "context_window",
+    "max_context_length",
+    "max_model_len",
+  ]) {
+    const dir = makeAgentDir(providerEntry());
+    const registered = await run(
+      dir,
+      modelsFetch(["m"], [], { m: { [field]: 32_768 } }),
+    );
+    const models = modelsOf(registered.find((r) => r.id === "deskapp"));
+    expect((models[0] as { contextWindow: number }).contextWindow).toBe(32_768);
+  }
+});
+
+test("the first valid known field wins when several are reported", async () => {
+  const dir = makeAgentDir(providerEntry());
+  const registered = await run(
+    dir,
+    modelsFetch(["m"], [], {
+      m: { max_model_len: 2048, context_length: 0, context_window: 4096 },
+    }),
+  );
+  const models = modelsOf(registered.find((r) => r.id === "deskapp"));
+  expect((models[0] as { contextWindow: number }).contextWindow).toBe(4096);
+});
+
+test("invalid reported context lengths fall back to the configured default", async () => {
+  for (const invalid of [0, -1, 8.5, "65536", null, true]) {
+    const dir = makeAgentDir(
+      providerEntry({ discoverDefaults: { contextWindow: 125_000 } }),
+    );
+    const registered = await run(
+      dir,
+      modelsFetch(["m"], [], { m: { context_length: invalid } }),
+    );
+    const models = modelsOf(registered.find((r) => r.id === "deskapp"));
+    expect((models[0] as { contextWindow: number }).contextWindow).toBe(
+      125_000,
+    );
+  }
+});
+
+test("a reported context window does not change maxTokens", async () => {
+  const dir = makeAgentDir(
+    providerEntry({ discoverDefaults: { maxTokens: 32_000 } }),
+  );
+  const registered = await run(
+    dir,
+    modelsFetch(["m"], [], { m: { context_length: 4096 } }),
+  );
+  const models = modelsOf(registered.find((r) => r.id === "deskapp"));
+  expect(models[0]).toMatchObject({ contextWindow: 4096, maxTokens: 32_000 });
 });
 
 test("a discoverDefaults edit applies at the next startup without a re-fetch", async () => {

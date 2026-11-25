@@ -4,22 +4,24 @@
  * before startup model selection runs (Pi awaits extension factories), so
  * the discovered catalog exists synchronously at first use.
  *
- * Pi composes extension-registered models above `models.json` but below
- * `models.json` `modelOverrides`, and does not merge provider-level `compat`
- * into extension-provided models. The provider `compat` is therefore baked
- * into every model definition this extension registers, while per-model
- * metadata (context window, output cap, input modalities, thinking map,
- * sampling) stays declarative in `models.json` `modelOverrides`.
+ * Each discovered model keeps the context length its endpoint reports, and
+ * otherwise falls back to the provider's `discoverDefaults`, then to a parity
+ * default. Pi composes extension-registered models above `models.json` but
+ * below `models.json` `modelOverrides`, and does not merge provider-level
+ * `compat` into extension-provided models. The provider `compat` is therefore
+ * baked into every model definition this extension registers, while the other
+ * per-model metadata (output cap, input modalities, thinking map, sampling)
+ * stays declarative in `models.json` `discoverDefaults` / `modelOverrides`.
  *
  * The catalog persists to `{agentDir}/extensions/model-discovery/cache.json`
- * as the raw discovered ids, keyed by a provider config fingerprint, so
- * startup is cache-first and survives an unreachable endpoint. Models are
- * constructed at registration time from the ids plus the provider's
- * optional `discoverDefaults`, so editing those defaults in `models.json`
- * takes effect at the next startup without a re-fetch.
- * `refreshModels` re-fetches when Pi refreshes (e.g. `/model` opens) and
- * returns the last list when the network is unavailable, never clearing the
- * catalog.
+ * as the discovered entries (id plus optional context window), keyed by a
+ * provider config fingerprint, so startup is cache-first and survives an
+ * unreachable endpoint. Models are constructed at registration time from
+ * those entries plus the provider's `discoverDefaults`, so editing those
+ * defaults in `models.json` takes effect at the next startup without a
+ * re-fetch. `refreshModels` re-fetches when Pi refreshes (e.g. `/model`
+ * opens) and returns the last list when the network is unavailable, never
+ * clearing the catalog.
  *
  * Silent by design: no commands, panels, notices, or writes outside the
  * cache file.
@@ -35,6 +37,20 @@ const STARTUP_FETCH_TIMEOUT_MS = 15_000;
 /** Discovered models get these defaults; `modelOverrides` corrects per model. */
 const DEFAULT_CONTEXT_WINDOW = 1_048_576;
 const DEFAULT_MAX_TOKENS = 65_536;
+
+/** Field names local model servers use to report a model's context length. */
+const CONTEXT_LENGTH_FIELDS = [
+  "context_length",
+  "context_window",
+  "max_context_length",
+  "max_model_len",
+];
+
+/**
+ * Cache schema. It also feeds the discovery fingerprint, so a cache written by
+ * an older schema counts as stale and refetches once at the next startup.
+ */
+const CACHE_VERSION = 2;
 
 interface ProviderEntry {
   baseUrl?: string;
@@ -76,9 +92,21 @@ interface DiscoverDefaults {
   thinkingLevelMap?: Record<string, string>;
 }
 
+/** One discovered model; a reported context window is optional. */
+interface DiscoveredEntry {
+  id: string;
+  contextWindow?: number;
+}
+
+/** A provider's cached catalog, tied to the fingerprint it was fetched under. */
+interface CachedProvider {
+  fingerprint: string;
+  models: DiscoveredEntry[];
+}
+
 interface CacheFile {
-  version: 1;
-  providers: Record<string, { fingerprint: string; ids: string[] }>;
+  version: typeof CACHE_VERSION;
+  providers: Record<string, CachedProvider>;
 }
 
 type ModelsRefreshContext = Parameters<
@@ -102,30 +130,24 @@ export default async function (pi: ExtensionAPI): Promise<void> {
 
     const fingerprint = fingerprintOf(entry);
     const cached = cache.providers[providerId];
-    const validIds = (ids: unknown): ids is string[] =>
-      Array.isArray(ids) && ids.every((id) => typeof id === "string");
-    // The cache holds the raw discovered ids; models are constructed at
+    // The cache holds discovered entries; models are constructed at
     // registration time so discoverDefaults edits apply without a re-fetch.
-    let ids: string[] | undefined =
-      cached &&
-      cached.fingerprint === fingerprint &&
-      validIds(cached.ids)
-        ? cached.ids
-        : undefined;
+    let catalog: DiscoveredEntry[] | undefined =
+      cached && cached.fingerprint === fingerprint ? cached.models : undefined;
 
     // Startup fetch is best effort: on failure fall back to any stale cache.
-    if (!ids) {
+    if (!catalog) {
       try {
         const signal = AbortSignal.timeout(STARTUP_FETCH_TIMEOUT_MS);
-        ids = await fetchModelIds(entry, signal);
-        persist(cache, cacheFile(dir), providerId, fingerprint, ids);
+        catalog = await fetchModels(entry, signal);
+        persist(cache, cacheFile(dir), providerId, fingerprint, catalog);
       } catch {
-        ids = cached && validIds(cached.ids) ? cached.ids : undefined;
+        catalog = cached?.models;
       }
     }
 
-    const lastModels: DiscoveredModel[] = (ids ?? []).map((id) =>
-      toDiscoveredModel(id, entry.compat, entry.discoverDefaults),
+    const lastModels: DiscoveredModel[] = (catalog ?? []).map((discovered) =>
+      toDiscoveredModel(discovered, entry.compat, entry.discoverDefaults),
     );
     pi.registerProvider(providerId, {
       baseUrl: entry.baseUrl,
@@ -139,15 +161,21 @@ export default async function (pi: ExtensionAPI): Promise<void> {
           return lastModels;
         }
         try {
-          const fresh = await fetchModelIds(entry, context.signal);
+          const fresh = await fetchModels(entry, context.signal);
           lastModels.splice(
             0,
             lastModels.length,
-            ...fresh.map((id) =>
-              toDiscoveredModel(id, entry.compat, entry.discoverDefaults),
+            ...fresh.map((discovered) =>
+              toDiscoveredModel(discovered, entry.compat, entry.discoverDefaults),
             ),
           );
-          persist(cache, cacheFile(dir), providerId, fingerprint, fresh);
+          persist(
+            cache,
+            cacheFile(dir),
+            providerId,
+            fingerprint,
+            fresh,
+          );
           return lastModels;
         } catch {
           return lastModels;
@@ -188,9 +216,13 @@ function readProviderEntries(dir: string): Record<string, ProviderEntry> {
   return {};
 }
 
-/** Stable identity of the fields a discovery request and its compat depend on. */
+/**
+ * Stable identity of the fields a discovery request and its compat depend on,
+ * plus the cache schema so upgraded extensions refetch once.
+ */
 function fingerprintOf(entry: ProviderEntry): string {
   return JSON.stringify([
+    CACHE_VERSION,
     entry.baseUrl,
     entry.api,
     entry.apiKey,
@@ -201,14 +233,60 @@ function fingerprintOf(entry: ProviderEntry): string {
 
 function loadCache(file: string): CacheFile {
   try {
-    const data = JSON.parse(fs.readFileSync(file, "utf-8")) as Partial<CacheFile>;
+    const data = JSON.parse(fs.readFileSync(file, "utf-8")) as {
+      providers?: unknown;
+    };
     if (data.providers && typeof data.providers === "object") {
-      return { version: 1, providers: data.providers };
+      const providers: Record<string, CachedProvider> = {};
+      const rawProviders = data.providers as Record<string, unknown>;
+      for (const [providerId, raw] of Object.entries(rawProviders)) {
+        const provider = toCachedProvider(raw);
+        if (provider) providers[providerId] = provider;
+      }
+      return { version: CACHE_VERSION, providers };
     }
   } catch {
     // Missing or corrupt cache: start empty.
   }
-  return { version: 1, providers: {} };
+  return { version: CACHE_VERSION, providers: {} };
+}
+
+/** Cached provider; a version 1 `ids` list upgrades in memory to entries. */
+function toCachedProvider(raw: unknown): CachedProvider | undefined {
+  if (!raw || typeof raw !== "object") return undefined;
+  const { fingerprint, models, ids } = raw as {
+    fingerprint?: unknown;
+    models?: unknown;
+    ids?: unknown;
+  };
+  if (typeof fingerprint !== "string") return undefined;
+  const list = Array.isArray(models)
+    ? models
+    : Array.isArray(ids)
+      ? ids
+      : undefined;
+  if (!list) return undefined;
+  const entries: DiscoveredEntry[] = [];
+  for (const item of list) {
+    const entry = typeof item === "string" ? { id: item } : toCachedEntry(item);
+    if (!entry) return undefined;
+    entries.push(entry);
+  }
+  return { fingerprint, models: entries };
+}
+
+function toCachedEntry(raw: unknown): DiscoveredEntry | undefined {
+  if (!raw || typeof raw !== "object") return undefined;
+  const { id, contextWindow } = raw as {
+    id?: unknown;
+    contextWindow?: unknown;
+  };
+  if (typeof id !== "string") return undefined;
+  return isContextWindow(contextWindow) ? { id, contextWindow } : { id };
+}
+
+function isContextWindow(value: unknown): value is number {
+  return typeof value === "number" && Number.isInteger(value) && value > 0;
 }
 
 function persist(
@@ -216,10 +294,10 @@ function persist(
   file: string,
   providerId: string,
   fingerprint: string,
-  ids: string[],
+  models: DiscoveredEntry[],
 ): void {
   try {
-    cache.providers[providerId] = { fingerprint, ids };
+    cache.providers[providerId] = { fingerprint, models };
     fs.mkdirSync(path.dirname(file), { recursive: true });
     fs.writeFileSync(file, `${JSON.stringify(cache, null, 2)}\n`, "utf-8");
   } catch {
@@ -227,11 +305,11 @@ function persist(
   }
 }
 
-/** Model ids from `GET {baseUrl}/models`; tolerates a bare array body. */
-async function fetchModelIds(
+/** Models from `GET {baseUrl}/models`; tolerates a bare array body. */
+async function fetchModels(
   entry: ProviderEntry,
   signal: AbortSignal,
-): Promise<string[]> {
+): Promise<DiscoveredEntry[]> {
   const url = `${entry.baseUrl}/models`;
   const headers: Record<string, string> = { ...(entry.headers ?? {}) };
   if (entry.apiKey) headers.Authorization = `Bearer ${entry.apiKey}`;
@@ -247,29 +325,61 @@ async function fetchModelIds(
     throw new Error(`GET ${url}: unexpected response shape`);
   }
   return list
-    .map((model) => (model && typeof model === "object" ? model.id : undefined))
-    .filter((id): id is string => typeof id === "string");
+    .map((model) =>
+      model && typeof model === "object"
+        ? toDiscoveredEntry(model as Record<string, unknown>)
+        : undefined,
+    )
+    .filter((model): model is DiscoveredEntry => model !== undefined);
+}
+
+function toDiscoveredEntry(
+  raw: Record<string, unknown>,
+): DiscoveredEntry | undefined {
+  if (typeof raw.id !== "string") return undefined;
+  const contextWindow = reportedContextWindow(raw);
+  return contextWindow === undefined
+    ? { id: raw.id }
+    : { id: raw.id, contextWindow };
+}
+
+/** First plausible context length among the field names servers report. */
+function reportedContextWindow(
+  raw: Record<string, unknown>,
+): number | undefined {
+  for (const field of CONTEXT_LENGTH_FIELDS) {
+    const value = raw[field];
+    if (isContextWindow(value)) {
+      return value;
+    }
+  }
+  return undefined;
 }
 
 /**
  * Discovered models get the conservative defaults, overridden field-by-field
- * by the provider's `discoverDefaults`, plus the provider `compat`.
+ * by the provider's `discoverDefaults`, plus the provider `compat`. A context
+ * window reported by the endpoint wins over `discoverDefaults.contextWindow`.
  */
 function toDiscoveredModel(
-  id: string,
+  entry: DiscoveredEntry,
   providerCompat: Record<string, unknown> | undefined,
   defaults: DiscoverDefaults | undefined,
 ): DiscoveredModel {
   return {
-    id,
-    name: id,
+    id: entry.id,
+    name: entry.id,
     input: defaults?.input ?? ["text", "image"],
     cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
     reasoning: defaults?.reasoning ?? true,
-    contextWindow: defaults?.contextWindow ?? DEFAULT_CONTEXT_WINDOW,
+    contextWindow:
+      entry.contextWindow ?? defaults?.contextWindow ?? DEFAULT_CONTEXT_WINDOW,
     maxTokens: defaults?.maxTokens ?? DEFAULT_MAX_TOKENS,
     // Surface xhigh/max in /thinking; modelOverrides may narrow per model.
-    thinkingLevelMap: defaults?.thinkingLevelMap ?? { xhigh: "xhigh", max: "max" },
+    thinkingLevelMap: defaults?.thinkingLevelMap ?? {
+      xhigh: "xhigh",
+      max: "max",
+    },
     // Pi drops provider-level compat for extension models, so carry it here.
     compat: { supportsDeveloperRole: false, ...(providerCompat ?? {}) },
   };

@@ -17,7 +17,7 @@ let
       api = "openai-completions";
       apiKey = "local";
 
-      discoverModels = true; # used by `model-discovery` extension to register models from GET /v1/models
+      discoverModels = true; # `model-discovery` registers models from GET /v1/models, with their reported context length
       discoverDefaults = {
         contextWindow = 125000;
         maxTokens = 32000;
@@ -53,12 +53,7 @@ let
           };
         };
 
-        "qwen3.8-flash-next" = {
-          contextWindow = 262144;
-        };
-
         "inkling-2-mini" = {
-          contextWindow = 300000;
           input = [
             "text"
             "image"
