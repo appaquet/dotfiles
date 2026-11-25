@@ -17,12 +17,12 @@ final: prev: {
     # https://github.com/dlyongemallo/diffview-plus.nvim
     diffview-nvim = prev.vimUtils.buildVimPlugin {
       pname = "diffview-nvim";
-      version = "fae72d6c9810";
+      version = "5e8ea5341833";
       src = prev.fetchFromGitHub {
         owner = "dlyongemallo";
         repo = "diffview-plus.nvim";
-        rev = "fae72d6c981075dce2e0f946f002382ce0cb44e1";
-        sha256 = "sha256-JZr63uzY+Ms6kdvIPyUJsl33PmSPA9SND7FBzdRgELY=";
+        rev = "5e8ea53418336be4b9a10600318cae8749063fdb";
+        sha256 = "sha256-kY9mLbSKq+V3omuemjSeLrNgcDcmNxdJD7zjPMOHJf0=";
       };
       doCheck = false;
       meta.homepage = "https://github.com/dlyongemallo/diffview-plus.nvim/";
