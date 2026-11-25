@@ -3,12 +3,12 @@ final: prev: {
     # https://github.com/zbirenbaum/copilot.lua
     copilot-lua = prev.vimUtils.buildVimPlugin {
       pname = "copilot.lua";
-      version = "ba6c1c7e7b2b";
+      version = "d1570ddc00fc";
       src = prev.fetchFromGitHub {
         owner = "zbirenbaum";
         repo = "copilot.lua";
-        rev = "ba6c1c7e7b2b6b0a93838097bd09c7c83afa30d3";
-        sha256 = "sha256-B4CI5Ix18w+dn1JPtUIU/2C7sQbBa5yAGpzNMhvGUtc=";
+        rev = "d1570ddc00fc4fc4caf7422803805ee22cca14ff";
+        sha256 = "sha256-yw3KrsbRPtdoaCZ6SUEjaKR5uo3f8gvDv22lqNmPCSs=";
       };
       meta.homepage = "https://github.com/zbirenbaum/copilot.lua/";
       meta.hydraPlatforms = [ ];
