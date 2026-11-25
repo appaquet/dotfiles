@@ -1,8 +1,7 @@
 { pkgs }:
 
-# Unit tests for the spaces list's row grouping: worktree rows nested under their repo's first main
-# checkout, tree markers, kids counts, the parents map the goto picker reads, and the fold's hidden
-# marking. The suite imports the helpers directly, so it needs neither the app nor the linked mod folder.
+# Unit tests for worktree grouping and folding, and the sidebar's saved machine order.
+# The suite imports the helpers without needing the app or the linked mod folder.
 pkgs.runCommand "spaces-rows-unit-check"
   {
     nativeBuildInputs = [ pkgs.bun ];
@@ -12,6 +11,8 @@ pkgs.runCommand "spaces-rows-unit-check"
     mkdir suite
     cp ${../app/ap/mods/spaces-status/rows.js} suite/rows.js
     cp ${../app/ap/mods/spaces-status/rows.test.js} suite/rows.test.js
+    cp ${../app/ap/mods/spaces-status/machine-order.js} suite/machine-order.js
+    cp ${../app/ap/mods/spaces-status/machine-order.test.js} suite/machine-order.test.js
     cd suite
     if ! HOME=$TMPDIR bun test >unit.out 2>&1; then
       cat unit.out >&2

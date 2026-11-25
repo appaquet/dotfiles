@@ -10,6 +10,7 @@ import { v_flex, h_flex } from "gpui-base";
 import { spaces, machines, panes, terminals, run, openOverlay, exec, hc, theme, shared, setShared, watchFolder, window, layout, home, appHome } from "herdr";
 import { CAP, parseGh, prSummary, ciRollup, nextDue, prLook, prTip, hasCi } from "./prs.js";
 import { groupRows } from "./rows.js";
+import { readMachineOrder, resolveMachineOrder, moveMachine, trackMachinePress, releaseMachinePress } from "./machine-order.js";
 
 function find(node, id) {
   if (node?.id === id) return node;
@@ -30,6 +31,7 @@ function place(s, ps) {
   return ps.find((p) => tabs.has(p.tab) && p.cwd)?.cwd || s.folder;
 }
 const rowHeight = ({ tree }) => (tree ? 28 : 30);
+const machineKey = m => m === null ? "local" : `remote:${m}`;
 const where = (s, ps) => JSON.stringify([s.machine ?? null, place(s, ps)]);
 const base = (path) => path.replace(/\/+$/, "").split("/").pop();
 // Changes made outside Herdr (an editor's save, a commit in another app): looked
@@ -86,6 +88,8 @@ export default class Spaces extends View {
     this.over = null;
     this.machines = [];
     this.folded = new Set(JSON.parse(localStorage.getItem("machines.folded") ?? "[]"));
+    this.machineOrder = readMachineOrder(localStorage.getItem("machines.order"));
+    this.machinePress = null;
     this.repoFolded = new Set(JSON.parse(localStorage.getItem("spaces.folded") ?? "[]")); // repos whose worktree rows are hidden, keyed like g.repo (machine-scoped)
     // The active space at the last look: a folded repo opens on a change into it, never while it already holds the active space.
     this.lastActive = spaces().find((s) => s.active)?.id ?? null;
@@ -455,40 +459,109 @@ export default class Spaces extends View {
   grouped(t, collapsed) {
     const rows = this.ordered();
     const draw = (r) => (collapsed ? this.compact(r, t) : this.row(r, t));
-    const remote = [...new Set([...rows.map(r => r.w.machine).filter(Boolean), ...this.machines.map(m => m.name)])].sort();
+    const remote = [...rows.map(r => r.w.machine).filter(Boolean), ...this.machines.map(m => m.name)];
+    const order = resolveMachineOrder(this.machineOrder, remote);
+    if (collapsed || !remote.length || (this.machinePress && !order.visible.includes(this.machinePress.source))) {
+      this.cancelMachinePress();
+    }
+
     const loading = m => {
       const layout = machines().find(k => k.name === m)?.layout;
       return layout === "loading" || (!layout && this.machines.some(k => k.name === m && k.state === "connected"))
         || spaces().some(s => (s.machine ?? null) === m && !this.shown.has(s.id));
     };
-    const loadingRow = m => div().id(`machine-loading-${m ?? "local"}`).h(28).flex_none().px(8).text_size(12).text_color(t.dim).child(collapsed ? "…" : "Loading…");
+    const loadingRow = m => div().id(`machine-loading-${machineKey(m)}`).h(28).flex_none().px(8).text_size(12).text_color(t.dim).child(collapsed ? "…" : "Loading…");
     if (!remote.length) return loading(null) && !rows.length ? [loadingRow(null)] : rows.filter((r) => !r.hidden).map(draw);
-    const machineNames = [null, ...remote];
-    return machineNames.flatMap((m) => {
+
+    return order.visible.flatMap((m) => {
       const mine = rows.filter((r) => (r.w.machine ?? null) === m && !r.hidden);
-      const machine = this.machines.find(k => k.name === m);
-      const connected = !m || machine?.state === "connected";
-      const folded = this.folded.has(m);
-      const head = h_flex().id(`machine-${m ?? "local"}`).h(26).flex_none().px(collapsed ? 2 : 8).gap(7).items_center().text_size(11).text_color(t.dim)
-        .cursor_pointer().hover(s => s.bg(t.hover))
-        .on_click((_e, cx) => {
-          folded ? this.folded.delete(m) : this.folded.add(m);
-          localStorage.setItem("machines.folded", JSON.stringify([...this.folded]));
-          cx.notify();
-        })
-        .child(svg(`mods/workspace-chrome/${m ? "server" : "monitor"}.svg`).size(13).flex_none())
-        .when(!collapsed, el => el.child(div().flex_1().truncate().child(m ?? "This computer"))
-          .when(!connected, el => el.child(div().flex_none().child((machine?.state ?? "asleep").replace(/_/g, " "))))
-          .when(connected, el => el.child(div().id(`machine-add-${m ?? "local"}`).flex_none().px(4).rounded(4).hover(s => s.bg(t.hover).text_color(t.foreground))
-            .on_click((_e, cx) => { cx.stop_propagation(); run("space.new", m ? { machine: m } : {}); }).child("+")))
-          .child(div().size(6).rounded(3).flex_none().bg(connected ? t.ansi2 : t.dim))
-          .child(svg(`mods/workspace-chrome/chevron-${folded ? "right" : "down"}.svg`).size(11).flex_none()));
-      const empty = h_flex().id(`machine-new-${m ?? "local"}`).h(28).flex_none().px(8).gap(7).items_center().rounded(7)
+      const head = this.machineHeader(m, order, t, collapsed);
+      const empty = h_flex().id(`machine-new-${machineKey(m)}`).h(28).flex_none().px(8).gap(7).items_center().rounded(7)
         .text_size(12).text_color(t.dim).hover(s => s.bg(t.hover).text_color(t.foreground))
         .on_click(() => run("space.new", m ? { machine: m } : {}))
         .child(svg("mods/workspace-chrome/plus.svg").size(12)).when(!collapsed, el => el.child("New space there"));
-      return [head, ...(folded ? [] : mine.length ? mine.map(draw) : [loading(m) ? loadingRow(m) : empty])];
+      return [head, ...(this.folded.has(m) ? [] : mine.length ? mine.map(draw) : [loading(m) ? loadingRow(m) : empty])];
     });
+  }
+
+  machineHeader(m, order, t, collapsed) {
+    const machine = this.machines.find(k => k.name === m);
+    const connected = m === null || machine?.state === "connected";
+    const folded = this.folded.has(m);
+    const key = machineKey(m);
+    const press = this.machinePress;
+    const over = press?.over === m;
+    const before = over && order.visible.indexOf(press.source) > order.visible.indexOf(m);
+
+    return h_flex().id(`machine-${key}`).relative().h(26).flex_none().px(collapsed ? 2 : 8).gap(7).items_center().text_size(11).text_color(t.dim)
+      .cursor_pointer().hover(s => s.bg(t.hover))
+      .when(collapsed, el => el.on_click((_e, cx) => this.toggleMachineFold(m, cx)))
+      .when(!collapsed, el => el
+        .on_mouse_down("left", (e, cx) => {
+          cx.stop_propagation();
+          this.cancelMachinePress(cx);
+          this.machinePress = { source: m, y: e.position.y, dragging: false, over: undefined };
+        })
+        // The viewport treats moves that reach it as being outside a machine header.
+        .on_mouse_move((e, cx) => {
+          if (!this.machinePress) return;
+          cx.stop_propagation();
+          this.previewMachinePress(m, e.position.y, cx);
+        })
+        .on_mouse_up("left", (e, cx) => this.finishMachinePress(m, order, e.position.y, cx)))
+      .child(svg(`mods/workspace-chrome/${m ? "server" : "monitor"}.svg`).size(13).flex_none())
+      .when(!collapsed, el => el.child(div().flex_1().truncate().child(m ?? "This computer"))
+        .when(!connected, el => el.child(div().flex_none().child((machine?.state ?? "asleep").replace(/_/g, " "))))
+        .when(connected, el => el.child(div().id(`machine-add-${key}`).flex_none().px(4).rounded(4).hover(s => s.bg(t.hover).text_color(t.foreground))
+          .on_mouse_down("left", (_e, cx) => { cx.stop_propagation(); this.cancelMachinePress(cx); })
+          .on_mouse_move((e, cx) => {
+            if (!this.machinePress) return;
+            cx.stop_propagation();
+            this.previewMachinePress(undefined, e.position.y, cx);
+          })
+          .on_mouse_up("left", (_e, cx) => this.cancelMachinePress(cx))
+          .on_click((_e, cx) => { cx.stop_propagation(); run("space.new", m ? { machine: m } : {}); }).child("+")))
+        .child(div().size(6).rounded(3).flex_none().bg(connected ? t.ansi2 : t.dim))
+        .child(svg(`mods/workspace-chrome/chevron-${folded ? "right" : "down"}.svg`).size(11).flex_none()))
+      .when(over, el => el.child(div().absolute().left(0).right(0).h(2).bg(t.accent)
+        .when(before, line => line.top(0))
+        .when(!before, line => line.bottom(0))));
+  }
+
+  toggleMachineFold(m, cx) {
+    this.folded.has(m) ? this.folded.delete(m) : this.folded.add(m);
+    localStorage.setItem("machines.folded", JSON.stringify([...this.folded]));
+    cx.notify();
+  }
+
+  previewMachinePress(target, y, cx) {
+    const press = this.machinePress;
+    if (!press) return;
+    this.machinePress = trackMachinePress(press, target, y);
+    if (this.machinePress !== press) cx.notify();
+  }
+
+  finishMachinePress(target, order, y, cx) {
+    const press = this.machinePress;
+    if (!press) return;
+    this.machinePress = null;
+
+    const action = releaseMachinePress(press, target, y);
+    if (action === "fold") return this.toggleMachineFold(target, cx);
+    if (action === "move") {
+      const next = moveMachine(order, press.source, target);
+      if (next) {
+        this.machineOrder = next;
+        localStorage.setItem("machines.order", JSON.stringify(next));
+      }
+    }
+    cx.notify();
+  }
+
+  cancelMachinePress(cx) {
+    if (!this.machinePress) return;
+    this.machinePress = null;
+    cx?.notify();
   }
 
   // The PR of the space's bookmark: shape for its state, color for its CI. A click opens it in the
@@ -679,8 +752,17 @@ export default class Spaces extends View {
         .when(!collapsed, el => el.child("Spaces"))
         .child(div().id("space-new").size(26).flex_none().flex().items_center().justify_center().rounded(6).hover(s => s.bg(t.hover).text_color(t.foreground))
           .on_click(() => run("space.new")).child(svg("mods/workspace-chrome/plus.svg").size(14))))
-      .child(v_flex().flex_1().min_h(0).px(8).pb(14).overflow_y_scrollbar().mode("always")
-        .on_mouse_up("left", (_e, cx) => { this.pressed = null; cx.notify(); })
+      .child(v_flex().id("spaces-scroll").flex_1().min_h(0).px(8).pb(14).overflow_y_scrollbar().mode("always")
+        .when(!collapsed, el => el
+          .on_hover((hovered, cx) => { if (!hovered) this.cancelMachinePress(cx); })
+          .on_mouse_down("left", (_e, cx) => this.cancelMachinePress(cx))
+          .on_mouse_down_out((_e, cx) => this.cancelMachinePress(cx))
+          .on_mouse_move((e, cx) => this.previewMachinePress(undefined, e.position.y, cx)))
+        .on_mouse_up("left", (_e, cx) => {
+          this.cancelMachinePress();
+          this.pressed = null;
+          cx.notify();
+        })
         .children(this.grouped(t, collapsed)));
   }
 }
