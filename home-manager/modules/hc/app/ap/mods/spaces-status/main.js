@@ -474,8 +474,9 @@ export default class Spaces extends View {
     if (!remote.length) return loading(null) && !rows.length ? [loadingRow(null)] : rows.filter((r) => !r.hidden).map(draw);
 
     return order.visible.flatMap((m) => {
-      const mine = rows.filter((r) => (r.w.machine ?? null) === m && !r.hidden);
-      const head = this.machineHeader(m, order, t, collapsed);
+      const sectionRows = rows.filter((r) => (r.w.machine ?? null) === m);
+      const mine = sectionRows.filter((r) => !r.hidden);
+      const head = this.machineHeader(m, order, t, collapsed, sectionRows.length);
       const empty = h_flex().id(`machine-new-${machineKey(m)}`).h(28).flex_none().px(8).gap(7).items_center().rounded(7)
         .text_size(12).text_color(t.dim).hover(s => s.bg(t.hover).text_color(t.foreground))
         .on_click(() => run("space.new", m ? { machine: m } : {}))
@@ -484,7 +485,7 @@ export default class Spaces extends View {
     });
   }
 
-  machineHeader(m, order, t, collapsed) {
+  machineHeader(m, order, t, collapsed, count = 0) {
     const machine = this.machines.find(k => k.name === m);
     const connected = m === null || machine?.state === "connected";
     const folded = this.folded.has(m);
@@ -511,6 +512,7 @@ export default class Spaces extends View {
         .on_mouse_up("left", (e, cx) => this.finishMachinePress(m, order, e.position.y, cx)))
       .child(svg(`mods/workspace-chrome/${m ? "server" : "monitor"}.svg`).size(13).flex_none())
       .when(!collapsed, el => el.child(div().flex_1().truncate().child(m ?? "This computer"))
+        .when(folded && count > 0, el => el.child(div().flex_none().text_size(11).text_color(t.dim).child(String(count))))
         .when(!connected, el => el.child(div().flex_none().child((machine?.state ?? "asleep").replace(/_/g, " "))))
         .when(connected, el => el.child(div().id(`machine-add-${key}`).flex_none().px(4).rounded(4).hover(s => s.bg(t.hover).text_color(t.foreground))
           .on_mouse_down("left", (_e, cx) => { cx.stop_propagation(); this.cancelMachinePress(cx); })
