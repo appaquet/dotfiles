@@ -13,6 +13,15 @@ export const SEPARATOR = "@@@";
 export const sourceCommand = `d=\${HERDR_APP_HOME:-$HOME/.config/herdr-app}/data/claude-usage/sessions
 for f in $(find "$d" -name '*.json' -mtime -8 2>/dev/null); do printf '\\n@@@\\n'; cat "$f"; done`;
 
+// The scope a payload is attributed to when it carries no marker: the dump is shared by personal and scoped
+// instances, and an older payload predates the marker, so it is read as the personal account.
+export const DEFAULT_SCOPE = "personal";
+
+export function scopeOf(payload) {
+  const scope = payload?.scope;
+  return typeof scope === "string" && scope.trim() ? scope.trim() : DEFAULT_SCOPE;
+}
+
 // The payloads a dump holds, in order. A chunk that is blank or does not parse is dropped rather than failing the
 // whole read, so one truncated write on the other machine costs nothing.
 export function parseDump(text) {
@@ -30,28 +39,35 @@ export function parseDump(text) {
   return payloads;
 }
 
-// Per window, the freshest report those payloads hold.
+// Per scope, per window, the freshest report those payloads hold. Personal and scoped instances share the dump
+// but must never overwrite each other's windows.
 export function windowsOf(payloads) {
   const windows = {};
   for (const payload of payloads) {
+    const scope = scopeOf(payload);
+    let bucket = null;
     for (const key of WINDOW_KEYS) {
       const window = payload?.rate_limits?.[key];
       if (!window || typeof window.used_percentage !== "number") continue;
 
+      bucket ??= (windows[scope] ??= {});
       const entry = { used: window.used_percentage, resets: typeof window.resets_at === "number" ? window.resets_at : 0 };
-      if (fresher(entry, windows[key])) windows[key] = entry;
+      if (fresher(entry, bucket[key])) bucket[key] = entry;
     }
   }
   return windows;
 }
 
-// Every source's windows as one, i.e. the same rule applied across machines. A source may be empty or miss a
-// window; nothing it lacks removes what another source reported.
+// Every source's windows as one, per scope, i.e. the same rule applied across machines. A source may be empty
+// or miss a window; nothing it lacks removes what another source reported. Scopes never merge into each other.
 export function mergeWindows(...maps) {
   const merged = {};
   for (const map of maps) {
-    for (const [key, entry] of Object.entries(map ?? {})) {
-      if (entry && fresher(entry, merged[key])) merged[key] = entry;
+    for (const [scope, windows] of Object.entries(map ?? {})) {
+      const bucket = (merged[scope] ??= {});
+      for (const [key, entry] of Object.entries(windows)) {
+        if (entry && fresher(entry, bucket[key])) bucket[key] = entry;
+      }
     }
   }
   return merged;

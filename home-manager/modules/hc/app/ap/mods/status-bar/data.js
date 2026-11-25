@@ -2,6 +2,7 @@
 // Copyright (c) 2026 PostHog Inc., MIT license: see LICENSE.claude-usage.
 import { exec, hc, home, appHome, readTextFile } from "herdr";
 import * as fs from "fs/promises";
+import { scopeOf } from "./sources.js";
 
 export const dataDir = () => `${appHome()}/data/claude-usage`;
 export const tapPath = () => `${appHome()}/mods/claude-usage/tap.sh`;
@@ -196,13 +197,16 @@ export async function limits() {
     const p = parse(await readTextFile(`${dir}/${name}`).catch(() => null));
     if (!p) continue;
     sessions.set(p.session_id ?? name.slice(0, -5), { transcript: p.transcript_path ?? null, model: p.model?.display_name ?? null });
+    const scope = scopeOf(p);
+    let bucket = null;
     for (const { key } of WINDOWS) {
       const w = p.rate_limits?.[key];
       if (!w || typeof w.used_percentage !== "number") continue;
+      bucket ??= (windows[scope] ??= {});
       const resets = typeof w.resets_at === "number" ? w.resets_at : 0;
-      const best = windows[key];
+      const best = bucket[key];
       if (!best || resets > best.resets || (resets === best.resets && w.used_percentage > best.used)) {
-        windows[key] = { used: w.used_percentage, resets };
+        bucket[key] = { used: w.used_percentage, resets };
       }
     }
   }

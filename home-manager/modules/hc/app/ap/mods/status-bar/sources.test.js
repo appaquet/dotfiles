@@ -13,8 +13,9 @@ const RESET_WEEK = 1795176000;
 const NEXT_5H = RESET_5H + 18000;
 
 const window = (used, resets) => ({ used_percentage: used, resets_at: resets });
-const payload = (five, week, resets5h = RESET_5H, resetsWeek = RESET_WEEK) => ({
+const payload = (five, week, resets5h = RESET_5H, resetsWeek = RESET_WEEK, scope = "personal") => ({
   session_id: `session-${five}-${week}`,
+  scope,
   rate_limits: { five_hour: window(five, resets5h), seven_day: window(week, resetsWeek) },
 });
 
@@ -46,8 +47,23 @@ describe("windowsOf", () => {
   test("takes the latest window, then the greater value inside it", () => {
     const windows = windowsOf([payload(9, 46), payload(15, 47), payload(12, 47, NEXT_5H)]);
 
-    expect(windows.five_hour).toEqual({ used: 12, resets: NEXT_5H });
-    expect(windows.seven_day).toEqual({ used: 47, resets: RESET_WEEK });
+    expect(windows.personal.five_hour).toEqual({ used: 12, resets: NEXT_5H });
+    expect(windows.personal.seven_day).toEqual({ used: 47, resets: RESET_WEEK });
+  });
+
+  test("attributes each payload to its scope instead of merging scopes", () => {
+    const windows = windowsOf([payload(9, 46, RESET_5H, RESET_WEEK, "vlx"), payload(15, 47)]);
+
+    expect(windows.vlx.five_hour).toEqual({ used: 9, resets: RESET_5H });
+    expect(windows.vlx.seven_day).toEqual({ used: 46, resets: RESET_WEEK });
+    expect(windows.personal.five_hour).toEqual({ used: 15, resets: RESET_5H });
+    expect(windows.personal.seven_day).toEqual({ used: 47, resets: RESET_WEEK });
+  });
+
+  test("reads a markerless payload as personal", () => {
+    const legacy = { session_id: "legacy-1", rate_limits: { five_hour: { used_percentage: 9, resets_at: RESET_5H } } };
+
+    expect(windowsOf([legacy])).toEqual({ personal: { five_hour: { used: 9, resets: RESET_5H } } });
   });
 
   test("ignores payloads without usable rates", () => {
@@ -57,7 +73,7 @@ describe("windowsOf", () => {
   test("falls back to zero when a payload carries no reset instant", () => {
     const windows = windowsOf([{ rate_limits: { spend_limit: { used_percentage: 40 } } }]);
 
-    expect(windows).toEqual({ spend_limit: { used: 40, resets: 0 } });
+    expect(windows).toEqual({ personal: { spend_limit: { used: 40, resets: 0 } } });
   });
 });
 
@@ -67,8 +83,10 @@ describe("mergeWindows", () => {
     const deskapp = windowsOf([payload(15, 47)]);
 
     expect(mergeWindows(here, deskapp)).toEqual({
-      five_hour: { used: 15, resets: RESET_5H },
-      seven_day: { used: 47, resets: RESET_WEEK },
+      personal: {
+        five_hour: { used: 15, resets: RESET_5H },
+        seven_day: { used: 47, resets: RESET_WEEK },
+      },
     });
   });
 
@@ -76,17 +94,35 @@ describe("mergeWindows", () => {
     const stale = windowsOf([payload(90, 90, RESET_5H - 18000, RESET_WEEK - 600000)]);
     const fresh = windowsOf([payload(20, 10)]);
 
-    expect(mergeWindows(stale, fresh).five_hour).toEqual({ used: 20, resets: RESET_5H });
+    expect(mergeWindows(stale, fresh).personal.five_hour).toEqual({ used: 20, resets: RESET_5H });
+  });
+
+  test("merges each scope separately across machines without bleeding into the other", () => {
+    const here = windowsOf([payload(9, 46, RESET_5H, RESET_WEEK, "vlx"), payload(15, 47)]);
+    const deskapp = windowsOf([payload(95, 96, RESET_5H, RESET_WEEK, "vlx"), payload(50, 11)]);
+
+    expect(mergeWindows(here, deskapp)).toEqual({
+      vlx: {
+        five_hour: { used: 95, resets: RESET_5H },
+        seven_day: { used: 96, resets: RESET_WEEK },
+      },
+      personal: {
+        five_hour: { used: 50, resets: RESET_5H },
+        seven_day: { used: 47, resets: RESET_WEEK },
+      },
+    });
   });
 
   test("merges empty and partial sources without erasing what another one reported", () => {
     const here = windowsOf([payload(9, 46)]);
-    const spendOnly = { spend_limit: { used: 55, resets: RESET_WEEK } };
+    const spendOnly = { personal: { spend_limit: { used: 55, resets: RESET_WEEK } } };
 
     expect(mergeWindows({}, here, undefined, spendOnly)).toEqual({
-      five_hour: { used: 9, resets: RESET_5H },
-      seven_day: { used: 46, resets: RESET_WEEK },
-      spend_limit: { used: 55, resets: RESET_WEEK },
+      personal: {
+        five_hour: { used: 9, resets: RESET_5H },
+        seven_day: { used: 46, resets: RESET_WEEK },
+        spend_limit: { used: 55, resets: RESET_WEEK },
+      },
     });
     expect(mergeWindows({}, {})).toEqual({});
   });

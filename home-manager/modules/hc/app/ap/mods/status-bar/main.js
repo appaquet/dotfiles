@@ -1,16 +1,17 @@
 // Window status bar: machine, branch, agents count, Claude plan usage and the palette hint. A clone of the
-// shipped `workspace-status` with one added segment: what remains of the 5-hour and weekly Claude limits, when the
-// 5-hour window ends, and the spend budget per remaining hour or working day. A percentage turns amber at 25% of a
-// window left and red at 10% (color.js). The percentages come from the statusline payloads `tap.sh` saves here and on
-// every machine herdr-core reports connected (data.js, copied from PostHog's claude-usage mod, for this machine;
-// sources.js and remote.js for the others), read at most once a minute and only while the window is active; the
-// budget from pace.js. Being always on screen, it also records when each space was last shown, for the `goto`
-// picker's ordering.
+// shipped `workspace-status` with one added segment: one pill per Claude scope — personal and each scoped
+// instance — with what remains of the 5-hour and weekly limits and the weekly spend budget per remaining
+// working day. The windows are merged per scope, not across scopes: personal and scoped instances share the dump,
+// and a scope's pill never shows another scope's numbers. A percentage turns amber at 25% of a window left and
+// red at 10% (color.js). The percentages come from the statusline payloads `tap.sh` saves here and on every machine
+// herdr-core reports connected (data.js, copied from PostHog's claude-usage mod, for this machine; sources.js and
+// remote.js for the others), read at most once a minute and only while the window is active; the budget from
+// pace.js. Being always on screen, it also records when each space was last shown, for the `goto` picker's ordering.
 
 import { View, div, svg } from "gpui-kit";
 import { h_flex } from "gpui-base";
 import { spaces, agents, theme, run, window, keys, shared, setShared } from "herdr";
-import { DAYS, clockAt, resetText } from "./clock.js";
+import { DAYS, resetText } from "./clock.js";
 import { tierOf } from "./color.js";
 import { WINDOWS, limits, ensureDataDir, prune } from "./data.js";
 import { WORK, leftPercent, paceFor } from "./pace.js";
@@ -120,43 +121,56 @@ export default class WorkspaceStatus extends View {
     return key ? `${key}  commands` : "commands";
   }
 
-  // `5h 82% (17:50) · week 62% (23%/d)`: what remains of each window, the 5-hour window's end time and the weekly
-  // spend budget per remaining working day, both in a smaller parenthetical. The reset wording and both leftovers
-  // live in the tooltip; null when nothing was ever tapped.
+  // One pill per scope: `pers [5h 82% · wk 2% (1%/d)] · vlx [5h 20% · wk 62% (21%/d)]`. Personal and scoped
+  // Claude instances share one dump, so the windows are merged per scope and never overwrite each other. The
+  // weekly spend budget is a smaller parenthetical; the 5-hour window's end time lives in the tooltip, not the bar.
+  // Pills dim after a stale read. null when no payload has ever been tapped.
   usageSegment(t) {
-    const shown = WINDOWS.filter((w) => SHOWN.includes(w.key) && this.usage[w.key]);
-    if (shown.length === 0) return null;
+    const scopes = Object.keys(this.usage ?? {}).sort((a, b) =>
+      a === "personal" ? -1 : b === "personal" ? 1 : a.localeCompare(b),
+    );
+    if (scopes.length === 0) return null;
 
     const now = Date.now();
-    const pace = (w) => paceFor(w.key, this.usage[w.key], now);
     const at = shared(SEEN)?.at;
     const old = Boolean(at) && now - at > DIM_AFTER;
-    const parts = [];
-    for (const w of shown) {
-      if (parts.length > 0) parts.push(" · ");
-      const v = this.usage[w.key];
-      if (v.resets * 1000 <= now) {
-        parts.push(`${w.label} --`);
-        continue;
+    const pills = [];
+    const tip = [];
+    for (const scope of scopes) {
+      const bucket = this.usage[scope];
+      const shown = WINDOWS.filter((w) => SHOWN.includes(w.key) && bucket[w.key]);
+      if (shown.length === 0) continue;
+      const tag = scope === "personal" ? "pers" : scope;
+      const chip = tag === "pers" ? t.ansi6 : t.ansi5;
+      const parts = [
+        div().flex_none().px(4).py(1).rounded(3).bg(old ? t.dim : chip).font_semibold()
+          .text_size(9.5).text_color(old ? t.dim : "#0a0f0d").child(tag.toUpperCase()),
+      ];
+      for (const w of shown) {
+        const v = bucket[w.key];
+        const p = paceFor(w.key, v, now);
+        if (v.resets * 1000 <= now) {
+          parts.push(`${w.label} --`);
+          continue;
+        }
+        const pct = Math.round(p ? p.left : leftPercent(v.used));
+        if (parts.length > 1) parts.push(" · ");
+        parts.push(`${w.label} `);
+        parts.push(div().flex_none().text_color(old ? t.dim : t[TIER_TOKEN[tierOf(pct)]]).child(`${pct}%`));
+        if (w.key === BAR_BUDGET && p) {
+          parts.push(div().flex_none().text_size(DETAIL_SIZE).child(` (${Math.round(p.perUnit)}%/${p.unit})`));
+        }
+        tip.push(`${tag}: ${w.title}: ${resetText(v.resets)}`);
+        if (p) tip.push(`${tag}: ${NAMES[w.key] ?? w.label} left: ${Math.round(p.left)}% over ${spanText(p.span, p.unit)}`);
       }
-      const p = pace(w);
-      const pct = Math.round(p ? p.left : leftPercent(v.used));
-      parts.push(`${w.label} `);
-      parts.push(div().flex_none().text_color(old ? t.dim : t[TIER_TOKEN[tierOf(pct)]]).child(`${pct}%`));
-      if (w.key === "five_hour") parts.push(div().flex_none().text_size(DETAIL_SIZE).child(` (${clockAt(v.resets * 1000)})`));
-      if (p && w.key === BAR_BUDGET) {
-        parts.push(div().flex_none().text_size(DETAIL_SIZE).child(` (${Math.round(p.perUnit)}%/${p.unit})`));
-      }
+      pills.push(
+        h_flex().id("usage-pill").px(6).py(1.5).rounded(4).border(1).border_color(t.border).bg(t.raised)
+          .gap(5).items_center().text_color(old ? t.dim : t.muted).children(parts),
+      );
     }
-    const tip = shown.flatMap((w) => {
-      const p = pace(w);
-      const lines = [`${w.title}: ${resetText(this.usage[w.key].resets)}`];
-      if (p) lines.push(`${NAMES[w.key] ?? w.label} left: ${Math.round(p.left)}% over ${spanText(p.span, p.unit)}`);
-      return lines;
-    });
+    if (pills.length === 0) return null;
     tip.push(workText());
-
-    return h_flex().id("usage").gap(0).items_center().text_color(old ? t.dim : t.muted).tooltip(tip.join("\n")).children(parts);
+    return h_flex().id("usage").gap(6).items_center().tooltip(tip.join("\n")).children(pills);
   }
 
   render() {
