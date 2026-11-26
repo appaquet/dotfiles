@@ -14,7 +14,7 @@ import { spaces, agents, theme, run, window, keys, shared, setShared } from "her
 import { DAYS, resetText } from "./clock.js";
 import { tierOf } from "./color.js";
 import { WINDOWS, limits, ensureDataDir, prune } from "./data.js";
-import { WORK, leftPercent, paceFor } from "./pace.js";
+import { WORK, leftPercent, paceFor, showBudget } from "./pace.js";
 import { mergeWindows } from "./sources.js";
 import { fetchMachine, pollableMachines } from "./remote.js";
 
@@ -157,7 +157,7 @@ export default class WorkspaceStatus extends View {
         if (parts.length > 1) parts.push(" · ");
         parts.push(`${w.label} `);
         parts.push(div().flex_none().text_color(old ? t.dim : t[TIER_TOKEN[tierOf(pct)]]).child(`${pct}%`));
-        if (w.key === BAR_BUDGET && p) {
+        if (w.key === BAR_BUDGET && showBudget(p)) {
           parts.push(div().flex_none().text_size(DETAIL_SIZE).child(` (${Math.round(p.perUnit)}%/${p.unit})`));
         }
         tip.push(`${tag}: ${w.title}: ${resetText(v.resets)}`);

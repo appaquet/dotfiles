@@ -79,3 +79,9 @@ export function paceFor(key, window, nowMs, work = WORK) {
 
   return { left, span, unit, perUnit: left / span };
 }
+
+// Whether the bar should show a per-unit budget. Once the window ends inside a working day the figure is
+// noise — the whole remainder collapses into one day — so the bar keeps only the % left.
+export function showBudget(pace) {
+  return Boolean(pace) && pace.unit === "d" && pace.span >= 1;
+}

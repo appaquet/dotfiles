@@ -2,7 +2,7 @@
 // in any timezone; only the module under test and bun's runner are imported.
 
 import { describe, expect, test } from "bun:test";
-import { MIN_SPAN_HOURS, WORK, hoursLeft, leftPercent, paceFor, workHoursLeft } from "./pace.js";
+import { MIN_SPAN_HOURS, WORK, hoursLeft, leftPercent, paceFor, showBudget, workHoursLeft } from "./pace.js";
 
 const MINUTE_MS = 60000;
 const HOUR_MS = 3600000;
@@ -114,5 +114,34 @@ describe("leftPercent", () => {
     expect(leftPercent(105)).toBe(0);
     expect(leftPercent(-5)).toBe(100);
     expect(leftPercent(undefined)).toBe(0);
+  });
+});
+
+describe("showBudget", () => {
+  test("shows the weekly budget when a working day or more remains", () => {
+    const pace = paceFor("seven_day", { used: 38, resets: FRI_0700 }, TUE_1140);
+    const wholeDay = paceFor("seven_day", { used: 38, resets: sec(at(2026, 10, 17, 20, 0)) }, at(2026, 10, 17, 8, 0));
+
+    expect(showBudget(pace)).toBe(true);
+    expect(wholeDay.span).toBeCloseTo(1, 5);
+    expect(showBudget(wholeDay)).toBe(true);
+  });
+
+  test("hides the weekly budget on the last day", () => {
+    const pace = paceFor("seven_day", { used: 63, resets: sec(at(2026, 10, 17, 13, 45)) }, at(2026, 10, 17, 11, 40));
+
+    expect(pace.span).toBeLessThan(1);
+    expect(showBudget(pace)).toBe(false);
+  });
+
+  test("never shows the five-hour budget", () => {
+    const pace = paceFor("five_hour", { used: 18, resets: sec(TUE_1140 + 2 * HOUR_MS) }, TUE_1140);
+
+    expect(pace.span).toBeGreaterThanOrEqual(1);
+    expect(showBudget(pace)).toBe(false);
+  });
+
+  test("hides a missing pace", () => {
+    expect(showBudget(null)).toBe(false);
   });
 });
