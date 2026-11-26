@@ -42,6 +42,10 @@
     };
   };
 
+  dotfiles.hc.space-url.vars = [
+    "EXOMIND_SERVER_URL"
+  ];
+
   home.username = "appaquet";
   home.homeDirectory = "/Users/appaquet";
   home.stateVersion = "25.11";
