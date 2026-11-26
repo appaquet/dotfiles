@@ -11,7 +11,7 @@ const KEEP_DAYS = 8;
 
 export const WINDOWS = [
   { key: "five_hour", label: "5h", long: "5 hours", title: "5-hour Claude limit" },
-  { key: "seven_day", label: "week", long: "Week", title: "Weekly Claude limit" },
+  { key: "seven_day", label: "wk", long: "Week", title: "Weekly Claude limit" },
   { key: "spend_limit", label: "spend", long: "Spend", title: "Claude spend limit" },
 ];
 
