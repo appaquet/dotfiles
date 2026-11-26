@@ -52,6 +52,10 @@
 }
 
 .smd-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
@@ -89,6 +93,70 @@
   display: grid;
   grid-template-columns: 17rem minmax(0, 1fr);
   align-items: start;
+}
+
+/* document outline */
+
+.smd-outlinetoggle {
+  flex: none;
+}
+
+.smd-outlinetoggle[hidden] {
+  display: none;
+}
+
+.smd-outline {
+  display: none;
+  min-width: 0;
+  max-height: min(60dvh, 24rem);
+  scroll-margin-top: 3.5rem;
+  overflow: auto;
+  margin-bottom: 0.8rem;
+  padding: 0.6rem;
+  border: 1px solid var(--smd-border);
+  border-radius: 0.4rem;
+  background: var(--smd-surface);
+  font-size: 0.86rem;
+}
+
+.smd-outline.smd-outline-open:not([hidden]) {
+  display: block;
+}
+
+.smd-outline-title {
+  display: none;
+  margin: 0 0.4rem 0.3rem;
+  font-weight: 600;
+}
+
+.smd-outline ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.smd-outline ul ul {
+  padding-inline-start: 0.6rem;
+}
+
+.smd-outline a {
+  display: block;
+  padding: 0.18rem 0.4rem;
+  border-radius: 0.35rem;
+  color: var(--smd-muted);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.smd-outline a:hover,
+.smd-outline a[aria-current="location"] {
+  background: rgba(45, 212, 191, 0.12);
+  color: var(--smd-text);
+}
+
+/* Preserve the reading layout while the Comments drawer owns the right edge. */
+body:has(.smfb-drawer.smfb-open) :is(.smd-outline, .smd-outlinetoggle) {
+  visibility: hidden;
 }
 
 /* docs tree */
@@ -390,6 +458,33 @@
 .smd-remote-image {
   color: var(--smd-faint);
   font-size: 0.9em;
+}
+
+@media (min-width: 78rem) {
+  .smd-outlinetoggle {
+    display: none;
+  }
+
+  .smd-main:has(.smd-outline:not([hidden])) {
+    display: grid;
+    grid-template-columns: minmax(0, 52rem) minmax(0, 13rem);
+    column-gap: 1.2rem;
+    align-items: start;
+  }
+
+  .smd-outline:not([hidden]) {
+    display: block;
+    grid-column: 2;
+    grid-row: 1;
+    position: sticky;
+    top: 3.5rem;
+    max-height: calc(100dvh - 8rem);
+    margin-bottom: 0;
+  }
+
+  .smd-outline-title {
+    display: block;
+  }
 }
 
 @media (max-width: 52rem) {

@@ -26,12 +26,19 @@
       <button class="smd-btn smd-navtoggle" type="button" aria-expanded="false" aria-controls="smd-nav">
         Files
       </button>
+      <button class="smd-btn smd-outlinetoggle" type="button" aria-expanded="false" aria-controls="smd-outline" hidden>
+        On this page
+      </button>
       <h1 class="smd-title">Docs</h1>
       <span class="smd-path"></span>
     </header>
     <div class="smd-layout">
       <nav class="smd-nav" id="smd-nav" aria-label="Documents"></nav>
       <main class="smd-main">
+        <nav class="smd-outline" id="smd-outline" aria-label="On this page" hidden>
+          <p class="smd-outline-title" aria-hidden="true">On this page</p>
+          <ul class="smd-outline-list"></ul>
+        </nav>
         <p class="smd-state" role="status" hidden></p>
         <article class="smd-doc"></article>
       </main>

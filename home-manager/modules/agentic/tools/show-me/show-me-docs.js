@@ -10,10 +10,14 @@ import { mountFeedback } from "/_show-me/feedback.js";
 const MARKDOWN_EXTENSIONS = [".md", ".markdown"];
 const TREE_ENDPOINT = "/_show-me/tree";
 const HEADING_PATTERN = /^H[1-6]$/;
+const HEADING_SELECTOR = "h1, h2, h3, h4, h5, h6";
 
 const els = {
   nav: document.querySelector(".smd-nav"),
   navToggle: document.querySelector(".smd-navtoggle"),
+  outline: document.querySelector(".smd-outline"),
+  outlineList: document.querySelector(".smd-outline-list"),
+  outlineToggle: document.querySelector(".smd-outlinetoggle"),
   title: document.querySelector(".smd-title"),
   path: document.querySelector(".smd-path"),
   state: document.querySelector(".smd-state"),
@@ -58,6 +62,12 @@ async function start() {
   });
 
   els.navToggle.addEventListener("click", toggleNavigation);
+  els.outlineToggle.addEventListener("click", () => {
+    const open = !els.outline.classList.contains("smd-outline-open");
+    setOutlineOpen(open);
+    if (open) els.outline.scrollIntoView({ block: "start" });
+  });
+  els.outline.addEventListener("click", followOutlineLink);
   window.addEventListener("popstate", () => {
     // The browser also fires popstate when only the fragment changes, so a
     // same-document fragment must scroll instead of refetching the document.
@@ -85,6 +95,10 @@ async function showDocument(target, { push }) {
 
   setState("loading", "Loading this document…");
   els.doc.replaceChildren();
+  els.outlineList.replaceChildren();
+  els.outline.hidden = true;
+  els.outlineToggle.hidden = true;
+  setOutlineOpen(false);
   const inventoryRequest = fetchTree();
 
   let text;
@@ -140,10 +154,11 @@ async function renderDocument(text, documentUrl, signal) {
   await mountDiagrams(els.doc, { signal });
   if (signal?.aborted) return;
 
-  prepareHeadings();
+  const headings = prepareHeadings();
   renderCallouts();
   detachRemoteImages(documentUrl);
   reader.feedback?.setTargets(buildSections());
+  renderOutline(headings);
 }
 
 // --- rendering ---
@@ -151,7 +166,8 @@ async function renderDocument(text, documentUrl, signal) {
 /** Give every heading a stable id and the anchor that shares its section. */
 function prepareHeadings() {
   const used = new Set();
-  for (const heading of els.doc.querySelectorAll("h1, h2, h3, h4, h5, h6")) {
+  const headings = els.doc.querySelectorAll(HEADING_SELECTOR);
+  for (const heading of headings) {
     const base = slugify(heading.textContent) || "section";
     let id = base;
     let suffix = 1;
@@ -160,12 +176,13 @@ function prepareHeadings() {
     heading.id = id;
     heading.append(sectionAnchor(id));
   }
+  return headings;
 }
 
 function sectionAnchor(id) {
   const anchor = document.createElement("a");
   anchor.className = "smd-anchor";
-  anchor.href = `#${encodeURIComponent(id)}`;
+  anchor.href = sectionHref(id);
   anchor.textContent = "#";
   anchor.setAttribute("aria-label", "Link to this section");
   return anchor;
@@ -176,6 +193,48 @@ function headingLabel(heading) {
   const clone = heading.cloneNode(true);
   clone.querySelector(".smd-anchor")?.remove();
   return clone.textContent.trim();
+}
+
+function renderOutline(headings) {
+  const parents = [];
+  for (const heading of headings) {
+    const rank = Number(heading.tagName[1]);
+    while (parents.length > 0 && parents.at(-1).rank >= rank) parents.pop();
+
+    const item = document.createElement("li");
+    const link = document.createElement("a");
+    link.href = sectionHref(heading.id);
+    link.textContent = headingLabel(heading) || heading.id;
+    item.append(link);
+
+    const parent = parents.at(-1);
+    if (parent && !parent.list) {
+      parent.list = document.createElement("ul");
+      parent.item.append(parent.list);
+    }
+    (parent?.list ?? els.outlineList).append(item);
+    parents.push({ rank, item, list: null });
+  }
+
+  els.outline.hidden = headings.length === 0;
+  els.outlineToggle.hidden = els.outline.hidden;
+}
+
+function setOutlineOpen(open) {
+  els.outline.classList.toggle("smd-outline-open", open);
+  els.outlineToggle.setAttribute("aria-expanded", String(open));
+}
+
+function followOutlineLink(event) {
+  if (!isPlainClick(event) || els.outlineToggle.getClientRects().length === 0) return;
+  const link = event.target.closest?.("a[href]");
+  const heading = link && fragmentTarget(link.hash);
+  if (!heading) return;
+
+  // Move focus out of the disclosure while leaving the native fragment jump intact.
+  setOutlineOpen(false);
+  heading.tabIndex = -1;
+  heading.focus({ preventScroll: true });
 }
 
 function renderCallouts() {
@@ -325,8 +384,7 @@ function closeNavigation() {
 // --- navigation ---
 
 function interceptDocumentLink(event) {
-  if (event.defaultPrevented || event.button !== 0) return;
-  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  if (!isPlainClick(event)) return;
 
   const anchor = event.target.closest?.("a[href]");
   if (!anchor || anchor.target === "_blank") return;
@@ -367,23 +425,30 @@ function findSection(targetId) {
 
 function scrollToFragment(hash) {
   for (const linked of els.doc.querySelectorAll(".smd-linked")) linked.classList.remove("smd-linked");
+  els.outlineList.querySelector('[aria-current="location"]')?.removeAttribute("aria-current");
 
-  if (!hash || hash === "#") return;
-
-  let id;
-  try {
-    // Decoding the fragment keeps unicode ids working: the browser does not
-    // match a percent-encoded fragment against a DOM id.
-    id = decodeURIComponent(hash.slice(1));
-  } catch {
-    return;
-  }
-
-  const target = document.getElementById(id);
+  const target = fragmentTarget(hash);
   if (!target) return;
 
   target.scrollIntoView({ block: "start" });
   target.classList.add("smd-linked");
+  const link = els.outlineList.querySelector(`a[href="${sectionHref(target.id)}"]`);
+  link?.setAttribute("aria-current", "location");
+}
+
+function fragmentTarget(hash) {
+  if (!hash || hash === "#") return null;
+
+  let id;
+  try {
+    id = decodeURIComponent(hash.slice(1));
+  } catch {
+    return null;
+  }
+
+  const selector = `#${CSS.escape(id)}`;
+  return els.doc.querySelector(`:is(${HEADING_SELECTOR})${selector}`)
+    ?? els.doc.querySelector(selector);
 }
 
 function warnAboutUnsavedComments(event) {
@@ -394,6 +459,15 @@ function warnAboutUnsavedComments(event) {
 }
 
 // --- helpers ---
+
+function isPlainClick(event) {
+  return !event.defaultPrevented && event.button === 0
+    && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
+}
+
+function sectionHref(id) {
+  return `#${encodeURIComponent(id)}`;
+}
 
 async function fetchTree() {
   try {
