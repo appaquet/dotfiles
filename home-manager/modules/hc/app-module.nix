@@ -9,7 +9,7 @@ let
   cfg = config.dotfiles.herdr-app;
   jsonFormat = pkgs.formats.json { };
 
-  # Names the app ships and rewrites on start (non-layout keys of installed.json, herdr-app 0.1.15).
+  # Names the app ships and rewrites on start (non-layout keys of installed.json, verified against herdr-app 0.1.18).
   # A managed entry with one of these names would be renamed or overwritten by the app. Refresh
   # when a new herdr-app version ships more mods, layouts or themes.
   shippedMods = [

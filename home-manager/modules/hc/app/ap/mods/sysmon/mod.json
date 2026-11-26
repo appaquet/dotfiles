@@ -1,5 +1,8 @@
 {
   "place": "none",
   "title": "System monitor",
-  "overlay": { "kind": "popup", "width": 2, "height": 2, "frame": "none" }
+  "overlay": { "kind": "popup", "width": 2, "height": 2, "frame": "none" },
+  "palette": [
+    { "title": "System monitor", "command": "mod.open", "args": { "name": "sysmon" }, "words": "btop cpu memory processes" }
+  ]
 }

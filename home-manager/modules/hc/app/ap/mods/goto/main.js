@@ -49,6 +49,14 @@ function spaceColor(t, p) {
   return c.startsWith("#") ? c : (MARK[c] ?? t[c]);
 }
 
+// Keep the whole leading emoji in the avatar (same rule as spaces-status).
+// Newer pictographs such as 🖥 may be drawn as emoji without VS16. A trailing
+// selector, modifier or joiner can signal that we matched only part of a glyph.
+const EMOJI = /^(?:[#*0-9]\uFE0F?\u20E3|\p{Regional_Indicator}{2}|(?:\p{Emoji_Presentation}|(?=[\u{1F000}-\u{1FFFF}])\p{Extended_Pictographic}|\p{Extended_Pictographic}(?=\uFE0F)|\p{Emoji_Modifier_Base}(?=\p{Emoji_Modifier}))\uFE0F?[\p{Emoji_Modifier}\u{E0020}-\u{E007F}]*(?:\u200D\p{Extended_Pictographic}\uFE0F?\p{Emoji_Modifier}?)*)(?![\p{Grapheme_Extend}\p{Emoji_Modifier}\u200D])/u;
+function spaceAvatar(name) {
+  return EMOJI.exec(name)?.[0] ?? ([...name][0]?.toUpperCase() ?? "?");
+}
+
 export default class SpacePicker extends View {
   init(_props, cx) {
     this.filter = "";
@@ -206,7 +214,7 @@ export default class SpacePicker extends View {
       .hover((st) => st.bg(t.hover))
       .on_click((_e, cx) => this.go(r, cx))
       .child(this.glyph(t, s.status))
-      .child(h_flex().size(18).flex_none().rounded(5).bg(spaceColor(t, s)).items_center().justify_center().text_size(10.5).font_bold().text_color("#ffffff").child([...s.name][0]?.toUpperCase() ?? "?"))
+      .child(h_flex().size(18).flex_none().rounded(5).bg(spaceColor(t, s)).items_center().justify_center().text_size(10.5).font_bold().text_color("#ffffff").child(spaceAvatar(s.name)))
       .child(h_flex().flex_1().min_w(0).items_center()
         .when(Boolean(r.parent), (el) => el.child(div().flex_none().text_color(t.dim).child(`${r.parent} › `)))
         .child(div().truncate().text_color(t.foreground).when(s.active, (d) => d.font_semibold()).child(s.name)))

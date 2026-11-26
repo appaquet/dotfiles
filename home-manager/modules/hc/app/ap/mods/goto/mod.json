@@ -5,5 +5,8 @@
   "cloned_from": {
     "name": "picker",
     "version": "0.1.16"
-  }
+  },
+  "palette": [
+    { "title": "Go to space", "command": "mod.open", "args": { "name": "goto" }, "words": "picker spaces switch jump" }
+  ]
 }

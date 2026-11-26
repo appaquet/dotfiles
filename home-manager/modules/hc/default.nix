@@ -76,6 +76,7 @@ in
       "cmd-q" = "app.quit";
       "cmd-h" = "app.hide";
       "cmd-alt-h" = "app.hide_others";
+      "cmd-m" = "window.minimize";
       "cmd-t" = "tab.new";
       "cmd-w" = "tab.close";
       "ctrl-tab" = "spaces-status.next";
@@ -159,6 +160,11 @@ in
       "ctrl-a shift-j" = "pane.swap:down";
       "ctrl-a shift-k" = "pane.swap:up";
       "ctrl-a shift-l" = "pane.swap:right";
+      "ctrl-a shift-left" = "pane.resize:left";
+      "ctrl-a shift-down" = "pane.resize:down";
+      "ctrl-a shift-up" = "pane.resize:up";
+      "ctrl-a shift-right" = "pane.resize:right";
+      "ctrl-a r" = "pane.rename";
       "ctrl-a x" = "pane.close";
       "ctrl-a z" = "pane.zoom";
       "ctrl-a b" = "layout.toggle:sidebar";
@@ -169,6 +175,8 @@ in
       "cmd-c" = "terminal.copy";
       "cmd-v" = "terminal.paste";
       "ctrl-v" = "terminal.paste_image";
+      "cmd-f" = "terminal.search";
+      "cmd-a" = "terminal.select_all";
       "alt-left" = "send:${esc "\\u001b"}b";
       "alt-right" = "send:${esc "\\u001b"}f";
       "alt-backspace" = "send:${esc "\\u0017"}";
