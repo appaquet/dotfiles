@@ -31,7 +31,7 @@ const RUNTIME_WITH_DRIFT = {
   enableInstallTelemetry: false,
   hideThinkingBlock: false,
   lastChangelogVersion: "0.85.1",
-  showCacheMissNotices: true,
+  notices: { cacheMisses: true },
   tokenSpeed: { slidingWindow: 1000 },
 };
 
@@ -46,7 +46,7 @@ const REPORT_WITH_DRIFT = [
   '  doubleEscapeAction = "tree"',
   "  enableInstallTelemetry = false",
   "  hideThinkingBlock = false",
-  "  showCacheMissNotices = true",
+  "  notices.cacheMisses = true",
   "  tokenSpeed.slidingWindow = 1000",
 ].join("\n");
 
@@ -63,7 +63,7 @@ const REPORT_UNFILTERED = [
   "  enableInstallTelemetry = false",
   "  hideThinkingBlock = false",
   '  lastChangelogVersion = "0.85.1"',
-  "  showCacheMissNotices = true",
+  "  notices.cacheMisses = true",
   "  tokenSpeed.slidingWindow = 1000",
 ].join("\n");
 
@@ -263,7 +263,7 @@ test("loadDrift: returns runtime-only paths and filters ignored ones", async () 
     { path: "enableInstallTelemetry", value: false },
     { path: "hideThinkingBlock", value: false },
     { path: "lastChangelogVersion", value: "0.85.1" },
-    { path: "showCacheMissNotices", value: true },
+    { path: "notices.cacheMisses", value: true },
   ]);
 
   // The default ignore list suppresses Pi-owned paths.
@@ -271,7 +271,7 @@ test("loadDrift: returns runtime-only paths and filters ignored ones", async () 
     { path: "doubleEscapeAction", value: "tree" },
     { path: "enableInstallTelemetry", value: false },
     { path: "hideThinkingBlock", value: false },
-    { path: "showCacheMissNotices", value: true },
+    { path: "notices.cacheMisses", value: true },
     { path: "tokenSpeed.slidingWindow", value: 1000 },
   ]);
 });

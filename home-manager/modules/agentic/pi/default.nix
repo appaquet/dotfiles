@@ -24,8 +24,13 @@ in
       doubleEscapeAction = "tree";
       enableInstallTelemetry = false;
       hideThinkingBlock = false;
+      notices = {
+        cacheMisses = true;
+        cacheWarming = true;
+        compactionCosts = true;
+        reasoningDrops = true;
+      };
       quietStartup = "header";
-      showCacheMissNotices = true;
       tuiMode = "fullscreen";
     };
   };
