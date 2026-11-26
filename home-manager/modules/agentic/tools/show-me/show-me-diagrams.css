@@ -1,24 +1,97 @@
 /*
- * Diagram rendering styles for show-me. The container, its pending state, and
- * the failure state are self-contained: the same stylesheet serves the docs
+ * Diagram rendering styles for show-me. The same stylesheet serves the docs
  * reader and authored artifacts.
+ *
+ * A rendered diagram is a card: a controls row above a scroll area that keeps
+ * the figure inside a viewport-height budget. An unrendered block and the
+ * failure state get the same card without controls.
  */
-
-.smdg,
+.smdg-frame,
+.smdg-error,
 pre.mermaid {
   margin: 0.9rem 0;
-  padding: 0.75rem;
-  max-height: 70vh;
-  overflow: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 0.45rem;
   background: #0f1420;
 }
 
+/* Controls sit above the diagram, never over it, and stay put while it scrolls. */
+.smdg-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.3rem;
+  padding: 0.4rem 0.55rem 0;
+  opacity: 0.7;
+  transition: opacity 120ms ease;
+}
+
+.smdg-frame:hover .smdg-controls,
+.smdg-frame:focus-within .smdg-controls {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .smdg-controls {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .smdg-controls {
+    transition: none;
+  }
+}
+
+.smdg-control {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0.35rem;
+  padding: 0.28rem 0.5rem;
+  background: rgba(15, 20, 32, 0.92);
+  color: #e8edf4;
+  font-size: 0.78rem;
+  line-height: 1.1;
+  cursor: pointer;
+}
+
+.smdg-control:hover:not(:disabled) {
+  border-color: rgba(45, 212, 191, 0.55);
+  color: #2dd4bf;
+}
+
+.smdg-control:focus-visible {
+  outline: 2px solid rgba(45, 212, 191, 0.8);
+  outline-offset: 2px;
+}
+
+.smdg-control:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.smdg-control[aria-pressed="true"] {
+  border-color: rgba(45, 212, 191, 0.65);
+  background: rgba(45, 212, 191, 0.12);
+  color: #2dd4bf;
+}
+
+.smdg-zoom-value {
+  min-width: 2.6rem;
+  color: #9aa8bd;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  user-select: none;
+}
+
 .smdg {
   display: block;
+  padding: 0.75rem;
+  max-height: 70vh;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
   text-align: center;
 }
 
@@ -29,7 +102,7 @@ pre.mermaid {
 
 .smdg:focus-visible {
   outline: 2px solid rgba(45, 212, 191, 0.8);
-  outline-offset: 3px;
+  outline-offset: -3px;
 }
 
 /* A diagram block keeps its source visible and readable until it renders. */

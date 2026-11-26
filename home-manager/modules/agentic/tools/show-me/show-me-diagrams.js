@@ -40,6 +40,28 @@ const THEME_VARIABLES = {
 /** Per-diagram-type setting that keeps a rendered SVG at its natural size. */
 const NATURAL_WIDTH = { useMaxWidth: false };
 
+/** Zoom bounds as multipliers of natural size: the diagram may shrink 10% and grow 5x. */
+export const MIN_ZOOM = 0.1;
+export const MAX_ZOOM = 5;
+/** Multiplicative step used by Zoom in (Zoom out steps by its reciprocal). */
+export const ZOOM_STEP = 1.25;
+
+/**
+ * Scale that fits a diagram into its frame, never enlarging beyond natural size.
+ * A zero-sized input falls back to 1 so a missing measurement never hides content.
+ */
+export function fitScale(naturalW, naturalH, frameWidth, frameHeight) {
+  if (naturalW <= 0 || naturalH <= 0 || frameWidth <= 0 || frameHeight <= 0) return 1;
+  return Math.min(frameWidth / naturalW, frameHeight / naturalH, 1);
+}
+
+/** Per-step zoom level, kept within [MIN_ZOOM, MAX_ZOOM]. */
+export function stepScale(currentScale, factor) {
+  const next = currentScale * factor;
+  if (!Number.isFinite(next)) return currentScale;
+  return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, next));
+}
+
 let rendererPromise = null;
 let sequence = 0;
 
@@ -72,7 +94,7 @@ export async function mountDiagrams(root = document, { signal } = {}) {
 
     for (const diagram of diagrams) {
       if (signal?.aborted) return;
-      await renderDiagram(renderer, diagram);
+      await renderDiagram(renderer, diagram, signal);
     }
   } catch {
     reportUnavailable(diagrams, MOUNT_FAILURE);
@@ -142,7 +164,7 @@ async function loadRenderer() {
   return rendererPromise;
 }
 
-async function renderDiagram(mermaid, diagram) {
+async function renderDiagram(mermaid, diagram, signal) {
   const { source, target } = diagram;
 
   if (source === "") {
@@ -169,8 +191,136 @@ async function renderDiagram(mermaid, diagram) {
   // securityLevel strict, and DOMPurify's HTML profile strips the
   // `foreignObject` labels most diagram types render their text into.
   figure.innerHTML = rendered.svg;
-  target.replaceWith(figure);
+
+  // The controls live outside the scroll area: a zoomed diagram scrolls
+  // beneath them instead of carrying them off-screen.
+  const frame = document.createElement("div");
+  frame.className = "smdg-frame";
+  frame.append(figure);
+
+  target.replaceWith(frame);
   bindInteractions(rendered.bindFunctions, figure);
+  initDiagramZoom(frame, figure, signal);
+}
+
+/**
+ * Fits the diagram to its frame and adds the Zoom in / Zoom out / Fit controls.
+ *
+ * Zoom state belongs to the mounted figure, so a document load always starts
+ * fitted. The observer re-fits when the frame changes width, while a scale the
+ * reader chose by hand is left alone until Fit is pressed again.
+ */
+function initDiagramZoom(frame, figure, signal) {
+  const svg = figure.querySelector("svg");
+  if (!svg) return;
+
+  const natural = naturalSize(svg);
+  if (natural.width <= 0 || natural.height <= 0) return;
+
+  const bar = document.createElement("div");
+  bar.className = "smdg-controls";
+  bar.setAttribute("role", "group");
+  bar.setAttribute("aria-label", "Diagram controls");
+
+  const zoomIn = makeControlButton("Zoom in diagram", "+");
+  const zoomOut = makeControlButton("Zoom out diagram", "−");
+  const fitButton = makeControlButton("Fit diagram", "Fit");
+  fitButton.setAttribute("aria-pressed", "true");
+
+  const readout = document.createElement("span");
+  readout.className = "smdg-zoom-value";
+  readout.setAttribute("aria-hidden", "true");
+
+  bar.append(zoomIn, zoomOut, fitButton, readout);
+  frame.prepend(bar);
+
+  let scale = 1;
+  let fitted = true;
+
+  const applyScale = (next, { fit = false } = {}) => {
+    scale = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, next));
+    fitted = fit;
+    // Floor the pixels: a fitted diagram must never overflow its content box by
+    // a fraction of a pixel and grow a scrollbar it does not need.
+    svg.style.width = `${Math.floor(natural.width * scale)}px`;
+    svg.style.height = `${Math.floor(natural.height * scale)}px`;
+    readout.textContent = `${Math.round(scale * 100)}%`;
+    zoomIn.disabled = scale >= MAX_ZOOM;
+    zoomOut.disabled = scale <= MIN_ZOOM;
+    fitButton.setAttribute("aria-pressed", fit ? "true" : "false");
+  };
+
+  const fitScaleNow = () => {
+    const bounds = frameBounds(figure);
+    return fitScale(natural.width, natural.height, bounds.width, bounds.height);
+  };
+
+  const applyFit = () => applyScale(fitScaleNow(), { fit: true });
+
+  zoomIn.addEventListener("click", () => applyScale(stepScale(scale, ZOOM_STEP)));
+  zoomOut.addEventListener("click", () => applyScale(stepScale(scale, 1 / ZOOM_STEP)));
+  fitButton.addEventListener("click", applyFit);
+
+  const observer = new ResizeObserver(() => {
+    if (!fitted) return;
+
+    // Re-fit only when the frame moved by a pixel or more: the floor above makes
+    // sub-pixel churn meaningless, and re-fitting on it would fight the browser.
+    const next = fitScaleNow();
+    if (Math.abs(Math.floor(natural.width * next) - Math.floor(natural.width * scale)) >= 1) {
+      applyScale(next, { fit: true });
+    }
+  });
+  observer.observe(frame);
+  signal?.addEventListener("abort", () => observer.disconnect(), { once: true });
+
+  applyFit();
+}
+
+/**
+ * Natural size of a rendered diagram. Mermaid writes the natural size as
+ * `width`/`height` attributes, which keep their value once the element is
+ * scaled, unlike its measured box.
+ */
+function naturalSize(svg) {
+  const width = Number.parseFloat(svg.getAttribute("width"));
+  const height = Number.parseFloat(svg.getAttribute("height"));
+  if (width > 0 && height > 0) return { width, height };
+
+  const rect = svg.getBoundingClientRect();
+  return { width: rect.width, height: rect.height };
+}
+
+/** Room inside the frame: its content width and the height cap it enforces. */
+function frameBounds(figure) {
+  const style = getComputedStyle(figure);
+  const padX = length(style.paddingLeft) + length(style.paddingRight);
+  const padY = length(style.paddingTop) + length(style.paddingBottom);
+  const borderY = length(style.borderTopWidth) + length(style.borderBottomWidth);
+  const cap = parseFloat(style.maxHeight);
+
+  return {
+    width: figure.clientWidth - padX,
+    // max-height counts the whole box when border-box, and the content box otherwise.
+    height: Number.isFinite(cap) && cap > 0
+      ? Math.max(24, cap - (style.boxSizing === "border-box" ? padY + borderY : 0))
+      : Number.POSITIVE_INFINITY,
+  };
+}
+
+function length(value) {
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+/** Buttons inside the frame: native buttons keep keyboard activation free. */
+function makeControlButton(ariaLabel, label) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "smdg-control";
+  button.textContent = label;
+  button.setAttribute("aria-label", ariaLabel);
+  return button;
 }
 
 /** Binds Mermaid's optional interactions without risking the rendered diagram. */

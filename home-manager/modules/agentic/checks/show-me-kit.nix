@@ -11,6 +11,8 @@ pkgs.runCommand "show-me-kit-check"
     mkdir suite
     cp ${../tools/show-me/show-me-feedback.js} suite/show-me-feedback.js
     cp ${../tools/show-me/show-me-feedback.test.mjs} suite/show-me-feedback.test.mjs
+    cp ${../tools/show-me/show-me-diagrams.js} suite/show-me-diagrams.js
+    cp ${../tools/show-me/show-me-diagrams.test.mjs} suite/show-me-diagrams.test.mjs
     cp ${../tools/show-me/show-me-serve.ts} suite/show-me-serve.ts
     cp ${../tools/show-me/show-me-serve.test.ts} suite/show-me-serve.test.ts
     cd suite
