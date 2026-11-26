@@ -10,6 +10,7 @@ import { v_flex, h_flex } from "gpui-base";
 import { spaces, machines, panes, terminals, run, nextCommand, openOverlay, exec, hc, theme, shared, setShared, watchFolder, window, layout, home, appHome } from "herdr";
 import { CAP, parseGh, prSummary, ciRollup, nextDue, prLook, prTip, hasCi } from "./prs.js";
 import { groupRows } from "./rows.js";
+import { groupFolders, folderOfSpace } from "./folders.js";
 import { repoName, spaceAvatar } from "./names.js";
 import { readMachineOrder, resolveMachineOrder, moveMachine, trackMachinePress, releaseMachinePress } from "./machine-order.js";
 import { visibleNavOrder, step } from "./nav.js";
@@ -92,7 +93,8 @@ export default class Spaces extends View {
     this.machineOrder = readMachineOrder(localStorage.getItem("machines.order"));
     this.machinePress = null;
     this.repoFolded = new Set(JSON.parse(localStorage.getItem("spaces.folded") ?? "[]")); // repos whose worktree rows are hidden, keyed like g.repo (machine-scoped)
-    // The active space at the last look: a folded repo opens on a change into it, never while it already holds the active space.
+    this.foldedFolders = new Set(JSON.parse(localStorage.getItem("spaces.folders") ?? "[]")); // folder names whose member rows are hidden
+    // The active space at the last look: a folded group (repo or folder) opens on a change into it, never while it already holds the active space.
     this.lastActive = spaces().find((s) => s.active)?.id ?? null;
     this.navOrder = []; // ids of the rows the sidebar draws, in draw order
     this.parents = {}; // worktree space id -> main space id
@@ -443,12 +445,18 @@ export default class Spaces extends View {
     const list = sp.map((w, i) => ({ w, i, g: this.git[where(w, ps)] ?? null })).filter((r) => this.shown.has(r.w.id));
     // A jump into a worktree of a folded repo opens it, but only on a change of
     // active space: folding the group you're in sticks while you remain there.
+    // The same rule opens a folder the active space lands in.
     const active = sp.find((s) => s.active);
     if (active && active.id !== this.lastActive) {
       const g = this.git[where(active, ps)];
       if (g?.linked && this.repoFolded.has(g.repo)) {
         this.repoFolded.delete(g.repo);
         localStorage.setItem("spaces.folded", JSON.stringify([...this.repoFolded]));
+      }
+      const folder = folderOfSpace(list, active);
+      if (folder && this.foldedFolders.has(folder)) {
+        this.foldedFolders.delete(folder);
+        localStorage.setItem("spaces.folders", JSON.stringify([...this.foldedFolders]));
       }
     }
     this.lastActive = active?.id ?? null;
@@ -482,10 +490,10 @@ export default class Spaces extends View {
     if (JSON.stringify(prev) !== JSON.stringify(next)) setShared("space.prs", next);
   }
 
-  // The rows, under a header per machine once one isn't this computer.
+  // The rows, under a header per machine once one isn't this computer. Hyphenated names group under
+  // a folder header inside their machine section, collapsible with a click like machine headers.
   grouped(t, collapsed) {
     const rows = this.ordered();
-    const draw = (r) => (collapsed ? this.compact(r, t) : this.row(r, t));
     const remote = [...rows.map(r => r.w.machine).filter(Boolean), ...this.machines.map(m => m.name)];
     const order = resolveMachineOrder(this.machineOrder, remote);
     if (collapsed || !remote.length || (this.machinePress && !order.visible.includes(this.machinePress.source))) {
@@ -498,27 +506,67 @@ export default class Spaces extends View {
         || spaces().some(s => (s.machine ?? null) === m && !this.shown.has(s.id));
     };
     const loadingRow = m => div().id(`machine-loading-${machineKey(m)}`).h(28).flex_none().px(8).text_size(12).text_color(t.dim).child(collapsed ? "…" : "Loading…");
-    if (!remote.length) {
-      this.navOrder = rows.filter((r) => !r.hidden).map((r) => r.w.id);
-      return loading(null) && !rows.length ? [loadingRow(null)] : rows.filter((r) => !r.hidden).map(draw);
-    }
 
     const sections = order.visible.map((m) => ({
       machine: m,
-      rows: rows.filter((r) => (r.w.machine ?? null) === m),
+      items: groupFolders(rows.filter((r) => (r.w.machine ?? null) === m)),
     }));
-    this.navOrder = visibleNavOrder(sections, this.folded);
+    this.navOrder = visibleNavOrder(sections, this.folded, this.foldedFolders);
 
-    return order.visible.flatMap((m) => {
-      const sectionRows = rows.filter((r) => (r.w.machine ?? null) === m);
-      const mine = sectionRows.filter((r) => !r.hidden);
-      const head = this.machineHeader(m, order, t, collapsed, sectionRows.length);
-      const empty = h_flex().id(`machine-new-${machineKey(m)}`).h(28).flex_none().px(8).gap(7).items_center().rounded(7)
-        .text_size(12).text_color(t.dim).hover(s => s.bg(t.hover).text_color(t.foreground))
-        .on_click(() => run("space.new", m ? { machine: m } : {}))
-        .child(svg("mods/workspace-chrome/plus.svg").size(12)).when(!collapsed, el => el.child("New space there"));
-      return [head, ...(this.folded.has(m) ? [] : mine.length ? mine.map(draw) : [loading(m) ? loadingRow(m) : empty])];
+    return sections.flatMap((section) => {
+      const m = section.machine;
+      const headRow = remote.length ? this.machineHeader(m, order, t, collapsed, section.items.filter((it) => it.kind === "row").length) : null;
+      if (remote.length && this.folded.has(m)) return headRow ? [headRow] : [];
+      const body = this.renderItems(section.items, t, collapsed);
+      if (!body.length) {
+        if (loading(m)) return headRow ? [headRow, loadingRow(m)] : [loadingRow(m)];
+        if (remote.length) {
+          const empty = h_flex().id(`machine-new-${machineKey(m)}`).h(28).flex_none().px(8).gap(7).items_center().rounded(7)
+            .text_size(12).text_color(t.dim).hover(s => s.bg(t.hover).text_color(t.foreground))
+            .on_click(() => run("space.new", m ? { machine: m } : {}))
+            .child(svg("mods/workspace-chrome/plus.svg").size(12)).when(!collapsed, el => el.child("New space there"));
+          return [headRow, empty];
+        }
+        return [];
+      }
+      return headRow ? [headRow, ...body] : body;
     });
+  }
+
+  // The rows of one machine section, in draw order: folder headers (always shown, so a collapsed
+  // folder can be reopened) followed by the rows that are not hidden and not inside a collapsed folder.
+  renderItems(items, t, collapsed) {
+    const out = [];
+    for (const it of items) {
+      if (it.kind === "folder") {
+        out.push(this.folderHeader(it, t, collapsed));
+        continue;
+      }
+      if (it.row.hidden) continue;
+      if (it.folder && this.foldedFolders.has(it.folder)) continue;
+      out.push(collapsed ? this.compact(it.row, t) : this.row({ ...it.row, displayName: it.displayName, folder: it.folder }, t));
+    }
+    return out;
+  }
+
+  // A folder header, like a machine header but without drag or machine state: it toggles its
+  // members. Its count rides along while folded, mirroring the machine header.
+  folderHeader(it, t, collapsed) {
+    const folded = this.foldedFolders.has(it.name);
+    return h_flex().id(`folder-${it.name}`).h(30).flex_none().px(collapsed ? 2 : 8).gap(9).items_center().text_size(13).text_color(t.dim)
+      .cursor_pointer().hover(s => s.bg(t.hover))
+      .on_click((_e, cx) => this.toggleFolderFold(it.name, cx))
+      .child(svg("mods/workspace-chrome/folder.svg").size(18).flex_none().text_color(t.dim))
+      .when(!collapsed, el => el.child(h_flex().flex_1().items_center().gap(9)
+        .child(div().max_w(150).truncate().child(it.name))
+        .when(folded && it.count > 0, el => el.child(div().flex_none().text_size(11).text_color(t.dim).child(String(it.count))))))
+      .when(!collapsed, el => el.child(svg(`mods/workspace-chrome/chevron-${folded ? "right" : "down"}.svg`).size(11).flex_none().text_color(t.dim)));
+  }
+
+  toggleFolderFold(name, cx) {
+    this.foldedFolders.has(name) ? this.foldedFolders.delete(name) : this.foldedFolders.add(name);
+    localStorage.setItem("spaces.folders", JSON.stringify([...this.foldedFolders]));
+    cx.notify();
   }
 
   machineHeader(m, order, t, collapsed, count = 0) {
@@ -694,7 +742,7 @@ export default class Spaces extends View {
     return div().size(7).mx(2).flex_none().rounded(4).bg(tone(t, status));
   }
 
-  row({ w, i, g, tree, kids }, t) {
+  row({ w, i, g, tree, kids, displayName, folder }, t) {
     const on = w.active;
     const pr = (shared("space.prs") ?? {})[w.id];
     const showMe = spaceShowMe(w.id);
@@ -744,9 +792,10 @@ export default class Spaces extends View {
         h_flex()
           .gap(9)
           .items_center()
-          .when(Boolean(tree), el => el.pl(22).child(svg("mods/workspace-chrome/branch.svg").size(13).text_color(t.dim)))
+          .pl((tree ? 22 : 0) + (folder ? 14 : 0))
+          .when(Boolean(tree), el => el.child(svg("mods/workspace-chrome/branch.svg").size(13).text_color(t.dim)))
           .when(!tree, el => el.child(h_flex().size(18).flex_none().rounded(5).bg(fill).items_center().justify_center().text_size(10.5).font_bold().text_color("#ffffff").child(spaceAvatar(w.name))))
-          .child(div().flex_shrink(0).max_w(150).truncate().text_color(t.foreground).child(w.name))
+          .child(div().flex_shrink(0).max_w(150).truncate().text_color(t.foreground).child(displayName ?? w.name))
           .when(kids > 0 && this.repoFolded.has(g.repo), (el) => el.child(div().flex_none().text_size(11).text_color(t.dim).child(String(kids))))
           .child(div().flex_1())
           .when(Boolean(url), (el) => el.child(this.urlIcon(w, url, t)))

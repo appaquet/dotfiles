@@ -1,16 +1,20 @@
 // Navigation along the sidebar's visible rows. Pure — no herdr imports, so bun
 // can test it directly.
 
-// visibleNavOrder(sections, folded): `sections` is in display order (the saved
-// machine order); each section holds its rows in draw order (ordered()'s output,
-// with `hidden` rows still present). Returns the ids of the rows actually drawn:
-// mains and visible worktrees, skipping rows of collapsed sections and hidden
-// (repo-folded) rows.
-export function visibleNavOrder(sections, folded) {
+// visibleNavOrder(sections, folded, folderFolders): `sections` is in display order (the saved
+// machine order); each section holds the display items (folder headers and rows in draw order, from
+// folders.js). Returns the ids of the rows actually drawn: mains and visible worktrees, skipping rows
+// of collapsed sections, collapsed folders and hidden (repo-folded) rows.
+export function visibleNavOrder(sections, folded, folderFolders = new Set()) {
   const ids = [];
-  for (const { machine, rows } of sections) {
+  for (const { machine, items } of sections) {
     if (folded?.has(machine)) continue;
-    for (const r of rows) if (!r.hidden) ids.push(r.w.id);
+    for (const it of items) {
+      if (it.kind !== "row") continue;
+      if (it.row.hidden) continue;
+      if (it.folder && folderFolders?.has(it.folder)) continue;
+      ids.push(it.row.w.id);
+    }
   }
   return ids;
 }
