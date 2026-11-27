@@ -61,6 +61,21 @@ export function stepScale(currentScale, factor) {
   if (!Number.isFinite(next)) return currentScale;
   return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, next));
 }
+/**
+ * Overflow state of a scroll container. Used to gate pan affordances and
+ * cursors: a diagram can only be panned when its content exceeds the frame.
+ */
+export function isOverflowing({ scrollHeight, clientHeight, scrollWidth, clientWidth }) {
+  return scrollHeight > clientHeight || scrollWidth > clientWidth;
+}
+
+/**
+ * Whether a pointer-down on the diagram figure may start a pan. Drag that
+ * starts on the SVG's text or outside the figure must never hijack selection.
+ */
+export function panStartAllowed({ insideFigure, insideText }) {
+  return insideFigure && !insideText;
+}
 
 let rendererPromise = null;
 let sequence = 0;
@@ -237,6 +252,10 @@ function initDiagramZoom(frame, figure, signal) {
   let scale = 1;
   let fitted = true;
 
+  // Background drag, panned by the scroll container: applied in applyScale
+  // so fit and zoom changes keep the cursor honest.
+  const pan = initDiagramPan(figure, signal);
+
   const applyScale = (next, { fit = false } = {}) => {
     scale = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, next));
     fitted = fit;
@@ -248,6 +267,7 @@ function initDiagramZoom(frame, figure, signal) {
     zoomIn.disabled = scale >= MAX_ZOOM;
     zoomOut.disabled = scale <= MIN_ZOOM;
     fitButton.setAttribute("aria-pressed", fit ? "true" : "false");
+    pan.syncCursor();
   };
 
   const fitScaleNow = () => {
@@ -255,7 +275,11 @@ function initDiagramZoom(frame, figure, signal) {
     return fitScale(natural.width, natural.height, bounds.width, bounds.height);
   };
 
-  const applyFit = () => applyScale(fitScaleNow(), { fit: true });
+  const applyFit = () => {
+    figure.scrollLeft = 0;
+    figure.scrollTop = 0;
+    applyScale(fitScaleNow(), { fit: true });
+  };
 
   zoomIn.addEventListener("click", () => applyScale(stepScale(scale, ZOOM_STEP)));
   zoomOut.addEventListener("click", () => applyScale(stepScale(scale, 1 / ZOOM_STEP)));
@@ -275,6 +299,61 @@ function initDiagramZoom(frame, figure, signal) {
   signal?.addEventListener("abort", () => observer.disconnect(), { once: true });
 
   applyFit();
+}
+
+/**
+ * Drag-to-pan for a zoomed diagram: grabbing the figure background (or any
+ * non-text surface of the SVG) scrolls it. Text stays naturally selectable.
+ * Only mouse and pen are handled — touch keeps native scrolling.
+ *
+ * Returns a sync function so zoom/fit can re-check the scroll affordance.
+ */
+function initDiagramPan(figure, signal) {
+  const syncCursor = () => {
+    figure.classList.toggle("smdg-pannable", isOverflowing(figure));
+  };
+  syncCursor();
+
+  figure.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "touch") return;
+    if (event.button !== 0) return;
+    if (!isOverflowing(figure)) return;
+
+    const target = event.target;
+    const insideFigure = figure.contains(target);
+    const insideText = Boolean(target?.closest?.("text, tspan, foreignObject"));
+    if (!panStartAllowed({ insideFigure, insideText })) return;
+
+    event.preventDefault();
+    figure.classList.add("smdg-dragging");
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const startLeft = figure.scrollLeft;
+    const startTop = figure.scrollTop;
+
+    // Window-level listeners keep the drag alive regardless of capture support.
+    const onMove = (moveEvent) => {
+      figure.scrollLeft = startLeft - (moveEvent.clientX - startX);
+      figure.scrollTop = startTop - (moveEvent.clientY - startY);
+    };
+    const onEnd = () => {
+      figure.classList.remove("smdg-dragging");
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onEnd);
+      window.removeEventListener("pointercancel", onEnd);
+      syncCursor();
+    };
+
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onEnd, { once: true });
+    window.addEventListener("pointercancel", onEnd, { once: true });
+  });
+
+  signal?.addEventListener("abort", () => {
+    figure.classList.remove("smdg-pannable", "smdg-dragging");
+  }, { once: true });
+
+  return { syncCursor };
 }
 
 /**

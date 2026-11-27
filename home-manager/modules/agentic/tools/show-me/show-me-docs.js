@@ -6,6 +6,7 @@
 
 import { mountDiagrams } from "/_show-me/diagrams.js";
 import { mountFeedback } from "/_show-me/feedback.js";
+import { loadDocWidth, saveDocWidth, clampDocWidth } from "/_show-me/docs-width.js";
 
 const MARKDOWN_EXTENSIONS = [".md", ".markdown"];
 const TREE_ENDPOINT = "/_show-me/tree";
@@ -19,6 +20,7 @@ const els = {
   outlineList: document.querySelector(".smd-outline-list"),
   outlineToggle: document.querySelector(".smd-outlinetoggle"),
   title: document.querySelector(".smd-title"),
+  main: document.querySelector(".smd-main"),
   path: document.querySelector(".smd-path"),
   state: document.querySelector(".smd-state"),
   doc: document.querySelector(".smd-doc"),
@@ -81,7 +83,7 @@ async function start() {
   window.addEventListener("beforeunload", warnAboutUnsavedComments);
   window.addEventListener("hashchange", () => scrollToFragment(location.hash));
   document.addEventListener("click", interceptDocumentLink);
-
+  initWidthResize();
   await showDocument(location.pathname + location.search + location.hash, { push: false });
 }
 
@@ -158,6 +160,7 @@ async function renderDocument(text, documentUrl, signal) {
   renderCallouts();
   detachRemoteImages(documentUrl);
   reader.feedback?.setTargets(buildSections());
+  appendWidthHandle();
   renderOutline(headings);
 }
 
@@ -218,6 +221,62 @@ function renderOutline(headings) {
 
   els.outline.hidden = headings.length === 0;
   els.outlineToggle.hidden = els.outline.hidden;
+}
+
+/**
+ * Re-creates the width-handle strip at the article's right edge. It is rebuilt
+ * after each render (buildSections replaces the article's children) and is
+ * purely presentational — all interaction is handled by delegation.
+ */
+function appendWidthHandle() {
+  els.doc.querySelector(".smd-width-handle")?.remove();
+  const handle = document.createElement("div");
+  handle.className = "smd-width-handle";
+  handle.setAttribute("aria-hidden", "true");
+  els.doc.append(handle);
+}
+
+/** Mouse-drag extender for the reading column: dragging the right edge of the
+ * article changes --smd-doc-width on .smd-main live and persists the result. */
+function initWidthResize() {
+  if (!els.main) return;
+
+  let currentRem = loadDocWidth();
+  const applyWidth = (rem) => {
+    currentRem = rem;
+    els.main.style.setProperty("--smd-doc-width", `${rem}rem`);
+  };
+  applyWidth(currentRem);
+
+  els.main.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "touch") return;
+    if (event.button !== 0) return;
+    if (!event.target?.classList?.contains("smd-width-handle")) return;
+
+    event.preventDefault();
+    const handle = event.target;
+    const remPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+    const startX = event.clientX;
+    const startRem = currentRem;
+    handle.classList.add("smd-width-drag");
+
+    // Window-level listeners keep the drag alive regardless of capture support.
+    const onMove = (moveEvent) => {
+      const deltaRem = (moveEvent.clientX - startX) / remPx;
+      applyWidth(clampDocWidth(startRem + deltaRem));
+    };
+    const onEnd = () => {
+      handle.classList.remove("smd-width-drag");
+      saveDocWidth(currentRem);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onEnd);
+      window.removeEventListener("pointercancel", onEnd);
+    };
+
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onEnd, { once: true });
+    window.addEventListener("pointercancel", onEnd, { once: true });
+  });
 }
 
 function setOutlineOpen(open) {

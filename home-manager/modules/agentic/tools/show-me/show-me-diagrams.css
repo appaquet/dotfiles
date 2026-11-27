@@ -95,6 +95,16 @@ pre.mermaid {
   text-align: center;
 }
 
+.smdg.smdg-pannable {
+  cursor: grab;
+}
+
+/* While dragging, no text selection may start over the diagram surface. */
+.smdg.smdg-dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
 .smdg svg {
   display: block;
   margin-inline: auto;

@@ -7,6 +7,7 @@ let
     mkdir -p $out
     cp ${./show-me-docs.html} $out/docs.html
     cp ${./show-me-docs.js} $out/docs.js
+    cp ${./show-me-docs-width.js} $out/docs-width.js
     cp ${./show-me-docs.css} $out/docs.css
     cp ${./show-me-feedback.js} $out/feedback.js
     cp ${./show-me-feedback.css} $out/feedback.css

@@ -242,12 +242,13 @@ body:has(.smfb-drawer.smfb-open) :is(.smd-outline, .smd-outlinetoggle) {
 /* main pane */
 
 .smd-main {
+  --smd-doc-width: 64rem;
   padding: 1.2rem clamp(1rem, 3vw, 2.5rem) 6rem;
   min-width: 0;
 }
 
 .smd-state {
-  max-width: 52rem;
+  max-width: var(--smd-doc-width);
   margin: 0 0 1rem;
   padding: 0.6rem 0.9rem;
   border: 1px dashed var(--smd-border);
@@ -267,7 +268,8 @@ body:has(.smfb-drawer.smfb-open) :is(.smd-outline, .smd-outlinetoggle) {
 }
 
 .smd-doc {
-  max-width: 52rem;
+  max-width: var(--smd-doc-width);
+  position: relative;
   padding: 0.4rem clamp(1rem, 3vw, 2rem) 1.6rem;
   background: var(--smd-paper);
   border: 1px solid var(--smd-border);
@@ -276,6 +278,35 @@ body:has(.smfb-drawer.smfb-open) :is(.smd-outline, .smd-outlinetoggle) {
 
 .smd-doc:empty {
   display: none;
+}
+/* The mouse-width extender: a slim grab strip at the article's right edge.
+   It stays invisible until the pointer is in the narrow band near the side. */
+.smd-width-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -0.55rem;
+  width: 0.5rem;
+  cursor: col-resize;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+/* Visible grabber hugs the paper edge while the transparent strip stays narrow. */
+.smd-width-handle::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0.3rem;
+  width: 0.2rem;
+  border-radius: 0.15rem;
+  background: rgba(45, 212, 191, 0.55);
+}
+
+.smd-width-handle:hover,
+.smd-width-handle.smd-width-drag {
+  opacity: 1;
 }
 
 /* rendered markdown */
@@ -467,7 +498,7 @@ body:has(.smfb-drawer.smfb-open) :is(.smd-outline, .smd-outlinetoggle) {
 
   .smd-main:has(.smd-outline:not([hidden])) {
     display: grid;
-    grid-template-columns: minmax(0, 52rem) minmax(0, 13rem);
+    grid-template-columns: minmax(0, var(--smd-doc-width)) minmax(0, 13rem);
     column-gap: 1.2rem;
     align-items: start;
   }
@@ -488,6 +519,9 @@ body:has(.smfb-drawer.smfb-open) :is(.smd-outline, .smd-outlinetoggle) {
 }
 
 @media (max-width: 52rem) {
+  .smd-width-handle {
+    display: none;
+  }
   .smd-navtoggle {
     display: inline-block;
   }
@@ -500,7 +534,7 @@ body:has(.smfb-drawer.smfb-open) :is(.smd-outline, .smd-outlinetoggle) {
     display: none;
     position: static;
     max-height: none;
-    border-right: 0;
+    border-right: 0.28rem;
     border-bottom: 1px solid var(--smd-border);
   }
 
