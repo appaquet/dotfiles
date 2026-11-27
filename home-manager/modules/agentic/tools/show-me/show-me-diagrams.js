@@ -61,6 +61,19 @@ export function stepScale(currentScale, factor) {
   if (!Number.isFinite(next)) return currentScale;
   return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, next));
 }
+/** Sensitivity of ctrl/cmd + wheel zoom: how much scale each pixel of deltaY moves. */
+export const WHEEL_ZOOM_SENSITIVITY = 0.003;
+
+/**
+ * Per-wheel-notch zoom level, kept within [MIN_ZOOM, MAX_ZOOM]. Trackpads
+ * fire many small events, so the factor is proportional to deltaY — a fixed
+ * per-notch step would amplify momentum into wild swings.
+ */
+export function wheelScale(currentScale, deltaY) {
+  if (!Number.isFinite(deltaY) || deltaY === 0) return currentScale;
+  const factor = Math.exp(-deltaY * WHEEL_ZOOM_SENSITIVITY);
+  return stepScale(currentScale, factor);
+}
 /**
  * Overflow state of a scroll container. Used to gate pan affordances and
  * cursors: a diagram can only be panned when its content exceeds the frame.
@@ -284,6 +297,14 @@ function initDiagramZoom(frame, figure, signal) {
   zoomIn.addEventListener("click", () => applyScale(stepScale(scale, ZOOM_STEP)));
   zoomOut.addEventListener("click", () => applyScale(stepScale(scale, 1 / ZOOM_STEP)));
   fitButton.addEventListener("click", applyFit);
+
+  // Ctrl/Cmd + wheel is the "zoom toward the chart" gesture: the same applyScale
+  // keeps Fit's state and cursor honest. Plain wheel keeps native scrolling.
+  figure.addEventListener("wheel", (event) => {
+    if (!event.ctrlKey && !event.metaKey) return;
+    event.preventDefault();
+    applyScale(wheelScale(scale, event.deltaY));
+  }, { passive: false });
 
   const observer = new ResizeObserver(() => {
     if (!fitted) return;

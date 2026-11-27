@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
 // @ts-expect-error -- the module ships plain JS with no type declarations
-import { fitScale, stepScale, isOverflowing, panStartAllowed, MIN_ZOOM, MAX_ZOOM, ZOOM_STEP } from "./show-me-diagrams.js";
+import { fitScale, stepScale, isOverflowing, panStartAllowed, wheelScale, MIN_ZOOM, MAX_ZOOM, ZOOM_STEP } from "./show-me-diagrams.js";
 
 describe("fitScale", () => {
   test("never enlarges a small diagram beyond natural size", () => {
@@ -83,5 +83,28 @@ describe("panStartAllowed", () => {
   test("never starts outside the figure", () => {
     expect(panStartAllowed({ insideFigure: false, insideText: false })).toBe(false);
     expect(panStartAllowed({ insideFigure: false, insideText: true })).toBe(false);
+  });
+});
+
+describe("wheelScale", () => {
+  test("zooms in on an up tick and out on a down tick", () => {
+    // -100px of deltaY is an up scroll: the diagram grows by ~e^0.3.
+    expect(wheelScale(1, -100)).toBeCloseTo(Math.exp(0.3), 3);
+    // A down scroll shrinks it by the reciprocal factor.
+    expect(wheelScale(1, 100)).toBeCloseTo(Math.exp(-0.3), 3);
+  });
+
+  test("stays flat for a zero tick", () => {
+    expect(wheelScale(1, 0)).toBe(1);
+  });
+
+  test("keeps the current scale on non-finite input", () => {
+    expect(wheelScale(2, Infinity)).toBe(2);
+    expect(wheelScale(0.5, NaN)).toBe(0.5);
+  });
+
+  test("clamps to the zoom bounds", () => {
+    expect(wheelScale(MAX_ZOOM, -1000)).toBe(MAX_ZOOM);
+    expect(wheelScale(MIN_ZOOM, 1000)).toBe(MIN_ZOOM);
   });
 });
