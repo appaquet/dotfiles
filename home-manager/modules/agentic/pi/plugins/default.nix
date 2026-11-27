@@ -31,7 +31,7 @@ let
 
     # https://github.com/tintinweb/pi-subagents
     {
-      package = "npm:@tintinweb/pi-subagents@0.26.1";
+      package = "npm:@tintinweb/pi-subagents@0.26.2";
       files = {
         ".pi/agent/subagents.json".text = builtins.toJSON {
           disableDefaultAgents = true;
