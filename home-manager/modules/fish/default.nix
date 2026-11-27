@@ -43,6 +43,9 @@
 
         # Some shortcuts (ctrl-alt-c, in iTerm2, need to rebind alt to Esc+)
         bind -M insert ctrl-alt-g 'fzf-ripgrep'
+
+        # `monitor <cmd>` / `monitor fg`: report a command's status to Herdr
+        source ${./monitor.fish}
       '';
 
     plugins = [
@@ -70,6 +73,7 @@
 
     shellAbbrs = {
       k = "kubectl";
+      m = "monitor";
 
       ".." = "cd ..";
       "..." = "cd ../..";

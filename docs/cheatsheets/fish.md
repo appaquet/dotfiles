@@ -23,3 +23,11 @@
   * `<ctrl>v`: search env variables
   * `<ctl><alt>n`: search nix packages
   * `<ctl><alt>g`: rigrep search
+
+* Monitor a command in Herdr (`monitor`, abbreviation `m`)
+  * `m <cmd> [args...]`: run a command; Herdr shows it working, then done (exit 0) or error (other exits)
+  * Already running? Press `<ctl>z`, then `m fg` to resume the same job under monitoring
+    * With several stopped jobs: `m fg %N`, with `N` from `jobs`
+  * Ctrl-C or another `<ctl>z` ends monitoring as `idle`, not done or error
+  * Only reports inside a Herdr pane (`HC_TERMINAL_ID` set); elsewhere it just runs or resumes the command
+  * Full-screen apps that handle `<ctl>z` themselves (vim, less, ...) may not suspend
