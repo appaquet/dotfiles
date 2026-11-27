@@ -1,6 +1,8 @@
 {
   config,
   inputs',
+  lib,
+  pkgs,
   ...
 }:
 
@@ -18,7 +20,14 @@ in
     enable = true;
     package = inputs'.llm-agents.packages.pi.override { useBun = false; };
     authFile = config.sops.secrets.pi_auth_json.path;
-    environment.JJ_EDITOR.value = "false"; # fail loud if a jj command tries to open an editor
+    environment = {
+      JJ_EDITOR.value = "false"; # fail loud if a jj command tries to open an editor
+
+      # macOS writes the system clipboard directly. A Linux session with a display set expects
+      # xclip/xsel and never falls back to OSC 52, so this makes Pi always emit OSC 52 and copies
+      # reach the terminal's clipboard (herdr-app).
+      PI_CLIPBOARD_OSC52 = lib.mkIf pkgs.stdenv.hostPlatform.isLinux { value = "1"; };
+    };
 
     settings = {
       doubleEscapeAction = "tree";
