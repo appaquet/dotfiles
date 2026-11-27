@@ -11,6 +11,12 @@ describe("fitScale", () => {
     expect(fitScale(100, 100, 200, 200)).toBe(1);
   });
 
+  test("enlarges to fit a fullscreen frame without exceeding the zoom cap", () => {
+    expect(fitScale(200, 100, 840, 300, MAX_ZOOM)).toBe(3);
+    expect(fitScale(200, 100, 440, 600, MAX_ZOOM)).toBe(2.2);
+    expect(fitScale(200, 100, 2000, 1000, MAX_ZOOM)).toBe(MAX_ZOOM);
+  });
+
   test("fits both dimensions by the tighter term", () => {
     // 168x1081 tall diagram in a 631x604 frame is height-bound.
     expect(fitScale(168, 1081, 631, 604)).toBeCloseTo(604 / 1081, 5);
@@ -41,6 +47,11 @@ describe("stepScale", () => {
     expect(stepScale(MIN_ZOOM, 1 / ZOOM_STEP)).toBe(MIN_ZOOM);
     expect(stepScale(2, 10)).toBe(MAX_ZOOM);
     expect(stepScale(0.5, 0.1)).toBe(MIN_ZOOM);
+  });
+
+  test("zooms in smoothly from a fullscreen fit below the manual zoom floor", () => {
+    expect(stepScale(0.04, ZOOM_STEP)).toBeCloseTo(0.05);
+    expect(stepScale(0.04, 1 / ZOOM_STEP)).toBe(0.04);
   });
 
   test("keeps the current scale on a non-finite result", () => {

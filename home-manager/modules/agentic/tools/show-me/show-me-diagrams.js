@@ -40,32 +40,34 @@ const THEME_VARIABLES = {
 /** Per-diagram-type setting that keeps a rendered SVG at its natural size. */
 const NATURAL_WIDTH = { useMaxWidth: false };
 
-/** Zoom bounds as multipliers of natural size: the diagram may shrink 10% and grow 5x. */
+/** Manual zoom bounds as multipliers of natural size. */
 export const MIN_ZOOM = 0.1;
 export const MAX_ZOOM = 5;
 /** Multiplicative step used by Zoom in (Zoom out steps by its reciprocal). */
 export const ZOOM_STEP = 1.25;
 
 /**
- * Scale that fits a diagram into its frame, never enlarging beyond natural size.
- * A zero-sized input falls back to 1 so a missing measurement never hides content.
+ * Scale that fits a diagram into its frame. The cap bounds the enlargement:
+ * the page itself never scales a diagram past natural size, while the
+ * fullscreen modal lets it fill the panel. A zero-sized input falls back to 1
+ * so a missing measurement never hides content.
  */
-export function fitScale(naturalW, naturalH, frameWidth, frameHeight) {
+export function fitScale(naturalW, naturalH, frameWidth, frameHeight, cap = 1) {
   if (naturalW <= 0 || naturalH <= 0 || frameWidth <= 0 || frameHeight <= 0) return 1;
-  return Math.min(frameWidth / naturalW, frameHeight / naturalH, 1);
+  return Math.min(frameWidth / naturalW, frameHeight / naturalH, cap);
 }
 
-/** Per-step zoom level, kept within [MIN_ZOOM, MAX_ZOOM]. */
+/** Steps within the manual bounds without snapping up from a smaller fullscreen fit. */
 export function stepScale(currentScale, factor) {
   const next = currentScale * factor;
   if (!Number.isFinite(next)) return currentScale;
-  return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, next));
+  return Math.min(MAX_ZOOM, Math.max(Math.min(MIN_ZOOM, currentScale), next));
 }
 /** Sensitivity of ctrl/cmd + wheel zoom: how much scale each pixel of deltaY moves. */
 export const WHEEL_ZOOM_SENSITIVITY = 0.003;
 
 /**
- * Per-wheel-notch zoom level, kept within [MIN_ZOOM, MAX_ZOOM]. Trackpads
+ * Per-wheel-notch zoom level. Trackpads
  * fire many small events, so the factor is proportional to deltaY — a fixed
  * per-notch step would amplify momentum into wild swings.
  */
@@ -206,9 +208,11 @@ async function renderDiagram(mermaid, diagram, signal) {
   try {
     rendered = await mermaid.render(`smdg-diagram-${++sequence}`, source);
   } catch (error) {
-    target.replaceWith(errorState(source, errorMessage(error)));
+    if (!signal?.aborted) target.replaceWith(errorState(source, errorMessage(error)));
     return;
   }
+
+  if (signal?.aborted) return;
 
   const figure = document.createElement("figure");
   figure.className = "smdg";
@@ -232,7 +236,7 @@ async function renderDiagram(mermaid, diagram, signal) {
 }
 
 /**
- * Fits the diagram to its frame and adds the Zoom in / Zoom out / Fit controls.
+ * Fits the diagram to its frame and adds zoom, fit, and fullscreen controls.
  *
  * Zoom state belongs to the mounted figure, so a document load always starts
  * fitted. The observer re-fits when the frame changes width, while a scale the
@@ -250,16 +254,16 @@ function initDiagramZoom(frame, figure, signal) {
   bar.setAttribute("role", "group");
   bar.setAttribute("aria-label", "Diagram controls");
 
+  const expandButton = makeControlButton("Expand diagram", "Expand");
+  expandButton.classList.add("smdg-expand");
+  expandButton.setAttribute("aria-haspopup", "dialog");
+
   const zoomIn = makeControlButton("Zoom in diagram", "+");
   const zoomOut = makeControlButton("Zoom out diagram", "−");
   const fitButton = makeControlButton("Fit diagram", "Fit");
   fitButton.setAttribute("aria-pressed", "true");
 
-  const readout = document.createElement("span");
-  readout.className = "smdg-zoom-value";
-  readout.setAttribute("aria-hidden", "true");
-
-  bar.append(zoomIn, zoomOut, fitButton, readout);
+  bar.append(zoomIn, zoomOut, fitButton, expandButton);
   frame.prepend(bar);
 
   let scale = 1;
@@ -270,13 +274,12 @@ function initDiagramZoom(frame, figure, signal) {
   const pan = initDiagramPan(figure, signal);
 
   const applyScale = (next, { fit = false } = {}) => {
-    scale = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, next));
+    scale = next;
     fitted = fit;
     // Floor the pixels: a fitted diagram must never overflow its content box by
     // a fraction of a pixel and grow a scrollbar it does not need.
     svg.style.width = `${Math.floor(natural.width * scale)}px`;
     svg.style.height = `${Math.floor(natural.height * scale)}px`;
-    readout.textContent = `${Math.round(scale * 100)}%`;
     zoomIn.disabled = scale >= MAX_ZOOM;
     zoomOut.disabled = scale <= MIN_ZOOM;
     fitButton.setAttribute("aria-pressed", fit ? "true" : "false");
@@ -284,8 +287,10 @@ function initDiagramZoom(frame, figure, signal) {
   };
 
   const fitScaleNow = () => {
-    const bounds = frameBounds(figure);
-    return fitScale(natural.width, natural.height, bounds.width, bounds.height);
+    const expanded = Boolean(frame.closest(".smdg-modal"));
+    const bounds = frameBounds(figure, expanded);
+    const next = fitScale(natural.width, natural.height, bounds.width, bounds.height, expanded ? MAX_ZOOM : 1);
+    return expanded ? next : Math.max(MIN_ZOOM, next);
   };
 
   const applyFit = () => {
@@ -309,17 +314,78 @@ function initDiagramZoom(frame, figure, signal) {
   const observer = new ResizeObserver(() => {
     if (!fitted) return;
 
-    // Re-fit only when the frame moved by a pixel or more: the floor above makes
-    // sub-pixel churn meaningless, and re-fitting on it would fight the browser.
     const next = fitScaleNow();
-    if (Math.abs(Math.floor(natural.width * next) - Math.floor(natural.width * scale)) >= 1) {
+    const width = Math.floor(natural.width * next);
+    const height = Math.floor(natural.height * next);
+    if (width !== Math.floor(natural.width * scale) || height !== Math.floor(natural.height * scale)) {
       applyScale(next, { fit: true });
     }
   });
   observer.observe(frame);
   signal?.addEventListener("abort", () => observer.disconnect(), { once: true });
 
+  initFullscreen(frame, figure, expandButton, signal, () => {
+    if (fitted) applyFit();
+    else pan.syncCursor();
+  });
   applyFit();
+}
+
+/**
+ * Expands the existing frame without rendering or binding the diagram again.
+ * A placeholder keeps the page in place while the dialog owns the frame.
+ */
+function initFullscreen(frame, figure, expandButton, signal, refit) {
+  let close;
+
+  expandButton.addEventListener("click", () => {
+    if (close || signal?.aborted || !frame.isConnected) return;
+
+    const dialog = document.createElement("dialog");
+    dialog.className = "smdg-modal";
+    dialog.setAttribute("aria-label", "Expanded diagram");
+
+    const closeButton = makeControlButton("Close expanded diagram", "×");
+    closeButton.classList.add("smdg-modal-close");
+    closeButton.autofocus = true;
+
+    const placeholder = document.createElement("div");
+    placeholder.className = "smdg-frame smdg-placeholder";
+    placeholder.style.height = `${frame.getBoundingClientRect().height}px`;
+    const { scrollLeft, scrollTop } = figure;
+
+    close = (restoreFocus = true) => {
+      placeholder.replaceWith(frame);
+      dialog.close();
+      dialog.remove();
+      close = undefined;
+
+      if (!restoreFocus) return;
+      refit();
+      figure.scrollLeft = scrollLeft;
+      figure.scrollTop = scrollTop;
+      if (expandButton.isConnected) expandButton.focus({ preventScroll: true });
+    };
+
+    closeButton.addEventListener("click", () => close());
+    dialog.addEventListener("cancel", (event) => {
+      event.preventDefault();
+      close();
+    });
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) close();
+    });
+
+    frame.replaceWith(placeholder);
+    dialog.append(closeButton, frame);
+    document.body.append(dialog);
+    dialog.showModal();
+    refit();
+    figure.scrollLeft = scrollLeft;
+    figure.scrollTop = scrollTop;
+  });
+
+  signal?.addEventListener("abort", () => close?.(false), { once: true });
 }
 
 /**
@@ -392,7 +458,7 @@ function naturalSize(svg) {
 }
 
 /** Room inside the frame: its content width and the height cap it enforces. */
-function frameBounds(figure) {
+function frameBounds(figure, expanded) {
   const style = getComputedStyle(figure);
   const padX = length(style.paddingLeft) + length(style.paddingRight);
   const padY = length(style.paddingTop) + length(style.paddingBottom);
@@ -402,9 +468,11 @@ function frameBounds(figure) {
   return {
     width: figure.clientWidth - padX,
     // max-height counts the whole box when border-box, and the content box otherwise.
-    height: Number.isFinite(cap) && cap > 0
-      ? Math.max(24, cap - (style.boxSizing === "border-box" ? padY + borderY : 0))
-      : Number.POSITIVE_INFINITY,
+    height: expanded
+      ? figure.clientHeight - padY
+      : Number.isFinite(cap) && cap > 0
+        ? Math.max(24, cap - (style.boxSizing === "border-box" ? padY + borderY : 0))
+        : Number.POSITIVE_INFINITY,
   };
 }
 
